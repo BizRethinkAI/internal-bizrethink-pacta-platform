@@ -1,0 +1,85 @@
+# Why: Documenso's native placeholder syntax determines a SIGNATURE
+#      widget's bbox from the visible width of the placeholder text in
+#      the source docx. `{{SIGNATURE, r1}}` renders ~80-110pt wide —
+#      narrower than DocuSign's default ~250pt and too tight for full
+#      handwritten signatures (image rendering clips at the right edge,
+#      cuts "Test Merchant" to "Test Merch", etc.).
+#
+#      This patch adds optional `width=` and `height=` placeholder
+#      params to ZSignatureFieldMeta, then teaches auto-place-fields.ts
+#      to override the auto-detected bbox with these values when present.
+#      Anchor stays at the placeholder's top-left corner; height
+#      override re-anchors Y so the widget grows downward (preserves
+#      the visual position the docx author chose).
+#
+#      Bounds: width 40-600pt, height 20-200pt. Below 40 makes
+#      signatures unusable; above 600 risks overlapping page margins.
+#
+# Why-not-additive: ZSignatureFieldMeta and the placement bbox writer
+#      are upstream files we don't own. Cannot inject these params via
+#      a separate package — they have to be parsed inline with the rest
+#      of the placeholder syntax.
+#
+# Upstream-merge-fragility: LOW
+#      ZSignatureFieldMeta is a leaf schema (no upstream usages depend
+#      on its exact shape). auto-place-fields.ts touches the bbox lines
+#      surgically; rest of the function is unchanged.
+#
+# Files patched:
+#   - packages/lib/types/field-meta.ts (ZSignatureFieldMeta)
+#   - packages/lib/server-only/pdf/auto-place-fields.ts (bbox override)
+
+diff --git a/packages/lib/types/field-meta.ts b/packages/lib/types/field-meta.ts
+--- a/packages/lib/types/field-meta.ts
++++ b/packages/lib/types/field-meta.ts
+@@ -156,6 +156,14 @@ export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
+
+ export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
+   type: z.literal('signature'),
++  // BizRethink overlay 034: width / height in PDF points override the
++  // placeholder bbox at auto-placement time. Allows
++  // `{{SIGNATURE, r1, width=240, height=30}}` to produce a wider/taller
++  // signature widget regardless of the placeholder text width in the
++  // source docx. Bounds chosen to prevent abusively-large widgets from
++  // overlapping unrelated PDF content.
++  width: z.coerce.number().min(40).max(600).optional(),
++  height: z.coerce.number().min(20).max(200).optional(),
+ });
+
+ export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
+diff --git a/packages/lib/server-only/pdf/auto-place-fields.ts b/packages/lib/server-only/pdf/auto-place-fields.ts
+index 052b20ed7..65e251e33 100644
+--- a/packages/lib/server-only/pdf/auto-place-fields.ts
++++ b/packages/lib/server-only/pdf/auto-place-fields.ts
+@@ -128,15 +128,28 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
+       */
+       const topLeftY = pageHeight - match.bbox.y - match.bbox.height;
+ 
++      // BizRethink overlay 034: SIGNATURE placeholders may carry explicit
++      // width/height meta to override the placeholder text bbox. Useful
++      // when the visible placeholder text in the docx is short (e.g.
++      // "{{SIGNATURE, r1}}") but the desired widget should be wider
++      // (~240pt) to comfortably accept handwritten signatures. The
++      // override anchors at the placeholder's top-left corner — placement
++      // logic upstream is otherwise unchanged.
++      const metaWithSize = parsedFieldMeta as { width?: number; height?: number } | undefined;
++      const overrideWidth = metaWithSize?.width;
++      const overrideHeight = metaWithSize?.height;
++
+       placeholders.push({
+         placeholder,
+         recipient,
+         fieldAndMeta,
+         page: page.index + 1,
+         x: match.bbox.x,
+-        y: topLeftY,
+-        width: match.bbox.width,
+-        height: match.bbox.height,
++        y: overrideHeight !== undefined
++          ? pageHeight - match.bbox.y - overrideHeight
++          : topLeftY,
++        width: overrideWidth ?? match.bbox.width,
++        height: overrideHeight ?? match.bbox.height,
+         pageWidth,
+         pageHeight,
+       });

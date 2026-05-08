@@ -79,6 +79,12 @@ export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
 export const ZDateFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('date'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  // BizRethink overlay 035: fontWeight gives the rendered date glyph
+  // weight without affecting other meta. Allows
+  // `{{DATE, r1, fontSize=10, fontWeight=bold}}` to render bold dates,
+  // which the FRPA + tri-party templates use to draw the eye to
+  // executed-on dates.
+  fontWeight: z.enum(['normal', 'bold']).optional(),
 });
 
 export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
@@ -156,6 +162,14 @@ export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
 export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('signature'),
+  // BizRethink overlay 034: width / height in PDF points override the
+  // placeholder bbox at auto-placement time. Allows
+  // `{{SIGNATURE, r1, width=240, height=30}}` to produce a wider/taller
+  // signature widget regardless of the placeholder text width in the
+  // source docx. Bounds chosen to prevent abusively-large widgets from
+  // overlapping unrelated PDF content.
+  width: z.coerce.number().min(40).max(600).optional(),
+  height: z.coerce.number().min(20).max(200).optional(),
 });
 
 export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;

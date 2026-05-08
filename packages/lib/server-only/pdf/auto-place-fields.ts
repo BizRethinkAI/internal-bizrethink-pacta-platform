@@ -128,15 +128,26 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
       */
       const topLeftY = pageHeight - match.bbox.y - match.bbox.height;
 
+      // BizRethink overlay 034: SIGNATURE placeholders may carry explicit
+      // width/height meta to override the placeholder text bbox. Useful
+      // when the visible placeholder text in the docx is short (e.g.
+      // "{{SIGNATURE, r1}}") but the desired widget should be wider
+      // (~240pt) to comfortably accept handwritten signatures. The
+      // override anchors at the placeholder's top-left corner — placement
+      // logic upstream is otherwise unchanged.
+      const metaWithSize = parsedFieldMeta as { width?: number; height?: number } | undefined;
+      const overrideWidth = metaWithSize?.width;
+      const overrideHeight = metaWithSize?.height;
+
       placeholders.push({
         placeholder,
         recipient,
         fieldAndMeta,
         page: page.index + 1,
         x: match.bbox.x,
-        y: topLeftY,
-        width: match.bbox.width,
-        height: match.bbox.height,
+        y: overrideHeight !== undefined ? pageHeight - match.bbox.y - overrideHeight : topLeftY,
+        width: overrideWidth ?? match.bbox.width,
+        height: overrideHeight ?? match.bbox.height,
         pageWidth,
         pageHeight,
       });
