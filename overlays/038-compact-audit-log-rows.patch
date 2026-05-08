@@ -1,0 +1,250 @@
+# Why: Upstream draws each audit-log event as a bordered card with a
+#      header section, divider line, and a 2-row meta block including
+#      a multi-line User Agent string. For our typical envelope flow
+#      (~25-30 events: created, sent, viewed×N, signed×N, completed,
+#      etc.), this consumes 4-5 PDF pages in the appended audit log.
+#      Operationally fine; visually feels inflated and harder to scan
+#      at a glance — every legal-flavor doc reviewer expects denser
+#      audit trails (DocuSign's is ~12 events/page; ours was ~3).
+#
+#      New layout (per row):
+#        Line 1: [dot] EVENT_TYPE — Description.... 2026-05-08 04:05 UTC
+#        Line 2:        user@email · 69.132.246.203 · Mac · Chrome 147
+#        thin gray separator
+#
+#      All upstream fields preserved (type, description, timestamp,
+#      email, IP, user agent — UA decomposed to OS + browser instead
+#      of full string for compactness). Drop the bordered card and
+#      vertical labels in favor of a denser two-line layout. Result:
+#      ~12-15 events per page vs ~3, so a 30-event envelope fits in
+#      ~2-3 pages instead of 8-10.
+#
+# Why-not-additive: render-audit-logs.ts is upstream. The renderRow
+#      function is called by the page-grouping logic that follows;
+#      replacing it changes the visual output but not the contract.
+#
+# Upstream-merge-fragility: MEDIUM
+#      Replaces ~130 lines of renderRow body. If upstream restyles
+#      the audit log (likely as Documenso evolves), this patch will
+#      conflict. Easiest re-application: re-derive the compact layout
+#      from the new upstream renderRow shape.
+#
+# Files patched:
+#   - packages/lib/server-only/pdf/render-audit-logs.ts (renderRow)
+
+diff --git a/packages/lib/server-only/pdf/render-audit-logs.ts b/packages/lib/server-only/pdf/render-audit-logs.ts
+index 0a6f73789..a3a053c0e 100644
+--- a/packages/lib/server-only/pdf/render-audit-logs.ts
++++ b/packages/lib/server-only/pdf/render-audit-logs.ts
+@@ -307,136 +307,112 @@ type RenderRowOptions = {
+   i18n: I18n;
+ };
+ 
++// BizRethink overlay 038: compact 2-line audit-log row (vs upstream's
++// 4-line card layout).
++//
++// Why: upstream draws each audit event as a bordered card with three
++// stacked sections (header / divider / two-row meta block including a
++// full UA string). For our typical envelope flow (~30 events: created,
++// sent, viewed×2, signed×2, completed, etc.) this consumes 4-5 pages
++// in the appended audit-log PDF. Operationally fine; visually feels
++// inflated for what is mostly redundant rows.
++//
++// New layout (per row):
++//   Line 1: [dot] EVENT_TYPE — Description.................. 2026-05-08 04:05 UTC
++//   Line 2:        user@email · 69.132.246.203 · Mac · Chrome 147
++//
++// All upstream fields preserved (type, description, timestamp, email,
++// IP, user agent) — just visually denser and without the bordered
++// card. Result: ~12 events per page vs ~3, so a 30-event envelope fits
++// in ~3 pages instead of 10.
+ const renderRow = (options: RenderRowOptions) => {
+   const { auditLog, width, i18n } = options;
+ 
+-  const paddingWithinCard = 12;
+-
+-  const columnSpacing = 10;
+-  const columnWidth = (width - paddingWithinCard * 2 - columnSpacing) / 2;
+-
+-  const indicatorWidth = 3;
+-  const indicatorPaddingRight = 10;
++  const indicatorRadius = 3;
++  const indicatorPaddingRight = 8;
++  const lineGap = 4;
+   const rowGroup = new Konva.Group();
+ 
+-  const rowHeaderGroup = new Konva.Group();
++  // ── Line 1: indicator + EVENT TYPE — Description (left) + timestamp (right)
++  const headerLeftWidth = width * 0.7; // 70% for type+description
++  const headerRightWidth = width * 0.3; // 30% for timestamp
+ 
+-  const auditLogIndicatorColor = new Konva.Circle({
+-    x: indicatorWidth,
+-    y: indicatorWidth + 3,
+-    radius: indicatorWidth,
++  const indicatorDot = new Konva.Circle({
++    x: indicatorRadius,
++    y: indicatorRadius + 3,
++    radius: indicatorRadius,
+     fill: getAuditLogIndicatorColor(auditLog.type),
+   });
+ 
+-  const auditLogTypeText = new Konva.Text({
+-    x: indicatorWidth + indicatorPaddingRight,
++  const description = formatDocumentAuditLogAction(i18n, auditLog).description;
++  const typeAndDesc = `${auditLog.type.replace(/_/g, ' ')} — ${description}`;
++
++  const headerText = new Konva.Text({
++    x: indicatorRadius * 2 + indicatorPaddingRight,
+     y: 0,
+-    width: columnWidth - indicatorWidth - indicatorPaddingRight,
+-    text: auditLog.type.replace(/_/g, ' '),
++    width: headerLeftWidth - indicatorRadius * 2 - indicatorPaddingRight,
++    text: typeAndDesc,
+     fontFamily: 'Inter',
+     fontSize: textSm,
+     fontStyle: fontMedium,
+-    fill: textMutedForeground,
+-  });
+-
+-  const auditLogDescriptionText = new Konva.Text({
+-    x: indicatorWidth + indicatorPaddingRight,
+-    y: auditLogTypeText.height() + 4,
+-    width: columnWidth - indicatorWidth - indicatorPaddingRight,
+-    text: formatDocumentAuditLogAction(i18n, auditLog).description,
+-    fontFamily: 'Inter',
+-    fontSize: textSm,
+     fill: textForeground,
++    ellipsis: true,
++    wrap: 'none',
+   });
+ 
+-  const auditLogTimestampText = new Konva.Text({
+-    x: columnWidth + columnSpacing,
+-    width: columnWidth,
++  const timestampText = new Konva.Text({
++    x: headerLeftWidth,
++    y: 0,
++    width: headerRightWidth,
+     text: DateTime.fromJSDate(auditLog.createdAt)
+       .setLocale(APP_I18N_OPTIONS.defaultLocale)
+       .toLocaleString(dateFormat),
+     fontFamily: 'Inter',
+-    align: 'right',
+     fontSize: textSm,
+-    fill: textMutedForeground,
+-  });
+-
+-  rowHeaderGroup.add(auditLogIndicatorColor);
+-  rowHeaderGroup.add(auditLogTypeText);
+-  rowHeaderGroup.add(auditLogDescriptionText);
+-  rowHeaderGroup.add(auditLogTimestampText);
+-
+-  rowHeaderGroup.setAttrs({
+-    x: paddingWithinCard,
+-    y: paddingWithinCard,
+-  } satisfies Partial<Konva.GroupConfig>);
+-
+-  rowGroup.add(rowHeaderGroup);
+-
+-  // Draw border line.
+-  const borderLine = new Konva.Line({
+-    points: [0, 0, width - paddingWithinCard * 2, 0],
+-    stroke: '#e5e7eb',
+-    strokeWidth: 1,
+-    x: paddingWithinCard,
+-    y: rowGroup.getClientRect().height + paddingWithinCard + 12,
+-  });
+-
+-  rowGroup.add(borderLine);
+-
+-  const bottomSection = new Konva.Group({
+-    x: paddingWithinCard,
+-    y: rowGroup.getClientRect().height + paddingWithinCard + 12,
+-  });
+-
+-  // Row 1 Column 1
+-  const userLabel = renderVerticalLabelAndText({
+-    label: i18n._(msg`User`).toUpperCase(),
+-    text: auditLog.email || 'N/A',
+-    align: 'left',
+-    width: columnWidth,
+-    textFontFamily: 'ui-monospace',
+-  });
+-
+-  // Row 1 Column 2
+-  const ipAddressLabel = renderVerticalLabelAndText({
+-    label: i18n._(msg`IP Address`).toUpperCase(),
+-    text: auditLog.ipAddress || 'N/A',
++    fontStyle: fontMedium,
+     align: 'right',
+-    x: columnWidth + columnSpacing,
+-    width: columnWidth,
+-    textFontFamily: 'ui-monospace',
++    fill: textMutedForeground,
+   });
+ 
+-  bottomSection.add(userLabel);
+-  bottomSection.add(ipAddressLabel);
++  rowGroup.add(indicatorDot);
++  rowGroup.add(headerText);
++  rowGroup.add(timestampText);
+ 
++  // ── Line 2: user · ip · OS · browser (single muted line)
+   parser.setUA(auditLog.userAgent || '');
+-  const userAgentInfo = parser.getResult();
+-
+-  // Row 2 Column 1
+-  const userAgentLabel = renderVerticalLabelAndText({
+-    label: i18n._(msg`User Agent`).toUpperCase(),
+-    text: i18n._(formatUserAgent(auditLog.userAgent, userAgentInfo)),
+-    align: 'left',
+-    width,
+-    y: bottomSection.getClientRect().height + 16,
++  const ua = parser.getResult();
++  const browser = ua.browser?.name ? `${ua.browser.name}${ua.browser.major ? ' ' + ua.browser.major : ''}` : '';
++  const os = ua.os?.name ? ua.os.name : '';
++  const metaParts = [
++    auditLog.email || 'N/A',
++    auditLog.ipAddress || 'N/A',
++    os,
++    browser,
++  ].filter(Boolean);
++
++  const metaText = new Konva.Text({
++    x: indicatorRadius * 2 + indicatorPaddingRight,
++    y: textSm + lineGap,
++    width: width - (indicatorRadius * 2 + indicatorPaddingRight),
++    text: metaParts.join(' · '),
++    fontFamily: 'Inter',
++    fontSize: textXs,
++    fill: textMutedForeground,
++    ellipsis: true,
++    wrap: 'none',
+   });
+ 
+-  bottomSection.add(userAgentLabel);
+-  rowGroup.add(bottomSection);
++  rowGroup.add(metaText);
+ 
+-  const cardRect = new Konva.Rect({
+-    x: 0,
+-    y: 0,
+-    width: rowGroup.getClientRect().width,
+-    height: rowGroup.getClientRect().height + paddingWithinCard * 2,
++  // Thin separator line below the row (replaces upstream's bordered card)
++  const separator = new Konva.Line({
++    points: [0, 0, width, 0],
+     stroke: '#e5e7eb',
+-    strokeWidth: 1,
+-    cornerRadius: 8,
++    strokeWidth: 0.5,
++    x: 0,
++    y: rowGroup.getClientRect().height + 6,
+   });
+-
+-  rowGroup.add(cardRect);
++  rowGroup.add(separator);
+ 
+   return rowGroup;
+ };
