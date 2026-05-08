@@ -28,6 +28,9 @@
 # Files patched:
 #   - packages/lib/types/field-meta.ts (ZSignatureFieldMeta)
 #   - packages/lib/server-only/pdf/auto-place-fields.ts (bbox override)
+#   - packages/lib/server-only/pdf/helpers.ts (parseFieldMetaFromPlaceholder
+#     pass-through for SIGNATURE width/height — upstream's early return
+#     strips ALL meta for SIGNATURE which would silently kill our override)
 
 diff --git a/packages/lib/types/field-meta.ts b/packages/lib/types/field-meta.ts
 --- a/packages/lib/types/field-meta.ts
@@ -96,3 +99,32 @@ index 052b20ed7..65e251e33 100644
          pageWidth,
          pageHeight,
        });
+diff --git a/packages/lib/server-only/pdf/helpers.ts b/packages/lib/server-only/pdf/helpers.ts
+index 1a2677fef..eb5084728 100644
+--- a/packages/lib/server-only/pdf/helpers.ts
++++ b/packages/lib/server-only/pdf/helpers.ts
+@@ -83,6 +83,24 @@ export const parseFieldMetaFromPlaceholder = (
+   fieldType: FieldType,
+ ): Record<string, unknown> | undefined => {
+   if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE) {
++    // BizRethink overlay 034: SIGNATURE accepts optional width/height meta
++    // (in PDF points) so the auto-placer can override the placeholder text
++    // bbox with a wider/taller widget. Without this, the upstream early
++    // return strips ALL meta for SIGNATURE — including our width/height
++    // params — so the override never applies and signature widgets render
++    // at the (often-tiny) placeholder text size.
++    if (fieldType === FieldType.SIGNATURE && (rawFieldMeta.width || rawFieldMeta.height)) {
++      const sigMeta: Record<string, number | string> = { type: 'signature' };
++      if (rawFieldMeta.width) {
++        const w = Number(rawFieldMeta.width);
++        if (!Number.isNaN(w)) sigMeta.width = w;
++      }
++      if (rawFieldMeta.height) {
++        const h = Number(rawFieldMeta.height);
++        if (!Number.isNaN(h)) sigMeta.height = h;
++      }
++      return sigMeta;
++    }
+     return;
+   }
+ 

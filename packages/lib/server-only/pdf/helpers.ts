@@ -16,21 +16,18 @@ export const ensureFontLibrary = () => {
   const fontPath = path.join(process.cwd(), 'public/fonts');
 
   if (!FontLibrary.has('Caveat')) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({
       ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
     });
   }
 
   if (!FontLibrary.has('Inter')) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({
       ['Inter']: [path.join(fontPath, 'inter-variablefont_opsz,wght.ttf')],
     });
   }
 
   if (!FontLibrary.has('Noto Sans')) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     FontLibrary.use({
       ['Noto Sans']: [path.join(fontPath, 'noto-sans.ttf')],
       ['Noto Sans Japanese']: [path.join(fontPath, 'noto-sans-japanese.ttf')],
@@ -83,6 +80,24 @@ export const parseFieldMetaFromPlaceholder = (
   fieldType: FieldType,
 ): Record<string, unknown> | undefined => {
   if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE) {
+    // BizRethink overlay 034: SIGNATURE accepts optional width/height meta
+    // (in PDF points) so the auto-placer can override the placeholder text
+    // bbox with a wider/taller widget. Without this, the upstream early
+    // return strips ALL meta for SIGNATURE — including our width/height
+    // params — so the override never applies and signature widgets render
+    // at the (often-tiny) placeholder text size.
+    if (fieldType === FieldType.SIGNATURE && (rawFieldMeta.width || rawFieldMeta.height)) {
+      const sigMeta: Record<string, number | string> = { type: 'signature' };
+      if (rawFieldMeta.width) {
+        const w = Number(rawFieldMeta.width);
+        if (!Number.isNaN(w)) sigMeta.width = w;
+      }
+      if (rawFieldMeta.height) {
+        const h = Number(rawFieldMeta.height);
+        if (!Number.isNaN(h)) sigMeta.height = h;
+      }
+      return sigMeta;
+    }
     return;
   }
 

@@ -144,7 +144,10 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
       // source docx files carries 240/240 dxa spacing before/after to
       // give the widget room to extend without colliding with adjacent
       // rows.
-      const metaWithSize = parsedFieldMeta as { width?: number; height?: number } | undefined;
+      const metaWithSize: { width?: number; height?: number } | undefined =
+        parsedFieldMeta && 'width' in parsedFieldMeta
+          ? (parsedFieldMeta as { width?: number; height?: number })
+          : undefined;
       const overrideWidth = metaWithSize?.width;
       const overrideHeight = metaWithSize?.height;
 
