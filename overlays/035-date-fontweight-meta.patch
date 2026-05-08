@@ -1,0 +1,68 @@
+# Why: ZDateFieldMeta exposes fontSize + textAlign but no font weight.
+#      Renderer uses Konva default ('normal'). Our FRPA + tri-party
+#      templates want bold dates (Date: 2026-05-08) to draw the eye to
+#      the executed-on date — same convention as DocuSign and most
+#      legal docs. Without this patch, every date renders identically
+#      to surrounding body text and gets visually lost.
+#
+#      Adds fontWeight: 'normal' | 'bold' optional param to
+#      ZDateFieldMeta. In render-generic-text-field.ts (which DATE,
+#      TEXT, NAME, EMAIL, NUMBER all share) we read the meta key when
+#      type === 'date' and apply Konva's `fontStyle` ('normal' | 'bold'
+#      | 'italic'). Other types ignore the key — feature is DATE-only
+#      for now to keep the patch surface tight.
+#
+#      Use after patch: `{{DATE, r1, fontSize=10, fontWeight=bold}}`
+#
+# Why-not-additive: Same as 034 — schema and renderer are upstream files.
+#
+# Upstream-merge-fragility: LOW
+#      ZDateFieldMeta extension is purely additive. The renderer change
+#      is a single-line addition to setAttrs (new key only).
+#
+# Files patched:
+#   - packages/lib/types/field-meta.ts (ZDateFieldMeta)
+#   - packages/lib/universal/field-renderer/render-generic-text-field.ts
+
+diff --git a/packages/lib/types/field-meta.ts b/packages/lib/types/field-meta.ts
+--- a/packages/lib/types/field-meta.ts
++++ b/packages/lib/types/field-meta.ts
+@@ -79,6 +79,12 @@ export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
+ export const ZDateFieldMeta = ZBaseFieldMeta.extend({
+   type: z.literal('date'),
+   textAlign: ZFieldTextAlignSchema.optional(),
++  // BizRethink overlay 035: fontWeight gives the rendered date glyph
++  // weight without affecting other meta. Allows
++  // `{{DATE, r1, fontSize=10, fontWeight=bold}}` to render bold dates,
++  // which the FRPA + tri-party templates use to draw the eye to
++  // executed-on dates.
++  fontWeight: z.enum(['normal', 'bold']).optional(),
+ });
+
+ export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
+diff --git a/packages/lib/universal/field-renderer/render-generic-text-field.ts b/packages/lib/universal/field-renderer/render-generic-text-field.ts
+index 6b90e48da..c5f3513e1 100644
+--- a/packages/lib/universal/field-renderer/render-generic-text-field.ts
++++ b/packages/lib/universal/field-renderer/render-generic-text-field.ts
+@@ -95,6 +95,13 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
+     }
+   }
+ 
++  // BizRethink overlay 035: pick up fontWeight from DATE meta and apply
++  // as Konva fontStyle. Only DATE supports it today; other generic-text
++  // field types ignore the meta key. Konva's `fontStyle` accepts
++  // 'normal' | 'bold' | 'italic' | 'bold italic'.
++  const textFontStyle: 'normal' | 'bold' =
++    fieldMeta?.type === 'date' && fieldMeta.fontWeight === 'bold' ? 'bold' : 'normal';
++
+   // Note: Do not use native text padding since it's uniform.
+   // We only want to have padding on the left and right hand sides.
+   fieldText.setAttrs({
+@@ -104,6 +111,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
+     wrap: 'word',
+     text: textToRender,
+     fontSize: textFontSize,
++    fontStyle: textFontStyle,
+     align: textAlign,
+     lineHeight: textLineHeight,
+     letterSpacing: textLetterSpacing,

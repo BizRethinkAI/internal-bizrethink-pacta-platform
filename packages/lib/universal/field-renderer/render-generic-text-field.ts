@@ -95,6 +95,13 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     }
   }
 
+  // BizRethink overlay 035: pick up fontWeight from DATE meta and apply
+  // as Konva fontStyle. Only DATE supports it today; other generic-text
+  // field types ignore the meta key. Konva's `fontStyle` accepts
+  // 'normal' | 'bold' | 'italic' | 'bold italic'.
+  const textFontStyle: 'normal' | 'bold' =
+    fieldMeta?.type === 'date' && fieldMeta.fontWeight === 'bold' ? 'bold' : 'normal';
+
   // Note: Do not use native text padding since it's uniform.
   // We only want to have padding on the left and right hand sides.
   fieldText.setAttrs({
@@ -104,6 +111,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     wrap: 'word',
     text: textToRender,
     fontSize: textFontSize,
+    fontStyle: textFontStyle,
     align: textAlign,
     lineHeight: textLineHeight,
     letterSpacing: textLetterSpacing,
