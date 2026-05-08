@@ -22,7 +22,13 @@ export type FieldToRender = Pick<
   // BizRethink overlay 037: pass `created` through so the export-mode
   // signature renderer can stamp a "Signed YYYY-MM-DD HH:MM UTC" badge
   // beneath each signature glyph (Tier 2 inline verification).
-  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature' | 'created'> | null;
+  // `created` is optional so client-side callers (e.g.
+  // `EnvelopeRenderFieldSignature` in envelope-render-provider) can
+  // construct minimal signature objects without the timestamp; the
+  // renderer guards on `field.signature?.created` before drawing.
+  signature?:
+    | (Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> & { created?: Date | null })
+    | null;
 };
 
 export type RenderFieldElementOptions = {

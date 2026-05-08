@@ -35,7 +35,7 @@ diff --git a/packages/lib/universal/field-renderer/field-renderer.ts b/packages/
 index 8f66084e2..7b9bbe733 100644
 --- a/packages/lib/universal/field-renderer/field-renderer.ts
 +++ b/packages/lib/universal/field-renderer/field-renderer.ts
-@@ -19,7 +19,10 @@ export type FieldToRender = Pick<
+@@ -19,7 +19,16 @@ export type FieldToRender = Pick<
    positionX: number;
    positionY: number;
    fieldMeta?: TFieldMetaSchema | null;
@@ -43,15 +43,21 @@ index 8f66084e2..7b9bbe733 100644
 +  // BizRethink overlay 037: pass `created` through so the export-mode
 +  // signature renderer can stamp a "Signed YYYY-MM-DD HH:MM UTC" badge
 +  // beneath each signature glyph (Tier 2 inline verification).
-+  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature' | 'created'> | null;
++  // `created` is optional so client-side callers (e.g.
++  // `EnvelopeRenderFieldSignature` in envelope-render-provider) can
++  // construct minimal signature objects without the timestamp; the
++  // renderer guards on `field.signature?.created` before drawing.
++  signature?:
++    | (Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> & { created?: Date | null })
++    | null;
  };
- 
+
  export type RenderFieldElementOptions = {
 diff --git a/packages/lib/universal/field-renderer/render-field.ts b/packages/lib/universal/field-renderer/render-field.ts
 index d7000389a..0b8a6df7e 100644
 --- a/packages/lib/universal/field-renderer/render-field.ts
 +++ b/packages/lib/universal/field-renderer/render-field.ts
-@@ -36,7 +36,11 @@ export type FieldToRender = Pick<
+@@ -36,7 +36,15 @@ export type FieldToRender = Pick<
    positionX: number;
    positionY: number;
    fieldMeta?: TFieldMetaSchema | null;
@@ -59,10 +65,14 @@ index d7000389a..0b8a6df7e 100644
 +  // BizRethink overlay 037: pass `created` through (kept in sync with
 +  // the duplicate FieldToRender in `field-renderer.ts`) so the
 +  // export-mode signature renderer can stamp a "Signed YYYY-MM-DD
-+  // HH:MM UTC" badge beneath each signature glyph.
-+  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature' | 'created'> | null;
++  // HH:MM UTC" badge beneath each signature glyph. `created` is
++  // optional so client-side callers can construct minimal signature
++  // objects without the timestamp; renderer guards before drawing.
++  signature?:
++    | (Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> & { created?: Date | null })
++    | null;
  };
- 
+
  type RenderFieldOptions = {
 diff --git a/packages/lib/universal/field-renderer/render-signature-field.ts b/packages/lib/universal/field-renderer/render-signature-field.ts
 index bd7daa6c1..df692be4f 100644
