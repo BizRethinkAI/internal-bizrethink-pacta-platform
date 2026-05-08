@@ -1,0 +1,87 @@
+# Why: Documenso PAdES-signs every sealed PDF (CAdES/PKCS#7 +
+#      optional TSA, see packages/signing/) and appends a Signing
+#      Certificate page. In Adobe Acrobat Reader this triggers a blue
+#      "Signed and all signatures are valid" banner — strong legal
+#      provenance. But ~95% of merchants open contract PDFs in Chrome,
+#      Mac Preview, or mobile viewers that DON'T validate PAdES, so
+#      they never see that banner. The document feels less authoritative
+#      than it actually is.
+#
+#      This patch stamps a small Dotloop-style footer at the bottom of
+#      every contract-body page (NOT certificate / audit-log pages —
+#      those have their own provenance markings). Format:
+#
+#        Verified by sign.pacta.ink · Envelope <id> · Signed <ts> UTC
+#
+#      Footer is muted gray (gray-500), 6.5pt Noto Sans, centered at
+#      14pt from page bottom. Survives single-page screenshots and is
+#      visible regardless of PDF viewer. Skipped for rejected
+#      documents (those carry a different visual stamp via
+#      addRejectionStampToPdf).
+#
+# Why-not-additive: The footer-drawing function itself IS additive —
+#      it lives at packages/bizrethink/server-only/pdf/add-verification-footer-to-pdf.ts.
+#      But seal-document.handler.ts (the upstream sealer) has to import
+#      and call it. That import + call is what this patch adds.
+#
+# Upstream-merge-fragility: LOW
+#      Single new import + one if-block insertion before the certificate
+#      copy. DecorateAndSignPdfOptions extended with `completedAt`
+#      (single new key in a Pick — doesn't shift positional behavior).
+#
+# Files patched:
+#   - packages/lib/jobs/definitions/internal/seal-document.handler.ts
+#
+# Files added (no patch):
+#   - packages/bizrethink/server-only/pdf/add-verification-footer-to-pdf.ts
+
+diff --git a/packages/lib/jobs/definitions/internal/seal-document.handler.ts b/packages/lib/jobs/definitions/internal/seal-document.handler.ts
+index 061b5866d..6809e8e97 100644
+--- a/packages/lib/jobs/definitions/internal/seal-document.handler.ts
++++ b/packages/lib/jobs/definitions/internal/seal-document.handler.ts
+@@ -18,6 +18,8 @@ import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-
+ import { getLastPageDimensions } from '@documenso/lib/server-only/pdf/get-page-size';
+ import { prisma } from '@documenso/prisma';
+ import { signPdf } from '@documenso/signing';
++// BizRethink overlay 036: per-page verification footer (Tier 1)
++import { addVerificationFooterToPdf } from '@bizrethink/customizations/server-only/pdf/add-verification-footer-to-pdf';
+ 
+ import { NEXT_PRIVATE_USE_PLAYWRIGHT_PDF } from '../../../constants/app';
+ import { AppError, AppErrorCode } from '../../../errors/app-error';
+@@ -354,7 +356,15 @@ export const run = async ({
+ };
+ 
+ type DecorateAndSignPdfOptions = {
+-  envelope: Pick<Envelope, 'id' | 'title' | 'useLegacyFieldInsertion' | 'internalVersion'>;
++  envelope: Pick<
++    Envelope,
++    | 'id'
++    | 'title'
++    | 'useLegacyFieldInsertion'
++    | 'internalVersion'
++    // BizRethink overlay 036: needed to stamp the per-page verification footer.
++    | 'completedAt'
++  >;
+   envelopeItem: EnvelopeItem & { documentData: DocumentData };
+   envelopeItemFields: Field[];
+   isRejected: boolean;
+@@ -389,6 +399,19 @@ const decorateAndSignPdf = async ({
+     await addRejectionStampToPdf(pdfDoc, rejectionReason);
+   }
+ 
++  // BizRethink overlay 036: per-page verification footer.
++  // Only stamp the contract body (NOT the certificate / audit-log
++  // pages, which haven't been appended yet at this point and have
++  // their own provenance markings). Skip when rejected — rejected
++  // documents already carry the diagonal "DOCUMENT REJECTED" stamp
++  // and adding a verification footer would muddy the visual semantics.
++  if (!isRejected) {
++    await addVerificationFooterToPdf(pdfDoc, {
++      envelopeId: envelope.id,
++      completedAt: envelope.completedAt ?? null,
++    });
++  }
++
+   if (certificateDoc) {
+     await pdfDoc.copyPagesFrom(
+       certificateDoc,

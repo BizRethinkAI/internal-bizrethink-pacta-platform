@@ -1,3 +1,5 @@
+// BizRethink overlay 036: per-page verification footer (Tier 1)
+import { addVerificationFooterToPdf } from '@bizrethink/customizations/server-only/pdf/add-verification-footer-to-pdf';
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { PDF } from '@libpdf/core';
 import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
@@ -354,7 +356,15 @@ export const run = async ({
 };
 
 type DecorateAndSignPdfOptions = {
-  envelope: Pick<Envelope, 'id' | 'title' | 'useLegacyFieldInsertion' | 'internalVersion'>;
+  envelope: Pick<
+    Envelope,
+    | 'id'
+    | 'title'
+    | 'useLegacyFieldInsertion'
+    | 'internalVersion'
+    // BizRethink overlay 036: needed to stamp the per-page verification footer.
+    | 'completedAt'
+  >;
   envelopeItem: EnvelopeItem & { documentData: DocumentData };
   envelopeItemFields: Field[];
   isRejected: boolean;
@@ -387,6 +397,19 @@ const decorateAndSignPdf = async ({
   // Add rejection stamp if the document is rejected
   if (isRejected) {
     await addRejectionStampToPdf(pdfDoc, rejectionReason);
+  }
+
+  // BizRethink overlay 036: per-page verification footer.
+  // Only stamp the contract body (NOT the certificate / audit-log
+  // pages, which haven't been appended yet at this point and have
+  // their own provenance markings). Skip when rejected — rejected
+  // documents already carry the diagonal "DOCUMENT REJECTED" stamp
+  // and adding a verification footer would muddy the visual semantics.
+  if (!isRejected) {
+    await addVerificationFooterToPdf(pdfDoc, {
+      envelopeId: envelope.id,
+      completedAt: envelope.completedAt ?? null,
+    });
   }
 
   if (certificateDoc) {
