@@ -248,6 +248,38 @@ export const renderSignatureFieldElement = (
   if (mode === 'export') {
     // Hide the rectangle.
     fieldRect.opacity(0);
+
+    // BizRethink overlay 037: inline verification badge — render the
+    // signed timestamp directly below the signature image so the
+    // document carries visible proof of execution at every signature
+    // location. Mirrors Dotloop's pattern and complements the
+    // page-footer stamp (overlay 036). Only renders when the field
+    // has a signed-on timestamp (i.e., not for unsigned/preview
+    // exports). Width matches the signature widget's bbox; positioned
+    // at the bottom 10pt of the field group (tucks under the glyph).
+    if (field.signature?.created) {
+      const signedAt = new Date(field.signature.created);
+      const yyyy = signedAt.getUTCFullYear();
+      const mm = String(signedAt.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(signedAt.getUTCDate()).padStart(2, '0');
+      const hh = String(signedAt.getUTCHours()).padStart(2, '0');
+      const mi = String(signedAt.getUTCMinutes()).padStart(2, '0');
+      const stamp = `Signed ${yyyy}-${mm}-${dd} ${hh}:${mi} UTC`;
+      const verificationBadge = new Konva.Text({
+        x: 0,
+        y: Math.max(0, fieldRect.height() - 9),
+        width: fieldRect.width(),
+        height: 9,
+        text: stamp,
+        fontSize: 6.5,
+        fontFamily: 'Inter',
+        fontStyle: 'normal',
+        align: 'center',
+        fill: '#6b7280',
+        listening: false,
+      });
+      fieldGroup.add(verificationBadge);
+    }
   }
 
   if (color !== 'readOnly' && mode !== 'export') {

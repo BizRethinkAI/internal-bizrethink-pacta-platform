@@ -1,0 +1,109 @@
+# Why: Tier 2 visual reinforcement complementing 036's page footer.
+#      Renders a small "Signed YYYY-MM-DD HH:MM UTC" badge directly
+#      below each signature glyph in the exported PDF — Dotloop pattern.
+#      Visible at every signature location even on a single-page
+#      screenshot, so a printed/forwarded contract page carries
+#      execution metadata regardless of viewer.
+#
+#      Implementation: in render-signature-field.ts the export-mode
+#      branch already runs after the signature image is added to the
+#      field group. We append a Konva.Text node sized to the field
+#      width, positioned at the bottom 9pt of the field rect, in muted
+#      gray Inter 6.5pt. Only renders when field.signature.created is
+#      present (i.e., the signature actually has a signed-on
+#      timestamp — won't render for unfilled signatures or preview
+#      exports).
+#
+# Why-not-additive: render-signature-field.ts is upstream. Adding the
+#      badge requires extending the existing render function and
+#      threading `signature.created` through FieldToRender's Pick.
+#
+# Upstream-merge-fragility: MEDIUM
+#      Three files change: FieldToRender's signature Pick is extended
+#      with `created` in TWO places (field-renderer.ts and the
+#      duplicate type in render-field.ts — both are kept in sync), and
+#      render-signature-field.ts gets a new block inside the
+#      `mode === 'export'` branch. If upstream consolidates the two
+#      duplicate FieldToRender types, this patch needs adjustment.
+#
+# Files patched:
+#   - packages/lib/universal/field-renderer/field-renderer.ts
+#   - packages/lib/universal/field-renderer/render-field.ts
+#   - packages/lib/universal/field-renderer/render-signature-field.ts
+
+diff --git a/packages/lib/universal/field-renderer/field-renderer.ts b/packages/lib/universal/field-renderer/field-renderer.ts
+index 8f66084e2..7b9bbe733 100644
+--- a/packages/lib/universal/field-renderer/field-renderer.ts
++++ b/packages/lib/universal/field-renderer/field-renderer.ts
+@@ -19,7 +19,10 @@ export type FieldToRender = Pick<
+   positionX: number;
+   positionY: number;
+   fieldMeta?: TFieldMetaSchema | null;
+-  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
++  // BizRethink overlay 037: pass `created` through so the export-mode
++  // signature renderer can stamp a "Signed YYYY-MM-DD HH:MM UTC" badge
++  // beneath each signature glyph (Tier 2 inline verification).
++  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature' | 'created'> | null;
+ };
+ 
+ export type RenderFieldElementOptions = {
+diff --git a/packages/lib/universal/field-renderer/render-field.ts b/packages/lib/universal/field-renderer/render-field.ts
+index d7000389a..0b8a6df7e 100644
+--- a/packages/lib/universal/field-renderer/render-field.ts
++++ b/packages/lib/universal/field-renderer/render-field.ts
+@@ -36,7 +36,11 @@ export type FieldToRender = Pick<
+   positionX: number;
+   positionY: number;
+   fieldMeta?: TFieldMetaSchema | null;
+-  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
++  // BizRethink overlay 037: pass `created` through (kept in sync with
++  // the duplicate FieldToRender in `field-renderer.ts`) so the
++  // export-mode signature renderer can stamp a "Signed YYYY-MM-DD
++  // HH:MM UTC" badge beneath each signature glyph.
++  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature' | 'created'> | null;
+ };
+ 
+ type RenderFieldOptions = {
+diff --git a/packages/lib/universal/field-renderer/render-signature-field.ts b/packages/lib/universal/field-renderer/render-signature-field.ts
+index bd7daa6c1..df692be4f 100644
+--- a/packages/lib/universal/field-renderer/render-signature-field.ts
++++ b/packages/lib/universal/field-renderer/render-signature-field.ts
+@@ -248,6 +248,38 @@ export const renderSignatureFieldElement = (
+   if (mode === 'export') {
+     // Hide the rectangle.
+     fieldRect.opacity(0);
++
++    // BizRethink overlay 037: inline verification badge — render the
++    // signed timestamp directly below the signature image so the
++    // document carries visible proof of execution at every signature
++    // location. Mirrors Dotloop's pattern and complements the
++    // page-footer stamp (overlay 036). Only renders when the field
++    // has a signed-on timestamp (i.e., not for unsigned/preview
++    // exports). Width matches the signature widget's bbox; positioned
++    // at the bottom 10pt of the field group (tucks under the glyph).
++    if (field.signature?.created) {
++      const signedAt = new Date(field.signature.created);
++      const yyyy = signedAt.getUTCFullYear();
++      const mm = String(signedAt.getUTCMonth() + 1).padStart(2, '0');
++      const dd = String(signedAt.getUTCDate()).padStart(2, '0');
++      const hh = String(signedAt.getUTCHours()).padStart(2, '0');
++      const mi = String(signedAt.getUTCMinutes()).padStart(2, '0');
++      const stamp = `Signed ${yyyy}-${mm}-${dd} ${hh}:${mi} UTC`;
++      const verificationBadge = new Konva.Text({
++        x: 0,
++        y: Math.max(0, fieldRect.height() - 9),
++        width: fieldRect.width(),
++        height: 9,
++        text: stamp,
++        fontSize: 6.5,
++        fontFamily: 'Inter',
++        fontStyle: 'normal',
++        align: 'center',
++        fill: '#6b7280',
++        listening: false,
++      });
++      fieldGroup.add(verificationBadge);
++    }
+   }
+ 
+   if (color !== 'readOnly' && mode !== 'export') {

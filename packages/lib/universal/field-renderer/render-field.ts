@@ -36,7 +36,11 @@ export type FieldToRender = Pick<
   positionX: number;
   positionY: number;
   fieldMeta?: TFieldMetaSchema | null;
-  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
+  // BizRethink overlay 037: pass `created` through (kept in sync with
+  // the duplicate FieldToRender in `field-renderer.ts`) so the
+  // export-mode signature renderer can stamp a "Signed YYYY-MM-DD
+  // HH:MM UTC" badge beneath each signature glyph.
+  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature' | 'created'> | null;
 };
 
 type RenderFieldOptions = {
