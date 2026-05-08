@@ -132,12 +132,28 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
       // width/height meta to override the placeholder text bbox. Useful
       // when the visible placeholder text in the docx is short (e.g.
       // "{{SIGNATURE, r1}}") but the desired widget should be wider
-      // (~240pt) to comfortably accept handwritten signatures. The
-      // override anchors at the placeholder's top-left corner — placement
-      // logic upstream is otherwise unchanged.
+      // (~200pt) to comfortably accept handwritten signatures.
+      //
+      // Vertical anchoring: when the placeholder text is rendered small
+      // (e.g. 5pt to keep the placeholder on a single line), the
+      // override-sized widget is centered vertically on the placeholder's
+      // bbox — extends both upward and downward equally so the resulting
+      // widget visually sits on the placeholder's text line rather than
+      // floating above (anchored to the placeholder bottom) or below
+      // (anchored to the placeholder top). The signature paragraph in
+      // source docx files carries 240/240 dxa spacing before/after to
+      // give the widget room to extend without colliding with adjacent
+      // rows.
       const metaWithSize = parsedFieldMeta as { width?: number; height?: number } | undefined;
       const overrideWidth = metaWithSize?.width;
       const overrideHeight = metaWithSize?.height;
+
+      const finalWidth = overrideWidth ?? match.bbox.width;
+      const finalHeight = overrideHeight ?? match.bbox.height;
+      const finalY =
+        overrideHeight !== undefined
+          ? topLeftY - (overrideHeight - match.bbox.height) / 2
+          : topLeftY;
 
       placeholders.push({
         placeholder,
@@ -145,9 +161,9 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
         fieldAndMeta,
         page: page.index + 1,
         x: match.bbox.x,
-        y: overrideHeight !== undefined ? pageHeight - match.bbox.y - overrideHeight : topLeftY,
-        width: overrideWidth ?? match.bbox.width,
-        height: overrideHeight ?? match.bbox.height,
+        y: finalY,
+        width: finalWidth,
+        height: finalHeight,
         pageWidth,
         pageHeight,
       });
