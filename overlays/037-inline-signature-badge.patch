@@ -1,35 +1,36 @@
-# Why: Tier 2 visual reinforcement complementing 036's page footer.
-#      Renders a small "Signed YYYY-MM-DD HH:MM UTC" badge directly
-#      below each signature glyph in the exported PDF — Dotloop pattern.
-#      Visible at every signature location even on a single-page
-#      screenshot, so a printed/forwarded contract page carries
-#      execution metadata regardless of viewer.
+# Why: Originally added an inline "Signed YYYY-MM-DD HH:MM UTC" badge
+#      below each signature image (Dotloop pattern). On 2026-05-09 the
+#      badge was found to overlap the signature glyph at our standard
+#      widget height (20pt) — badge y was field.height-9, which placed
+#      it at y=11..20 inside a 20pt rect, colliding with the bottom half
+#      of the signature image. User pushback: "the signed date/time
+#      stamp overlaps the signature, needs to be removed or fixed."
 #
-#      Implementation: in render-signature-field.ts the export-mode
-#      branch already runs after the signature image is added to the
-#      field group. We append a Konva.Text node sized to the field
-#      width, positioned at the bottom 9pt of the field rect, in muted
-#      gray Inter 6.5pt. Only renders when field.signature.created is
-#      present (i.e., the signature actually has a signed-on
-#      timestamp — won't render for unfilled signatures or preview
-#      exports).
+#      Decision: remove the inline badge entirely. The per-page footer
+#      stamp (overlay 036) already carries visible execution metadata,
+#      and Documenso's audit-log page at the end provides the
+#      authoritative timestamps. The inline badge was redundant and
+#      visually noisy.
 #
-# Why-not-additive: render-signature-field.ts is upstream. Adding the
-#      badge requires extending the existing render function and
-#      threading `signature.created` through FieldToRender's Pick.
+#      What this patch keeps: the FieldToRender.signature Pick<> still
+#      includes `created?: Date | null` in BOTH duplicate type
+#      definitions (field-renderer.ts + render-field.ts). The field is
+#      optional so nothing currently in the codebase requires it, but
+#      keeping it preserves the option to re-introduce a non-overlapping
+#      stamp later (e.g. positioned in adjacent whitespace) without
+#      re-touching consumer types.
 #
-# Upstream-merge-fragility: MEDIUM
-#      Three files change: FieldToRender's signature Pick is extended
-#      with `created` in TWO places (field-renderer.ts and the
-#      duplicate type in render-field.ts — both are kept in sync), and
-#      render-signature-field.ts gets a new block inside the
-#      `mode === 'export'` branch. If upstream consolidates the two
-#      duplicate FieldToRender types, this patch needs adjustment.
+# Why-not-additive: the FieldToRender Pick<> is upstream and there's no
+#      cleaner way to thread an extra signature field through to the
+#      renderer without amending it.
+#
+# Upstream-merge-fragility: LOW
+#      Only adds an optional field to two duplicate Pick<> types. No
+#      runtime-behavior changes against upstream after this revision.
 #
 # Files patched:
 #   - packages/lib/universal/field-renderer/field-renderer.ts
 #   - packages/lib/universal/field-renderer/render-field.ts
-#   - packages/lib/universal/field-renderer/render-signature-field.ts
 
 diff --git a/packages/lib/universal/field-renderer/field-renderer.ts b/packages/lib/universal/field-renderer/field-renderer.ts
 index 8f66084e2..7b9bbe733 100644
@@ -40,13 +41,13 @@ index 8f66084e2..7b9bbe733 100644
    positionY: number;
    fieldMeta?: TFieldMetaSchema | null;
 -  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
-+  // BizRethink overlay 037: pass `created` through so the export-mode
-+  // signature renderer can stamp a "Signed YYYY-MM-DD HH:MM UTC" badge
-+  // beneath each signature glyph (Tier 2 inline verification).
-+  // `created` is optional so client-side callers (e.g.
-+  // `EnvelopeRenderFieldSignature` in envelope-render-provider) can
-+  // construct minimal signature objects without the timestamp; the
-+  // renderer guards on `field.signature?.created` before drawing.
++  // BizRethink overlay 037: keep `created` reachable through the renderer's
++  // signature Pick<> so a future inline-stamp implementation can re-use
++  // it without re-touching consumer types. The original inline badge was
++  // removed (overlapped signatures at our standard 20pt height); the
++  // per-page footer (overlay 036) carries execution metadata. `created`
++  // is optional so client-side callers (e.g. `EnvelopeRenderFieldSignature`)
++  // can construct minimal signature objects without the timestamp.
 +  signature?:
 +    | (Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> & { created?: Date | null })
 +    | null;
@@ -62,58 +63,15 @@ index d7000389a..0b8a6df7e 100644
    positionY: number;
    fieldMeta?: TFieldMetaSchema | null;
 -  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
-+  // BizRethink overlay 037: pass `created` through (kept in sync with
-+  // the duplicate FieldToRender in `field-renderer.ts`) so the
-+  // export-mode signature renderer can stamp a "Signed YYYY-MM-DD
-+  // HH:MM UTC" badge beneath each signature glyph. `created` is
-+  // optional so client-side callers can construct minimal signature
-+  // objects without the timestamp; renderer guards before drawing.
++  // BizRethink overlay 037: kept in sync with the duplicate FieldToRender
++  // in `field-renderer.ts`. `created` reachable through the Pick<> in
++  // case a non-overlapping inline stamp is added later. The original
++  // inline badge was removed for overlapping signature images. Optional
++  // so client-side callers can construct minimal signature objects
++  // without the timestamp.
 +  signature?:
 +    | (Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> & { created?: Date | null })
 +    | null;
  };
 
  type RenderFieldOptions = {
-diff --git a/packages/lib/universal/field-renderer/render-signature-field.ts b/packages/lib/universal/field-renderer/render-signature-field.ts
-index bd7daa6c1..df692be4f 100644
---- a/packages/lib/universal/field-renderer/render-signature-field.ts
-+++ b/packages/lib/universal/field-renderer/render-signature-field.ts
-@@ -248,6 +248,38 @@ export const renderSignatureFieldElement = (
-   if (mode === 'export') {
-     // Hide the rectangle.
-     fieldRect.opacity(0);
-+
-+    // BizRethink overlay 037: inline verification badge — render the
-+    // signed timestamp directly below the signature image so the
-+    // document carries visible proof of execution at every signature
-+    // location. Mirrors Dotloop's pattern and complements the
-+    // page-footer stamp (overlay 036). Only renders when the field
-+    // has a signed-on timestamp (i.e., not for unsigned/preview
-+    // exports). Width matches the signature widget's bbox; positioned
-+    // at the bottom 10pt of the field group (tucks under the glyph).
-+    if (field.signature?.created) {
-+      const signedAt = new Date(field.signature.created);
-+      const yyyy = signedAt.getUTCFullYear();
-+      const mm = String(signedAt.getUTCMonth() + 1).padStart(2, '0');
-+      const dd = String(signedAt.getUTCDate()).padStart(2, '0');
-+      const hh = String(signedAt.getUTCHours()).padStart(2, '0');
-+      const mi = String(signedAt.getUTCMinutes()).padStart(2, '0');
-+      const stamp = `Signed ${yyyy}-${mm}-${dd} ${hh}:${mi} UTC`;
-+      const verificationBadge = new Konva.Text({
-+        x: 0,
-+        y: Math.max(0, fieldRect.height() - 9),
-+        width: fieldRect.width(),
-+        height: 9,
-+        text: stamp,
-+        fontSize: 6.5,
-+        fontFamily: 'Inter',
-+        fontStyle: 'normal',
-+        align: 'center',
-+        fill: '#6b7280',
-+        listening: false,
-+      });
-+      fieldGroup.add(verificationBadge);
-+    }
-   }
- 
-   if (color !== 'readOnly' && mode !== 'export') {
