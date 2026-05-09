@@ -389,8 +389,27 @@ const decorateAndSignPdf = async ({
 }: DecorateAndSignPdfOptions) => {
   let pdfDoc = await PDF.load(pdfData);
 
-  // Normalize and flatten layers that could cause issues with the signature
-  pdfDoc.flattenAll();
+  // BizRethink overlay 040: skip the buggy AcroForm portion of flattenAll()
+  // at seal time. `pdf-lib`'s `form.flatten()` mis-renders multi-page,
+  // multi-instance AcroForm widgets (already documented in overlay 018 for
+  // the document-creation flow); the same bug fires here when a sealed
+  // document came in with pre-filled widgets from `insertFormValuesInPdf`.
+  // Symptom: sealed PDF Section 1 widgets render values from completely
+  // different `/T` names than what the AcroForm `/T → /Rect` structure says.
+  //
+  // Verified live 2026-05-09 against FRPA v4 (template id=20, document 62):
+  // unsigned PDF rendered all 39 widgets with correct /T → /V mapping;
+  // sealed PDF rendered slot 0 as `merchant_signer_name`, slot 1 as
+  // `merchant_signer_title`, slot 4 as `guarantor_home_address`, etc. —
+  // values present in formValues but mis-routed by flatten.
+  //
+  // Replacement: only `flattenLayers()` here (the actually-required step
+  // for signature compatibility — flattens OCGs / transparency groups /
+  // nested forms). AcroForm widgets remain interactive in the sealed PDF;
+  // the cryptographic signature step downstream still locks the document
+  // (signed `/V` values cannot be modified post-seal without invalidating
+  // the signature). PDF readers render widgets natively from `/V + /DA`.
+  pdfDoc.flattenLayers();
   // Upgrade to PDF 1.7 for better compatibility with signing
   pdfDoc.upgradeVersion('1.7');
 
@@ -501,9 +520,17 @@ const decorateAndSignPdf = async ({
     }
   }
 
-  // Re-flatten the form to handle our checkbox and radio fields that
-  // create native arcoFields
-  pdfDoc.flattenAll();
+  // BizRethink overlay 040: same as the line ~393 patch above — skip the
+  // buggy AcroForm flatten. The upstream comment refers to checkbox/radio
+  // arcoFields created by V2 field insertion; those native AcroForm
+  // widgets ARE safe to flatten because they were just created and have
+  // 1:1 /T-to-/Rect mapping. But the multi-instance Tx widgets we ship
+  // in pre-built templates (BizRethink AcroForm-pivot pipeline) get
+  // corrupted by the same flatten path. Trade-off: sealed PDFs retain
+  // checkbox/radio AcroForm widgets as interactive — same /V locking
+  // applies via signature, so post-seal modification is detectable.
+  pdfDoc.flattenLayers();
+  pdfDoc.flattenAnnotations();
 
   pdfDoc = await PDF.load(await pdfDoc.save({ useXRefStream: true }));
 
