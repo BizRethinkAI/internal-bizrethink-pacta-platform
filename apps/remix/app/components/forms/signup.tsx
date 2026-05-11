@@ -13,7 +13,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import communityCardsImage from '@documenso/assets/images/community-cards.png';
 import { authClient } from '@documenso/auth/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { ZNameSchema } from '@documenso/lib/constants/auth';
@@ -41,9 +40,10 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-// MODIFIED for BizRethink (overlay 054): use Pacta-branded hero component
-// instead of upstream's Timur (Documenso founder) demo profile.
-import { UserProfilePacta } from '~/components/general/user-profile-pacta';
+// MODIFIED for BizRethink (overlay 054, revised): full-bleed Pacta hero
+// panel that mirrors the pacta.ink marketing site (charcoal + gold +
+// brand copy + trust signals) instead of upstream's Timur fake-profile.
+import { PactaSignupHero } from '~/components/general/pacta-signup-hero';
 
 export const ZSignUpFormSchema = z
   .object({
@@ -219,32 +219,12 @@ export const SignUpForm = ({
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
-      <div className="border-border relative hidden flex-1 overflow-hidden rounded-xl border xl:flex">
-        <div className="absolute -inset-8 -z-[2] backdrop-blur">
-          <img
-            src={communityCardsImage}
-            alt="community-cards"
-            className="h-full w-full object-cover dark:brightness-95 dark:contrast-[70%] dark:invert"
-          />
-        </div>
-
-        <div className="bg-background/50 absolute -inset-8 -z-[1] backdrop-blur-[2px]" />
-
-        <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-          {/* MODIFIED for BizRethink (overlay 054): Pacta voice. */}
-          <div className="bg-background rounded-2xl border px-4 py-1 text-sm font-medium">
-            <Trans>Built for agreements that hold.</Trans>
-          </div>
-
-          <div className="w-full max-w-md">
-            <UserProfilePacta
-              rows={2}
-              className="border-border bg-background rounded-2xl border shadow-md"
-            />
-          </div>
-
-          <div />
-        </div>
+      {/* MODIFIED for BizRethink (overlay 054, revised): replaced Documenso's
+          community-cards backdrop + Timur fake profile with the Pacta-branded
+          hero panel that mirrors the pacta.ink marketing site (charcoal bg
+          + gold radial gradient + brand copy + trust signals). */}
+      <div className="hidden flex-1 xl:flex">
+        <PactaSignupHero className="min-h-[min(850px,80vh)] w-full" />
       </div>
 
       <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
