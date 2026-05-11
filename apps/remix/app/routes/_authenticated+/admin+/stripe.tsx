@@ -223,7 +223,7 @@ export default function AdminStripeConfigPage() {
               </div>
               <p className="text-muted-foreground mt-2 text-sm">
                 <Trans>
-                  Webhook URL: <code>/api/stripe.webhook</code> — point your Stripe Dashboard ➜
+                  Webhook URL: <code>/api/stripe/webhook</code> — point your Stripe Dashboard ➜
                   Webhooks here.
                 </Trans>
               </p>
