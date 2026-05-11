@@ -111,6 +111,8 @@ export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
       data: {
         signupDisabled: signup?.data?.signupDisabled ?? false,
         allowedDomains: signup?.data?.allowedDomains ?? [],
+        // Phase L (2026-05-11): require pending invite when domain-gated.
+        requireInviteWhenDomainGated: signup?.data?.requireInviteWhenDomainGated ?? false,
       },
     },
   });
@@ -419,6 +421,30 @@ export default function AdminBannerPage({ loaderData }: Route.ComponentProps) {
                     <FormDescription>
                       <Trans>
                         Empty list means all domains allowed. Only relevant when signup is enabled.
+                      </Trans>
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Phase L (2026-05-11): require pending invite when domain-gated. */}
+              <FormField
+                control={signupForm.control}
+                name="data.requireInviteWhenDomainGated"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>
+                      <Trans>Require an invitation</Trans>
+                    </FormLabel>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormDescription>
+                      <Trans>
+                        When on AND at least one allowed domain is set, signup additionally requires
+                        a matching pending invitation. New signups will be auto-joined to the
+                        invited org (no blank Personal Org spawned).
                       </Trans>
                     </FormDescription>
                     <FormMessage />

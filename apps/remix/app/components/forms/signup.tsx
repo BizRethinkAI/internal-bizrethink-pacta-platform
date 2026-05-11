@@ -20,6 +20,11 @@ import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
+// MODIFIED for BizRethink (overlay 048c): pending-invite preview at signup
+// form. Calls trpc.bizrethink.signupInvite.lookup with the entered email
+// (debounced) and renders "You'll join: <orgName> as <role>" so the user
+// knows they're landing in the invited team's org, not a Personal Org.
+import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -212,7 +217,7 @@ export const SignUpForm = ({
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
-      <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
+      <div className="border-border relative hidden flex-1 overflow-hidden rounded-xl border xl:flex">
         <div className="absolute -inset-8 -z-[2] backdrop-blur">
           <img
             src={communityCardsImage}
@@ -221,17 +226,17 @@ export const SignUpForm = ({
           />
         </div>
 
-        <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
+        <div className="bg-background/50 absolute -inset-8 -z-[1] backdrop-blur-[2px]" />
 
         <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-          <div className="rounded-2xl border bg-background px-4 py-1 text-sm font-medium">
+          <div className="bg-background rounded-2xl border px-4 py-1 text-sm font-medium">
             <Trans>User profiles are here!</Trans>
           </div>
 
           <div className="w-full max-w-md">
             <UserProfileTimur
               rows={2}
-              className="rounded-2xl border border-border bg-background shadow-md"
+              className="border-border bg-background rounded-2xl border shadow-md"
             />
           </div>
 
@@ -239,13 +244,13 @@ export const SignUpForm = ({
         </div>
       </div>
 
-      <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
+      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
         <div className="h-20">
           <h1 className="text-xl font-semibold md:text-2xl">
             <Trans>Create a new account</Trans>
           </h1>
 
-          <p className="mt-2 text-xs text-muted-foreground md:text-sm">
+          <p className="text-muted-foreground mt-2 text-xs md:text-sm">
             <Trans>
               Create your account and start using state-of-the-art document signing. Open and
               beautiful signing is within your grasp.
@@ -292,6 +297,8 @@ export const SignUpForm = ({
                   </FormItem>
                 )}
               />
+
+              <PendingInvitePreview email={form.watch('email')} />
 
               <FormField
                 control={form.control}
@@ -347,11 +354,11 @@ export const SignUpForm = ({
 
               {hasSocialAuthEnabled && (
                 <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="bg-transparent text-muted-foreground">
+                  <div className="bg-border h-px flex-1" />
+                  <span className="text-muted-foreground bg-transparent">
                     <Trans>Or</Trans>
                   </span>
-                  <div className="h-px flex-1 bg-border" />
+                  <div className="bg-border h-px flex-1" />
                 </div>
               )}
 
@@ -360,7 +367,7 @@ export const SignUpForm = ({
                   type="button"
                   size="lg"
                   variant={'outline'}
-                  className="border bg-background text-muted-foreground"
+                  className="bg-background text-muted-foreground border"
                   disabled={isSubmitting}
                   onClick={onSignUpWithGoogleClick}
                 >
@@ -374,7 +381,7 @@ export const SignUpForm = ({
                   type="button"
                   size="lg"
                   variant={'outline'}
-                  className="border bg-background text-muted-foreground"
+                  className="bg-background text-muted-foreground border"
                   disabled={isSubmitting}
                   onClick={onSignUpWithMicrosoftClick}
                 >
@@ -392,7 +399,7 @@ export const SignUpForm = ({
                   type="button"
                   size="lg"
                   variant={'outline'}
-                  className="border bg-background text-muted-foreground"
+                  className="bg-background text-muted-foreground border"
                   disabled={isSubmitting}
                   onClick={onSignUpWithOIDCClick}
                 >
@@ -401,7 +408,7 @@ export const SignUpForm = ({
                 </Button>
               )}
 
-              <p className="mt-4 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mt-4 text-sm">
                 <Trans>
                   Already have an account?{' '}
                   <Link to="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
@@ -421,7 +428,7 @@ export const SignUpForm = ({
             </Button>
           </form>
         </Form>
-        <p className="mt-6 text-xs text-muted-foreground">
+        <p className="text-muted-foreground mt-6 text-xs">
           <Trans>
             By proceeding, you agree to our{' '}
             <Link
@@ -443,6 +450,51 @@ export const SignUpForm = ({
           </Trans>
         </p>
       </div>
+    </div>
+  );
+};
+
+// ADDED for BizRethink (overlay 048c): inline preview component for
+// pending OrganisationMemberInvites matching the entered email. Renders
+// nothing when the email is empty/invalid or no invites are found.
+// Debounced 400ms so we don't hammer the lookup endpoint on every
+// keystroke. The lookup endpoint is public (no auth) but only returns
+// org NAME + role — no token, no inviter identity.
+const PendingInvitePreview = ({ email }: { email: string | undefined }) => {
+  const [debounced, setDebounced] = useState('');
+
+  useEffect(() => {
+    const trimmed = (email ?? '').trim().toLowerCase();
+    if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
+      setDebounced('');
+      return;
+    }
+    const timer = setTimeout(() => setDebounced(trimmed), 400);
+    return () => clearTimeout(timer);
+  }, [email]);
+
+  const { data } = trpc.bizrethink.signupInvite.lookup.useQuery(
+    { email: debounced },
+    { enabled: debounced.length > 0 },
+  );
+
+  if (!data || data.pendingInvites.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm dark:border-blue-900/50 dark:bg-blue-950/30">
+      <p className="font-medium text-blue-900 dark:text-blue-200">
+        <Trans>You'll join after signup</Trans>
+      </p>
+      <ul className="mt-1 space-y-0.5 text-blue-800 dark:text-blue-300">
+        {data.pendingInvites.map((invite, idx) => (
+          <li key={idx}>
+            • <span className="font-medium">{invite.organisationName}</span> as{' '}
+            <span className="lowercase">{invite.organisationRole}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

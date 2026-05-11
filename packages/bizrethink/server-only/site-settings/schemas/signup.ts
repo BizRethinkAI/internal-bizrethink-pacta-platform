@@ -20,11 +20,18 @@ export const ZSiteSettingsSignupSchema = ZSiteSettingsBaseSchema.extend({
     .object({
       signupDisabled: z.boolean().default(false),
       allowedDomains: z.array(z.string().min(1)).default([]),
+      // Phase L (2026-05-11): when true AND allowedDomains is non-empty,
+      // signups are additionally required to match a PENDING
+      // OrganisationMemberInvite. Closes the "domain matches but nobody
+      // invited me" leak — useful for B2B-team setups where every legitimate
+      // signup should be triggered by an admin invite first.
+      requireInviteWhenDomainGated: z.boolean().default(false),
     })
     .optional()
     .default({
       signupDisabled: false,
       allowedDomains: [],
+      requireInviteWhenDomainGated: false,
     }),
 });
 

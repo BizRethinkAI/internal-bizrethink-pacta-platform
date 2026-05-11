@@ -40,6 +40,22 @@ export const isSignupDisabled = async (): Promise<boolean> => {
 };
 
 /**
+ * True if signup requires a pending OrganisationMemberInvite to succeed.
+ * Only meaningful when allowedSignupDomains is non-empty (domain-gated
+ * mode) — when no domain gating exists, this returns false even if the
+ * setting is on (we don't want to surprise-block self-host single-user
+ * deployments). Phase L (2026-05-11): closes the "domain matches but no
+ * invite" hole.
+ */
+export const isInviteRequiredForSignup = async (): Promise<boolean> => {
+  const dbConfig = await readDbConfig();
+  if (!dbConfig) {
+    return false;
+  }
+  return dbConfig.requireInviteWhenDomainGated && dbConfig.allowedDomains.length > 0;
+};
+
+/**
  * List of email domains permitted to sign up. Empty array means all
  * domains allowed. DB takes precedence; `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`
  * (CSV) is the env fallback.

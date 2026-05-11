@@ -226,6 +226,31 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
+    // MODIFIED for BizRethink (overlay 048b): when the admin has opted into
+    // require-invite-when-domain-gated, signup ALSO requires a pending
+    // OrganisationMemberInvite matching this email. Closes the "domain
+    // matches but nobody invited me" hole — useful for B2B-team setups.
+    // The auto-claim helper below (in createUser → onCreateUserHook) will
+    // then claim that invite. See packages/bizrethink/server-only/signup-config.ts.
+    const { isInviteRequiredForSignup } =
+      await import('@bizrethink/customizations/server-only/signup-config');
+    if (await isInviteRequiredForSignup()) {
+      const matchingInvite = await prisma.organisationMemberInvite.findFirst({
+        where: {
+          email: { equals: email, mode: 'insensitive' },
+          status: 'PENDING',
+        },
+        select: { id: true },
+      });
+      if (!matchingInvite) {
+        throw new AppError(AuthenticationErrorCode.SignupDisabled, {
+          statusCode: 400,
+          message:
+            'Signup requires an invitation. Ask your administrator to invite you, then sign up again with that email.',
+        });
+      }
+    }
+
     const user = await createUser({ name, email, password, signature }).catch((err) => {
       console.error(err);
       throw err;
