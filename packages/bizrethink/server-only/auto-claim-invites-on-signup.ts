@@ -70,17 +70,18 @@ export const autoClaimInvitesOnSignup = async ({
 
   for (const invite of pendingInvites) {
     try {
-      // bypassEmail=true skips the "you joined!" email that addUserToOrganisation
-      // normally triggers — for auto-claim during signup we don't want a flood
-      // of join emails landing seconds after the welcome/signup-confirmation.
-      // The admin-notification email (sent separately below) covers the
-      // "someone joined your org" notification side.
+      // bypassEmail=false (default) triggers the
+      // `send.organisation-member-joined.email` job. Despite the name,
+      // upstream's handler sends this to all org admins/managers (everyone
+      // with the MANAGE_ORGANISATION permission) — NOT to the joining user
+      // — so this gives us the admin-notification-on-auto-accept feature
+      // for free. The joining user gets the unrelated signup-confirmation
+      // email from the auth flow.
       await addUserToOrganisation({
         userId,
         organisationId: invite.organisation.id,
         organisationGroups: invite.organisation.groups,
         organisationMemberRole: invite.organisationRole,
-        bypassEmail: true,
       });
 
       await prisma.organisationMemberInvite.update({
