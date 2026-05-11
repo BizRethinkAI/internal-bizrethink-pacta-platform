@@ -1,3 +1,5 @@
+// BizRethink (overlay 041): trial bookkeeping for new external orgs.
+import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
 import { Prisma } from '@prisma/client';
 import { OrganisationType } from '@prisma/client';
 import { OrganisationMemberRole } from '@prisma/client';
@@ -164,12 +166,16 @@ export const createPersonalOrganisation = async ({
   inheritMembers = true,
   type = OrganisationType.PERSONAL,
 }: CreatePersonalOrganisationOptions) => {
+  // MODIFIED for BizRethink (overlay 041): route new external orgs to PRO claim
+  // with a 14-day trial. Internal orgs (BizRethink-operated) are created
+  // separately or get bizrethinkInternal=true stamped via admin/migration; this
+  // path is always external because it's called on every public signup.
   const organisation = await createOrganisation({
     name: 'Personal Organisation',
     userId,
     url: orgUrl,
     type,
-    claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
+    claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
   }).catch((err) => {
     console.error(err);
 
@@ -179,6 +185,16 @@ export const createPersonalOrganisation = async ({
 
     // Todo: (LOGS)
   });
+
+  // BizRethink (overlay 041): record the trial window so the trial-expire-sweep
+  // cron (Phase 2) can downgrade the claim to FREE on expiry. Safe to fail
+  // silently — the org is already created and usable on PRO; the trial state
+  // is bookkeeping that defaults to "no row = external, no trial" downstream.
+  if (organisation) {
+    await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
+      console.error('[bizrethink] startTrialForNewOrg failed', err);
+    });
+  }
 
   if (organisation) {
     await createTeam({

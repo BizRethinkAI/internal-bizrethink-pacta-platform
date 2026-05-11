@@ -205,3 +205,50 @@ model BizrethinkInstanceAiConfig {
   updatedAt       DateTime @updatedAt
   updatedByUserId Int?
 }
+
+// ─── Phase J (overlay 041) — per-org billing metadata ─────────────────────
+//
+// One row per organisation, holding BizRethink-specific fields layered on
+// top of upstream's billing primitives. Upstream already provides:
+//   - `Organisation.customerId` (Stripe customer ID)
+//   - `Subscription` model with status / planId / priceId / periodEnd
+//   - `OrganisationClaim` with tier flags + caps
+//
+// This model fills two gaps upstream doesn't cover:
+//   1. `bizrethinkInternal` — marks BizRethink-operated orgs (Personal,
+//       BizRethink AI, MFG, MORG CAP) that should always retain the
+//       BIZRETHINK claim regardless of Stripe subscription state. New
+//       external customers default to `false` and follow normal
+//       Free/Trial/Paid tier flow.
+//   2. Trial bookkeeping — `trialStartedAt` / `trialEndsAt` track the
+//      14-day Pro evaluation that new external orgs get on signup.
+//      Cleared when a Stripe subscription becomes active; preserved as
+//      audit trail otherwise. The trial-expire-sweep Inngest job
+//      (overlay 044) consults these fields to downgrade expired trials.
+//
+// Row creation: overlay 041 inserts a row at org-creation time. Default
+// values mean missing rows behave as "external, no trial set" — safe
+// fallback if the row is somehow absent.
+
+model BizrethinkOrganisationBilling {
+  id             String @id @default(cuid())
+  organisationId String @unique
+
+  // True ONLY for BizRethink-operated orgs. Set manually by admin or via
+  // bootstrap migration for the 4 current production orgs. Drives the
+  // BIZRETHINK-vs-FREE_TRIAL routing decision at org-creation time in
+  // packages/lib/server-only/organisation/create-organisation.ts (overlay 041).
+  bizrethinkInternal Boolean @default(false)
+
+  // 14-day Pro trial window. Set at org creation (when bizrethinkInternal
+  // is false). `trialEndsAt` is the cron job's selector: orgs with
+  // trialEndsAt < now() AND no active Subscription get downgraded to FREE.
+  // After downgrade these fields remain populated for audit; the cron's
+  // selector also checks the org's current OrganisationClaim to avoid
+  // re-downgrading.
+  trialStartedAt DateTime?
+  trialEndsAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

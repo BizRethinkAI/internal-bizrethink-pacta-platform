@@ -1,3 +1,5 @@
+// BizRethink (overlay 041): trial bookkeeping for new external orgs.
+import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
 import { OrganisationType } from '@prisma/client';
 
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
@@ -72,11 +74,19 @@ export const createOrganisationRoute = authenticatedProcedure
       ? OrganisationType.PERSONAL
       : OrganisationType.ORGANISATION;
 
-    await createOrganisation({
+    // MODIFIED for BizRethink (overlay 041): assign PRO claim with 14-day trial
+    // instead of BIZRETHINK. New external orgs experience Pro features during
+    // the trial window; trial-expire-sweep cron downgrades to FREE on expiry.
+    const organisation = await createOrganisation({
       userId: user.id,
       name,
       type: organisationType,
-      claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
+      claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
+    });
+
+    // BizRethink (overlay 041): record trial window for the new org.
+    await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
+      console.error('[bizrethink] startTrialForNewOrg failed', err);
     });
 
     return {

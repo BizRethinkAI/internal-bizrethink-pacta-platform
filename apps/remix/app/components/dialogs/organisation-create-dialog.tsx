@@ -286,6 +286,13 @@ const internalClaimsDescription: {
   // every INTERNAL_CLAIM_ID key to be present. Empty description is fine.
   // See overlays/004.
   [INTERNAL_CLAIM_ID.BIZRETHINK]: '',
+  // BizRethink public SaaS tiers (overlay 043). Descriptions surface once
+  // the dialog's plan loop is widened to include PRO + BUSINESS (which
+  // happens when NEXT_PUBLIC_FEATURE_BILLING_ENABLED flips on with
+  // overlay 041 / 042). Empty would also satisfy the type, but having
+  // real copy here means no scramble at launch.
+  [INTERNAL_CLAIM_ID.PRO]: msg`100 documents a month, branded signing, AI-assisted document creation`,
+  [INTERNAL_CLAIM_ID.BUSINESS]: msg`Unlimited documents, 10 members, CFR21 + HIPAA compliance, full AI`,
 };
 
 type BillingPlanFormProps = {
@@ -362,9 +369,9 @@ const BillingPlanForm = ({
         <button
           onClick={() => onChange('')}
           className={cn(
-            'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
+            'hover:border-primary flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:shadow-sm',
             {
-              'border-primary ring-2 ring-primary/10 ring-offset-1': '' === value,
+              'border-primary ring-primary/10 ring-2 ring-offset-1': '' === value,
             },
           )}
           disabled={!canCreateFreeOrganisation}
@@ -395,9 +402,9 @@ const BillingPlanForm = ({
             key={plan[billingPeriod]?.id}
             onClick={() => onChange(plan[billingPeriod]?.id ?? '')}
             className={cn(
-              'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
+              'hover:border-primary flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:shadow-sm',
               {
-                'border-primary ring-2 ring-primary/10 ring-offset-1':
+                'border-primary ring-primary/10 ring-2 ring-offset-1':
                   plan[billingPeriod]?.id === value,
               },
             )}
@@ -406,9 +413,9 @@ const BillingPlanForm = ({
               <p className="font-medium">{plan.name}</p>
               <p className="text-muted-foreground">{plan.description}</p>
             </div>
-            <div className="whitespace-nowrap text-right text-sm font-medium">
+            <div className="text-right text-sm font-medium whitespace-nowrap">
               <p>{plan[billingPeriod]?.friendlyPrice}</p>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 {billingPeriod === 'monthlyPrice' ? (
                   <Trans>per month</Trans>
                 ) : (
@@ -422,13 +429,13 @@ const BillingPlanForm = ({
         <Link
           to="https://documen.so/enterprise-cta"
           target="_blank"
-          className="flex items-center space-x-2 rounded-md border bg-muted/30 p-4"
+          className="bg-muted/30 flex items-center space-x-2 rounded-md border p-4"
         >
           <div className="flex-1 font-normal">
-            <p className="font-medium text-muted-foreground">
+            <p className="text-muted-foreground font-medium">
               <Trans>Enterprise</Trans>
             </p>
-            <p className="flex flex-row items-center gap-1 text-muted-foreground">
+            <p className="text-muted-foreground flex flex-row items-center gap-1">
               <Trans>Contact sales here</Trans>
               <ExternalLinkIcon className="h-4 w-4" />
             </p>
@@ -439,7 +446,7 @@ const BillingPlanForm = ({
       <div className="mt-6 text-center">
         <Link
           to="https://documenso.com/pricing"
-          className="flex items-center justify-center gap-1 text-sm text-primary hover:text-primary/80 hover:underline"
+          className="text-primary hover:text-primary/80 flex items-center justify-center gap-1 text-sm hover:underline"
           target="_blank"
         >
           <Trans>Compare all plans and features in detail</Trans>

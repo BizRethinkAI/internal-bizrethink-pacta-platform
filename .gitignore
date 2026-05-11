@@ -64,6 +64,7 @@ CLAUDE.md
 # scripts
 scripts/output*
 scripts/bench-*
+scripts/.creds.env
 
 # license
 .documenso-license.json

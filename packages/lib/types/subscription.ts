@@ -36,6 +36,12 @@ export const ZClaimFlagsSchema = z.object({
   allowLegacyEnvelopes: z.boolean().optional(),
 
   signingReminders: z.boolean().optional(),
+
+  // BizRethink-added flag (overlay 043). Gates AI-assisted document creation,
+  // smart field detection on uploaded PDFs, and chat-with-document for signers.
+  // Pro tier and above set true; Free sets false/undefined. Feature implementation
+  // ships in a later phase; the flag exists now so tier definitions are stable.
+  aiEnabled: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -107,6 +113,11 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
     key: 'signingReminders',
     label: 'Signing reminders',
   },
+  // BizRethink (overlay 043).
+  aiEnabled: {
+    key: 'aiEnabled',
+    label: 'AI-assisted document creation',
+  },
 };
 
 export enum INTERNAL_CLAIM_ID {
@@ -117,6 +128,10 @@ export enum INTERNAL_CLAIM_ID {
   PLATFORM = 'platform',
   ENTERPRISE = 'enterprise',
   BIZRETHINK = 'bizrethink',
+  // BizRethink-added public SaaS tiers (overlay 043). Pro + Business are the
+  // paid public tiers; Free and Enterprise reuse the existing upstream entries.
+  PRO = 'pro',
+  BUSINESS = 'business',
 }
 
 export type InternalClaim = Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
@@ -215,6 +230,48 @@ export const internalClaims: InternalClaims = {
       embedSigning: true,
       embedSigningWhiteLabel: true,
       signingReminders: true,
+    },
+  },
+  // BizRethink public SaaS tier — Pro (overlay 043). $35/mo or $350/yr.
+  // Targets small fintech / healthcare buyers wanting branded signing +
+  // AI-assisted document creation. 100 docs/mo (hard cap, no unlimitedDocuments
+  // flag). 5 members. Custom branding + custom email domain + AI.
+  [INTERNAL_CLAIM_ID.PRO]: {
+    id: INTERNAL_CLAIM_ID.PRO,
+    name: 'Pro',
+    teamCount: 1,
+    memberCount: 5,
+    envelopeItemCount: 100,
+    locked: true,
+    flags: {
+      allowCustomBranding: true,
+      hidePoweredBy: true,
+      emailDomains: true,
+      signingReminders: true,
+      aiEnabled: true,
+    },
+  },
+  // BizRethink public SaaS tier — Business (overlay 043). $199/mo or $1990/yr.
+  // Targets mid-size compliance-heavy buyers (fintech, healthcare, regulated B2B).
+  // Unlimited docs, 10 members (overage billing handled separately), full
+  // compliance flag set (CFR21 + HIPAA + embedded signing). Full AI.
+  [INTERNAL_CLAIM_ID.BUSINESS]: {
+    id: INTERNAL_CLAIM_ID.BUSINESS,
+    name: 'Business',
+    teamCount: 0,
+    memberCount: 10,
+    envelopeItemCount: 0,
+    locked: true,
+    flags: {
+      unlimitedDocuments: true,
+      allowCustomBranding: true,
+      hidePoweredBy: true,
+      emailDomains: true,
+      embedSigning: true,
+      cfr21: true,
+      hipaa: true,
+      signingReminders: true,
+      aiEnabled: true,
     },
   },
   // MODIFIED for BizRethink: internal tier used by every org-creation path in

@@ -1,0 +1,140 @@
+# Why: SaaS-billing Phase 1 — route new external orgs from BIZRETHINK claim
+#      to PRO claim + 14-day trial. Internal BizRethink-operated orgs continue
+#      to receive BIZRETHINK claim (currently via data migration on existing
+#      8 orgs; future internal orgs use the admin "promote to internal" flow
+#      in Phase 3). Pairs with overlay 043 (defines PRO + BUSINESS tiers +
+#      aiEnabled flag) and the additive helper at
+#      `packages/bizrethink/server-only/billing/start-trial-for-new-org.ts`
+#      (which writes the BizrethinkOrganisationBilling row with trial dates).
+# Why-not-additive: Same as overlay 002 — every call site that creates an
+#      Organisation hard-references a specific InternalClaim, so changing the
+#      default claim requires touching each site. There's no upstream hook
+#      we can wrap. Three sites total:
+#        1. createPersonalOrganisation (auto-personal on signup)
+#        2. createOrganisationRoute (TRPC, user creates Team org)
+#        3. createAdminOrganisationRoute (TRPC, admin creates org)
+#      All three additionally invoke the new BizRethink helper after success
+#      to set trial dates.
+# Upstream-merge-fragility: MEDIUM. Upstream may add new org-creation paths
+#      (e.g., Stripe webhook on subscription-created already creates orgs via
+#      a different code path in packages/ee/server-only/stripe/webhook/
+#      on-subscription-created.ts — left untouched here because Stripe paths
+#      already assign tier via the price's claimId metadata). Watch for new
+#      `createOrganisation({... claim: BIZRETHINK})` references in future
+#      upstream-sync PRs.
+# Supersedes: overlay 002 (which routed all three to BIZRETHINK). The
+#      one-token swap goes the other direction: BIZRETHINK → PRO. Internal
+#      orgs are promoted retroactively via the BizrethinkOrganisationBilling
+#      table's `bizrethinkInternal=true` flag + admin tooling.
+diff --git a/packages/lib/server-only/organisation/create-organisation.ts b/packages/lib/server-only/organisation/create-organisation.ts
+index bb5c81897..07d3d3b38 100644
+diff --git a/packages/lib/server-only/organisation/create-organisation.ts b/packages/lib/server-only/organisation/create-organisation.ts
+index bb5c81897..6aa8cdf82 100644
+--- a/packages/lib/server-only/organisation/create-organisation.ts
++++ b/packages/lib/server-only/organisation/create-organisation.ts
+@@ -1,3 +1,5 @@
++// BizRethink (overlay 041): trial bookkeeping for new external orgs.
++import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
+ import { Prisma } from '@prisma/client';
+ import { OrganisationType } from '@prisma/client';
+ import { OrganisationMemberRole } from '@prisma/client';
+@@ -164,12 +166,16 @@ export const createPersonalOrganisation = async ({
+   inheritMembers = true,
+   type = OrganisationType.PERSONAL,
+ }: CreatePersonalOrganisationOptions) => {
++  // MODIFIED for BizRethink (overlay 041): route new external orgs to PRO claim
++  // with a 14-day trial. Internal orgs (BizRethink-operated) are created
++  // separately or get bizrethinkInternal=true stamped via admin/migration; this
++  // path is always external because it's called on every public signup.
+   const organisation = await createOrganisation({
+     name: 'Personal Organisation',
+     userId,
+     url: orgUrl,
+     type,
+-    claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
++    claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
+   }).catch((err) => {
+     console.error(err);
+ 
+@@ -180,6 +186,16 @@ export const createPersonalOrganisation = async ({
+     // Todo: (LOGS)
+   });
+ 
++  // BizRethink (overlay 041): record the trial window so the trial-expire-sweep
++  // cron (Phase 2) can downgrade the claim to FREE on expiry. Safe to fail
++  // silently — the org is already created and usable on PRO; the trial state
++  // is bookkeeping that defaults to "no row = external, no trial" downstream.
++  if (organisation) {
++    await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
++      console.error('[bizrethink] startTrialForNewOrg failed', err);
++    });
++  }
++
+   if (organisation) {
+     await createTeam({
+       userId,
+diff --git a/packages/trpc/server/admin-router/create-admin-organisation.ts b/packages/trpc/server/admin-router/create-admin-organisation.ts
+index ba68e2993..0d21be733 100644
+--- a/packages/trpc/server/admin-router/create-admin-organisation.ts
++++ b/packages/trpc/server/admin-router/create-admin-organisation.ts
+@@ -1,3 +1,5 @@
++// BizRethink (overlay 041): trial bookkeeping for new external orgs.
++import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
+ import { OrganisationType } from '@prisma/client';
+ 
+ import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+@@ -21,11 +23,21 @@ export const createAdminOrganisationRoute = adminProcedure
+       },
+     });
+ 
++    // MODIFIED for BizRethink (overlay 041): admin-created orgs default to PRO
++    // claim with 14-day trial. Admins promote orgs to BIZRETHINK tier by
++    // flipping bizrethinkInternal=true via the admin override panel (Phase 3)
++    // or direct DB update for now. Keeping admin route external-by-default
++    // avoids accidentally minting BIZRETHINK-tier orgs for non-team users.
+     const organisation = await createOrganisation({
+       userId: ownerUserId,
+       name: data.name,
+       type: OrganisationType.ORGANISATION,
+-      claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
++      claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
++    });
++
++    // BizRethink (overlay 041): record trial window for the new org.
++    await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
++      console.error('[bizrethink] startTrialForNewOrg failed', err);
+     });
+ 
+     return {
+diff --git a/packages/trpc/server/organisation-router/create-organisation.ts b/packages/trpc/server/organisation-router/create-organisation.ts
+index d1e4d8e1b..5a06466ef 100644
+--- a/packages/trpc/server/organisation-router/create-organisation.ts
++++ b/packages/trpc/server/organisation-router/create-organisation.ts
+@@ -1,3 +1,5 @@
++// BizRethink (overlay 041): trial bookkeeping for new external orgs.
++import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
+ import { OrganisationType } from '@prisma/client';
+ 
+ import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
+@@ -72,11 +74,19 @@ export const createOrganisationRoute = authenticatedProcedure
+       ? OrganisationType.PERSONAL
+       : OrganisationType.ORGANISATION;
+ 
+-    await createOrganisation({
++    // MODIFIED for BizRethink (overlay 041): assign PRO claim with 14-day trial
++    // instead of BIZRETHINK. New external orgs experience Pro features during
++    // the trial window; trial-expire-sweep cron downgrades to FREE on expiry.
++    const organisation = await createOrganisation({
+       userId: user.id,
+       name,
+       type: organisationType,
+-      claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
++      claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
++    });
++
++    // BizRethink (overlay 041): record trial window for the new org.
++    await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
++      console.error('[bizrethink] startTrialForNewOrg failed', err);
+     });
+ 
+     return {
