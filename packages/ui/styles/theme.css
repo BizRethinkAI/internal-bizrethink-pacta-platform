@@ -29,8 +29,18 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 95.08 71.08% 67.45%;
-    --primary-foreground: 95.08 71.08% 10%;
+    /* MODIFIED for BizRethink (overlay 055): Pacta charcoal (#1f2937)
+       replaces upstream Documenso's signature green for the `--primary`
+       token. Drives every <Button variant="default"> + bg-primary
+       consumer site-wide. Foreground is Pacta canvas (#fafafa) for
+       AA contrast on the dark button. Pacta Gold (#d4a574) stays as
+       an accent (period dots, hover lines) in component-level styles —
+       not promoted to a CSS var because it's used sparingly. The
+       `--new-primary-*` graduated scale below is intentionally left
+       on Documenso green for now; remap to a charcoal scale only if
+       residual greens surface after deploy. */
+    --primary: 215 28% 17%;
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -164,11 +174,14 @@
 
     --field-border: 214.3 31.8% 91.4%;
 
-    --primary: 95.08 71.08% 67.45%;
-    --primary-foreground: 95.08 71.08% 10%;
+    /* MODIFIED for BizRethink (overlay 055): in dark mode the primary
+       button needs to be LIGHTER than the dark background to register
+       as a CTA. Inverted from light mode: canvas on charcoal text. */
+    --primary: 0 0% 98%;
+    --primary-foreground: 215 28% 17%;
 
     --secondary: 0 0% 23.4%;
-    --secondary-foreground: 95.08 71.08% 67.45%;
+    --secondary-foreground: 0 0% 98%;
 
     --accent: 0 0% 27.9%;
     --accent-foreground: 95.08 71.08% 67.45%;
