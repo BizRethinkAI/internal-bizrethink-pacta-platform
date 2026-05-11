@@ -41,7 +41,9 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { UserProfileTimur } from '~/components/general/user-profile-timur';
+// MODIFIED for BizRethink (overlay 054): use Pacta-branded hero component
+// instead of upstream's Timur (Documenso founder) demo profile.
+import { UserProfilePacta } from '~/components/general/user-profile-pacta';
 
 export const ZSignUpFormSchema = z
   .object({
@@ -229,12 +231,13 @@ export const SignUpForm = ({
         <div className="bg-background/50 absolute -inset-8 -z-[1] backdrop-blur-[2px]" />
 
         <div className="relative flex h-full w-full flex-col items-center justify-evenly">
+          {/* MODIFIED for BizRethink (overlay 054): Pacta voice. */}
           <div className="bg-background rounded-2xl border px-4 py-1 text-sm font-medium">
-            <Trans>User profiles are here!</Trans>
+            <Trans>Built for agreements that hold.</Trans>
           </div>
 
           <div className="w-full max-w-md">
-            <UserProfileTimur
+            <UserProfilePacta
               rows={2}
               className="border-border bg-background rounded-2xl border shadow-md"
             />
@@ -250,10 +253,11 @@ export const SignUpForm = ({
             <Trans>Create a new account</Trans>
           </h1>
 
+          {/* MODIFIED for BizRethink (overlay 054): Pacta voice. */}
           <p className="text-muted-foreground mt-2 text-xs md:text-sm">
             <Trans>
-              Create your account and start using state-of-the-art document signing. Open and
-              beautiful signing is within your grasp.
+              Create your Pacta account. Send, sign, and seal contracts with timestamped audit
+              trails and AATL-grade cryptographic signatures.
             </Trans>
           </p>
         </div>
