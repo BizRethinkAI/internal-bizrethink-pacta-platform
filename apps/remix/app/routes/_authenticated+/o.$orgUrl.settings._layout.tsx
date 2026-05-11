@@ -96,9 +96,19 @@ export default function SettingsLayout() {
       icon: CreditCardIcon,
     },
   ].filter((route) => {
-    if (!isBillingEnabled && route.path.includes('/billing')) {
-      return false;
-    }
+    // MODIFIED for BizRethink (overlay 050): drop the env-var billing gate
+    // on the Billing nav entry. Upstream's `IS_BILLING_ENABLED()` reads the
+    // NEXT_PUBLIC_FEATURE_BILLING_ENABLED env var, which Pacta deliberately
+    // doesn't set — billing is configured via /admin/stripe (DB-backed,
+    // overlay 045). The org Billing page itself is the right place to
+    // render configure-billing-first messaging if the admin hasn't saved
+    // credentials yet; hiding the nav entry just leaves Personal Org
+    // users with no path to upgrade. The original gate is preserved
+    // below as documentation but disabled.
+    //
+    // if (!isBillingEnabled && route.path.includes('/billing')) {
+    //   return false;
+    // }
 
     // MODIFIED for BizRethink: gate nav links on claim flag ONLY, not on
     // billing-enabled. On self-host, billing is always disabled but BIZRETHINK
