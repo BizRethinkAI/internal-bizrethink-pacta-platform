@@ -1159,8 +1159,8 @@ model RateLimit {
 // env vars at the per-org level. Falls back to env-default when no row exists.
 
 model BizrethinkOrganisationSmtpConfig {
-  id             String @id
-  organisationId String @unique
+  id             String   @id
+  organisationId String   @unique
 
   // Mirrors `NEXT_PRIVATE_SMTP_TRANSPORT`. Phase B v1 supports `smtp-auth` only;
   // future expansion: `smtp-api`, `mailchannels`, `resend` (each adds its own
@@ -1223,11 +1223,11 @@ model BizrethinkInstanceSigningConfig {
 
   // ── gcloud-hsm fields ──
   // GCP KMS key version path. Plain text — not sensitive.
-  gcloudKeyPath     String?
+  gcloudKeyPath String?
   // Base64-encoded service-account JSON, ENCRYPTED AT REST.
   gcloudCredentials String?
   // Base64-encoded PEM cert chain, ENCRYPTED AT REST.
-  gcloudCertChain   String?
+  gcloudCertChain String?
 
   // Comma-separated TSA URLs (mirrors `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`).
   // Empty = no timestamping. With at least one URL, LTV + archival timestamp
@@ -1273,9 +1273,9 @@ model BizrethinkInstanceStorageConfig {
   s3SecretAccessKey String?
 
   // Optional CDN distribution (CloudFront-style signed URLs).
-  s3DistributionDomain String?
-  s3DistributionKeyId  String?
-  s3DistributionKeyPem String?
+  s3DistributionDomain   String?
+  s3DistributionKeyId    String?
+  s3DistributionKeyPem   String?
 
   updatedAt       DateTime @updatedAt
   updatedByUserId Int?
@@ -1300,11 +1300,11 @@ model BizrethinkSsoProvider {
   clientSecret String?
 
   // OIDC-only. wellKnownUrl + label + skipVerify + prompt.
-  oidcWellKnownUrl  String?
-  oidcProviderLabel String?
-  oidcSkipVerify    Boolean @default(false)
+  oidcWellKnownUrl   String?
+  oidcProviderLabel  String?
+  oidcSkipVerify     Boolean @default(false)
   // 'none' | 'login' | 'consent' | 'select_account'. Empty = use provider default.
-  oidcPrompt        String?
+  oidcPrompt String?
 
   updatedAt       DateTime @updatedAt
   updatedByUserId Int?
