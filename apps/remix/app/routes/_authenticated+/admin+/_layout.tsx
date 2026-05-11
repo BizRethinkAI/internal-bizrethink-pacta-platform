@@ -4,6 +4,7 @@ import {
   AlertTriangleIcon,
   BarChart3,
   Building2Icon,
+  CreditCardIcon,
   DatabaseIcon,
   FileStack,
   KeyRoundIcon,
@@ -247,6 +248,21 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/ai">
               <SparklesIcon className="mr-2 h-5 w-5" />
               <Trans>AI Config</Trans>
+            </Link>
+          </Button>
+
+          {/* MODIFIED for BizRethink (overlay 047): Stripe billing config admin UI link. */}
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/stripe') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/stripe">
+              <CreditCardIcon className="mr-2 h-5 w-5" />
+              <Trans>Billing & Stripe</Trans>
             </Link>
           </Button>
         </div>

@@ -3,6 +3,7 @@ import { router } from '@documenso/trpc/server/trpc';
 import { instanceAiRouter } from './instance-ai-router';
 import { instanceSigningRouter } from './instance-signing-router';
 import { instanceStorageRouter } from './instance-storage-router';
+import { instanceStripeRouter } from './instance-stripe-router';
 import { orgSmtpRouter } from './org-smtp-router';
 import { organisationBillingRouter } from './organisation-billing-router';
 import { ssoProviderRouter } from './sso-provider-router';
@@ -27,4 +28,8 @@ export const bizrethinkRouter = router({
   // returning trial state + internal flag for an org. Consumed by the
   // trial-banner component on the in-app billing page.
   organisationBilling: organisationBillingRouter,
+  // Phase K (Stripe-via-UI) — DB-backed Stripe credentials + mode switch
+  // + product sync. Replaces three env vars (STRIPE_API_KEY,
+  // STRIPE_WEBHOOK_SECRET, FEATURE_BILLING_ENABLED) with admin-UI config.
+  instanceStripe: instanceStripeRouter,
 });
