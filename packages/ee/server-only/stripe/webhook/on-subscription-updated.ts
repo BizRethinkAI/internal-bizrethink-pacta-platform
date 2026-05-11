@@ -92,10 +92,19 @@ export const onSubscriptionUpdated = async ({
     .with('past_due', () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
 
+  // MODIFIED for BizRethink (overlay 052): see same comment in
+  // on-subscription-created.ts. New Stripe API moved current_period_end
+  // to item level; SDK types are pinned to old version so we cast.
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const itemPeriodEnd: number | undefined = (updatedItem as any).current_period_end;
+  const rootPeriodEnd: number | undefined = (subscription as any).current_period_end;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+  const effectivePeriodEnd = itemPeriodEnd ?? rootPeriodEnd;
+
   const periodEnd =
     subscription.status === 'trialing' && subscription.trial_end
       ? new Date(subscription.trial_end * 1000)
-      : new Date(subscription.current_period_end * 1000);
+      : new Date((effectivePeriodEnd ?? 0) * 1000);
 
   // Migrate the organisation type if it is no longer an individual plan.
   if (

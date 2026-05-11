@@ -85,10 +85,22 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
     .with('past_due', () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
 
+  // MODIFIED for BizRethink (overlay 052): support newer Stripe API versions
+  // (2025-08-27+ / dahlia) which moved `current_period_end` from the
+  // subscription root to the line-item level. The SDK is pinned to an
+  // older API version whose TypeScript types don't know about the item-
+  // level field, so we cast through `any`. Read item-level first; fall
+  // back to root-level for older API versions.
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const itemPeriodEnd: number | undefined = (subscriptionItem as any).current_period_end;
+  const rootPeriodEnd: number | undefined = (subscription as any).current_period_end;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+  const effectivePeriodEnd = itemPeriodEnd ?? rootPeriodEnd;
+
   const periodEnd =
     subscription.status === 'trialing' && subscription.trial_end
       ? new Date(subscription.trial_end * 1000)
-      : new Date(subscription.current_period_end * 1000);
+      : new Date((effectivePeriodEnd ?? 0) * 1000);
 
   await prisma.subscription.upsert({
     where: {
