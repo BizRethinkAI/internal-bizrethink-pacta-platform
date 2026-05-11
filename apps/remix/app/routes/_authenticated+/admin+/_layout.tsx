@@ -56,9 +56,11 @@ type NavItemDef = {
   label: React.ReactNode;
   href: string;
   icon: LucideIcon;
-  // True if the route + UI + data model is entirely BizRethink, OR if we
-  // changed the underlying behavior meaningfully via overlays (per user
-  // 2026-05-11 — Email Domains qualifies because of SES→DNS swap).
+  // True if a BizRethink overlay patch introduced or substantively changed
+  // the route. Audited 2026-05-11: Organisation Insights (upstream #1937)
+  // and Unsealed Documents (upstream #2563) are NOT BR despite their
+  // operational/health-monitoring framing. Email Domains IS flagged (per
+  // user 2026-05-11) because overlays 008 + 009 reshape behavior.
   bizrethink: boolean;
   // Placeholder for a planned page. Renders disabled + "Soon" pill.
   disabledSoon?: boolean;
@@ -78,7 +80,7 @@ const NAV_GROUPS: NavGroupDef[] = [
         label: <Trans>Organisation Insights</Trans>,
         href: '/admin/organisation-insights',
         icon: Trophy,
-        bizrethink: true,
+        bizrethink: false,
       },
       {
         label: <Trans>Audit Log</Trans>,
@@ -116,7 +118,7 @@ const NAV_GROUPS: NavGroupDef[] = [
         label: <Trans>Unsealed Documents</Trans>,
         href: '/admin/unsealed-documents',
         icon: AlertTriangleIcon,
-        bizrethink: true,
+        bizrethink: false,
       },
     ],
   },
