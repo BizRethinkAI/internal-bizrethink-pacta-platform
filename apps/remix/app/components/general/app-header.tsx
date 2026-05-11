@@ -4,8 +4,6 @@ import { ReadStatus } from '@prisma/client';
 import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
 import { Link, useParams } from 'react-router';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { getRootHref } from '@documenso/lib/utils/params';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -16,15 +14,21 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import { AppCommandMenu } from './app-command-menu';
 import { AppNavDesktop } from './app-nav-desktop';
 import { AppNavMobile } from './app-nav-mobile';
-import { MenuSwitcher } from './menu-switcher';
+// MODIFIED for BizRethink (overlay 049): always render OrgMenuSwitcher,
+// even for solo-Personal-Org users. Upstream Documenso swaps in a
+// stripped <MenuSwitcher /> for `isPersonalLayout()` users — that variant
+// has NO link to /o/<orgUrl>/settings, so the Personal Org's billing page
+// becomes unreachable from the UI. For Pacta SaaS that's a blocker:
+// Personal Orgs are paying customers who need to upgrade Free → Pro.
+// Overlay 049 makes the org switcher universal. Other `isPersonalLayout`
+// call sites (nav/command-menu/billing-portal-button) keep their default
+// behavior; only the menu-switcher swap matters for billing reachability.
 import { OrgMenuSwitcher } from './org-menu-switcher';
 
 export type HeaderProps = HTMLAttributes<HTMLDivElement>;
 
 export const Header = ({ className, ...props }: HeaderProps) => {
   const params = useParams();
-
-  const { organisations } = useSession();
 
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
@@ -61,7 +65,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
       <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
         <Link
           to={getRootHref(params)}
-          className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
+          className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none md:inline"
         >
           {/* MODIFIED for BizRethink overlay 026: bumped from h-6 to h-9
               — gives the wordmark proper presence in the admin nav. */}
@@ -75,7 +79,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
             <InboxIcon className="text-muted-foreground hover:text-foreground h-5 w-5 flex-shrink-0 transition-colors" />
 
             {unreadCountData && unreadCountData.count > 0 && (
-              <span className="bg-primary text-primary-foreground absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold">
+              <span className="bg-primary text-primary-foreground absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold">
                 {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
               </span>
             )}
@@ -83,7 +87,8 @@ export const Header = ({ className, ...props }: HeaderProps) => {
         </Button>
 
         <div className="md:ml-4">
-          {isPersonalLayout(organisations) ? <MenuSwitcher /> : <OrgMenuSwitcher />}
+          {/* MODIFIED for BizRethink (overlay 049): always show full org switcher. */}
+          <OrgMenuSwitcher />
         </div>
 
         <div className="flex flex-row items-center space-x-4 md:hidden">
