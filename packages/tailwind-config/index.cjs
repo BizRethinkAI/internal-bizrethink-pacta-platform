@@ -67,19 +67,33 @@ module.exports = {
           DEFAULT: 'hsl(var(--widget))',
           foreground: 'hsl(var(--widget-foreground))',
         },
+        // MODIFIED for BizRethink (overlay 057): remap the `documenso-*` Tailwind
+        // color palette from upstream's signature green to Pacta charcoal. The
+        // palette name stays "documenso" because 30+ email templates + a few UI
+        // components reference `bg-documenso-500`, `text-documenso-700`, etc.
+        // by class name — remapping the values is a one-file change that
+        // updates every consumer (especially email CTA buttons) without
+        // touching any template. If we ever rename the palette, every consumer
+        // needs to be search/replaced — not worth the churn for a cosmetic
+        // alignment.
+        //
+        // Scale design: 500 is the workhorse (email CTAs); 700 is link/body
+        // emphasis. Both anchored on Pacta charcoal (#1f2937). Lower shades
+        // are slate-neutral so light backgrounds in emails read clean; upper
+        // shades darken progressively for hover/active states.
         documenso: {
-          DEFAULT: '#A2E771',
-          50: '#FFFFFF',
-          100: '#FDFFFD',
-          200: '#E7F9DA',
-          300: '#D0F3B7',
-          400: '#B9ED94',
-          500: '#A2E771',
-          600: '#83DF41',
-          700: '#66C622',
-          800: '#4D9619',
-          900: '#356611',
-          950: '#284E0D',
+          DEFAULT: '#1f2937',
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#64748b',
+          500: '#1f2937',
+          600: '#16202b',
+          700: '#111827',
+          800: '#0c121a',
+          900: '#060a10',
+          950: '#030608',
         },
         dawn: {
           DEFAULT: '#aaa89f',

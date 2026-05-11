@@ -11,8 +11,12 @@ import {
 } from '@documenso/lib/constants/app';
 
 export const appMetaTags = (title?: MessageDescriptor) => {
-  const description =
-    `${APP_FULL_NAME} — the document signing platform for BizRethink companies. Send, sign, and seal contracts with branded per-tenant identity, audit trails, and AATL-grade cryptographic signatures. Built on the Documenso open-source core.`;
+  // MODIFIED for BizRethink (overlay 056): drop the trailing
+  // "Built on the Documenso open-source core." sentence — it surfaces in
+  // OG/Twitter previews + meta description, which should read like Pacta's
+  // own positioning, not a derivative. The AGPL attribution still lives in
+  // the marketing site's About + Security pages where it belongs.
+  const description = `${APP_FULL_NAME} — the document signing platform built for teams that take agreements seriously. eIDAS-grade cryptographic signatures, AI-assisted contracts, long-term verifiability, and the compliance posture your auditors will sign off on.`;
 
   return [
     {

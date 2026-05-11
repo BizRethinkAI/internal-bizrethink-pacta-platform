@@ -18,3 +18,9 @@ packages/lib/translations/**/*.js
 
 # Docs MDX - Prettier strips indentation from code blocks inside components
 apps/docs/content/**/*.mdx
+
+# prettier-plugin-tailwindcss chokes on the tailwind config itself
+# (tries to resolve theme.css inside the package's node_modules even
+# when formatting a class-definitions file). Excluded since it's a JS
+# config, not user-facing markup. Restore if upstream tooling fixes it.
+packages/tailwind-config/index.cjs
