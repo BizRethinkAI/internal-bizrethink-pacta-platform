@@ -1,0 +1,128 @@
+# Why: SaaS-billing Phase 1 — surface trial / internal-org state on the
+#      in-app billing page. New external orgs get a 14-day Pro trial on
+#      signup (overlay 041); without UI feedback they have no way to know
+#      they're on a trial or when it ends. This patch adds a small banner
+#      at the top of `/o/<orgUrl>/settings/billing` that reads from the
+#      new `bizrethink.organisationBilling.get` TRPC procedure
+#      (additive in packages/bizrethink/server-only/trpc/) and renders
+#      one of three states:
+#        - bizrethinkInternal=true     → blue "BizRethink Internal" badge
+#        - trialEndsAt > now (>3 days) → indigo "Pro trial active, N days"
+#        - trialEndsAt > now (<=3 days)→ amber "Pro trial active, N days" urgent
+#        - trialEndsAt <= now          → red "Trial ended" with upgrade CTA
+#        - no row / loading            → renders nothing (silent fallback)
+# Why-not-additive: The billing route file is upstream Documenso
+#      (`apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx`).
+#      A new React component can live in `packages/bizrethink/ui/` long-term,
+#      but doing that for a single small component now means adding
+#      `@documenso/trpc`, `@documenso/ui`, and React deps to the bizrethink
+#      package — overkill for one banner. The component is defined inline
+#      in the patch (PactaBillingBanner, ~50 lines) and rendered above the
+#      existing billing UI. When we add more BizRethink in-app components
+#      later, extract this into `packages/bizrethink/ui/billing/`.
+# Upstream-merge-fragility: LOW. The patch adds new lines at the top of
+#      the file (component definition) and one JSX node insertion at the
+#      start of the return value. Upstream Documenso would have to delete
+#      the entire billing page or rename it for this to break. Watch for
+#      restructuring of the billing route during weekly sync.
+# Pairs with: bizrethink.organisationBilling.get TRPC procedure at
+#      packages/bizrethink/server-only/trpc/organisation-billing-router.ts
+#      (additive, wired into top-level bizrethinkRouter at router.ts).
+diff --git a/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx b/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+index b7fbcf8a1..e4058c32c 100644
+--- a/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
++++ b/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+@@ -2,7 +2,7 @@ import { msg } from '@lingui/core/macro';
+ import { useLingui } from '@lingui/react';
+ import { Trans } from '@lingui/react/macro';
+ import { SubscriptionStatus } from '@prisma/client';
+-import { Loader } from 'lucide-react';
++import { AlertTriangle, Loader, ShieldCheck, Sparkles } from 'lucide-react';
+ import type Stripe from 'stripe';
+ import { P, match } from 'ts-pattern';
+ 
+@@ -15,6 +15,74 @@ import { OrganisationBillingPortalButton } from '~/components/general/organisati
+ import { OrganisationBillingInvoicesTable } from '~/components/tables/organisation-billing-invoices-table';
+ import { appMetaTags } from '~/utils/meta';
+ 
++// BizRethink (overlay 044): trial / internal banner. Renders above the
++// upstream billing UI. Reads from bizrethink.organisationBilling.get.
++function PactaBillingBanner({ organisationId }: { organisationId: string }) {
++  const { data, isLoading } = trpc.bizrethink.organisationBilling.get.useQuery({
++    organisationId,
++  });
++
++  if (isLoading || !data) {
++    return null;
++  }
++
++  if (data.bizrethinkInternal) {
++    return (
++      <div className="mb-4 flex items-center gap-3 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-100">
++        <ShieldCheck className="h-4 w-4 flex-shrink-0" />
++        <p>
++          <Trans>
++            <span className="font-semibold">BizRethink Internal.</span> This organisation is
++            operated directly by BizRethink AI and is not subject to standard SaaS billing.
++          </Trans>
++        </p>
++      </div>
++    );
++  }
++
++  if (!data.trialEndsAt) {
++    return null;
++  }
++
++  const now = Date.now();
++  const trialEndsAtMs = new Date(data.trialEndsAt).getTime();
++  const daysRemaining = Math.ceil((trialEndsAtMs - now) / (1000 * 60 * 60 * 24));
++
++  if (trialEndsAtMs <= now) {
++    return (
++      <div className="mb-4 flex items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-100">
++        <AlertTriangle className="h-4 w-4 flex-shrink-0" />
++        <p>
++          <Trans>
++            <span className="font-semibold">Your Pro trial has ended.</span> Upgrade below to keep
++            Pro features, or your organisation will be downgraded to the Free plan.
++          </Trans>
++        </p>
++      </div>
++    );
++  }
++
++  const urgent = daysRemaining <= 3;
++  const colorClasses = urgent
++    ? 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-100'
++    : 'border-indigo-200 bg-indigo-50 text-indigo-900 dark:border-indigo-900/40 dark:bg-indigo-950/30 dark:text-indigo-100';
++
++  return (
++    <div
++      className={`mb-4 flex items-center gap-3 rounded-md border px-4 py-3 text-sm ${colorClasses}`}
++    >
++      <Sparkles className="h-4 w-4 flex-shrink-0" />
++      <p>
++        <Trans>
++          <span className="font-semibold">Pro trial active</span> — {daysRemaining}{' '}
++          {daysRemaining === 1 ? 'day' : 'days'} remaining. Add a payment method below to keep Pro
++          features after the trial ends.
++        </Trans>
++      </p>
++    </div>
++  );
++}
++
+ export function meta() {
+   return appMetaTags(msg`Billing`);
+ }
+@@ -52,6 +120,9 @@ export default function TeamsSettingBillingPage() {
+ 
+   return (
+     <div>
++      {/* BizRethink (overlay 044): trial / internal banner */}
++      <PactaBillingBanner organisationId={organisation.id} />
++
+       <div className="flex flex-row items-end justify-between">
+         <div>
+           <h3 className="text-2xl font-semibold">

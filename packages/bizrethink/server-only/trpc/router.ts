@@ -4,6 +4,7 @@ import { instanceAiRouter } from './instance-ai-router';
 import { instanceSigningRouter } from './instance-signing-router';
 import { instanceStorageRouter } from './instance-storage-router';
 import { orgSmtpRouter } from './org-smtp-router';
+import { organisationBillingRouter } from './organisation-billing-router';
 import { ssoProviderRouter } from './sso-provider-router';
 
 // Top-level BizRethink TRPC router. Wired into the main `appRouter` via
@@ -22,4 +23,8 @@ export const bizrethinkRouter = router({
   instanceStorage: instanceStorageRouter,
   ssoProvider: ssoProviderRouter,
   instanceAi: instanceAiRouter,
+  // Phase J (SaaS billing) — adds `bizrethink.organisationBilling.get`
+  // returning trial state + internal flag for an org. Consumed by the
+  // trial-banner component on the in-app billing page.
+  organisationBilling: organisationBillingRouter,
 });
