@@ -1,6 +1,9 @@
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
-import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+// MODIFIED for BizRethink (overlay 051): DB-aware billing gate so the
+// Stripe-config-in-admin-UI flow (overlay 045) actually unlocks the
+// in-app upgrade flow.
+import { NEXT_PUBLIC_WEBAPP_URL, isBillingEnabledFromConfig } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
@@ -23,7 +26,7 @@ export const createSubscriptionRoute = authenticatedProcedure
 
     const userId = ctx.user.id;
 
-    if (!IS_BILLING_ENABLED()) {
+    if (!(await isBillingEnabledFromConfig())) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Billing is not enabled',
       });

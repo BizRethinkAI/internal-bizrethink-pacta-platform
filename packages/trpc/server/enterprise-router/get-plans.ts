@@ -1,5 +1,6 @@
 import { getInternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+// MODIFIED for BizRethink (overlay 051): DB-aware billing gate.
+import { isBillingEnabledFromConfig } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
@@ -11,7 +12,7 @@ export const getPlansRoute = authenticatedProcedure.query(async ({ ctx }) => {
 
   let canCreateFreeOrganisation = false;
 
-  if (IS_BILLING_ENABLED()) {
+  if (await isBillingEnabledFromConfig()) {
     const numberOfFreeOrganisations = await prisma.organisation.count({
       where: {
         ownerUserId: userId,

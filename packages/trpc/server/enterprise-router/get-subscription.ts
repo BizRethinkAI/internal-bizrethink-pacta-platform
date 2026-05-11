@@ -1,6 +1,9 @@
 import { getInternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
 import { getSubscription } from '@documenso/ee/server-only/stripe/get-subscription';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+// MODIFIED for BizRethink (overlay 051): swap the sync env-var billing gate
+// for the DB-aware async getter so Pacta's admin-UI Stripe config
+// (overlay 045) actually unlocks the in-app billing page.
+import { isBillingEnabledFromConfig } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 
 import { authenticatedProcedure } from '../trpc';
@@ -19,7 +22,7 @@ export const getSubscriptionRoute = authenticatedProcedure
 
     const userId = ctx.user.id;
 
-    if (!IS_BILLING_ENABLED()) {
+    if (!(await isBillingEnabledFromConfig())) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Billing is not enabled',
       });
