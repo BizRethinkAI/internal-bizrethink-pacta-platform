@@ -15,6 +15,16 @@
 #   prod  — reads PACTA_PROD_DATABASE_URL (set in scripts/.creds.env or env)
 #   stg   — reads PACTA_STG_DATABASE_URL (set in scripts/.creds.env or env)
 #
+# Transport (per-env, optional):
+#   - Direct (default): psql connects to the URL host:port from your laptop.
+#   - SSH-tunneled: when PACTA_<ENV>_SSH_HOST is set (e.g.
+#     PACTA_PROD_SSH_HOST="root@45.32.220.165"), the script ships the query
+#     over SSH and runs psql ON the remote host. This is required when the
+#     URL points at a Coolify/Docker internal hostname that only resolves
+#     inside the VPS network (the typical Coolify Postgres setup). No
+#     port-forward, no background tunnel — psql executes remotely and stdout
+#     comes back over the SSH session.
+#
 # Safety:
 #   - Default mode is READ-ONLY. The script rejects queries containing
 #     INSERT / UPDATE / DELETE / DROP / TRUNCATE / ALTER / CREATE / GRANT
@@ -22,17 +32,27 @@
 #   - --write requires an interactive "yes" confirmation showing the
 #     query first. Refuses to run unattended without confirm.
 #   - PGCONNECT_TIMEOUT=10 prevents hanging on bad networks.
+#   - When SSH-tunneled, the URL string is shell-quoted with printf %q so
+#     special chars in the password don't break remote command parsing.
 #
 # ── First-time setup for prod ────────────────────────────────────────────
 # 1. In Coolify dashboard, find the pacta-platform service → Environment
 #    Variables → copy NEXT_PRIVATE_DATABASE_URL (it'll look like
-#    `postgres://docu:PASS@<host>:5432/documenso`)
-# 2. Save to scripts/.creds.env (this file is gitignored):
+#    `postgres://docu:PASS@<host>:5432/documenso`).
+# 2. (If URL host is an internal Docker hostname like `f640r884...`,
+#    you also need SSH-tunnel mode — see step 3a.)
+# 3. Save to scripts/.creds.env (this file is gitignored):
 #
 #      echo 'export PACTA_PROD_DATABASE_URL="postgres://..."' \
 #        >> scripts/.creds.env
 #
-# 3. Run queries:
+#    3a. If the URL host doesn't resolve locally, also add the VPS SSH
+#        host. The VPS must be reachable via passwordless SSH key auth:
+#
+#      echo 'export PACTA_PROD_SSH_HOST="root@45.32.220.165"' \
+#        >> scripts/.creds.env
+#
+# 4. Run queries (no flag changes — transport is auto-selected):
 #      ./scripts/bizrethink-db-query.sh prod \
 #        'SELECT id, url, name FROM "Organisation" ORDER BY "createdAt";'
 #
@@ -85,29 +105,43 @@ if [[ -z "$ENV" || "$ENV" == "-h" || "$ENV" == "--help" ]]; then
 fi
 
 ALLOW_WRITE=false
-if [[ "${1:-}" == "--write" ]]; then
-  ALLOW_WRITE=true
-  shift
-fi
+NON_INTERACTIVE=false
+while true; do
+  case "${1:-}" in
+    --write) ALLOW_WRITE=true; shift ;;
+    # --yes skips the interactive "Type yes" prompt. Use ONLY when invoking
+    # this script from another script / automation that has already shown
+    # the SQL to a human reviewer (e.g., a committed migration file).
+    # NOT a shortcut for ad-hoc destructive queries from the terminal.
+    --yes) NON_INTERACTIVE=true; shift ;;
+    *) break ;;
+  esac
+done
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CREDS_FILE="$REPO_ROOT/scripts/.creds.env"
 
-# Resolve DATABASE_URL based on env
+# Resolve DATABASE_URL + optional SSH transport host based on env.
+# When SSH_HOST is non-empty, psql runs on the remote host instead of locally
+# — required for Coolify Postgres which uses internal Docker hostnames.
+SSH_HOST=""
 case "$ENV" in
   local)
     if [[ -f "$REPO_ROOT/.env" ]]; then
       set -a; source "$REPO_ROOT/.env"; set +a
     fi
     URL="${NEXT_PRIVATE_DATABASE_URL:-}"
+    # No SSH for local — always direct.
     ;;
   prod)
     [[ -f "$CREDS_FILE" ]] && source "$CREDS_FILE"
     URL="${PACTA_PROD_DATABASE_URL:-}"
+    SSH_HOST="${PACTA_PROD_SSH_HOST:-}"
     ;;
   stg)
     [[ -f "$CREDS_FILE" ]] && source "$CREDS_FILE"
     URL="${PACTA_STG_DATABASE_URL:-}"
+    SSH_HOST="${PACTA_STG_SSH_HOST:-}"
     ;;
   *)
     echo "Unknown env: $ENV  (expected: local | prod | stg)" >&2
@@ -159,13 +193,47 @@ fi
 if $ALLOW_WRITE; then
   printf '\n⚠️  WRITE MODE on env=%s. Query:\n' "$ENV"
   printf -- '---\n%s\n---\n' "$QUERY"
-  printf 'Type "yes" to proceed: '
-  read -r confirm
-  if [[ "$confirm" != "yes" ]]; then
-    echo "Aborted." >&2
-    exit 1
+  if $NON_INTERACTIVE; then
+    printf '✓ --yes flag set; skipping interactive confirmation.\n'
+  else
+    printf 'Type "yes" to proceed: '
+    read -r confirm
+    if [[ "$confirm" != "yes" ]]; then
+      echo "Aborted." >&2
+      exit 1
+    fi
   fi
 fi
 
-# Execute
-PGCONNECT_TIMEOUT=10 psql "$URL" -v ON_ERROR_STOP=1 -c "$QUERY"
+# Execute — direct or via SSH+docker-exec depending on transport selection.
+# In both modes the query is piped via stdin to psql so we don't have to
+# worry about shell-quoting the SQL itself.
+if [[ -n "$SSH_HOST" ]]; then
+  # SSH mode. The VPS host doesn't ship psql at the OS level — Postgres
+  # runs as a Coolify-managed Docker container. The Coolify convention is
+  # that the container name == the internal Docker hostname == the host
+  # portion of the URL. Parse it out and `docker exec` into it.
+  #
+  # Strip protocol prefix → "user:pass@host:port/db", then auth →
+  # "host:port/db", then port+db → "host" which is the container name.
+  REMOTE_HOST_PART="${URL#*@}"
+  CONTAINER="${REMOTE_HOST_PART%%:*}"
+
+  if [[ -z "$CONTAINER" ]]; then
+    echo "Could not parse container name from URL." >&2
+    exit 1
+  fi
+
+  # printf %q shell-quotes the URL safely for re-evaluation by the remote
+  # bash. docker exec then passes the un-escaped URL as a single argv to
+  # psql (no further shell parsing inside the container).
+  QUOTED_URL=$(printf '%q' "$URL")
+  printf '%s\n' "$QUERY" | ssh \
+    -o ConnectTimeout=10 \
+    -o BatchMode=yes \
+    -o LogLevel=ERROR \
+    -T "$SSH_HOST" \
+    "docker exec -i $CONTAINER env PGCONNECT_TIMEOUT=10 psql $QUOTED_URL -v ON_ERROR_STOP=1"
+else
+  printf '%s\n' "$QUERY" | PGCONNECT_TIMEOUT=10 psql "$URL" -v ON_ERROR_STOP=1
+fi
