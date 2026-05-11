@@ -223,21 +223,27 @@ export const SignUpForm = ({
           community-cards backdrop + Timur fake profile with the Pacta-branded
           hero panel that mirrors the pacta.ink marketing site (charcoal bg
           + gold radial gradient + brand copy + trust signals). */}
-      <div className="hidden flex-1 xl:flex">
+      {/* MODIFIED for BizRethink (overlay 054, revised): cap the hero width
+          on large displays so it stays proportional alongside the form. */}
+      <div className="hidden max-w-2xl flex-1 xl:flex">
         <PactaSignupHero className="min-h-[min(850px,80vh)] w-full" />
       </div>
 
-      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
-        <div className="h-20">
+      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-xl flex-col rounded-xl border bg-neutral-100 p-6">
+        {/* MODIFIED for BizRethink (overlay 054, revised): removed `h-20`
+            fixed height — upstream sized this for Documenso's short
+            two-line subtitle; Pacta's longer copy was overflowing into
+            the form fields below. Letting it auto-size with the content
+            keeps the layout from clipping. */}
+        <div>
           <h1 className="text-xl font-semibold md:text-2xl">
             <Trans>Create a new account</Trans>
           </h1>
 
-          {/* MODIFIED for BizRethink (overlay 054): Pacta voice. */}
           <p className="text-muted-foreground mt-2 text-xs md:text-sm">
             <Trans>
-              Create your Pacta account. Send, sign, and seal contracts with timestamped audit
-              trails and AATL-grade cryptographic signatures.
+              Send, sign, and seal contracts with timestamped audit trails and AATL-grade
+              cryptographic signatures.
             </Trans>
           </p>
         </div>

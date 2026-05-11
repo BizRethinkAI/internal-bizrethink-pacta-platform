@@ -138,51 +138,98 @@ const AiDraftingVisual = () => (
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VISUAL 3 — Native iOS app
-// Simplified iPhone frame showing the app: header, document card, big CTA.
+// iPhone frame with proper ~9:19 aspect ratio (prior revision was too
+// square, looked like an Apple Watch). Includes status bar, Dynamic
+// Island notch, app content, and home indicator pill.
 // ─────────────────────────────────────────────────────────────────────────────
 const IosAppVisual = () => (
-  <div className="relative flex h-full w-full items-center justify-center p-6">
-    <div className="relative">
-      {/* Phone frame */}
-      <div className="relative w-[180px] overflow-hidden rounded-[2.25rem] border-[5px] border-white/20 bg-[#0f1419] p-3 shadow-2xl">
-        {/* Notch */}
-        <div className="mx-auto mb-2 h-1 w-12 rounded-full bg-white/30" />
+  <div className="relative flex h-full w-full items-center justify-center p-4">
+    {/* Phone frame — fixed aspect ratio so it always reads as a phone. */}
+    <div
+      className="relative flex flex-col overflow-hidden rounded-[2rem] border-[3px] border-white/15 bg-[#0a0e14] shadow-2xl"
+      style={{ width: '155px', aspectRatio: '9 / 19' }}
+    >
+      {/* Status bar */}
+      <div className="flex items-center justify-between px-4 pt-2 text-[8px] font-semibold text-white">
+        <span>9:41</span>
+        <div className="flex items-center gap-1">
+          {/* Signal bars */}
+          <div className="flex items-end gap-px">
+            <div className="h-1 w-0.5 rounded-sm bg-white/80" />
+            <div className="h-1.5 w-0.5 rounded-sm bg-white/80" />
+            <div className="h-2 w-0.5 rounded-sm bg-white/80" />
+            <div className="h-2.5 w-0.5 rounded-sm bg-white/80" />
+          </div>
+          {/* Battery */}
+          <div className="relative ml-0.5 h-2 w-3.5 rounded-[2px] border border-white/70">
+            <div className="absolute inset-0.5 rounded-[1px] bg-white/80" />
+          </div>
+        </div>
+      </div>
 
+      {/* Dynamic Island */}
+      <div className="mt-1 flex justify-center">
+        <div className="h-3 w-12 rounded-full bg-black" />
+      </div>
+
+      {/* App content */}
+      <div className="flex flex-1 flex-col px-3 pt-3">
         {/* App header */}
-        <div className="mb-3 flex items-center justify-between px-1">
-          <div className="text-[11px] font-bold tracking-tight text-white">
+        <div className="mb-2.5 flex items-center justify-between">
+          <div className="text-[12px] font-bold tracking-tight text-white">
             pacta<span className="text-[#d4a574]">.</span>
           </div>
-          <div className="h-1.5 w-1.5 rounded-full bg-[#d4a574]" />
+          <div className="h-5 w-5 rounded-full bg-white/15" />
         </div>
 
-        {/* Document card */}
-        <div className="mb-3 rounded-xl border border-white/10 bg-white/5 p-2.5">
-          <div className="mb-1.5 h-1 w-3/4 rounded-full bg-white/30" />
-          <div className="mb-2 h-1 w-1/2 rounded-full bg-white/15" />
-          <div className="flex items-center gap-1.5">
+        {/* Section label */}
+        <div className="mb-1.5 text-[7px] font-semibold tracking-[0.14em] text-white/40 uppercase">
+          Awaiting signature
+        </div>
+
+        {/* Document card (in progress) */}
+        <div className="mb-2 rounded-lg border border-[#d4a574]/30 bg-[#d4a574]/[0.06] p-2">
+          <div className="mb-1 h-1 w-3/4 rounded-full bg-white/40" />
+          <div className="mb-1.5 h-0.5 w-1/2 rounded-full bg-white/20" />
+          <div className="flex items-center gap-1">
             <div className="h-1 w-1 rounded-full bg-[#d4a574]" />
-            <div className="text-[8px] font-medium tracking-wider text-[#d4a574] uppercase">
-              Awaiting signature
-            </div>
+            <div className="text-[7px] font-medium text-[#d4a574]">2 of 3 signed</div>
           </div>
         </div>
 
-        {/* Document card (second) */}
-        <div className="mb-3 rounded-xl border border-white/10 bg-white/5 p-2.5">
-          <div className="mb-1.5 h-1 w-2/3 rounded-full bg-white/30" />
-          <div className="mb-2 h-1 w-3/5 rounded-full bg-white/15" />
-          <div className="flex items-center gap-1.5">
+        {/* Section label */}
+        <div className="mt-1 mb-1.5 text-[7px] font-semibold tracking-[0.14em] text-white/40 uppercase">
+          Recently completed
+        </div>
+
+        {/* Document card (sealed 3h) */}
+        <div className="mb-1.5 rounded-lg border border-white/10 bg-white/5 p-2">
+          <div className="mb-1 h-1 w-2/3 rounded-full bg-white/30" />
+          <div className="mb-1.5 h-0.5 w-3/5 rounded-full bg-white/15" />
+          <div className="flex items-center gap-1">
             <div className="h-1 w-1 rounded-full bg-emerald-400" />
-            <div className="text-[8px] font-medium tracking-wider text-emerald-400/80 uppercase">
-              Completed
-            </div>
+            <div className="text-[7px] font-medium text-emerald-400/80">Sealed · 3h ago</div>
+          </div>
+        </div>
+
+        {/* Document card (sealed yesterday) */}
+        <div className="rounded-lg border border-white/10 bg-white/5 p-2">
+          <div className="mb-1 h-1 w-3/5 rounded-full bg-white/30" />
+          <div className="mb-1.5 h-0.5 w-2/5 rounded-full bg-white/15" />
+          <div className="flex items-center gap-1">
+            <div className="h-1 w-1 rounded-full bg-emerald-400" />
+            <div className="text-[7px] font-medium text-emerald-400/80">Sealed · yesterday</div>
           </div>
         </div>
 
         {/* CTA */}
-        <div className="rounded-xl bg-white py-2 text-center text-[10px] font-semibold text-[#1f2937]">
+        <div className="mt-auto mb-2 rounded-xl bg-white py-2 text-center text-[9px] font-semibold text-[#1f2937]">
           Sign with Face ID
+        </div>
+
+        {/* Home indicator */}
+        <div className="mb-1.5 flex justify-center">
+          <div className="h-0.5 w-10 rounded-full bg-white/60" />
         </div>
       </div>
     </div>
