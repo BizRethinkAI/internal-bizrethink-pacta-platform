@@ -1,6 +1,6 @@
 # UPSTREAM.md — handling Documenso upstream merges
 
-Runbook for keeping `internal-bizrethink-documenso` in sync with `documenso/documenso` upstream while preserving BizRethink customizations.
+Runbook for keeping `internal-bizrethink-pacta-platform` in sync with `documenso/documenso` upstream while preserving BizRethink customizations.
 
 ## Weekly automated sync (preferred path)
 
@@ -16,7 +16,7 @@ Review the PR, run smoke tests, merge.
 ## Manual sync (when the action fails)
 
 ```bash
-cd ~/github/bizrethink/internal-bizrethink-documenso
+cd ~/github/bizrethink/internal-bizrethink-pacta-platform
 git fetch upstream
 git checkout -b sync/$(date +%Y-%m-%d)
 git merge upstream/main

@@ -1,16 +1,15 @@
-# internal-bizrethink-documenso — Project context
+# internal-bizrethink-pacta-platform — Project context
 
 BizRethink AI's document signing platform. **Additive fork of [documenso/documenso](https://github.com/documenso/documenso).** All BizRethink customization lives in `packages/bizrethink/` and `overlays/*.patch`; upstream files in `apps/` and `packages/*` (except `bizrethink/`) are NEVER modified directly.
 
 ## Background — read before designing anything
 
-**This project replaces the deprecated `internal-bizrethink-docuseal-deprecated`** (sibling directory). Five working days were spent attempting to build a CLI for self-hosted DocuSeal Pro before discovering that on-prem DocuSeal lacks the multi-tenant API surface the bootstrap spec assumed. Documenso has the correct surface (per-team API tokens, first-class multi-team primitives) and matches BizRethink's TypeScript stack.
+**This project replaces a deprecated DocuSeal CLI attempt** (`internal-bizrethink-docuseal-deprecated`, deleted from local 2026-05-10 — never pushed to GitHub; safety tarball at `/tmp/docuseal-deprecated-backup-2026-05-10.tar.gz`). Five working days were spent attempting to build a CLI for self-hosted DocuSeal Pro before discovering that on-prem DocuSeal lacks the multi-tenant API surface the bootstrap spec assumed. Documenso has the correct surface (per-team API tokens, first-class multi-team primitives) and matches BizRethink's TypeScript stack.
 
-- **Decision rationale + paywall audit:** `~/.claude/projects/-Users-shwet-github-bizrethink-internal-bizrethink-documenso/memory/`
+- **Decision rationale + paywall audit:** `~/.claude/projects/-Users-shwet-github-bizrethink-internal-bizrethink-pacta-platform/memory/`
   - `documenso_paywall_audit.md` — confirms self-host unlock = 1 env var + 1-line patch
-  - `lessons_from_docuseal_attempt.md` — what we learned the hard way
+  - `lessons_from_docuseal_attempt.md` — what we learned + patterns worth carrying forward
   - `coolify_api.md` — Coolify access pattern (still valid)
-- **Migration notes (DocuSeal):** `~/github/bizrethink/internal-bizrethink-docuseal-deprecated/MIGRATION_NOTES.md`
 - **Setup Guide (deprecated):** `~/Desktop/Claude Cowork/BizRethink/Platform/DocuSeal_Setup_Guide.md` — has a deprecation banner; §10 (business model) still valid, everything DocuSeal-specific is stale
 - **Cutover target unchanged: 2026-05-10** (MFG-only acceptable on day one; MORG CAP can roll out the following week)
 
@@ -27,7 +26,7 @@ BizRethink AI's document signing platform. **Additive fork of [documenso/documen
 ## Layout
 
 ```
-internal-bizrethink-documenso/
+internal-bizrethink-pacta-platform/
 ├── apps/                            ← upstream files (DON'T MODIFY)
 │   ├── remix/                       ← main web app
 │   ├── docs/                        ← docs site (probably skip deploying)
