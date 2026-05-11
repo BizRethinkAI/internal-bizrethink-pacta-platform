@@ -46,6 +46,7 @@
     "autoprefixer": "^10.4.22",
     "colord": "^2.9.3",
     "content-disposition": "^1.0.1",
+    "dlv": "^1.1.3",
     "framer-motion": "^12.23.24",
     "hono": "^4.12.18",
     "hono-react-router-adapter": "^0.6.5",
