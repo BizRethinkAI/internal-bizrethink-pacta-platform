@@ -1,8 +1,17 @@
+// MODIFIED for BizRethink (overlay 045b): read webhook secret + billing-
+// enabled flag from DB-backed config (BizrethinkInstanceStripeConfig)
+// before falling back to env vars. Also calls ensureStripeClient() to
+// guarantee the SDK singleton is using the active mode's API key when
+// verifying the signature — sandbox events won't verify against a live
+// secret, which is the correct fail-closed behavior.
+import {
+  getInstanceStripeConfig,
+  isBillingEnabled as isBillingEnabledFromConfig,
+} from '@bizrethink/customizations/server-only/instance-stripe-config';
 import { match } from 'ts-pattern';
 
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
-import { stripe } from '@documenso/lib/server-only/stripe';
+import { ensureStripeClient, stripe } from '@documenso/lib/server-only/stripe';
 import { env } from '@documenso/lib/utils/env';
 
 import { onSubscriptionCreated } from './on-subscription-created';
@@ -16,9 +25,12 @@ type StripeWebhookResponse = {
 
 export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
   try {
-    const isBillingEnabled = IS_BILLING_ENABLED();
+    const isBillingEnabled = await isBillingEnabledFromConfig();
 
-    const webhookSecret = env('NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET');
+    // Read webhook secret from DB-backed config (active mode), falling back
+    // to env var for the bootstrap path on fresh deploys.
+    const config = await getInstanceStripeConfig();
+    const webhookSecret = config?.webhookSecret ?? env('NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET');
 
     if (!webhookSecret) {
       throw new Error('Missing Stripe webhook secret');
@@ -33,6 +45,12 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
         { status: 500 },
       );
     }
+
+    // Make sure the SDK singleton matches the current DB-active mode before
+    // verifying the signature. Without this, a sandbox->live mode switch
+    // followed by a webhook delivery from the previous mode would use a
+    // stale `stripe` binding.
+    await ensureStripeClient();
 
     const signature =
       typeof req.headers.get('stripe-signature') === 'string'

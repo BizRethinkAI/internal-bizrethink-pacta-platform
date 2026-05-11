@@ -17,6 +17,25 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = () =>
 
 export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
 
+// MODIFIED for BizRethink (overlay 045c): async variant that reads from
+// the DB-backed BizrethinkInstanceStripeConfig singleton with env-var
+// fallback. New code paths (webhook handler, billing-gated TRPC routes,
+// admin UI gates) prefer this over the sync IS_BILLING_ENABLED() so
+// admins can toggle billing via the admin UI without a redeploy.
+//
+// The sync IS_BILLING_ENABLED() is kept for backward compat with 25+
+// existing call sites that can't easily go async (component renders,
+// loader gates, etc.). Those still read the env var; migrating them to
+// the DB-aware variant happens gradually as we touch each one.
+export const isBillingEnabledFromConfig = async (): Promise<boolean> => {
+  // Dynamic import to avoid a hot import cycle:
+  // app.ts → instance-stripe-config → prisma → (lots of other lib code).
+  // Lazy resolution keeps this constants file lightweight.
+  const { isBillingEnabled } =
+    await import('@bizrethink/customizations/server-only/instance-stripe-config');
+  return isBillingEnabled();
+};
+
 export const API_V2_BETA_URL = '/api/v2-beta';
 export const API_V2_URL = '/api/v2';
 

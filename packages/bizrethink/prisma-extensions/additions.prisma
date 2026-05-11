@@ -252,3 +252,76 @@ model BizrethinkOrganisationBilling {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ─── Phase K (overlay 045) — instance Stripe billing config ──────────────
+//
+// Singleton row holding the Stripe credentials + master billing toggle.
+// Replaces THREE upstream env vars with admin-UI config:
+//   - NEXT_PRIVATE_STRIPE_API_KEY          → activeApiKey (from current mode)
+//   - NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET   → activeWebhookSecret (from current mode)
+//   - NEXT_PUBLIC_FEATURE_BILLING_ENABLED  → billingEnabled (boolean)
+//
+// Two-mode design: holds BOTH sandbox AND live credential sets in one row
+// with a `mode` toggle that flips which set is active at runtime. Switching
+// modes is a single UI click + cache invalidation, no redeploy. Matches
+// the BizrethinkInstanceStorageConfig pattern (transport: database|s3 with
+// distinct columns per transport).
+//
+// All four secret columns (sandboxApiKey, sandboxWebhookSecret, liveApiKey,
+// liveWebhookSecret) are ENCRYPTED AT REST with NEXT_PRIVATE_ENCRYPTION_KEY
+// via symmetricEncrypt; getter decrypts on read. Publishable keys are
+// plaintext (they're public by design — fine to render in UI).
+//
+// Fallback semantics: if no row exists, the server-only getter
+// (instance-stripe-config.ts) returns null → callers fall back to the
+// upstream env vars. This preserves the bootstrap path for fresh deploys
+// and keeps the system functional during the env-var-to-DB migration.
+
+model BizrethinkInstanceStripeConfig {
+  id String @id @default("singleton")
+
+  // Master toggle — replaces NEXT_PUBLIC_FEATURE_BILLING_ENABLED env var.
+  // When false, isBillingEnabledFromConfig() returns false and all
+  // upstream Stripe glue (Stripe customer creation, seat sync, checkout
+  // routes) is gated off. Defaults false on first deploy — admin opts in.
+  billingEnabled Boolean @default(false)
+
+  // Active credential set. 'sandbox' uses sandbox* fields; 'live' uses live*.
+  // Switching is a UI click — invalidateStripeClient() rebuilds the SDK
+  // singleton with the new mode's credentials. No redeploy required.
+  mode String @default("sandbox")
+
+  // ── Sandbox credentials ──
+  // sk_test_... — encrypted at rest. Used by Stripe SDK when mode='sandbox'.
+  sandboxApiKey String?
+  // whsec_... — encrypted at rest. Used by webhook handler when mode='sandbox'.
+  sandboxWebhookSecret String?
+  // pk_test_... — plaintext, public-by-design. Optional. For client-side
+  // Checkout / Elements customization in future.
+  sandboxPublishableKey String?
+
+  // ── Live credentials ──
+  // sk_live_... — encrypted at rest. ⚠️ Real-money mode.
+  liveApiKey String?
+  // whsec_... — encrypted at rest. Live-mode webhook signing secret.
+  liveWebhookSecret String?
+  // pk_live_... — plaintext, public-by-design.
+  livePublishableKey String?
+
+  // ── Test-connection status (drives admin UI "Connected ✓ 2h ago" badges) ──
+  // Updated on every successful stripe.balance.retrieve() call from the
+  // "Test connection" button. lastTestError* cleared on success, populated
+  // on failure with the Stripe error message.
+  lastTestedSandbox    DateTime?
+  lastTestErrorSandbox String?
+  lastTestedLive       DateTime?
+  lastTestErrorLive    String?
+
+  // Statement descriptor that appears on customer credit-card statements.
+  // ≤22 chars per Stripe. Default "PACTA SIGN". Applied to Stripe Checkout
+  // sessions at creation time.
+  statementDescriptor String?
+
+  updatedAt       DateTime @updatedAt
+  updatedByUserId Int?
+}
