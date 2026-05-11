@@ -27,6 +27,10 @@ const ZBillingState = z
     bizrethinkInternal: z.boolean(),
     trialStartedAt: z.date().nullable(),
     trialEndsAt: z.date().nullable(),
+    // Phase L follow-up (2026-05-11): true when the org has an active Stripe
+    // subscription. The trial banner should suppress itself in that case —
+    // upstream's own "subscribed to Pacta Pro" line already conveys the state.
+    hasActiveSubscription: z.boolean(),
   })
   .nullable();
 
@@ -52,18 +56,39 @@ export const organisationBillingRouter = router({
         });
       }
 
-      const row = await prisma.bizrethinkOrganisationBilling.findUnique({
-        where: { organisationId },
-        select: {
-          bizrethinkInternal: true,
-          trialStartedAt: true,
-          trialEndsAt: true,
-        },
-      });
+      const [row, activeSubscription] = await Promise.all([
+        prisma.bizrethinkOrganisationBilling.findUnique({
+          where: { organisationId },
+          select: {
+            bizrethinkInternal: true,
+            trialStartedAt: true,
+            trialEndsAt: true,
+          },
+        }),
+        // Check upstream's Subscription table — anything other than INACTIVE
+        // means the org is on a real paid (or trialing-via-Stripe) plan and
+        // the BizRethink trial banner should hide itself.
+        prisma.subscription.findFirst({
+          where: {
+            organisationId,
+            status: { in: ['ACTIVE', 'PAST_DUE'] },
+          },
+          select: { id: true },
+        }),
+      ]);
+
+      const hasActiveSubscription = !!activeSubscription;
 
       // No row = no BizRethink billing state recorded (legacy org pre-migration
       // OR a brand-new org where overlay 041's helper hasn't run yet). Returning
       // null lets the UI fall back to upstream's default billing display.
-      return row ?? null;
+      if (!row) {
+        return null;
+      }
+
+      return {
+        ...row,
+        hasActiveSubscription,
+      };
     }),
 });

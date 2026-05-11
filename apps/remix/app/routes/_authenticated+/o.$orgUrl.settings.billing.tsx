@@ -40,6 +40,14 @@ function PactaBillingBanner({ organisationId }: { organisationId: string }) {
     );
   }
 
+  // Phase L follow-up (2026-05-11): once the org has an active Stripe
+  // subscription, the trial concept is moot — upstream's billing page
+  // already shows "subscribed to Pacta Pro · renews on …". Hide the trial
+  // banner to avoid contradicting that.
+  if (data.hasActiveSubscription) {
+    return null;
+  }
+
   if (!data.trialEndsAt) {
     return null;
   }
