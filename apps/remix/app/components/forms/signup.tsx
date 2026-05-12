@@ -226,10 +226,10 @@ export const SignUpForm = ({
       {/* MODIFIED for BizRethink (overlay 054, revised): cap the hero width
           on large displays so it stays proportional alongside the form. */}
       <div className="hidden max-w-2xl flex-1 xl:flex">
-        <PactaSignupHero className="min-h-[min(720px,72vh)] w-full" />
+        <PactaSignupHero className="min-h-[min(640px,65vh)] w-full" />
       </div>
 
-      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(720px,72vh)] w-full max-w-xl flex-col rounded-xl border bg-neutral-100 p-6">
+      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(640px,65vh)] w-full max-w-xl flex-col rounded-xl border bg-neutral-100 p-6">
         {/* MODIFIED for BizRethink (overlay 054, revised): removed `h-20`
             fixed height — upstream sized this for Documenso's short
             two-line subtitle; Pacta's longer copy was overflowing into

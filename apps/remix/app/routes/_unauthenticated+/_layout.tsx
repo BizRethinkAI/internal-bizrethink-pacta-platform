@@ -29,10 +29,11 @@ export default function Layout() {
         </a>
       </div>
 
-      {/* Page content centered in the remaining viewport space. Extra
-          top padding so the panels sit comfortably below the logo
-          instead of crowding it. */}
-      <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-4 pt-10 pb-8 md:px-12 md:pt-14 md:pb-12 lg:px-16 lg:pt-16 lg:pb-16">
+      {/* Page content centered in the remaining viewport space. The top
+          padding is intentionally LARGER than the side padding so the
+          panels sit clearly below the logo (previous symmetric `p-16`
+          made the panels crowd the logo). */}
+      <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-4 pt-12 pb-8 md:px-12 md:pt-20 md:pb-12 lg:px-16 lg:pt-28 lg:pb-16">
         <div className="absolute -inset-[min(600px,max(400px,60vw))] -z-[1] flex items-center justify-center opacity-70">
           <img
             src={backgroundPattern}
