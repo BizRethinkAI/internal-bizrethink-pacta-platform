@@ -39,9 +39,13 @@ export const isBillingEnabledFromConfig = async (): Promise<boolean> => {
 export const API_V2_BETA_URL = '/api/v2-beta';
 export const API_V2_URL = '/api/v2';
 
-// MODIFIED for BizRethink overlay 021: rebrand support email default.
-// Operators can still override via NEXT_PUBLIC_SUPPORT_EMAIL env var.
-export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@bizrethink.ai';
+// MODIFIED for BizRethink overlay 021 (revised 2026-05-12): SUPPORT_EMAIL
+// default flipped from `support@bizrethink.ai` to `hello@pacta.ink` to
+// match what the marketing site (pacta.ink) uses everywhere. Single
+// public-facing email for Pacta makes inbound easier to triage and is
+// less confusing for users — they don't have to remember which brand
+// owns which inbox. Operators can still override via env var.
+export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'hello@pacta.ink';
 
 // Added for BizRethink overlay 021: canonical product name used in meta tags,
 // page titles, and email copy. Pacta is the BizRethink AI document signing

@@ -2,6 +2,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
+import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
+
 import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -68,16 +70,12 @@ export const ResetPasswordTemplate = ({
                 <Trans>
                   Didn't request a password change? We are here to help you secure your account,
                   just{' '}
-                  {/* MODIFIED for BizRethink (overlay 058): swap stray
-                      hi@documenso.com mailto for Pacta's support email so
-                      reset-password recipients reach BizRethink, not
-                      Documenso's general inbox. SUPPORT_EMAIL constant
-                      (overlay 021) already drives every other email
-                      contact link — this one was missed. */}
-                  <Link
-                    className="text-documenso-700 font-normal"
-                    href="mailto:support@bizrethink.ai"
-                  >
+                  {/* MODIFIED for BizRethink (overlay 058, revised
+                      2026-05-12): use SUPPORT_EMAIL constant (now
+                      hello@pacta.ink per overlay 021 revision) so this
+                      stays in sync with the rest of the app + the
+                      marketing site. */}
+                  <Link className="text-documenso-700 font-normal" href={`mailto:${SUPPORT_EMAIL}`}>
                     contact us
                   </Link>
                   .
