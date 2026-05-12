@@ -26,8 +26,18 @@ jobs:
       - name: Copy env
         run: cp .env.example .env
 
+      # MODIFIED for BizRethink (overlay 059): exclude @documenso/docs from the
+      # CI build. Pacta doesn't deploy the upstream Documenso docs site (per
+      # CLAUDE.md; "apps/docs — docs site, probably skip deploying"). After
+      # Phase 0's lockfile regen + Dependabot patches, the docs app's
+      # transitive deps (@mdx-js/mdx, @fumadocs/ui CSS path) ended up broken.
+      # Coolify builds via Docker which targets only apps/remix, so deploys
+      # work — but `npm run build` at the monorepo root via Turborepo expands
+      # to build every workspace including apps/docs, failing CI on every
+      # push. Filtering it out via Turbo flag silences the false alarm and
+      # still validates everything Pacta actually ships.
       - name: Build app
-        run: npm run build
+        run: npm run build -- --filter=!@documenso/docs
 
   build_docker:
     name: Build Docker Image
