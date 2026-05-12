@@ -43,34 +43,35 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
   if (!license) {
     return (
       <div className="relative">
-        <div className="absolute right-3 top-3 z-10">
+        <div className="absolute top-3 right-3 z-10">
           <AdminLicenseResyncButton />
         </div>
         <CardMetric icon={KeyRoundIcon} title={t`License`} className="h-fit max-h-fit">
           <div className="mt-1 flex items-center justify-center gap-2">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-muted-foreground/30 bg-muted/50">
-              <KeyRoundIcon className="h-5 w-5 text-muted-foreground/50" />
+            <div className="border-muted-foreground/30 bg-muted/50 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed">
+              <KeyRoundIcon className="text-muted-foreground/50 h-5 w-5" />
             </div>
 
             <div className="flex flex-col gap-0.5">
               {licenseData?.requestedLicenseKey ? (
                 <>
-                  <p className="text-sm font-medium text-destructive">
+                  <p className="text-destructive text-sm font-medium">
                     <Trans>Invalid License Key</Trans>
                   </p>
                   {/* Don't need to hide invalid license keys. */}
-                  <p className="text-xs text-muted-foreground">{licenseData.requestedLicenseKey}</p>
+                  <p className="text-muted-foreground text-xs">{licenseData.requestedLicenseKey}</p>
                 </>
               ) : (
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-muted-foreground text-sm font-medium">
                   <Trans>No License Configured</Trans>
                 </p>
               )}
 
+              {/* MODIFIED for BizRethink (overlay 060): Pacta plan docs. */}
               <Link
-                to="https://docs.documenso.com/users/licenses/enterprise-edition"
+                to="https://pacta.ink/docs/getting-started/choose-a-plan"
                 target="_blank"
-                className="flex flex-row items-center text-xs text-muted-foreground hover:text-muted-foreground/80"
+                className="text-muted-foreground hover:text-muted-foreground/80 flex flex-row items-center text-xs"
               >
                 <Trans>Learn more</Trans> <ArrowRightIcon className="h-3 w-3" />
               </Link>
@@ -84,17 +85,17 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
   const enabledFlags = Object.entries(license.flags).filter(([, enabled]) => enabled);
 
   return (
-    <div className="relative max-w-full overflow-hidden rounded-lg border border-border bg-background px-4 pb-6 pt-4 shadow shadow-transparent duration-200 hover:shadow-border/80">
-      <div className="absolute right-3 top-3">
+    <div className="border-border bg-background hover:shadow-border/80 relative max-w-full overflow-hidden rounded-lg border px-4 pt-4 pb-6 shadow shadow-transparent duration-200">
+      <div className="absolute top-3 right-3">
         <AdminLicenseResyncButton />
       </div>
 
       <div className="flex items-start gap-2">
         <div className="h-4 w-4">
-          <KeyRoundIcon className="h-4 w-4 text-muted-foreground" />
+          <KeyRoundIcon className="text-muted-foreground h-4 w-4" />
         </div>
 
-        <h3 className="text-primary-forground mb-2 flex items-end text-sm font-medium leading-tight">
+        <h3 className="text-primary-forground mb-2 flex items-end text-sm leading-tight font-medium">
           <Trans>Pacta License</Trans>
         </h3>
 
@@ -122,27 +123,27 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
 
       <div className="mt-4 grid grid-cols-2 gap-4">
         <div>
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-foreground text-sm font-medium">
             <Trans>License</Trans>
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{license.name}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">{license.name}</p>
         </div>
 
         <div>
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-foreground text-sm font-medium">
             <Trans>Expires</Trans>
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-xs">
             {i18n.date(license.periodEnd, DateTime.DATE_MED)}
           </p>
         </div>
 
         <div>
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-foreground text-sm font-medium">
             <Trans>License Key</Trans>
           </p>
           <div className="mt-0.5 flex items-center gap-1">
-            <p className="min-w-0 break-all text-xs text-muted-foreground">
+            <p className="text-muted-foreground min-w-0 text-xs break-all">
               {isLicenseKeyVisible ? license.licenseKey : '•'.repeat(license.licenseKey.length)}
             </p>
 
@@ -150,7 +151,7 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
               type="button"
               variant="ghost"
               size="sm"
-              className="h-6 w-6 p-0 text-muted-foreground"
+              className="text-muted-foreground h-6 w-6 p-0"
               aria-label={isLicenseKeyVisible ? t`Hide license key` : t`Show license key`}
               onClick={() => setIsLicenseKeyVisible((prevState) => !prevState)}
             >
@@ -164,10 +165,10 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
         </div>
 
         <div>
-          <p className="text-sm font-medium text-foreground">
+          <p className="text-foreground text-sm font-medium">
             <Trans>Features</Trans>
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-0.5 text-xs">
             {enabledFlags.length > 0 ? (
               enabledFlags
                 .map(

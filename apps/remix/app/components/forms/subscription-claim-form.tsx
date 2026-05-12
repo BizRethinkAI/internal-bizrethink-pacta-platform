@@ -174,7 +174,7 @@ export const SubscriptionClaimForm = ({
                               />
 
                               <label
-                                className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+                                className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
                                 htmlFor={`flag-${key}`}
                               >
                                 {label}
@@ -195,8 +195,11 @@ export const SubscriptionClaimForm = ({
                 <AlertDescription>
                   <span>¹&nbsp;</span>
                   <Trans>Your current license does not include these features.</Trans>{' '}
+                  {/* MODIFIED for BizRethink (overlay 060): point at the
+                      Pacta Choose-a-Plan article instead of Documenso's
+                      enterprise-edition docs. */}
                   <Link
-                    to="https://docs.documenso.com/users/licenses/enterprise-edition"
+                    to="https://pacta.ink/docs/getting-started/choose-a-plan"
                     target="_blank"
                     className="text-foreground underline hover:opacity-80"
                   >

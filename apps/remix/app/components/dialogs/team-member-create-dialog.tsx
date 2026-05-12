@@ -197,12 +197,13 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                   <TooltipTrigger asChild>
                     <InfoIcon className="mx-2 h-4 w-4" />
                   </TooltipTrigger>
-                  <TooltipContent className="z-[99999] max-w-xs text-muted-foreground">
+                  <TooltipContent className="text-muted-foreground z-[99999] max-w-xs">
                     <Trans>
                       To be able to add members to a team, you must first add them to the
                       organisation. For more information, please see the{' '}
+                      {/* MODIFIED for BizRethink (overlay 060): Pacta org-setup docs. */}
                       <Link
-                        to="https://docs.documenso.com/users/organisations/members"
+                        to="https://pacta.ink/docs/getting-started/organisation-setup"
                         target="_blank"
                         rel="noreferrer"
                         className="text-documenso-700 hover:text-documenso-600 hover:underline"
@@ -260,14 +261,14 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
 
                         <FormControl>
                           {hasNoAvailableMembers ? (
-                            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-muted-foreground/25 bg-muted/30 px-6 py-12 text-center">
-                              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-                                <UserPlusIcon className="h-6 w-6 text-muted-foreground" />
+                            <div className="border-muted-foreground/25 bg-muted/30 flex flex-col items-center justify-center rounded-lg border border-dashed px-6 py-12 text-center">
+                              <div className="bg-muted mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+                                <UserPlusIcon className="text-muted-foreground h-6 w-6" />
                               </div>
                               <h3 className="mb-2 text-sm font-semibold">
                                 <Trans>No organisation members available</Trans>
                               </h3>
-                              <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+                              <p className="text-muted-foreground mb-6 max-w-sm text-sm">
                                 {canInviteOrganisationMembers ? (
                                   <Trans>
                                     To add members to this team, you must first add them to the
@@ -317,7 +318,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                   })),
                                 );
                               }}
-                              className="w-full bg-background"
+                              className="bg-background w-full"
                               emptySelectionPlaceholder={t`Select members`}
                             />
                           )}
@@ -335,7 +336,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                 className="mt-2 flex items-center gap-2 space-y-0"
                               >
                                 <div>
-                                  <UserPlusIcon className="h-5 w-5 text-muted-foreground" />
+                                  <UserPlusIcon className="text-muted-foreground h-5 w-5" />
                                 </div>
                                 <AlertDescription className="mt-0 flex-1">
                                   <Trans>Can't find someone?</Trans>{' '}
@@ -346,7 +347,7 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                                       <Button
                                         type="button"
                                         variant="link"
-                                        className="h-auto p-0 text-sm font-medium text-documenso-700 hover:text-documenso-600"
+                                        className="text-documenso-700 hover:text-documenso-600 h-auto p-0 text-sm font-medium"
                                       >
                                         <Trans>Invite them to the organisation first</Trans>
                                       </Button>

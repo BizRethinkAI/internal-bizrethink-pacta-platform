@@ -113,7 +113,7 @@ export default function OrganisationGroupSettingsPage({
         header: t`Team ID`,
         accessorKey: 'id',
         cell: ({ row }) => (
-          <span className="font-mono text-xs text-muted-foreground">{row.original.id}</span>
+          <span className="text-muted-foreground font-mono text-xs">{row.original.id}</span>
         ),
       },
       {
@@ -126,7 +126,7 @@ export default function OrganisationGroupSettingsPage({
         accessorKey: 'createdAt',
         cell: ({ row }) => {
           return (
-            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+            <span className="text-muted-foreground font-mono text-xs whitespace-nowrap">
               {i18n.date(row.original.createdAt)}
             </span>
           );
@@ -152,7 +152,7 @@ export default function OrganisationGroupSettingsPage({
               {row.original.user.name ?? row.original.user.email}
             </Link>
             {row.original.user.name && (
-              <div className="font-mono text-xs text-muted-foreground">
+              <div className="text-muted-foreground font-mono text-xs">
                 {row.original.user.email}
               </div>
             )}
@@ -163,7 +163,7 @@ export default function OrganisationGroupSettingsPage({
         header: t`User ID`,
         accessorKey: 'userId',
         cell: ({ row }) => (
-          <span className="font-mono text-xs text-muted-foreground">{row.original.userId}</span>
+          <span className="text-muted-foreground font-mono text-xs">{row.original.userId}</span>
         ),
       },
       {
@@ -193,7 +193,7 @@ export default function OrganisationGroupSettingsPage({
         accessorKey: 'createdAt',
         cell: ({ row }) => {
           return (
-            <span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+            <span className="text-muted-foreground font-mono text-xs whitespace-nowrap">
               {i18n.date(row.original.createdAt)}
             </span>
           );
@@ -238,7 +238,7 @@ export default function OrganisationGroupSettingsPage({
   if (isLoadingOrganisation) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
+        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
       </div>
     );
   }
@@ -287,7 +287,7 @@ export default function OrganisationGroupSettingsPage({
             <p className="text-sm font-medium">
               <Trans>Organisation usage</Trans>
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-sm">
               <Trans>Current usage against organisation limits.</Trans>
             </p>
           </div>
@@ -322,7 +322,7 @@ export default function OrganisationGroupSettingsPage({
                 <p className="text-sm font-medium">
                   <Trans>Global Settings</Trans>
                 </p>
-                <p className="mt-1 text-sm font-normal text-muted-foreground">
+                <p className="text-muted-foreground mt-1 text-sm font-normal">
                   <Trans>Default settings applied to this organisation.</Trans>
                 </p>
               </div>
@@ -410,7 +410,7 @@ export default function OrganisationGroupSettingsPage({
 
       <div className="mt-16 space-y-10">
         <div>
-          <label className="text-sm font-medium leading-none">
+          <label className="text-sm leading-none font-medium">
             <Trans>Organisation Members</Trans>
           </label>
 
@@ -420,7 +420,7 @@ export default function OrganisationGroupSettingsPage({
         </div>
 
         <div>
-          <label className="text-sm font-medium leading-none">
+          <label className="text-sm leading-none font-medium">
             <Trans>Organisation Teams</Trans>
           </label>
 
@@ -517,7 +517,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
                 <Input {...field} />
               </FormControl>
               {!form.formState.errors.url && (
-                <span className="text-xs font-normal text-foreground/50">
+                <span className="text-foreground/50 text-xs font-normal">
                   {field.value ? (
                     `${NEXT_PUBLIC_WEBAPP_URL()}/o/${field.value}`
                   ) : (
@@ -613,7 +613,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                     <InfoIcon className="mx-2 h-4 w-4" />
                   </TooltipTrigger>
 
-                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                  <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
                     <h2>
                       <strong>
                         <Trans>Inherited subscription claim</Trans>
@@ -666,7 +666,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                 <Link
                   target="_blank"
                   to={`https://dashboard.stripe.com/customers/${field.value}`}
-                  className="text-xs font-normal text-foreground/50"
+                  className="text-foreground/50 text-xs font-normal"
                 >
                   {`https://dashboard.stripe.com/customers/${field.value}`}
                 </Link>
@@ -776,7 +776,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                           />
 
                           <label
-                            className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+                            className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
                             htmlFor={`flag-${key}`}
                           >
                             {label}
@@ -796,8 +796,9 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
               <AlertDescription>
                 <span>¹&nbsp;</span>
                 <Trans>Your current license does not include these features.</Trans>{' '}
+                {/* MODIFIED for BizRethink (overlay 060): Pacta plan docs. */}
                 <Link
-                  to="https://docs.documenso.com/users/licenses/enterprise-edition"
+                  to="https://pacta.ink/docs/getting-started/choose-a-plan"
                   target="_blank"
                   className="text-foreground underline hover:opacity-80"
                 >

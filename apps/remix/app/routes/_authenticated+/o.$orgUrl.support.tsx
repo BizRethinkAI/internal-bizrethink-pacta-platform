@@ -40,20 +40,23 @@ export default function SupportPage() {
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <div className="mb-8">
         <h1 className="flex flex-row items-center gap-2 text-3xl font-bold">
-          <HelpCircleIcon className="h-8 w-8 text-muted-foreground" />
+          <HelpCircleIcon className="text-muted-foreground h-8 w-8" />
           <Trans>Support</Trans>
         </h1>
 
-        <p className="mt-2 text-muted-foreground">
+        <p className="text-muted-foreground mt-2">
           <Trans>Your current plan includes the following support channels:</Trans>
         </p>
 
         <div className="mt-6 flex flex-col gap-4">
           <div className="rounded-lg border p-4">
             <h2 className="flex items-center gap-2 text-lg font-bold">
-              <BookIcon className="h-5 w-5 text-muted-foreground" />
+              <BookIcon className="text-muted-foreground h-5 w-5" />
+              {/* MODIFIED for BizRethink (overlay 060): repoint to Pacta docs at
+                  pacta.ink/docs instead of upstream docs.documenso.com.
+                  See ~/.claude/plans/harmonic-squishing-lecun.md. */}
               <Link
-                to="https://docs.documenso.com"
+                to="https://pacta.ink/docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
@@ -61,13 +64,13 @@ export default function SupportPage() {
                 <Trans>Documentation</Trans>
               </Link>
             </h2>
-            <p className="mt-1 text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               <Trans>Read our documentation to get started with Pacta.</Trans>
             </p>
           </div>
           <div className="rounded-lg border p-4">
             <h2 className="flex items-center gap-2 text-lg font-bold">
-              <Link2Icon className="h-5 w-5 text-muted-foreground" />
+              <Link2Icon className="text-muted-foreground h-5 w-5" />
               <Link
                 to="https://documen.so/discord"
                 target="_blank"
@@ -77,7 +80,7 @@ export default function SupportPage() {
                 <Trans>Discord</Trans>
               </Link>
             </h2>
-            <p className="mt-1 text-muted-foreground">
+            <p className="text-muted-foreground mt-1">
               <Trans>
                 Join our community on{' '}
                 <Link
@@ -96,10 +99,10 @@ export default function SupportPage() {
             <>
               <div className="rounded-lg border p-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold">
-                  <Link2Icon className="h-5 w-5 text-muted-foreground" />
+                  <Link2Icon className="text-muted-foreground h-5 w-5" />
                   <Trans>Contact us</Trans>
                 </h2>
-                <p className="mt-1 text-muted-foreground">
+                <p className="text-muted-foreground mt-1">
                   <Trans>We'll get back to you as soon as possible via email.</Trans>
                 </p>
                 <div className="mt-4">
