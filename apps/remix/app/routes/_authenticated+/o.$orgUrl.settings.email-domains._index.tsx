@@ -37,6 +37,7 @@ export default function OrganisationSettingsEmailDomains() {
       <SettingsHeader
         title={t`Email Domains`}
         subtitle={t`Here you can add email domains to your organisation.`}
+        docsHref="https://pacta.ink/docs/features/email-domains"
       >
         {isEmailDomainsEnabled && <OrganisationEmailDomainCreateDialog />}
       </SettingsHeader>

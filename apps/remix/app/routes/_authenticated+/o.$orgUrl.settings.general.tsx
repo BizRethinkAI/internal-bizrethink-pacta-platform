@@ -26,6 +26,7 @@ export default function OrganisationSettingsGeneral() {
       <SettingsHeader
         title={_(msg`General`)}
         subtitle={_(msg`Here you can edit your organisation details.`)}
+        docsHref="https://pacta.ink/docs/getting-started/organisation-setup"
       />
 
       <div className="space-y-8">

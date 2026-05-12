@@ -164,6 +164,7 @@ export default function OrganisationSettingsSmtp() {
       <SettingsHeader
         title={t`SMTP Settings`}
         subtitle={t`Configure the SMTP credentials this organisation uses to send outgoing mail. Without a config, the instance default is used.`}
+        docsHref="https://pacta.ink/docs/features/email-domains"
       />
 
       <div className="mt-6 space-y-4">
@@ -201,7 +202,7 @@ export default function OrganisationSettingsSmtp() {
                 checked={form.secure}
                 onCheckedChange={(v) => setForm({ ...form, secure: v })}
               />
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 {form.secure ? t`Port 465 / TLS` : t`Port 587 / STARTTLS`}
               </span>
             </div>
@@ -231,7 +232,7 @@ export default function OrganisationSettingsSmtp() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             placeholder={hasExistingConfig ? t`(leave empty to keep existing)` : t`Required`}
           />
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-xs">
             <Trans>
               Stored encrypted using the instance encryption key. Never returned to the client.
             </Trans>

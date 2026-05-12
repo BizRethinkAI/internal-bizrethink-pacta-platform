@@ -1,7 +1,7 @@
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
 import { ReadStatus } from '@prisma/client';
-import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
+import { CircleHelpIcon, InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
 import { Link, useParams } from 'react-router';
 
 import { getRootHref } from '@documenso/lib/utils/params';
@@ -84,6 +84,21 @@ export const Header = ({ className, ...props }: HeaderProps) => {
               </span>
             )}
           </Link>
+        </Button>
+
+        {/* ADDED for BizRethink (overlay 061): Docs help icon next to inbox.
+            Opens pacta.ink/docs in a new tab — keeps in-app context but
+            lets users dip into the docs without losing their place. */}
+        <Button asChild variant="outline" className="hidden h-10 w-10 rounded-lg md:flex">
+          <a
+            href="https://pacta.ink/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block h-10 w-10"
+            aria-label="Open Pacta documentation"
+          >
+            <CircleHelpIcon className="text-muted-foreground hover:text-foreground h-5 w-5 flex-shrink-0 transition-colors" />
+          </a>
         </Button>
 
         <div className="md:ml-4">

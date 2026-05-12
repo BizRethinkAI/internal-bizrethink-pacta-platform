@@ -90,7 +90,7 @@ export default function OrganisationSettingsBrandingPage() {
   if (isLoadingOrganisation || !organisationWithSettings) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
+        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
       </div>
     );
   }
@@ -105,7 +105,11 @@ export default function OrganisationSettingsBrandingPage() {
 
   return (
     <div className="max-w-2xl">
-      <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
+      <SettingsHeader
+        title={settingsHeaderText}
+        subtitle={settingsHeaderSubtitle}
+        docsHref="https://pacta.ink/docs/features/branding"
+      />
 
       {organisationWithSettings.organisationClaim.flags.allowCustomBranding ||
       !IS_BILLING_ENABLED() ? (
@@ -117,9 +121,11 @@ export default function OrganisationSettingsBrandingPage() {
             // so the form can default the toggle correctly. Read from the
             // org's claim flags JSON.
             hidePoweredBy={Boolean(
-              (organisationWithSettings.organisationClaim?.flags as
-                | { hidePoweredBy?: boolean }
-                | undefined)?.hidePoweredBy,
+              (
+                organisationWithSettings.organisationClaim?.flags as
+                  | { hidePoweredBy?: boolean }
+                  | undefined
+              )?.hidePoweredBy,
             )}
             onFormSubmit={onBrandingPreferencesFormSubmit}
           />
