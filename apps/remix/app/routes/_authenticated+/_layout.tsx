@@ -13,6 +13,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { AppBanner } from '~/components/general/app-banner';
 import { Header } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { OnboardingDialog } from '~/components/general/onboarding-dialog';
 import { OrganisationBillingBanner } from '~/components/general/organisations/organisation-billing-banner';
 import { VerifyEmailBanner } from '~/components/general/verify-email-banner';
 import { TeamProvider } from '~/providers/team';
@@ -117,6 +118,11 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
         {banner && !hideHeader && <AppBanner banner={banner} />}
 
         {!hideHeader && <Header />}
+
+        {/* ADDED for BizRethink (overlay 061): one-time welcome dialog for
+            new users. Self-dismisses to localStorage so it shows exactly
+            once per user per browser. Hidden on editor routes (hideHeader). */}
+        {!hideHeader && <OnboardingDialog />}
 
         <main
           className={cn({
