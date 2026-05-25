@@ -1,12 +1,10 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
-
-import { getMailer } from '@documenso/email/mailer';
+import { mailer } from '@documenso/email/mailer';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { EnvelopeType, ReadStatus, SendStatus, SigningStatus } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
@@ -17,13 +15,7 @@ import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentCancelledEmailsJobDefinition } from './send-document-cancelled-emails';
 
-export const run = async ({
-  payload,
-  io,
-}: {
-  payload: TSendDocumentCancelledEmailsJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ payload, io }: { payload: TSendDocumentCancelledEmailsJobDefinition; io: JobRunIO }) => {
   const { documentId, cancellationReason } = payload;
 
   const envelope = await prisma.envelope.findFirstOrThrow({
@@ -54,15 +46,14 @@ export const run = async ({
     },
   });
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
 
   const { documentMeta, user: documentOwner } = envelope;
 
@@ -103,9 +94,7 @@ export const run = async ({
           }),
         ]);
 
-        const orgMailer = await getMailer(organisationId);
-
-        await orgMailer.sendMail({
+        await mailer.sendMail({
           to: {
             name: recipient.name,
             address: recipient.email,

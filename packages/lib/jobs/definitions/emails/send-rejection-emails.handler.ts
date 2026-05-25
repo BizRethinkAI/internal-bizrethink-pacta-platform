@@ -1,13 +1,11 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
-
-import { getMailer } from '@documenso/email/mailer';
+import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
@@ -20,13 +18,7 @@ import { formatDocumentsPath } from '../../../utils/teams';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningRejectionEmailsJobDefinition } from './send-rejection-emails';
 
-export const run = async ({
-  payload,
-  io,
-}: {
-  payload: TSendSigningRejectionEmailsJobDefinition;
-  io: JobRunIO;
-}) => {
+export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmailsJobDefinition; io: JobRunIO }) => {
   const { documentId, recipientId } = payload;
 
   const [envelope, recipient] = await Promise.all([
@@ -66,23 +58,20 @@ export const run = async ({
 
   const { user: documentOwner } = envelope;
 
-  const isEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).recipientSigningRequest;
+  const isEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientSigningRequest;
 
   if (!isEmailEnabled) {
     return;
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
 
   const i18n = await getI18nInstance(emailLanguage);
 
@@ -106,9 +95,7 @@ export const run = async ({
         }),
       ]);
 
-      const orgMailer = await getMailer(organisationId);
-
-      await orgMailer.sendMail({
+      await mailer.sendMail({
         to: {
           name: recipient.name,
           address: recipient.email,
@@ -127,9 +114,7 @@ export const run = async ({
     const ownerTemplate = createElement(DocumentRejectedEmail, {
       recipientName: recipient.name,
       documentName: envelope.title,
-      documentUrl: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(envelope.team?.url)}/${
-        envelope.id
-      }`,
+      documentUrl: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(envelope.team?.url)}/${envelope.id}`,
       rejectionReason: recipient.rejectionReason || '',
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
@@ -143,9 +128,7 @@ export const run = async ({
       }),
     ]);
 
-    const ownerMailer = await getMailer(organisationId);
-
-    await ownerMailer.sendMail({
+    await mailer.sendMail({
       to: {
         name: documentOwner.name || '',
         address: documentOwner.email,

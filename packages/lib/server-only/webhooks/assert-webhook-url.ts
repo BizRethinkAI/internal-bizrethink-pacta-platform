@@ -24,8 +24,7 @@ type TLookupFn = (
 
 const normalizeHostname = (hostname: string) => hostname.toLowerCase().replace(/\.+$/, '');
 
-const toAddressUrl = (address: string) =>
-  address.includes(':') ? `http://[${address}]` : `http://${address}`;
+const toAddressUrl = (address: string) => (address.includes(':') ? `http://[${address}]` : `http://${address}`);
 
 // MODIFIED for BizRethink (overlay 017): bypass hosts come from the
 // DB-backed site.webhook SiteSettings row merged with env. The async
@@ -33,9 +32,7 @@ const toAddressUrl = (address: string) =>
 //
 // Empty or unset = no bypasses (safe default).
 const isBypassedHost = async (url: string): Promise<boolean> => {
-  const { getWebhookSsrfBypassHosts } = await import(
-    '@bizrethink/customizations/server-only/webhook-config'
-  );
+  const { getWebhookSsrfBypassHosts } = await import('@bizrethink/customizations/server-only/webhook-config');
   const bypass = await getWebhookSsrfBypassHosts();
 
   if (bypass.size === 0) {

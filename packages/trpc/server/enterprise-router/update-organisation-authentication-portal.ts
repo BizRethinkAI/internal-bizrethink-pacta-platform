@@ -59,17 +59,15 @@ export const updateOrganisationAuthenticationPortalRoute = authenticatedProcedur
       wellKnownUrl,
       autoProvisionUsers,
       allowedDomains,
+      allowPersonalOrganisations,
     } = data;
 
     if (
       enabled &&
-      (!wellKnownUrl ||
-        !clientId ||
-        (!clientSecret && !organisation.organisationAuthenticationPortal.clientSecret))
+      (!wellKnownUrl || !clientId || (!clientSecret && !organisation.organisationAuthenticationPortal.clientSecret))
     ) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
-        message:
-          'Client ID, client secret, and well known URL are required when authentication portal is enabled',
+        message: 'Client ID, client secret, and well known URL are required when authentication portal is enabled',
       });
     }
 
@@ -102,6 +100,7 @@ export const updateOrganisationAuthenticationPortalRoute = authenticatedProcedur
         wellKnownUrl,
         autoProvisionUsers,
         allowedDomains,
+        allowPersonalOrganisations,
       },
     });
   });

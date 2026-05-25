@@ -1,6 +1,5 @@
-import { Outlet } from 'react-router';
-
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
+import { Outlet } from 'react-router';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 
@@ -25,7 +24,7 @@ export default function Layout() {
           className="inline-flex items-center transition-opacity hover:opacity-80"
           aria-label="Pacta home"
         >
-          <BrandingLogo className="text-foreground h-10 w-auto" />
+          <BrandingLogo className="h-10 w-auto text-foreground" />
         </a>
       </div>
 
