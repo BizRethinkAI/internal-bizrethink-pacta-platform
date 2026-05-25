@@ -37,17 +37,29 @@ export const getWebhookSsrfBypassHosts = async (): Promise<Set<string>> => {
 
   const merged = parseEnvHosts();
 
-  const row = await prisma.siteSettings.findFirst({
-    where: { id: 'site.webhook' },
-  });
+  // Defensive: if DB is unreachable (Postgres down, network flap, test env
+  // without DB), fall back to env-only hosts. Better to validate webhook
+  // URLs against the env list alone than to throw and break ALL webhook
+  // delivery + the upstream `assertNotPrivateUrl` callers (which catch
+  // AppError, not PrismaClientInitializationError).
+  try {
+    const row = await prisma.siteSettings.findFirst({
+      where: { id: 'site.webhook' },
+    });
 
-  if (row && row.enabled) {
-    const parsed = ZSiteSettingsWebhookSchema.safeParse(row);
-    if (parsed.success) {
-      for (const host of parsed.data.data.ssrfBypassHosts) {
-        merged.add(host.trim().toLowerCase());
+    if (row && row.enabled) {
+      const parsed = ZSiteSettingsWebhookSchema.safeParse(row);
+      if (parsed.success) {
+        for (const host of parsed.data.data.ssrfBypassHosts) {
+          merged.add(host.trim().toLowerCase());
+        }
       }
     }
+  } catch (err) {
+    console.warn(
+      '[bizrethink/webhook-config] DB read failed; falling back to env-only SSRF bypass hosts:',
+      err instanceof Error ? err.message : err,
+    );
   }
 
   setCache(merged);
