@@ -1,44 +1,123 @@
-# Why: SaaS-billing Phase 1 — route new external orgs from BIZRETHINK claim
-#      to PRO claim + 14-day trial. Internal BizRethink-operated orgs continue
-#      to receive BIZRETHINK claim (currently via data migration on existing
-#      8 orgs; future internal orgs use the admin "promote to internal" flow
-#      in Phase 3). Pairs with overlay 043 (defines PRO + BUSINESS tiers +
-#      aiEnabled flag) and the additive helper at
-#      `packages/bizrethink/server-only/billing/start-trial-for-new-org.ts`
-#      (which writes the BizrethinkOrganisationBilling row with trial dates).
-# Why-not-additive: Same as overlay 002 — every call site that creates an
-#      Organisation hard-references a specific InternalClaim, so changing the
-#      default claim requires touching each site. There's no upstream hook
-#      we can wrap. Three sites total:
-#        1. createPersonalOrganisation (auto-personal on signup)
-#        2. createOrganisationRoute (TRPC, user creates Team org)
-#        3. createAdminOrganisationRoute (TRPC, admin creates org)
-#      All three additionally invoke the new BizRethink helper after success
-#      to set trial dates.
-# Upstream-merge-fragility: MEDIUM. Upstream may add new org-creation paths
-#      (e.g., Stripe webhook on subscription-created already creates orgs via
-#      a different code path in packages/ee/server-only/stripe/webhook/
-#      on-subscription-created.ts — left untouched here because Stripe paths
-#      already assign tier via the price's claimId metadata). Watch for new
-#      `createOrganisation({... claim: BIZRETHINK})` references in future
-#      upstream-sync PRs.
-# Supersedes: overlay 002 (which routed all three to BIZRETHINK). The
-#      one-token swap goes the other direction: BIZRETHINK → PRO. Internal
-#      orgs are promoted retroactively via the BizrethinkOrganisationBilling
-#      table's `bizrethinkInternal=true` flag + admin tooling.
+# Why: Route new external orgs from the default BIZRETHINK claim (overlay 002's
+#      route, which gave new orgs full internal-tier access) to the PRO claim
+#      with a 14-day trial. On trial expiry, a sweep cron downgrades them to
+#      FREE. BizRethink-operated internal orgs get bizrethinkInternal=true
+#      flagged separately (admin override or migration) and stay on the
+#      BIZRETHINK tier without trial bookkeeping.
+#
+#      This is SaaS-billing Phase 1: pivot from "every new org gets full
+#      features" to "every new org gets PRO features for 14 days, then
+#      downgrades to FREE unless they subscribe." Matches the pricing
+#      decisions in memory/pacta_usp_and_pricing.md.
+#
+#      Three call sites — must merge consistently. Drift between any two
+#      sites breaks the trial funnel (one site PRO+trial, another FREE).
+#
+#        1. `packages/lib/server-only/organisation/create-organisation.ts`
+#           — `createPersonalOrganisation()`. The base function called by
+#           the email-password signup path. Overrides `INTERNAL_CLAIM_ID.PRO`
+#           and calls `startTrialForNewOrg({ organisationId, internal: false })`
+#           after creation (defensive try/catch — trial record failure
+#           doesn't roll back the org).
+#
+#        2. `packages/trpc/server/organisation-router/create-organisation.ts`
+#           — `createOrganisationRoute` mutation. The TRPC route used by
+#           the in-app "Create New Organisation" button.
+#
+#        3. `packages/trpc/server/admin-router/create-admin-organisation.ts`
+#           — `createAdminOrganisationRoute` mutation. The admin-panel
+#           variant. Identical behaviour but called by an admin acting
+#           on behalf of a new tenant.
+#
+#      Companion files (no patches — new files outside upstream's tree):
+#        - packages/bizrethink/server-only/billing/start-trial-for-new-org.ts
+#          (writes the trial row + sets trial_ends_at)
+#        - packages/bizrethink/server-only/trpc/organisation-billing-router.ts
+#          (provides /billing data + trial status to the in-app billing page)
+#
+# Why-not-additive: The claim assignment happens INLINE in upstream's
+#      org-creation flow as a single argument to `createOrganisation()`.
+#      There's no extension point. Same for the trial-setup call — it has
+#      to happen after the org row exists but before the function returns.
+#      Inline patches are unavoidable.
+#
+# Discipline note — relationship to overlay 002:
+#      Overlay 002 (`002-route-org-creation-to-bizrethink-tier.patch`)
+#      historically routed new orgs to BIZRETHINK claim. Overlay 041
+#      SUPERSEDES 002 for external orgs. The 002 patch should be marked
+#      obsolete and removed in post-merge cleanup (Task TBD), OR retained
+#      only for internal-org paths. Resolve during the cleanup workstream.
+#
+# Upstream-merge-fragility: MEDIUM.
+#   - Three call sites with structurally similar patches. Upstream's
+#     2026-05-15 biome lint reformatted all three (single-line
+#     destructures → multi-line). Patch hunks re-anchor against the new
+#     formatting; logic preserved.
+#   - If upstream renames `INTERNAL_CLAIM_ID.FREE` to `internalClaims.free`
+#     (lowercase property access) inconsistently across the three files,
+#     the patches need to use whichever accessor each file uses.
+#   - If upstream adds new arguments to `createOrganisation()` or its
+#     trpc routes, the patches may need to thread the new args through.
+#
+# Previous patch state: the on-disk 041 patch was BROKEN (garbage at
+#      line 31). Regenerated from scratch 2026-05-25 by diffing
+#      upstream/main against current main for the three files.
+#
+# Status: REGENERATED 2026-05-25 (v2). v1 was corrupt — likely an editor
+#         save that lost the @@ count. Diff captured fresh against
+#         current main.
+
 diff --git a/packages/lib/server-only/organisation/create-organisation.ts b/packages/lib/server-only/organisation/create-organisation.ts
-index bb5c81897..07d3d3b38 100644
-diff --git a/packages/lib/server-only/organisation/create-organisation.ts b/packages/lib/server-only/organisation/create-organisation.ts
-index bb5c81897..6aa8cdf82 100644
+index cecf1391a..6aa8cdf82 100644
 --- a/packages/lib/server-only/organisation/create-organisation.ts
 +++ b/packages/lib/server-only/organisation/create-organisation.ts
-@@ -1,3 +1,5 @@
+@@ -1,10 +1,16 @@
 +// BizRethink (overlay 041): trial bookkeeping for new external orgs.
 +import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
- import { Prisma } from '@prisma/client';
- import { OrganisationType } from '@prisma/client';
- import { OrganisationMemberRole } from '@prisma/client';
-@@ -164,12 +166,16 @@ export const createPersonalOrganisation = async ({
++import { Prisma } from '@prisma/client';
++import { OrganisationType } from '@prisma/client';
++import { OrganisationMemberRole } from '@prisma/client';
++
+ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
+ import { prisma } from '@documenso/prisma';
+-import { OrganisationMemberRole, OrganisationType, Prisma } from '@prisma/client';
+ 
+ import { IS_BILLING_ENABLED } from '../../constants/app';
+ import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
+-import { AppError, AppErrorCode } from '../../errors/app-error';
++import { AppErrorCode } from '../../errors/app-error';
++import { AppError } from '../../errors/app-error';
+ import type { InternalClaim } from '../../types/subscription';
+ import { INTERNAL_CLAIM_ID, internalClaims } from '../../types/subscription';
+ import { generateDatabaseId, prefixedId } from '../../universal/id';
+@@ -20,7 +26,14 @@ type CreateOrganisationOptions = {
+   claim: InternalClaim;
+ };
+ 
+-export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
++export const createOrganisation = async ({
++  name,
++  url,
++  type,
++  userId,
++  customerId,
++  claim,
++}: CreateOrganisationOptions) => {
+   let customerIdToUse = customerId;
+ 
+   if (!customerId && IS_BILLING_ENABLED()) {
+@@ -110,7 +123,9 @@ export const createOrganisation = async ({ name, url, type, userId, customerId,
+         throw err;
+       });
+ 
+-    const adminGroup = organisation.groups.find((group) => group.organisationRole === OrganisationMemberRole.ADMIN);
++    const adminGroup = organisation.groups.find(
++      (group) => group.organisationRole === OrganisationMemberRole.ADMIN,
++    );
+ 
+     if (!adminGroup) {
+       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+@@ -151,12 +166,16 @@ export const createPersonalOrganisation = async ({
    inheritMembers = true,
    type = OrganisationType.PERSONAL,
  }: CreatePersonalOrganisationOptions) => {
@@ -51,12 +130,12 @@ index bb5c81897..6aa8cdf82 100644
      userId,
      url: orgUrl,
      type,
--    claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
+-    claim: internalClaims[INTERNAL_CLAIM_ID.FREE],
 +    claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
    }).catch((err) => {
      console.error(err);
  
-@@ -180,6 +186,16 @@ export const createPersonalOrganisation = async ({
+@@ -167,6 +186,16 @@ export const createPersonalOrganisation = async ({
      // Todo: (LOGS)
    });
  
@@ -73,17 +152,36 @@ index bb5c81897..6aa8cdf82 100644
    if (organisation) {
      await createTeam({
        userId,
+@@ -186,7 +215,10 @@ export const createPersonalOrganisation = async ({
+ 
+ export const createOrganisationClaimUpsertData = (subscriptionClaim: InternalClaim) => {
+   // Done like this to ensure type errors are thrown if items are added.
+-  const data: Omit<Prisma.SubscriptionClaimCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'> = {
++  const data: Omit<
++    Prisma.SubscriptionClaimCreateInput,
++    'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'
++  > = {
+     flags: {
+       ...subscriptionClaim.flags,
+     },
 diff --git a/packages/trpc/server/admin-router/create-admin-organisation.ts b/packages/trpc/server/admin-router/create-admin-organisation.ts
-index ba68e2993..0d21be733 100644
+index 753512c18..0d21be733 100644
 --- a/packages/trpc/server/admin-router/create-admin-organisation.ts
 +++ b/packages/trpc/server/admin-router/create-admin-organisation.ts
-@@ -1,3 +1,5 @@
+@@ -1,7 +1,10 @@
+-import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+-import { internalClaims } from '@documenso/lib/types/subscription';
 +// BizRethink (overlay 041): trial bookkeeping for new external orgs.
 +import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
  import { OrganisationType } from '@prisma/client';
  
- import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
-@@ -21,11 +23,21 @@ export const createAdminOrganisationRoute = adminProcedure
++import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
++import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
++
+ import { adminProcedure } from '../trpc';
+ import {
+   ZCreateAdminOrganisationRequestSchema,
+@@ -20,11 +23,21 @@ export const createAdminOrganisationRoute = adminProcedure
        },
      });
  
@@ -96,7 +194,7 @@ index ba68e2993..0d21be733 100644
        userId: ownerUserId,
        name: data.name,
        type: OrganisationType.ORGANISATION,
--      claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
+-      claim: internalClaims.free,
 +      claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
 +    });
 +
@@ -107,18 +205,40 @@ index ba68e2993..0d21be733 100644
  
      return {
 diff --git a/packages/trpc/server/organisation-router/create-organisation.ts b/packages/trpc/server/organisation-router/create-organisation.ts
-index d1e4d8e1b..5a06466ef 100644
+index 737079f73..5a06466ef 100644
 --- a/packages/trpc/server/organisation-router/create-organisation.ts
 +++ b/packages/trpc/server/organisation-router/create-organisation.ts
-@@ -1,3 +1,5 @@
+@@ -1,3 +1,7 @@
 +// BizRethink (overlay 041): trial bookkeeping for new external orgs.
 +import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
- import { OrganisationType } from '@prisma/client';
- 
++import { OrganisationType } from '@prisma/client';
++
  import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
-@@ -72,11 +74,19 @@ export const createOrganisationRoute = authenticatedProcedure
-       ? OrganisationType.PERSONAL
-       : OrganisationType.ORGANISATION;
+ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
+ import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+@@ -6,10 +10,12 @@ import { createOrganisation } from '@documenso/lib/server-only/organisation/crea
+ import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
+ import { generateStripeOrganisationCreateMetadata } from '@documenso/lib/utils/billing';
+ import { prisma } from '@documenso/prisma';
+-import { OrganisationType } from '@prisma/client';
+ 
+ import { authenticatedProcedure } from '../trpc';
+-import { ZCreateOrganisationRequestSchema, ZCreateOrganisationResponseSchema } from './create-organisation.types';
++import {
++  ZCreateOrganisationRequestSchema,
++  ZCreateOrganisationResponseSchema,
++} from './create-organisation.types';
+ 
+ export const createOrganisationRoute = authenticatedProcedure
+   // .meta(createOrganisationMeta)
+@@ -64,13 +70,23 @@ export const createOrganisationRoute = authenticatedProcedure
+     }
+ 
+     // Free organisations should be Personal by default.
+-    const organisationType = IS_BILLING_ENABLED() ? OrganisationType.PERSONAL : OrganisationType.ORGANISATION;
++    const organisationType = IS_BILLING_ENABLED()
++      ? OrganisationType.PERSONAL
++      : OrganisationType.ORGANISATION;
  
 -    await createOrganisation({
 +    // MODIFIED for BizRethink (overlay 041): assign PRO claim with 14-day trial
@@ -128,7 +248,7 @@ index d1e4d8e1b..5a06466ef 100644
        userId: user.id,
        name,
        type: organisationType,
--      claim: internalClaims[INTERNAL_CLAIM_ID.BIZRETHINK],
+-      claim: internalClaims[INTERNAL_CLAIM_ID.FREE],
 +      claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
 +    });
 +
