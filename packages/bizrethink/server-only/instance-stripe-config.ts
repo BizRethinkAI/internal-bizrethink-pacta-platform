@@ -96,9 +96,21 @@ export const getInstanceStripeConfig = async (): Promise<DecryptedStripeConfig |
     return null;
   }
 
-  const row = await prisma.bizrethinkInstanceStripeConfig.findUnique({
-    where: { id: 'singleton' },
-  });
+  // Defensive: DB unreachable returns null. Callers fall back to env reads
+  // (NEXT_PRIVATE_STRIPE_API_KEY etc.) so billing webhooks stay verifiable
+  // during outages.
+  let row;
+  try {
+    row = await prisma.bizrethinkInstanceStripeConfig.findUnique({
+      where: { id: 'singleton' },
+    });
+  } catch (err) {
+    console.warn(
+      '[bizrethink/instance-stripe-config] DB read failed; returning null (env fallback):',
+      err instanceof Error ? err.message : err,
+    );
+    return null;
+  }
 
   if (!row) {
     setCachedNullRowProbed(true);
@@ -167,10 +179,20 @@ export const isBillingEnabled = async (): Promise<boolean> => {
     return process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true';
   }
 
-  const row = await prisma.bizrethinkInstanceStripeConfig.findUnique({
-    where: { id: 'singleton' },
-    select: { billingEnabled: true },
-  });
+  // Defensive: DB unreachable falls back to env (same path as no-row).
+  let row;
+  try {
+    row = await prisma.bizrethinkInstanceStripeConfig.findUnique({
+      where: { id: 'singleton' },
+      select: { billingEnabled: true },
+    });
+  } catch (err) {
+    console.warn(
+      '[bizrethink/instance-stripe-config] isBillingEnabled DB read failed; env fallback:',
+      err instanceof Error ? err.message : err,
+    );
+    return process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true';
+  }
 
   if (!row) {
     setCachedNullRowProbed(true);
