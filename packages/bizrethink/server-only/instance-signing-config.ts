@@ -103,9 +103,21 @@ export const getInstanceSigningConfig = async (): Promise<DecryptedSigningConfig
     return null;
   }
 
-  const row = await prisma.bizrethinkInstanceSigningConfig.findUnique({
-    where: { id: 'singleton' },
-  });
+  // Defensive: DB unreachable returns null (callers fall back to env-based
+  // signing config). Throwing here would break ALL PDF sealing during
+  // outages — env fallback degrades gracefully to bootstrap config.
+  let row;
+  try {
+    row = await prisma.bizrethinkInstanceSigningConfig.findUnique({
+      where: { id: 'singleton' },
+    });
+  } catch (err) {
+    console.warn(
+      '[bizrethink/instance-signing-config] DB read failed; returning null (env fallback):',
+      err instanceof Error ? err.message : err,
+    );
+    return null;
+  }
 
   if (!row) {
     setCachedNullRowProbed(true);

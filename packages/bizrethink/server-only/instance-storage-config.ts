@@ -58,9 +58,20 @@ export const getInstanceStorageConfig = async (): Promise<DecryptedStorageConfig
   if (cachedConfig) return cachedConfig;
   if (cachedNullProbed) return null;
 
-  const row = await prisma.bizrethinkInstanceStorageConfig.findUnique({
-    where: { id: 'singleton' },
-  });
+  // Defensive: DB unreachable returns null (callers fall back to env-based
+  // S3 config). Throwing here would break uploads entirely during outages.
+  let row;
+  try {
+    row = await prisma.bizrethinkInstanceStorageConfig.findUnique({
+      where: { id: 'singleton' },
+    });
+  } catch (err) {
+    console.warn(
+      '[bizrethink/instance-storage-config] DB read failed; returning null (env fallback):',
+      err instanceof Error ? err.message : err,
+    );
+    return null;
+  }
 
   if (!row) {
     setCachedNullProbed(true);
