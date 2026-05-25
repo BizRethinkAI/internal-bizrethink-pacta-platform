@@ -16,6 +16,30 @@ export const FIELD_MAX_LETTER_SPACING = 100;
 
 export const DEFAULT_FIELD_FONT_SIZE = 12;
 
+export const DEFAULT_SIGNATURE_OVERFLOW_MODE = 'auto';
+export const DEFAULT_DATE_OVERFLOW_MODE = 'auto';
+export const DEFAULT_EMAIL_OVERFLOW_MODE = 'auto';
+
+/**
+ * The overflow mode for a field.
+ *
+ * - 'auto': Will overflow horizontally if no room to wrap vertically.
+ * - 'horizontal': Overflow horizontally, will not wrap at all.
+ * - 'vertical': Overflow vertically, will wrap at the field width.
+ * - 'crop': Crop the text to the field bounds, will not overflow at all.
+ *
+ * @default 'crop'
+ */
+export const ZFieldOverflowMode = z.enum(['auto', 'horizontal', 'vertical', 'crop']);
+export type TFieldOverflowMode = z.infer<typeof ZFieldOverflowMode>;
+
+/**
+ * Resolves the overflow mode for a field. Returns 'crop' when undefined.
+ */
+export const resolveFieldOverflowMode = (fieldMeta?: { overflow?: TFieldOverflowMode } | null): TFieldOverflowMode => {
+  return fieldMeta?.overflow ?? 'crop';
+};
+
 /**
  * Grouped field types that use the same generic text rendering function.
  */
@@ -37,9 +61,7 @@ const ZFieldMetaLetterSpacing = z.coerce
   .min(FIELD_MIN_LETTER_SPACING)
   .max(FIELD_MAX_LETTER_SPACING)
   .describe('The spacing between each character');
-const ZFieldMetaVerticalAlign = z
-  .enum(['top', 'middle', 'bottom'])
-  .describe('The vertical alignment of the text');
+const ZFieldMetaVerticalAlign = z.enum(['top', 'middle', 'bottom']).describe('The vertical alignment of the text');
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
@@ -47,6 +69,7 @@ export const ZBaseFieldMeta = z.object({
   required: z.boolean().optional(),
   readOnly: z.boolean().optional(),
   fontSize: z.number().min(8).max(96).default(DEFAULT_FIELD_FONT_SIZE).optional(),
+  overflow: ZFieldOverflowMode.optional(),
 });
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;
@@ -72,6 +95,7 @@ export type TNameFieldMeta = z.infer<typeof ZNameFieldMeta>;
 export const ZEmailFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('email'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  overflow: ZFieldOverflowMode.optional().default(DEFAULT_EMAIL_OVERFLOW_MODE),
 });
 
 export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
@@ -79,6 +103,7 @@ export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
 export const ZDateFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('date'),
   textAlign: ZFieldTextAlignSchema.optional(),
+  overflow: ZFieldOverflowMode.optional().default(DEFAULT_DATE_OVERFLOW_MODE),
   // BizRethink overlay 035: fontWeight gives the rendered date glyph
   // weight without affecting other meta. Allows
   // `{{DATE, r1, fontSize=10, fontWeight=bold}}` to render bold dates,
@@ -92,10 +117,7 @@ export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
 export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('text'),
   text: z.string().optional(),
-  characterLimit: z.coerce
-    .number({ invalid_type_error: 'Value must be a number' })
-    .min(0)
-    .optional(),
+  characterLimit: z.coerce.number({ invalid_type_error: 'Value must be a number' }).min(0).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
   lineHeight: ZFieldMetaLineHeight.nullish(),
   letterSpacing: ZFieldMetaLetterSpacing.nullish(),
@@ -162,6 +184,7 @@ export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
 export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('signature'),
+  overflow: ZFieldOverflowMode.optional().default(DEFAULT_SIGNATURE_OVERFLOW_MODE),
   // BizRethink overlay 034: width / height in PDF points override the
   // placeholder bbox at auto-placement time. Allows
   // `{{SIGNATURE, r1, width=240, height=30}}` to produce a wider/taller
@@ -297,6 +320,7 @@ export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
   type: 'date',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
+  overflow: DEFAULT_DATE_OVERFLOW_MODE,
 };
 
 export const FIELD_TEXT_META_DEFAULT_VALUES: TTextFieldMeta = {
@@ -336,6 +360,7 @@ export const FIELD_EMAIL_META_DEFAULT_VALUES: TEmailFieldMeta = {
   type: 'email',
   fontSize: DEFAULT_FIELD_FONT_SIZE,
   textAlign: 'left',
+  overflow: DEFAULT_EMAIL_OVERFLOW_MODE,
 };
 
 export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
@@ -370,6 +395,7 @@ export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
 export const FIELD_SIGNATURE_META_DEFAULT_VALUES: TSignatureFieldMeta = {
   type: 'signature',
   fontSize: DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
+  overflow: DEFAULT_SIGNATURE_OVERFLOW_MODE,
 };
 
 export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {

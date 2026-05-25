@@ -12,6 +12,9 @@ export const ZGetOrganisationAuthenticationPortalResponseSchema = OrganisationAu
   wellKnownUrl: true,
   autoProvisionUsers: true,
   allowedDomains: true,
+  // BizRethink (post-merge fix): include allowPersonalOrganisations so the
+  // settings/sso.tsx page can read it. Upstream's get endpoint dropped this
+  // field; we restore it here since our sso.tsx still surfaces the toggle.
   allowPersonalOrganisations: true,
 }).extend({
   /**

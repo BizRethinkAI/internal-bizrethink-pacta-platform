@@ -31,30 +31,22 @@ export const IDENTITY_PROVIDER_NAME: Record<string, string> = {
 // fallback for fresh instances.
 
 export const isGoogleSsoEnabled = async (): Promise<boolean> => {
-  const { getProviderConfig } = await import(
-    '@bizrethink/customizations/server-only/sso-provider-config'
-  );
+  const { getProviderConfig } = await import('@bizrethink/customizations/server-only/sso-provider-config');
   return (await getProviderConfig('google')).enabled;
 };
 
 export const isMicrosoftSsoEnabled = async (): Promise<boolean> => {
-  const { getProviderConfig } = await import(
-    '@bizrethink/customizations/server-only/sso-provider-config'
-  );
+  const { getProviderConfig } = await import('@bizrethink/customizations/server-only/sso-provider-config');
   return (await getProviderConfig('microsoft')).enabled;
 };
 
 export const isOidcSsoEnabled = async (): Promise<boolean> => {
-  const { getProviderConfig } = await import(
-    '@bizrethink/customizations/server-only/sso-provider-config'
-  );
+  const { getProviderConfig } = await import('@bizrethink/customizations/server-only/sso-provider-config');
   return (await getProviderConfig('oidc')).enabled;
 };
 
 export const getOidcProviderLabel = async (): Promise<string> => {
-  const { getProviderConfig } = await import(
-    '@bizrethink/customizations/server-only/sso-provider-config'
-  );
+  const { getProviderConfig } = await import('@bizrethink/customizations/server-only/sso-provider-config');
   return (await getProviderConfig('oidc')).oidcProviderLabel || 'OIDC';
 };
 
@@ -112,9 +104,7 @@ export const getCookieDomain = () => {
  * @bizrethink/customizations.
  */
 export const getAllowedSignupDomains = async (): Promise<string[]> => {
-  const { getAllowedSignupDomains: dbGetter } = await import(
-    '@bizrethink/customizations/server-only/signup-config'
-  );
+  const { getAllowedSignupDomains: dbGetter } = await import('@bizrethink/customizations/server-only/signup-config');
   return (await dbGetter()).map((d) => d.toLowerCase());
 };
 
@@ -138,4 +128,26 @@ export const isEmailDomainAllowedForSignup = async (email: string): Promise<bool
   }
 
   return allowedDomains.includes(emailDomain);
+};
+
+/**
+ * Adopted from upstream 2026-05-25 merge: env-driven per-provider signup gating.
+ * Returns false if NEXT_PUBLIC_DISABLE_SIGNUP=true OR the per-provider env flag
+ * is set. Separate from `isSignupDisabled()` (overlay 028, DB-aware) — this is
+ * the upstream sync-env path used by auth/handle-oauth-* and the email-password
+ * signup route. Both gates run independently.
+ */
+export const isSignupEnabledForProvider = (provider: 'email' | 'google' | 'microsoft' | 'oidc'): boolean => {
+  if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+    return false;
+  }
+
+  const flagMap = {
+    email: 'NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP',
+    google: 'NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP',
+    microsoft: 'NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP',
+    oidc: 'NEXT_PUBLIC_DISABLE_OIDC_SIGNUP',
+  } as const;
+
+  return env(flagMap[provider]) !== 'true';
 };
