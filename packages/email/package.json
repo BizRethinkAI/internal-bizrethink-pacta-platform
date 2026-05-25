@@ -13,11 +13,14 @@
   ],
   "scripts": {
     "dev": "email dev --port 3002 --dir templates",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/tailwind-config": "*",
     "@documenso/nodemailer-resend": "4.0.0",
+    "@documenso/tailwind-config": "*",
     "@react-email/body": "0.2.0",
     "@react-email/button": "0.2.0",
     "@react-email/code-block": "0.2.0",
@@ -43,6 +46,8 @@
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^8.0.0"
+    "@types/nodemailer": "^8.0.0",
+    "@vitest/coverage-v8": "^4.1.6",
+    "vitest": "^4.1.6"
   }
 }
