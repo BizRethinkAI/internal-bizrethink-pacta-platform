@@ -29,6 +29,7 @@ ENV_FILES.forEach((file) => {
  */
 export default defineConfig({
   testDir: './e2e',
+  globalSetup: require.resolve('./global-setup'),
   fullyParallel: true,
   workers: 10, // See Projects where 10 is utilized for API tests. We're not running 10 workers for UI tests.
   maxFailures: process.env.CI ? 1 : undefined,
@@ -41,7 +42,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.NEXT_PUBLIC_WEBAPP_URL || 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',

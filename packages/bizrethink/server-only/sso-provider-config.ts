@@ -97,9 +97,22 @@ export const getProviderConfig = async (provider: Provider): Promise<ProviderCon
     if (cached) return cached;
   }
 
-  const row = await prisma.bizrethinkSsoProvider.findUnique({
-    where: { provider },
-  });
+  // Defensive: if DB is unreachable (Postgres down, network flap, test env),
+  // fall back to env-only so SSO sign-in stays available during outages.
+  // Throwing here would block every sign-in attempt — env-fallback degrades
+  // gracefully to the bootstrap config.
+  let row;
+  try {
+    row = await prisma.bizrethinkSsoProvider.findUnique({
+      where: { provider },
+    });
+  } catch (err) {
+    console.warn(
+      '[bizrethink/sso-provider-config] DB read failed; falling back to env-only:',
+      err instanceof Error ? err.message : err,
+    );
+    row = null;
+  }
 
   let cfg: ProviderConfig;
   if (!row) {

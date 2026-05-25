@@ -1,11 +1,9 @@
-import { createElement } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { EnvelopeType } from '@prisma/client';
-
-import { getMailer } from '@documenso/email/mailer';
+import { mailer } from '@documenso/email/mailer';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
 import { prisma } from '@documenso/prisma';
+import { msg } from '@lingui/core/macro';
+import { EnvelopeType } from '@prisma/client';
+import { createElement } from 'react';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
@@ -49,19 +47,16 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
     throw new Error('Document has no recipients');
   }
 
-  const { branding, emailLanguage, senderEmail, replyToEmail, organisationId } =
-    await getEmailContext({
-      emailType: 'RECIPIENT',
-      source: {
-        type: 'team',
-        teamId: envelope.teamId,
-      },
-      meta: envelope.documentMeta,
-    });
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: envelope.teamId,
+    },
+    meta: envelope.documentMeta,
+  });
 
-  const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(
-    envelope.documentMeta,
-  ).documentPending;
+  const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).documentPending;
 
   if (!isDocumentPendingEmailEnabled) {
     return;
@@ -94,9 +89,7 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
 
   const i18n = await getI18nInstance(emailLanguage);
 
-  const orgMailer = await getMailer(organisationId);
-
-  await orgMailer.sendMail({
+  await mailer.sendMail({
     to: {
       address: email,
       name,

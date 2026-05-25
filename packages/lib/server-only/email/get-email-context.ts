@@ -1,5 +1,3 @@
-import { P, match } from 'ts-pattern';
-
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 import { prisma } from '@documenso/prisma';
 import type {
@@ -9,11 +7,8 @@ import type {
   OrganisationEmail,
   OrganisationType,
 } from '@documenso/prisma/client';
-import {
-  EmailDomainStatus,
-  type OrganisationClaim,
-  type OrganisationGlobalSettings,
-} from '@documenso/prisma/client';
+import { EmailDomainStatus, type OrganisationClaim, type OrganisationGlobalSettings } from '@documenso/prisma/client';
+import { match, P } from 'ts-pattern';
 
 import { DOCUMENSO_INTERNAL_EMAIL } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -66,7 +61,7 @@ type RecipientGetEmailContextOptions = BaseGetEmailContextOptions & {
 
 type GetEmailContextOptions = InternalGetEmailContextOptions | RecipientGetEmailContextOptions;
 
-type EmailContextResponse = {
+export type EmailContextResponse = {
   allowedEmails: OrganisationEmail[];
   branding: BrandingSettings;
   settings: Omit<OrganisationGlobalSettings, 'id'>;
@@ -85,15 +80,10 @@ type EmailContextResponse = {
   organisationId: string | undefined;
 };
 
-export const getEmailContext = async (
-  options: GetEmailContextOptions,
-): Promise<EmailContextResponse> => {
+export const getEmailContext = async (options: GetEmailContextOptions): Promise<EmailContextResponse> => {
   const { source, meta } = options;
 
-  let emailContext: Omit<
-    EmailContextResponse,
-    'senderEmail' | 'replyToEmail' | 'emailLanguage' | 'organisationId'
-  >;
+  let emailContext: Omit<EmailContextResponse, 'senderEmail' | 'replyToEmail' | 'emailLanguage' | 'organisationId'>;
   let resolvedOrgId: string | undefined;
 
   if (source.type === 'organisation') {
@@ -227,18 +217,11 @@ const handleTeamEmailContext = async (teamId: number) => {
 
   const allowedEmails = getAllowedEmails(organisation);
 
-  const teamSettings = extractDerivedTeamSettings(
-    organisation.organisationGlobalSettings,
-    team.teamGlobalSettings,
-  );
+  const teamSettings = extractDerivedTeamSettings(organisation.organisationGlobalSettings, team.teamGlobalSettings);
 
   return {
     allowedEmails,
-    branding: teamGlobalSettingsToBranding(
-      teamSettings,
-      teamId,
-      claims.flags.hidePoweredBy ?? false,
-    ),
+    branding: teamGlobalSettingsToBranding(teamSettings, teamId, claims.flags.hidePoweredBy ?? false),
     settings: teamSettings,
     claims,
     organisationType: organisation.type,

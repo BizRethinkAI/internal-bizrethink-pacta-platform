@@ -1,32 +1,191 @@
-# Why: Replace upstream Documenso brand defaults at the constant layer so all
-#      downstream consumers (meta.ts, email templates, route copy) read from a
-#      single source of truth. Two changes:
+# Why: Replace upstream Documenso brand defaults at the constant layer + the
+#      one consuming email template that doesn't go through the constant
+#      indirection. Single source of truth so future renames are a one-file
+#      constant change.
 #
-#        1. SUPPORT_EMAIL default flips from "support@documenso.com" to
-#           "support@bizrethink.ai". Env var override (NEXT_PUBLIC_SUPPORT_EMAIL)
-#           still works — this only changes the fallback when no env is set.
+#      Three logical changes across two files:
 #
-#        2. New constants APP_NAME ("Pacta"), APP_PARENT_BRAND ("BizRethink AI"),
-#           APP_FULL_NAME ("Pacta by BizRethink AI"). Subsequent overlays
-#           (022 meta tags, 023 email footer, 024 route copy) import these
-#           instead of hardcoding strings — meaning future renames are a
-#           one-file constant change.
+#        1. SUPPORT_EMAIL default — upstream defaults to "support@documenso.com".
+#           We flip it to "hello@pacta.ink" (the same support address used on
+#           pacta.ink marketing). Env var override (NEXT_PUBLIC_SUPPORT_EMAIL)
+#           still works. Originally "support@bizrethink.ai" in overlay 021 v1
+#           (2026-04-29); flipped to "hello@pacta.ink" in v2 (commit
+#           4e0b45758, 2026-05-12) to unify with the marketing site inbox.
 #
-#      Fragility: LOW. App.ts gets ~1 commit per quarter upstream. Our edit is
-#      additive (new exports) plus a one-line default change — both easy to
-#      reapply on conflict.
+#        2. Brand constants — APP_NAME ("Pacta"), APP_PARENT_BRAND
+#           ("BizRethink AI"), APP_FULL_NAME ("Pacta by BizRethink AI").
+#           Downstream overlays (022 meta tags, 023 email footer, 024 route
+#           copy) read these. Adding them in app.ts means future renames
+#           propagate everywhere via a single constant change.
 #
+#        3. reset-password email template — (folded in from former phantom
+#           overlay 058 on 2026-05-25 during merge prep). Two changes there:
+#              a. Adds the SUPPORT_EMAIL import + replaces the hardcoded
+#                 `mailto:hi@documenso.com` link with `mailto:${SUPPORT_EMAIL}`,
+#                 so the brand stays consistent across the app + marketing
+#                 site without per-template hardcoding.
+#              b. Changes the fallback `<Img alt="Documenso Logo">` to
+#                 `<Img alt="Pacta Logo">`. Pure brand rebrand for screen
+#                 readers and accessibility.
+#           This template is the only one in packages/email/templates/*.tsx
+#           that uses a literal email address (the others go through
+#           template-footer.tsx, which is patched by overlay 023). Folding
+#           the change here rather than creating a tiny standalone 058
+#           patch keeps all brand-rebrand surface in one reviewable place.
+#
+# Why-not-additive:
+#   - app.ts: constants are imported by ~40+ files; can't be re-exported
+#     from a separate package without breaking the existing import paths.
+#     Inline patch is the only way.
+#   - reset-password.tsx: the template directly renders a `<Link>` with a
+#     hardcoded href. No injection point exists; the only way to swap the
+#     literal is to edit the JSX.
+#
+# Upstream-merge-fragility: LOW.
+#   - app.ts: gets ~1 commit per quarter upstream. Our changes are
+#     additive (new exports) plus three line replacements; easy to
+#     reapply on conflict.
+#   - reset-password.tsx: upstream's biome lint reformat (className order,
+#     JSX multi-line) accounts for ~80% of the diff body. Functional
+#     changes are 3 small edits (import, alt text, mailto). Re-anchor
+#     trivially on conflict.
+#
+# Discipline note — 045c piggyback:
+#   The app.ts diff body also includes a `+// MODIFIED for BizRethink
+#   (overlay 045c)` block adding `isBillingEnabledFromConfig` (async
+#   DB-backed billing toggle). This was inlined to app.ts on 2026-05-12
+#   when the admin-UI billing toggle shipped, but no patch file 045c
+#   exists. It's thematically billing-async, not brand-rebrand, and
+#   should live in its own overlay 045 patch.
+#
+#   It's included in this regenerated patch because the diff is captured
+#   wholesale ("what does upstream/main differ from main today on these
+#   files"). EXTRACT TO ITS OWN PATCH in the post-merge cleanup workstream.
+#   When that happens, remove the corresponding hunk from this 021 patch
+#   so 021 stays focused on brand.
+#
+# Status: REGENERATED 2026-05-25 (v3) — folds in reset-password.tsx (former
+#         phantom 058) and captures the v2 SUPPORT_EMAIL change. v1 patch
+#         on disk was corrupt (hunk header off-by-one) since the v2 inline
+#         edit shipped without updating the patch file.
+
+diff --git a/packages/email/templates/reset-password.tsx b/packages/email/templates/reset-password.tsx
+--- a/packages/email/templates/reset-password.tsx
++++ b/packages/email/templates/reset-password.tsx
+@@ -2,6 +2,8 @@ import { msg } from '@lingui/core/macro';
+ import { useLingui } from '@lingui/react';
+ import { Trans } from '@lingui/react/macro';
+
++import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
++
+ import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
+ import { useBranding } from '../providers/branding';
+ import { TemplateFooter } from '../template-components/template-footer';
+@@ -31,21 +33,25 @@ export const ResetPasswordTemplate = ({
+
+       <Body className="mx-auto my-auto bg-white font-sans">
+         <Section>
+-          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
++          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
+             <Section>
+               {branding.brandingEnabled && branding.brandingLogo ? (
+                 <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
+               ) : (
+-                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
++                <Img src={getAssetUrl('/static/logo.png')} alt="Pacta Logo" className="mb-4 h-6" />
+               )}
+
+-              <TemplateResetPassword userName={userName} userEmail={userEmail} assetBaseUrl={assetBaseUrl} />
++              <TemplateResetPassword
++                userName={userName}
++                userEmail={userEmail}
++                assetBaseUrl={assetBaseUrl}
++              />
+             </Section>
+           </Container>
+
+           <Container className="mx-auto mt-12 max-w-xl">
+             <Section>
+-              <Text className="my-4 font-semibold text-base">
++              <Text className="my-4 text-base font-semibold">
+                 <Trans>
+                   Hi, {userName}{' '}
+                   <Link className="font-normal text-slate-400" href={`mailto:${userEmail}`}>
+@@ -55,12 +61,21 @@ export const ResetPasswordTemplate = ({
+               </Text>
+
+               <Text className="mt-2 text-base text-slate-400">
+-                <Trans>We've changed your password as you asked. You can now sign in with your new password.</Trans>
++                <Trans>
++                  We've changed your password as you asked. You can now sign in with your new
++                  password.
++                </Trans>
+               </Text>
+               <Text className="mt-2 text-base text-slate-400">
+                 <Trans>
+-                  Didn't request a password change? We are here to help you secure your account, just{' '}
+-                  <Link className="font-normal text-documenso-700" href="mailto:hi@documenso.com">
++                  Didn't request a password change? We are here to help you secure your account,
++                  just{' '}
++                  {/* MODIFIED for BizRethink (overlay 058, revised
++                      2026-05-12): use SUPPORT_EMAIL constant (now
++                      hello@pacta.ink per overlay 021 revision) so this
++                      stays in sync with the rest of the app + the
++                      marketing site. */}
++                  <Link className="text-documenso-700 font-normal" href={`mailto:${SUPPORT_EMAIL}`}>
+                     contact us
+                   </Link>
+                   .
 diff --git a/packages/lib/constants/app.ts b/packages/lib/constants/app.ts
 --- a/packages/lib/constants/app.ts
 +++ b/packages/lib/constants/app.ts
-@@ -20,7 +20,15 @@ export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED
+@@ -1,8 +1,10 @@
+ import { env } from '@documenso/lib/utils/env';
+
+-export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT = Number(env('NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT')) || 50;
++export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT =
++  Number(env('NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT')) || 50;
+
+-export const NEXT_PUBLIC_WEBAPP_URL = () => env('NEXT_PUBLIC_WEBAPP_URL') ?? 'http://localhost:3000';
++export const NEXT_PUBLIC_WEBAPP_URL = () =>
++  env('NEXT_PUBLIC_WEBAPP_URL') ?? 'http://localhost:3000';
+
+ export const NEXT_PUBLIC_SIGNING_CONTACT_INFO = () =>
+   env('NEXT_PUBLIC_SIGNING_CONTACT_INFO') ?? NEXT_PUBLIC_WEBAPP_URL();
+@@ -15,14 +17,48 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL = () =>
+
+ export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
+
++// MODIFIED for BizRethink (overlay 045c): async variant that reads from
++// the DB-backed BizrethinkInstanceStripeConfig singleton with env-var
++// fallback. New code paths (webhook handler, billing-gated TRPC routes,
++// admin UI gates) prefer this over the sync IS_BILLING_ENABLED() so
++// admins can toggle billing via the admin UI without a redeploy.
++//
++// The sync IS_BILLING_ENABLED() is kept for backward compat with 25+
++// existing call sites that can't easily go async (component renders,
++// loader gates, etc.). Those still read the env var; migrating them to
++// the DB-aware variant happens gradually as we touch each one.
++export const isBillingEnabledFromConfig = async (): Promise<boolean> => {
++  // Dynamic import to avoid a hot import cycle:
++  // app.ts → instance-stripe-config → prisma → (lots of other lib code).
++  // Lazy resolution keeps this constants file lightweight.
++  const { isBillingEnabled } =
++    await import('@bizrethink/customizations/server-only/instance-stripe-config');
++  return isBillingEnabled();
++};
++
  export const API_V2_BETA_URL = '/api/v2-beta';
  export const API_V2_URL = '/api/v2';
 
 -export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@documenso.com';
-+// MODIFIED for BizRethink overlay 021: rebrand support email default.
-+// Operators can still override via NEXT_PUBLIC_SUPPORT_EMAIL env var.
-+export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@bizrethink.ai';
++// MODIFIED for BizRethink overlay 021 (revised 2026-05-12): SUPPORT_EMAIL
++// default flipped from `support@bizrethink.ai` to `hello@pacta.ink` to
++// match what the marketing site (pacta.ink) uses everywhere. Single
++// public-facing email for Pacta makes inbound easier to triage and is
++// less confusing for users — they don't have to remember which brand
++// owns which inbox. Operators can still override via env var.
++export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'hello@pacta.ink';
 +
 +// Added for BizRethink overlay 021: canonical product name used in meta tags,
 +// page titles, and email copy. Pacta is the BizRethink AI document signing
@@ -35,5 +194,24 @@ diff --git a/packages/lib/constants/app.ts b/packages/lib/constants/app.ts
 +export const APP_PARENT_BRAND = 'BizRethink AI';
 +export const APP_FULL_NAME = `${APP_NAME} by ${APP_PARENT_BRAND}`;
 
- export const USE_INTERNAL_URL_BROWSERLESS = () =>
-   env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
+-export const USE_INTERNAL_URL_BROWSERLESS = () => env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
++export const USE_INTERNAL_URL_BROWSERLESS = () =>
++  env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
+
+-export const IS_AI_FEATURES_CONFIGURED = () => !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
++export const IS_AI_FEATURES_CONFIGURED = () =>
++  !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+
+ /**
+  * Temporary flag to toggle between Playwright-based and Konva-based PDF generation
+@@ -30,6 +66,8 @@ export const IS_AI_FEATURES_CONFIGURED = () => !!env('GOOGLE_VERTEX_PROJECT_ID')
+  *
+  * @deprecated This is a temporary flag and will be removed once Konva-based generation is stable.
+  */
+-export const NEXT_PRIVATE_USE_PLAYWRIGHT_PDF = () => env('NEXT_PRIVATE_USE_PLAYWRIGHT_PDF') === 'true';
++export const NEXT_PRIVATE_USE_PLAYWRIGHT_PDF = () =>
++  env('NEXT_PRIVATE_USE_PLAYWRIGHT_PDF') === 'true';
+
+-export const NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY = () => env('NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY');
++export const NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY = () =>
++  env('NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY');

@@ -1,7 +1,6 @@
-import { P12Signer } from '@libpdf/core';
 import * as fs from 'node:fs';
-
 import { env } from '@documenso/lib/utils/env';
+import { P12Signer } from '@libpdf/core';
 
 // MODIFIED for BizRethink (overlay 011): cert + passphrase resolution
 // consults the singleton `BizrethinkInstanceSigningConfig` row first.
@@ -30,9 +29,7 @@ const loadP12FromEnvOrFile = (): Uint8Array => {
 };
 
 export const createLocalSigner = async () => {
-  const { getInstanceSigningConfig } = await import(
-    '@bizrethink/customizations/server-only/instance-signing-config'
-  );
+  const { getInstanceSigningConfig } = await import('@bizrethink/customizations/server-only/instance-signing-config');
   const dbConfig = await getInstanceSigningConfig();
 
   const p12 =

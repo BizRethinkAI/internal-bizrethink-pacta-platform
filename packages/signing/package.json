@@ -9,7 +9,9 @@
     "index.ts"
   ],
   "scripts": {
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@google-cloud/kms": "^5.2.1",
@@ -17,6 +19,8 @@
     "ts-pattern": "^5.9.0"
   },
   "devDependencies": {
-    "@documenso/tsconfig": "*"
+    "@documenso/tsconfig": "*",
+    "@vitest/coverage-v8": "^4.1.6",
+    "vitest": "^4.1.6"
   }
 }

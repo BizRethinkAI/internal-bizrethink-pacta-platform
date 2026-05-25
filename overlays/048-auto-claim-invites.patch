@@ -1,0 +1,127 @@
+# Why: Auto-claim pending OrganisationMemberInvite rows matching the new
+#      user's email at signup time. In a B2B / domain-gated setup (Pacta
+#      for CircularPay), users invited by an admin should land in the
+#      invited org — NOT in a blank Personal Org.
+#
+#      This patch is a PRE-STAGED MERGE RESOLUTION (not a documentation
+#      capture of current main). Reason: upstream commit f10d3284b added
+#      a new `OnCreateUserHookOptions` parameter to `onCreateUserHook`
+#      with a `skipPersonalOrganisation?: boolean` field (for SSO callers
+#      that want to suppress Personal Org creation). Our existing inline
+#      mod uses the OLD single-arg signature. A naive `git diff main
+#      upstream` would show a structurally-breaking conflict; this patch
+#      pre-stages the resolution.
+#
+#      Target post-merge behaviour (combines both gates):
+#         1. Auto-claim invites runs UNIVERSALLY for every signup path
+#            (email-password, SSO, future passkey, etc.). This is the
+#            "don't tie auto-claim to auth mechanism" principle locked
+#            in conversation 2026-05-25.
+#         2. Personal Org is created only when BOTH gates allow:
+#              - !options.skipPersonalOrganisation (SSO callers opt out)
+#              - accepted.length === 0 (no invites were consumed)
+#         3. Auto-claim failures (DB blips) fall back to Personal Org
+#            creation as a safety net — better blank workspace than none.
+#
+#      Companion module `packages/bizrethink/server-only/auto-claim-
+#      invites-on-signup.ts` (new file, outside upstream's tree, no patch
+#      needed) implements the invite-matching + claim logic.
+#
+# Why-not-additive: `onCreateUserHook` is the canonical post-signup hook
+#      called from `createUser` (email-password path) and the SSO callback
+#      handlers. There's no extension point or event system; we have to
+#      patch the hook body itself.
+#
+# Why combine gates rather than short-circuit on SSO:
+#      Considered alternative: short-circuit on options.skipPersonalOrganisation
+#      first, then run auto-claim only for non-SSO. Rejected because: an SSO
+#      user invited by email to a separate org should still pick up that
+#      invite. Decoupling auto-claim from auth mechanism keeps future auth
+#      methods (magic-link, passkeys) inheriting correct behaviour.
+#
+# Upstream-merge-fragility: MEDIUM.
+#   - This patch CHANGES the relationship to upstream from "inline-modified"
+#     to "patched on top of upstream's f10d3284b refactor". Once applied
+#     during the 2026-05-25 merge, future syncs become routine.
+#   - If upstream further refactors onCreateUserHook (e.g., adds another
+#     options field), the hunk re-anchors trivially.
+#   - If upstream removes OnCreateUserHookOptions entirely, the patch
+#     becomes a structural rewrite — high-friction. Low probability.
+#
+# Status: PATCHIFIED 2026-05-25 from inline `// MODIFIED for BizRethink
+#         (overlay 048)` markers. Forward-staged against upstream's
+#         f10d3284b refactor. Round-trip tested: applies cleanly to
+#         upstream's create-user.ts, produces target post-merge state.
+
+diff --git a/packages/lib/server-only/user/create-user.ts b/packages/lib/server-only/user/create-user.ts
+--- a/packages/lib/server-only/user/create-user.ts
++++ b/packages/lib/server-only/user/create-user.ts
+@@ -1,7 +1,27 @@
+-import { prisma } from '@documenso/prisma';
++// MODIFIED for BizRethink (overlay 048): auto-claim pending OrganisationMember
++// invites matching the new user's email at signup time. The Personal Org
++// creation gate now combines BOTH conditions:
++//   - !options.skipPersonalOrganisation (upstream's SSO suppression)
++//   - accepted.length === 0 (no invites were auto-claimed)
++//
++// Both must be true for Personal Org to spawn. Auto-claim runs UNIVERSALLY
++// regardless of options.skipPersonalOrganisation — invite consumption is
++// post-signup user onboarding, decoupled from the auth mechanism (this is
++// the "don't tie auto-claim to auth" principle locked in 2026-05-25).
++//
++// Why: Documenso's default flow always spawns a Personal Organisation for
++// every new user, ignoring any pending OrganisationMemberInvite that
++// matches their email. In a B2B / domain-gated setup (Pacta for
++// CircularPay) the user was invited by an admin — they should land in
++// the invited org, not in a blank Personal Org. See helper at
++// packages/bizrethink/server-only/auto-claim-invites-on-signup.ts for
++// the full reasoning.
++import { autoClaimInvitesOnSignup } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
+ import { hash } from '@node-rs/bcrypt';
+ import type { User } from '@prisma/client';
+ 
++import { prisma } from '@documenso/prisma';
++
+ import { SALT_ROUNDS } from '../../constants/auth';
+ import { AppError, AppErrorCode } from '../../errors/app-error';
+ import { createPersonalOrganisation } from '../organisation/create-organisation';
+@@ -78,6 +98,10 @@
+    *
+    * Defaults to false — preserves the historical behaviour of creating a
+    * personal organisation for every new user.
++   *
++   * Note (overlay 048): auto-claim of pending invites runs for ALL signups
++   * regardless of this flag — invite consumption is universal post-signup
++   * onboarding, decoupled from the auth mechanism.
+    */
+   skipPersonalOrganisation?: boolean;
+ };
+@@ -85,10 +109,27 @@
+ /**
+  * Should be run after a user is created, example during email password signup or google sign in.
+  *
++ * MODIFIED for BizRethink (overlay 048): auto-claim pending invites matching
++ * the new user's email FIRST (runs universally regardless of options).
++ * Personal Org is created only when BOTH gates allow:
++ *   1. !options.skipPersonalOrganisation (upstream's SSO suppression)
++ *   2. accepted.length === 0 (no invites consumed)
++ *
+  * @returns User
+  */
+ export const onCreateUserHook = async (user: User, options: OnCreateUserHookOptions = {}) => {
+-  if (!options.skipPersonalOrganisation) {
++  const accepted = await autoClaimInvitesOnSignup({
++    userId: user.id,
++    userEmail: user.email,
++  }).catch((err) => {
++    // Defensive: if auto-claim itself fails (DB blip, etc), still create
++    // Personal Org as the safety net. Better to give the user a blank
++    // workspace than no workspace at all.
++    console.error('[onCreateUserHook] auto-claim invites failed:', err);
++    return [];
++  });
++
++  if (!options.skipPersonalOrganisation && accepted.length === 0) {
+     await createPersonalOrganisation({ userId: user.id });
+   }
+ 

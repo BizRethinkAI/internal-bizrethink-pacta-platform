@@ -1,0 +1,96 @@
+# Why: When any BizRethink-namespaced site-setting row is upserted (admin
+#      UI save), the corresponding in-memory cache in
+#      `@bizrethink/customizations/server-only/*-config.ts` must be
+#      invalidated so the next request picks up the new value WITHOUT a
+#      process restart. Otherwise, admin UI saves appear to succeed but
+#      take no effect until the next deploy.
+#
+#      Currently handles only `site.security-headers` cache invalidation,
+#      which is overlay 032's surface. Other BizRethink site-settings
+#      (signup-config, webhook-config, captcha-config) are read fresh
+#      each request, so they don't need cache invalidation; if any of
+#      those gain caches in the future, this file is where the
+#      invalidation hooks land.
+#
+#      Implementation: dynamic import of `invalidateSecurityHeadersConfig`
+#      from @bizrethink/customizations after the `prisma.siteSettings.upsert()`
+#      succeeds. Dynamic import avoids a circular dep (the customizations
+#      package depends on @documenso/lib/prisma).
+#
+# Why-not-additive: `upsertSiteSetting()` is the canonical write path for
+#      all site-settings rows. There's no hook or event system on the
+#      Prisma upsert; we have to splice the invalidation call into the
+#      same function.
+#
+# Discipline note — relationship to overlay 032:
+#   This change was originally part of overlay 032's broader security-
+#   headers feature (which also patches apps/remix/server/security-
+#   headers.ts and apps/remix/app/routes/_authenticated+/admin+/site-
+#   settings.tsx). Overlay 032's patch file on disk has only a header
+#   with NO diff body — the implementation went inline without proper
+#   patchification. This 029 patch covers ONLY the upsert-site-setting.ts
+#   slice (the one that appears in the 2026-05-25 merge conflict list);
+#   the other 032 surfaces will be patchified in post-merge cleanup
+#   (see Task #10). When 032 is fully regenerated, this 029 patch
+#   should be folded back in to keep all security-headers-related
+#   changes in one place.
+#
+# Upstream-merge-fragility: LOW.
+#   - Single function with ~10 lines added inside the existing
+#     `upsertSiteSetting()` body, after the prisma call. Anchors are
+#     stable (function name + Prisma model name).
+#   - If upstream restructures the upsert (e.g., moves it inside a
+#     transaction or splits into per-site-setting handlers), the
+#     dynamic-import block can stay or move as needed.
+#
+# Status: PATCHIFIED 2026-05-25 from inline `// MODIFIED for BizRethink
+#         (overlay 032)` markers. Transitional — will fold into a
+#         regenerated overlay 032 in post-merge cleanup.
+
+diff --git a/packages/lib/server-only/site-settings/upsert-site-setting.ts b/packages/lib/server-only/site-settings/upsert-site-setting.ts
+index 37e53d18d..384a868ad 100644
+--- a/packages/lib/server-only/site-settings/upsert-site-setting.ts
++++ b/packages/lib/server-only/site-settings/upsert-site-setting.ts
+@@ -1,13 +1,23 @@
+ import { prisma } from '@documenso/prisma';
+ 
+-import type { TSiteSettingSchema } from './schema';
++import { type TSiteSettingSchema } from './schema';
++
++// MODIFIED for BizRethink (overlay 032): bust the in-memory caches of any
++// BizRethink-namespaced site-settings so admin UI saves take effect on
++// the next request without a process restart.
++const SITE_SETTINGS_SECURITY_HEADERS_ID = 'site.security-headers';
+ 
+ export type UpsertSiteSettingOptions = TSiteSettingSchema & {
+   userId?: number | null;
+ };
+ 
+-export const upsertSiteSetting = async ({ id, enabled, data, userId }: UpsertSiteSettingOptions) => {
+-  return await prisma.siteSettings.upsert({
++export const upsertSiteSetting = async ({
++  id,
++  enabled,
++  data,
++  userId,
++}: UpsertSiteSettingOptions) => {
++  const result = await prisma.siteSettings.upsert({
+     where: {
+       id,
+     },
+@@ -25,4 +35,15 @@ export const upsertSiteSetting = async ({ id, enabled, data, userId }: UpsertSit
+       lastModifiedAt: new Date(),
+     },
+   });
++
++  // MODIFIED for BizRethink (overlay 032): cache invalidation for our
++  // site-settings-backed configs. Done via dynamic import to break the
++  // circular dependency between @documenso/lib and @bizrethink/customizations.
++  if (id === SITE_SETTINGS_SECURITY_HEADERS_ID) {
++    const { invalidateSecurityHeadersConfig } =
++      await import('@bizrethink/customizations/server-only/security-headers-config');
++    invalidateSecurityHeadersConfig();
++  }
++
++  return result;
+ };

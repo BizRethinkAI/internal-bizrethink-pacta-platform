@@ -11,9 +11,21 @@ import { ZSiteSettingsSignupSchema } from './site-settings/schemas/signup';
 // the bootstrap config.
 
 const readDbConfig = async () => {
-  const row = await prisma.siteSettings.findFirst({
-    where: { id: 'site.signup' },
-  });
+  // Defensive: if DB is unreachable (Postgres down, network flap, test env),
+  // return null so callers fall back to env-only behaviour. Better to honor
+  // the env config during an outage than to throw and break signup entirely.
+  let row;
+  try {
+    row = await prisma.siteSettings.findFirst({
+      where: { id: 'site.signup' },
+    });
+  } catch (err) {
+    console.warn(
+      '[bizrethink/signup-config] DB read failed; falling back to env-only:',
+      err instanceof Error ? err.message : err,
+    );
+    return null;
+  }
 
   if (!row || !row.enabled) {
     return null;

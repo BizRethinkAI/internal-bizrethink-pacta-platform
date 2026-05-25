@@ -5,9 +5,19 @@ import { ZSiteSettingsCaptchaSchema } from './site-settings/schemas/captcha';
 // Phase G (overlay 015): DB-aware captcha config getters.
 
 const readDb = async () => {
-  const row = await prisma.siteSettings.findFirst({
-    where: { id: 'site.captcha' },
-  });
+  // Defensive: DB unreachable falls back to env-only (callers below handle null).
+  let row;
+  try {
+    row = await prisma.siteSettings.findFirst({
+      where: { id: 'site.captcha' },
+    });
+  } catch (err) {
+    console.warn(
+      '[bizrethink/captcha-config] DB read failed; falling back to env-only:',
+      err instanceof Error ? err.message : err,
+    );
+    return null;
+  }
   if (!row || !row.enabled) return null;
   const parsed = ZSiteSettingsCaptchaSchema.safeParse(row);
   if (!parsed.success) return null;

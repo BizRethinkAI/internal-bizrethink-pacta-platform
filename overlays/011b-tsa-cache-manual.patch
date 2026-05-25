@@ -1,0 +1,154 @@
+# Why: TSA (Time Stamp Authority) lookup must be DB-backed so admins can
+#      hot-swap TSA URLs via the admin UI (/admin/instance-signing) without
+#      a process restart. Upstream uses `remeda.once()` which makes the TSA
+#      list immutable for the lifetime of the Node process — fine for env-
+#      only configuration, broken for admin-UI configuration.
+#
+#      CRYPTOGRAPHICALLY CRITICAL surface. The TSA timestamps every signed
+#      PDF for Long-Term Validation (LTV). If TSA URLs are wrong or stale,
+#      signed PDFs may pass current validation but fail archival validation
+#      5+ years out (when Acrobat's TSA cert trust list rotates). PAdES-B-LT
+#      compliance requires the timestamp authority to be reachable AND
+#      trusted at signing time.
+#
+#      Three changes to upstream's tsa.ts:
+#
+#        1. `cachedAuthorities` + `cacheProbed` — replace the `once()`
+#           wrapper with a manual two-variable cache. `cacheProbed` flag
+#           lets us distinguish "haven't seeded yet" from "seeded but no
+#           TSAs configured" (legitimate state — TSA is optional).
+#
+#        2. `buildAuthorities()` — extracted helper that constructs the
+#           TSA authority objects. Called from both the seed path (DB
+#           values, async) and the env-fallback path (sync). Internal
+#           use only; not exported.
+#
+#        3. NEW exports:
+#             - `seedTsaFromConfig(urls: string[])` — called by
+#               `getSigner()` (overlay 011a) at the start of every
+#               signing session to seed the cache with DB-loaded TSA
+#               URLs. Idempotent on re-entry.
+#             - `resetTimestampAuthorities()` — called by the admin UI
+#               after saving new TSA config to bust the cache.
+#
+#      Companion file: `packages/bizrethink/server-only/instance-signing-
+#      config.ts` (the same one overlay 011a uses) supplies the TSA URL
+#      list from the DB row.
+#
+# Why-not-additive: `getTimestampAuthority()` is the sync API that the
+#      PAdES library calls to look up the TSA at signing time. We have
+#      to override its lookup logic in this file; the function signature
+#      itself is fixed by the library, so we can't intercept from a
+#      separate package.
+#
+# Upstream-merge-fragility: MEDIUM.
+#   - If upstream changes `getTimestampAuthority()`'s signature or moves
+#     it to a different module, the seed + reset pattern breaks. Currently
+#     the contract is sync `() => Authority | null`, called from inside
+#     `signPdf()`.
+#   - If upstream replaces `remeda.once()` with another memoization
+#     primitive, we'd need to re-derive the cache pattern.
+#   - The CRITICAL invariant: `seedTsaFromConfig()` must be called BEFORE
+#     `signPdf()` issues its first TSA request. If upstream restructures
+#     the signer initialization and skips the seed step, TSA URLs silently
+#     default to env-only (or null if env is unset → no timestamps applied
+#     → archival LTV validation fails in 5+ years).
+#
+# Caveat: TSA is optional. If neither DB nor env has TSA URLs configured,
+#      seal-document.handler still signs the PDF (CAdES), just without
+#      a timestamp. The PDF is still cryptographically valid but loses
+#      LTV-grade archival assurance. Recommend admin UI shows a warning
+#      banner if signing config exists but has empty TSA URL list.
+#
+# Status: PATCHIFIED 2026-05-25 from inline `// MODIFIED for BizRethink
+#         (overlay 011)` markers. PAIRS WITH overlay 011a (signing/index.ts).
+
+diff --git a/packages/signing/helpers/tsa.ts b/packages/signing/helpers/tsa.ts
+index 8a2736464..d9b82d010 100644
+--- a/packages/signing/helpers/tsa.ts
++++ b/packages/signing/helpers/tsa.ts
+@@ -1,24 +1,71 @@
+-import { NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY } from '@documenso/lib/constants/app';
+ import { HttpTimestampAuthority } from '@libpdf/core';
+-import { once } from 'remeda';
+ 
+-const setupTimestampAuthorities = once(() => {
+-  const timestampAuthority = NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY();
++import { NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY } from '@documenso/lib/constants/app';
++
++// MODIFIED for BizRethink (overlay 011): replaced upstream's `once()` wrapper
++// from `remeda` with a manual cache so we can expose a reset hook. The TSA
++// list is read from `BizrethinkInstanceSigningConfig.tsaUrls` first, with
++// env fallback. The cache-bust is invoked by the admin TRPC mutation via
++// `resetSigningCaches()` in packages/signing/index.ts.
++
++let cachedAuthorities: HttpTimestampAuthority[] | null = null;
++let cacheProbed = false;
+ 
+-  if (!timestampAuthority) {
++const buildAuthorities = (csv: string | null | undefined): HttpTimestampAuthority[] | null => {
++  if (!csv) {
+     return null;
+   }
+-
+-  const timestampAuthorities = timestampAuthority
++  const urls = csv
+     .trim()
+     .split(',')
+-    .filter(Boolean)
+-    .map((url) => {
+-      return new HttpTimestampAuthority(url);
+-    });
++    .map((u) => u.trim())
++    .filter(Boolean);
++  if (urls.length === 0) {
++    return null;
++  }
++  return urls.map((url) => new HttpTimestampAuthority(url));
++};
+ 
+-  return timestampAuthorities;
+-});
++const setupTimestampAuthorities = (): HttpTimestampAuthority[] | null => {
++  if (cacheProbed) {
++    return cachedAuthorities;
++  }
++
++  // ENV-only fast path: synchronous setup is required by signPdf's call site
++  // which reads `getTimestampAuthority()` synchronously. The DB-backed config
++  // is loaded asynchronously elsewhere (by getSigner / getInstanceSigningConfig)
++  // and feeds in via `seedTsaFromConfig()` below — that function is called
++  // from packages/signing/index.ts:getSigner() before the first signPdf, so
++  // by the time getTimestampAuthority() runs, the DB-sourced TSAs are
++  // already in cache when applicable.
++  const envCsv = NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY();
++  cachedAuthorities = buildAuthorities(envCsv);
++  cacheProbed = true;
++  return cachedAuthorities;
++};
++
++/**
++ * Seed the TSA cache from a DB-loaded config. Called by `getSigner()` in
++ * `packages/signing/index.ts` before the first signPdf, so signPdf's
++ * synchronous `getTimestampAuthority()` read sees the right values without
++ * having to await.
++ */
++export const seedTsaFromConfig = (tsaUrls: string[] | null | undefined) => {
++  if (!tsaUrls || tsaUrls.length === 0) {
++    return;
++  }
++  cachedAuthorities = buildAuthorities(tsaUrls.join(','));
++  cacheProbed = true;
++};
++
++/**
++ * Drop the TSA cache. Used by the admin TRPC mutation after writing a new
++ * config so subsequent signPdf calls re-evaluate the source.
++ */
++export const resetTimestampAuthorities = () => {
++  cachedAuthorities = null;
++  cacheProbed = false;
++};
+ 
+ export const getTimestampAuthority = () => {
+   const authorities = setupTimestampAuthorities();

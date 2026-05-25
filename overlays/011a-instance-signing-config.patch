@@ -1,0 +1,160 @@
+# Why: Signing transport selection (local cert vs Google Cloud HSM), contact
+#      info embedded in every PAdES signature, and the cert cache itself must
+#      all consult the BizRethink `BizrethinkInstanceSigningConfig` singleton
+#      row BEFORE falling back to env vars. This lets operators hot-swap
+#      signing certs, TSA URLs, and contact info via the admin UI
+#      (/admin/instance-signing) without a Coolify redeploy.
+#
+#      CRYPTOGRAPHICALLY CRITICAL surface. The signing transport produced
+#      by `getSigner()` is what writes the PAdES signature into every
+#      sealed PDF — if the wrong cert is selected (or env-only fallback
+#      kicks in when DB config exists), contracts get signed with the
+#      wrong cryptographic key, invalidating their legal standing.
+#
+#      Three integration points in this file:
+#
+#        1. `getSigner()` (lines 27-42) — DB-first transport selection.
+#           Calls `getInstanceSigningConfig()` (dynamic import to avoid
+#           circular dep); if a DB row exists, builds the local-cert or
+#           GCP-HSM transport from DB values; otherwise falls back to
+#           upstream's env-based factory.
+#
+#        2. `resetSigningCaches()` (lines 57-64) — NEW export. The admin
+#           UI's "Save signing config" handler calls this after writing
+#           the new config row so the next `signPdf()` call picks up
+#           the change. Without it, signing config would only take
+#           effect on next process restart.
+#
+#        3. `signPdf()` contact-info resolution (lines 71-79) — embeds
+#           the contact info string into every PAdES signature dictionary.
+#           Reads DB config first (so admins can set "BizRethink AI
+#           Compliance <legal@bizrethink.ai>" or similar) with env-var
+#           fallback.
+#
+#      Companion module `packages/bizrethink/server-only/instance-signing-
+#      config.ts` (new file, outside upstream's tree) implements the
+#      prisma read, 60s in-process cache, and `invalidateInstanceSigning-
+#      Config()`. Pairs with overlay 011b (tsa.ts) which seeds the TSA
+#      cache from the same config row.
+#
+# Why-not-additive: `getSigner()` and `signPdf()` are upstream exports
+#      called directly by `seal-document.handler.ts`. There's no
+#      extension point or DI to inject our resolver. Inline patch is
+#      the only path.
+#
+# Upstream-merge-fragility: MEDIUM.
+#   - The three integration sites anchor on function bodies that upstream
+#     rarely touches. Last upstream commit on this file was the biome
+#     lint sweep, 8671f269e.
+#   - If upstream adds a new signing transport (e.g., AWS KMS), the
+#     transport-selection switch in `getSigner()` would need to gain
+#     a new branch on our DB config too.
+#   - The `resetSigningCaches()` export is purely additive (no upstream
+#     equivalent); zero conflict risk on that surface.
+#   - CRITICAL: the cache-seed ordering invariant — `getSigner()` must
+#     call `seedTsaFromConfig()` (from overlay 011b's tsa.ts) BEFORE
+#     the first `signPdf()` call on the process. If upstream restructures
+#     getSigner() to skip this seed step, LTV archival validation silently
+#     degrades 5+ years out. Verify ordering on every upstream merge.
+#
+# Caveat — DB unavailable behavior: If the DB read throws (Postgres
+#      down), the catch falls back to upstream's env-only factory.
+#      This means a temporarily-bad DB does NOT break signing — but
+#      a permanently-misconfigured DB row WILL override correct env
+#      values silently. Admin UI MUST show test results before saving.
+#
+# Status: PATCHIFIED 2026-05-25 from inline `// MODIFIED for BizRethink
+#         (overlay 011)` markers that had been live since the admin UI
+#         for signing config shipped. Backfilling discipline before
+#         the stalled upstream merge. PAIRS WITH overlay 011b (tsa.ts).
+
+diff --git a/packages/signing/index.ts b/packages/signing/index.ts
+index 45af28441..0c71102cd 100644
+--- a/packages/signing/index.ts
++++ b/packages/signing/index.ts
+@@ -1,13 +1,15 @@
++import type { Signer } from '@libpdf/core';
++import type { PDF } from '@libpdf/core';
++import { match } from 'ts-pattern';
++
+ import {
+   NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER,
+   NEXT_PUBLIC_SIGNING_CONTACT_INFO,
+   NEXT_PUBLIC_WEBAPP_URL,
+ } from '@documenso/lib/constants/app';
+ import { env } from '@documenso/lib/utils/env';
+-import type { PDF, Signer } from '@libpdf/core';
+-import { match } from 'ts-pattern';
+ 
+-import { getTimestampAuthority } from './helpers/tsa';
++import { getTimestampAuthority, resetTimestampAuthorities, seedTsaFromConfig } from './helpers/tsa';
+ import { createGoogleCloudSigner } from './transports/google-cloud';
+ import { createLocalSigner } from './transports/local';
+ 
+@@ -22,7 +24,24 @@ const getSigner = async () => {
+     return signer;
+   }
+ 
+-  const transport = env('NEXT_PRIVATE_SIGNING_TRANSPORT') || 'local';
++  // MODIFIED for BizRethink (overlay 011): transport selection consults the
++  // singleton `BizrethinkInstanceSigningConfig` row first (so the admin UI
++  // can flip transport without a redeploy), and falls back to env reads
++  // when the row is absent. The cert/key payloads themselves are loaded
++  // inside createLocalSigner / createGoogleCloudSigner — those functions
++  // are independently patched to consult the DB row before env.
++  const { getInstanceSigningConfig } = await import(
++    '@bizrethink/customizations/server-only/instance-signing-config'
++  );
++  const dbConfig = await getInstanceSigningConfig();
++
++  // Seed the TSA cache from DB before the first signPdf so the synchronous
++  // `getTimestampAuthority()` read inside signPdf sees the DB-sourced URLs.
++  if (dbConfig?.tsaUrls && dbConfig.tsaUrls.length > 0) {
++    seedTsaFromConfig(dbConfig.tsaUrls);
++  }
++
++  const transport = dbConfig?.transport ?? env('NEXT_PRIVATE_SIGNING_TRANSPORT') ?? 'local';
+ 
+   // eslint-disable-next-line require-atomic-updates
+   signer = await match(transport)
+@@ -35,17 +54,38 @@ const getSigner = async () => {
+   return signer;
+ };
+ 
++// ADDED for BizRethink (overlay 011): expose a cache-bust hook so the admin
++// TRPC mutation that writes the singleton row can force the next signPdf
++// call to re-load the new cert + transport without a process restart.
++// Resets BOTH the in-process Signer cache and the TSA cache.
++export const resetSigningCaches = () => {
++  signer = null;
++  resetTimestampAuthorities();
++};
++
+ export const signPdf = async ({ pdf }: SignOptions) => {
+   const signer = await getSigner();
+ 
+   const tsa = getTimestampAuthority();
+ 
++  // MODIFIED for BizRethink (overlay 011): contact info reads from the DB
++  // row first, falling back to the env helper. We DO want to await the DB
++  // lookup here because the Contact Info field is embedded into every signed
++  // PDF and changing it via admin UI shouldn't require a restart.
++  const { getInstanceSigningConfig } = await import(
++    '@bizrethink/customizations/server-only/instance-signing-config'
++  );
++  const dbConfig = await getInstanceSigningConfig();
++  const contactInfo = dbConfig?.signingContactInfo || NEXT_PUBLIC_SIGNING_CONTACT_INFO();
++
+   const { bytes } = await pdf.sign({
+     signer,
+     reason: 'Signed by Documenso',
+     location: NEXT_PUBLIC_WEBAPP_URL(),
+-    contactInfo: NEXT_PUBLIC_SIGNING_CONTACT_INFO(),
+-    subFilter: NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER() ? 'adbe.pkcs7.detached' : 'ETSI.CAdES.detached',
++    contactInfo,
++    subFilter: NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER()
++      ? 'adbe.pkcs7.detached'
++      : 'ETSI.CAdES.detached',
+     timestampAuthority: tsa ?? undefined,
+     longTermValidation: !!tsa,
+     archivalTimestamp: !!tsa,

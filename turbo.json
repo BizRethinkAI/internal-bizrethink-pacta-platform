@@ -33,6 +33,14 @@
     "test:e2e": {
       "dependsOn": ["^build"],
       "cache": false
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
     }
   },
   "globalDependencies": ["**/.env.*local"],
@@ -48,6 +56,10 @@
     "NEXT_PUBLIC_POSTHOG_KEY",
     "NEXT_PUBLIC_FEATURE_BILLING_ENABLED",
     "NEXT_PUBLIC_DISABLE_SIGNUP",
+    "NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP",
+    "NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP",
+    "NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP",
+    "NEXT_PUBLIC_DISABLE_OIDC_SIGNUP",
     "NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS",
     "NEXT_PRIVATE_PLAIN_API_KEY",
     "NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT",
@@ -143,6 +155,7 @@
     "NEXT_PRIVATE_OIDC_PROMPT",
     "NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS",
     "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
-    "NEXT_PRIVATE_TURNSTILE_SECRET_KEY"
+    "NEXT_PRIVATE_TURNSTILE_SECRET_KEY",
+    "PLAYWRIGHT_ALLOW_NON_LOCAL"
   ]
 }

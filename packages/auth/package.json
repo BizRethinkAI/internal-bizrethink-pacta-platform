@@ -5,8 +5,8 @@
   "types": "./index.ts",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rimraf node_modules"
   },
   "dependencies": {
@@ -22,5 +22,9 @@
     "nanoid": "^5.1.6",
     "ts-pattern": "^5.9.0",
     "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.6",
+    "vitest": "^4.1.6"
   }
 }

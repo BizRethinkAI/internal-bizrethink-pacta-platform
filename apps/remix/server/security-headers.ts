@@ -50,8 +50,7 @@ const EMBED_PATH_REGEX = /^\/embed(\/|\.data|$)/;
  * keeps `/sign` from matching `/signin`/`/signup` and `/d` from matching
  * `/dashboard`.
  */
-const FRAMEABLE_PATH_REGEX =
-  /^\/(signin|forgot-password|check-email|unverified-account|sign|d)(\/|\.data|$)/;
+const FRAMEABLE_PATH_REGEX = /^\/(signin|forgot-password|check-email|unverified-account|sign|d)(\/|\.data|$)/;
 
 /**
  * Hono context variable name where the per-request CSP nonce is stashed.
@@ -189,8 +188,9 @@ export const securityHeadersMiddleware = createMiddleware<HonoEnv>(async (c, nex
 
   // MODIFIED for BizRethink (overlay 032): dynamic-import to defer module
   // resolution to runtime (see static-import comment at the top of file).
-  const { getSecurityHeadersConfig, buildHstsValue } =
-    await import('@bizrethink/customizations/server-only/security-headers-config');
+  const { getSecurityHeadersConfig, buildHstsValue } = await import(
+    '@bizrethink/customizations/server-only/security-headers-config'
+  );
 
   const extra = await getSecurityHeadersConfig();
 

@@ -1,10 +1,9 @@
-import { FieldType } from '@prisma/client';
-import type { Recipient } from '@prisma/client';
 import path from 'node:path';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { Recipient } from '@prisma/client';
+import { FieldType } from '@prisma/client';
 import { FontLibrary } from 'skia-canvas';
 import { match } from 'ts-pattern';
-
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 
 /**
  * Ensure all required fonts are registered in the skia-canvas FontLibrary.
@@ -90,11 +89,15 @@ export const parseFieldMetaFromPlaceholder = (
       const sigMeta: Record<string, number | string> = { type: 'signature' };
       if (rawFieldMeta.width) {
         const w = Number(rawFieldMeta.width);
-        if (!Number.isNaN(w)) sigMeta.width = w;
+        if (!Number.isNaN(w)) {
+          sigMeta.width = w;
+        }
       }
       if (rawFieldMeta.height) {
         const h = Number(rawFieldMeta.height);
-        if (!Number.isNaN(h)) sigMeta.height = h;
+        if (!Number.isNaN(h)) {
+          sigMeta.height = h;
+        }
       }
       return sigMeta;
     }

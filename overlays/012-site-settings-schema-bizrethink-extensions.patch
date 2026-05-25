@@ -1,0 +1,81 @@
+# Why: Extend the upstream `ZSiteSettingSchema` Zod union to include four
+#      BizRethink-specific site-setting schemas:
+#
+#        - ZSiteSettingsSignupSchema     (allowed-domains gate, signup flags)
+#        - ZSiteSettingsCaptchaSchema    (reCAPTCHA / Turnstile site keys)
+#        - ZSiteSettingsWebhookSchema    (outbound webhook destination URLs)
+#        - ZSiteSettingsSecurityHeadersSchema (HSTS, Permissions-Policy,
+#                                              nosniff config)
+#
+#      Each schema's *declaration* lives in
+#      `packages/bizrethink/server-only/site-settings/schemas/*.ts` (so
+#      upstream's tree stays clean of our types). This overlay patches
+#      ONLY the union assembly in `packages/lib/server-only/site-settings/
+#      schema.ts` so callers of `ZSiteSettingSchema` get our IDs typechecked
+#      alongside upstream's Banner + Telemetry.
+#
+#      Why one combined union rather than four separate patches: the union
+#      assembly is a single logical change in one block of code. Splitting
+#      it across four patches creates artificial seams that the merge can
+#      break in non-additive ways (each split would compete for the same
+#      `@@` anchor lines). Keep all four union extensions in one patch;
+#      if upstream ever rejects the union pattern and switches to a registry,
+#      this patch becomes obsolete in one place rather than four.
+#
+# Why-not-additive: the union must be ONE schema (Prisma's siteSettings table
+#      writes a single JSONB column that must validate against this union).
+#      Re-exporting from a separate package would force every caller to know
+#      whether they want upstream-only or extended; that's a worse API than
+#      patching the canonical union in place.
+#
+# Companion files (no patches needed — they're new files in
+# packages/bizrethink/, outside upstream's tree):
+#   - packages/bizrethink/server-only/site-settings/schemas/signup.ts
+#   - packages/bizrethink/server-only/site-settings/schemas/captcha.ts
+#   - packages/bizrethink/server-only/site-settings/schemas/webhook.ts
+#   - packages/bizrethink/server-only/site-settings/schemas/security-headers.ts
+#
+# Upstream-merge-fragility: LOW.
+#   - Adds 4 imports (at the top of the file, before the upstream imports)
+#     and extends the union literal by 4 entries. Pure additive.
+#   - Upstream's `ZSiteSettingSchema` rarely changes (the upstream union
+#     itself was last touched 2026-03-15 to add ZSiteSettingsTelemetrySchema).
+#   - If upstream adds another schema to the union, our merge picks up the
+#     new entry and our four entries stay; no conflict.
+#   - Biome lint reformat of the union literal (single-line → multi-line)
+#     is captured in this patch since it's part of the same diff hunk.
+#
+# Status: PATCHIFIED 2026-05-25 from inline `// MODIFIED for BizRethink
+#         (overlay 012)` markers that had been live since the relevant
+#         BizRethink site-settings features shipped (signup, captcha,
+#         webhook, security-headers). Backfilling discipline before the
+#         stalled upstream merge.
+
+diff --git a/packages/lib/server-only/site-settings/schema.ts b/packages/lib/server-only/site-settings/schema.ts
+--- a/packages/lib/server-only/site-settings/schema.ts
++++ b/packages/lib/server-only/site-settings/schema.ts
+@@ -1,9 +1,23 @@
++// MODIFIED for BizRethink (overlay 012): extend the union with our additional
++// site-setting IDs. Importing from `@bizrethink/customizations` keeps the
++// schema declarations themselves out of upstream's tree.
++import { ZSiteSettingsCaptchaSchema } from '@bizrethink/customizations/server-only/site-settings/schemas/captcha';
++import { ZSiteSettingsSecurityHeadersSchema } from '@bizrethink/customizations/server-only/site-settings/schemas/security-headers';
++import { ZSiteSettingsSignupSchema } from '@bizrethink/customizations/server-only/site-settings/schemas/signup';
++import { ZSiteSettingsWebhookSchema } from '@bizrethink/customizations/server-only/site-settings/schemas/webhook';
+ import { z } from 'zod';
+ 
+ import { ZSiteSettingsBannerSchema } from './schemas/banner';
+ import { ZSiteSettingsTelemetrySchema } from './schemas/telemetry';
+ 
+-export const ZSiteSettingSchema = z.union([ZSiteSettingsBannerSchema, ZSiteSettingsTelemetrySchema]);
++export const ZSiteSettingSchema = z.union([
++  ZSiteSettingsBannerSchema,
++  ZSiteSettingsTelemetrySchema,
++  ZSiteSettingsSignupSchema,
++  ZSiteSettingsCaptchaSchema,
++  ZSiteSettingsWebhookSchema,
++  ZSiteSettingsSecurityHeadersSchema,
++]);
+ 
+ export type TSiteSettingSchema = z.infer<typeof ZSiteSettingSchema>;
+ 
