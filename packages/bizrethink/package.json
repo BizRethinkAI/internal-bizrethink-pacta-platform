@@ -12,6 +12,11 @@
     "feature-flags.ts",
     "index.ts"
   ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
   "dependencies": {
     "@documenso/email": "*",
     "@documenso/lib": "*",
@@ -19,6 +24,8 @@
     "@noble/ciphers": "0.6.0"
   },
   "devDependencies": {
-    "@documenso/tsconfig": "*"
+    "@documenso/tsconfig": "*",
+    "@vitest/coverage-v8": "^4.1.6",
+    "vitest": "^4.1.6"
   }
 }

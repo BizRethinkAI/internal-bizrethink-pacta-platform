@@ -12,6 +12,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "clean": "rimraf node_modules"
@@ -73,6 +74,7 @@
     "@playwright/browser-chromium": "1.56.1",
     "@types/luxon": "^3.7.1",
     "@types/pg": "^8.15.6",
+    "@vitest/coverage-v8": "^4.1.6",
     "vitest": "^4.0.18"
   }
 }
