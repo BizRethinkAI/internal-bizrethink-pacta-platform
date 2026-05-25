@@ -325,13 +325,110 @@ Summary: 3 primary files + 7 email templates audited. field-meta.ts (M), render-
 
 ---
 
-## 9. Sign-off
+## 9. Status as of 2026-05-25 (pause + resume point)
 
-This manifest reflects the state of planning as of 2026-05-25, after:
-- 1 ground-truth survey agent
-- 3 forensic audit agents
-- 4 user-confirmed decisions
+### Phase 0 — COMPLETE ✅
 
-The actual merge has not yet been executed. Phase 0 prerequisites must complete before Phase A.
+All 9 pre-merge patches created + committed on `sync/manual-2026-05-25` as `23bac1a7e`:
+- 053 (service-account filter)
+- 021 v3 (regenerated; folded 058 reset-password in)
+- 012 (site-settings schema extensions)
+- 013 (instance storage config)
+- 011a (instance signing config)
+- 011b (TSA cache manual)
+- 029 (upsert cache-bust — transitional, folds into 032 later)
+- 048 (auto-claim invites — pre-staged merge resolution)
+- 041 v2 (regenerated; was "garbage at line 31")
+
+All validated via `git apply --reverse --check` (or round-trip test for 048).
+
+### Phase A/B — Merge initiated then ABORTED
+
+- Created branch `sync/manual-2026-05-25` ✓
+- Ran `git merge upstream/main --no-commit --no-ff` → produced 104 UU + 3 DU + 1 UD conflicts
+- Aborted via `git merge --abort` to refine plan with the full picture
+- Branch is clean and back to `23bac1a7e`
+
+### Findings from the aborted merge — REFINED SCOPE
+
+**Original manifest tracked 17 conflicted files. Actual merge surfaced 104.**
+
+Conflict groupings:
+- 11 i18n `.po` files (mechanical take-upstream)
+- 35 in `apps/remix/app/` (mostly take-ours — UI rebrand)
+- 20 in `packages/email/templates/` (some take-ours rebrand, some take-upstream)
+- 9 in `packages/lib/jobs/` (mostly take-upstream — email handlers)
+- 17 manifest-tracked files (audited, plans documented)
+- 7 NEWLY-DISCOVERED files with inline mods (sub-audit completed; see below)
+- 4 special: 3 DU workflow files (just keep deletion) + 1 UD `.prettierignore` (decide)
+- ~1 other (`package-lock.json`)
+
+### NEWLY-DISCOVERED conflicted files with inline BizRethink mods
+
+Sub-audit completed 2026-05-25. Per-file resolution requires strategic decision:
+
+| File | Phantom overlay # | Risk | Strategic decision |
+|---|---|---|---|
+| `packages/auth/server/routes/callback.ts` | 014 (SSO async) | M | KEEP DB-backed OR ABANDON to env-only? |
+| `packages/auth/server/routes/email-password.ts` | 028 (signup-disabled async) + 048b (invite-required gate) | **H** | TWO sub-overlays. 028 same DB-vs-env tradeoff. 048b is a security gate (B2B users without invite can't self-signup); abandoning weakens domain-allowlist enforcement. |
+| `packages/ee/server-only/lib/verify-email-domain.ts` | 009 (DNS replacing SES) | **H** | Currently we use DNS-only; reverting to SES needs AWS creds + sdk dependency. |
+| `packages/ee/server-only/stripe/webhook/handler.ts` | 045b (Stripe mode async) | **H** | Production billing risk — runtime mode-switch ability is operationally important. |
+| `packages/email/template-components/template-confirmation-email.tsx` | Inline "Pacta" text | L | Cosmetic; can re-apply post-merge |
+| `packages/email/template-components/template-document-image.tsx` | Inline "Pacta" alt | L | Cosmetic; can re-apply post-merge |
+| `packages/email/template-components/template-footer.tsx` | 023 (email-footer-rebrand) | M | Overlay 023 patch is BROKEN/INCOMPLETE (truncated at line 31). Regenerate. |
+
+### Catalogue of phantom overlay numbers (inline mods without patch files)
+
+Now known: **011, 012, 013, 014, 028, 045a/b/c, 048, 048b, 053, 058**
+
+Of these:
+- ✅ 011a/b, 012, 013, 048, 053, 058 — PATCHIFIED in Phase 0
+- ⚠️ 014, 028, 045a/b/c, 048b — STILL PHANTOM, strategic decisions pending
+- ⚠️ 023, 032, 041 — patches EXIST but are broken/empty (032 empty body; 023 truncated; 041 was fixed)
+
+### RESUME PLAN — next session
+
+To restart cleanly:
+
+1. **Discipline-drift sweep:** `grep -rn "MODIFIED for BizRethink (overlay" packages apps --include="*.ts" --include="*.tsx" | grep -oE "overlay [0-9]+[a-z]?" | sort -u` to find ANY phantom overlays not yet catalogued. Cross-reference against `ls overlays/*.patch`. Update the phantom list.
+
+2. **Strategic decisions** for the 6 remaining phantom-overlay surfaces (014, 028, 048b, 009, 045b, 023). For each: keep-as-DB-backed (creates new patch like 048's pre-staged resolution) OR abandon-to-env-only (`git checkout --theirs`). Treat each as a feature-level decision, not a merge tactic.
+
+3. **Regenerate broken patches:** 023 (truncated at line 31 — needs fresh diff like we did for 021/041) and 032 (empty body — needs full reconstruction since the security-headers feature is fully inline).
+
+4. **Re-do the merge** with the full picture. Same flow as today: `git merge upstream/main --no-commit --no-ff`, then resolve in groups:
+   - Group A: i18n (11 files) — `git checkout --theirs`
+   - Group B: UI rebrand (35 in apps/remix/app/) — mostly `git checkout --ours` (likely; verify)
+   - Group C: email templates (20) — case by case (most likely `--theirs` since branding is via overlay 023's footer)
+   - Group D: email handlers (9 in lib/jobs) — `git checkout --theirs`
+   - Group E: send-* helpers (2 in lib/server-only/document/) — `git checkout --theirs`
+   - Group F: 17 manifest files — hand-merge per audit recommendations
+   - Group G: 7 newly-discovered files — per strategic decisions from step 2
+   - Group H: DU/UD edge cases (4 files)
+   - Final: `tsc --noEmit` + `npm run build` validation, commit, push, manually open PR, Phase E-I from this manifest
+
+5. **Post-merge cleanup workstreams** (tracked as separate tasks):
+   - Extract overlay 045c from 021 into its own patch (Task #9)
+   - Regenerate overlay 032 with full diff body (Task #10)
+   - Decide fate of overlay 002 (superseded by 041)
+
+6. **Independent of merge — enterprise-level GitHub Actions toggle.** Org-level PUT silently fails because enterprise policy vetoes "Allow GitHub Actions to create and approve pull requests" (Task #7). User needs to investigate enterprise settings OR modify workflow to push-branch-only.
+
+### Branch state
+
+- `sync/manual-2026-05-25` exists locally at `23bac1a7e`
+- NOT yet pushed to origin (user discretion — push when ready to resume in another machine, or before next session if uncertain about losing local state)
+- `main` untouched at `a9ffb394a`
+- All 9 pre-merge patches + this manifest are on the branch and reviewable
+
+### Time accounting
+
+- Phase 0 (patchify 9 inline mods): ~3h
+- Phase A/B (merge initiate + abort): ~30min
+- Sub-audit of 7 new files: ~15min
+- Refined plan documentation: ~15min
+- **Subtotal: ~4h. Remaining estimated: 4-6h for full execution + smoke test.**
+
+---
 
 Document is mutable until merge ships; update as decisions are made or new findings emerge during execution.
