@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   getAllowedSignupDomains,
@@ -8,6 +8,7 @@ import {
   isGoogleSsoEnabled,
   isMicrosoftSsoEnabled,
   isOidcSsoEnabled,
+  isSignupEnabledForProvider,
   URL_PATTERN,
   ZNameSchema,
 } from './auth';
@@ -124,6 +125,74 @@ describe('getAllowedSignupDomains — overlay 012', () => {
   it('returns empty array when DB returns empty', async () => {
     mockedAllowedDomains.mockResolvedValueOnce([]);
     expect(await getAllowedSignupDomains()).toEqual([]);
+  });
+});
+
+/**
+ * Upstream-sync regression suite (added 2026-05-25 after PR #1 deploy fail).
+ *
+ * PR #1 broke Coolify because the merge dropped upstream's new
+ * `isSignupEnabledForProvider` env-driven gate — upstream code in
+ * `handle-oauth-*` + the email signup route was calling it, and tsc blew
+ * up. The function is independent of our DB-aware overlay 028
+ * `isSignupDisabled()`; both gates run in series.
+ *
+ * These tests assert:
+ *   - The function is exported (regression for accidental deletion)
+ *   - It honours the 4 documented env-var combinations
+ *
+ * If this file fails after a future upstream sync, restore the function
+ * before pushing — see UPSTREAM.md §"Pre-merge gates" + the implementation
+ * in packages/lib/constants/auth.ts.
+ */
+describe('isSignupEnabledForProvider — upstream env-driven gate', () => {
+  const ORIGINAL_ENV = { ...process.env };
+
+  beforeEach(() => {
+    delete process.env.NEXT_PUBLIC_DISABLE_SIGNUP;
+    delete process.env.NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP;
+    delete process.env.NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP;
+    delete process.env.NEXT_PUBLIC_DISABLE_MICROSOFT_SIGNUP;
+    delete process.env.NEXT_PUBLIC_DISABLE_OIDC_SIGNUP;
+  });
+
+  it('is exported as a function (regression: do not delete)', () => {
+    expect(typeof isSignupEnabledForProvider).toBe('function');
+  });
+
+  it('returns true for all providers when no env vars set', () => {
+    expect(isSignupEnabledForProvider('email')).toBe(true);
+    expect(isSignupEnabledForProvider('google')).toBe(true);
+    expect(isSignupEnabledForProvider('microsoft')).toBe(true);
+    expect(isSignupEnabledForProvider('oidc')).toBe(true);
+  });
+
+  it('returns false for all providers when NEXT_PUBLIC_DISABLE_SIGNUP=true', () => {
+    process.env.NEXT_PUBLIC_DISABLE_SIGNUP = 'true';
+    expect(isSignupEnabledForProvider('email')).toBe(false);
+    expect(isSignupEnabledForProvider('google')).toBe(false);
+    expect(isSignupEnabledForProvider('microsoft')).toBe(false);
+    expect(isSignupEnabledForProvider('oidc')).toBe(false);
+  });
+
+  it('disables only the targeted provider via per-provider env flag', () => {
+    process.env.NEXT_PUBLIC_DISABLE_GOOGLE_SIGNUP = 'true';
+    expect(isSignupEnabledForProvider('email')).toBe(true);
+    expect(isSignupEnabledForProvider('google')).toBe(false);
+    expect(isSignupEnabledForProvider('microsoft')).toBe(true);
+    expect(isSignupEnabledForProvider('oidc')).toBe(true);
+  });
+
+  it('treats any value other than the literal string "true" as enabled', () => {
+    process.env.NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP = 'false';
+    expect(isSignupEnabledForProvider('email')).toBe(true);
+    process.env.NEXT_PUBLIC_DISABLE_EMAIL_PASSWORD_SIGNUP = '1';
+    expect(isSignupEnabledForProvider('email')).toBe(true);
+  });
+
+  // Restore env after the suite finishes so other tests don't see our mutations.
+  afterAll(() => {
+    process.env = ORIGINAL_ENV;
   });
 });
 

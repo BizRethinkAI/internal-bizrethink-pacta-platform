@@ -13,6 +13,10 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "-----BEGIN ...-----"
+msgstr "-----BEGIN ...-----"
+
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 msgstr ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
@@ -55,6 +59,25 @@ msgstr "\"{title}\" has been successfully hidden"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"Team Name\" has invited you to sign \"example document\"."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "(empty if cert has no passphrase)"
+msgstr "(empty if cert has no passphrase)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "(leave empty to keep existing)"
+msgstr "(leave empty to keep existing)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "(leave empty to keep)"
+msgstr "(leave empty to keep)"
 
 #. placeholder {0}: warning.line
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
@@ -294,6 +317,16 @@ msgstr "{0} of {1} documents remaining this month."
 #: packages/lib/server-only/document/resend-document.ts
 msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
 msgstr "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
+
+#. placeholder {0}: PROVIDER_LABELS[provider]
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "{0} provider removed"
+msgstr "{0} provider removed"
+
+#. placeholder {0}: PROVIDER_LABELS[provider]
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "{0} provider saved"
+msgstr "{0} provider saved"
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
@@ -688,6 +721,10 @@ msgstr "<0>Account management:</0> Modify your account settings, permissions, an
 msgid "<0>Admins only</0> - Only admins can access and view the document"
 msgstr "<0>Admins only</0> - Only admins can access and view the document"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "<0>BizRethink Internal.</0> This organisation is operated directly by BizRethink AI and is not subject to standard SaaS billing."
+msgstr "<0>BizRethink Internal.</0> This organisation is operated directly by BizRethink AI and is not subject to standard SaaS billing."
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "<0>Data access:</0> Access all data associated with your account"
 msgstr "<0>Data access:</0> Access all data associated with your account"
@@ -751,6 +788,11 @@ msgstr "<0>Organisation</0> templates are shared across all teams in your organi
 msgid "<0>Private</0> templates can only be used by your team."
 msgstr "<0>Private</0> templates can only be used by your team."
 
+#. placeholder {0}: daysRemaining === 1 ? 'day' : 'days'
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "<0>Pro trial active</0> — {daysRemaining} {0} remaining. Add a payment method below to keep Pro features after the trial ends."
+msgstr "<0>Pro trial active</0> — {daysRemaining} {0} remaining. Add a payment method below to keep Pro features after the trial ends."
+
 #: packages/ui/components/template/template-type-select.tsx
 msgid "<0>Public</0> templates are linked to your public profile."
 msgstr "<0>Public</0> templates are linked to your public profile."
@@ -785,6 +827,10 @@ msgstr "<0>Typed</0> - A signature that is typed using a keyboard."
 msgid "<0>Uploaded</0> - A signature that is uploaded from a file."
 msgstr "<0>Uploaded</0> - A signature that is uploaded from a file."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
+msgid "<0>Your Pro trial has ended.</0> Upgrade below to keep Pro features, or your organisation will be downgraded to the Free plan."
+msgstr "<0>Your Pro trial has ended.</0> Upgrade below to keep Pro features, or your organisation will be downgraded to the Free plan."
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "0 Free organisations left"
 msgstr "0 Free organisations left"
@@ -796,6 +842,10 @@ msgstr "1 Free organisations left"
 #: apps/remix/app/components/forms/token.tsx
 msgid "1 month"
 msgstr "1 month"
+
+#: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+msgid "100 documents a month, branded signing, AI-assisted document creation"
+msgstr "100 documents a month, branded signing, AI-assisted document creation"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "12 months"
@@ -816,6 +866,10 @@ msgstr "2FA token"
 #: apps/remix/app/components/forms/token.tsx
 msgid "3 months"
 msgstr "3 months"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "31536000 = 1 year (recommended once verified). Lower values let you back out faster if something breaks."
+msgstr "31536000 = 1 year (recommended once verified). Lower values let you back out faster if something breaks."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "400 Error"
@@ -900,6 +954,10 @@ msgstr "6 months"
 msgid "7 days"
 msgstr "7 days"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "A certificate is already stored. Upload a new file to replace; leave blank to keep the existing."
+msgstr "A certificate is already stored. Upload a new file to replace; leave blank to keep the existing."
+
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "A confirmation email has been sent, and it should arrive in your inbox shortly."
 msgstr "A confirmation email has been sent, and it should arrive in your inbox shortly."
@@ -936,8 +994,8 @@ msgid "A means to print or download documents for your records"
 msgstr "A means to print or download documents for your records"
 
 #: packages/email/templates/organisation-join.tsx
-msgid "A member has joined your organisation on Documenso"
-msgstr "A member has joined your organisation on Documenso"
+msgid "A member has joined your organisation on Pacta"
+msgstr "A member has joined your organisation on Pacta"
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-left-email.handler.ts
 msgid "A member has left your organisation"
@@ -948,8 +1006,8 @@ msgid "A member has left your organisation {organisationName}"
 msgstr "A member has left your organisation {organisationName}"
 
 #: packages/email/templates/organisation-leave.tsx
-msgid "A member has left your organisation on Documenso"
-msgstr "A member has left your organisation on Documenso"
+msgid "A member has left your organisation on Pacta"
+msgstr "A member has left your organisation on Pacta"
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-joined-email.handler.ts
 msgid "A new member has joined your organisation"
@@ -998,8 +1056,8 @@ msgstr "A request to use your email has been initiated by {0} on Documenso"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
-msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
-msgstr "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
+msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Pacta."
+msgstr "A secret that will be sent to your URL so you can verify that the request has been sent by Pacta."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "A stable internet connection"
@@ -1064,6 +1122,10 @@ msgstr "Access disabled"
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "Access enabled"
 msgstr "Access enabled"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Access Key ID"
+msgstr "Access Key ID"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
@@ -1461,6 +1523,20 @@ msgstr "After signing a document electronically, you will be provided the opport
 msgid "After submission, a document will be automatically generated and added to your documents page. You will also receive a notification via email."
 msgstr "After submission, a document will be automatically generated and added to your documents page. You will also receive a notification via email."
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "AI Config"
+msgstr "AI Config"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "AI config reset"
+msgstr "AI config reset"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "AI config saved"
+msgstr "AI config saved"
+
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
 msgid "AI features"
 msgstr "AI features"
@@ -1574,6 +1650,10 @@ msgstr "Allowed Email Domains"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Allowed Signature Types"
 msgstr "Allowed Signature Types"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Allowed signup domains (one per line)"
+msgstr "Allowed signup domains (one per line)"
 
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 msgid "Allowed teams"
@@ -1889,6 +1969,9 @@ msgstr "An unexpected error occurred."
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "An unknown error occurred"
 msgstr "An unknown error occurred"
@@ -1924,6 +2007,10 @@ msgstr "Any Source"
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Any Status"
 msgstr "Any Status"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "API Keys & Webhooks"
+msgstr "API Keys & Webhooks"
 
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -2126,6 +2213,7 @@ msgstr "Attachments"
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 msgstr "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Audit Log"
@@ -2234,6 +2322,16 @@ msgstr "Before you get started, please confirm your email address by clicking th
 msgid "Billing"
 msgstr "Billing"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Billing & Stripe"
+msgstr "Billing & Stripe"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Billing enabled (master toggle)"
+msgstr "Billing enabled (master toggle)"
+
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Black"
 msgstr "Black"
@@ -2311,11 +2409,19 @@ msgstr "Branding preferences updated with warnings"
 msgid "Branding URL"
 msgstr "Branding URL"
 
+#: apps/remix/app/components/general/onboarding-dialog.tsx
+msgid "Browse all docs →"
+msgstr "Browse all docs →"
+
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Browser"
 msgstr "Browser"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Bucket"
+msgstr "Bucket"
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 msgid "Bulk Copy"
@@ -2365,8 +2471,8 @@ msgid "By enabling 2FA, you will be required to enter a code from your authentic
 msgstr "By enabling 2FA, you will be required to enter a code from your authenticator app every time you sign in using email password."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
-msgid "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
-msgstr "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
+msgid "By proceeding to use the electronic signature service provided by Pacta, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
+msgstr "By proceeding to use the electronic signature service provided by Pacta, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
 
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
@@ -2379,6 +2485,10 @@ msgstr "By proceeding, you agree to our <0>Terms of Service</0> and <1>Privacy P
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
 msgstr "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
+
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "Bypass email verification"
+msgstr "Bypass email verification"
 
 #: packages/ui/components/recipient/recipient-role-select.tsx
 msgid "Can prepare"
@@ -2509,6 +2619,14 @@ msgstr "Cannot remove signer"
 msgid "Cannot upload items after the document has been sent"
 msgstr "Cannot upload items after the document has been sent"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Captcha (Cloudflare Turnstile)"
+msgstr "Captcha (Cloudflare Turnstile)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Captcha config saved"
+msgstr "Captcha config saved"
+
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role name"
 msgid "Cc"
@@ -2537,6 +2655,18 @@ msgstr "Ccers"
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Center"
 msgstr "Center"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Cert chain stored. Upload to replace."
+msgstr "Cert chain stored. Upload to replace."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "cert.p12 file"
+msgstr "cert.p12 file"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Certificate chain (PEM)"
+msgstr "Certificate chain (PEM)"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Change language"
@@ -2671,6 +2801,7 @@ msgstr "Click to copy signing link for sending to recipient"
 msgid "Click to insert field"
 msgstr "Click to insert field"
 
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Client ID"
 msgstr "Client ID"
@@ -2678,6 +2809,10 @@ msgstr "Client ID"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Client ID is required"
 msgstr "Client ID is required"
+
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "Client secret"
+msgstr "Client secret"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Client Secret"
@@ -2716,9 +2851,25 @@ msgstr "Client secret is required"
 msgid "Close"
 msgstr "Close"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "CloudFront key-pair ID"
+msgstr "CloudFront key-pair ID"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "CloudFront private-key PEM"
+msgstr "CloudFront private-key PEM"
+
 #: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 msgid "Collapse sidebar"
 msgstr "Collapse sidebar"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Comma-separated directives. Empty parens = deny. See developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy for the full directive list."
+msgstr "Comma-separated directives. Empty parens = deny. See developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy for the full directive list."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Comma-separated list of RFC 3161 TSA URLs. With at least one URL, signed PDFs get LTV + archival timestamp. Empty = no timestamping."
+msgstr "Comma-separated list of RFC 3161 TSA URLs. With at least one URL, signed PDFs get LTV + archival timestamp. Empty = no timestamping."
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
@@ -2782,6 +2933,10 @@ msgstr "Completed Documents"
 msgid "Completed on {formattedDate}"
 msgstr "Completed on {formattedDate}"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Configuration"
+msgstr "Configuration"
+
 #: packages/lib/constants/pdf-viewer-i18n.ts
 #: packages/lib/constants/pdf-viewer-i18n.ts
 #: packages/lib/constants/pdf-viewer-i18n.ts
@@ -2828,6 +2983,10 @@ msgstr "Configure general settings for the document."
 msgid "Configure general settings for the template."
 msgstr "Configure general settings for the template."
 
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "Configure Google / Microsoft / OIDC sign-in. Stored encrypted at rest. DB row overrides NEXT_PRIVATE_*_CLIENT_ID/_SECRET env vars."
+msgstr "Configure Google / Microsoft / OIDC sign-in. Stored encrypted at rest. DB row overrides NEXT_PRIVATE_*_CLIENT_ID/_SECRET env vars."
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Configure security settings for the document."
 msgstr "Configure security settings for the document."
@@ -2851,10 +3010,18 @@ msgstr "Configure Template"
 msgid "Configure the {0} field"
 msgstr "Configure the {0} field"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Configure the cryptographic certificate, time-stamp authorities, and contact info used for every signed PDF. Stored encrypted at rest."
+msgstr "Configure the cryptographic certificate, time-stamp authorities, and contact info used for every signed PDF. Stored encrypted at rest."
+
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 msgid "Configure the fields you want to place on the document."
 msgstr "Configure the fields you want to place on the document."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Configure the SMTP credentials this organisation uses to send outgoing mail. Without a config, the instance default is used."
+msgstr "Configure the SMTP credentials this organisation uses to send outgoing mail. Without a config, the instance default is used."
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Configure the team roles for each group"
@@ -2900,6 +3067,18 @@ msgstr "Confirm email"
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Confirmation email sent"
 msgstr "Confirmation email sent"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Connected to Stripe"
+msgstr "Connected to Stripe"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Connection failed"
+msgstr "Connection failed"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Connection succeeded."
+msgstr "Connection succeeded."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Consent to Electronic Transactions"
@@ -3291,10 +3470,6 @@ msgstr "Create Webhook"
 msgid "Create your account and start using state-of-the-art document signing."
 msgstr "Create your account and start using state-of-the-art document signing."
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
-msgstr "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
-
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -3347,6 +3522,14 @@ msgstr "Creating Document"
 #: apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
 msgid "Creating Template"
 msgstr "Creating Template"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Credentials"
+msgstr "Credentials"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Credentials already stored. Upload to replace."
+msgstr "Credentials already stored. Upload to replace."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
@@ -3414,10 +3597,6 @@ msgstr "Custom Organisation Groups"
 msgid "Customise the colours used on your signing pages."
 msgstr "Customise the colours used on your signing pages."
 
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Danger Zone"
-msgstr "Danger Zone"
-
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
 msgstr "Dark Mode"
@@ -3426,6 +3605,14 @@ msgstr "Dark Mode"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Dashboard"
 msgstr "Dashboard"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Data"
+msgstr "Data"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Database (Postgres bytea)"
+msgstr "Database (Postgres bytea)"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx
@@ -3597,6 +3784,11 @@ msgstr "Delete"
 msgid "delete {0}"
 msgstr "delete {0}"
 
+#. placeholder {0}: PROVIDER_LABELS[provider]
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "Delete {0} provider config? Falls back to env."
+msgstr "Delete {0} provider config? Falls back to env."
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 msgid "delete {emailDomain}"
 msgstr "delete {emailDomain}"
@@ -3620,6 +3812,10 @@ msgstr "Delete account"
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "Delete Account"
 msgstr "Delete Account"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Delete config"
+msgstr "Delete config"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete document"
@@ -3658,7 +3854,6 @@ msgid "Delete Folder"
 msgstr "Delete Folder"
 
 #: apps/remix/app/components/dialogs/admin-organisation-delete-dialog.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Delete organisation"
 msgstr "Delete organisation"
@@ -3698,6 +3893,10 @@ msgstr "Delete Templates"
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete the document. This action is irreversible so proceed with caution."
 msgstr "Delete the document. This action is irreversible so proceed with caution."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Delete the SMTP config for this organisation? Outgoing mail will fall back to the instance default."
+msgstr "Delete the SMTP config for this organisation? Outgoing mail will fall back to the instance default."
 
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "Delete the users account and all its contents. This action is irreversible and will cancel their subscription, so proceed with caution."
@@ -3881,6 +4080,14 @@ msgstr "Disable account"
 msgid "Disable Account"
 msgstr "Disable Account"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Disable signup"
+msgstr "Disable signup"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Disable signup entirely or restrict it to a list of email domains. This DB-backed setting overrides NEXT_PUBLIC_DISABLE_SIGNUP and NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS. \"Enabled\" must be on for the override to take effect."
+msgstr "Disable signup entirely or restrict it to a list of email domains. This DB-backed setting overrides NEXT_PUBLIC_DISABLE_SIGNUP and NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS. \"Enabled\" must be on for the override to take effect."
+
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Disable Two Factor Authentication before deleting your account."
 msgstr "Disable Two Factor Authentication before deleting your account."
@@ -3918,6 +4125,10 @@ msgstr "Display your name and email in documents"
 msgid "Distribute Document"
 msgstr "Distribute Document"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Distribution domain"
+msgstr "Distribution domain"
+
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Distribution Method"
 msgstr "Distribution Method"
@@ -3930,14 +4141,6 @@ msgstr "DKIM records generated. Please add the DNS records to verify your domain
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "DNS Records"
 msgstr "DNS Records"
-
-#: apps/remix/app/components/general/admin-license-card.tsx
-msgid "Documenso License"
-msgstr "Documenso License"
-
-#: apps/remix/app/components/dialogs/account-delete-dialog.tsx
-msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
-msgstr "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
 
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -4815,6 +5018,10 @@ msgstr "Email verification has been resent"
 msgid "Emails"
 msgstr "Emails"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Embedded in every signed PDF as Contact Info. Defaults to the webapp URL if empty."
+msgstr "Embedded in every signed PDF as Contact Info. Defaults to the webapp URL if empty."
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Embedding, 5 members included and more"
 msgstr "Embedding, 5 members included and more"
@@ -4822,6 +5029,10 @@ msgstr "Embedding, 5 members included and more"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Empty field"
 msgstr "Empty field"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Empty list means all domains allowed. Only relevant when signup is enabled."
+msgstr "Empty list means all domains allowed. Only relevant when signup is enabled."
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "Enable"
@@ -4902,12 +5113,21 @@ msgstr "Enable team API tokens to delegate document ownership to another team me
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/general/admin-global-settings-section.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 #: packages/ui/components/document/reminder-settings-picker.tsx
 msgid "Enabled"
 msgstr "Enabled"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Enabled (override env)"
+msgstr "Enabled (override env)"
 
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 msgid "Enabling the account results in the user being able to use the account again, and all the related features such as webhooks, teams, and API keys for example."
@@ -4920,6 +5140,10 @@ msgstr "Enclosed Document"
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
 msgstr "Enclosed Documents"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Endpoint (optional, for non-AWS providers)"
+msgstr "Endpoint (optional, for non-AWS providers)"
 
 #: packages/lib/constants/i18n.ts
 msgid "English"
@@ -4982,6 +5206,10 @@ msgstr "Enter the next signer's email"
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Enter the next signer's name"
 msgstr "Enter the next signer's name"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Enter the SMTP password to run a test. The Test does not save anything."
+msgstr "Enter the SMTP password to run a test. The Test does not save anything."
 
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Enter verification code"
@@ -5276,6 +5504,11 @@ msgstr "Failed to create subscription claim."
 msgid "Failed to create support ticket"
 msgstr "Failed to create support ticket"
 
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Failed to delete"
+msgstr "Failed to delete"
+
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Failed to delete folder"
 msgstr "Failed to delete folder"
@@ -5304,6 +5537,18 @@ msgstr "Failed to move subscription. Please try again."
 msgid "Failed to re-register email domain"
 msgstr "Failed to re-register email domain"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Failed to read cert chain file"
+msgstr "Failed to read cert chain file"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Failed to read cert file"
+msgstr "Failed to read cert file"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Failed to read credentials file"
+msgstr "Failed to read credentials file"
+
 #: apps/remix/app/components/dialogs/envelope-item-edit-dialog.tsx
 msgid "Failed to read file"
 msgstr "Failed to read file"
@@ -5312,9 +5557,24 @@ msgstr "Failed to read file"
 msgid "Failed to reseal document"
 msgstr "Failed to reseal document"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Failed to reset"
+msgstr "Failed to reset"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Failed to revoke session"
 msgstr "Failed to revoke session"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Failed to save"
+msgstr "Failed to save"
 
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Failed to save settings."
@@ -5351,6 +5611,10 @@ msgstr "Failed to update item"
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Failed to update recipient"
 msgstr "Failed to update recipient"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Failed to update security headers"
+msgstr "Failed to update security headers"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Failed to update subscription claim."
@@ -5524,6 +5788,14 @@ msgstr "For each recipient, provide their email (required) and name (optional) i
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 msgstr "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Force path-style URLs (Vultr / Minio / R2)"
+msgstr "Force path-style URLs (Vultr / Minio / R2)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Forces HTTPS on every subdomain of this host. Only enable after confirming all *.your-domain are HTTPS-only."
+msgstr "Forces HTTPS on every subdomain of this host. Only enable after confirming all *.your-domain are HTTPS-only."
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Foreground"
 msgstr "Foreground"
@@ -5570,6 +5842,14 @@ msgstr "Free Signature Settings"
 msgid "French"
 msgstr "French"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "From address"
+msgstr "From address"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "From name"
+msgstr "From name"
+
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -5587,6 +5867,7 @@ msgstr "Full Name"
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
@@ -5681,6 +5962,10 @@ msgstr "Go to owner"
 msgid "Go to previous page"
 msgstr "Go to previous page"
 
+#: apps/remix/app/components/general/onboarding-dialog.tsx
+msgid "Go to settings →"
+msgstr "Go to settings →"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Go to team"
 msgstr "Go to team"
@@ -5688,6 +5973,15 @@ msgstr "Go to team"
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Go to your <0>public profile settings</0> to add documents."
 msgstr "Go to your <0>public profile settings</0> to add documents."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Google Cloud HSM"
+msgstr "Google Cloud HSM"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Google Vertex AI credentials for AI-assisted contract review. Stored encrypted at rest."
+msgstr "Google Vertex AI credentials for AI-assisted contract review. Stored encrypted at rest."
 
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Green"
@@ -5731,6 +6025,14 @@ msgstr "Groups"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist."
 msgstr "Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Header value"
+msgstr "Header value"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Headers will apply to new responses. No restart required."
+msgstr "Headers will apply to new responses. No restart required."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -5819,6 +6121,10 @@ msgstr "Hi, {userName} <0>({userEmail})</0>"
 msgid "Hide"
 msgstr "Hide"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "Hide \"Powered by Pacta\" attribution"
+msgstr "Hide \"Powered by Pacta\" attribution"
+
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Hide license key"
 msgstr "Hide license key"
@@ -5843,12 +6149,27 @@ msgstr "Home (No Folder)"
 msgid "Horizontal"
 msgstr "Horizontal"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Host"
+msgstr "Host"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Hostnames listed here are allowed to resolve to private/loopback addresses for outbound webhook delivery. Useful for hitting Docker-internal services. Merged with NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS env var. \"Enabled\" must be on for the DB list to take effect."
+msgstr "Hostnames listed here are allowed to resolve to private/loopback addresses for outbound webhook delivery. Useful for hitting Docker-internal services. Merged with NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS env var. \"Enabled\" must be on for the DB list to take effect."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Hostnames or IP literals. Webhooks targeting these hosts skip the private-address SSRF guard."
+msgstr "Hostnames or IP literals. Webhooks targeting these hosts skip the private-address SSRF guard."
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
 msgstr "How long recipients have to complete this document after it is sent. Uses the team default when set to inherit."
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "HTTP response headers added to every page. Documenso already ships a strict CSP with per-request nonces — these settings cover the headers it doesn't ship by default (HSTS, Permissions-Policy) plus globalize Referrer-Policy and X-Content-Type-Options across all routes (upstream sets them only on /embed)."
+msgstr "HTTP response headers added to every page. Documenso already ships a strict CSP with per-request nonces — these settings cover the headers it doesn't ship by default (HSTS, Permissions-Policy) plus globalize Referrer-Policy and X-Content-Type-Options across all routes (upstream sets them only on /embed)."
+
 #: apps/remix/app/components/forms/signin.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Human verification required"
 msgstr "Human verification required"
@@ -5901,6 +6222,10 @@ msgstr "ID"
 msgid "ID copied to clipboard"
 msgstr "ID copied to clipboard"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Idempotently creates Pacta Pro ($35/mo · $350/yr) and Pacta Business ($199/mo · $1990/yr) in the active mode's Stripe account."
+msgstr "Idempotently creates Pacta Pro ($35/mo · $350/yr) and Pacta Business ($199/mo · $1990/yr) in the active mode's Stripe account."
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "Identifying input fields"
 msgstr "Identifying input fields"
@@ -5908,6 +6233,10 @@ msgstr "Identifying input fields"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Identifying recipients"
 msgstr "Identifying recipients"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Identity & Access"
+msgstr "Identity & Access"
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
@@ -5989,6 +6318,10 @@ msgstr "Include the Signing Certificate in the Document"
 msgid "Includes:"
 msgstr "Includes:"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "includeSubDomains"
+msgstr "includeSubDomains"
+
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Information"
@@ -6053,6 +6386,10 @@ msgstr "Initials Settings"
 msgid "Inserted"
 msgstr "Inserted"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Insights"
+msgstr "Insights"
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Instance Stats"
 msgstr "Instance Stats"
@@ -6082,10 +6419,6 @@ msgstr "Invalid embedding presign token provided"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Invalid License Key"
 msgstr "Invalid License Key"
-
-#: apps/remix/app/components/general/admin-license-status-banner.tsx
-msgid "Invalid License Type - Your Documenso instance is using features that are not part of your license."
-msgstr "Invalid License Type - Your Documenso instance is using features that are not part of your license."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
@@ -6168,14 +6501,9 @@ msgstr "Invoice"
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
-#: packages/lib/server-only/pdf/render-audit-logs.ts
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "IP Address"
 msgstr "IP Address"
-
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Irreversible actions for this organisation"
-msgstr "Irreversible actions for this organisation"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Issuer URL"
@@ -6218,6 +6546,10 @@ msgstr "Italian"
 msgid "Japanese"
 msgstr "Japanese"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Jobs & Crons"
+msgstr "Jobs & Crons"
+
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
 msgstr "Join {organisationName} on Documenso"
@@ -6240,6 +6572,10 @@ msgstr "Joined {0}"
 #: apps/remix/app/routes/_authenticated+/admin+/teams.$id.tsx
 msgid "Key identifiers and relationships for this team."
 msgstr "Key identifiers and relationships for this team."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "KMS key version path"
+msgstr "KMS key version path"
 
 #: packages/lib/constants/i18n.ts
 msgid "Korean"
@@ -6332,6 +6668,7 @@ msgstr "Last Year"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 #: apps/remix/app/components/general/admin-license-card.tsx
+#: apps/remix/app/components/general/onboarding-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Learn more"
 msgstr "Learn more"
@@ -6373,17 +6710,9 @@ msgstr "Letter Spacing"
 msgid "License"
 msgstr "License"
 
-#: apps/remix/app/components/general/admin-license-status-banner.tsx
-msgid "License Expired - Please renew your license to continue using enterprise features."
-msgstr "License Expired - Please renew your license to continue using enterprise features."
-
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "License Key"
 msgstr "License Key"
-
-#: apps/remix/app/components/general/admin-license-status-banner.tsx
-msgid "License Payment Overdue - Please update your payment to avoid service disruptions."
-msgstr "License Payment Overdue - Please update your payment to avoid service disruptions."
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "License synced"
@@ -6440,6 +6769,26 @@ msgstr "Links Generated"
 msgid "Listening to"
 msgstr "Listening to"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Live"
+msgstr "Live"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Live API secret key"
+msgstr "Live API secret key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Live publishable key"
+msgstr "Live publishable key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Live status"
+msgstr "Live status"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Live webhook signing secret"
+msgstr "Live webhook signing secret"
+
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 msgid "Load older activity"
 msgstr "Load older activity"
@@ -6471,6 +6820,14 @@ msgstr "Loading suggestions..."
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Loading..."
 msgstr "Loading..."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Local cert (P12)"
+msgstr "Local cert (P12)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Local certificate"
+msgstr "Local certificate"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Local timezone"
@@ -6676,6 +7033,14 @@ msgstr "Mark as viewed"
 msgid "Mark as Viewed"
 msgstr "Mark as Viewed"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Marks the domain as eligible for the browser-vendor HSTS preload list. Submit at hstspreload.org after enabling. Removal takes months — be sure."
+msgstr "Marks the domain as eligible for the browser-vendor HSTS preload list. Submit at hstspreload.org after enabling. Removal takes months — be sure."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Master toggle. When off, Documenso's default CSP middleware still runs but no extra BizRethink headers are added."
+msgstr "Master toggle. When off, Documenso's default CSP middleware still runs but no extra BizRethink headers are added."
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "MAU (created document)"
 msgstr "MAU (created document)"
@@ -6692,6 +7057,10 @@ msgstr "MAU (signed in)"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Max"
 msgstr "Max"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "max-age (seconds)"
+msgstr "max-age (seconds)"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Maximum file size: 4MB. Maximum 100 rows per upload. Blank values will use template defaults."
@@ -6772,10 +7141,6 @@ msgstr "Middle"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Min"
 msgstr "Min"
-
-#: apps/remix/app/components/general/admin-license-status-banner.tsx
-msgid "Missing License - Your Documenso instance is using features that require a license."
-msgstr "Missing License - Your Documenso instance is using features that require a license."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Missing Recipients"
@@ -6957,6 +7322,10 @@ msgstr "New option {0}"
 msgid "New Password"
 msgstr "New Password"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "New uploads will use this configuration."
+msgstr "New uploads will use this configuration."
+
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
@@ -6989,6 +7358,10 @@ msgstr "No"
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "No active drafts"
 msgstr "No active drafts"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "No certificate stored yet. Without an upload, the instance falls back to the NEXT_PRIVATE_SIGNING_LOCAL_FILE_* environment variable."
+msgstr "No certificate stored yet. Without an upload, the instance falls back to the NEXT_PRIVATE_SIGNING_LOCAL_FILE_* environment variable."
 
 #: apps/remix/app/components/general/pdf-viewer/envelope-pdf-viewer.tsx
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer.tsx
@@ -7330,6 +7703,10 @@ msgstr "Option 1"
 msgid "Option value cannot be empty"
 msgstr "Option value cannot be empty"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Optional CDN distribution"
+msgstr "Optional CDN distribution"
+
 #: apps/remix/app/components/dialogs/sign-field-dropdown-dialog.tsx
 msgid "Options"
 msgstr "Options"
@@ -7560,6 +7937,18 @@ msgstr "Owner recipient expired"
 msgid "Ownership transferred to {organisationMemberName}."
 msgstr "Ownership transferred to {organisationMemberName}."
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Pacta License"
+msgstr "Pacta License"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Pacta products & prices"
+msgstr "Pacta products & prices"
+
+#: apps/remix/app/components/dialogs/account-delete-dialog.tsx
+msgid "Pacta will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
+msgstr "Pacta will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
+
 #. placeholder {0}: table.getState().pagination.pageIndex + 1
 #. placeholder {1}: table.getPageCount() || 1
 #: packages/ui/primitives/data-table-pagination.tsx
@@ -7624,12 +8013,17 @@ msgstr "Passkeys allow you to sign in and authenticate using biometrics, passwor
 msgid "Passkeys are not supported on this browser"
 msgstr "Passkeys are not supported on this browser"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Passphrase"
+msgstr "Passphrase"
+
 #: apps/remix/app/components/forms/reset-password.tsx
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 msgid "Password"
 msgstr "Password"
 
@@ -7637,6 +8031,10 @@ msgstr "Password"
 #: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Password Re-Authentication"
 msgstr "Password Re-Authentication"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Password required"
+msgstr "Password required"
 
 #: packages/email/templates/forgot-password.tsx
 msgid "Password Reset Requested"
@@ -7730,9 +8128,9 @@ msgstr "per month"
 msgid "per year"
 msgstr "per year"
 
-#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
-msgstr "Permanently delete this organisation. Documents will be orphaned (not deleted) so they remain accessible via the deleted-account service account."
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Permissions-Policy"
+msgstr "Permissions-Policy"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgctxt "Personal organisation (adjective)"
@@ -7764,6 +8162,10 @@ msgstr "Pick a password"
 #: apps/remix/app/components/general/user-profile-timur.tsx
 msgid "Pick any of the following agreements below and start signing to get started"
 msgstr "Pick any of the following agreements below and start signing to get started"
+
+#: apps/remix/app/components/general/onboarding-dialog.tsx
+msgid "Pick whichever you'd like to do first. Each opens a short guide — you can come back to the rest any time from the help icon in the top bar."
+msgstr "Pick whichever you'd like to do first. Each opens a short guide — you can come back to the rest any time from the help icon in the top bar."
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Pin"
@@ -7821,7 +8223,6 @@ msgid "Please choose your new password"
 msgstr "Please choose your new password"
 
 #: apps/remix/app/components/forms/signin.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Please complete the CAPTCHA challenge before signing in."
 msgstr "Please complete the CAPTCHA challenge before signing in."
@@ -7974,6 +8375,13 @@ msgstr "Please try a different domain."
 msgid "Please try again and make sure you enter the correct email address."
 msgstr "Please try again and make sure you enter the correct email address."
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Please try again later."
+msgstr "Please try again later."
+
 #: apps/remix/app/components/general/pdf-viewer/pdf-viewer-states.tsx
 msgid "Please try again or contact our support."
 msgstr "Please try again or contact our support."
@@ -8000,6 +8408,18 @@ msgstr "Please upload a logo"
 #: packages/lib/constants/i18n.ts
 msgid "Polish"
 msgstr "Polish"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Port"
+msgstr "Port"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Port 465 / TLS"
+msgstr "Port 465 / TLS"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Port 587 / STARTTLS"
+msgstr "Port 587 / STARTTLS"
 
 #: packages/lib/constants/i18n.ts
 msgid "Portuguese (Brazil)"
@@ -8034,6 +8454,10 @@ msgstr "Pre-formatted CSV template with example data."
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "Preferences"
 msgstr "Preferences"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "preload"
+msgstr "preload"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
@@ -8092,6 +8516,10 @@ msgstr "Proceed"
 msgid "Processing document"
 msgstr "Processing document"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Products synced"
+msgstr "Products synced"
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -8118,6 +8546,10 @@ msgstr "Profile updated"
 msgid "Progress"
 msgstr "Progress"
 
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "Prompt (none / login / consent / select_account)"
+msgstr "Prompt (none / login / consent / select_account)"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Provider"
 msgstr "Provider"
@@ -8125,6 +8557,10 @@ msgstr "Provider"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Provider has been updated successfully"
 msgstr "Provider has been updated successfully"
+
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "Provider label (button text)"
+msgstr "Provider label (button text)"
 
 #: apps/remix/app/components/general/template/template-type.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
@@ -8151,6 +8587,12 @@ msgstr "Public Template"
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
 msgstr "Public templates are connected to your public profile. Any modifications to public templates will also appear in your public profile."
+
+#. placeholder {0}: result.details.bucket
+#. placeholder {1}: result.details.roundTripMs
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "PutObject → GetObject → DeleteObject succeeded on bucket \"{0}\" in {1} ms."
+msgstr "PutObject → GetObject → DeleteObject succeeded on bucket \"{0}\" in {1} ms."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Quick Actions"
@@ -8197,8 +8639,8 @@ msgid "Read Only"
 msgstr "Read Only"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
-msgid "Read our documentation to get started with Documenso."
-msgstr "Read our documentation to get started with Documenso."
+msgid "Read our documentation to get started with Pacta."
+msgstr "Read our documentation to get started with Pacta."
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Read Status"
@@ -8427,6 +8869,10 @@ msgstr "Redirect URL"
 msgid "Redirecting"
 msgstr "Redirecting"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Region"
+msgstr "Region"
+
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Registration Successful"
@@ -8627,6 +9073,10 @@ msgstr "Require 2FA"
 msgid "Require account"
 msgstr "Require account"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Require an invitation"
+msgstr "Require an invitation"
+
 #: packages/lib/constants/document-auth.ts
 msgid "Require passkey"
 msgstr "Require passkey"
@@ -8634,6 +9084,15 @@ msgstr "Require passkey"
 #: packages/lib/constants/document-auth.ts
 msgid "Require password"
 msgstr "Require password"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Required"
+msgstr "Required"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
@@ -8650,6 +9109,14 @@ msgstr "Required Field"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Required scopes"
 msgstr "Required scopes"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Required: GCP service-account JSON file with KMS sign access."
+msgstr "Required: GCP service-account JSON file with KMS sign access."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Required: PEM file with the public certificate (and any intermediates) for the KMS-held key."
+msgstr "Required: PEM file with the public certificate (and any intermediates) for the KMS-held key."
 
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Reseal"
@@ -8699,6 +9166,10 @@ msgstr "Reset"
 msgid "Reset 2FA"
 msgstr "Reset 2FA"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Reset AI config? Falls back to environment variables."
+msgstr "Reset AI config? Falls back to environment variables."
+
 #: apps/remix/app/components/forms/forgot-password.tsx
 msgid "Reset email sent"
 msgstr "Reset email sent"
@@ -8712,9 +9183,24 @@ msgstr "Reset email sent"
 msgid "Reset Password"
 msgstr "Reset Password"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Reset storage config? Falls back to environment variables."
+msgstr "Reset storage config? Falls back to environment variables."
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Reset the instance signing config? Signing will fall back to environment variables."
+msgstr "Reset the instance signing config? Signing will fall back to environment variables."
+
 #: apps/remix/app/components/dialogs/admin-user-reset-two-factor-dialog.tsx
 msgid "Reset the users two factor authentication. This action is irreversible and will disable two factor authentication for the user."
 msgstr "Reset the users two factor authentication. This action is irreversible and will disable two factor authentication for the user."
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Reset to env"
+msgstr "Reset to env"
 
 #: apps/remix/app/components/dialogs/admin-user-reset-two-factor-dialog.tsx
 msgid "Reset Two Factor Authentication"
@@ -8778,10 +9264,6 @@ msgstr "Return"
 msgid "Return Home"
 msgstr "Return Home"
 
-#: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
-msgid "Return to Documenso sign in page here"
-msgstr "Return to Documenso sign in page here"
-
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Return to documents"
 msgstr "Return to documents"
@@ -8789,6 +9271,10 @@ msgstr "Return to documents"
 #: apps/remix/app/routes/_unauthenticated+/organisation.decline.$token.tsx
 msgid "Return to Home"
 msgstr "Return to Home"
+
+#: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
+msgid "Return to Pacta sign in page here"
+msgstr "Return to Pacta sign in page here"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 #: apps/remix/app/routes/_unauthenticated+/reset-password._index.tsx
@@ -8855,14 +9341,48 @@ msgstr "Roles"
 msgid "Rows per page"
 msgstr "Rows per page"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "S3 (any S3-compatible endpoint)"
+msgstr "S3 (any S3-compatible endpoint)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "S3 connection"
+msgstr "S3 connection"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Sandbox"
+msgstr "Sandbox"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Sandbox API secret key"
+msgstr "Sandbox API secret key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Sandbox publishable key"
+msgstr "Sandbox publishable key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Sandbox status"
+msgstr "Sandbox status"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Sandbox webhook signing secret"
+msgstr "Sandbox webhook signing secret"
+
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Save"
 msgstr "Save"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Save AI config"
+msgstr "Save AI config"
 
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
@@ -8873,11 +9393,23 @@ msgstr "Save"
 msgid "Save as Template"
 msgstr "Save as Template"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Save changes"
+msgstr "Save changes"
+
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 #: packages/lib/client-only/providers/envelope-editor-provider.tsx
 msgid "Save failed"
 msgstr "Save failed"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Save signing config"
+msgstr "Save signing config"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Save storage config"
+msgstr "Save storage config"
 
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Save Template"
@@ -8962,6 +9494,22 @@ msgstr "Search members by name or email"
 msgid "Secret"
 msgstr "Secret"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Secret Access Key"
+msgstr "Secret Access Key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Secret inputs left blank preserve their saved values."
+msgstr "Secret inputs left blank preserve their saved values."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Secret key (server-side)"
+msgstr "Secret key (server-side)"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Secure (implicit TLS)"
+msgstr "Secure (implicit TLS)"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -8975,9 +9523,13 @@ msgstr "Security"
 msgid "Security activity"
 msgstr "Security activity"
 
-#: apps/remix/app/components/general/admin-license-status-banner.tsx
-msgid "See Documentation"
-msgstr "See Documentation"
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Security Headers"
+msgstr "Security Headers"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Security headers updated"
+msgstr "Security headers updated"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "See the background jobs tab for the status"
@@ -9090,6 +9642,7 @@ msgstr "Select groups of members to add to the team."
 msgid "Select groups to add to this team"
 msgstr "Select groups to add to this team"
 
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 #: apps/remix/app/components/general/organisation-members-multiselect-combobox.tsx
 msgid "Select members"
@@ -9239,9 +9792,17 @@ msgstr "Send Envelope"
 msgid "Send first reminder after"
 msgstr "Send first reminder after"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Send HSTS header"
+msgstr "Send HSTS header"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Send on Behalf of Team"
 msgstr "Send on Behalf of Team"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Send Permissions-Policy header"
+msgstr "Send Permissions-Policy header"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send recipient expired email to the owner"
@@ -9259,6 +9820,10 @@ msgstr "Send reminders to the following recipients"
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Send Status"
 msgstr "Send Status"
+
+#: apps/remix/app/components/forms/signup.tsx
+msgid "Send, sign, and seal contracts with timestamped audit trails and AATL-grade cryptographic signatures."
+msgstr "Send, sign, and seal contracts with timestamped audit trails and AATL-grade cryptographic signatures."
 
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -9280,6 +9845,10 @@ msgstr "Sending..."
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Sent"
 msgstr "Sent"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Service-account credentials JSON"
+msgstr "Service-account credentials JSON"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
@@ -9570,6 +10139,10 @@ msgctxt "Recipient role progressive verb"
 msgid "Signing"
 msgstr "Signing"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Signing caches reset. The next document signed will use this configuration."
+msgstr "Signing caches reset. The next document signed will use this configuration."
+
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Signing Certificate"
@@ -9584,6 +10157,24 @@ msgstr "Signing certificate provided by"
 #: packages/lib/jobs/definitions/emails/send-document-completed-emails.handler.ts
 msgid "Signing Complete!"
 msgstr "Signing Complete!"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Signing Config"
+msgstr "Signing Config"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Signing config reset"
+msgstr "Signing config reset"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Signing config saved"
+msgstr "Signing config saved"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Signing Contact Info"
+msgstr "Signing Contact Info"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
 msgid "Signing Deadline Expired"
@@ -9621,6 +10212,10 @@ msgstr "Signing Reminders"
 msgid "Signing Status"
 msgstr "Signing Status"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Signing transport"
+msgstr "Signing transport"
+
 #: apps/remix/app/components/embed/embed-recipient-expired.tsx
 msgid "Signing Window Expired"
 msgstr "Signing Window Expired"
@@ -9641,6 +10236,18 @@ msgstr "Signing window expired for \"{displayName}\" on \"{documentName}\""
 msgid "Signing window expired for {0}"
 msgstr "Signing window expired for {0}"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Signup config updated. New visitors will hit the new policy."
+msgstr "Signup config updated. New visitors will hit the new policy."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Signup gating"
+msgstr "Signup gating"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Signup gating saved"
+msgstr "Signup gating saved"
+
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Signup is currently disabled or not available for your email domain."
 msgstr "Signup is currently disabled or not available for your email domain."
@@ -9654,15 +10261,48 @@ msgstr "Since {0}"
 msgid "Site Banner"
 msgstr "Site Banner"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Site key (public)"
+msgstr "Site key (public)"
+
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Site Settings"
 msgstr "Site Settings"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "sk_live_*** (saved)"
+msgstr "sk_live_*** (saved)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "sk_test_*** (saved)"
+msgstr "sk_test_*** (saved)"
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Skip"
 msgstr "Skip"
+
+#: apps/remix/app/components/general/onboarding-dialog.tsx
+msgid "Skip for now"
+msgstr "Skip for now"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+msgid "SMTP"
+msgstr "SMTP"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "SMTP config deleted"
+msgstr "SMTP config deleted"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "SMTP Settings"
+msgstr "SMTP Settings"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "SMTP settings saved"
+msgstr "SMTP settings saved"
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "Some signers have not been assigned a signature field. Please assign at least 1 signature field to each signer before proceeding."
@@ -9817,6 +10457,20 @@ msgid "SSO"
 msgstr "SSO"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "SSO Providers"
+msgstr "SSO Providers"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "SSRF bypass hosts (one per line)"
+msgstr "SSRF bypass hosts (one per line)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Statement descriptor (max 22 chars)"
+msgstr "Statement descriptor (max 22 chars)"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Stats"
 msgstr "Stats"
 
@@ -9849,9 +10503,63 @@ msgstr "Step {0}/{1}"
 msgid "Step <0>{step} of {maxStep}</0>"
 msgstr "Step <0>{step} of {maxStep}</0>"
 
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage"
+msgstr "Storage"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage Config"
+msgstr "Storage Config"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage config reset"
+msgstr "Storage config reset"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage config saved"
+msgstr "Storage config saved"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage connection OK"
+msgstr "Storage connection OK"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage test failed"
+msgstr "Storage test failed"
+
+#. placeholder {0}: result.stage
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage test failed (stage: {0})"
+msgstr "Storage test failed (stage: {0})"
+
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Storage transport"
+msgstr "Storage transport"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Stored cleartext in SiteSettings.data JSON. Postgres column-level access should be restricted to the app role."
+msgstr "Stored cleartext in SiteSettings.data JSON. Postgres column-level access should be restricted to the app role."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Stored encrypted using the instance encryption key. Never returned to the client."
+msgstr "Stored encrypted using the instance encryption key. Never returned to the client."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Strict-Transport-Security (HSTS)"
+msgstr "Strict-Transport-Security (HSTS)"
+
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "Stripe"
 msgstr "Stripe"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Stripe config saved"
+msgstr "Stripe config saved"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Stripe credentials, mode switching, and product sync. Credentials stored encrypted."
+msgstr "Stripe credentials, mode switching, and product sync. Credentials stored encrypted."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Stripe customer created successfully"
@@ -10016,6 +10724,26 @@ msgstr "Support"
 msgid "Support ticket created"
 msgstr "Support ticket created"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Switch failed"
+msgstr "Switch failed"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Switch to {otherMode}"
+msgstr "Switch to {otherMode}"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Switch to LIVE mode? This routes all billing through your live Stripe account immediately."
+msgstr "Switch to LIVE mode? This routes all billing through your live Stripe account immediately."
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Switch to sandbox mode? Live subscriptions will continue billing but new checkouts will use sandbox."
+msgstr "Switch to sandbox mode? Live subscriptions will continue billing but new checkouts will use sandbox."
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Switched to {otherMode} mode"
+msgstr "Switched to {otherMode} mode"
+
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync"
 msgstr "Sync"
@@ -10024,6 +10752,10 @@ msgstr "Sync"
 msgid "Sync Email Domains"
 msgstr "Sync Email Domains"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Sync failed"
+msgstr "Sync failed"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-header.tsx
 msgid "Sync failed, changes not saved"
 msgstr "Sync failed, changes not saved"
@@ -10031,6 +10763,10 @@ msgstr "Sync failed, changes not saved"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Sync license from server"
 msgstr "Sync license from server"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Sync Pacta products to {activeMode}"
+msgstr "Sync Pacta products to {activeMode}"
 
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
@@ -10114,8 +10850,8 @@ msgid "Team email removed"
 msgstr "Team email removed"
 
 #: packages/email/templates/team-email-removed.tsx
-msgid "Team email removed for {teamName} on Documenso"
-msgstr "Team email removed for {teamName} on Documenso"
+msgid "Team email removed for {teamName} on Pacta"
+msgstr "Team email removed for {teamName} on Pacta"
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Team email verification"
@@ -10234,6 +10970,14 @@ msgstr "Teams that this organisation group is currently assigned to"
 msgid "Teams that this user is a member of and their roles."
 msgstr "Teams that this user is a member of and their roles."
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Tells browsers to only load this domain over HTTPS for the configured duration. Enable AFTER verifying every subdomain you serve is HTTPS-only, otherwise includeSubdomains can break HTTP-only siblings."
+msgstr "Tells browsers to only load this domain over HTTPS for the configured duration. Enable AFTER verifying every subdomain you serve is HTTPS-only, otherwise includeSubdomains can break HTTP-only siblings."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Tells browsers which features (camera, microphone, geolocation, etc.) are denied for this origin. Reduces blast radius if XSS ever ships."
+msgstr "Tells browsers which features (camera, microphone, geolocation, etc.) are denied for this origin. Reduces blast radius if XSS ever ships."
+
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -10351,6 +11095,23 @@ msgstr "Templates partially deleted"
 msgid "Test"
 msgstr "Test"
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Test connection"
+msgstr "Test connection"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Test failed"
+msgstr "Test failed"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Test live connection"
+msgstr "Test live connection"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Test sandbox connection"
+msgstr "Test sandbox connection"
+
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Test Webhook"
 msgstr "Test Webhook"
@@ -10405,8 +11166,8 @@ msgid "Thank you for completing the signing process."
 msgstr "Thank you for completing the signing process."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
-msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
+msgid "Thank you for using Pacta to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
+msgstr "Thank you for using Pacta to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
 
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "That's okay, it happens! Click the button below to reset your password."
@@ -10592,6 +11353,10 @@ msgstr "The following signers are missing signature fields:"
 #: packages/email/templates/team-delete.tsx
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "The following team has been deleted. You will no longer be able to access this team and its documents"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "The instance now signs using environment-variable configuration."
+msgstr "The instance now signs using environment-variable configuration."
 
 #. placeholder {0}: form.watch('name')
 #. placeholder {1}: form.watch('email')
@@ -10793,8 +11558,8 @@ msgstr "The types of signatures that recipients are allowed to use when signing 
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
-msgid "The URL for Documenso to send webhook events to."
-msgstr "The URL for Documenso to send webhook events to."
+msgid "The URL for Pacta to send webhook events to."
+msgstr "The URL for Pacta to send webhook events to."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "The user you are looking for may have been removed, renamed or may have never existed."
@@ -10940,8 +11705,8 @@ msgid "This document has been signed by all recipients"
 msgstr "This document has been signed by all recipients"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
-msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
-msgstr "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
+msgid "This document is available in your Pacta account. You can view more details, recipients, and audit logs there."
+msgstr "This document is available in your Pacta account. You can view more details, recipients, and audit logs there."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document is currently a draft and has not been sent"
@@ -10960,8 +11725,8 @@ msgid "This document was created using a direct link."
 msgstr "This document was created using a direct link."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>Documenso</0>."
-msgstr "This document was sent using <0>Documenso</0>."
+msgid "This document was sent using <0>{APP_NAME}</0>."
+msgstr "This document was sent using <0>{APP_NAME}</0>."
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document will be duplicated."
@@ -11046,6 +11811,10 @@ msgstr "This item cannot be deleted"
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
 msgstr "This link is invalid or has expired. Please contact your team to resend a verification."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "This organisation now sends through the instance-default mailer."
+msgstr "This organisation now sends through the instance-default mailer."
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "This organisation will have administrative control over your account. You can revoke this access later, but they will retain access to any data they've already collected."
 msgstr "This organisation will have administrative control over your account. You can revoke this access later, but they will retain access to any data they've already collected."
@@ -11053,6 +11822,10 @@ msgstr "This organisation will have administrative control over your account. Yo
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "This organisation, and any associated data will be permanently deleted."
 msgstr "This organisation, and any associated data will be permanently deleted."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "This organisation's outgoing mail will now authenticate with these credentials."
+msgstr "This organisation's outgoing mail will now authenticate with these credentials."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "This passkey has already been registered."
@@ -11169,6 +11942,10 @@ msgstr "Time zone"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Time Zone"
 msgstr "Time Zone"
+
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "Time-stamp authority + signing metadata"
+msgstr "Time-stamp authority + signing metadata"
 
 #: apps/remix/app/components/dialogs/envelope-rename-dialog.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
@@ -11420,6 +12197,10 @@ msgstr "Triggers"
 msgid "Try again"
 msgstr "Try again"
 
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+msgid "TSA URLs (comma-separated)"
+msgstr "TSA URLs (comma-separated)"
+
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
 msgstr "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
@@ -11601,6 +12382,25 @@ msgstr "Undo"
 msgid "Unknown"
 msgstr "Unknown"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 #: packages/ui/lib/handle-dropzone-rejection.tsx
 msgid "Unknown error"
 msgstr "Unknown error"
@@ -11614,6 +12414,10 @@ msgstr "Unknown name"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Unlimited"
 msgstr "Unlimited"
+
+#: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+msgid "Unlimited documents, 10 members, CFR21 + HIPAA compliance, full AI"
+msgstr "Unlimited documents, 10 members, CFR21 + HIPAA compliance, full AI"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Unlimited documents, API and more"
@@ -11674,6 +12478,10 @@ msgstr "Update Banner"
 msgid "Update Billing"
 msgstr "Update Billing"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Update captcha config"
+msgstr "Update captcha config"
+
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Claim"
 msgstr "Update Claim"
@@ -11729,6 +12537,14 @@ msgstr "Update Recipient"
 msgid "Update role"
 msgstr "Update role"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Update security headers"
+msgstr "Update security headers"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Update signup gating"
+msgstr "Update signup gating"
+
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Subscription Claim"
 msgstr "Update Subscription Claim"
@@ -11767,6 +12583,10 @@ msgstr "Update the title or replace the PDF file."
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Update user"
 msgstr "Update user"
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Update webhook config"
+msgstr "Update webhook config"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 msgid "Updated {organisationMemberName} to {roleLabel}."
@@ -11935,12 +12755,10 @@ msgstr "Use your passkey for authentication"
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
-#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "User"
 msgstr "User"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
-#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "User Agent"
 msgstr "User Agent"
 
@@ -11972,13 +12790,13 @@ msgstr "User not found."
 msgid "User Organisations"
 msgstr "User Organisations"
 
-#: apps/remix/app/components/forms/signup.tsx
-msgid "User profiles are here!"
-msgstr "User profiles are here!"
-
 #: apps/remix/app/components/general/menu-switcher.tsx
 msgid "User settings"
 msgstr "User settings"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+msgid "Username"
+msgstr "Username"
 
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
@@ -12049,6 +12867,18 @@ msgstr "Verify your email to upload documents."
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Verify your team email address"
 msgstr "Verify your team email address"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Vertex API key"
+msgstr "Vertex API key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Vertex location"
+msgstr "Vertex location"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Vertex project ID"
+msgstr "Vertex project ID"
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
@@ -12264,8 +13094,8 @@ msgstr "Waiting for Your Turn"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
-msgid "Want to send slick signing links like this one? <0>Check out Documenso</0>."
-msgstr "Want to send slick signing links like this one? <0>Check out Documenso</0>."
+msgid "Want to send slick signing links like this one? <0>Check out Pacta</0>."
+msgstr "Want to send slick signing links like this one? <0>Check out Pacta</0>."
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Want your own public profile?"
@@ -12661,6 +13491,10 @@ msgstr "We've sent a confirmation email to <0>{email}</0>. Please check your inb
 msgid "Webhook"
 msgstr "Webhook"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Webhook config saved"
+msgstr "Webhook config saved"
+
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Webhook created"
 msgstr "Webhook created"
@@ -12681,6 +13515,10 @@ msgstr "Webhook not found"
 msgid "Webhook queued for resend"
 msgstr "Webhook queued for resend"
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "Webhook SSRF bypass hosts"
+msgstr "Webhook SSRF bypass hosts"
+
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "Webhook updated"
 msgstr "Webhook updated"
@@ -12689,6 +13527,10 @@ msgstr "Webhook updated"
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Webhook URL"
 msgstr "Webhook URL"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "Webhook URL: <0>/api/stripe/webhook</0> — point your Stripe Dashboard ➜ Webhooks here."
+msgstr "Webhook URL: <0>/api/stripe/webhook</0> — point your Stripe Dashboard ➜ Webhooks here."
 
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -12720,9 +13562,20 @@ msgid "Welcome to Documenso"
 msgstr "Welcome to Documenso"
 
 #: packages/email/template-components/template-admin-user-created.tsx
-#: packages/email/template-components/template-confirmation-email.tsx
 msgid "Welcome to Documenso!"
 msgstr "Welcome to Documenso!"
+
+#: apps/remix/app/components/general/onboarding-dialog.tsx
+msgid "Welcome to Pacta"
+msgstr "Welcome to Pacta"
+
+#: packages/email/template-components/template-confirmation-email.tsx
+msgid "Welcome to Pacta!"
+msgstr "Welcome to Pacta!"
+
+#: apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+msgid "Well-known URL"
+msgstr "Well-known URL"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Well-known URL is required"
@@ -12736,6 +13589,10 @@ msgstr "Were you trying to edit this document instead?"
 msgid "What you can do with teams:"
 msgstr "What you can do with teams:"
 
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
+msgid "When enabled, outgoing emails from this organisation won't display the \"This document was sent using Pacta\" footer line. Useful when this organisation has its own brand identity it wants to present unattributed."
+msgstr "When enabled, outgoing emails from this organisation won't display the \"This document was sent using Pacta\" footer line. Useful when this organisation has its own brand identity it wants to present unattributed."
+
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -12743,9 +13600,21 @@ msgstr "What you can do with teams:"
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 msgstr "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
 
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "When enabled, signin and signup forms render a Turnstile widget. DB-backed config overrides NEXT_PUBLIC_TURNSTILE_SITE_KEY and NEXT_PRIVATE_TURNSTILE_SECRET_KEY."
+msgstr "When enabled, signin and signup forms render a Turnstile widget. DB-backed config overrides NEXT_PUBLIC_TURNSTILE_SITE_KEY and NEXT_PRIVATE_TURNSTILE_SECRET_KEY."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
 msgstr "When enabled, users signing in via SSO for the first time will also receive their own personal organisation."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "When on AND at least one allowed domain is set, signup additionally requires a matching pending invitation. New signups will be auto-joined to the invited org (no blank Personal Org spawned)."
+msgstr "When on AND at least one allowed domain is set, signup additionally requires a matching pending invitation. New signups will be auto-joined to the invited org (no blank Personal Org spawned)."
+
+#: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+msgid "When on, /signup redirects to /signin and the \"Sign up\" link disappears."
+msgstr "When on, /signup redirects to /signin and the \"Sign up\" link disappears."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
@@ -12759,13 +13628,17 @@ msgstr "When you sign a document, we can automatically fill in and sign the foll
 msgid "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
 msgstr "When you use our platform to affix your electronic signature to documents, you are consenting to do so under the Electronic Signatures in Global and National Commerce Act (E-Sign Act) and other applicable laws. This action indicates your agreement to use electronic means to sign documents and receive notifications."
 
+#: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+msgid "Where uploaded PDFs live. Switching transport does not migrate existing files — that's a separate one-shot script."
+msgstr "Where uploaded PDFs live. Switching transport does not migrate existing files — that's a separate one-shot script."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Whether to enable the SSO portal for your organisation"
 msgstr "Whether to enable the SSO portal for your organisation"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
-msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
-msgstr "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
+msgid "While waiting for them to do so you can create your own Pacta account and get started with document signing right away."
+msgstr "While waiting for them to do so you can create your own Pacta account and get started with document signing right away."
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Whitelabeling, unlimited members and more"
@@ -12774,6 +13647,11 @@ msgstr "Whitelabeling, unlimited members and more"
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 msgid "Who do you want to remind?"
 msgstr "Who do you want to remind?"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
+msgid "whsec_*** (saved)"
+msgstr "whsec_*** (saved)"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: packages/ui/primitives/document-flow/field-item.tsx
@@ -13558,6 +14436,10 @@ msgstr "You will now be required to enter a code from your authenticator app whe
 msgid "You will receive an email copy of the signed document once everyone has signed."
 msgstr "You will receive an email copy of the signed document once everyone has signed."
 
+#: apps/remix/app/components/forms/signup.tsx
+msgid "You'll join after signup"
+msgstr "You'll join after signup"
+
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
 msgstr "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
@@ -13737,12 +14619,12 @@ msgid "Your Email"
 msgstr "Your Email"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-msgid "Your email has already been confirmed. You can now use all features of Documenso."
-msgstr "Your email has already been confirmed. You can now use all features of Documenso."
+msgid "Your email has already been confirmed. You can now use all features of Pacta."
+msgstr "Your email has already been confirmed. You can now use all features of Pacta."
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
-msgstr "Your email has been successfully confirmed! You can now use all features of Documenso."
+msgid "Your email has been successfully confirmed! You can now use all features of Pacta."
+msgstr "Your email has been successfully confirmed! You can now use all features of Pacta."
 
 #. placeholder {0}: teamEmail.team.name
 #. placeholder {1}: teamEmail.team.url
@@ -13815,8 +14697,8 @@ msgid "Your plan does not support inviting members. Please upgrade or your plan 
 msgstr "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to discuss your options."
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
-msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
-msgstr "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
+msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using Pacta."
+msgstr "Your plan is no longer valid. Please subscribe to a new plan to continue using Pacta."
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Your profile has been updated successfully."

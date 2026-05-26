@@ -57,16 +57,51 @@ You may modify an upstream file directly (no overlay) ONLY if:
 
 Document each exception in `overlays/EXCEPTIONS.md` so they don't get lost.
 
-## How to verify a sync didn't break BizRethink features
+## Pre-merge gates (REQUIRED before merging any upstream-sync PR)
 
-After every merge, run:
+These run on every PR via `.github/workflows/ci.yml` (`Build App` + `Build Docker Image` jobs). **Do not merge until both are green.** Branch protection on `main` *should* enforce this — verify with `gh api repos/BizRethinkAI/internal-bizrethink-pacta-platform/branches/main/protection` (returns `Branch not protected` if disabled).
+
+### Why this section exists
+
+PR #1 (the 2026-05-25 merge) was merged while `Build App` was red. Coolify rebuilt from `main`, hit the same `tsc` errors CI had already flagged, and the deploy failed. Two enforcement layers — branch protection + this runbook — keep that from happening again.
+
+### Local pre-merge build gate (do this before pushing the merge commit)
 
 ```bash
-pnpm install
-pnpm build
-pnpm test
-# spike-deploy to a test Coolify env
-# manually test: create org, create team, issue API token, send a test contract, sign it
+# 1. Regenerate Prisma + zod (overlays/schema may have changed)
+npm run prisma:generate --workspace=@documenso/prisma
+
+# 2. Full app build — this is what CI and Coolify run
+npm run build --workspace=@documenso/remix
+
+# 3. Bizrethink customizations test suite
+npm test --workspace=@bizrethink/customizations
+
+# 4. (Optional but recommended) Full monorepo build, mirrors CI exactly
+npm run build -- --filter=!@documenso/docs
+```
+
+If any of the above fails, **resolve before pushing**. CI will catch it anyway, but local feedback is 2 minutes vs 4 minutes of CI queue time. More importantly, fixing locally means you push one clean commit instead of a cascade of "fix typecheck" follow-ups.
+
+### Common failure modes (post-merge typecheck)
+
+The take-ours / take-theirs conflict strategy resolves files in isolation, but TypeScript needs symbols to line up *across* files. After every merge, expect one or more of:
+
+1. **Upstream added a new symbol our overlay calls a different name for** — extend our overlay to alias or accept both shapes (see `onCreateUserHook` overlay 048 for the 1-arg → 2-arg fix pattern)
+2. **Upstream added a new symbol our overlay never picks up** — copy upstream's new exports into our overlay-modified file, keeping our additions next to them (see `field-meta.ts` overflow system addition)
+3. **Upstream deleted a file our overlay imports from** — switch to upstream's replacement pattern (see `seal-document.handler.ts` `sendCompletedEmail` → `jobs.triggerJob` migration)
+4. **Upstream rewrote a UI component our overlay customized** — take upstream's new version as base, re-apply our overlay's additions on top (see `branding-preferences-form.tsx` overlay 025 re-application)
+5. **Upstream extended a TRPC response schema that our UI still reads** — restore the dropped fields on the response (see `get-organisation-authentication-portal` `allowPersonalOrganisations` restoration)
+
+### Full post-merge smoke (after the merge lands on `main` + Coolify deploys)
+
+```bash
+# All of these should be green:
+npm test --workspace=@bizrethink/customizations
+npm test --workspace=@documenso/lib
+npm run test:e2e:dev    # Playwright regression gate (HARD RULE: never skip)
+
+# Manual: log into sign.pacta.ink, send a test contract, sign it, verify webhook fires
 ```
 
 If any of those fail and were working before the merge, the upstream change broke us. Either:

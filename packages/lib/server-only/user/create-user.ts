@@ -9,10 +9,9 @@
 // packages/bizrethink/server-only/auto-claim-invites-on-signup.ts for
 // the full reasoning.
 import { autoClaimInvitesOnSignup } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
+import { prisma } from '@documenso/prisma';
 import { hash } from '@node-rs/bcrypt';
 import type { User } from '@prisma/client';
-
-import { prisma } from '@documenso/prisma';
 
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -71,19 +70,33 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
   return user;
 };
 
+export type OnCreateUserHookOptions = {
+  /**
+   * When true, do not create a Personal Organisation for the new user.
+   * Used by the Organisation SSO signup path where the user is intended to
+   * operate inside the SSO organisation rather than a personal space.
+   * Defaults to false (preserves Documenso's default).
+   *
+   * Note (overlay 048): auto-claim of pending invites runs for ALL signups
+   * regardless of this flag — invite consumption is universal post-signup
+   * onboarding, decoupled from the auth mechanism.
+   */
+  skipPersonalOrganisation?: boolean;
+};
+
 /**
- * Should be run after a user is created, example during email password signup or google sign in.
+ * Should be run after a user is created (email-password signup, Google SSO,
+ * Organisation SSO link).
  *
- * MODIFIED for BizRethink (overlay 048): try auto-claiming pending invites
- * matching the new user's email FIRST. If any invites were accepted, skip
- * Personal Org creation entirely — the user's primary workspace is the
- * org(s) they were invited to. Falls back to Personal Org creation when
- * no pending invites exist (preserves Documenso's default for self-host
- * single-user signups).
+ * MODIFIED for BizRethink (overlay 048): auto-claim pending invites
+ * matching the new user's email FIRST (runs universally regardless of
+ * options). Personal Org is created only when BOTH gates allow:
+ *   1. !options.skipPersonalOrganisation (upstream's SSO suppression)
+ *   2. accepted.length === 0 (no invites were consumed)
  *
  * @returns User
  */
-export const onCreateUserHook = async (user: User) => {
+export const onCreateUserHook = async (user: User, options: OnCreateUserHookOptions = {}) => {
   const accepted = await autoClaimInvitesOnSignup({
     userId: user.id,
     userEmail: user.email,
@@ -95,7 +108,7 @@ export const onCreateUserHook = async (user: User) => {
     return [];
   });
 
-  if (accepted.length === 0) {
+  if (!options.skipPersonalOrganisation && accepted.length === 0) {
     await createPersonalOrganisation({ userId: user.id });
   }
 

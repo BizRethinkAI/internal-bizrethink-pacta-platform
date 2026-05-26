@@ -52,6 +52,7 @@ export const getOrganisationAuthenticationPortal = async ({
           wellKnownUrl: true,
           autoProvisionUsers: true,
           allowedDomains: true,
+          // BizRethink: surfaced for sso.tsx toggle (see types file).
           allowPersonalOrganisations: true,
           clientSecret: true,
         },
