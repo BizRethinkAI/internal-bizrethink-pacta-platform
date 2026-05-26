@@ -9,6 +9,12 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# MODIFIED for BizRethink (security hardening 2026-05-26): default-deny
+# GITHUB_TOKEN scope. The e2e job only needs to checkout code and run
+# Playwright; no repo writes. Closes CodeQL alert #7.
+permissions:
+  contents: read
+
 jobs:
   e2e_tests:
     name: 'E2E Tests'
