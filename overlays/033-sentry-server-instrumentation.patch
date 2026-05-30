@@ -70,3 +70,12 @@
 #      hosters running fintech/healthcare/regulated apps universally
 #      need this; baking it in saves every operator from re-implementing
 #      this overlay.
+#
+#      2026-05-30 addendum: instrument.mjs now also starts a low-volume
+#      liveness heartbeat (one stdout line every ~10min) so the Axiom
+#      "pacta-app log drain silence" monitor can be tightened from a 24h
+#      window to ~30min — silence then means the container is down or the
+#      log drain is broken, not just idle. Inlined (not imported) because
+#      instrument.mjs is copied verbatim into the build with no bundler.
+#      Mirrors the unit-tested heartbeat in the two CircularPay apps.
+#      Fragility: LOW — additive block at end of a fork-owned file.
