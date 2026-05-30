@@ -83,3 +83,29 @@ if (shouldEnable) {
     },
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// BizRethink: liveness heartbeat for the Axiom log drain.
+//
+// The Axiom "log drain silence" monitor counts events in the `pacta-app`
+// dataset and alerts when a window has none. Pacta emits no per-request logs
+// during quiet stretches, so without a beacon the monitor can't tell "idle"
+// from "down". A low-volume heartbeat (~144 lines/day) makes silence a
+// trustworthy signal and lets the monitor window tighten from 24h to ~30min.
+//
+// Inlined here (not imported) because instrument.mjs is copied verbatim to
+// build/server/ with no bundler to resolve imports. Mirrors the unit-tested
+// heartbeat in client-fundedin24-app / client-circular-payments-platform.
+//
+// Word choice avoids `error`/`FATAL`/`OOM`/`panic`/`ECONNREFUSED` so it never
+// trips the error-spike / critical-pattern monitors. Added 2026-05-30.
+// ─────────────────────────────────────────────────────────────────────────
+if (nodeEnv !== 'development' && nodeEnv !== 'test') {
+  const overrideMs = Number(process.env.HEARTBEAT_INTERVAL_MS);
+  const intervalMs = overrideMs > 0 ? overrideMs : 10 * 60 * 1000;
+  const beat = () =>
+    console.log(`[heartbeat] pacta-app alive uptime=${Math.round(process.uptime())}s pid=${process.pid}`);
+  beat(); // immediate, so a fresh deploy is visible right away
+  const timer = setInterval(beat, intervalMs);
+  timer.unref?.(); // never block shutdown; the HTTP server keeps the loop alive
+}
