@@ -33,4 +33,11 @@ printf "🌟 Starting Documenso server...\n"
 # Node's HTTP/exception handlers before other modules load them. Init
 # is a no-op unless NEXT_PRIVATE_SENTRY_DSN is set, so this is harmless
 # on fresh installs without Sentry configured.
-HOSTNAME=0.0.0.0 node --import ./build/server/instrument.mjs build/server/main.js
+#
+# NODE_ENV=production (overlay 033 amend, 2026-08-12): upstream's `npm run start`
+# set this via cross-env; when overlay 033 replaced that invocation with a raw
+# `node --import`, it was dropped. Without it, Node resolves react-router's
+# `development` export condition and serves the DEV build in production — every
+# 404 logs a ~10-line stack trace, amplifying scanner noise ~10x. Guarded by
+# packages/bizrethink/regression-tests/docker-start-node-env.test.ts.
+NODE_ENV=production HOSTNAME=0.0.0.0 node --import ./build/server/instrument.mjs build/server/main.js

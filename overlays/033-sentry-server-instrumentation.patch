@@ -79,3 +79,16 @@
 #      instrument.mjs is copied verbatim into the build with no bundler.
 #      Mirrors the unit-tested heartbeat in the two CircularPay apps.
 #      Fragility: LOW — additive block at end of a fork-owned file.
+#
+#      2026-08-12 amend: the launch line in docker/start.sh now prepends
+#      `NODE_ENV=production`. Upstream's `npm run start` set this via
+#      cross-env; when this overlay replaced that invocation with a raw
+#      `node --import`, NODE_ENV was silently dropped. With it unset, Node
+#      resolved react-router's `development` export condition and the
+#      container served the DEV build in production — every 404 emitted a
+#      ~10-line internal stack trace, amplifying routine bot-scanner noise
+#      ~10x in the Axiom logs (and running the slower unoptimized build).
+#      Diagnosed from an Axiom "error spike" alert that was 90% dev-mode
+#      404 stack frames. Regression-guarded by
+#      packages/bizrethink/regression-tests/docker-start-node-env.test.ts.
+#      Fragility: LOW — one env prefix on a fork-owned launch line.
