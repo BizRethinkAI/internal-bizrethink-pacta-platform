@@ -32,7 +32,7 @@ export default defineConfig({
   globalSetup: require.resolve('./global-setup'),
   fullyParallel: true,
   workers: 10, // See Projects where 10 is utilized for API tests. We're not running 10 workers for UI tests.
-  maxFailures: process.env.CI ? 1 : undefined,
+  maxFailures: undefined, // [inventory branch] disabled to surface ALL failures in one run for fork-test curation
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
