@@ -1,0 +1,24 @@
+# What this patches: .github/workflows/e2e-tests.yml — the `runs-on` label for
+#   the Playwright "E2E Tests" job.
+#
+# Why not a new file: it's a targeted change to an upstream Documenso workflow
+#   file; the runner label is inline, so it must be edited in place (recorded
+#   here per overlays/ discipline; the edit is committed inline to the yml).
+#
+# Why we need it: upstream runs Playwright on WarpBuild self-hosted runners
+#   (`runs-on: warp-ubuntu-2204-x64-8x`). BizRethink's fork has NO WarpBuild
+#   runner integration, so every E2E job sat in `queued` state indefinitely and
+#   NEVER reported a result. Effect: the Playwright regression gate (a project
+#   HARD RULE) was silently non-functional — PRs showed a perpetually-"pending"
+#   E2E check that could never go green. Discovered while trying to merge PR #8
+#   (the NODE_ENV=production fix): the E2E check had been queued ~1h40m with 0
+#   registered runners for that label.
+#
+#   Fix: repoint to GitHub-hosted `ubuntu-latest`. It has Docker (needed for
+#   `npm run dx:up`), Node, and is always available. The 60-minute timeout is
+#   ample for the 2/4-core hosted runner. Guarded by
+#   packages/bizrethink/regression-tests/workflow-runners.test.ts so an upstream
+#   sync that reintroduces a `warp-*` label fails the bizrethink test suite.
+#
+# Estimated upstream-merge fragility: LOW — single-line label swap. If upstream
+#   restructures e2e-tests.yml, re-apply the one-line runs-on change.
