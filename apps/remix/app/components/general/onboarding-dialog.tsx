@@ -1,10 +1,4 @@
-import { useEffect, useState } from 'react';
-
-import { Trans } from '@lingui/react/macro';
-import { ArrowRight, BookOpenIcon, MailIcon, PaletteIcon, UsersIcon } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { Link } from 'react-router';
-
+import { shouldAutoOpenOnboarding } from '@bizrethink/customizations/should-auto-open-onboarding';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -15,6 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
+import { Trans } from '@lingui/react/macro';
+import type { LucideIcon } from 'lucide-react';
+import { ArrowRight, BookOpenIcon, MailIcon, PaletteIcon, UsersIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router';
 
 // ADDED for BizRethink (overlay 061): one-time onboarding modal that fires
 // on the first authenticated render after sign-in. Helps new users find the
@@ -31,8 +30,7 @@ import {
 // Storage key intentionally includes the user.id so multiple Pacta accounts
 // on the same browser each get their own onboarding flow.
 
-const ONBOARDING_DISMISSED_KEY = (userId: number | string) =>
-  `pacta-onboarding-dismissed-${userId}`;
+const ONBOARDING_DISMISSED_KEY = (userId: number | string) => `pacta-onboarding-dismissed-${userId}`;
 
 type OnboardingCard = {
   icon: LucideIcon;
@@ -48,31 +46,27 @@ const CARDS: OnboardingCard[] = [
   {
     icon: BookOpenIcon,
     title: 'Send your first document',
-    description:
-      'Upload a PDF, place signature fields, add recipients, hit send. Five minutes start to finish.',
+    description: 'Upload a PDF, place signature fields, add recipients, hit send. Five minutes start to finish.',
     docsHref: 'https://pacta.ink/docs/getting-started/send-your-first-document',
   },
   {
     icon: PaletteIcon,
     title: 'Make it yours',
-    description:
-      'Replace the Pacta logo with yours, pick an accent color, choose what your customers see.',
+    description: 'Replace the Pacta logo with yours, pick an accent color, choose what your customers see.',
     docsHref: 'https://pacta.ink/docs/features/branding',
     appHref: (orgUrl) => `/o/${orgUrl}/settings/branding`,
   },
   {
     icon: UsersIcon,
     title: 'Invite your team',
-    description:
-      'Add admins, managers, and members. Each role has the right level of access — no surprises.',
+    description: 'Add admins, managers, and members. Each role has the right level of access — no surprises.',
     docsHref: 'https://pacta.ink/docs/getting-started/organisation-setup',
     appHref: (orgUrl) => `/o/${orgUrl}/settings/members`,
   },
   {
     icon: MailIcon,
     title: 'Send from your own domain',
-    description:
-      'Verify a domain via one DNS TXT record. Your signing emails go from yours, not ours.',
+    description: 'Verify a domain via one DNS TXT record. Your signing emails go from yours, not ours.',
     docsHref: 'https://pacta.ink/docs/features/email-domains',
     appHref: (orgUrl) => `/o/${orgUrl}/settings/email-domains`,
   },
@@ -80,6 +74,7 @@ const CARDS: OnboardingCard[] = [
 
 export const OnboardingDialog = () => {
   const { user, organisations } = useSession();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -96,12 +91,18 @@ export const OnboardingDialog = () => {
     const dismissed = window.localStorage.getItem(ONBOARDING_DISMISSED_KEY(user.id));
     setHydrated(true);
 
-    if (!dismissed) {
+    // Auto-open only for a not-yet-dismissed real user in the main app — never
+    // on /admin or /settings (would cover Danger Zone dialogs), and never for
+    // automated browsers (navigator.webdriver — Playwright et al.), where the
+    // delayed modal races E2E interactions.
+    const isAutomated = navigator.webdriver === true;
+
+    if (shouldAutoOpenOnboarding(location.pathname, Boolean(dismissed), isAutomated)) {
       // Small delay so the modal doesn't jump in before the page renders.
       const timer = setTimeout(() => setOpen(true), 500);
       return () => clearTimeout(timer);
     }
-  }, [user.id]);
+  }, [user.id, location.pathname]);
 
   const dismiss = () => {
     if (typeof window !== 'undefined') {
@@ -126,8 +127,8 @@ export const OnboardingDialog = () => {
           </DialogTitle>
           <DialogDescription className="text-base">
             <Trans>
-              Pick whichever you'd like to do first. Each opens a short guide — you can come back to
-              the rest any time from the help icon in the top bar.
+              Pick whichever you'd like to do first. Each opens a short guide — you can come back to the rest any time
+              from the help icon in the top bar.
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -141,18 +142,16 @@ export const OnboardingDialog = () => {
                 href={card.docsHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border-border hover:border-foreground/20 hover:bg-muted/30 group block rounded-lg border p-4 transition"
+                className="group block rounded-lg border border-border p-4 transition hover:border-foreground/20 hover:bg-muted/30"
               >
                 <div className="flex items-start gap-3">
-                  <div className="bg-muted flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg">
-                    <Icon className="text-muted-foreground h-4 w-4" />
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-muted">
+                    <Icon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-foreground text-sm font-semibold">{card.title}</h3>
-                    <p className="text-muted-foreground mt-1 text-[12.5px] leading-relaxed">
-                      {card.description}
-                    </p>
-                    <div className="text-foreground/70 group-hover:text-foreground mt-2 flex items-center gap-1 text-[11px] font-medium">
+                    <h3 className="font-semibold text-foreground text-sm">{card.title}</h3>
+                    <p className="mt-1 text-[12.5px] text-muted-foreground leading-relaxed">{card.description}</p>
+                    <div className="mt-2 flex items-center gap-1 font-medium text-[11px] text-foreground/70 group-hover:text-foreground">
                       <Trans>Learn more</Trans>
                       <ArrowRight className="h-3 w-3" />
                     </div>
@@ -162,7 +161,7 @@ export const OnboardingDialog = () => {
                   <Link
                     to={card.appHref(firstOrgUrl)}
                     onClick={dismiss}
-                    className="text-foreground/60 hover:text-foreground mt-3 block text-[11px] font-medium underline-offset-2 hover:underline"
+                    className="mt-3 block font-medium text-[11px] text-foreground/60 underline-offset-2 hover:text-foreground hover:underline"
                   >
                     <Trans>Go to settings →</Trans>
                   </Link>
@@ -177,7 +176,7 @@ export const OnboardingDialog = () => {
             href="https://pacta.ink/docs"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground text-xs font-medium"
+            className="font-medium text-muted-foreground text-xs hover:text-foreground"
           >
             <Trans>Browse all docs →</Trans>
           </a>
