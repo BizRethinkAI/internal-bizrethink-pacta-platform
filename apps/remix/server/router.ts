@@ -1,3 +1,4 @@
+import { isMalformedPath } from '@bizrethink/customizations/server-only/is-malformed-path';
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -55,6 +56,23 @@ const apiV2RateLimitMiddleware = createRateLimitMiddleware(apiV2RateLimit);
 const aiRateLimitMiddleware = createRateLimitMiddleware(aiRateLimit);
 const trpcRateLimitMiddleware = createRateLimitMiddleware(apiTrpcRateLimit);
 const fileRateLimitMiddleware = createRateLimitMiddleware(fileUploadRateLimit);
+
+/**
+ * BizRethink (overlay 064): reject malformed-encoding paths with a 400 before
+ * anything else touches them. react-router's route matching runs
+ * decodeURIComponent on each path segment ONCE PER route pattern, so bot/scanner
+ * traversal probes (overlong-UTF-8 %C0%AF, bad percent-encoding) make its
+ * decodePath() throw + warn ~14x per request — noise that never reaches the
+ * entry.server handleError (overlay 063). Rejecting here kills the warnings and
+ * serves scanners a fast 400. Runs first so malformed requests do the least work.
+ */
+app.use(async (c, next) => {
+  if (isMalformedPath(new URL(c.req.url).pathname)) {
+    return c.text('Bad Request', 400);
+  }
+
+  return next();
+});
 
 /**
  * Attach session and context to requests.
