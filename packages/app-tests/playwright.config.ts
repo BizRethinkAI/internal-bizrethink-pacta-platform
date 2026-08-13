@@ -98,7 +98,18 @@ export default defineConfig({
     {
       name: 'ui',
       testMatch: /e2e\/(?!api\/).*\.spec\.ts/,
-      testIgnore: /e2e\/license\/.*\.spec\.ts/,
+      // BizRethink fork-divergence exclusions (overlay 066 — see FORK-TESTING.md).
+      // These upstream specs assert behavior our fork deliberately changed, or
+      // pixel-compare against baselines rendered on a runner we don't use. Each
+      // cites the overlay that diverged. NOT hiding fork defects — verified via
+      // the 2026-08-13 curation (0 real bugs). Webhook create/update conflicts
+      // are handled with test.skip in-file (only 2 of 4 tests in that spec conflict).
+      testIgnore: [
+        /e2e\/license\/.*\.spec\.ts/,
+        /e2e\/scenarios\/form-flattening\.spec\.ts/, // OVERLAY 018/040: fork keeps AcroForm widgets un-flattened (flattenForm:false)
+        /e2e\/envelopes\/envelope-alignment\.spec\.ts/, // OVERLAY 061 (ENV): pixel-diff vs WarpBuild baselines, we run ubuntu-latest
+        /e2e\/envelopes\/envelope-overflow\.spec\.ts/, // OVERLAY 061 (ENV): pixel-diff vs WarpBuild baselines, we run ubuntu-latest
+      ],
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1200 },
