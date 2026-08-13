@@ -1,0 +1,23 @@
+# What this patches: apps/remix/server/router.ts — registers a hono guard middleware
+#   (and imports the @bizrethink predicate) as the first app.use() on the
+#   bundled hono app.
+#
+# Why not a new file: the middleware attaches to the existing hono `app` in
+#   router.ts. It MUST live in a bundled server file (router.ts is the rollup
+#   entry) — NOT the copied-raw server/main.js, which runs under plain `node`
+#   in production and cannot import the raw-.ts @bizrethink package. Mirrors
+#   the existing securityHeadersMiddleware wiring. Decision logic is factored into
+#   @bizrethink/customizations/server-only/is-malformed-path.ts (unit-tested).
+#
+# Why we need it: react-router's decodePath() runs decodeURIComponent() on each
+#   "/"-split segment during matching, ONCE PER route pattern tried. Malformed
+#   segments (overlong-UTF-8 %C0%AF traversal probes, bad percent-encoding) make
+#   it throw URIError + log a warning each time — ~14 log lines for a single
+#   scanner request, none reaching handleError (overlay 063 only covers the
+#   error-handler path). This guard 400s such paths before matching, eliminating
+#   the warnings and serving scanners a fast reject. Pairs with overlay 063
+#   (which killed the 404 stack-trace flood). Together they close both
+#   bot-noise sources on pacta-app.
+#
+# Estimated upstream-merge fragility: LOW — additive middleware at the top of a
+#   fork-touched server entry; independent of upstream route logic.

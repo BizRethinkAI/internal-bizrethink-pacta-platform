@@ -11,6 +11,7 @@
  *  approach is robust against linter import-sort reordering and is
  *  Sentry's recommended pattern for ESM Node apps.
  */
+
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import handle from 'hono-react-router-adapter/node';
