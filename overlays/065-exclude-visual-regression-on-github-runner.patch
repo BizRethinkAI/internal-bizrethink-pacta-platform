@@ -1,0 +1,27 @@
+# What this patches: packages/app-tests/playwright.config.ts — adds the two
+#   envelope visual-regression specs to the 'ui' project's testIgnore.
+#
+# Why not a new file: the exclusion must live in the upstream Playwright config
+#   that drives the E2E run (recorded here; edit committed inline).
+#
+# Why we need it: e2e/envelopes/envelope-alignment.spec.ts and
+#   envelope-overflow.spec.ts pixel-diff rendered PDFs (via pixelmatch) against
+#   reference PNGs in packages/app-tests/visual-regression/ that upstream
+#   generated on its WarpBuild CI runner. This fork runs E2E on github-hosted
+#   ubuntu-latest (overlay 061 — we have no WarpBuild integration), which
+#   renders fonts/glyphs ~3,000 px differently, so the `toBeLessThan(2)`
+#   pixel-diff assertions fail on ENVIRONMENT grounds, not on any logic defect.
+#   Surfaced after overlay 063/064 + the onboarding-webdriver fix de-flaked the
+#   suite enough for these to run to completion.
+#
+#   Excluded rather than: (a) committing fork copies of the upstream binary
+#   baseline PNGs — they'd conflict on every upstream sync and re-drift with the
+#   ubuntu-latest image; or (b) loosening the threshold in an upstream test.
+#   These specs validate upstream PDF pixel rendering, not BizRethink logic, so
+#   excluding them on our runner loses no coverage of our code. NOT a case of
+#   skipping a failing test to hide our own regression.
+#
+# Revisit if we ever adopt a runner matching the baselines.
+#
+# Estimated upstream-merge fragility: LOW — additive entry in a testIgnore
+#   array; re-apply if upstream restructures the projects config.
