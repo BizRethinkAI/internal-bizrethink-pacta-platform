@@ -13,7 +13,12 @@ jobs:
   e2e_tests:
     name: 'E2E Tests'
     timeout-minutes: 60
-    runs-on: warp-ubuntu-2204-x64-8x
+    # overlay 061 (2026-08-13): upstream runs Playwright on WarpBuild
+    # (warp-ubuntu-2204-x64-8x). This fork has no WarpBuild runner integration,
+    # so that label sat queued forever and silently disabled the E2E gate.
+    # GitHub-hosted ubuntu-latest has Docker (for dx:up) + is always available.
+    # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
