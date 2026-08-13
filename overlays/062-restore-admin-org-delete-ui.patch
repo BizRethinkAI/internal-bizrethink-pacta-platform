@@ -1,0 +1,27 @@
+# What this patches: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+#   — restores the "Danger Zone" org-delete UI integration (import of
+#   AdminOrganisationDeleteDialog, `retry: false` on the admin.organisation.get
+#   query, and the destructive Alert + dialog block before the closing div).
+#
+# Why not a new file: it's a targeted restoration of upstream code inside an
+#   upstream route file; recorded here per overlays/ discipline (edit committed
+#   inline).
+#
+# Why we need it: upstream #2795 (cfaad6efc "feat: add admin org deletion")
+#   shipped the backend (tRPC/jobs/email), the dialog component
+#   (admin-organisation-delete-dialog.tsx), the route integration (+37 lines in
+#   organisations.$id.tsx), AND the e2e test (delete-organisation.spec.ts).
+#   During the 2026-05-25 manual upstream sync, a merge-conflict resolution on
+#   organisations.$id.tsx DROPPED the route integration while keeping the
+#   backend, the (now-orphaned) dialog component, and the test. Result: the
+#   admin "delete organisation" feature was unreachable in the UI and its e2e
+#   test failed deterministically — invisible for ~2.5 months because the E2E
+#   gate itself was broken (WarpBuild runner missing; fixed by overlay 061).
+#   Discovered on the first real E2E run after 061.
+#
+#   This restores the exact upstream integration hunk. It is NOT a BizRethink
+#   customization — it re-aligns the file toward upstream, so the pending
+#   119-commit sync should reconcile it cleanly.
+#
+# Estimated upstream-merge fragility: LOW — restores upstream's own code; the
+#   next sync brings organisations.$id.tsx to upstream state anyway.
