@@ -1,9 +1,12 @@
 name: Upstream sync
 
 # Weekly attempt to merge documenso/main into our main.
-# - If clean merge: opens a PR with the upstream diff for review.
-# - If conflicts: opens a PR with conflict markers + the list of overlay patches
-#   that may need re-application.
+# - Always: pushes a sync/<date> branch and writes a job summary with the
+#   compare URL + (on conflicts) overlay patches that may need re-application.
+# - PR opening is intentionally NOT automated: the GitHub enterprise policy
+#   forbids GITHUB_TOKEN from creating pull requests, and we don't want a
+#   long-lived PAT to rotate. Open + review the PR via the upstream-sync skill
+#   (see UPSTREAM.md). The job summary gives you the compare link to start from.
 #
 # Manual trigger also available via Actions tab.
 #
@@ -17,7 +20,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   sync:
@@ -105,39 +107,46 @@ jobs:
       - name: Push sync branch
         run: git push origin ${{ steps.branch.outputs.branch }} --force
 
-      - name: Open PR (clean merge)
+      # PR creation is blocked by enterprise policy for GITHUB_TOKEN, so instead
+      # of failing we write the actionable details to the job summary. Open the
+      # PR from the compare URL via the upstream-sync skill (see UPSTREAM.md).
+      - name: Write job summary (clean merge)
         if: steps.merge.outputs.result == 'clean'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr create \
-            --base main \
-            --head ${{ steps.branch.outputs.branch }} \
-            --title "chore(upstream-sync): $(date +%Y-%m-%d) — clean merge" \
-            --body "Automated weekly merge of \`documenso/main\` into our main. **Clean merge — no conflicts.** Review the diff, run smoke tests, and merge if all good."
-
-      - name: Open PR (with conflicts)
-        if: steps.merge.outputs.result == 'conflicts'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
           {
-            echo "Automated weekly merge of \`documenso/main\` into our main hit **CONFLICTS**."
+            echo "## Upstream sync — clean merge ✅"
             echo ""
-            echo "## Conflict status"
-            echo "\`\`\`"
+            echo "Merged \`documenso/main\` into \`$BRANCH\` with no conflicts."
+            echo ""
+            echo "**Open the PR:** [$REPO_URL/compare/main...$BRANCH]($REPO_URL/compare/main...$BRANCH?expand=1)"
+            echo ""
+            echo "Review the diff, run smoke + Playwright gates, then merge. See \`UPSTREAM.md\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write job summary (with conflicts)
+        if: steps.merge.outputs.result == 'conflicts'
+        env:
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          {
+            echo "## Upstream sync — CONFLICTS ⚠️"
+            echo ""
+            echo "Merging \`documenso/main\` into \`$BRANCH\` hit conflicts."
+            echo "Resolve locally via the **upstream-sync skill** — see \`UPSTREAM.md\`."
+            echo ""
+            echo "**Compare:** $REPO_URL/compare/main...$BRANCH"
+            echo ""
+            echo "### Conflict status"
+            echo '```'
             cat /tmp/conflict-status.txt
-            echo "\`\`\`"
+            echo '```'
             echo ""
-            echo "## Overlay patches in repo (may need re-application)"
-            echo "\`\`\`"
+            echo "### Overlay patches in repo (may need re-application)"
+            echo '```'
             cat /tmp/overlay-list.txt
-            echo "\`\`\`"
-            echo ""
-            echo "Resolve per the runbook in \`UPSTREAM.md\`."
-          } > /tmp/pr-body.md
-          gh pr create \
-            --base main \
-            --head ${{ steps.branch.outputs.branch }} \
-            --title "chore(upstream-sync): $(date +%Y-%m-%d) — CONFLICTS need review" \
-            --body-file /tmp/pr-body.md
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
