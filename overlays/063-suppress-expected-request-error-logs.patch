@@ -1,0 +1,21 @@
+# What this patches: apps/remix/app/entry.server.tsx — adds a custom
+#   `handleError` export (plus the import of the @bizrethink predicate).
+#
+# Why not a new file: react-router discovers `handleError` as a named export of
+#   the app's server entry module; it MUST live in entry.server.tsx. Decision
+#   logic is factored into @bizrethink/customizations/server-only/
+#   should-log-request-error.ts (unit-tested) so the overlay is a thin wire-up.
+#
+# Why we need it: react-router's DEFAULT server error handler console.errors
+#   EVERY request error, gated only by `serverMode !== "test"` — so it logs in
+#   production too. Documenso exports no custom handleError, so 404s
+#   ("No route matches URL ...") and malformed-URL URIErrors from bot/scanner
+#   probes each emit a ~10-line stack trace. THAT is the pacta-app "bot noise"
+#   (originally misdiagnosed as dev-mode-in-production; NODE_ENV has no effect
+#   on this logging path). The custom handleError drops expected/uninteresting
+#   request errors (404, URIError-malformed, aborted) while still logging — and
+#   letting Sentry (overlay 033) capture — genuine 500-class errors.
+#
+# Estimated upstream-merge fragility: LOW — additive named export at the end of
+#   entry.server.tsx + one import. If upstream adds its OWN handleError, merge
+#   the 404/URIError suppression into it (don't duplicate).
