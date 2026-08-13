@@ -1,4 +1,5 @@
 import { PassThrough } from 'node:stream';
+import { shouldLogRequestError } from '@bizrethink/customizations/server-only/should-log-request-error';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { dynamicActivate, extractLocaleData } from '@documenso/lib/utils/i18n';
 import { i18n } from '@lingui/core';
@@ -7,7 +8,7 @@ import { createReadableStreamFromReadable } from '@react-router/node';
 import { isbot } from 'isbot';
 import type { RenderToPipeableStreamOptions } from 'react-dom/server';
 import { renderToPipeableStream } from 'react-dom/server';
-import type { AppLoadContext, EntryContext } from 'react-router';
+import type { AppLoadContext, EntryContext, HandleErrorFunction } from 'react-router';
 import { ServerRouter } from 'react-router';
 
 import { langCookie } from './storage/lang-cookie.server';
@@ -86,3 +87,19 @@ export default async function handleRequest(
     setTimeout(abort, streamTimeout + 1000);
   });
 }
+
+// BizRethink (overlay 063): react-router's default server error handler
+// console.errors EVERY request error — including 404s ("No route matches URL")
+// and malformed-URL URIErrors from bot/scanner probes — in production as well
+// as development (the only exempt mode is "test"). Each 404 emits a ~10-line
+// stack trace, which is what floods the pacta-app logs. Providing a custom
+// `handleError` lets us drop the uninteresting request errors while still
+// surfacing (and letting Sentry capture) genuine 500-class ones. Decision logic
+// lives in the tested @bizrethink/customizations predicate.
+export const handleError: HandleErrorFunction = (error, { request }) => {
+  if (!shouldLogRequestError(error, { aborted: request.signal.aborted })) {
+    return;
+  }
+
+  console.error(error);
+};
