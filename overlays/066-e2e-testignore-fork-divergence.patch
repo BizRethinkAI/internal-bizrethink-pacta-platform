@@ -1,0 +1,38 @@
+# What this patches: packages/app-tests/playwright.config.ts (ui-project
+#   testIgnore) + packages/app-tests/e2e/webhooks/webhooks-crud.spec.ts (two
+#   test.skip). Excludes upstream E2E tests that assert behavior our fork
+#   deliberately diverged from, so the Playwright gate can lock a green baseline.
+#
+# Why not a new file: the exclusions must live in the upstream Playwright config
+#   and (for the 2-of-4 webhook case) inline in the upstream spec. Recorded here.
+#
+# Why we need it: the E2E suite in packages/app-tests/ is UPSTREAM Documenso's,
+#   inherited verbatim on every sync. Our fork changes behavior via ~40 overlays,
+#   so some upstream tests assert behavior we intentionally replaced. A one-time
+#   curation on 2026-08-13 (full inventory: 8 failed / 6 flaky / 812 passed, then
+#   a 13-agent categorization with adversarial verification) found **0 real bugs**
+#   — every stable failure is a deliberate-divergence or environment artifact:
+#     - form-flattening.spec.ts (4 tests) — assert AcroForm widgets get flattened;
+#       overlays 018/040 deliberately keep them interactive (flattenForm:false at
+#       create-document-from-template.ts:494 + send-document.ts:352) because
+#       pdf-lib flatten corrupts multi-instance contract fields. Whole-file ignore.
+#       Backfilled by packages/bizrethink/regression-tests/acroform-flatten-skip.test.ts.
+#     - envelope-alignment.spec.ts + envelope-overflow.spec.ts — pixel-diff vs PNG
+#       baselines rendered on upstream's WarpBuild runner; overlay 061 runs us on
+#       ubuntu-latest, so font/raster deltas fail the diff. Environment. Whole-file.
+#     - webhooks-crud create(:42)+update(:173) — dismiss-click locator uses the old
+#       "The URL for Documenso..." copy; overlay 024 rebranded it to "Pacta", so the
+#       locator times out. view(:92)+delete(:126) pass and MUST keep running, so
+#       these two are test.skip in-file (a file-level ignore would drop the passing
+#       coverage).
+#   The 6 flakes are NOT excluded (they pass on retry and cover upstream logic we
+#   rely on — excluding would hide real regressions).
+#
+# Policy + maintenance: see FORK-TESTING.md. Rule of thumb — upstream test
+#   conflicts with an overlay => ignore it here (cite the overlay) and cover the
+#   behavior with a fork-owned test in packages/bizrethink, NOT by editing the
+#   upstream test's assertions (which would conflict on every sync).
+#
+# Estimated upstream-merge fragility: MEDIUM — the form-flattening/envelope spec
+#   paths and the webhook test titles are the conflict surface. If upstream
+#   renames/relocates them, re-point the testIgnore globs / re-apply the skips.
