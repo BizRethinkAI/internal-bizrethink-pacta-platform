@@ -2,15 +2,12 @@
 // the POST /signup handler so the admin Signup-gating UI override actually
 // works at form-submit time. Original used raw env() and ignored the DB row.
 import { isSignupDisabled } from '@bizrethink/customizations/server-only/signup-config';
-import { sValidator } from '@hono/standard-validator';
-import { compare } from '@node-rs/bcrypt';
-import { UserSecurityAuditLogType } from '@prisma/client';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import { DateTime } from 'luxon';
-import { z } from 'zod';
-
-import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
+import {
+  isDisposableEmail,
+  isEmailDomainAllowedForSignup,
+  isSigninEnabledForProvider,
+  isSignupEnabledForProvider,
+} from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -30,6 +27,7 @@ import {
   signupRateLimit,
   verifyEmailRateLimit,
 } from '@documenso/lib/server-only/rate-limit/rate-limits';
+import { getEmailBlocklistDomains } from '@documenso/lib/server-only/site-settings/get-email-blocklist-domains';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
 import { getMostRecentEmailVerificationToken } from '@documenso/lib/server-only/user/get-most-recent-email-verification-token';
@@ -40,6 +38,13 @@ import { legacyServiceAccountEmail } from '@documenso/lib/server-only/user/servi
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
 import { prisma } from '@documenso/prisma';
+import { sValidator } from '@hono/standard-validator';
+import { compare } from '@node-rs/bcrypt';
+import { UserSecurityAuditLogType } from '@prisma/client';
+import { Hono } from 'hono';
+import { HTTPException } from 'hono/http-exception';
+import { DateTime } from 'luxon';
+import { z } from 'zod';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { invalidateSessions } from '../lib/session/session';
@@ -63,6 +68,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post('/authorize', sValidator('json', ZSignInSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
+
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
 
     const { email, password, totpCode, backupCode, csrfToken, captchaToken } = c.req.valid('json');
 
@@ -93,10 +104,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       ipAddress: requestMetadata.ipAddress,
     });
 
-    if (
-      email.toLowerCase() === legacyServiceAccountEmail() ||
-      email.toLowerCase() === deletedServiceAccountEmail()
-    ) {
+    if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
       return c.text('FORBIDDEN', 403);
     }
 
@@ -175,12 +183,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    if (user.disabled) {
-      throw new AppError('ACCOUNT_DISABLED', {
-        message: 'Account disabled',
-      });
-    }
-
+    // The disabled check now lives inside `onAuthorize` so every sign-in path
+    // (password, passkey, OAuth, OIDC) shares the same enforcement.
     await onAuthorize({ userId: user.id }, c);
 
     return c.text('', 201);
@@ -194,7 +198,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     // MODIFIED for BizRethink (overlay 028): DB-aware. Layer 1 (signup page
     // loader) already uses isSignupDisabled(); this matches it so the admin
     // UI's Signup-gating override applies end-to-end (form submit too).
-    if (await isSignupDisabled()) {
+    // Upstream's env-driven per-provider gate runs alongside ours — either one
+    // disabling email signup rejects the request.
+    if ((await isSignupDisabled()) || !isSignupEnabledForProvider('email')) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         statusCode: 400,
       });
@@ -232,8 +238,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     // matches but nobody invited me" hole — useful for B2B-team setups.
     // The auto-claim helper below (in createUser → onCreateUserHook) will
     // then claim that invite. See packages/bizrethink/server-only/signup-config.ts.
-    const { isInviteRequiredForSignup } =
-      await import('@bizrethink/customizations/server-only/signup-config');
+    const { isInviteRequiredForSignup } = await import('@bizrethink/customizations/server-only/signup-config');
     if (await isInviteRequiredForSignup()) {
       const matchingInvite = await prisma.organisationMemberInvite.findFirst({
         where: {
@@ -249,6 +254,14 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
             'Signup requires an invitation. Ask your administrator to invite you, then sign up again with that email.',
         });
       }
+    }
+
+    const additionalBlockedDomains = await getEmailBlocklistDomains();
+
+    if (isDisposableEmail(email, additionalBlockedDomains)) {
+      throw new AppError(AuthenticationErrorCode.SignupDisposableEmail, {
+        statusCode: 400,
+      });
     }
 
     const user = await createUser({ name, email, password, signature }).catch((err) => {
@@ -271,6 +284,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/update-password', sValidator('json', ZUpdatePasswordSchema), async (c) => {
     const { password, currentPassword } = c.req.valid('json');
     const requestMetadata = c.get('requestMetadata');
+
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
 
     const { session, user } = await getSession(c);
 
@@ -374,6 +393,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/forgot-password', sValidator('json', ZForgotPasswordSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
+
     const { email } = c.req.valid('json');
 
     const forgotLimitResult = await forgotPasswordRateLimit.check({
@@ -389,10 +414,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    if (
-      email.toLowerCase() === legacyServiceAccountEmail() ||
-      email.toLowerCase() === deletedServiceAccountEmail()
-    ) {
+    if (email.toLowerCase() === legacyServiceAccountEmail() || email.toLowerCase() === deletedServiceAccountEmail()) {
       return c.text('FORBIDDEN', 403);
     }
 
@@ -407,6 +429,12 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post('/reset-password', sValidator('json', ZResetPasswordSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
+
+    if (!isSigninEnabledForProvider('email')) {
+      throw new AppError(AuthenticationErrorCode.SigninDisabled, {
+        statusCode: 400,
+      });
+    }
 
     const { token, password } = c.req.valid('json');
 

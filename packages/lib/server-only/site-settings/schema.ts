@@ -8,10 +8,12 @@ import { ZSiteSettingsWebhookSchema } from '@bizrethink/customizations/server-on
 import { z } from 'zod';
 
 import { ZSiteSettingsBannerSchema } from './schemas/banner';
+import { ZSiteSettingsEmailBlocklistSchema } from './schemas/email-blocklist';
 import { ZSiteSettingsTelemetrySchema } from './schemas/telemetry';
 
 export const ZSiteSettingSchema = z.union([
   ZSiteSettingsBannerSchema,
+  ZSiteSettingsEmailBlocklistSchema,
   ZSiteSettingsTelemetrySchema,
   ZSiteSettingsSignupSchema,
   ZSiteSettingsCaptchaSchema,

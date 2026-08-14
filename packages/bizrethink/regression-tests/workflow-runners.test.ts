@@ -38,3 +38,48 @@ describe('.github/workflows — runners must be GitHub-hosted', () => {
     ).toEqual([]);
   });
 });
+
+/**
+ * Regression guard for the E2E-cap incident (2026-08-13, second occurrence).
+ *
+ * The curated suite took 51 min on the green baseline against a 60 min job cap
+ * — 9 min of headroom. The 142-commit upstream sync added enough new tests to
+ * blow through it, and the job was killed mid-run by GitHub's cap. A cancelled
+ * job reports neither pass nor fail, so the gate goes dark exactly like the
+ * warp-runner incident above.
+ *
+ * The fork's runner is a 2-core `ubuntu-latest`, not upstream's 8-core
+ * WarpBuild box, so our wall-clock will always exceed upstream's. The cap must
+ * leave real headroom above the observed runtime.
+ */
+describe('.github/workflows/e2e-tests.yml — job cap must leave headroom', () => {
+  const workflowPath = resolve(dirname(fileURLToPath(import.meta.url)), '../../../.github/workflows/e2e-tests.yml');
+
+  const MINIMUM_TIMEOUT_MINUTES = 90;
+
+  it(`sets timeout-minutes >= ${MINIMUM_TIMEOUT_MINUTES} so the suite can finish`, () => {
+    const content = readFileSync(workflowPath, 'utf8');
+
+    const match = content.match(/timeout-minutes:\s*(\d+)/);
+
+    expect(match, 'e2e-tests.yml declares no timeout-minutes; it would inherit the 360 min default').not.toBeNull();
+
+    expect(
+      Number(match?.[1]),
+      `E2E job cap is too tight. The suite ran 51 min on the 2026-08-13 baseline and the ` +
+        `upstream sync pushed it past a 60 min cap, killing the job mid-run and reporting ` +
+        `neither pass nor fail. Keep at least ${MINIMUM_TIMEOUT_MINUTES} min of room.`,
+    ).toBeGreaterThanOrEqual(MINIMUM_TIMEOUT_MINUTES);
+  });
+
+  it('streams turbo task logs so a stalled run is diagnosable', () => {
+    const content = readFileSync(workflowPath, 'utf8');
+
+    expect(
+      /TURBO_LOG_ORDER:\s*stream/.test(content),
+      'Without TURBO_LOG_ORDER=stream, turbo buffers task output and discards it when the job ' +
+        'is killed — the 2026-08-13 cancelled run produced 53 min of total silence, making ' +
+        '"slow" and "hung" indistinguishable.',
+    ).toBe(true);
+  });
+});

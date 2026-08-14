@@ -36,6 +36,28 @@ This directory contains patches applied on top of upstream Documenso files. **Ev
 
 > **Note on the original `001-default-claim-enterprise.patch`:** That patch was written against an older shape of `create-organisation.ts` (had a default-fallback). By the time of the day-1 spike, upstream had refactored to require `claim` as a parameter at every call site, breaking that single-line strategy. The patch was deleted and replaced by 001+002 above. See `~/.claude/projects/-Users-shwet-github-bizrethink-internal-bizrethink-pacta-platform/memory/documenso_paywall_audit.md` for the staleness note.
 
+## Relocations from the 2026-08-13 upstream sync (142 commits, upstream 2.16.0)
+
+Upstream refactored several files out from under these overlays. The behavior was
+re-applied at the new anchor points — **the table above still names the old file for
+some of these, so check here first when re-deriving a patch.**
+
+| Overlay | Old anchor (gone) | New home |
+|---|---|---|
+| 008 (nav gating), 050 (Billing entry), 010 (SMTP nav item) | `o.$orgUrl.settings._layout.tsx` nav array | `packages/lib/utils/settings-nav.ts` → `getSettingsNavGroups` |
+| 052 (dahlia `current_period_end` fallback) | `webhook/on-subscription-created.ts` + `-updated.ts` (deleted upstream) | `packages/ee/server-only/stripe/sync-stripe-customer-subscription.ts` |
+| 013 (DB-first storage config) | `universal/upload/server-actions.ts` (now a delegation shim) | `universal/upload/providers/resolve-storage-settings.ts` + `providers/s3-provider.ts`; `providers/index.ts` no longer throws on an unset transport env |
+| 021 #3b (`alt="Pacta Logo"`) | inline `<Img>` in `templates/reset-password.tsx` | `email/template-components/template-branding-logo.tsx` |
+| 012 / 015 / 017 / 032 (admin sections) | inline in `admin+/site-settings.tsx` (route is now a thin shell) | `apps/remix/app/components/general/admin-{signup-gating,captcha,webhook,security-headers}-section.tsx` |
+| 037 (`created` on signature type) | duplicate `FieldToRender` in `render-field.ts` | single definition in `universal/field-renderer/field-renderer.ts` |
+| 041 (PRO claim + trial) | `claim: internalClaims[INTERNAL_CLAIM_ID.PRO]` | `getSubscriptionClaim(INTERNAL_CLAIM_ID.PRO)` — upstream slimmed `internalClaims` to `Pick<'id'\|'name'>`, so flags/quotas now come from the DB row |
+
+Overlay 047's `NAV_GROUPS` also gained upstream's two new admin routes (Email Transports,
+Organisation Stats) — re-check that array whenever upstream adds an admin page.
+
+**Patch files for 013 / 047 / 052 / 060 / 061 still describe the pre-sync layout and need
+regenerating before they can be re-applied mechanically.**
+
 ## Production deploy step (one-shot)
 
 After applying 001+002 to a fresh deployment, also run the BIZRETHINK `SubscriptionClaim` INSERT documented in `packages/bizrethink/README.md`. Org creation works without it (no FK constraint), but admin UIs that list tiers won't see BIZRETHINK until the row exists.

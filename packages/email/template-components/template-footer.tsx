@@ -1,32 +1,47 @@
-// MODIFIED for BizRethink overlay 023: rebrand the email footer from
-// upstream Documenso defaults to Pacta. Three changes:
-//   1. "Powered by Documenso" link → "Powered by Pacta" linking to the
-//      BizRethink AI marketing site.
-//   2. Address fallback (when an org has no brandingCompanyDetails set):
-//      Documenso's San Francisco address → BizRethink AI's address.
-//   3. Use APP_NAME / APP_PARENT_BRAND constants from app.ts (overlay 021)
-//      so future renames are a one-file change.
-import { Trans } from '@lingui/react/macro';
+// MODIFIED for BizRethink (overlay 023): the footer is the most-seen brand
+// surface in the product — every signer email carries it. Rebranded to Pacta:
+// the "sent using" link points at bizrethink.ai and the branding-disabled
+// address fallback names Server Baba Inc. (Florida) instead of Documenso, Inc.
+// (San Francisco). Upstream's report-sender block, branding-URL section and
+// theme tokens are kept as-is.
 
 import { APP_NAME, APP_PARENT_BRAND } from '@documenso/lib/constants/app';
+import { Trans } from '@lingui/react/macro';
+import { Fragment } from 'react';
 
 import { Link, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
+import { getSafeBrandingUrl } from '../utils/branding-url';
 
 export type TemplateFooterProps = {
   isDocument?: boolean;
+  reportUrl?: string;
 };
 
-export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
+export const TemplateFooter = ({ isDocument = true, reportUrl }: TemplateFooterProps) => {
   const branding = useBranding();
+
+  const safeBrandingUrl = branding.brandingEnabled ? getSafeBrandingUrl(branding.brandingUrl) : null;
 
   return (
     <Section>
+      {reportUrl && (
+        <Text className="my-4 text-base text-muted-foreground">
+          <Trans>
+            Did not expect this email?{' '}
+            <Link className="text-primary" href={reportUrl}>
+              Click here to report the sender
+            </Link>
+            . Never sign a document you don't recognize or weren't expecting.
+          </Trans>
+        </Text>
+      )}
+
       {isDocument && !branding.brandingHidePoweredBy && (
-        <Text className="my-4 text-base text-slate-400">
+        <Text className="my-4 text-base text-muted-foreground">
           <Trans>
             This document was sent using{' '}
-            <Link className="text-[#1f2937]" href="https://bizrethink.ai">
+            <Link className="text-primary" href="https://bizrethink.ai">
               {APP_NAME}
             </Link>
             .
@@ -35,20 +50,28 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
       )}
 
       {branding.brandingEnabled && branding.brandingCompanyDetails && (
-        <Text className="my-8 text-sm text-slate-400">
+        <Text className="my-8 text-muted-foreground text-sm">
           {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
             return (
-              <>
+              <Fragment key={idx}>
                 {idx > 0 && <br />}
                 {line}
-              </>
+              </Fragment>
             );
           })}
         </Text>
       )}
 
+      {branding.brandingEnabled && safeBrandingUrl && (
+        <Text className="my-8 text-muted-foreground text-sm">
+          <Link href={safeBrandingUrl} target="_blank">
+            {safeBrandingUrl}
+          </Link>
+        </Text>
+      )}
+
       {!branding.brandingEnabled && (
-        <Text className="my-8 text-sm text-slate-400">
+        <Text className="my-8 text-muted-foreground text-sm">
           {APP_PARENT_BRAND} (Server Baba Inc.)
           <br />
           Florida, USA

@@ -1,12 +1,11 @@
 // MODIFIED for BizRethink (overlay 061): docs CTA on the all-empty state so
 // new users who don't know "how do I send a document?" have a clear path
 // to the walkthrough instead of staring at an empty table.
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { ArrowRight, Bird, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Bird, CheckCircle2, TimerOff, XCircle } from 'lucide-react';
 import { match } from 'ts-pattern';
-
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 export type DocumentsTableEmptyStateProps = { status: ExtendedDocumentStatus };
 
@@ -34,6 +33,27 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
       docsHref: undefined as string | undefined,
       docsLabel: undefined as string | undefined,
     }))
+    .with(ExtendedDocumentStatus.CANCELLED, () => ({
+      title: msg`Nothing cancelled`,
+      message: msg`There are no cancelled documents. Documents you cancel will remain here as a record that they were distributed.`,
+      icon: XCircle,
+      docsHref: undefined as string | undefined,
+      docsLabel: undefined as string | undefined,
+    }))
+    .with(ExtendedDocumentStatus.REJECTED, () => ({
+      title: msg`No rejected documents`,
+      message: msg`There are no rejected documents. Documents that a recipient declines to sign will appear here.`,
+      icon: XCircle,
+      docsHref: undefined as string | undefined,
+      docsLabel: undefined as string | undefined,
+    }))
+    .with(ExtendedDocumentStatus.EXPIRED, () => ({
+      title: msg`No expired documents`,
+      message: msg`There are no documents with expired signing links. You can redistribute a document to renew its expiration.`,
+      icon: TimerOff,
+      docsHref: undefined as string | undefined,
+      docsLabel: undefined as string | undefined,
+    }))
     .with(ExtendedDocumentStatus.ALL, () => ({
       title: msg`We're all empty`,
       message: msg`You have not yet created or received any documents. To create a document please upload one.`,
@@ -51,13 +71,13 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
 
   return (
     <div
-      className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4"
+      className="flex h-60 flex-col items-center justify-center gap-y-4 text-muted-foreground/60"
       data-testid="empty-document-state"
     >
       <Icon className="h-12 w-12" strokeWidth={1.5} />
 
       <div className="text-center">
-        <h3 className="text-lg font-semibold">{_(title)}</h3>
+        <h3 className="font-semibold text-lg">{_(title)}</h3>
 
         <p className="mt-2 max-w-[60ch]">{_(message)}</p>
 
@@ -66,7 +86,7 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
             href={docsHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-foreground/80 hover:text-foreground mt-4 inline-flex items-center gap-1.5 text-sm font-medium underline-offset-2 hover:underline"
+            className="mt-4 inline-flex items-center gap-1.5 font-medium text-foreground/80 text-sm underline-offset-2 hover:text-foreground hover:underline"
           >
             {docsLabel}
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

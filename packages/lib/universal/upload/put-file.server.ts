@@ -72,18 +72,23 @@ export const putNormalizedPdfFileServerSide = async (file: File, options: { flat
 
 /**
  * Uploads a file to the appropriate storage location.
- *
- * MODIFIED for BizRethink (overlay 013): transport selection consults the
- * BizrethinkInstanceStorageConfig singleton row before falling back to env.
  */
 export const putFileServerSide = async (file: File) => {
+  // MODIFIED for BizRethink (overlay 013): transport selection consults the
+  // DB-backed instance storage config (admin UI) before falling back to the
+  // env var. Note the DB config's transport union is 'database' | 's3' only —
+  // upstream's 'azure-blob' arm stays reachable through the env fallback when
+  // no DB row is set. Extend ForkStorageConfig if azure-blob ever needs to be
+  // selectable from the admin UI.
   const { getInstanceStorageConfig } = await import('@bizrethink/customizations/server-only/instance-storage-config');
+
   const dbConfig = await getInstanceStorageConfig();
 
   const transport = dbConfig?.transport ?? env('NEXT_PUBLIC_UPLOAD_TRANSPORT');
 
   return await match(transport)
-    .with('s3', async () => putFileInS3(file))
+    .with('s3', async () => putFileInObjectStorage(file))
+    .with('azure-blob', async () => putFileInObjectStorage(file))
     .otherwise(async () => putFileInDatabase(file));
 };
 
@@ -100,7 +105,7 @@ const putFileInDatabase = async (file: File) => {
   };
 };
 
-const putFileInS3 = async (file: File) => {
+const putFileInObjectStorage = async (file: File) => {
   const buffer = await file.arrayBuffer();
 
   const blob = new Blob([buffer], { type: file.type });

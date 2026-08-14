@@ -1,10 +1,9 @@
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
-import { OrganisationType } from '@prisma/client';
-
 import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
-import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
-
+import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
+import { OrganisationType } from '@prisma/client';
 import { adminProcedure } from '../trpc';
 import {
   ZCreateAdminOrganisationRequestSchema,
@@ -23,19 +22,19 @@ export const createAdminOrganisationRoute = adminProcedure
       },
     });
 
-    // MODIFIED for BizRethink (overlay 041): admin-created orgs default to PRO
-    // claim with 14-day trial. Admins promote orgs to BIZRETHINK tier by
-    // flipping bizrethinkInternal=true via the admin override panel (Phase 3)
-    // or direct DB update for now. Keeping admin route external-by-default
-    // avoids accidentally minting BIZRETHINK-tier orgs for non-team users.
+    // MODIFIED for BizRethink (overlay 041): admin-created orgs get the PRO
+    // claim with a 14-day trial instead of FREE, matching the public signup
+    // path. The trial-expire-sweep cron downgrades to FREE on expiry.
+    const proSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.PRO);
+
     const organisation = await createOrganisation({
       userId: ownerUserId,
       name: data.name,
       type: OrganisationType.ORGANISATION,
-      claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
+      claim: proSubscriptionClaim,
     });
 
-    // BizRethink (overlay 041): record trial window for the new org.
+    // BizRethink (overlay 041): record the trial window for the new org.
     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
       console.error('[bizrethink] startTrialForNewOrg failed', err);
     });

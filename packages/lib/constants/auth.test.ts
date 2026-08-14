@@ -40,8 +40,27 @@ describe('ZNameSchema', () => {
     expect(ZNameSchema.parse('  Alice  ')).toBe('Alice');
   });
 
-  it('rejects names shorter than 3 chars (post-trim)', () => {
-    expect(ZNameSchema.safeParse('Al').success).toBe(false);
+  // Upstream #2978 (adopted in the 2026-08-13 sync) moved ZNameSchema to
+  // packages/lib/types/name.ts and deliberately relaxed the minimum from 3 to 2
+  // characters while adding invisible/control-character rejection. The old
+  // min(3) was upstream's value at our fork point, never a BizRethink choice —
+  // so we adopt the new bound rather than pin the stale one. The assertions stay
+  // strict on both sides of the boundary.
+  it('rejects names shorter than 2 chars (post-trim)', () => {
+    expect(ZNameSchema.safeParse('A').success).toBe(false);
+    expect(ZNameSchema.safeParse('  A  ').success).toBe(false);
+  });
+
+  it('accepts a 2-char name (upstream #2978 bound)', () => {
+    expect(ZNameSchema.safeParse('Al').success).toBe(true);
+  });
+
+  it('rejects names with invisible/control characters (upstream #2978)', () => {
+    expect(ZNameSchema.safeParse('Jane​Doe').success).toBe(false);
+  });
+
+  it('rejects names longer than 100 chars (upstream #2978)', () => {
+    expect(ZNameSchema.safeParse('a'.repeat(101)).success).toBe(false);
   });
 
   it('rejects names containing a URL (phishing guard)', () => {
