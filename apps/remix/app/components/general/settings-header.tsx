@@ -1,8 +1,7 @@
-import React from 'react';
+import { cn } from '@documenso/ui/lib/utils';
 
 import { ArrowRight } from 'lucide-react';
-
-import { cn } from '@documenso/ui/lib/utils';
+import type React from 'react';
 
 // MODIFIED for BizRethink (overlay 061): optional `docsHref` prop renders
 // a "Learn more →" link below the subtitle pointing at a relevant article
@@ -33,9 +32,9 @@ export const SettingsHeader = ({
 }: SettingsHeaderProps) => {
   return (
     <>
-      <div className={cn('flex flex-row items-center justify-between', className)}>
+      <div className={cn('mb-4 flex flex-row items-center justify-between', className)}>
         <div>
-          <h3 className="text-lg font-medium">{title}</h3>
+          <h2 className="font-bold text-xl">{title}</h2>
 
           <p className="text-muted-foreground text-sm md:mt-2">{subtitle}</p>
 
@@ -44,7 +43,7 @@ export const SettingsHeader = ({
               href={docsHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground/70 hover:text-foreground mt-2 inline-flex items-center gap-1 text-xs font-medium underline-offset-2 hover:underline"
+              className="mt-2 inline-flex items-center gap-1 font-medium text-foreground/70 text-xs underline-offset-2 hover:text-foreground hover:underline"
             >
               {docsLabel}
               <ArrowRight className="h-3 w-3" aria-hidden="true" />
@@ -55,7 +54,7 @@ export const SettingsHeader = ({
         {children}
       </div>
 
-      {!hideDivider && <hr className="my-4" />}
+      {!hideDivider && <hr className="mb-4" />}
     </>
   );
 };

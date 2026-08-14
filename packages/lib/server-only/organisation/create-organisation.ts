@@ -1,18 +1,14 @@
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
-import { Prisma } from '@prisma/client';
-import { OrganisationType } from '@prisma/client';
-import { OrganisationMemberRole } from '@prisma/client';
-
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
+import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
 import { prisma } from '@documenso/prisma';
+import { OrganisationMemberRole, OrganisationType, Prisma, type SubscriptionClaim } from '@prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
-import { AppErrorCode } from '../../errors/app-error';
-import { AppError } from '../../errors/app-error';
-import type { InternalClaim } from '../../types/subscription';
-import { INTERNAL_CLAIM_ID, internalClaims } from '../../types/subscription';
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import { INTERNAL_CLAIM_ID } from '../../types/subscription';
 import { generateDatabaseId, prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
 import { createTeam } from '../team/create-team';
@@ -23,17 +19,10 @@ type CreateOrganisationOptions = {
   type: OrganisationType;
   url?: string;
   customerId?: string;
-  claim: InternalClaim;
+  claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 };
 
-export const createOrganisation = async ({
-  name,
-  url,
-  type,
-  userId,
-  customerId,
-  claim,
-}: CreateOrganisationOptions) => {
+export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
   let customerIdToUse = customerId;
 
   if (!customerId && IS_BILLING_ENABLED()) {
@@ -123,9 +112,7 @@ export const createOrganisation = async ({
         throw err;
       });
 
-    const adminGroup = organisation.groups.find(
-      (group) => group.organisationRole === OrganisationMemberRole.ADMIN,
-    );
+    const adminGroup = organisation.groups.find((group) => group.organisationRole === OrganisationMemberRole.ADMIN);
 
     if (!adminGroup) {
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
@@ -166,16 +153,20 @@ export const createPersonalOrganisation = async ({
   inheritMembers = true,
   type = OrganisationType.PERSONAL,
 }: CreatePersonalOrganisationOptions) => {
-  // MODIFIED for BizRethink (overlay 041): route new external orgs to PRO claim
-  // with a 14-day trial. Internal orgs (BizRethink-operated) are created
-  // separately or get bizrethinkInternal=true stamped via admin/migration; this
-  // path is always external because it's called on every public signup.
+  // MODIFIED for BizRethink (overlay 041): route new external orgs to the PRO
+  // claim with a 14-day trial instead of FREE. Internal orgs (BizRethink-operated)
+  // are created separately or get bizrethinkInternal=true stamped via
+  // admin/migration; this path is always external because it's called on every
+  // public signup. Sourced via getSubscriptionClaim (upstream's new DB-backed
+  // accessor) so the claim carries the real quota/rate-limit columns.
+  const proSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.PRO);
+
   const organisation = await createOrganisation({
     name: 'Personal Organisation',
     userId,
     url: orgUrl,
     type,
-    claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
+    claim: proSubscriptionClaim,
   }).catch((err) => {
     console.error(err);
 
@@ -213,19 +204,27 @@ export const createPersonalOrganisation = async ({
   return organisation;
 };
 
-export const createOrganisationClaimUpsertData = (subscriptionClaim: InternalClaim) => {
+export const createOrganisationClaimUpsertData = (
+  subscriptionClaim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>,
+) => {
   // Done like this to ensure type errors are thrown if items are added.
-  const data: Omit<
-    Prisma.SubscriptionClaimCreateInput,
-    'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'
-  > = {
-    flags: {
-      ...subscriptionClaim.flags,
-    },
-    envelopeItemCount: subscriptionClaim.envelopeItemCount,
-    teamCount: subscriptionClaim.teamCount,
-    memberCount: subscriptionClaim.memberCount,
-  };
+  const data: Omit<Prisma.SubscriptionClaimUncheckedCreateInput, 'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'> =
+    {
+      flags: {
+        ...subscriptionClaim.flags,
+      },
+      envelopeItemCount: subscriptionClaim.envelopeItemCount,
+      recipientCount: subscriptionClaim.recipientCount,
+      teamCount: subscriptionClaim.teamCount,
+      memberCount: subscriptionClaim.memberCount,
+      documentRateLimits: subscriptionClaim.documentRateLimits ?? [],
+      documentQuota: subscriptionClaim.documentQuota,
+      emailRateLimits: subscriptionClaim.emailRateLimits ?? [],
+      emailQuota: subscriptionClaim.emailQuota,
+      apiRateLimits: subscriptionClaim.apiRateLimits ?? [],
+      apiQuota: subscriptionClaim.apiQuota,
+      emailTransportId: subscriptionClaim.emailTransportId ?? null,
+    };
 
   return {
     ...data,

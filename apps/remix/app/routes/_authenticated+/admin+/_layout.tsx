@@ -1,5 +1,12 @@
+import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
+import { cn } from '@documenso/ui/lib/utils';
+import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
+import type { LucideIcon } from 'lucide-react';
 import {
   AlertTriangleIcon,
   BarChart3,
@@ -10,6 +17,7 @@ import {
   FileStack,
   KeyIcon,
   KeyRoundIcon,
+  LineChartIcon,
   LogInIcon,
   MailIcon,
   ScrollTextIcon,
@@ -19,15 +27,7 @@ import {
   Users,
   Wallet2,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
-
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
-import { isAdmin } from '@documenso/lib/utils/is-admin';
-import { cn } from '@documenso/ui/lib/utils';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
 
 import { AdminLicenseStatusBanner } from '~/components/general/admin-license-status-banner';
 import { appMetaTags } from '~/utils/meta';
@@ -80,6 +80,13 @@ const NAV_GROUPS: NavGroupDef[] = [
         label: <Trans>Organisation Insights</Trans>,
         href: '/admin/organisation-insights',
         icon: Trophy,
+        bizrethink: false,
+      },
+      {
+        // Upstream route added 2026-08 sync — not a BizRethink overlay.
+        label: <Trans>Organisation Stats</Trans>,
+        href: '/admin/organisation-stats',
+        icon: LineChartIcon,
         bizrethink: false,
       },
       {
@@ -153,6 +160,13 @@ const NAV_GROUPS: NavGroupDef[] = [
     heading: <Trans>Configuration</Trans>,
     items: [
       {
+        // Upstream route added 2026-08 sync — not a BizRethink overlay.
+        label: <Trans>Email Transports</Trans>,
+        href: '/admin/email-transports',
+        icon: MailIcon,
+        bizrethink: false,
+      },
+      {
         label: <Trans>Site Settings</Trans>,
         href: '/admin/site-settings',
         icon: Settings,
@@ -198,7 +212,7 @@ const NavItem = ({ item, pathname }: { item: NavItemDef; pathname: string | unde
       <div
         className={cn(
           'flex items-center justify-start gap-2 px-3 py-2 text-sm',
-          'text-muted-foreground cursor-not-allowed opacity-60',
+          'cursor-not-allowed text-muted-foreground opacity-60',
         )}
         aria-disabled="true"
         title="Coming soon"
@@ -218,11 +232,7 @@ const NavItem = ({ item, pathname }: { item: NavItemDef; pathname: string | unde
   }
 
   return (
-    <Button
-      variant="ghost"
-      className={cn('justify-start md:w-full', isActive && 'bg-secondary')}
-      asChild
-    >
+    <Button variant="ghost" className={cn('justify-start md:w-full', isActive && 'bg-secondary')} asChild>
       <Link to={item.href}>
         <Icon className="mr-2 h-5 w-5" />
         <span className="flex-1 truncate text-left">{item.label}</span>
@@ -238,7 +248,7 @@ const NavItem = ({ item, pathname }: { item: NavItemDef; pathname: string | unde
 
 const NavGroup = ({ group, pathname }: { group: NavGroupDef; pathname: string | undefined }) => (
   <div className="flex flex-col gap-1">
-    <div className="text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wider uppercase">
+    <div className="px-3 pt-3 pb-1 font-semibold text-muted-foreground text-xs uppercase tracking-wider">
       {group.heading}
     </div>
     {group.items.map((item) => (
@@ -273,7 +283,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <AdminLicenseStatusBanner license={license} />
 
-      <h1 className="text-4xl font-semibold">
+      <h1 className="font-semibold text-4xl">
         <Trans>Admin Panel</Trans>
       </h1>
 

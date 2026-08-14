@@ -1,9 +1,16 @@
-import { useState } from 'react';
-
+import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
+import type { TCachedLicense } from '@documenso/lib/types/license';
+import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
+import { trpc } from '@documenso/trpc/react';
+import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 import { Trans, useLingui } from '@lingui/react/macro';
 import {
   ArrowRightIcon,
   CheckCircle2Icon,
+  CopyIcon,
   EyeIcon,
   EyeOffIcon,
   KeyRoundIcon,
@@ -12,21 +19,9 @@ import {
   XCircleIcon,
 } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { useState } from 'react';
 import { Link, useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
-
-import type { TCachedLicense } from '@documenso/lib/types/license';
-import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
-import { trpc } from '@documenso/trpc/react';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { CardMetric } from './metric-card';
 
@@ -36,6 +31,8 @@ type AdminLicenseCardProps = {
 
 export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
   const { t, i18n } = useLingui();
+  const { toast } = useToast();
+  const [, copy] = useCopyToClipboard();
   const [isLicenseKeyVisible, setIsLicenseKeyVisible] = useState(false);
 
   const { license } = licenseData || {};
@@ -48,21 +45,21 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
         </div>
         <CardMetric icon={KeyRoundIcon} title={t`License`} className="h-fit max-h-fit">
           <div className="mt-1 flex items-center justify-center gap-2">
-            <div className="border-muted-foreground/30 bg-muted/50 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed">
-              <KeyRoundIcon className="text-muted-foreground/50 h-5 w-5" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-muted-foreground/30 border-dashed bg-muted/50">
+              <KeyRoundIcon className="h-5 w-5 text-muted-foreground/50" />
             </div>
 
             <div className="flex flex-col gap-0.5">
               {licenseData?.requestedLicenseKey ? (
                 <>
-                  <p className="text-destructive text-sm font-medium">
+                  <p className="font-medium text-destructive text-sm">
                     <Trans>Invalid License Key</Trans>
                   </p>
                   {/* Don't need to hide invalid license keys. */}
                   <p className="text-muted-foreground text-xs">{licenseData.requestedLicenseKey}</p>
                 </>
               ) : (
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="font-medium text-muted-foreground text-sm">
                   <Trans>No License Configured</Trans>
                 </p>
               )}
@@ -71,7 +68,7 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
               <Link
                 to="https://pacta.ink/docs/getting-started/choose-a-plan"
                 target="_blank"
-                className="text-muted-foreground hover:text-muted-foreground/80 flex flex-row items-center text-xs"
+                className="flex flex-row items-center text-muted-foreground text-xs hover:text-muted-foreground/80"
               >
                 <Trans>Learn more</Trans> <ArrowRightIcon className="h-3 w-3" />
               </Link>
@@ -85,17 +82,18 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
   const enabledFlags = Object.entries(license.flags).filter(([, enabled]) => enabled);
 
   return (
-    <div className="border-border bg-background hover:shadow-border/80 relative max-w-full overflow-hidden rounded-lg border px-4 pt-4 pb-6 shadow shadow-transparent duration-200">
+    <div className="relative max-w-full overflow-hidden rounded-lg border border-border bg-background px-4 pt-4 pb-6 shadow shadow-transparent duration-200 hover:shadow-border/80">
       <div className="absolute top-3 right-3">
         <AdminLicenseResyncButton />
       </div>
 
       <div className="flex items-start gap-2">
         <div className="h-4 w-4">
-          <KeyRoundIcon className="text-muted-foreground h-4 w-4" />
+          <KeyRoundIcon className="h-4 w-4 text-muted-foreground" />
         </div>
 
-        <h3 className="text-primary-forground mb-2 flex items-end text-sm leading-tight font-medium">
+        <h3 className="mb-2 flex items-end font-medium text-foreground text-sm leading-tight">
+          {/* MODIFIED for BizRethink (overlay 024): copy rebrand. */}
           <Trans>Pacta License</Trans>
         </h3>
 
@@ -123,27 +121,25 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
 
       <div className="mt-4 grid grid-cols-2 gap-4">
         <div>
-          <p className="text-foreground text-sm font-medium">
+          <p className="font-medium text-foreground text-sm">
             <Trans>License</Trans>
           </p>
-          <p className="text-muted-foreground mt-0.5 text-xs">{license.name}</p>
+          <p className="mt-0.5 text-muted-foreground text-xs">{license.name}</p>
         </div>
 
         <div>
-          <p className="text-foreground text-sm font-medium">
+          <p className="font-medium text-foreground text-sm">
             <Trans>Expires</Trans>
           </p>
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            {i18n.date(license.periodEnd, DateTime.DATE_MED)}
-          </p>
+          <p className="mt-0.5 text-muted-foreground text-xs">{i18n.date(license.periodEnd, DateTime.DATE_MED)}</p>
         </div>
 
         <div>
-          <p className="text-foreground text-sm font-medium">
+          <p className="font-medium text-foreground text-sm">
             <Trans>License Key</Trans>
           </p>
           <div className="mt-0.5 flex items-center gap-1">
-            <p className="text-muted-foreground min-w-0 text-xs break-all">
+            <p className="min-w-0 break-all text-muted-foreground text-xs">
               {isLicenseKeyVisible ? license.licenseKey : '•'.repeat(license.licenseKey.length)}
             </p>
 
@@ -151,24 +147,38 @@ export const AdminLicenseCard = ({ licenseData }: AdminLicenseCardProps) => {
               type="button"
               variant="ghost"
               size="sm"
-              className="text-muted-foreground h-6 w-6 p-0"
+              className="h-6 w-6 p-0 text-muted-foreground"
               aria-label={isLicenseKeyVisible ? t`Hide license key` : t`Show license key`}
               onClick={() => setIsLicenseKeyVisible((prevState) => !prevState)}
             >
-              {isLicenseKeyVisible ? (
-                <EyeOffIcon className="h-3.5 w-3.5" />
-              ) : (
-                <EyeIcon className="h-3.5 w-3.5" />
-              )}
+              {isLicenseKeyVisible ? <EyeOffIcon className="h-3.5 w-3.5" /> : <EyeIcon className="h-3.5 w-3.5" />}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-muted-foreground"
+              aria-label={t`Copy license key`}
+              onClick={async () =>
+                copy(license.licenseKey).then(() => {
+                  toast({
+                    title: t`Copied to clipboard`,
+                    description: t`The license key has been copied to your clipboard`,
+                  });
+                })
+              }
+            >
+              <CopyIcon className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
 
         <div>
-          <p className="text-foreground text-sm font-medium">
+          <p className="font-medium text-foreground text-sm">
             <Trans>Features</Trans>
           </p>
-          <p className="text-muted-foreground mt-0.5 text-xs">
+          <p className="mt-0.5 text-muted-foreground text-xs">
             {enabledFlags.length > 0 ? (
               enabledFlags
                 .map(
@@ -194,22 +204,21 @@ const AdminLicenseResyncButton = () => {
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
-  const { mutate: resyncLicense, isPending: isResyncingLicense } =
-    trpc.admin.license.resync.useMutation({
-      onSuccess: async () => {
-        toast({
-          title: t`License synced`,
-        });
+  const { mutate: resyncLicense, isPending: isResyncingLicense } = trpc.admin.license.resync.useMutation({
+    onSuccess: async () => {
+      toast({
+        title: t`License synced`,
+      });
 
-        await revalidate();
-      },
-      onError: () => {
-        toast({
-          title: t`Failed to sync license`,
-          variant: 'destructive',
-        });
-      },
-    });
+      await revalidate();
+    },
+    onError: () => {
+      toast({
+        title: t`Failed to sync license`,
+        variant: 'destructive',
+      });
+    },
+  });
 
   return (
     <TooltipProvider>

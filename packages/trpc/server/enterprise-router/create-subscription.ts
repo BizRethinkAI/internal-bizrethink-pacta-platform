@@ -3,7 +3,7 @@ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer
 // MODIFIED for BizRethink (overlay 051): DB-aware billing gate so the
 // Stripe-config-in-admin-UI flow (overlay 045) actually unlocks the
 // in-app upgrade flow.
-import { NEXT_PUBLIC_WEBAPP_URL, isBillingEnabledFromConfig } from '@documenso/lib/constants/app';
+import { isBillingEnabledFromConfig, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
@@ -15,7 +15,7 @@ import { ZCreateSubscriptionRequestSchema } from './create-subscription.types';
 export const createSubscriptionRoute = authenticatedProcedure
   .input(ZCreateSubscriptionRequestSchema)
   .mutation(async ({ ctx, input }) => {
-    const { organisationId, priceId, isPersonalLayoutMode } = input;
+    const { organisationId, priceId } = input;
 
     ctx.logger.info({
       input: {
@@ -73,9 +73,7 @@ export const createSubscriptionRoute = authenticatedProcedure
       });
     }
 
-    const returnUrl = isPersonalLayoutMode
-      ? `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing-personal`
-      : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
+    const returnUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
 
     const redirectUrl = await createCheckoutSession({
       customerId,

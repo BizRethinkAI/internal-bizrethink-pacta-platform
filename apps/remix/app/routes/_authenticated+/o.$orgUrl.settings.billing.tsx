@@ -1,14 +1,15 @@
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import { trpc } from '@documenso/trpc/react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
 import { AlertTriangle, Loader, ShieldCheck, Sparkles } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router';
 import type Stripe from 'stripe';
-import { P, match } from 'ts-pattern';
-
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
-import { trpc } from '@documenso/trpc/react';
+import { match, P } from 'ts-pattern';
 
 import { BillingPlans } from '~/components/general/billing-plans';
 import { OrganisationBillingPortalButton } from '~/components/general/organisations/organisation-billing-portal-button';
@@ -28,12 +29,12 @@ function PactaBillingBanner({ organisationId }: { organisationId: string }) {
 
   if (data.bizrethinkInternal) {
     return (
-      <div className="mb-4 flex items-center gap-3 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-100">
+      <div className="mb-4 flex items-center gap-3 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-blue-900 text-sm dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-100">
         <ShieldCheck className="h-4 w-4 flex-shrink-0" />
         <p>
           <Trans>
-            <span className="font-semibold">BizRethink Internal.</span> This organisation is
-            operated directly by BizRethink AI and is not subject to standard SaaS billing.
+            <span className="font-semibold">BizRethink Internal.</span> This organisation is operated directly by
+            BizRethink AI and is not subject to standard SaaS billing.
           </Trans>
         </p>
       </div>
@@ -58,12 +59,12 @@ function PactaBillingBanner({ organisationId }: { organisationId: string }) {
 
   if (trialEndsAtMs <= now) {
     return (
-      <div className="mb-4 flex items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-100">
+      <div className="mb-4 flex items-center gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-900 text-sm dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-100">
         <AlertTriangle className="h-4 w-4 flex-shrink-0" />
         <p>
           <Trans>
-            <span className="font-semibold">Your Pro trial has ended.</span> Upgrade below to keep
-            Pro features, or your organisation will be downgraded to the Free plan.
+            <span className="font-semibold">Your Pro trial has ended.</span> Upgrade below to keep Pro features, or your
+            organisation will be downgraded to the Free plan.
           </Trans>
         </p>
       </div>
@@ -76,15 +77,13 @@ function PactaBillingBanner({ organisationId }: { organisationId: string }) {
     : 'border-indigo-200 bg-indigo-50 text-indigo-900 dark:border-indigo-900/40 dark:bg-indigo-950/30 dark:text-indigo-100';
 
   return (
-    <div
-      className={`mb-4 flex items-center gap-3 rounded-md border px-4 py-3 text-sm ${colorClasses}`}
-    >
+    <div className={`mb-4 flex items-center gap-3 rounded-md border px-4 py-3 text-sm ${colorClasses}`}>
       <Sparkles className="h-4 w-4 flex-shrink-0" />
       <p>
         <Trans>
           <span className="font-semibold">Pro trial active</span> — {daysRemaining}{' '}
-          {daysRemaining === 1 ? 'day' : 'days'} remaining. Add a payment method below to keep Pro
-          features after the trial ends.
+          {daysRemaining === 1 ? 'day' : 'days'} remaining. Add a payment method below to keep Pro features after the
+          trial ends.
         </Trans>
       </p>
     </div>
@@ -100,25 +99,61 @@ export default function TeamsSettingBillingPage() {
 
   const organisation = useCurrentOrganisation();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const utils = trpc.useUtils();
+
   const { data: subscriptionQuery, isLoading: isLoadingSubscription } =
     trpc.enterprise.billing.subscription.get.useQuery({
       organisationId: organisation.id,
     });
 
-  if (isLoadingSubscription || !subscriptionQuery) {
+  const { mutateAsync: syncSubscription, isPending: isSyncingSubscription } =
+    trpc.enterprise.billing.subscription.sync.useMutation();
+
+  const hasTriggeredCheckoutSyncRef = useRef(false);
+
+  const isCheckoutSuccess = searchParams.get('success') === 'true';
+
+  /**
+   * Eagerly sync the subscription from Stripe when returning from a successful
+   * checkout, since the webhook may not have arrived yet.
+   */
+  useEffect(() => {
+    if (!isCheckoutSuccess || hasTriggeredCheckoutSyncRef.current) {
+      return;
+    }
+
+    hasTriggeredCheckoutSyncRef.current = true;
+
+    void syncSubscription({ organisationId: organisation.id })
+      .catch(() => {
+        // Non-fatal, webhooks will converge the subscription state shortly.
+      })
+      .finally(() => {
+        void utils.enterprise.billing.invalidate();
+
+        setSearchParams(
+          (params) => {
+            params.delete('success');
+
+            return params;
+          },
+          { replace: true },
+        );
+      });
+  }, [isCheckoutSuccess, organisation.id]);
+
+  if (isLoadingSubscription || !subscriptionQuery || isSyncingSubscription) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   const { subscription, plans } = subscriptionQuery;
 
-  const canManageBilling = canExecuteOrganisationAction(
-    'MANAGE_BILLING',
-    organisation.currentOrganisationRole,
-  );
+  const canManageBilling = canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole);
 
   const { organisationSubscription, stripeSubscription } = subscription || {};
 
@@ -133,11 +168,11 @@ export default function TeamsSettingBillingPage() {
 
       <div className="flex flex-row items-end justify-between">
         <div>
-          <h3 className="text-2xl font-semibold">
+          <h3 className="font-semibold text-2xl">
             <Trans>Billing</Trans>
           </h3>
 
-          <div className="text-muted-foreground mt-2 text-sm">
+          <div className="mt-2 text-muted-foreground text-sm">
             {!organisationSubscription && (
               <p>
                 <Trans>
@@ -151,45 +186,37 @@ export default function TeamsSettingBillingPage() {
                 .with('ACTIVE', () => (
                   <p>
                     {match(organisationSubscription)
-                      .with(
-                        { cancelAtPeriodEnd: true, periodEnd: P.nonNullable },
-                        ({ periodEnd }) =>
-                          currentProductName ? (
-                            <Trans>
-                              You are currently subscribed to{' '}
-                              <span className="font-semibold">{currentProductName}</span> which is
-                              set to end on{' '}
-                              <span className="font-semibold">{i18n.date(periodEnd)}</span>.
-                            </Trans>
-                          ) : (
-                            <Trans>
-                              You currently have an active plan which is set to end on{' '}
-                              <span className="font-semibold">{i18n.date(periodEnd)}</span>.
-                            </Trans>
-                          ),
+                      .with({ cancelAtPeriodEnd: true, periodEnd: P.nonNullable }, ({ periodEnd }) =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to <span className="font-semibold">{currentProductName}</span>{' '}
+                            which is set to end on <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
+                        ) : (
+                          <Trans>
+                            You currently have an active plan which is set to end on{' '}
+                            <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
+                        ),
                       )
-                      .with(
-                        { cancelAtPeriodEnd: false, periodEnd: P.nonNullable },
-                        ({ periodEnd }) =>
-                          currentProductName ? (
-                            <Trans>
-                              You are currently subscribed to{' '}
-                              <span className="font-semibold">{currentProductName}</span> which is
-                              set to automatically renew on{' '}
-                              <span className="font-semibold">{i18n.date(periodEnd)}</span>.
-                            </Trans>
-                          ) : (
-                            <Trans>
-                              You currently have an active plan which is set to automatically renew
-                              on <span className="font-semibold">{i18n.date(periodEnd)}</span>.
-                            </Trans>
-                          ),
+                      .with({ cancelAtPeriodEnd: false, periodEnd: P.nonNullable }, ({ periodEnd }) =>
+                        currentProductName ? (
+                          <Trans>
+                            You are currently subscribed to <span className="font-semibold">{currentProductName}</span>{' '}
+                            which is set to automatically renew on{' '}
+                            <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
+                        ) : (
+                          <Trans>
+                            You currently have an active plan which is set to automatically renew on{' '}
+                            <span className="font-semibold">{i18n.date(periodEnd)}</span>.
+                          </Trans>
+                        ),
                       )
                       .otherwise(() =>
                         currentProductName ? (
                           <Trans>
-                            You are currently subscribed to{' '}
-                            <span className="font-semibold">{currentProductName}</span>.
+                            You are currently subscribed to <span className="font-semibold">{currentProductName}</span>.
                           </Trans>
                         ) : (
                           <Trans>You currently have an active plan.</Trans>
@@ -201,8 +228,8 @@ export default function TeamsSettingBillingPage() {
                   <p>
                     {currentProductName ? (
                       <Trans>
-                        You currently have an inactive{' '}
-                        <span className="font-semibold">{currentProductName}</span> subscription.
+                        You currently have an inactive <span className="font-semibold">{currentProductName}</span>{' '}
+                        subscription.
                       </Trans>
                     ) : (
                       <Trans>Your current plan is inactive.</Trans>
@@ -213,8 +240,7 @@ export default function TeamsSettingBillingPage() {
                   <p>
                     {currentProductName ? (
                       <Trans>
-                        Your current {currentProductName} plan is past due. Please update your
-                        payment information.
+                        Your current {currentProductName} plan is past due. Please update your payment information.
                       </Trans>
                     ) : (
                       <Trans>Your current plan is past due.</Trans>
@@ -230,15 +256,11 @@ export default function TeamsSettingBillingPage() {
 
       <hr className="my-4" />
 
-      {(!subscription ||
-        subscription.organisationSubscription.status === SubscriptionStatus.INACTIVE) &&
+      {(!subscription || subscription.organisationSubscription.status === SubscriptionStatus.INACTIVE) &&
         canManageBilling && <BillingPlans plans={plans} />}
 
       <section className="mt-6">
-        <OrganisationBillingInvoicesTable
-          organisationId={organisation.id}
-          subscriptionExists={Boolean(subscription)}
-        />
+        <OrganisationBillingInvoicesTable organisationId={organisation.id} subscriptionExists={Boolean(subscription)} />
       </section>
     </div>
   );

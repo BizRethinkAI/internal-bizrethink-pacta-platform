@@ -34,6 +34,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     new Konva.Text({
       id: `${field.renderId}-text`,
       name: 'field-text',
+      listening: false,
     });
 
   // Calculate text positioning based on alignment
@@ -124,10 +125,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   return fieldText;
 };
 
-export const renderGenericTextFieldElement = (
-  field: FieldToRender,
-  options: RenderFieldElementOptions,
-) => {
+export const renderGenericTextFieldElement = (field: FieldToRender, options: RenderFieldElementOptions) => {
   const { mode = 'edit', pageLayer, color } = options;
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);

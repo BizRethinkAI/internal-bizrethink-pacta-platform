@@ -1,7 +1,7 @@
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 // MODIFIED for BizRethink (overlay 051): DB-aware billing gate.
-import { NEXT_PUBLIC_WEBAPP_URL, isBillingEnabledFromConfig } from '@documenso/lib/constants/app';
+import { isBillingEnabledFromConfig, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
@@ -13,7 +13,7 @@ import { ZManageSubscriptionRequestSchema } from './manage-subscription.types';
 export const manageSubscriptionRoute = authenticatedProcedure
   .input(ZManageSubscriptionRequestSchema)
   .mutation(async ({ ctx, input }) => {
-    const { organisationId, isPersonalLayoutMode } = input;
+    const { organisationId } = input;
 
     ctx.logger.info({
       input: {
@@ -94,9 +94,7 @@ export const manageSubscriptionRoute = authenticatedProcedure
       });
     }
 
-    const returnUrl = isPersonalLayoutMode
-      ? `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing-personal`
-      : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
+    const returnUrl = `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
 
     const redirectUrl = await getPortalSession({
       customerId,

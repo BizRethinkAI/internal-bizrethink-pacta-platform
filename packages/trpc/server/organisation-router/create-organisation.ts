@@ -1,21 +1,16 @@
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
-import { OrganisationType } from '@prisma/client';
-
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
-import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
-import { generateStripeOrganisationCreateMetadata } from '@documenso/lib/utils/billing';
+import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
-
+import { OrganisationType, SubscriptionStatus } from '@prisma/client';
 import { authenticatedProcedure } from '../trpc';
-import {
-  ZCreateOrganisationRequestSchema,
-  ZCreateOrganisationResponseSchema,
-} from './create-organisation.types';
+import { ZCreateOrganisationRequestSchema, ZCreateOrganisationResponseSchema } from './create-organisation.types';
 
 export const createOrganisationRoute = authenticatedProcedure
   // .meta(createOrganisationMeta)
@@ -49,18 +44,67 @@ export const createOrganisationRoute = authenticatedProcedure
       }
     }
 
-    // Create checkout session for payment.
+    // Create the organisation upfront, then redirect to checkout for payment.
+    // The webhook sync will attach the real subscription and claim after payment.
     if (IS_BILLING_ENABLED() && priceId) {
-      const customer = await createCustomer({
-        email: user.email,
-        name: user.name || user.email,
+      const pendingOrganisation = await prisma.organisation.findFirst({
+        where: {
+          ownerUserId: user.id,
+          type: OrganisationType.ORGANISATION,
+          OR: [
+            {
+              subscription: {
+                is: null,
+              },
+            },
+            {
+              subscription: {
+                status: SubscriptionStatus.INACTIVE,
+              },
+            },
+          ],
+        },
       });
+
+      if (pendingOrganisation) {
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+          message: 'You have a pending organisation awaiting payment. Complete or remove it before creating a new one.',
+        });
+      }
+
+      const freeSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.FREE);
+
+      const organisation = await createOrganisation({
+        userId: user.id,
+        name,
+        type: OrganisationType.ORGANISATION,
+        claim: freeSubscriptionClaim,
+      });
+
+      let customerId = organisation.customerId;
+
+      if (!customerId) {
+        const customer = await createCustomer({
+          email: user.email,
+          name: user.name || user.email,
+        });
+
+        customerId = customer.id;
+
+        await prisma.organisation.update({
+          where: {
+            id: organisation.id,
+          },
+          data: {
+            customerId,
+          },
+        });
+      }
 
       const checkoutUrl = await createCheckoutSession({
         priceId,
-        customerId: customer.id,
-        returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/settings/organisations`,
-        subscriptionMetadata: generateStripeOrganisationCreateMetadata(name, user.id),
+        customerId,
+        returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`,
       });
 
       return {
@@ -70,21 +114,24 @@ export const createOrganisationRoute = authenticatedProcedure
     }
 
     // Free organisations should be Personal by default.
-    const organisationType = IS_BILLING_ENABLED()
-      ? OrganisationType.PERSONAL
-      : OrganisationType.ORGANISATION;
+    const organisationType = IS_BILLING_ENABLED() ? OrganisationType.PERSONAL : OrganisationType.ORGANISATION;
 
-    // MODIFIED for BizRethink (overlay 041): assign PRO claim with 14-day trial
-    // instead of BIZRETHINK. New external orgs experience Pro features during
-    // the trial window; trial-expire-sweep cron downgrades to FREE on expiry.
+    // MODIFIED for BizRethink (overlay 041): assign the PRO claim with a 14-day
+    // trial instead of FREE. New external orgs experience Pro features during
+    // the trial window; the trial-expire-sweep cron downgrades to FREE on expiry.
+    // Only the free/non-billing tail is affected — the paid checkout branch above
+    // keeps upstream's FREE claim, since the real claim attaches via the Stripe
+    // webhook after payment.
+    const proSubscriptionClaim = await getSubscriptionClaim(INTERNAL_CLAIM_ID.PRO);
+
     const organisation = await createOrganisation({
       userId: user.id,
       name,
       type: organisationType,
-      claim: internalClaims[INTERNAL_CLAIM_ID.PRO],
+      claim: proSubscriptionClaim,
     });
 
-    // BizRethink (overlay 041): record trial window for the new org.
+    // BizRethink (overlay 041): record the trial window for the new org.
     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
       console.error('[bizrethink] startTrialForNewOrg failed', err);
     });
