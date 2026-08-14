@@ -12,7 +12,14 @@ concurrency:
 jobs:
   e2e_tests:
     name: 'E2E Tests'
-    timeout-minutes: 60
+    # overlay 061 (2026-08-13, second revision): raised from 60 to 120.
+    # The curated suite took 51 min on the green baseline, and the 142-commit
+    # upstream sync pushed it past the 60 min cap — GitHub killed the job
+    # mid-run, which reports neither pass nor fail and silently darkens the
+    # gate. This fork runs on a 2-core ubuntu-latest instead of upstream's
+    # 8-core WarpBuild box, so our wall-clock is structurally higher.
+    # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
+    timeout-minutes: 120
     # overlay 061 (2026-08-13): upstream runs Playwright on WarpBuild
     # (warp-ubuntu-2204-x64-8x). This fork has no WarpBuild runner integration,
     # so that label sat queued forever and silently disabled the E2E gate.
@@ -57,3 +64,8 @@ jobs:
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      # Stream task output instead of buffering it. Turbo's buffered mode
+      # discards output when a task is killed, so the 2026-08-13 capped run
+      # produced 53 min of total silence and "slow" was indistinguishable
+      # from "hung". Streaming keeps a stalled run diagnosable from the log.
+      TURBO_LOG_ORDER: stream
