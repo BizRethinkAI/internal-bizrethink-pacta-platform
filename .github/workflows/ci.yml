@@ -11,6 +11,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+# MODIFIED for BizRethink (security hardening 2026-05-26): default-deny
+# GITHUB_TOKEN scope. Both jobs only need to checkout code; neither writes
+# to the repo, posts comments, or triggers downstream workflows. Closes
+# CodeQL alerts #4 and #12 (actions/missing-workflow-permissions).
+permissions:
+  contents: read
+
 jobs:
   build_app:
     name: Build App
