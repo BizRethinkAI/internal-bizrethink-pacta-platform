@@ -240,11 +240,44 @@ export const FL_LEASE_BODY: Clause[] = [
       contradiction — and without billing a tenant twice for a deposit they
       already paid.
     */
-    body: 'A security deposit of {{depositHeldUsd}} is held under this Lease. Of that amount, {{depositCarriedInUsd}} was received under a prior tenancy of the Premises and is carried forward, and {{depositDueAtExecutionUsd}} is payable by Tenant on execution of this Lease. The deposit is held at {{depositInstitution}}, {{depositInstitutionAddress}}, in an account that {{depositInterestLabel}}.',
+    body: 'A security deposit of {{depositHeldUsd}} is payable by Tenant on execution of this Lease. The deposit is held at {{depositInstitution}}, {{depositInstitutionAddress}}, in an account that {{depositInterestLabel}}.',
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.49(2)',
     includeWhen: (facts) => facts.depositHeldUsd > 0,
+    variables: [
+      { name: 'depositHeldUsd', type: 'usd', label: 'Deposit held', required: true },
+      { name: 'depositInstitution', type: 'string', label: 'Institution holding the deposit', required: true },
+      { name: 'depositInstitutionAddress', type: 'string', label: 'Institution address', required: true },
+      { name: 'depositInterestLabel', type: 'string', label: 'Interest-bearing?', required: true },
+    ],
+    supersedes: [],
+    asserts: ['deposit-held', 'deposit-location-disclosed'],
+  },
+
+  {
+    slug: 'deposit.held-carried',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'deposit',
+    sortKey: 50,
+    heading: 'Security Deposit',
+    /*
+      The clause the 2026 Zillow lease could not express. It states the amount
+      HELD and the amount DUE as separate figures, so the lease can say
+      "$6,300 is held" and "$0.00 is payable at signing" without contradiction,
+      and without billing a tenant twice for money they already paid.
+
+      Separate from `deposit.held` rather than a conditional sentence inside it:
+      a new tenancy should not have to read past "$0.00 was carried forward" to
+      find the sentence that applies to it.
+    */
+    body: 'A security deposit of {{depositHeldUsd}} is held under this Lease. Of that amount, {{depositCarriedInUsd}} was received under a prior tenancy of the Premises and is carried forward to this Lease, and {{depositDueAtExecutionUsd}} is payable by Tenant on execution. The deposit is held at {{depositInstitution}}, {{depositInstitutionAddress}}, in an account that {{depositInterestLabel}}.',
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Fla. Stat. §83.49(2)',
+    includeWhen: (facts) => facts.depositCarriedInUsd > 0,
     variables: [
       { name: 'depositHeldUsd', type: 'usd', label: 'Deposit held', required: true },
       { name: 'depositCarriedInUsd', type: 'usd', label: 'Deposit carried from a prior tenancy', required: true },
@@ -253,7 +286,7 @@ export const FL_LEASE_BODY: Clause[] = [
       { name: 'depositInstitutionAddress', type: 'string', label: 'Institution address', required: true },
       { name: 'depositInterestLabel', type: 'string', label: 'Interest-bearing?', required: true },
     ],
-    supersedes: [],
+    supersedes: ['deposit.held'],
     asserts: ['deposit-held', 'deposit-location-disclosed'],
   },
 
@@ -265,16 +298,39 @@ export const FL_LEASE_BODY: Clause[] = [
     section: 'deposit',
     sortKey: 52,
     heading: 'Advance Rent',
-    body: "Advance rent of {{advanceRentUsd}} is held in respect of the final month of the term. Of that amount, {{advanceRentCarriedInUsd}} was received under a prior tenancy and is carried forward, and {{advanceRentTrueUpUsd}} is payable by Tenant on execution of this Lease. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement.",
+    body: "Advance rent of {{advanceRentUsd}} is payable by Tenant on execution of this Lease in respect of the final month of the term. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement.",
     source: drafted(),
     status: 'draft',
+    // Selected whenever advance rent is held. Where some of it was carried in
+    // from a prior tenancy, `deposit.advance-rent-carried` supersedes this and
+    // the removal is reported, rather than the two silently never meeting.
     includeWhen: (facts) => facts.advanceRentHeldUsd > 0,
+    variables: [{ name: 'advanceRentUsd', type: 'usd', label: 'Advance rent held', required: true }],
+    supersedes: [],
+    asserts: ['advance-rent-held'],
+  },
+
+  {
+    slug: 'deposit.advance-rent-carried',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'deposit',
+    sortKey: 52,
+    heading: 'Advance Rent',
+    // Advance rent semantically IS one month's rent, so when rent rises the
+    // carried amount falls short and the balance is a top-up rather than a new
+    // figure. That distinction is the reason this variant exists.
+    body: "Advance rent of {{advanceRentUsd}} is held in respect of the final month of the term. Of that amount, {{advanceRentCarriedInUsd}} was received under a prior tenancy and is carried forward to this Lease, and {{advanceRentTrueUpUsd}} is payable by Tenant on execution as a top-up to the current monthly rent. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement.",
+    source: drafted(),
+    status: 'draft',
+    includeWhen: (facts) => facts.advanceRentCarriedInUsd > 0,
     variables: [
       { name: 'advanceRentUsd', type: 'usd', label: 'Advance rent held', required: true },
       { name: 'advanceRentCarriedInUsd', type: 'usd', label: 'Advance rent carried in', required: true },
       { name: 'advanceRentTrueUpUsd', type: 'usd', label: 'Advance rent due at execution', required: true },
     ],
-    supersedes: [],
+    supersedes: ['deposit.advance-rent'],
     asserts: ['advance-rent-held'],
   },
 

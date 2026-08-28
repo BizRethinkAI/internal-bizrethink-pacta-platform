@@ -16,6 +16,8 @@ const NEW_TENANCY: ClauseFacts = {
   termMonths: 12,
   depositHeldUsd: 6900,
   advanceRentHeldUsd: 6900,
+  depositCarriedInUsd: 0,
+  advanceRentCarriedInUsd: 0,
   propertyYearBuilt: 2005,
   petsPermitted: true,
   hasHoa: true,

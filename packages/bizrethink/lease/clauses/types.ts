@@ -65,6 +65,13 @@ export type ClauseFacts = {
   depositHeldUsd: number;
   /** Advance rent held for the final month, from any tenancy. */
   advanceRentHeldUsd: number;
+  /**
+   * How much of the deposit and advance rent came from a PRIOR tenancy.
+   * Selects the carried-forward clause variants — a new tenancy should not
+   * carry a sentence explaining that $0.00 was carried over.
+   */
+  depositCarriedInUsd: number;
+  advanceRentCarriedInUsd: number;
   propertyYearBuilt: number | null;
   petsPermitted: boolean;
   hasHoa: boolean;
