@@ -192,13 +192,18 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
     ...signatureBlocks(parties, spec.key, spec.withInitials),
   );
 
-export type RenderLeaseOptions = {
-  documents: LeaseDocumentSpec[];
-  parties: LeaseParty[];
-};
-
-export const renderLeasePdf = async ({ documents, parties }: RenderLeaseOptions): Promise<Buffer> => {
-  const doc = h(Document, null, ...documents.map((spec) => renderDocument(spec, parties)));
+/**
+ * One spec, one PDF.
+ *
+ * Rendered separately rather than merged into a single file, because the
+ * separateness is legally load-bearing: Fla. Stat. §83.512 requires the flood
+ * disclosure to be a separate written disclosure, and an addendum is its own
+ * instrument with its own signature block. Each becomes its own envelope item,
+ * so a signer receives them as distinct documents rather than as later pages of
+ * the lease.
+ */
+export const renderDocumentPdf = async (spec: LeaseDocumentSpec, parties: LeaseParty[]): Promise<Buffer> => {
+  const doc = h(Document, null, renderDocument(spec, parties));
 
   const stream = await renderToStream(doc);
   const chunks: Buffer[] = [];

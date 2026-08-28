@@ -5,7 +5,7 @@ import { deriveMoney } from '../money/derive';
 import type { MoneyAnswers } from '../money/types';
 import type { InterpolationValue } from './interpolate';
 import type { LeaseDocumentSpec } from './lease-document';
-import { buildClauseText, renderLeasePdf } from './lease-document';
+import { buildClauseText, renderDocumentPdf } from './lease-document';
 import type { LeaseParty } from './signature-blocks';
 
 /**
@@ -26,8 +26,16 @@ export type RenderLeaseInput = {
   propertyAddress: string;
 };
 
-export type RenderLeaseResult = {
+export type RenderedDocument = {
+  key: string;
+  title: string;
   pdf: Buffer;
+  spec: LeaseDocumentSpec;
+};
+
+export type RenderLeaseResult = {
+  /** One PDF per document. The lease is always first. */
+  rendered: RenderedDocument[];
   /** `clauseSlug: variableName` for every declared variable left unfilled. */
   missing: string[];
   /**
@@ -123,7 +131,14 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
 export const renderLease = async (input: RenderLeaseInput): Promise<RenderLeaseResult> => {
   const { documents, missing } = buildLeaseDocuments(input);
 
-  const pdf = await renderLeasePdf({ documents, parties: input.parties });
+  const rendered = await Promise.all(
+    documents.map(async (spec) => ({
+      key: spec.key,
+      title: spec.title,
+      pdf: await renderDocumentPdf(spec, input.parties),
+      spec,
+    })),
+  );
 
-  return { pdf, missing, readyToSend: missing.length === 0, documents };
+  return { rendered, missing, readyToSend: missing.length === 0, documents };
 };

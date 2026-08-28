@@ -17,7 +17,8 @@ import { buildSignatureBlocks } from '../render/signature-blocks';
  */
 
 let result: RenderLeaseResult;
-let pdf: Buffer;
+/** Placeholders from every document, as the envelope will see them. */
+let allPlaceholders: Awaited<ReturnType<typeof extractPlaceholdersFromPDF>>;
 
 beforeAll(async () => {
   result = await renderLease({
@@ -28,13 +29,26 @@ beforeAll(async () => {
     propertyAddress: '29090 Picana Lane, Wesley Chapel, Florida 33543',
   });
 
-  pdf = result.pdf;
-}, 60_000);
+  allPlaceholders = (
+    await Promise.all(result.rendered.map(async (doc) => await extractPlaceholdersFromPDF(doc.pdf)))
+  ).flat();
+}, 90_000);
 
 describe('the document renders', () => {
-  it('produces a PDF of a plausible size', () => {
-    expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
-    expect(pdf.length).toBeGreaterThan(10_000);
+  it('produces a separate PDF per document', () => {
+    // Not one merged file. Fla. Stat. §83.512 requires the flood disclosure to
+    // be a separate written disclosure, and an addendum is its own instrument.
+    expect(result.rendered).toHaveLength(5);
+
+    for (const doc of result.rendered) {
+      expect(doc.pdf.subarray(0, 5).toString()).toBe('%PDF-');
+      expect(doc.pdf.length).toBeGreaterThan(1_000);
+    }
+  });
+
+  it('makes the lease the largest document and the first', () => {
+    expect(result.rendered[0].key).toBe('lease');
+    expect(result.rendered[0].pdf.length).toBeGreaterThan(result.rendered[4].pdf.length);
   });
 
   it('produces the lease plus its addenda and the standalone disclosure', () => {
@@ -96,30 +110,24 @@ describe('every placeholder survives into the PDF', () => {
       0,
     );
 
-    const extracted = await extractPlaceholdersFromPDF(pdf);
-
-    expect(extracted).toHaveLength(emitted);
+    expect(allPlaceholders).toHaveLength(emitted);
   });
 
   it('gives every party a signature on every document', async () => {
-    const extracted = await extractPlaceholdersFromPDF(pdf);
-    const signatures = extracted.filter((p) => p.fieldAndMeta.type === FieldType.SIGNATURE);
+    const signatures = allPlaceholders.filter((p) => p.fieldAndMeta.type === FieldType.SIGNATURE);
 
     expect(signatures).toHaveLength(PICANA_PARTIES.length * result.documents.length);
   });
 
   it('sizes every signature widget from its meta rather than its text', async () => {
-    const extracted = await extractPlaceholdersFromPDF(pdf);
-
-    for (const signature of extracted.filter((p) => p.fieldAndMeta.type === FieldType.SIGNATURE)) {
+    for (const signature of allPlaceholders.filter((p) => p.fieldAndMeta.type === FieldType.SIGNATURE)) {
       expect(signature.width).toBe(160);
       expect(signature.height).toBe(44);
     }
   });
 
   it('numbers recipients r1 to r4 and no further', async () => {
-    const extracted = await extractPlaceholdersFromPDF(pdf);
-    const recipients = new Set(extracted.map((p) => p.recipient.toLowerCase()));
+    const recipients = new Set(allPlaceholders.map((p) => p.recipient.toLowerCase()));
 
     expect([...recipients].sort()).toEqual(['r1', 'r2', 'r3', 'r4']);
   });
@@ -131,22 +139,27 @@ describe('nothing overlaps', () => {
     // three-page fixture: a sized signature widget grows ~16.5pt in each
     // direction and will overprint its neighbours unless the renderer reserves
     // the leading.
-    const extracted = await extractPlaceholdersFromPDF(pdf);
     const overlaps: string[] = [];
 
-    for (const page of new Set(extracted.map((p) => p.page))) {
-      const onPage = extracted.filter((p) => p.page === page);
+    // Per document: page numbers restart in each file, so pooling them would
+    // compare fields that are not on the same physical page.
+    for (const doc of result.rendered) {
+      const extracted = await extractPlaceholdersFromPDF(doc.pdf);
 
-      for (let i = 0; i < onPage.length; i++) {
-        for (let j = i + 1; j < onPage.length; j++) {
-          const a = onPage[i];
-          const b = onPage[j];
+      for (const page of new Set(extracted.map((p) => p.page))) {
+        const onPage = extracted.filter((p) => p.page === page);
 
-          const separated =
-            a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y;
+        for (let i = 0; i < onPage.length; i++) {
+          for (let j = i + 1; j < onPage.length; j++) {
+            const a = onPage[i];
+            const b = onPage[j];
 
-          if (!separated) {
-            overlaps.push(`p${page}: ${a.placeholder} overlaps ${b.placeholder}`);
+            const separated =
+              a.x + a.width <= b.x || b.x + b.width <= a.x || a.y + a.height <= b.y || b.y + b.height <= a.y;
+
+            if (!separated) {
+              overlaps.push(`${doc.key} p${page}: ${a.placeholder} overlaps ${b.placeholder}`);
+            }
           }
         }
       }
@@ -156,9 +169,7 @@ describe('nothing overlaps', () => {
   });
 
   it('keeps every field inside its page', async () => {
-    const extracted = await extractPlaceholdersFromPDF(pdf);
-
-    for (const p of extracted) {
+    for (const p of allPlaceholders) {
       expect(p.x).toBeGreaterThanOrEqual(0);
       expect(p.y).toBeGreaterThanOrEqual(0);
       expect(p.x + p.width).toBeLessThanOrEqual(p.pageWidth + 1);
