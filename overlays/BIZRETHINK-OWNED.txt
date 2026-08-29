@@ -1,0 +1,42 @@
+# Files BizRethink owns that live in upstream directories.
+#
+# WHY THIS FILE EXISTS
+#
+# The fork rule is "upstream files are modified only through overlays/*.patch",
+# and the governance guard enforced it by PATH: anything under apps/ or
+# packages/ that is not packages/bizrethink/ was treated as upstream.
+#
+# That test is wrong for one unavoidable case. Remix discovers routes by
+# filesystem convention, so a route we write MUST live in
+# apps/remix/app/routes/ — it physically cannot go in a package. The same
+# applies to the components a route imports. Those files are not upstream
+# files; they have never existed upstream and never will. But the guard could
+# not tell the difference, so every lease-builder PR failed it and was merged
+# over the failure. A guard that is always red is a guard nobody reads, which
+# is the precise failure mode the discipline system exists to prevent (see
+# docs/STATE.md on PR #1 merging red, and the E2E gate going dark twice).
+#
+# So ownership is now declared rather than inferred. Adding a line here is a
+# deliberate, reviewable act — which is the discipline the path rule was
+# reaching for in the first place.
+#
+# RULES
+#
+#   - One glob per line. `#` starts a comment. Matched with `grep -E` after
+#     glob-to-regex conversion, anchored at both ends.
+#   - A path listed here MUST NOT exist in documenso/main. If upstream ever
+#     adds a file at one of these paths, the sync will conflict — which is the
+#     correct, loud outcome, and the signal to rename ours.
+#   - This is NOT an escape hatch for editing upstream files. Editing an
+#     upstream file still requires an overlay. This only says "this file is
+#     ours, it was never theirs".
+
+# ── Lease builder ────────────────────────────────────────────────────────────
+# Routes must live here: Remix flat-routes resolves by filename, and `leases`
+# is not a route upstream has or is likely to add.
+apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases*.tsx
+
+# Components imported by those routes. Namespaced under lease/ so a collision
+# with an upstream component is impossible short of upstream shipping a lease
+# builder of their own.
+apps/remix/app/components/general/lease/*.tsx

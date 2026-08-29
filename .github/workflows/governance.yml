@@ -58,13 +58,25 @@ jobs:
       # (established precedent — 8 BizRethink migrations already live there),
       # and package-lock.json (npm workspaces writes our deps into upstream's
       # lockfile; see UPSTREAM.md).
+      #
+      # Also exempt: paths declared in overlays/BIZRETHINK-OWNED.txt. Path is
+      # not a reliable test of provenance — a Remix route we write MUST live in
+      # apps/remix/app/routes/ because Remix resolves routes by filename, so it
+      # cannot go in a package. Those files have never existed upstream. Before
+      # that file existed this guard failed on EVERY lease-builder PR and each
+      # was merged over the failure, which is how a guard stops being read.
       - name: Fork discipline — no unpatched upstream edits
         run: |
-          UPSTREAM=$(grep -E '^(apps|packages)/' /tmp/changed.txt \
-            | grep -v '^packages/bizrethink/' \
-            | grep -v '^packages/prisma/schema.prisma$' \
-            | grep -v '^packages/prisma/migrations/' \
-            || true)
+          # The ownership filter is Python, not sed. Converting a glob to a
+          # POSIX regex by hand needs a bracket expression containing `]`, and
+          # getting that subtly wrong silently OVER-exempts files — which is a
+          # worse bug than the one this is fixing. `re.escape` cannot be
+          # misparsed. (Verified: the sed version exempted only half the
+          # declared paths and would have hidden real upstream edits.)
+          python3 .github/scripts/fork-discipline.py \
+            /tmp/changed.txt overlays/BIZRETHINK-OWNED.txt > /tmp/upstream.txt
+
+          UPSTREAM=$(cat /tmp/upstream.txt)
 
           if [ -z "$UPSTREAM" ]; then
             echo "✓ No upstream files modified."
