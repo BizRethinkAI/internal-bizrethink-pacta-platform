@@ -1,5 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prefixedId } from '@documenso/lib/universal/id';
+import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
+import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 import { authenticatedProcedure, router } from '@documenso/trpc/server/trpc';
 import { z } from 'zod';
@@ -39,8 +41,37 @@ const ZAnswers = z.object({
   customClauses: z.array(ZCustomClause).default([]),
 });
 
-/** Shared by every procedure that touches a matter. */
+/**
+ * TWO CHECKS, AND THEY ANSWER DIFFERENT QUESTIONS.
+ *
+ * `canAccessLeaseBuilder` is a FEATURE GATE: is this feature switched on for
+ * this person or their organisation? It is not authorization. A user-scoped
+ * grant makes it return true for ANY organisationId, because it never looks at
+ * membership — that is by design, so one person can be granted access across
+ * every org they belong to.
+ *
+ * `buildOrganisationWhereQuery` is the AUTHORIZATION check: is this person
+ * actually a member of the organisation whose data they just asked for?
+ *
+ * Conflating the two is a cross-tenant read. Every organisationId here arrives
+ * from client input, so without the membership check a user holding a
+ * user-scoped grant could list another organisation's properties and leases by
+ * passing a different id. Both checks, every procedure, no exceptions.
+ */
 const assertAccess = async (organisationId: string, userId: number) => {
+  const organisation = await prisma.organisation.findFirst({
+    where: buildOrganisationWhereQuery({ organisationId, userId }),
+    select: { id: true },
+  });
+
+  if (!organisation) {
+    // Same shape as "feature off", deliberately: whether an organisation exists
+    // is not something to confirm to someone outside it.
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'The lease builder is not enabled for this organisation.',
+    });
+  }
+
   if (!(await canAccessLeaseBuilder({ organisationId, userId }))) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'The lease builder is not enabled for this organisation.',
@@ -48,13 +79,51 @@ const assertAccess = async (organisationId: string, userId: number) => {
   }
 };
 
+/**
+ * The team is client-supplied too, and a matter carries it through to envelope
+ * creation — so an unchecked teamId would put a lease in a team the author has
+ * no access to.
+ */
+const assertTeamAccess = async (teamId: number, organisationId: string, userId: number) => {
+  const team = await prisma.team.findFirst({
+    where: { ...buildTeamWhereQuery({ teamId, userId }), organisationId },
+    select: { id: true },
+  });
+
+  if (!team) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'No access to that team.' });
+  }
+};
+
+/**
+ * Scoped to organisations the user actually belongs to, in the query itself.
+ *
+ * Fetching by id and checking afterwards would answer two questions with two
+ * different errors — NOT_FOUND for an id that does not exist, UNAUTHORIZED for
+ * one belonging to someone else — which turns the endpoint into an existence
+ * oracle. Both cases are now identical and indistinguishable.
+ */
 const loadMatter = async (id: string, userId: number) => {
-  const matter = await prisma.bizrethinkLeaseMatter.findUnique({ where: { id } });
+  /*
+    Two queries rather than a join: BizrethinkLeaseMatter deliberately has no
+    Prisma @relation into Organisation, because a relation requires declaring
+    the reverse field on an upstream model and this fork does not modify
+    upstream files outside overlays. See ADR 0002.
+  */
+  const memberships = await prisma.organisation.findMany({
+    where: { members: { some: { userId } } },
+    select: { id: true },
+  });
+
+  const matter = await prisma.bizrethinkLeaseMatter.findFirst({
+    where: { id, organisationId: { in: memberships.map((o) => o.id) } },
+  });
 
   if (!matter) {
     throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Lease not found' });
   }
 
+  // Membership is established; this is the feature gate on top of it.
   await assertAccess(matter.organisationId, userId);
 
   return matter;
@@ -178,6 +247,21 @@ export const leaseBuilderRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         await assertAccess(input.organisationId, ctx.user.id);
+        await assertTeamAccess(input.teamId, input.organisationId, ctx.user.id);
+
+        /*
+          The property must belong to the same organisation. Without this a
+          lease could be created against another organisation's property,
+          copying its address and details into a document.
+        */
+        const property = await prisma.bizrethinkProperty.findFirst({
+          where: { id: input.propertyId, organisationId: input.organisationId },
+          select: { id: true },
+        });
+
+        if (!property) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Property not found.' });
+        }
 
         return await prisma.bizrethinkLeaseMatter.create({
           data: {
