@@ -93,6 +93,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     .map(({ clause }) => clause.slug);
 
   return {
+    teamUrl,
     propertyAddress: PROPERTY_ADDRESS,
     organisationIsInternal,
     monthlyRentUsd: PICANA_MONEY.rent.monthlyUsd,
@@ -112,6 +113,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 export default function LeaseBuilderPage() {
   const {
+    teamUrl,
     propertyAddress,
     organisationIsInternal,
     monthlyRentUsd,
@@ -228,7 +230,7 @@ export default function LeaseBuilderPage() {
 
       <div className="mt-6 flex items-center gap-3">
         <Button asChild variant="outline">
-          <a href="preview" target="_blank" rel="noreferrer">
+          <a href={`/t/${teamUrl}/leases/preview`} target="_blank" rel="noreferrer">
             Preview the lease PDF
           </a>
         </Button>
