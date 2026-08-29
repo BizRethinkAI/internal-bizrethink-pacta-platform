@@ -22,7 +22,7 @@ git checkout -b sync/$(date +%Y-%m-%d)
 git merge upstream/main
 ```
 
-Resolve conflicts. **Conflicts only happen in two places** (by design):
+Resolve conflicts. **Conflicts only happen in three places** (by design):
 
 1. **`packages/bizrethink/`** — our own files. Conflicts here mean we put a file in the same path as a new upstream file. Rename ours, accept upstream.
 2. **Files patched by `overlays/*.patch`** — upstream changed a file we patch. Re-apply the patch:
@@ -30,6 +30,32 @@ Resolve conflicts. **Conflicts only happen in two places** (by design):
    git apply overlays/001-default-claim-enterprise.patch
    ```
    If the patch fails (line numbers drifted), edit it: re-run `diff` against the new upstream content, regenerate the patch.
+3. **`package-lock.json`** — see below. Never hand-merge it.
+
+### Resolving a `package-lock.json` conflict
+
+`packages/bizrethink/package.json` declares its own dependencies (`@react-pdf/renderer`, `@noble/ciphers`, …), and npm workspaces record every one of them — plus their transitive tree — in the **root** `package-lock.json`. That file is upstream's. So any upstream sync that also changes dependencies conflicts there, and it is the one conflict that is neither in our directory nor covered by an overlay.
+
+**Never resolve it by hand.** A lockfile is generated state, and a hand-merged one can pin a dependency to a tree npm would never produce — the failure shows up as an install or build error days later, not as a merge conflict.
+
+```bash
+# Take upstream's lockfile wholesale, then let npm re-add our workspace deps.
+git checkout --theirs package-lock.json
+npm install                      # rewrites the lock from every package.json
+git add package-lock.json
+```
+
+Then confirm nothing was silently dropped or newly flagged:
+
+```bash
+# Our workspace deps must still resolve
+npm ls @react-pdf/renderer --workspace=@bizrethink/customizations
+
+# The security.yml CI gate blocks on high+; make sure the merge didn't add any
+npm audit --omit=dev --audit-level=high
+```
+
+If `npm install` fails during `prisma generate` with *"The property 'options.recursive' is no longer supported"*, that is **not** a merge problem: `zod-prisma-types` calls `fs.rm` with an option Node 26 removed. The Prisma client itself generates fine and only the zod generator's cleanup step fails. Run the workstation on Node 22 (the Docker image already does) or pin the generator, and treat the lockfile conflict as resolved.
 
 ## Adding a new overlay patch
 
