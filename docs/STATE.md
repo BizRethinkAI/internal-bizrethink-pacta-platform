@@ -128,6 +128,18 @@ precede it, are in flight as #26 and #27.
 **This repo's characteristic failure is silence, not breakage.** Everything below
 passed, or appeared to:
 
+- **A slow gate gets bypassed, and that is a design failure, not a discipline
+  one.** The E2E suite took ~50 minutes of wall clock on every PR, which on a
+  solo-maintained repo means it does not get waited for. PRs #26 and #27 were
+  merged mid-flight for exactly this reason and **five commits were lost** —
+  the governance fix, the statutory-notice fix, the STATE update and all of
+  Tranche A — because #26 merged at its first commit and the PRs then closed.
+  Recovered in #28. Two fixes landed 2026-08-29: repo-level **auto-merge is now
+  enabled**, so `gh pr merge <n> --auto --merge` merges a PR the moment it goes
+  green with nobody watching; and the suite is **8 shards instead of 4**.
+  Sharding is balanced by test COUNT, not duration, and specs are distributed
+  in sorted order — so the slow browser flows in the back half of the alphabet
+  all landed on shards 3 and 4 (31 min) while 1 and 2 finished in 10.
 - **A `cancelled` E2E job is not a pass.** It reports neither. The gate has gone
   dark twice this way — the warp runner, then the 60-minute cap. Guards now pin
   the runner, the cap (≥90 min) and `TURBO_LOG_ORDER: stream`, because without

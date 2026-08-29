@@ -7,7 +7,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
 
-import { canAccessLeaseBuilder, canRenderClause } from '../../server-only/feature-access';
+import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../../server-only/feature-access';
 import { FL_LIBRARY } from '../clauses/us-fl';
 import { selectClauses } from '../engine/select-clauses';
 import type { RenderedDocument, RenderLeaseInput } from '../render/render-lease';
@@ -127,8 +127,6 @@ export type CreateEnvelopeFromMatterOptions = {
   userId: number;
   teamId: number;
   organisationId: string;
-  /** `BizrethinkOrganisationBilling.bizrethinkInternal` for the owning org. */
-  organisationIsInternal: boolean;
   title: string;
   requestMetadata: ApiRequestMetadata;
 };
@@ -150,7 +148,6 @@ export const createEnvelopeFromMatter = async ({
   userId,
   teamId,
   organisationId,
-  organisationIsInternal,
   title,
   requestMetadata,
 }: CreateEnvelopeFromMatterOptions) => {
@@ -170,9 +167,16 @@ export const createEnvelopeFromMatter = async ({
     the clauses actually selected, so an org becomes able to send exactly when
     every clause its answers select has been through review — not when the
     library as a whole has.
+
+    Resolved here from its own grant rather than accepted as a parameter. A
+    caller-supplied "this org is allowed" boolean is a lock whose key is held
+    by the caller; the whole point of lock 2 is to hold when lock 1 has been
+    got wrong.
   */
+  const draftRenderingAllowed = await canRenderDraftClauses({ organisationId, userId });
+
   const unpublishable = [...selection.selected, ...selection.addenda, ...selection.standaloneDisclosures]
-    .filter((clause) => !canRenderClause({ status: clause.status, organisationIsInternal }))
+    .filter((clause) => !canRenderClause({ status: clause.status, draftRenderingAllowed }))
     .map((clause) => clause.slug);
 
   if (unpublishable.length > 0) {

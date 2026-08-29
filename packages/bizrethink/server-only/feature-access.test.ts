@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { canRenderClause, resolveFeatureAccess } from './feature-access';
+import {
+  canRenderClause,
+  LEASE_BUILDER_FEATURE,
+  LEASE_CLAUSE_DRAFT_FEATURE,
+  resolveFeatureAccess,
+} from './feature-access';
 
 /**
  * Two independent locks keep the lease builder internal until per-state
@@ -47,63 +52,65 @@ describe('resolveFeatureAccess — lock 1, who can open it', () => {
 
 describe('canRenderClause — lock 2, what is allowed onto paper', () => {
   it('renders a published clause for an ordinary organisation', () => {
-    expect(canRenderClause({ status: 'published', organisationIsInternal: false })).toBe(true);
+    expect(canRenderClause({ status: 'published', draftRenderingAllowed: false })).toBe(true);
   });
 
   it('refuses a draft clause for an ordinary organisation', () => {
     // Access alone must never be enough to put unreviewed legal text in front
     // of a third party. This is the lock that survives an accidental grant.
-    expect(canRenderClause({ status: 'draft', organisationIsInternal: false })).toBe(false);
+    expect(canRenderClause({ status: 'draft', draftRenderingAllowed: false })).toBe(false);
   });
 
   it('refuses a clause still in review for an ordinary organisation', () => {
-    expect(canRenderClause({ status: 'review', organisationIsInternal: false })).toBe(false);
+    expect(canRenderClause({ status: 'review', draftRenderingAllowed: false })).toBe(false);
   });
 
-  it('renders a draft clause for a BizRethink-internal organisation', () => {
+  it('renders a draft clause where draft rendering is explicitly allowed', () => {
     // This is what makes the tool usable internally before the attorney
     // engagement has happened.
-    expect(canRenderClause({ status: 'draft', organisationIsInternal: true })).toBe(true);
+    expect(canRenderClause({ status: 'draft', draftRenderingAllowed: true })).toBe(true);
   });
 
-  it('refuses a retired clause even for an internal organisation', () => {
+  it('refuses a retired clause even where draft rendering is allowed', () => {
     // Retired means superseded. Nothing should ever render it again.
-    expect(canRenderClause({ status: 'retired', organisationIsInternal: true })).toBe(false);
+    expect(canRenderClause({ status: 'retired', draftRenderingAllowed: true })).toBe(false);
   });
 });
 
-describe('a feature gate is not an authorization check', () => {
+describe('the two locks are keyed separately', () => {
   /*
-    This is the trap that produced a real cross-tenant bug in
-    lease-builder-router.ts on 2026-08-29, caught by security review.
+    WHY THIS TEST EXISTS.
 
-    `resolveFeatureAccess` deliberately short-circuits on a user-scoped grant
-    WITHOUT looking at the organisation — that is the whole point of user scope,
-    so one person can hold access across every org they belong to.
+    Lock 2 used to read `BizrethinkOrganisationBilling.bizrethinkInternal`.
+    That column was created for BILLING — its migration says so: it stamps the
+    8 organisations that predate the SaaS layer so the trial-expire cron skips
+    them and the banner reads "BizRethink Internal" rather than "Pro trial
+    active". It was never a statement about legal review.
 
-    The consequence is that it answers "is this switched on for this person?"
-    and NOT "may this person see this organisation's data?". The router used it
-    as though it answered both, on an organisationId taken from client input,
-    so a user holding a user-scoped grant could read another organisation's
-    properties and leases by passing a different id.
+    Reusing it as the safety lock made one flag carry two meanings, which is
+    the same defect this whole feature exists to fix — the Zillow lease had one
+    `securityDeposit` field carrying both money HELD and money COLLECTED.
 
-    Callers must pair it with a membership check — buildOrganisationWhereQuery.
-    These tests exist so the property is stated rather than assumed.
+    In production it had already drifted: 7 organisations carried the flag,
+    four of them auto-created "Personal Organisation" rows. Every one of them
+    had silently acquired permission to render unreviewed legal text. Nothing
+    was exploitable, because lock 1 had a single grant — but the second lock,
+    whose entire job is to survive an accidental first-lock grant, was weaker
+    than its own docstring claimed.
+
+    So the two now have separate keys and cannot drift into each other again.
   */
-  it('passes on a user grant regardless of which organisation is asked about', () => {
-    const userGrant = { enabled: true };
-
-    for (const orgGrant of [null, { enabled: false }]) {
-      expect(
-        resolveFeatureAccess({ userGrant, orgGrant }),
-        'A user-scoped grant is org-agnostic by design. Anything calling this MUST separately ' +
-          'verify the user belongs to the organisation whose data is being returned.',
-      ).toBe(true);
-    }
+  it('does not share a feature key', () => {
+    expect(LEASE_CLAUSE_DRAFT_FEATURE).not.toBe(LEASE_BUILDER_FEATURE);
   });
 
-  it('takes no organisation identifier at all, which is the tell', () => {
-    // The function has no way to check membership even if it wanted to.
-    expect(resolveFeatureAccess.length).toBe(1);
+  it('names the clause-rendering key for what it controls, not for who holds it', () => {
+    // 'bizrethink-internal' would repeat the original mistake: a name about
+    // WHO an organisation is rather than WHAT it is permitted to do.
+    expect(LEASE_CLAUSE_DRAFT_FEATURE).toBe('lease-clause-draft-rendering');
+  });
+
+  it('grants nothing by default — both locks deny on an unknown organisation', () => {
+    expect(resolveFeatureAccess({ userGrant: null, orgGrant: null })).toBe(false);
   });
 });
