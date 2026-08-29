@@ -6,6 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { authenticatedProcedure, router } from '@documenso/trpc/server/trpc';
 import { z } from 'zod';
 
+import { lookupAddress } from '../../lease/address/census';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { selectClauses } from '../../lease/engine/select-clauses';
@@ -237,6 +238,24 @@ export const leaseBuilderRouter = router({
             ...input,
           },
         });
+      }),
+
+    /**
+     * Normalise an address and derive its county, via the US Census geocoder.
+     *
+     * Server-side rather than from the browser: the endpoint sets no CORS
+     * headers, and routing it through here keeps it behind the same access gate
+     * as everything else rather than exposing an open proxy.
+     *
+     * Never throws. A geocoder that is slow, rate-limiting or wrong must not
+     * stand between a landlord and a lease — every field it fills can be typed.
+     */
+    lookupAddress: authenticatedProcedure
+      .input(z.object({ organisationId: z.string(), address: z.string().max(200) }))
+      .query(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        return { match: await lookupAddress(input.address) };
       }),
   }),
 
