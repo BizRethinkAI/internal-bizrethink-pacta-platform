@@ -4,6 +4,7 @@ import { instanceAiRouter } from './instance-ai-router';
 import { instanceSigningRouter } from './instance-signing-router';
 import { instanceStorageRouter } from './instance-storage-router';
 import { instanceStripeRouter } from './instance-stripe-router';
+import { leaseBuilderRouter } from './lease-builder-router';
 import { orgSmtpRouter } from './org-smtp-router';
 import { organisationBillingRouter } from './organisation-billing-router';
 import { signupInviteRouter } from './signup-invite-router';
@@ -38,4 +39,8 @@ export const bizrethinkRouter = router({
   // complete signup. Pairs with overlay 048 (auto-claim on signup) +
   // overlay 048b (require-invite-when-gated check).
   signupInvite: signupInviteRouter,
+  // Lease builder — properties, matters, and the validation the interview
+  // blocks on. Every procedure re-checks the access gate: a tRPC procedure is
+  // reachable without going through the page that renders it.
+  leaseBuilder: leaseBuilderRouter,
 });

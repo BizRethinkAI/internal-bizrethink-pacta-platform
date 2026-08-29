@@ -71,3 +71,39 @@ describe('canRenderClause — lock 2, what is allowed onto paper', () => {
     expect(canRenderClause({ status: 'retired', organisationIsInternal: true })).toBe(false);
   });
 });
+
+describe('a feature gate is not an authorization check', () => {
+  /*
+    This is the trap that produced a real cross-tenant bug in
+    lease-builder-router.ts on 2026-08-29, caught by security review.
+
+    `resolveFeatureAccess` deliberately short-circuits on a user-scoped grant
+    WITHOUT looking at the organisation — that is the whole point of user scope,
+    so one person can hold access across every org they belong to.
+
+    The consequence is that it answers "is this switched on for this person?"
+    and NOT "may this person see this organisation's data?". The router used it
+    as though it answered both, on an organisationId taken from client input,
+    so a user holding a user-scoped grant could read another organisation's
+    properties and leases by passing a different id.
+
+    Callers must pair it with a membership check — buildOrganisationWhereQuery.
+    These tests exist so the property is stated rather than assumed.
+  */
+  it('passes on a user grant regardless of which organisation is asked about', () => {
+    const userGrant = { enabled: true };
+
+    for (const orgGrant of [null, { enabled: false }]) {
+      expect(
+        resolveFeatureAccess({ userGrant, orgGrant }),
+        'A user-scoped grant is org-agnostic by design. Anything calling this MUST separately ' +
+          'verify the user belongs to the organisation whose data is being returned.',
+      ).toBe(true);
+    }
+  });
+
+  it('takes no organisation identifier at all, which is the tell', () => {
+    // The function has no way to check membership even if it wanted to.
+    expect(resolveFeatureAccess.length).toBe(1);
+  });
+});

@@ -369,3 +369,87 @@ model BizrethinkFeatureAccess {
   @@unique([feature, scope, scopeId])
   @@index([feature, scope])
 }
+
+// ─── Lease Builder — properties and matters ───────────────────────────────
+//
+// A property is set up once; leases are created against it. That shape is the
+// point: the 2026 lease on 29090 Picana Ln continued a tenancy that began under
+// a different manager, and because nothing linked the two, a $6,300 deposit
+// already held had to be described in prose on page 22 while §1.1 said $0.00.
+// `supersedesMatterId` is what makes a renewal know what came before it.
+//
+// Answers live as JSON rather than columns. They are versioned by the clause
+// library and rule pack that read them, not by this schema, and a lease
+// executed under rule pack v1 must still render years later exactly as signed.
+
+model BizrethinkProperty {
+  id              String @id
+  organisationId  String
+  createdByUserId Int
+
+  label       String // "29090 Picana Ln"
+  addressLine String
+  city        String
+  state       String @default("FL")
+  postalCode  String
+  county      String // venue for any proceeding — Fla. Stat. §83.51 et seq.
+
+  // Facts that decide which clauses Florida permits. Held on the property
+  // because they do not change per lease, and re-asking them every renewal is how
+  // an interview earns a reputation for being tedious.
+  propertyType       String // single-family | duplex | condo | multi-family
+  yearBuilt          Int? // null = unknown; the lead-paint disclosure is then included
+  hasPool            Boolean @default(false)
+  hasHoa             Boolean @default(false)
+  hoaName            String?
+  includedAppliances String?
+
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([organisationId])
+}
+
+model BizrethinkLeaseMatter {
+  id              String @id
+  organisationId  String
+  teamId          Int
+  createdByUserId Int
+  propertyId      String
+
+  title  String
+  status String @default("draft") // draft | ready | sent | executed | abandoned
+
+  jurisdiction String @default("US-FL")
+
+  // The whole answer set. Shapes are owned by
+  // packages/bizrethink/lease/interview/steps.ts, not by Prisma.
+  facts         Json
+  money         Json
+  values        Json
+  customClauses Json @default("[]")
+
+  /// Which step the answerer stopped on, so a 68-field interview can be left
+  /// and resumed rather than restarted.
+  currentStepId String?
+
+  /// Renewal lineage. The field whose absence produced the contradiction this
+  /// whole feature exists to prevent.
+  supersedesMatterId String?
+
+  /// Stamped at generation so an executed lease can always be traced back to
+  /// the rules that produced it — statutes move, and a document signed in 2026
+  /// must still be explainable in 2031.
+  rulePackVersion Int?
+  generatedAt     DateTime?
+
+  /// Set once sent. Links the matter to its signing envelope.
+  envelopeId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organisationId, status])
+  @@index([propertyId])
+}

@@ -1,49 +1,32 @@
-import {
-  PICANA_FACTS,
-  PICANA_MONEY,
-  PICANA_PARTIES,
-  PICANA_VALUES,
-} from '@bizrethink/customizations/lease/matters/picana-ln';
-import { buildLeaseDocuments } from '@bizrethink/customizations/lease/render/render-lease';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { prisma } from '@documenso/prisma';
+import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
-import { AlertTriangle, FileText, Lock } from 'lucide-react';
-import { useLoaderData } from 'react-router';
+import { Building2, Lock, Plus } from 'lucide-react';
+import { useLoaderData, useNavigate, useRevalidator } from 'react-router';
 
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/leases._index';
 
 /**
- * BizRethink lease builder — internal preview.
+ * Properties, and the leases written against them.
  *
- * NEW FILE in apps/remix rather than a modification of one. A Remix route
- * cannot live anywhere else, and adding a file upstream does not have is
- * additive in the same sense `packages/bizrethink/` is — nothing upstream
- * ships is changed, so nothing can conflict on a sync beyond a same-path
- * collision, which `leases.*` will not have.
- *
- * Both gates are enforced server-side in the loader, never in the component:
- *
- *   1. `canAccessLeaseBuilder` — deny by default, per organisation or per user.
- *   2. Clause status — unreviewed clause text renders only for a
- *      BizRethink-internal organisation.
- *
- * This page deliberately does not send anything. It generates and reports, so
- * the document can be read before any of it reaches a signer.
+ * The property/lease split is the point rather than tidiness. The 2026 lease on
+ * 29090 Picana Ln continued a tenancy begun under a different manager; because
+ * nothing linked the two, a deposit already held had to be described in prose
+ * on page 22 while the summary table said $0.00. A lease that knows its
+ * property — and on renewal, the lease before it — cannot make that mistake.
  */
 
 export function meta() {
-  return appMetaTags(msg`Lease Builder`);
+  return appMetaTags(msg`Leases`);
 }
-
-const PROPERTY_ADDRESS = '29090 Picana Lane, Wesley Chapel, Florida 33543';
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { teamUrl } = params;
@@ -53,194 +36,232 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
 
   const { user } = await getSession(request);
-
   const team = await getTeamByUrl({ userId: user.id, teamUrl });
 
-  const allowed = await canAccessLeaseBuilder({
-    organisationId: team.organisationId,
-    userId: user.id,
-  });
-
-  if (!allowed) {
-    // 404 rather than 403: a feature nobody has been granted should not
-    // advertise that it exists.
+  if (!(await canAccessLeaseBuilder({ organisationId: team.organisationId, userId: user.id }))) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const billing = await prisma.bizrethinkOrganisationBilling.findUnique({
-    where: { organisationId: team.organisationId },
-    select: { bizrethinkInternal: true },
-  });
-
-  const organisationIsInternal = billing?.bizrethinkInternal ?? false;
-
-  const { documents, missing } = buildLeaseDocuments({
-    facts: PICANA_FACTS,
-    money: PICANA_MONEY,
-    values: PICANA_VALUES,
-    parties: PICANA_PARTIES,
-    propertyAddress: PROPERTY_ADDRESS,
-  });
-
-  /*
-    Lock 2, checked against the clauses this matter actually selects rather
-    than the library as a whole — an organisation becomes able to send exactly
-    when the clauses it uses have been reviewed, not when all 47 have.
-  */
-  const unreviewed = documents
-    .flatMap((doc) => doc.clauses)
-    .filter(({ clause }) => clause.status !== 'published')
-    .map(({ clause }) => clause.slug);
+  const [properties, matters, billing] = await Promise.all([
+    prisma.bizrethinkProperty.findMany({
+      where: { organisationId: team.organisationId, archivedAt: null },
+      orderBy: { createdAt: 'asc' },
+    }),
+    prisma.bizrethinkLeaseMatter.findMany({
+      where: { organisationId: team.organisationId },
+      orderBy: { updatedAt: 'desc' },
+      select: { id: true, title: true, status: true, propertyId: true, updatedAt: true },
+    }),
+    prisma.bizrethinkOrganisationBilling.findUnique({
+      where: { organisationId: team.organisationId },
+      select: { bizrethinkInternal: true },
+    }),
+  ]);
 
   return {
     teamUrl,
-    propertyAddress: PROPERTY_ADDRESS,
-    organisationIsInternal,
-    monthlyRentUsd: PICANA_MONEY.rent.monthlyUsd,
-    termStart: PICANA_MONEY.term.startDate,
-    parties: PICANA_PARTIES.map((p) => ({ name: p.name, role: p.role })),
-    documents: documents.map((doc) => ({
-      key: doc.key,
-      title: doc.title,
-      clauseCount: doc.clauses.length,
-      kind: doc.key === 'lease' ? 'Lease' : doc.key.startsWith('addendum:') ? 'Addendum' : 'Separate document',
+    organisationId: team.organisationId,
+    teamId: team.id,
+    organisationIsInternal: billing?.bizrethinkInternal ?? false,
+    properties: properties.map((p) => ({
+      id: p.id,
+      label: p.label,
+      addressLine: p.addressLine,
+      city: p.city,
+      state: p.state,
+      postalCode: p.postalCode,
+      county: p.county,
+      propertyType: p.propertyType,
+      yearBuilt: p.yearBuilt,
+      hasPool: p.hasPool,
+      hasHoa: p.hasHoa,
+      hoaName: p.hoaName,
+      includedAppliances: p.includedAppliances,
     })),
-    missing,
-    unreviewedCount: new Set(unreviewed).size,
-    readyToSend: missing.length === 0,
+    matters: matters.map((m) => ({ ...m, updatedAt: m.updatedAt.toISOString() })),
   };
 }
 
-export default function LeaseBuilderPage() {
-  const {
-    teamUrl,
-    propertyAddress,
-    organisationIsInternal,
-    monthlyRentUsd,
-    termStart,
-    parties,
-    documents,
-    missing,
-    unreviewedCount,
-    readyToSend,
-  } = useLoaderData<typeof loader>();
+type LoadedProperty = Awaited<ReturnType<typeof loader>>['properties'][number];
 
-  const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+export default function LeasesPage() {
+  const { teamUrl, organisationId, teamId, organisationIsInternal, properties, matters } =
+    useLoaderData<typeof loader>();
+
+  const navigate = useNavigate();
+  const revalidator = useRevalidator();
+
+  const createProperty = trpc.bizrethink.leaseBuilder.property.create.useMutation({
+    onSuccess: () => revalidator.revalidate(),
+  });
+
+  const createMatter = trpc.bizrethink.leaseBuilder.matter.create.useMutation({
+    onSuccess: ({ id }) => navigate(`/t/${teamUrl}/leases/${id}`),
+  });
+
+  const startLease = (property: LoadedProperty) => {
+    /*
+      The property answers what it can — type, year built, pool, association,
+      appliances, county — so the interview opens partly filled and a renewal is
+      minutes rather than an hour.
+
+      Everything else is null rather than a plausible default. A number nobody
+      typed is a number nobody checked, and this document gets signed.
+    */
+    createMatter.mutate({
+      organisationId,
+      teamId,
+      propertyId: property.id,
+      title: `${property.label} — lease`,
+      supersedesMatterId: null,
+      answers: {
+        facts: {
+          propertyType: property.propertyType,
+          propertyYearBuilt: property.yearBuilt,
+          hasPool: property.hasPool,
+          hasHoa: property.hasHoa,
+          petsPermitted: false,
+          landlordProvidesLawnService: false,
+          lateFeePolicy: 'flat',
+          terminationOnSale: false,
+          holdoverPenalty: false,
+          earlyTerminationOffered: false,
+        },
+        money: {
+          rent: { monthlyUsd: null, dueDayOfMonth: 1 },
+          term: { startDate: null },
+          deposit: {
+            securityUsd: null,
+            alreadyHeldUsd: 0,
+            advanceRentUsd: null,
+            advanceRentHeldUsd: 0,
+            prepaidRentUsd: 0,
+          },
+          prorationMethod: 'actual-days-in-month',
+        },
+        values: {
+          propertyAddress: `${property.addressLine}, ${property.city}, ${property.state} ${property.postalCode}`,
+          propertyTypeLabel: property.propertyType.replace('-', ' '),
+          venueCounty: property.county,
+          hoaName: property.hoaName,
+          includedAppliances: property.includedAppliances,
+        },
+        customClauses: [],
+      },
+    });
+  };
 
   return (
     <div className="mx-auto w-full max-w-screen-lg px-4 md:px-8">
-      <div className="mt-8 flex flex-col gap-y-2">
-        <h1 className="font-semibold text-3xl">Lease Builder</h1>
-        <p className="text-muted-foreground">
-          Florida residential lease, assembled from a clause library rather than a fixed template.
+      <div className="mt-8">
+        <h1 className="font-semibold text-3xl">Leases</h1>
+        <p className="mt-1 text-muted-foreground">
+          Florida residential leases, assembled from a clause library rather than a fixed template.
         </p>
       </div>
 
-      {/*
-        The honest banner. This page can produce a document that looks finished,
-        and the clause text has not been reviewed by a lawyer. Saying so on the
-        page is cheaper than remembering it.
-      */}
       <Alert variant="warning" className="mt-6">
         <Lock className="h-4 w-4" />
         <AlertTitle>Internal preview — clause text is unreviewed</AlertTitle>
         <AlertDescription>
-          All {unreviewedCount} clauses selected for this lease are drafts awaiting review by a Florida attorney. They
-          render here because this organisation is marked BizRethink-internal
-          {organisationIsInternal ? '' : ' — which it is NOT, so generation is blocked'}. They cannot be sent to a third
-          party.
+          The clause library has not been through review by a Florida attorney. It renders here because this
+          organisation is marked BizRethink-internal
+          {organisationIsInternal ? '' : ' — which it is NOT, so generation is blocked'}. Nothing produced here may be
+          sent to a third party.
         </AlertDescription>
       </Alert>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-2">
-        <section className="rounded-lg border p-4">
-          <h2 className="font-medium text-sm">Matter</h2>
-          <dl className="mt-3 space-y-2 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Property</dt>
-              <dd className="text-right">{propertyAddress}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Monthly rent</dt>
-              <dd className="tabular-nums">{money.format(monthlyRentUsd)}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Term starts</dt>
-              <dd>{termStart}</dd>
-            </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Parties</dt>
-              <dd className="text-right">
-                {parties.map((p) => (
-                  <div key={p.name}>
-                    {p.name} <span className="text-muted-foreground">({p.role})</span>
-                  </div>
-                ))}
-              </dd>
-            </div>
-          </dl>
-          <p className="mt-3 text-muted-foreground text-xs">
-            Defined in <code>packages/bizrethink/lease/matters/picana-ln.ts</code>. Editing that file changes the
-            document; nothing here is compiled into a clause.
-          </p>
-        </section>
+      <section className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-lg">Properties</h2>
 
-        <section className="rounded-lg border p-4">
-          <h2 className="font-medium text-sm">Documents this matter produces</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {documents.map((doc) => (
-              <li key={doc.key} className="flex items-center justify-between gap-3">
-                <span className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-muted-foreground" />
-                  {doc.title}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-xs">{doc.clauseCount} clauses</span>
-                  <Badge variant="secondary">{doc.kind}</Badge>
-                </span>
+          {/* Seeded rather than a blank form: the one property this is being
+              dogfooded on. A property form is the next thing to build. */}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={createProperty.isPending || properties.length > 0}
+            onClick={() =>
+              createProperty.mutate({
+                organisationId,
+                label: '29090 Picana Ln',
+                addressLine: '29090 Picana Lane',
+                city: 'Wesley Chapel',
+                state: 'FL',
+                postalCode: '33543',
+                county: 'Pasco',
+                propertyType: 'single-family',
+                yearBuilt: 2005,
+                hasPool: true,
+                hasHoa: true,
+                hoaName: 'Estancia at Wiregrass Ranch',
+                includedAppliances:
+                  'refrigerator, oven and range, microwave, dishwasher, clothes washer and clothes dryer',
+              })
+            }
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add 29090 Picana Ln
+          </Button>
+        </div>
+
+        {properties.length === 0 ? (
+          <p className="mt-3 rounded-lg border border-dashed p-6 text-center text-muted-foreground text-sm">
+            No properties yet. A property is set up once — its type, year built, pool and association decide which
+            clauses Florida lets you agree, so every lease written against it opens partly answered.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {properties.map((property) => (
+              <li key={property.id} className="flex items-center justify-between rounded-lg border p-4">
+                <div className="flex items-center gap-3">
+                  <Building2 className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium">{property.label}</p>
+                    <p className="text-muted-foreground text-sm">
+                      {property.propertyType.replace('-', ' ')} · {property.city}, {property.state} · {property.county}{' '}
+                      County
+                      {property.hasPool && ' · pool'}
+                      {property.hasHoa && ' · HOA'}
+                    </p>
+                  </div>
+                </div>
+
+                <Button size="sm" disabled={createMatter.isPending} onClick={() => startLease(property)}>
+                  New lease
+                </Button>
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-muted-foreground text-xs">
-            Each is its own PDF and its own envelope item. The flood disclosure is separate because Fla. Stat. §83.512
-            requires it to be.
+        )}
+      </section>
+
+      <section className="mt-10 mb-16">
+        <h2 className="font-semibold text-lg">Leases</h2>
+
+        {matters.length === 0 ? (
+          <p className="mt-3 rounded-lg border border-dashed p-6 text-center text-muted-foreground text-sm">
+            No leases yet. Start one from a property above.
           </p>
-        </section>
-      </div>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {matters.map((matter) => (
+              <li key={matter.id} className="flex items-center justify-between rounded-lg border p-4">
+                <div>
+                  <a href={`/t/${teamUrl}/leases/${matter.id}`} className="font-medium hover:underline">
+                    {matter.title}
+                  </a>
+                  <p className="text-muted-foreground text-sm">
+                    Updated {new Date(matter.updatedAt).toLocaleDateString()}
+                  </p>
+                </div>
 
-      {missing.length > 0 && (
-        <Alert variant="destructive" className="mt-6">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>{missing.length} answers outstanding — not ready to send</AlertTitle>
-          <AlertDescription>
-            <ul className="mt-2 list-disc space-y-1 pl-4">
-              {missing.map((item) => (
-                <li key={item} className="font-mono text-xs">
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 text-sm">
-              Fla. Stat. §83.512 asks the landlord to state their own knowledge of flooding. These stay empty until
-              answered — defaulting them would put an unverified statement of fact into a statutory disclosure.
-            </p>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <div className="mt-6 flex items-center gap-3">
-        <Button asChild variant="outline">
-          <a href={`/t/${teamUrl}/leases/preview`} target="_blank" rel="noreferrer">
-            Preview the lease PDF
-          </a>
-        </Button>
-        <Button disabled title={readyToSend ? 'Not implemented yet' : 'Answers are outstanding'}>
-          Send for signature
-        </Button>
-        <p className="text-muted-foreground text-xs">
-          Sending is not wired up yet. The preview generates the real document.
-        </p>
-      </div>
+                <Badge variant={matter.status === 'draft' ? 'neutral' : 'default'}>{matter.status}</Badge>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
