@@ -132,6 +132,16 @@ precede it, are in flight as #26 and #27.
 **This repo's characteristic failure is silence, not breakage.** Everything below
 passed, or appeared to:
 
+- **Do NOT stack pull requests in this repo.** It has now lost work twice, the
+  same way both times. A PR whose base is another branch merges into THAT
+  branch, and if the base PR merges into `main` first at an earlier commit, the
+  stacked PR's content is stranded on a branch whose PR reads MERGED. It looks
+  like success from every angle: both PRs green, both marked merged, nothing
+  red anywhere — and the code is simply not on `main`. Cost: five commits in
+  #26/#27 (recovered in #28) and all of #32 (recovered in #33). **Sequential
+  PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
+  longer a reason to stack. Always verify a merge landed by checking the FILE
+  on `main`, never by trusting the PR's MERGED badge.
 - **A slow gate gets bypassed, and that is a design failure, not a discipline
   one.** The E2E suite took ~50 minutes of wall clock on every PR, which on a
   solo-maintained repo means it does not get waited for. PRs #26 and #27 were
