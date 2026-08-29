@@ -17,7 +17,7 @@ import { derivePartyValues, partyEmails, toLeaseParties, validateParties } from 
 import { buildLeaseDocuments } from '../../lease/render/render-lease';
 import { US_FL } from '../../lease/rule-packs/us-fl';
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
-import { canAccessLeaseBuilder, canRenderClause } from '../feature-access';
+import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
 
 /**
  * The lease builder's server surface.
@@ -376,9 +376,9 @@ export const leaseBuilderRouter = router({
       const matter = await loadMatter(input.id, ctx.user.id);
       const answers = hydrate(matter);
 
-      const billing = await prisma.bizrethinkOrganisationBilling.findUnique({
-        where: { organisationId: matter.organisationId },
-        select: { bizrethinkInternal: true },
+      const draftRenderingAllowed = await canRenderDraftClauses({
+        organisationId: matter.organisationId,
+        userId: ctx.user.id,
       });
 
       const library = [...FL_LIBRARY, ...answers.customClauses.map((clause, index) => toCustomClause(clause, index))];
@@ -421,13 +421,7 @@ export const leaseBuilderRouter = router({
       });
 
       const unreviewed = [...selection.selected, ...selection.addenda, ...selection.standaloneDisclosures]
-        .filter(
-          (clause) =>
-            !canRenderClause({
-              status: clause.status,
-              organisationIsInternal: billing?.bizrethinkInternal ?? false,
-            }),
-        )
+        .filter((clause) => !canRenderClause({ status: clause.status, draftRenderingAllowed }))
         .map((clause) => clause.slug);
 
       /*
@@ -487,11 +481,6 @@ export const leaseBuilderRouter = router({
         throw new AppError(AppErrorCode.INVALID_REQUEST, { message: partyFindings.join(' ') });
       }
 
-      const billing = await prisma.bizrethinkOrganisationBilling.findUnique({
-        where: { organisationId: matter.organisationId },
-        select: { bizrethinkInternal: true },
-      });
-
       const envelope = await createEnvelopeFromMatter({
         input: {
           facts: answers.facts,
@@ -506,7 +495,6 @@ export const leaseBuilderRouter = router({
         userId: ctx.user.id,
         teamId: matter.teamId,
         organisationId: matter.organisationId,
-        organisationIsInternal: billing?.bizrethinkInternal ?? false,
         title: matter.title,
         requestMetadata: ctx.metadata,
       });

@@ -1,4 +1,4 @@
-import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
+import { canAccessLeaseBuilder, canRenderDraftClauses } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { prisma } from '@documenso/prisma';
@@ -44,7 +44,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const [properties, matters, billing] = await Promise.all([
+  const [properties, matters, draftRenderingAllowed] = await Promise.all([
     prisma.bizrethinkProperty.findMany({
       where: { organisationId: team.organisationId, archivedAt: null },
       orderBy: { createdAt: 'asc' },
@@ -54,17 +54,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       orderBy: { updatedAt: 'desc' },
       select: { id: true, title: true, status: true, propertyId: true, updatedAt: true },
     }),
-    prisma.bizrethinkOrganisationBilling.findUnique({
-      where: { organisationId: team.organisationId },
-      select: { bizrethinkInternal: true },
-    }),
+    canRenderDraftClauses({ organisationId: team.organisationId, userId: user.id }),
   ]);
 
   return {
     teamUrl,
     organisationId: team.organisationId,
     teamId: team.id,
-    organisationIsInternal: billing?.bizrethinkInternal ?? false,
+    draftRenderingAllowed,
     properties: properties.map((p) => ({
       id: p.id,
       label: p.label,
@@ -87,7 +84,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 type LoadedProperty = Awaited<ReturnType<typeof loader>>['properties'][number];
 
 export default function LeasesPage() {
-  const { teamUrl, organisationId, teamId, organisationIsInternal, properties, matters } =
+  const { teamUrl, organisationId, teamId, draftRenderingAllowed, properties, matters } =
     useLoaderData<typeof loader>();
 
   const navigate = useNavigate();
@@ -165,8 +162,8 @@ export default function LeasesPage() {
         <AlertTitle>Internal preview — clause text is unreviewed</AlertTitle>
         <AlertDescription>
           The clause library has not been through review by a Florida attorney. It renders here because this
-          organisation is marked BizRethink-internal
-          {organisationIsInternal ? '' : ' — which it is NOT, so generation is blocked'}. Nothing produced here may be
+          organisation holds an explicit grant to render unreviewed clause text
+          {draftRenderingAllowed ? '' : ' — which it does NOT, so generation is blocked'}. Nothing produced here may be
           sent to a third party.
         </AlertDescription>
       </Alert>
