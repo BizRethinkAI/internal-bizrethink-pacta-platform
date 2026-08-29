@@ -69,6 +69,25 @@ group is DB contention on the shared document counter
 API-test project. Optional future hardening: a bounded retry on
 `incrementDocumentId` (own overlay) — not required for green.
 
+## Baseline refresh — 2026-08-13 upstream sync (142 commits, upstream 2.16.0)
+
+Post-sync the curated suite reports **1028 passed / 4 flaky / 64 skipped / 0 failed**
+(up from 812 passed — upstream added ~216 tests). No new REAL-BUGs; the exclusion
+table above still holds and needed no additions.
+
+The 4 flaky remain the DB-contention group described below (accept-on-retry).
+
+**Job cap:** the suite now runs ~51 min of test execution / ~59 min wall-clock. The
+E2E job cap was raised 60 → 120 min because the sync pushed it past the old cap and
+GitHub killed the job mid-run — a cancelled job reports **neither pass nor fail**, so
+the gate goes dark exactly like the warp-runner incident did. Two guards in
+`packages/bizrethink/regression-tests/workflow-runners.test.ts` now pin the cap
+(>= 90 min) and `TURBO_LOG_ORDER: stream` (without streaming, turbo buffers task
+output and discards it on kill — the capped run produced 53 min of pure silence,
+making "slow" and "hung" indistinguishable).
+
+**If E2E ever reports `cancelled`, treat it as no-verdict, not as a pass.**
+
 ## When a NEW test fails after this baseline
 
 Because the baseline is curated and green, **a new red means a real signal.**
