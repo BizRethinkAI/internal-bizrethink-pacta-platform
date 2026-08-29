@@ -82,4 +82,94 @@ describe('.github/workflows/e2e-tests.yml — job cap must leave headroom', () =
         '"slow" and "hung" indistinguishable.',
     ).toBe(true);
   });
+
+  it('still reports a status on a docs-only PR instead of being skipped', () => {
+    const content = readFileSync(workflowPath, 'utf8');
+
+    /*
+      The docs-only optimisation gates the expensive STEPS, never the job.
+
+      `E2E Tests` is a required check. A job skipped by a workflow-level
+      `paths` filter reports nothing at all — not a pass, not a failure — so
+      the PR waits forever for a status that never arrives. That is the same
+      silent-gate failure as the cancelled runs above, reached a different way.
+
+      If someone ever "simplifies" this into an `on: pull_request: paths:`
+      filter, this test is what stops it.
+    */
+    expect(
+      /^on:\s*\n(?:\s+\w+:\s*\n(?:\s+branches:.*\n(?:\s+-.*\n|\s+\[.*\]\n)?)?)+/m.test(content) &&
+        !/^\s+paths(-ignore)?:/m.test(content),
+      'e2e-tests.yml must not use a workflow-level paths filter: E2E Tests is a required ' +
+        'check, and a skipped job reports no status, blocking the PR indefinitely. Gate the ' +
+        'steps with `if: steps.scope.outputs.code` instead.',
+    ).toBe(true);
+
+    expect(
+      /id:\s*scope/.test(content) && /steps\.scope\.outputs\.code/.test(content),
+      'The docs-only detection step (id: scope) is missing. Without it every documentation ' +
+        'PR runs ~59 minutes of Playwright, which is the friction that trains people to ' +
+        'bypass required checks.',
+    ).toBe(true);
+  });
+
+  it('keeps the required-check name on a job that always reports', () => {
+    const content = readFileSync(workflowPath, 'utf8');
+
+    /*
+      Two ways sharding can silently darken the gate, both guarded here.
+
+      1. The required check is named "E2E Tests" in the protect-main ruleset.
+         Sharding moved the real work into a matrix job named "E2E Shard N",
+         so a separate gate job has to carry the required name. Rename it and
+         the required check never reports — the PR waits forever.
+
+      2. `if: always()` on that gate. Without it, GitHub skips the gate when
+         any shard fails, and a SKIPPED required check reports no status at
+         all rather than a failure. A red suite would leave the PR blocked on
+         a verdict that never arrives, which looks identical to a slow run.
+    */
+    expect(
+      /name:\s*'E2E Tests'/.test(content),
+      'No job is named "E2E Tests". That is the required check in the protect-main ruleset; ' +
+        'without a job carrying it, the check never reports and every PR blocks indefinitely.',
+    ).toBe(true);
+
+    const gate = content.slice(content.indexOf('e2e_gate:'));
+
+    expect(
+      /if:\s*always\(\)/.test(gate),
+      'The E2E gate job must be `if: always()`. Otherwise a failing shard skips it, and a ' +
+        'skipped required check reports NO STATUS rather than a failure — the PR blocks ' +
+        'forever instead of going red.',
+    ).toBe(true);
+
+    expect(
+      /needs:\s*\[e2e_tests\]/.test(gate),
+      'The gate must depend on the shard matrix, or it reports success without waiting for ' + 'any test to run.',
+    ).toBe(true);
+  });
+
+  it('shards the suite rather than running it serially on one runner', () => {
+    const content = readFileSync(workflowPath, 'utf8');
+
+    const shardMatch = content.match(/shard:\s*\[([\d,\s]+)\]/);
+
+    expect(
+      shardMatch,
+      'The shard matrix is gone. playwright.config.ts derives workers from `cores / 2`, so on ' +
+        'a 2-core ubuntu-latest runner the suite runs with ONE worker and takes ~59 minutes. ' +
+        'Sharding is what replaces the parallelism the runner cannot provide.',
+    ).not.toBeNull();
+
+    const shards = shardMatch?.[1].split(',').length ?? 0;
+
+    expect(shards, 'Expected more than one shard.').toBeGreaterThan(1);
+
+    expect(
+      new RegExp(`--shard=\\$\\{\\{ matrix.shard \\}\\}/${shards}`).test(content),
+      `The matrix declares ${shards} shards but the --shard argument does not divide by ${shards}. ` +
+        'A mismatch silently runs only part of the suite while reporting green.',
+    ).toBe(true);
+  });
 });
