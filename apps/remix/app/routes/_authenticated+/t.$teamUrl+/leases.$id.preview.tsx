@@ -1,6 +1,5 @@
-import { deriveFacts } from '@bizrethink/customizations/lease/interview/derive-facts';
 import { renderLease } from '@bizrethink/customizations/lease/render/render-lease';
-import type { LeaseParty } from '@bizrethink/customizations/lease/render/signature-blocks';
+import { renderInputForMatter } from '@bizrethink/customizations/lease/server-only/matter-answers';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -44,31 +43,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const money = matter.money as Parameters<typeof deriveFacts>[0];
-  const values = matter.values as Record<string, string | number | boolean | null>;
-  const facts = matter.facts as Record<string, unknown>;
-
   /*
-    Derived facts are recomputed here rather than read from the row. A stored
-    derived value is one that can go stale — edit the rent and a persisted
-    advance-rent top-up would state a figure that no longer follows from its own
-    inputs, which is the defect this whole feature exists to prevent.
+    Hydrated through the shared mapping rather than unpacked here. This route
+    used to do its own, and drifted: it built signers from
+    `values.landlordNames`, which became DERIVED when the party list landed, so
+    every preview said "LANDLORD — TO BE CONFIRMED" whoever was signing.
   */
-  const endDate = String(values.endDate ?? money.term.startDate);
-
-  const parties: LeaseParty[] = [
-    { name: String(values.landlordNames ?? 'LANDLORD — TO BE CONFIRMED'), role: 'landlord' },
-    { name: String(values.tenantNames ?? 'TENANT — TO BE CONFIRMED'), role: 'tenant' },
-  ];
-
-  const { rendered } = await renderLease({
-    facts: { ...facts, ...deriveFacts(money, endDate) } as never,
-    money,
-    values: { ...values, rentDueDay: money.rent.dueDayOfMonth, monthlyRentUsd: money.rent.monthlyUsd },
-    parties,
-    propertyAddress: String(values.propertyAddress ?? ''),
-    customClauses: matter.customClauses as never,
-  });
+  const { rendered } = await renderLease(renderInputForMatter(matter));
 
   const lease = rendered.find((doc) => doc.key === 'lease');
 

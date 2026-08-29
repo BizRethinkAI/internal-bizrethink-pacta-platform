@@ -99,9 +99,13 @@ Sequenced 2026-08-29 as four tranches. A, and the sending work that had to
 precede it, are in flight as #26 and #27.
 
 1. **Land #26 and #27.**
-2. **The review loop (~6–8 days).** *Domain, schema and server layer landed
-   2026-08-29; the reviewer-facing route and the landlord's comment panel are
-   the remaining half.* Sending a lease to a lawyer and sending it
+2. **The review loop — DONE 2026-08-29** (#31, #32). Domain, schema, server
+   layer, the reviewer's tokenised route and the landlord's comment panel.
+   Attorney comments block the send until dispositioned; tenant comments never
+   do; dismissal requires a written reason and is append-only. Outstanding:
+   the dismissal reason is not yet written into the ENVELOPE audit trail —
+   upstream's audit-log type is a closed Zod enum, so that needs its own
+   overlay PR with its own fragility rating. Sending a lease to a lawyer and sending it
    to a tenant are the same mechanism pointed at different people, and the
    platform has **no commenting primitive at all** — `RecipientRole` is
    CC/SIGNER/VIEWER/APPROVER/ASSISTANT and the only channel back from a
@@ -128,6 +132,16 @@ precede it, are in flight as #26 and #27.
 **This repo's characteristic failure is silence, not breakage.** Everything below
 passed, or appeared to:
 
+- **Do NOT stack pull requests in this repo.** It has now lost work twice, the
+  same way both times. A PR whose base is another branch merges into THAT
+  branch, and if the base PR merges into `main` first at an earlier commit, the
+  stacked PR's content is stranded on a branch whose PR reads MERGED. It looks
+  like success from every angle: both PRs green, both marked merged, nothing
+  red anywhere — and the code is simply not on `main`. Cost: five commits in
+  #26/#27 (recovered in #28) and all of #32 (recovered in #33). **Sequential
+  PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
+  longer a reason to stack. Always verify a merge landed by checking the FILE
+  on `main`, never by trusting the PR's MERGED badge.
 - **A slow gate gets bypassed, and that is a design failure, not a discipline
   one.** The E2E suite took ~50 minutes of wall clock on every PR, which on a
   solo-maintained repo means it does not get waited for. PRs #26 and #27 were

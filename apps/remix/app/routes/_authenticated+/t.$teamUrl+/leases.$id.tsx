@@ -18,6 +18,7 @@ import { CustomClauseEditor } from '~/components/general/lease/custom-clause-edi
 import type { FieldValue } from '~/components/general/lease/interview-field';
 import { InterviewFieldControl } from '~/components/general/lease/interview-field';
 import { PartyEditor } from '~/components/general/lease/party-editor';
+import { LeaseReviewPanel } from '~/components/general/lease/review-panel';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/leases.$id';
@@ -283,6 +284,7 @@ type ValidationResult = {
   findings: { code: string; severity: 'blocks' | 'warns'; citation: string; message: string }[];
   missing: string[];
   partyFindings: string[];
+  reviewFindings: string[];
   duplicateAssertions: { assertion: string; slugs: string[] }[];
   unreviewedClauses: string[];
   blocking: number;
@@ -398,6 +400,20 @@ const ReviewPanel = ({
         </Alert>
       )}
 
+      {data.reviewFindings.length > 0 && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>A reviewer is still waiting on you</AlertTitle>
+          <AlertDescription>
+            <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
+              {data.reviewFindings.map((finding) => (
+                <li key={finding}>{finding}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {data.duplicateAssertions.length > 0 && (
         <Alert variant="warning">
           <AlertTriangle className="h-4 w-4" />
@@ -423,6 +439,16 @@ const ReviewPanel = ({
           </AlertDescription>
         </Alert>
       )}
+
+      {/*
+        Between the findings and the Send button on purpose: reviewing is the
+        step between "nothing is blocking this" and "it has gone out", and a
+        review panel below the send control would be a review panel nobody
+        reads.
+      */}
+      <div className="border-t pt-2">
+        <LeaseReviewPanel matterId={matterId} origin={typeof window === 'undefined' ? '' : window.location.origin} />
+      </div>
 
       <div className="flex items-center gap-3 pt-2">
         <Button asChild variant="outline">
