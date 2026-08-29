@@ -114,10 +114,10 @@ const writeMoney = (money: Record<string, unknown>, name: string, value: FieldVa
 export default function LeaseInterviewPage() {
   const { teamUrl, matter } = useLoaderData<typeof loader>();
 
-  const [facts, setFacts] = useState(matter.facts);
-  const [money, setMoney] = useState(matter.money);
-  const [values, setValues] = useState(matter.values);
-  const [customClauses, setCustomClauses] = useState(matter.customClauses);
+  const [facts, setFacts] = useState<Record<string, FieldValue>>(matter.facts);
+  const [money, setMoney] = useState<Record<string, unknown>>(matter.money);
+  const [values, setValues] = useState<Record<string, FieldValue>>(matter.values);
+  const [customClauses, setCustomClauses] = useState<InterviewAnswers['customClauses']>(matter.customClauses);
 
   const answers = useMemo(
     () => ({ facts, money, values, customClauses }) as unknown as InterviewAnswers,
@@ -233,7 +233,13 @@ export default function LeaseInterviewPage() {
           />
         )}
 
-        {step.id === 'review' && <ReviewPanel teamUrl={teamUrl} matterId={matter.id} query={validate} />}
+        {step.id === 'review' && (
+          <ReviewPanel
+            teamUrl={teamUrl}
+            matterId={matter.id}
+            query={{ isLoading: validate.isLoading, data: validate.data as ValidationResult | undefined }}
+          />
+        )}
       </section>
 
       <div className="mt-10 flex items-center justify-between border-t py-6">
@@ -255,14 +261,38 @@ export default function LeaseInterviewPage() {
   );
 }
 
-type ValidateQuery = ReturnType<typeof trpc.bizrethink.leaseBuilder.matter.validate.useQuery>;
+/**
+ * What `matter.validate` returns.
+ *
+ * Written out rather than inferred: `ReturnType<typeof …useQuery>` does not
+ * carry the procedure's output type through, so `query.data` widens to `{}`
+ * and every read off it becomes an error — or worse, an implicit `any` that
+ * compiles and breaks at runtime.
+ */
+type ValidationResult = {
+  findings: { code: string; severity: 'blocks' | 'warns'; citation: string; message: string }[];
+  missing: string[];
+  duplicateAssertions: { assertion: string; slugs: string[] }[];
+  unreviewedClauses: string[];
+  blocking: number;
+  readyToSend: boolean;
+  rulePackVersion: number;
+};
 
 /**
  * The review step. Three kinds of problem, kept apart because each is resolved
  * differently: a statutory limit by changing an answer, an unfilled variable by
  * answering a question, an unreviewed clause by an attorney.
  */
-const ReviewPanel = ({ teamUrl, matterId, query }: { teamUrl: string; matterId: string; query: ValidateQuery }) => {
+const ReviewPanel = ({
+  teamUrl,
+  matterId,
+  query,
+}: {
+  teamUrl: string;
+  matterId: string;
+  query: { isLoading: boolean; data: ValidationResult | undefined };
+}) => {
   if (query.isLoading) {
     return (
       <p className="mt-6 flex items-center gap-2 text-muted-foreground text-sm">
