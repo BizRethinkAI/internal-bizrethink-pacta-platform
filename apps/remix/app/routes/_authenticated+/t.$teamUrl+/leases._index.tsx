@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
-import { Building2, Lock, Plus } from 'lucide-react';
+import { Building2, Lock, Plus, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useLoaderData, useNavigate, useRevalidator } from 'react-router';
 
@@ -155,6 +155,13 @@ export default function LeasesPage() {
         <p className="mt-1 text-muted-foreground">
           Florida residential leases, assembled from a clause library rather than a fixed template.
         </p>
+
+        <Button asChild variant="outline" size="sm" className="mt-4">
+          <a href={`/t/${teamUrl}/leases/library`}>
+            <ShieldCheck className="mr-2 h-4 w-4" />
+            Clause library and attorney sign-off
+          </a>
+        </Button>
       </div>
 
       <Alert variant="warning" className="mt-6">

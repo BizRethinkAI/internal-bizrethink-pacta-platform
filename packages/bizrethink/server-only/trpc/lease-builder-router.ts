@@ -7,6 +7,7 @@ import { authenticatedProcedure, procedure, router } from '@documenso/trpc/serve
 import { z } from 'zod';
 
 import { lookupAddress } from '../../lease/address/census';
+import { clauseFingerprint, isApprovalCurrent } from '../../lease/clauses/approval';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { selectClauses } from '../../lease/engine/select-clauses';
@@ -24,6 +25,7 @@ import {
 } from '../../lease/review/disposition';
 import type { Disposition, LeaseReview, ReviewAudience, ReviewComment, ReviewStatus } from '../../lease/review/types';
 import { US_FL } from '../../lease/rule-packs/us-fl';
+import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only/clause-approvals';
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
 
@@ -493,8 +495,10 @@ export const leaseBuilderRouter = router({
         pack: US_FL,
       });
 
+      const approvals = await loadClauseApprovals();
+
       const unreviewed = [...selection.selected, ...selection.addenda, ...selection.standaloneDisclosures]
-        .filter((clause) => !canRenderClause({ status: clause.status, draftRenderingAllowed }))
+        .filter((clause) => !canRenderClause({ status: statusWithApproval(clause, approvals), draftRenderingAllowed }))
         .map((clause) => clause.slug);
 
       /*
@@ -863,6 +867,131 @@ export const leaseBuilderRouter = router({
         ]);
 
         return { submitted: true, commentCount: input.comments.length };
+      }),
+  }),
+
+  /**
+   * The clause library, and attorney sign-off on it.
+   *
+   * This is the gate the whole product waits behind: 52 clauses drafted by a
+   * language model and reviewed by nobody. Until a clause has a current
+   * approval it renders only where draft rendering is explicitly granted, and
+   * never reaches a third party.
+   *
+   * RECORDING, NOT SIGNING. The landlord enters the approval on the attorney's
+   * behalf, capturing their name and bar number. `approvedByUserId` records
+   * who typed it, which is deliberately a different field from who approved —
+   * those differing is itself the honest description of what happened. A
+   * signature by the attorney themselves would be a different feature, and
+   * pretending this is one would be worse than not having it.
+   */
+  clauseLibrary: router({
+    list: authenticatedProcedure.input(z.object({ organisationId: z.string() })).query(async ({ ctx, input }) => {
+      await assertAccess(input.organisationId, ctx.user.id);
+
+      const approvals = await loadClauseApprovals();
+
+      return {
+        clauses: FL_LIBRARY.map((clause) => {
+          const approval = approvals.get(clause.slug) ?? null;
+          const current = isApprovalCurrent(clause, approval);
+
+          return {
+            slug: clause.slug,
+            version: clause.version,
+            section: clause.section,
+            heading: clause.heading,
+            body: clause.body,
+            placement: clause.placement,
+            requiredBy: clause.requiredBy ?? null,
+            sourceKind: clause.source.kind,
+            /*
+                For a statute clause the approval IS the verbatim
+                verification — `verbatimVerifiedAt` has been null on every one
+                of these since they were transcribed, and it is what an
+                attorney confirming the wording actually settles.
+              */
+            verbatimRequired: clause.source.kind === 'statute' && clause.source.verbatimRequired,
+            citation: clause.source.kind === 'statute' ? clause.source.citation : null,
+            codeStatus: clause.status,
+            effectiveStatus: statusWithApproval(clause, approvals),
+            fingerprint: clauseFingerprint(clause),
+            approval: approval
+              ? {
+                  approvedByName: approval.approvedByName,
+                  approvedByBarNumber: approval.approvedByBarNumber,
+                  approvedAt: approval.approvedAt,
+                  notes: approval.notes,
+                  // An approval that exists but no longer matches is shown
+                  // as lapsed rather than hidden — "it was approved, then
+                  // the text changed" is the useful thing to know.
+                  lapsed: !current,
+                }
+              : null,
+          };
+        }),
+      };
+    }),
+
+    approve: authenticatedProcedure
+      .input(
+        z.object({
+          organisationId: z.string(),
+          clauseSlug: z.string(),
+          /** The clause as the approver saw it. Rejected if it has moved since. */
+          fingerprint: z.string(),
+          approvedByName: z.string().min(1),
+          approvedByBarNumber: z.string().nullable().default(null),
+          notes: z.string().nullable().default(null),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        const clause = FL_LIBRARY.find((candidate) => candidate.slug === input.clauseSlug);
+
+        if (!clause) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'No such clause in the library.' });
+        }
+
+        /*
+          The fingerprint is sent back from the page that displayed the clause
+          and checked against the library as it stands now. If a deploy changed
+          the wording between the attorney reading it and the approval being
+          recorded, this refuses rather than attributing sign-off to text they
+          never saw.
+        */
+        const current = clauseFingerprint(clause);
+
+        if (current !== input.fingerprint) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message:
+              'This clause changed since it was displayed. Reload and read it again before recording an approval.',
+          });
+        }
+
+        await prisma.$transaction([
+          // Older approvals are superseded, not deleted: the record of who
+          // approved which words has to survive an edit.
+          prisma.bizrethinkClauseApproval.updateMany({
+            where: { clauseSlug: clause.slug, supersededAt: null },
+            data: { supersededAt: new Date() },
+          }),
+          prisma.bizrethinkClauseApproval.create({
+            data: {
+              id: prefixedId('clause_approval', 16),
+              clauseSlug: clause.slug,
+              clauseVersion: clause.version,
+              fingerprint: current,
+              approvedByName: input.approvedByName.trim(),
+              approvedByBarNumber: input.approvedByBarNumber?.trim() || null,
+              approvedByUserId: ctx.user.id,
+              notes: input.notes?.trim() || null,
+            },
+          }),
+        ]);
+
+        return { approved: true };
       }),
   }),
 });

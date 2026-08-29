@@ -1810,4 +1810,39 @@ model BizrethinkReviewComment {
   @@index([reviewId])
 }
 
+/// Attorney sign-off on one clause of the library.
+///
+/// The library is TypeScript, so a reviewing attorney cannot edit `status` in
+/// code — the approval lives here and overrides what the code says.
+///
+/// PINNED TO A FINGERPRINT. If an approval survived a text edit, changing a
+/// clause would silently inherit sign-off on words the attorney never read,
+/// with nothing red anywhere. `fingerprint` is a hash of everything a signer
+/// reads, and any change to it lapses the approval back to unreviewed. See
+/// packages/bizrethink/lease/clauses/approval.ts.
+model BizrethinkClauseApproval {
+  id String @id
+
+  clauseSlug    String
+  clauseVersion Int
+
+  /// Hash of the clause as approved. Mismatch = lapsed = unreviewed.
+  fingerprint String
+
+  /// Who signed off, and under what authority. An unattributed approval is
+  /// treated as no approval at all.
+  approvedByName      String
+  approvedByBarNumber String?
+  approvedByUserId    Int
+  notes               String?
+
+  approvedAt DateTime @default(now())
+
+  /// Set when a later edit lapsed this approval, so the history of who
+  /// approved what survives rather than being overwritten.
+  supersededAt DateTime?
+
+  @@index([clauseSlug])
+}
+
 // BIZRETHINK_ADDITIONS_END
