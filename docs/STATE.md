@@ -99,7 +99,9 @@ Sequenced 2026-08-29 as four tranches. A, and the sending work that had to
 precede it, are in flight as #26 and #27.
 
 1. **Land #26 and #27.**
-2. **The review loop (~6–8 days).** Sending a lease to a lawyer and sending it
+2. **The review loop (~6–8 days).** *Domain, schema and server layer landed
+   2026-08-29; the reviewer-facing route and the landlord's comment panel are
+   the remaining half.* Sending a lease to a lawyer and sending it
    to a tenant are the same mechanism pointed at different people, and the
    platform has **no commenting primitive at all** — `RecipientRole` is
    CC/SIGNER/VIEWER/APPROVER/ASSISTANT and the only channel back from a
