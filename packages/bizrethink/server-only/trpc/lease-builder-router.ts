@@ -11,8 +11,11 @@ import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
 import { deriveFacts } from '../../lease/interview/derive-facts';
+import type { LeasePartyInput } from '../../lease/parties/derive-parties';
+import { derivePartyValues, partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
 import { buildLeaseDocuments } from '../../lease/render/render-lease';
 import { US_FL } from '../../lease/rule-packs/us-fl';
+import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { canAccessLeaseBuilder, canRenderClause } from '../feature-access';
 
 /**
@@ -34,11 +37,23 @@ const ZCustomClause = z.object({
   asserts: z.array(z.string()).default([]),
 });
 
+const ZParty = z.object({
+  name: z.string(),
+  role: z.enum(['landlord', 'tenant']),
+  email: z.string(),
+});
+
 const ZAnswers = z.object({
   facts: z.record(z.string(), z.unknown()),
   money: z.record(z.string(), z.unknown()),
   values: z.record(z.string(), z.unknown()),
   customClauses: z.array(ZCustomClause).default([]),
+  /*
+    Not `.email()` here. A half-finished interview must stay saveable, so the
+    shape is checked on the way in and the content on the way out — the same
+    split the rest of the answer set uses. `validateParties` is what refuses.
+  */
+  parties: z.array(ZParty).default([]),
 });
 
 /**
@@ -146,23 +161,40 @@ const hydrate = (matter: {
   money: unknown;
   values: unknown;
   customClauses: unknown;
+  parties: unknown;
 }): {
   facts: never;
   money: Parameters<typeof deriveFacts>[0];
   values: HydratedValues;
   customClauses: z.infer<typeof ZCustomClause>[];
+  parties: LeasePartyInput[];
 } => {
   const money = matter.money as Parameters<typeof deriveFacts>[0];
   const values = matter.values as HydratedValues;
   const facts = matter.facts as Record<string, unknown>;
+  const parties = (matter.parties ?? []) as LeasePartyInput[];
 
   const endDate = String(values.endDate ?? money.term.startDate);
 
   return {
     facts: { ...facts, ...deriveFacts(money, endDate) } as never,
     money,
-    values: { ...values, rentDueDay: money.rent.dueDayOfMonth, monthlyRentUsd: money.rent.monthlyUsd },
+    values: {
+      ...values,
+      rentDueDay: money.rent.dueDayOfMonth,
+      monthlyRentUsd: money.rent.monthlyUsd,
+      /*
+        The opening clause names the parties, and both variables are required.
+        Derived here on every read rather than stored, for the same reason the
+        money figures are: a stored derived value is a value that can go stale,
+        and a lease whose first sentence names someone who is no longer a
+        signer is exactly the class of contradiction this feature exists to
+        prevent.
+      */
+      ...derivePartyValues(parties),
+    },
     customClauses: (matter.customClauses ?? []) as z.infer<typeof ZCustomClause>[],
+    parties,
   };
 };
 
@@ -276,6 +308,7 @@ export const leaseBuilderRouter = router({
             money: input.answers.money,
             values: input.answers.values,
             customClauses: input.answers.customClauses,
+            parties: input.answers.parties,
           },
           select: { id: true },
         });
@@ -305,6 +338,7 @@ export const leaseBuilderRouter = router({
             money: input.answers.money,
             values: input.answers.values,
             customClauses: input.answers.customClauses,
+            parties: input.answers.parties,
           },
         });
 
@@ -336,7 +370,7 @@ export const leaseBuilderRouter = router({
         facts: answers.facts,
         money: answers.money,
         values: answers.values,
-        parties: [],
+        parties: toLeaseParties(answers.parties),
         propertyAddress: String(answers.values.propertyAddress ?? ''),
         customClauses: answers.customClauses,
       });
@@ -377,15 +411,103 @@ export const leaseBuilderRouter = router({
         )
         .map((clause) => clause.slug);
 
+      /*
+        Kept as its own list rather than folded into `findings`: a party problem
+        is fixed on the parties step, not by changing a term, and two of them
+        (duplicate name, duplicate email) misroute a signing link silently
+        rather than producing a visibly wrong document.
+      */
+      const partyFindings = validateParties(answers.parties);
+
       return {
         findings,
         missing,
+        partyFindings,
         duplicateAssertions: selection.duplicateAssertions,
         unreviewedClauses: [...new Set(unreviewed)],
-        blocking: findings.filter((f) => f.severity === 'blocks').length + missing.length,
-        readyToSend: findings.every((f) => f.severity !== 'blocks') && missing.length === 0,
+        blocking: findings.filter((f) => f.severity === 'blocks').length + missing.length + partyFindings.length,
+        readyToSend:
+          findings.every((f) => f.severity !== 'blocks') && missing.length === 0 && partyFindings.length === 0,
         rulePackVersion: US_FL.version,
       };
+    }),
+
+    /**
+     * Send the lease for signature.
+     *
+     * The last thing standing between a draft and a signer, and deliberately
+     * the narrowest gate in the feature. Everything here is re-derived and
+     * re-checked from stored answers rather than accepted from the client: the
+     * caller supplies an id and nothing else, so there is no field on this
+     * mutation through which a validated document could be swapped for another.
+     *
+     * `createEnvelopeFromMatter` re-runs both access locks itself. That
+     * duplication is intentional — it is the narrowest point every caller must
+     * pass through, and this router is not the only conceivable caller.
+     */
+    send: authenticatedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+      const matter = await loadMatter(input.id, ctx.user.id);
+
+      /*
+          Idempotency, not just tidiness. Two clicks on a slow connection would
+          otherwise create two envelopes, and every signer would receive two
+          links to two different documents with no way to tell which is the
+          real lease.
+        */
+      if (matter.status !== 'draft' || matter.envelopeId) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'This lease has already been sent.',
+        });
+      }
+
+      const answers = hydrate(matter);
+
+      const partyFindings = validateParties(answers.parties);
+
+      if (partyFindings.length > 0) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, { message: partyFindings.join(' ') });
+      }
+
+      const billing = await prisma.bizrethinkOrganisationBilling.findUnique({
+        where: { organisationId: matter.organisationId },
+        select: { bizrethinkInternal: true },
+      });
+
+      const envelope = await createEnvelopeFromMatter({
+        input: {
+          facts: answers.facts,
+          money: answers.money,
+          values: answers.values,
+          parties: toLeaseParties(answers.parties),
+          propertyAddress: String(answers.values.propertyAddress ?? ''),
+          customClauses: answers.customClauses,
+        },
+        parties: toLeaseParties(answers.parties),
+        emails: partyEmails(answers.parties),
+        userId: ctx.user.id,
+        teamId: matter.teamId,
+        organisationId: matter.organisationId,
+        organisationIsInternal: billing?.bizrethinkInternal ?? false,
+        title: matter.title,
+        requestMetadata: ctx.metadata,
+      });
+
+      /*
+          Stamped only after the envelope exists. The rule pack version is
+          recorded here because statutes move: a lease signed today must still
+          be explainable against the rules that produced it in five years.
+        */
+      await prisma.bizrethinkLeaseMatter.update({
+        where: { id: matter.id },
+        data: {
+          status: 'sent',
+          envelopeId: envelope.id,
+          rulePackVersion: US_FL.version,
+          generatedAt: new Date(),
+        },
+      });
+
+      return { envelopeId: envelope.id };
     }),
   }),
 });
