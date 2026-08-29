@@ -46,6 +46,29 @@ Landlord {{landlordReceivedFloodAssistance}} received assistance for flood damag
 
 For purposes of this disclosure, "flooding" means a general or temporary condition of partial or complete inundation of the dwelling unit caused by any of the following: the overflow of inland or tidal waters; the unusual and rapid accumulation of runoff or surface waters from any established water source, such as a river, stream, or drainage ditch; or sustained periods of standing water resulting from rainfall.`;
 
+/**
+ * The disclosure Fla. Stat. §83.49(2) prescribes, which the landlord's 30-day
+ * written notice must contain and which leases customarily reproduce.
+ *
+ * legal-language-ok: the statute's own prescribed wording contains "YOU SHOULD
+ * ATTEMPT TO INFORMALLY RESOLVE ANY DISPUTE". That is the legislature giving
+ * advice, not us, and the text may not be altered — a paraphrase does not
+ * discharge the obligation. This is precisely the case the exemption marker
+ * exists for.
+ *
+ * TRANSCRIBED, NOT VERIFIED. `verbatimVerifiedAt` stays null: this was taken
+ * from an executed Florida lease rather than read off the statute book, and
+ * the publish guard blocks it until a human confirms it against the current
+ * text. Do not promote this clause on the strength of it looking right.
+ */
+const DEPOSIT_STATUTORY_NOTICE = `YOUR LEASE REQUIRES PAYMENT OF CERTAIN DEPOSITS. THE LANDLORD MAY TRANSFER ADVANCE RENTS TO THE LANDLORD'S ACCOUNT AS THEY ARE DUE AND WITHOUT NOTICE. WHEN YOU MOVE OUT, YOU MUST GIVE THE LANDLORD YOUR NEW ADDRESS SO THAT THE LANDLORD CAN SEND YOU NOTICES REGARDING YOUR DEPOSIT. THE LANDLORD MUST MAIL YOU NOTICE, WITHIN 30 DAYS AFTER YOU MOVE OUT, OF THE LANDLORD'S INTENT TO IMPOSE A CLAIM AGAINST THE DEPOSIT. IF YOU DO NOT REPLY TO THE LANDLORD STATING YOUR OBJECTION TO THE CLAIM WITHIN 15 DAYS AFTER RECEIPT OF THE LANDLORD'S NOTICE, THE LANDLORD WILL COLLECT THE CLAIM AND MUST MAIL YOU THE REMAINING DEPOSIT, IF ANY.
+
+IF THE LANDLORD FAILS TO TIMELY MAIL YOU NOTICE, THE LANDLORD MUST RETURN THE DEPOSIT BUT MAY LATER FILE A LAWSUIT AGAINST YOU FOR DAMAGES. IF YOU FAIL TO TIMELY OBJECT TO A CLAIM, THE LANDLORD MAY COLLECT FROM THE DEPOSIT, BUT YOU MAY LATER FILE A LAWSUIT CLAIMING A REFUND.
+
+YOU SHOULD ATTEMPT TO INFORMALLY RESOLVE ANY DISPUTE BEFORE FILING A LAWSUIT. GENERALLY, THE PARTY IN WHOSE FAVOR A JUDGMENT IS RENDERED WILL BE AWARDED COSTS AND ATTORNEY FEES PAYABLE BY THE LOSING PARTY.
+
+THIS DISCLOSURE IS BASIC. PLEASE REFER TO PART II OF CHAPTER 83, FLORIDA STATUTES, TO DETERMINE YOUR LEGAL RIGHTS AND OBLIGATIONS.`;
+
 export const FL_STATUTORY_DISCLOSURES: Clause[] = [
   {
     slug: 'disclosure.radon',
@@ -121,11 +144,7 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     section: 'deposit',
     sortKey: 120,
     heading: 'Notice — Security Deposits and Advance Rent',
-    // The statute requires a copy of §83.49(3) in the agreement itself. Text
-    // intentionally left to be transcribed from the current statute during
-    // verification rather than reproduced from memory; `verbatimVerifiedAt`
-    // stays null and the publish guard blocks it until then.
-    body: '{{STATUTORY_TEXT_PENDING_VERIFICATION: Fla. Stat. §83.49(3)}}',
+    body: DEPOSIT_STATUTORY_NOTICE,
     source: {
       kind: 'statute',
       citation: 'Fla. Stat. §83.49(3)',
@@ -141,6 +160,38 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     variables: [],
     supersedes: [],
     asserts: ['deposit-notice-given'],
+  },
+
+  {
+    slug: 'deposit.escrow-notice',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'deposit',
+    sortKey: 122,
+    heading: 'Notice of Where the Deposit Is Held',
+    /*
+      The obligation nothing in the lease stated. Naming the depository is only
+      half of §83.49(2) — the landlord must also NOTIFY the tenant in writing
+      within 30 days of receiving the money.
+
+      This is the sentence the landlord of 29090 Picana Ln had to hand-type into
+      a free-text addendum on the 2026 lease, because the builder they used
+      emitted no equivalent.
+    */
+    body: 'Within 30 days of receiving the security deposit or advance rent, Landlord shall give Tenant written notice stating the name and address of the depository holding it and whether it is held in an interest-bearing account. Landlord shall give further written notice if the deposit is later moved to a different depository.',
+    source: {
+      kind: 'statute',
+      citation: 'Fla. Stat. §83.49(2)',
+      verbatimRequired: false,
+      verbatimVerifiedAt: null,
+    },
+    status: 'draft',
+    requiredBy: 'Fla. Stat. §83.49(2)',
+    includeWhen: (facts) => facts.depositHeldUsd > 0,
+    variables: [],
+    supersedes: [],
+    asserts: ['deposit-escrow-notice'],
   },
 
   {

@@ -29,6 +29,8 @@ const NEW_TENANCY: ClauseFacts = {
   terminationOnSale: true,
   holdoverPenalty: true,
   earlyTerminationOffered: true,
+  nonRenewalNoticeRequired: true,
+  electronicNoticesElected: false,
 };
 
 /**

@@ -28,7 +28,18 @@ export const FL_BOILERPLATE: Clause[] = [
     section: 'notices',
     sortKey: 10,
     heading: 'Notices',
-    body: 'A notice under this Lease must be in writing and is validly given if delivered by hand, sent by post to the address given for that party in this Lease, or sent by email to the address given for that party. A notice sent by post is treated as received on the third day after posting. Either party may change its address for notices by giving notice in the manner set out in this section. Nothing in this section affects the manner of service required by Fla. Stat. §83.56 for a statutory notice.',
+    /*
+      Email was removed as an unconditional method. §83.505 permits electronic
+      delivery of notices under this part ONLY where the parties have signed a
+      separate addendum in substantially the form the statute prescribes,
+      stating that the election is voluntary and revocable.
+
+      The previous wording simply declared email valid. That is worse than an
+      omission: it grants what the statute conditions, and a tenant could rely
+      on it. Electing electronic delivery now selects
+      `notices.electronic-delivery`, which is that addendum.
+    */
+    body: 'A notice under this Lease must be in writing and is validly given if delivered by hand or sent by post to the address given for that party in this Lease. A notice sent by post is treated as received on the third day after posting. Notices may be delivered by email only where the parties have signed the electronic delivery addendum required by Fla. Stat. §83.505. Either party may change its address for notices by giving notice in the manner set out in this section. Nothing in this section affects the manner of service required by Fla. Stat. §83.56 for a statutory notice.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -59,6 +70,36 @@ export const FL_BOILERPLATE: Clause[] = [
     ],
     supersedes: [],
     asserts: ['tenant-notice-address'],
+  },
+
+  {
+    slug: 'notices.electronic-delivery',
+    version: 1,
+    jurisdiction: 'US-FL',
+    // Its own signed addendum, because the statute requires exactly that.
+    placement: 'addendum',
+    section: 'notices',
+    sortKey: 30,
+    heading: 'Electronic Delivery of Notices Addendum',
+    /*
+      Fla. Stat. §83.505 prescribes a form "substantially" like this: each party
+      elects separately, provides an email address, and is told in the document
+      that the election is voluntary and revocable at any time.
+
+      Offered only when elected. A landlord who does not want email notice
+      should not be handed an addendum inviting it.
+    */
+    body: 'Fla. Stat. §83.505 permits notices required under Part II of Chapter 83 to be delivered by email only where both parties agree in a signed addendum. This is that addendum. Election is voluntary. Either party may revoke it, or update the email address given, at any time by written notice to the other, and a revocation does not affect the validity of a notice already sent.\n\nLandlord elects to receive notices by email at: {{landlordNoticeEmail}}\n\nTenant elects to receive notices by email at: {{tenantNoticeEmail}}\n\nA notice sent by email is delivered when sent, unless it is returned as undeliverable. The sender shall keep a copy of the notice and evidence of its transmission.',
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Fla. Stat. §83.505',
+    includeWhen: (facts) => facts.electronicNoticesElected,
+    variables: [
+      { name: 'landlordNoticeEmail', type: 'string', label: 'Landlord email for notices', required: true },
+      { name: 'tenantNoticeEmail', type: 'string', label: 'Tenant email for notices', required: true },
+    ],
+    supersedes: [],
+    asserts: ['electronic-notice-elected'],
   },
 
   {

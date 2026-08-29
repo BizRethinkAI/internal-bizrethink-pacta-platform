@@ -39,6 +39,8 @@ const facts = (overrides: Partial<ClauseFacts> = {}): ClauseFacts => ({
   terminationOnSale: true,
   holdoverPenalty: true,
   earlyTerminationOffered: true,
+  nonRenewalNoticeRequired: true,
+  electronicNoticesElected: false,
   ...overrides,
 });
 

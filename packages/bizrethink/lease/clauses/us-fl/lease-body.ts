@@ -88,6 +88,35 @@ export const FL_LEASE_BODY: Clause[] = [
   },
 
   {
+    slug: 'term.non-renewal-notice',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'term',
+    sortKey: 33,
+    heading: 'Notice Before the Term Ends',
+    /*
+      Fla. Stat. §83.575(1) lets a lease require the tenant to give notice
+      before vacating at the end of the term — but ONLY if the same provision
+      obliges the landlord to say, within the same window, that the lease will
+      not be renewed. A one-sided version is not what the statute permits.
+
+      The bounds are also fixed: not less than 30 days and not more than 60,
+      from either party. Enforced numerically by the rule pack.
+    */
+    body: 'Tenant shall give Landlord at least {{nonRenewalNoticeDays}} days\u2019 written notice before vacating the Premises at the end of the term. Within that same period Landlord shall notify Tenant, in the manner required by Fla. Stat. \u00a783.56(4), if this Lease will not be renewed. Neither party may be required to give less than 30 nor more than 60 days\u2019 notice.',
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Fla. Stat. §83.575',
+    includeWhen: (facts) => facts.nonRenewalNoticeRequired,
+    variables: [
+      { name: 'nonRenewalNoticeDays', type: 'number', label: 'Days of notice before the term ends', required: true },
+    ],
+    supersedes: [],
+    asserts: ['non-renewal-notice'],
+  },
+
+  {
     slug: 'term.holdover',
     version: 1,
     jurisdiction: 'US-FL',

@@ -28,6 +28,7 @@ export type ValidateAnswersInput = {
   access: { noticeHours: number; earliestHour: number; latestHour: number };
   earlyTermination: { offered: boolean; feeUsd: number; tenantNoticeDays: number };
   lateFee: { graceDays: number };
+  nonRenewal: { required: boolean; noticeDays: number };
 };
 
 export type ValidateAnswersOptions = {
@@ -107,6 +108,31 @@ export const validateAnswers = ({ answers, pack }: ValidateAnswersOptions): Find
         severity: 'blocks',
         citation: 'Fla. Stat. §83.595(4)',
         message: `Fla. Stat. §83.595(4) permits the tenant to be required to give no more than ${pack.earlyTermination.maxTenantNoticeDays} days' notice of early termination. This lease requires ${earlyTermination.tenantNoticeDays} days.`,
+      });
+    }
+  }
+
+  /*
+    §83.575(1) fixes the window in both directions — a lease may not require
+    less than 30 days nor more than 60, from either party. Both ends matter:
+    too short is as unenforceable as too long.
+  */
+  if (answers.nonRenewal.required) {
+    if (answers.nonRenewal.noticeDays < pack.nonRenewal.minNoticeDays) {
+      findings.push({
+        code: 'non-renewal-notice-too-short',
+        severity: 'blocks',
+        citation: 'Fla. Stat. §83.575(1)',
+        message: `Fla. Stat. §83.575(1) does not permit a rental agreement to require less than ${pack.nonRenewal.minNoticeDays} days' notice before vacating at the end of the term. This lease states ${answers.nonRenewal.noticeDays} days.`,
+      });
+    }
+
+    if (answers.nonRenewal.noticeDays > pack.nonRenewal.maxNoticeDays) {
+      findings.push({
+        code: 'non-renewal-notice-too-long',
+        severity: 'blocks',
+        citation: 'Fla. Stat. §83.575(1)',
+        message: `Fla. Stat. §83.575(1) does not permit a rental agreement to require more than ${pack.nonRenewal.maxNoticeDays} days' notice from either party. This lease states ${answers.nonRenewal.noticeDays} days.`,
       });
     }
   }

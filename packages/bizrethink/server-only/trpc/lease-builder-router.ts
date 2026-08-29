@@ -359,6 +359,10 @@ export const leaseBuilderRouter = router({
             tenantNoticeDays: Number(answers.values.earlyTerminationNoticeDays ?? 0),
           },
           lateFee: { graceDays: Number(answers.values.graceDays ?? 0) },
+          nonRenewal: {
+            required: Boolean((answers.facts as Record<string, unknown>).nonRenewalNoticeRequired),
+            noticeDays: Number(answers.values.nonRenewalNoticeDays ?? 0),
+          },
         },
         pack: US_FL,
       });
