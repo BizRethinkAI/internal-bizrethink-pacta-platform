@@ -10,6 +10,7 @@ import { lookupAddress } from '../../lease/address/census';
 import { clauseFingerprint, isApprovalCurrent } from '../../lease/clauses/approval';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
+import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
 import { deriveFacts } from '../../lease/interview/derive-facts';
@@ -25,6 +26,7 @@ import {
 } from '../../lease/review/disposition';
 import type { Disposition, LeaseReview, ReviewAudience, ReviewComment, ReviewStatus } from '../../lease/review/types';
 import { US_FL } from '../../lease/rule-packs/us-fl';
+import { FL_NON_WAIVABLE } from '../../lease/rule-packs/us-fl-non-waivable';
 import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only/clause-approvals';
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
@@ -516,23 +518,39 @@ export const leaseBuilderRouter = router({
       */
       const reviewFindings = await reviewBlockersFor(matter.id);
 
+      /*
+        Clauses the landlord wrote themselves, checked against the areas
+        Florida does not let a lease contract around and against the answers
+        already given. Reports what it matched and stops — a regex is not
+        entitled to a verdict on a specific provision.
+      */
+      const clauseFindings = scanCustomClauses({
+        clauses: answers.customClauses,
+        facts: answers.facts,
+        values: answers.values,
+        pack: FL_NON_WAIVABLE,
+      });
+
       return {
         findings,
         missing,
         partyFindings,
         reviewFindings,
+        clauseFindings,
         duplicateAssertions: selection.duplicateAssertions,
         unreviewedClauses: [...new Set(unreviewed)],
         blocking:
           findings.filter((f) => f.severity === 'blocks').length +
           missing.length +
           partyFindings.length +
-          reviewFindings.length,
+          reviewFindings.length +
+          clauseFindings.filter((f) => f.severity === 'blocks').length,
         readyToSend:
           findings.every((f) => f.severity !== 'blocks') &&
           missing.length === 0 &&
           partyFindings.length === 0 &&
-          reviewFindings.length === 0,
+          reviewFindings.length === 0 &&
+          clauseFindings.every((f) => f.severity !== 'blocks'),
         rulePackVersion: US_FL.version,
       };
     }),
@@ -587,6 +605,21 @@ export const leaseBuilderRouter = router({
 
       if (reviewFindings.length > 0) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, { message: reviewFindings.join(' ') });
+      }
+
+      // Re-checked here for the same reason: `validate` is a query, and a gate
+      // that lives only in a read-only query is not a gate.
+      const blockingClauses = scanCustomClauses({
+        clauses: answers.customClauses,
+        facts: answers.facts,
+        values: answers.values,
+        pack: FL_NON_WAIVABLE,
+      }).filter((finding) => finding.severity === 'blocks');
+
+      if (blockingClauses.length > 0) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: blockingClauses.map((finding) => `${finding.clauseHeading}: ${finding.message}`).join(' '),
+        });
       }
       const envelope = await createEnvelopeFromMatter({
         input: {

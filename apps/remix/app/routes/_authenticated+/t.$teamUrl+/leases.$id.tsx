@@ -285,6 +285,15 @@ type ValidationResult = {
   missing: string[];
   partyFindings: string[];
   reviewFindings: string[];
+  clauseFindings: {
+    ruleId: string;
+    citation: string;
+    clauseHeading: string;
+    severity: 'blocks' | 'warns';
+    statute: string;
+    message: string;
+    matched: string[];
+  }[];
   duplicateAssertions: { assertion: string; slugs: string[] }[];
   unreviewedClauses: string[];
   blocking: number;
@@ -413,6 +422,37 @@ const ReviewPanel = ({
           </AlertDescription>
         </Alert>
       )}
+
+      {/*
+        One alert per finding rather than a bundled list: each carries its own
+        citation and the exact words it matched, and a reader has to be able to
+        judge the match for themselves. A collapsed summary would hide the one
+        thing that makes this honest.
+      */}
+      {data.clauseFindings.map((finding) => (
+        <Alert
+          key={`${finding.ruleId}-${finding.clauseHeading}`}
+          variant={finding.severity === 'blocks' ? 'destructive' : 'warning'}
+        >
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>
+            {finding.clauseHeading} — {finding.citation}
+          </AlertTitle>
+          <AlertDescription>
+            <p>{finding.message}</p>
+            <p className="mt-2 text-xs leading-relaxed opacity-90">{finding.statute}</p>
+            {finding.matched.filter(Boolean).length > 0 && (
+              <p className="mt-2 font-mono text-xs">
+                matched:{' '}
+                {finding.matched
+                  .filter(Boolean)
+                  .map((m) => `"${m}"`)
+                  .join(', ')}
+              </p>
+            )}
+          </AlertDescription>
+        </Alert>
+      ))}
 
       {data.duplicateAssertions.length > 0 && (
         <Alert variant="warning">
