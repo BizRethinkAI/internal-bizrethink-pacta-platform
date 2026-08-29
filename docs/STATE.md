@@ -39,7 +39,7 @@ branding.
 | PR | What | State |
 |---|---|---|
 | #26 | Lease party list + sending wired | Open. Base of the current stack. |
-| #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26 |
+| #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. You are reading its STATE update. |
 | #3 | `default-deny GITHUB_TOKEN` scope in CI workflows | Rebased 2026-08-29 |
 | #4 | AATL signing setup plan (DigiCert + GCP Cloud HSM) | Rebased 2026-08-29. AATL confirmed still live. |
 
@@ -198,6 +198,37 @@ Both create a valid envelope and produce a lease countersigned by the wrong
 person with no error anywhere. `validateParties` rejects both. **Party order is
 load-bearing** — placeholders are numbered positionally and resolved by index, so
 nothing may sort or regroup that list.
+
+### Property data
+
+Settled 2026-08-29 after checking what "national, fast, free" actually buys.
+**Free national data does not include the field that matters.** `yearBuilt`
+decides whether the federal lead-paint disclosure fires (42 U.S.C. §4852d), and
+the free tiers that carry it cap at ~5 properties (RentCast) or cost ~$299/mo
+(ATTOM). Zillow retired its public API in 2021 and prohibits automated access;
+third-party wrappers resell scraped data, which is not a foundation for a legal
+documents product.
+
+So: the **US Census geocoder** (free, no API key, US government data) normalises
+the address and derives the **county**, which sets venue. `yearBuilt` and
+`propertyType` stay asked, and "unknown" includes the disclosure rather than
+skipping it — a fail-safe an API guess would defeat.
+
+On blur, not per keystroke: it is a lookup, not a typeahead. Verified live before
+being designed around; the test fixture is a real captured response, because two
+things about the real shape would not have been guessed — the match returns ALL
+CAPS, and `addressComponents` carries no house number at all (`fromAddress`/
+`toAddress` are the block range).
+
+### The UPL line, now structural
+
+A field carrying a `statute` shows the bound and the citation and may **never**
+carry a suggested value — suggesting a number on a statutorily-constrained field
+is advising on the statute. A field with no statutory bound may state a market
+fact, phrased as an observation ("most leases use…", never "we recommend…").
+Both halves are asserted by test, including a required attributing word, so the
+rule cannot be eroded by a copy edit. Only three fields qualify today; inventing
+market statistics to fill more would be worse than an empty box.
 
 ### Paused elsewhere
 
