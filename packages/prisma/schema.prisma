@@ -1710,6 +1710,14 @@ model BizrethinkLeaseMatter {
   values        Json
   customClauses Json @default("[]")
 
+  /// Who signs, in order. `[{ name, role, email }]`.
+  ///
+  /// ORDER IS LOAD-BEARING: recipient placeholders (`r1`, `r2`, …) are assigned
+  /// positionally across this list and resolved back by index at signing, so
+  /// reordering it after an envelope exists would re-point signature fields at
+  /// different people.
+  parties Json @default("[]")
+
   /// Which step the answerer stopped on, so a 68-field interview can be left
   /// and resumed rather than restarted.
   currentStepId String?

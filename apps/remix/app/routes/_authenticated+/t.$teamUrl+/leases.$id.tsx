@@ -1,5 +1,6 @@
 import type { InterviewAnswers } from '@bizrethink/customizations/lease/interview/steps';
 import { FL_INTERVIEW, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
+import type { LeasePartyInput } from '@bizrethink/customizations/lease/parties/derive-parties';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -9,13 +10,14 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Button } from '@documenso/ui/primitives/button';
 import { Progress } from '@documenso/ui/primitives/progress';
 import { msg } from '@lingui/core/macro';
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useRevalidator } from 'react-router';
 
 import { CustomClauseEditor } from '~/components/general/lease/custom-clause-editor';
 import type { FieldValue } from '~/components/general/lease/interview-field';
 import { InterviewFieldControl } from '~/components/general/lease/interview-field';
+import { PartyEditor } from '~/components/general/lease/party-editor';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/leases.$id';
@@ -69,6 +71,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       money: matter.money as Record<string, unknown>,
       values: matter.values as Record<string, FieldValue>,
       customClauses: matter.customClauses as InterviewAnswers['customClauses'],
+      parties: matter.parties as LeasePartyInput[],
+      envelopeId: matter.envelopeId,
     },
   };
 }
@@ -118,10 +122,11 @@ export default function LeaseInterviewPage() {
   const [money, setMoney] = useState<Record<string, unknown>>(matter.money);
   const [values, setValues] = useState<Record<string, FieldValue>>(matter.values);
   const [customClauses, setCustomClauses] = useState<InterviewAnswers['customClauses']>(matter.customClauses);
+  const [parties, setParties] = useState<LeasePartyInput[]>(matter.parties);
 
   const answers = useMemo(
-    () => ({ facts, money, values, customClauses }) as unknown as InterviewAnswers,
-    [facts, money, values, customClauses],
+    () => ({ facts, money, values, customClauses, parties }) as unknown as InterviewAnswers,
+    [facts, money, values, customClauses, parties],
   );
 
   const steps = useMemo(() => visibleSteps(FL_INTERVIEW, answers), [answers]);
@@ -159,7 +164,7 @@ export default function LeaseInterviewPage() {
     await saveStep.mutateAsync({
       id: matter.id,
       currentStepId: target.id,
-      answers: { facts, money, values, customClauses } as never,
+      answers: { facts, money, values, customClauses, parties } as never,
     });
 
     setStepIndex(index);
@@ -225,6 +230,8 @@ export default function LeaseInterviewPage() {
           ))}
         </div>
 
+        {step.id === 'parties' && <PartyEditor parties={parties} onChange={setParties} />}
+
         {step.id === 'custom-clauses' && (
           <CustomClauseEditor
             sections={step.customClauseSections ?? []}
@@ -237,6 +244,9 @@ export default function LeaseInterviewPage() {
           <ReviewPanel
             teamUrl={teamUrl}
             matterId={matter.id}
+            status={matter.status}
+            envelopeId={matter.envelopeId}
+            parties={parties}
             query={{ isLoading: validate.isLoading, data: validate.data as ValidationResult | undefined }}
           />
         )}
@@ -272,6 +282,7 @@ export default function LeaseInterviewPage() {
 type ValidationResult = {
   findings: { code: string; severity: 'blocks' | 'warns'; citation: string; message: string }[];
   missing: string[];
+  partyFindings: string[];
   duplicateAssertions: { assertion: string; slugs: string[] }[];
   unreviewedClauses: string[];
   blocking: number;
@@ -287,17 +298,59 @@ type ValidationResult = {
 const ReviewPanel = ({
   teamUrl,
   matterId,
+  status,
+  envelopeId,
+  parties,
   query,
 }: {
   teamUrl: string;
   matterId: string;
+  status: string;
+  envelopeId: string | null;
+  parties: LeasePartyInput[];
   query: { isLoading: boolean; data: ValidationResult | undefined };
 }) => {
+  const revalidator = useRevalidator();
+  const [confirming, setConfirming] = useState(false);
+
+  const send = trpc.bizrethink.leaseBuilder.matter.send.useMutation({
+    onSuccess: () => {
+      setConfirming(false);
+      revalidator.revalidate();
+    },
+  });
   if (query.isLoading) {
     return (
       <p className="mt-6 flex items-center gap-2 text-muted-foreground text-sm">
         <Loader2 className="h-4 w-4 animate-spin" /> Checking the lease against Florida law…
       </p>
+    );
+  }
+
+  /*
+    A sent lease is done being edited here. Showing the findings panel again
+    would invite changes to a document that recipients are already signing —
+    the answers would drift from the PDF in their inbox with nothing to
+    reconcile the two.
+  */
+  if (status !== 'draft' || envelopeId) {
+    return (
+      <div className="mt-6 space-y-4">
+        <Alert>
+          <Check className="h-4 w-4" />
+          <AlertTitle>This lease has been sent for signature</AlertTitle>
+          <AlertDescription>
+            Every signer has been emailed their own link. The lease can no longer be edited here — track it from the
+            documents list.
+          </AlertDescription>
+        </Alert>
+
+        {envelopeId && (
+          <Button asChild variant="outline">
+            <a href={`/t/${teamUrl}/documents/${envelopeId}`}>Open the envelope</a>
+          </Button>
+        )}
+      </div>
     );
   }
 
@@ -325,6 +378,20 @@ const ReviewPanel = ({
             <ul className="mt-2 list-disc space-y-1 pl-4 font-mono text-xs">
               {data.missing.map((item) => (
                 <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {data.partyFindings.length > 0 && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>The signer list needs attention</AlertTitle>
+          <AlertDescription>
+            <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
+              {data.partyFindings.map((finding) => (
+                <li key={finding}>{finding}</li>
               ))}
             </ul>
           </AlertDescription>
@@ -365,13 +432,64 @@ const ReviewPanel = ({
           </a>
         </Button>
 
-        <Button
-          disabled={!data.readyToSend}
-          title={data.readyToSend ? 'Not wired up yet' : 'Resolve the findings above'}
-        >
+        <Button disabled={!data.readyToSend || send.isPending} onClick={() => setConfirming(true)}>
+          <Send className="mr-2 h-4 w-4" />
           Send for signature
         </Button>
       </div>
+
+      {/*
+        A confirmation step rather than a direct send, because this is the one
+        irreversible action in the feature: the moment it succeeds, a real
+        document is in other people's inboxes and the answers are frozen.
+        Naming every recipient here is the point — a mistyped address is
+        invisible on the parties step and obvious in a list headed "these
+        people will receive it".
+      */}
+      {confirming && (
+        <div className="rounded-lg border border-foreground/20 bg-muted/40 p-5">
+          <h3 className="font-semibold">Send this lease to {parties.length} people?</h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            Each person receives their own signing link. Once sent, the answers are frozen and the lease can no longer
+            be edited.
+          </p>
+
+          <ul className="mt-4 space-y-1.5 text-sm">
+            {parties.map((party) => (
+              <li key={party.email} className="flex items-baseline gap-2">
+                <span className="font-medium">{party.name}</span>
+                <span className="text-muted-foreground text-xs uppercase tracking-wide">{party.role}</span>
+                <span className="text-muted-foreground">{party.email}</span>
+              </li>
+            ))}
+          </ul>
+
+          {send.error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>The lease was not sent</AlertTitle>
+              <AlertDescription>{send.error.message}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="mt-5 flex items-center gap-3">
+            <Button disabled={send.isPending} onClick={() => send.mutate({ id: matterId })}>
+              {send.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sending…
+                </>
+              ) : (
+                'Yes, send it'
+              )}
+            </Button>
+
+            <Button variant="ghost" disabled={send.isPending} onClick={() => setConfirming(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

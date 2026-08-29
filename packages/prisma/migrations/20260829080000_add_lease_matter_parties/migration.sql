@@ -1,0 +1,13 @@
+-- Who signs a lease, in order: `[{ name, role, email }]`.
+--
+-- Until now the party list existed nowhere. `landlordNames` and `tenantNames`
+-- are required variables on the opening clause of every lease and sit in
+-- DERIVED_VALUES, so nobody typed them and nothing derived them — they were
+-- populated only by a hardcoded test fixture. Every real lease reported them
+-- as missing, `readyToSend` was therefore permanently false, and the send path
+-- could not be reached at all.
+--
+-- Defaulted to an empty array so existing draft matters remain readable; they
+-- surface as "add at least one landlord and one tenant" on the parties step
+-- rather than failing to load.
+ALTER TABLE "BizrethinkLeaseMatter" ADD COLUMN "parties" JSONB NOT NULL DEFAULT '[]';
