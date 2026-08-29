@@ -1,9 +1,4 @@
-import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import { alphaid } from '@documenso/lib/universal/id';
 
@@ -31,9 +26,7 @@ export type TestStorageResult =
   | { ok: true; details: { bucket: string; endpoint: string; roundTripMs: number } }
   | { ok: false; error: string; stage: 'connect' | 'put' | 'get' | 'delete' };
 
-export const testInstanceStorage = async (
-  config: TestStorageConfig,
-): Promise<TestStorageResult> => {
+export const testInstanceStorage = async (config: TestStorageConfig): Promise<TestStorageResult> => {
   if (!config.bucket) {
     return { ok: false, error: 'Bucket name is required', stage: 'connect' };
   }

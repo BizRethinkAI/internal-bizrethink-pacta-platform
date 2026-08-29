@@ -92,10 +92,7 @@ export async function syncStripeProducts(client: Stripe): Promise<SyncResult[]> 
   return results;
 }
 
-async function upsertProduct(
-  client: Stripe,
-  tier: StripeTierSpec,
-): Promise<{ id: string; created: boolean }> {
+async function upsertProduct(client: Stripe, tier: StripeTierSpec): Promise<{ id: string; created: boolean }> {
   const search = await client.products.search({
     query: `metadata['claimId']:'${tier.claimId}' AND active:'true'`,
   });

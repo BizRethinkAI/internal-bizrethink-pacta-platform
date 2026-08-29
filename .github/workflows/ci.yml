@@ -39,6 +39,22 @@ jobs:
       - name: Build app
         run: npm run build -- --filter=!@documenso/docs
 
+      # MODIFIED for BizRethink (2026-08-29): run the unit tests.
+      #
+      # Until this date CI ran the two build steps above and nothing else, so
+      # "CI green" certified only that the code compiled. The ~2,100 unit tests
+      # in this repo ran solely when a human remembered to run them — including
+      # every test in packages/bizrethink, which is where all our behaviour
+      # lives. See docs/engineering-standard.md §1.
+      #
+      # Note the inversion this exposes: CI runs Node 22 (the default in
+      # .github/actions/node-install) where `prisma generate` works, while a
+      # workstation on Node 26 cannot run `npm test` at all — zod-prisma-types
+      # calls fs.rm with the `recursive` option Node 26 removed. CI is
+      # currently the only place the full suite can run.
+      - name: Unit tests
+        run: npm test -- --filter=!@documenso/docs
+
   build_docker:
     name: Build Docker Image
     runs-on: ubuntu-latest

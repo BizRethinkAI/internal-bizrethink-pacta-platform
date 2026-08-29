@@ -18,9 +18,7 @@ import Stripe from 'stripe';
 // 10s so a misconfigured key doesn't make the admin UI's "Test" button
 // hang. Connection refused errors surface within ~1s anyway.
 
-export type TestStripeResult =
-  | { ok: true; accountId: string; livemode: boolean }
-  | { ok: false; error: string };
+export type TestStripeResult = { ok: true; accountId: string; livemode: boolean } | { ok: false; error: string };
 
 /**
  * Test a Stripe API key by calling `stripe.balance.retrieve()`.
@@ -87,7 +85,11 @@ export async function testStripeConnection(apiKey: string): Promise<TestStripeRe
  */
 function extractAccountIdFromKey(apiKey: string): string {
   const last4 = apiKey.slice(-4);
-  if (apiKey.startsWith('sk_test_')) return `sk_test_***${last4}`;
-  if (apiKey.startsWith('sk_live_')) return `sk_live_***${last4}`;
+  if (apiKey.startsWith('sk_test_')) {
+    return `sk_test_***${last4}`;
+  }
+  if (apiKey.startsWith('sk_live_')) {
+    return `sk_live_***${last4}`;
+  }
   return `***${last4}`;
 }

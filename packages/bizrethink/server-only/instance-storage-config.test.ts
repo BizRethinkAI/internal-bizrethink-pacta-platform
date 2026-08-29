@@ -1,12 +1,7 @@
+import { prisma } from '@documenso/prisma';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { prisma } from '@documenso/prisma';
-
-import {
-  encryptStorageString,
-  getInstanceStorageConfig,
-  invalidateStorageConfig,
-} from './instance-storage-config';
+import { encryptStorageString, getInstanceStorageConfig, invalidateStorageConfig } from './instance-storage-config';
 
 vi.mock('@documenso/prisma', () => ({
   prisma: {

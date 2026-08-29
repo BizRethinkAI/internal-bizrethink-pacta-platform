@@ -1,7 +1,6 @@
-import { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import { adminProcedure, router } from '@documenso/trpc/server/trpc';
+import { z } from 'zod';
 
 import { encryptStripeCredential, invalidateStripeConfig } from '../instance-stripe-config';
 import { syncStripeProducts } from '../sync-stripe-products';
@@ -122,9 +121,7 @@ const updateRoute = adminProcedure
       ? encryptStripeCredential(input.sandboxWebhookSecret)
       : (existing?.sandboxWebhookSecret ?? null);
 
-    const liveApiKey = input.liveApiKey
-      ? encryptStripeCredential(input.liveApiKey)
-      : (existing?.liveApiKey ?? null);
+    const liveApiKey = input.liveApiKey ? encryptStripeCredential(input.liveApiKey) : (existing?.liveApiKey ?? null);
 
     const liveWebhookSecret = input.liveWebhookSecret
       ? encryptStripeCredential(input.liveWebhookSecret)

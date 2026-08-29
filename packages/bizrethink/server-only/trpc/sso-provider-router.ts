@@ -1,7 +1,6 @@
-import { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import { adminProcedure, router } from '@documenso/trpc/server/trpc';
+import { z } from 'zod';
 
 import { encryptSsoString, invalidateProviderConfig } from '../sso-provider-config';
 
@@ -63,8 +62,7 @@ export const ssoProviderRouter = router({
         where: { provider: input.provider },
       });
 
-      const enc = (val: string, prev: string | null) =>
-        val ? encryptSsoString(val) : (prev ?? null);
+      const enc = (val: string, prev: string | null) => (val ? encryptSsoString(val) : (prev ?? null));
 
       const data = {
         enabled: input.enabled,

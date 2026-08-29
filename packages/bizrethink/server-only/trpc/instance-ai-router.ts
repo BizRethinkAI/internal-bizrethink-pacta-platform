@@ -1,7 +1,6 @@
-import { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import { adminProcedure, router } from '@documenso/trpc/server/trpc';
+import { z } from 'zod';
 
 import { encryptAiString, invalidateAiConfig } from '../instance-ai-config';
 
@@ -29,7 +28,9 @@ export const instanceAiRouter = router({
     const row = await prisma.bizrethinkInstanceAiConfig.findUnique({
       where: { id: 'singleton' },
     });
-    if (!row) return null;
+    if (!row) {
+      return null;
+    }
     return {
       enabled: row.enabled,
       vertexProjectId: row.vertexProjectId,
@@ -47,9 +48,7 @@ export const instanceAiRouter = router({
         where: { id: 'singleton' },
       });
 
-      const apiKey = input.vertexApiKey
-        ? encryptAiString(input.vertexApiKey)
-        : (existing?.vertexApiKey ?? null);
+      const apiKey = input.vertexApiKey ? encryptAiString(input.vertexApiKey) : (existing?.vertexApiKey ?? null);
 
       const data = {
         enabled: input.enabled,

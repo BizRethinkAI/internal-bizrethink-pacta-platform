@@ -1,0 +1,64 @@
+name: 'Security'
+
+# The npm-audit gate.
+#
+# The BizRethink master CLAUDE.md has cited this workflow since 2026-05-24 as a
+# live control — "npm audit CI gate (security.yml, blocks high+)" — and listed
+# it among the compensating controls for not holding a GHAS licence for CodeQL.
+#
+# It did not exist. This file closes that gap. A documented control that nobody
+# provides is worse than an acknowledged absence, because it is relied upon.
+#
+# Scope note: audits production dependencies only (--omit=dev). A high-severity
+# advisory in a build-time-only package does not ship to users, and blocking on
+# those in a monorepo this size produces noise that trains people to bypass the
+# gate.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: npm audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/node-install
+
+      # ADVISORY, NOT BLOCKING — deliberately, and this should change.
+      #
+      # As of 2026-08-29 `npm audit --omit=dev` reports 19 high-severity
+      # advisories in production dependencies. Landing this as a hard gate
+      # would block every PR in the repo from the moment it merged, and a gate
+      # that blocks everything gets bypassed rather than fixed.
+      #
+      # So it reports, loudly, and does not fail. Turn `continue-on-error` off
+      # once the 19 are triaged — each either patched, or accepted with a
+      # written reason. Until then CLAUDE.md must not describe this as blocking,
+      # because it is not.
+      - name: Audit production dependencies
+        continue-on-error: true
+        run: |
+          npm audit --omit=dev --audit-level=high || AUDIT_FAILED=1
+
+          echo ""
+          echo "─────────────────────────────────────────────────────────"
+          echo "This gate is ADVISORY. See the comment in security.yml."
+          echo "Baseline at 2026-08-29: 19 high, 8 moderate, 8 low (prod)."
+          echo "A rise above that baseline is a regression worth chasing."
+          echo "─────────────────────────────────────────────────────────"
+
+          if [ -n "${AUDIT_FAILED:-}" ]; then
+            echo "Advisories at or above 'high' are present."
+          fi

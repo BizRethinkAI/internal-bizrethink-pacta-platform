@@ -1,13 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { prisma } from '@documenso/prisma';
 import { env } from '@documenso/lib/utils/env';
 
-import {
-  encryptSsoString,
-  getProviderConfig,
-  invalidateProviderConfig,
-} from './sso-provider-config';
+import { prisma } from '@documenso/prisma';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { encryptSsoString, getProviderConfig, invalidateProviderConfig } from './sso-provider-config';
 
 vi.mock('@documenso/prisma', () => ({
   prisma: {
@@ -74,9 +70,7 @@ describe('getProviderConfig — google', () => {
   });
 
   it('returns enabled=false when DB row has empty creds', async () => {
-    mockedFindUnique.mockResolvedValueOnce(
-      dbRow({ clientId: null, clientSecret: null }) as never,
-    );
+    mockedFindUnique.mockResolvedValueOnce(dbRow({ clientId: null, clientSecret: null }) as never);
     const cfg = await getProviderConfig('google');
     expect(cfg.enabled).toBe(false);
   });
@@ -84,8 +78,12 @@ describe('getProviderConfig — google', () => {
   it('falls back to env when no DB row exists', async () => {
     mockedFindUnique.mockResolvedValueOnce(null);
     mockedEnv.mockImplementation((key: string) => {
-      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_ID') return 'env-id';
-      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_SECRET') return 'env-secret';
+      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_ID') {
+        return 'env-id';
+      }
+      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_SECRET') {
+        return 'env-secret';
+      }
       return undefined;
     });
     const cfg = await getProviderConfig('google');
@@ -114,8 +112,12 @@ describe('getProviderConfig — microsoft', () => {
   it('falls back to env when no DB row', async () => {
     mockedFindUnique.mockResolvedValueOnce(null);
     mockedEnv.mockImplementation((key: string) => {
-      if (key === 'NEXT_PRIVATE_MICROSOFT_CLIENT_ID') return 'ms-id';
-      if (key === 'NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET') return 'ms-secret';
+      if (key === 'NEXT_PRIVATE_MICROSOFT_CLIENT_ID') {
+        return 'ms-id';
+      }
+      if (key === 'NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET') {
+        return 'ms-secret';
+      }
       return undefined;
     });
     const cfg = await getProviderConfig('microsoft');
@@ -126,9 +128,7 @@ describe('getProviderConfig — microsoft', () => {
 
 describe('getProviderConfig — oidc', () => {
   it('requires oidcWellKnownUrl for enabled=true (DB path)', async () => {
-    mockedFindUnique.mockResolvedValueOnce(
-      dbRow({ provider: 'oidc', oidcWellKnownUrl: '' }) as never,
-    );
+    mockedFindUnique.mockResolvedValueOnce(dbRow({ provider: 'oidc', oidcWellKnownUrl: '' }) as never);
     const cfg = await getProviderConfig('oidc');
     expect(cfg.enabled).toBe(false);
   });
@@ -166,11 +166,21 @@ describe('getProviderConfig — oidc', () => {
   it('falls back to env (requires wellKnown there too)', async () => {
     mockedFindUnique.mockResolvedValueOnce(null);
     mockedEnv.mockImplementation((key: string) => {
-      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_ID') return 'oidc-id';
-      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_SECRET') return 'oidc-secret';
-      if (key === 'NEXT_PRIVATE_OIDC_WELL_KNOWN') return 'https://idp.test/.well-known/openid-configuration';
-      if (key === 'NEXT_PRIVATE_OIDC_PROVIDER_LABEL') return 'Env IDP';
-      if (key === 'NEXT_PRIVATE_OIDC_SKIP_VERIFY') return 'true';
+      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_ID') {
+        return 'oidc-id';
+      }
+      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_SECRET') {
+        return 'oidc-secret';
+      }
+      if (key === 'NEXT_PRIVATE_OIDC_WELL_KNOWN') {
+        return 'https://idp.test/.well-known/openid-configuration';
+      }
+      if (key === 'NEXT_PRIVATE_OIDC_PROVIDER_LABEL') {
+        return 'Env IDP';
+      }
+      if (key === 'NEXT_PRIVATE_OIDC_SKIP_VERIFY') {
+        return 'true';
+      }
       return undefined;
     });
     const cfg = await getProviderConfig('oidc');
@@ -182,9 +192,15 @@ describe('getProviderConfig — oidc', () => {
   it('env-fallback OIDC label defaults to "OIDC" when env not set', async () => {
     mockedFindUnique.mockResolvedValueOnce(null);
     mockedEnv.mockImplementation((key: string) => {
-      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_ID') return 'id';
-      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_SECRET') return 'sec';
-      if (key === 'NEXT_PRIVATE_OIDC_WELL_KNOWN') return 'https://idp.test/.well-known';
+      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_ID') {
+        return 'id';
+      }
+      if (key === 'NEXT_PRIVATE_OIDC_CLIENT_SECRET') {
+        return 'sec';
+      }
+      if (key === 'NEXT_PRIVATE_OIDC_WELL_KNOWN') {
+        return 'https://idp.test/.well-known';
+      }
       return undefined;
     });
     const cfg = await getProviderConfig('oidc');
@@ -196,8 +212,12 @@ describe('DB-failure fallback (defensive)', () => {
   it('falls back to env when DB read throws', async () => {
     mockedFindUnique.mockRejectedValueOnce(new Error('Prisma connection failed'));
     mockedEnv.mockImplementation((key: string) => {
-      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_ID') return 'fallback-id';
-      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_SECRET') return 'fallback-secret';
+      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_ID') {
+        return 'fallback-id';
+      }
+      if (key === 'NEXT_PRIVATE_GOOGLE_CLIENT_SECRET') {
+        return 'fallback-secret';
+      }
       return undefined;
     });
     const cfg = await getProviderConfig('google');
@@ -212,9 +232,7 @@ describe('encryptSsoString', () => {
     const encrypted = encryptSsoString('plain-secret');
     expect(encrypted).toBe('enc:plain-secret');
 
-    mockedFindUnique.mockResolvedValueOnce(
-      dbRow({ clientSecret: encrypted }) as never,
-    );
+    mockedFindUnique.mockResolvedValueOnce(dbRow({ clientSecret: encrypted }) as never);
     const cfg = await getProviderConfig('google');
     expect(cfg.clientSecret).toBe('plain-secret');
   });

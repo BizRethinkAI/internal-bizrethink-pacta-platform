@@ -1,13 +1,8 @@
-import { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import { adminProcedure, router } from '@documenso/trpc/server/trpc';
+import { z } from 'zod';
 
-import {
-  encryptBase64String,
-  encryptUtf8String,
-  invalidateSigningConfig,
-} from '../instance-signing-config';
+import { encryptBase64String, encryptUtf8String, invalidateSigningConfig } from '../instance-signing-config';
 
 // Phase C (overlay 011 prerequisite): TRPC router for instance signing config.
 //

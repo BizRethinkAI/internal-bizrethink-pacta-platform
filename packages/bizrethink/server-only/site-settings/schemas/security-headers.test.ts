@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  SITE_SETTINGS_SECURITY_HEADERS_ID,
-  ZSiteSettingsSecurityHeadersSchema,
-} from './security-headers';
+import { SITE_SETTINGS_SECURITY_HEADERS_ID, ZSiteSettingsSecurityHeadersSchema } from './security-headers';
 
 const VALID_BASE = {
   id: SITE_SETTINGS_SECURITY_HEADERS_ID,
@@ -47,9 +44,7 @@ describe('ZSiteSettingsSecurityHeadersSchema', () => {
     expect(parsed.data?.hsts.includeSubdomains).toBe(false);
     expect(parsed.data?.hsts.preload).toBe(false);
     expect(parsed.data?.permissionsPolicy.enabled).toBe(true);
-    expect(parsed.data?.permissionsPolicy.value).toBe(
-      'camera=(), microphone=(), geolocation=(), interest-cohort=()',
-    );
+    expect(parsed.data?.permissionsPolicy.value).toBe('camera=(), microphone=(), geolocation=(), interest-cohort=()');
   });
 
   it('applies HSTS field-level defaults when only enabled is supplied', () => {
