@@ -15,7 +15,7 @@ concurrency:
 permissions:
   contents: read
 
-# MODIFIED for BizRethink (2026-08-29): sharded across 4 runners.
+# MODIFIED for BizRethink (2026-08-29): sharded across 8 runners.
 #
 # The suite took ~59 minutes of wall clock on every pull request. Per-step
 # timings from a real run: 2m49s of setup, and ~56 minutes in a single step.
@@ -26,8 +26,30 @@ permissions:
 # spec files is the consequence.
 #
 # Sharding restores the parallelism the runner cannot provide. Setup is only
-# ~3 minutes and runs concurrently on each shard, so wall clock lands near
-# 3 + 53/4 ≈ 16 minutes with no loss of coverage: every test still runs.
+# ~3 minutes and runs concurrently on each shard, so every test still runs.
+#
+# FOUR SHARDS PREDICTED ~16 MINUTES AND DELIVERED 31. Measured on run
+# 33242865996: shards 1 and 2 finished in 9.8 and 10.7 minutes, shards 3 and 4
+# in 31.0 and 30.3. Playwright balances shards by TEST COUNT, not duration, and
+# the spec files are distributed in sorted order — so the back half of the
+# alphabet (envelope-editor-v2, envelopes, teams, templates: slow browser
+# flows) landed together, while the front half (mostly fast API specs) finished
+# in a third of the time. Wall clock is set by the slowest shard, so half the
+# fleet sat idle for 20 minutes.
+#
+# Eight shards splits the heavy half in two: the ~30-minute shards become
+# ~15-minute ones and wall clock lands near 3 + 15 = 18 minutes. That is a
+# blunt fix for an imbalance problem, and it is the right one here — Playwright
+# has no duration-aware sharding, and a hand-maintained list of "slow specs"
+# would go stale on the first upstream sync.
+#
+# WHY THIS MATTERS BEYOND CONVENIENCE. A 50-minute gate on a solo-maintained
+# repo does not get waited for; it gets bypassed. That is not a discipline
+# failure, it is what an unusable feedback loop causes, and PRs #26 and #27
+# were merged mid-flight because of it — losing five commits. Repo-level
+# auto-merge was enabled the same day so a green PR merges itself without
+# anyone watching. Making the gate fast and making it unattended are the same
+# fix approached from two directions.
 #
 # WHY NOT SIMPLY RUN IT LESS OFTEN. The tempting alternative is to skip the
 # suite unless a PR makes "material UI or flow changes". The repo's own history
@@ -58,7 +80,7 @@ jobs:
       # tests broke is much less useful than the whole one.
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     # overlay 061 (2026-08-13, second revision): raised from 60 to 120.
     # The curated suite took 51 min on the green baseline, and the 142-commit
     # upstream sync pushed it past the 60 min cap — GitHub killed the job
@@ -66,7 +88,7 @@ jobs:
     # gate. This fork runs on a 2-core ubuntu-latest instead of upstream's
     # 8-core WarpBuild box, so our wall-clock is structurally higher.
     # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
-    # Kept at 120 per shard: generous now that each shard runs a quarter of the
+    # Kept at 120 per shard: generous now that each shard runs an eighth of the
     # suite, but the failure it guards against (killed mid-run = no verdict) is
     # unchanged and costs nothing to over-provision against.
     timeout-minutes: 120
@@ -182,11 +204,11 @@ jobs:
       # E2E_TEST_PATH is interpolated straight into `playwright test $E2E_TEST_PATH`
       # by the upstream script, which makes it the seam for --shard without
       # touching upstream's package.json.
-      - name: Run Playwright shard ${{ matrix.shard }} of 4
+      - name: Run Playwright shard ${{ matrix.shard }} of 8
         if: steps.scope.outputs.code == 'true'
         run: npm run test:e2e -w @documenso/app-tests
         env:
-          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/4'
+          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/8'
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'

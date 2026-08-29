@@ -15,6 +15,24 @@ import { prisma } from '@documenso/prisma';
 
 export const LEASE_BUILDER_FEATURE = 'lease-builder';
 
+/**
+ * Lock 2's own key. Permission to render clause text that has NOT been through
+ * attorney review.
+ *
+ * Separate from `LEASE_BUILDER_FEATURE` on purpose — the two locks answer
+ * different questions ("may you open this?" versus "may unreviewed legal text
+ * reach paper?") and must be able to diverge.
+ *
+ * Named for what it permits rather than for who holds it. Lock 2 previously
+ * read `BizrethinkOrganisationBilling.bizrethinkInternal`, a column created for
+ * BILLING: its migration stamps the 8 organisations predating the SaaS layer so
+ * the trial-expire cron skips them and the banner reads "BizRethink Internal".
+ * It said nothing about legal review, and by 2026-08-29 it had drifted onto
+ * 7 organisations, four of them auto-created personal ones — each silently
+ * holding permission to render unreviewed legal language.
+ */
+export const LEASE_CLAUSE_DRAFT_FEATURE = 'lease-clause-draft-rendering';
+
 export type FeatureGrant = {
   enabled: boolean;
 };
@@ -47,8 +65,12 @@ export type ClauseStatus = 'draft' | 'review' | 'published' | 'retired';
 
 export type CanRenderClauseOptions = {
   status: ClauseStatus;
-  /** `BizrethinkOrganisationBilling.bizrethinkInternal` for the owning org. */
-  organisationIsInternal: boolean;
+  /**
+   * Whether this organisation may render clause text that has not been through
+   * attorney review. Comes from the `lease-clause-draft-rendering` grant, NOT
+   * from a billing flag.
+   */
+  draftRenderingAllowed: boolean;
 };
 
 /**
@@ -56,11 +78,14 @@ export type CanRenderClauseOptions = {
  * document at all.
  *
  * Access to the feature is not sufficient. Clause text that has not been
- * through attorney review renders only for a BizRethink-internal organisation,
- * so an accidental access grant cannot put unreviewed legal language in front
- * of a third party. Retired clauses never render for anyone.
+ * through attorney review renders only where draft rendering is explicitly
+ * granted, so an accidental access grant cannot put unreviewed legal language
+ * in front of a third party. Retired clauses never render for anyone.
+ *
+ * This lock's whole job is to survive a mistake in lock 1, which is why it has
+ * its own grant rather than borrowing a flag set for another reason.
  */
-export const canRenderClause = ({ status, organisationIsInternal }: CanRenderClauseOptions): boolean => {
+export const canRenderClause = ({ status, draftRenderingAllowed }: CanRenderClauseOptions): boolean => {
   if (status === 'published') {
     return true;
   }
@@ -69,7 +94,7 @@ export const canRenderClause = ({ status, organisationIsInternal }: CanRenderCla
     return false;
   }
 
-  return organisationIsInternal;
+  return draftRenderingAllowed;
 };
 
 export type GetFeatureAccessOptions = {
@@ -100,6 +125,10 @@ export const getFeatureAccess = async ({
   return resolveFeatureAccess({ userGrant: userRow, orgGrant: orgRow });
 };
 
-/** Convenience wrapper for the lease builder's own gate. */
+/** Convenience wrapper for the lease builder's own gate (lock 1). */
 export const canAccessLeaseBuilder = async (options: Omit<GetFeatureAccessOptions, 'feature'>): Promise<boolean> =>
   await getFeatureAccess({ ...options, feature: LEASE_BUILDER_FEATURE });
+
+/** Convenience wrapper for lock 2 — may unreviewed clause text be rendered? */
+export const canRenderDraftClauses = async (options: Omit<GetFeatureAccessOptions, 'feature'>): Promise<boolean> =>
+  await getFeatureAccess({ ...options, feature: LEASE_CLAUSE_DRAFT_FEATURE });
