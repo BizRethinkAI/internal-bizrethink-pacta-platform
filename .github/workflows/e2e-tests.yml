@@ -15,9 +15,50 @@ concurrency:
 permissions:
   contents: read
 
+# MODIFIED for BizRethink (2026-08-29): sharded across 4 runners.
+#
+# The suite took ~59 minutes of wall clock on every pull request. Per-step
+# timings from a real run: 2m49s of setup, and ~56 minutes in a single step.
+# The cause is the runner, not the tests — playwright.config.ts computes
+# workers as `cores / 2` capped at 6, so upstream's 8-core WarpBuild box gets 4
+# workers and this fork's 2-core ubuntu-latest gets 1. Overlay 061 made that
+# switch because WarpBuild was never available here, and a serial run of 133
+# spec files is the consequence.
+#
+# Sharding restores the parallelism the runner cannot provide. Setup is only
+# ~3 minutes and runs concurrently on each shard, so wall clock lands near
+# 3 + 53/4 ≈ 16 minutes with no loss of coverage: every test still runs.
+#
+# WHY NOT SIMPLY RUN IT LESS OFTEN. The tempting alternative is to skip the
+# suite unless a PR makes "material UI or flow changes". The repo's own history
+# argues against it:
+#
+#   - The gate sat dark from the fork's creation (2026-04-29) until overlay 061
+#     fixed the runner (2026-08-13). Two upstream syncs merged in that window,
+#     and the 2026-08-13 audit then found three silently dropped features.
+#   - One of them, admin organisation delete, has a dedicated spec —
+#     e2e/admin/organisations/delete-organisation.spec.ts — which is NOT in the
+#     overlay 066 exclusion list. A working gate would very likely have caught
+#     it. Its clean record exists because it was not running.
+#   - 125 of the 133 specs test UPSTREAM behaviour. In a fork the suite's real
+#     job is catching our ~42 overlays breaking upstream, and overlay changes
+#     rarely look like "material UI changes".
+#   - PR #12 ("reject malformed-URL scanner paths before route matching") had
+#     no UI and no user flow, yet changed request routing — where over-matching
+#     breaks every flow at once. A UI-only filter would have skipped it.
+#
+# So: make it fast, do not make it selective. The one exception below is
+# documentation, which changes nothing the app is built from.
+
 jobs:
   e2e_tests:
-    name: 'E2E Tests'
+    name: 'E2E Shard ${{ matrix.shard }}'
+    strategy:
+      # One shard failing must not cancel the rest. A partial picture of which
+      # tests broke is much less useful than the whole one.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     # overlay 061 (2026-08-13, second revision): raised from 60 to 120.
     # The curated suite took 51 min on the green baseline, and the 142-commit
     # upstream sync pushed it past the 60 min cap — GitHub killed the job
@@ -25,6 +66,9 @@ jobs:
     # gate. This fork runs on a 2-core ubuntu-latest instead of upstream's
     # 8-core WarpBuild box, so our wall-clock is structurally higher.
     # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
+    # Kept at 120 per shard: generous now that each shard runs a quarter of the
+    # suite, but the failure it guards against (killed mid-run = no verdict) is
+    # unchanged and costs nothing to over-provision against.
     timeout-minutes: 120
     # overlay 061 (2026-08-13): upstream runs Playwright on WarpBuild
     # (warp-ubuntu-2204-x64-8x). This fork has no WarpBuild runner integration,
@@ -39,22 +83,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      # MODIFIED for BizRethink (2026-08-29): skip the expensive suite on
-      # docs-only pull requests.
+      # MODIFIED for BizRethink (2026-08-29): skip the suite on docs-only PRs.
       #
-      # Every PR targeting main ran ~59 minutes of Playwright, including PRs
-      # that changed nothing but Markdown — #4 was 414 lines of one .md file
-      # and waited an hour. That is the friction that trains people to tick
-      # "merge without waiting for requirements", which is how PR #1 reached
-      # production with a red build.
+      # The narrow, safe exception to "run everything": a change that alters
+      # nothing the application is built from cannot break a browser test.
       #
-      # The job ALWAYS RUNS and always reports. It is a required check, and a
-      # required check that is skipped by a workflow-level `paths` filter
-      # reports nothing at all — the PR then waits forever for a status that
-      # will never arrive. So the filter gates the steps, not the job.
+      # The filter gates the STEPS, never the job. E2E Tests is a required
+      # check, and a job skipped by a workflow-level `paths` filter reports
+      # nothing at all — the PR then waits forever for a status that never
+      # arrives. Same silent-gate failure as a cancelled run, reached a
+      # different way.
       #
-      # Fail-safe toward running: the suite is skipped only when EVERY changed
-      # file is documentation. One source file anywhere and the full suite runs.
+      # Fail-safe toward running: skipped only when EVERY changed file is
+      # documentation. One source file anywhere and the full suite runs.
       - name: Detect docs-only change
         id: scope
         env:
@@ -123,10 +164,29 @@ jobs:
         if: steps.scope.outputs.code == 'true'
         run: npx playwright install --with-deps
 
-      - name: Run Playwright tests
+      # Was `npm run ci`, which is
+      #   turbo run build --filter=@documenso/remix && turbo run test && turbo run test:e2e
+      # — so this job rebuilt the app that the Build App job builds in parallel
+      # AND ran the whole unit-test suite, before getting to Playwright. The
+      # build is genuinely needed here (Playwright serves the built app); the
+      # unit tests are not, and belong to ci.yml.
+      - name: Build the app
         if: steps.scope.outputs.code == 'true'
-        run: npm run ci
+        run: npm run build -- --filter=@documenso/remix
+
+      # Called directly rather than through `turbo run test:e2e`, because turbo
+      # v2 defaults to strict env mode and would not pass E2E_TEST_PATH through
+      # to the script. The task declares `cache: false` and `dependsOn: ^build`,
+      # both of which the explicit build step above already satisfies.
+      #
+      # E2E_TEST_PATH is interpolated straight into `playwright test $E2E_TEST_PATH`
+      # by the upstream script, which makes it the seam for --shard without
+      # touching upstream's package.json.
+      - name: Run Playwright shard ${{ matrix.shard }} of 4
+        if: steps.scope.outputs.code == 'true'
+        run: npm run test:e2e -w @documenso/app-tests
         env:
+          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/4'
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
@@ -134,7 +194,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always() && steps.scope.outputs.code == 'true'
         with:
-          name: test-results
+          # Per shard, or the four uploads collide.
+          name: test-results-shard-${{ matrix.shard }}
           path: 'packages/app-tests/**/test-results/*'
           retention-days: 7
 
@@ -154,3 +215,36 @@ jobs:
       # produced 53 min of total silence and "slow" was indistinguishable
       # from "hung". Streaming keeps a stalled run diagnosable from the log.
       TURBO_LOG_ORDER: stream
+
+  # The required check. Branch protection names "E2E Tests", so that name has
+  # to survive sharding — this job carries it and simply reports whether every
+  # shard succeeded.
+  #
+  # `if: always()` matters: without it this job is skipped when any shard
+  # fails, and a skipped required check reports NO STATUS rather than a
+  # failure, leaving the PR blocked forever on a verdict that never comes.
+  e2e_gate:
+    name: 'E2E Tests'
+    needs: [e2e_tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify every shard succeeded
+        env:
+          RESULT: ${{ needs.e2e_tests.result }}
+        run: |
+          echo "Shard matrix result: $RESULT"
+
+          # 'success' means every shard passed. 'skipped' means the whole matrix
+          # was skipped, which should not happen — the shards no-op internally
+          # on docs-only PRs rather than being skipped as jobs — so treat it as
+          # a failure rather than quietly passing.
+          if [ "$RESULT" = "success" ]; then
+            echo "All 4 shards passed."
+            exit 0
+          fi
+
+          echo ""
+          echo "E2E did not pass. Shard matrix reported: $RESULT"
+          echo "'cancelled' is NOT a pass — it is no verdict. Re-run it."
+          exit 1
