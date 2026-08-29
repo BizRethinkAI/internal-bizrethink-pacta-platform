@@ -82,4 +82,34 @@ describe('.github/workflows/e2e-tests.yml — job cap must leave headroom', () =
         '"slow" and "hung" indistinguishable.',
     ).toBe(true);
   });
+
+  it('still reports a status on a docs-only PR instead of being skipped', () => {
+    const content = readFileSync(workflowPath, 'utf8');
+
+    /*
+      The docs-only optimisation gates the expensive STEPS, never the job.
+
+      `E2E Tests` is a required check. A job skipped by a workflow-level
+      `paths` filter reports nothing at all — not a pass, not a failure — so
+      the PR waits forever for a status that never arrives. That is the same
+      silent-gate failure as the cancelled runs above, reached a different way.
+
+      If someone ever "simplifies" this into an `on: pull_request: paths:`
+      filter, this test is what stops it.
+    */
+    expect(
+      /^on:\s*\n(?:\s+\w+:\s*\n(?:\s+branches:.*\n(?:\s+-.*\n|\s+\[.*\]\n)?)?)+/m.test(content) &&
+        !/^\s+paths(-ignore)?:/m.test(content),
+      'e2e-tests.yml must not use a workflow-level paths filter: E2E Tests is a required ' +
+        'check, and a skipped job reports no status, blocking the PR indefinitely. Gate the ' +
+        'steps with `if: steps.scope.outputs.code` instead.',
+    ).toBe(true);
+
+    expect(
+      /id:\s*scope/.test(content) && /steps\.scope\.outputs\.code/.test(content),
+      'The docs-only detection step (id: scope) is missing. Without it every documentation ' +
+        'PR runs ~59 minutes of Playwright, which is the friction that trains people to ' +
+        'bypass required checks.',
+    ).toBe(true);
+  });
 });

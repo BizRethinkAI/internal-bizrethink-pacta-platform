@@ -33,28 +33,98 @@ jobs:
     # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth: 0 so the docs-only detection below can diff against the
+      # PR base. A shallow clone does not contain base.sha.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # MODIFIED for BizRethink (2026-08-29): skip the expensive suite on
+      # docs-only pull requests.
+      #
+      # Every PR targeting main ran ~59 minutes of Playwright, including PRs
+      # that changed nothing but Markdown — #4 was 414 lines of one .md file
+      # and waited an hour. That is the friction that trains people to tick
+      # "merge without waiting for requirements", which is how PR #1 reached
+      # production with a red build.
+      #
+      # The job ALWAYS RUNS and always reports. It is a required check, and a
+      # required check that is skipped by a workflow-level `paths` filter
+      # reports nothing at all — the PR then waits forever for a status that
+      # will never arrive. So the filter gates the steps, not the job.
+      #
+      # Fail-safe toward running: the suite is skipped only when EVERY changed
+      # file is documentation. One source file anywhere and the full suite runs.
+      - name: Detect docs-only change
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "Not a pull request — running the full suite."
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+
+          if [ -z "$CHANGED" ]; then
+            echo "No changed files resolved — running the full suite to be safe."
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED" | sed 's/^/  /'
+
+          NON_DOCS=$(echo "$CHANGED" \
+            | grep -vE '\.md$' \
+            | grep -vE '^docs/' \
+            | grep -vE '^\.github/ISSUE_TEMPLATE/' \
+            | grep -vE '^(LICENSE|CODEOWNERS)$' \
+            || true)
+
+          if [ -z "$NON_DOCS" ]; then
+            echo ""
+            echo "Documentation only — skipping the Playwright suite."
+            echo "code=false" >> "$GITHUB_OUTPUT"
+          else
+            echo ""
+            echo "Non-documentation files changed:"
+            echo "$NON_DOCS" | sed 's/^/  /'
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Copy env
+        if: steps.scope.outputs.code == 'true'
         run: cp .env.example .env
 
       - uses: ./.github/actions/node-install
+        if: steps.scope.outputs.code == 'true'
 
       - name: Start Services
+        if: steps.scope.outputs.code == 'true'
         run: npm run dx:up
 
       - uses: ./.github/actions/playwright-install
+        if: steps.scope.outputs.code == 'true'
 
       - name: Create the database
+        if: steps.scope.outputs.code == 'true'
         run: npm run prisma:migrate-dev
 
       - name: Seed the database
+        if: steps.scope.outputs.code == 'true'
         run: npm run prisma:seed
 
       - name: Install playwright browsers
+        if: steps.scope.outputs.code == 'true'
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        if: steps.scope.outputs.code == 'true'
         run: npm run ci
         env:
           # Needed since we use next start which will set the NODE_ENV to production
@@ -62,11 +132,20 @@ jobs:
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
 
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.scope.outputs.code == 'true'
         with:
           name: test-results
           path: 'packages/app-tests/**/test-results/*'
           retention-days: 7
+
+      # Make the skip visible in the check output. A green E2E check that ran
+      # nothing should say so, not look identical to one that ran everything.
+      - name: Report skip
+        if: steps.scope.outputs.code != 'true'
+        run: |
+          echo "E2E suite SKIPPED — this pull request changes documentation only."
+          echo "The check reports success so the required-check gate is satisfied."
+          echo "Any non-documentation file in the diff runs the full suite."
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
