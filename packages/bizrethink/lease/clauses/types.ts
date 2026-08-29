@@ -102,6 +102,17 @@ export type ClauseFacts = {
    * what puts that addendum in the document.
    */
   earlyTerminationOffered: boolean;
+  /**
+   * Fla. Stat. §83.575 — a lease may require notice before vacating at term
+   * end, but only if it reciprocally obliges the landlord, and only within
+   * 30–60 days. Electing it selects that clause.
+   */
+  nonRenewalNoticeRequired: boolean;
+  /**
+   * Fla. Stat. §83.505 — email delivery of notices is lawful only under a
+   * separate signed addendum. Electing it produces that addendum.
+   */
+  electronicNoticesElected: boolean;
 };
 
 export type Clause = {

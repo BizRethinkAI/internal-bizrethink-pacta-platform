@@ -41,6 +41,8 @@ const SINGLE_FAMILY: ClauseFacts = {
   terminationOnSale: true,
   holdoverPenalty: true,
   earlyTerminationOffered: true,
+  nonRenewalNoticeRequired: true,
+  electronicNoticesElected: false,
 };
 
 const allSlugs = (facts: ClauseFacts) => {

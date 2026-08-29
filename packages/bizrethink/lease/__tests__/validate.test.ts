@@ -18,6 +18,7 @@ const ANSWERS = {
   access: { noticeHours: 24, earliestHour: 9, latestHour: 18 },
   earlyTermination: { offered: true, feeUsd: 13800, tenantNoticeDays: 60 },
   lateFee: { graceDays: 5 },
+  nonRenewal: { required: true, noticeDays: 60 },
 };
 
 const findings = (overrides: Partial<typeof ANSWERS> = {}) =>

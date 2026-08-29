@@ -42,6 +42,8 @@ export const PICANA_FACTS: ClauseFacts = {
   terminationOnSale: true,
   holdoverPenalty: true,
   earlyTerminationOffered: true,
+  nonRenewalNoticeRequired: true,
+  electronicNoticesElected: false,
 };
 
 export const PICANA_MONEY: MoneyAnswers = {
@@ -137,4 +139,7 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   // Fla. Stat. §83.595(4): max 2 months rent, max 60 days notice.
   earlyTerminationFeeUsd: 13800,
   earlyTerminationNoticeDays: 60,
+
+  // Fla. Stat. §83.575(1): not less than 30, not more than 60.
+  nonRenewalNoticeDays: 60,
 };

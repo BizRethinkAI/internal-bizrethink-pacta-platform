@@ -41,6 +41,13 @@ export type RulePack = {
     /** §83.595(4) — the tenant may be required to give no more than 60 days. */
     maxTenantNoticeDays: number;
   };
+
+  nonRenewal: {
+    /** Fla. Stat. §83.575(1) — a lease may not require less than 30 days. */
+    minNoticeDays: number;
+    /** §83.575(1) — nor more than 60, from either party. */
+    maxNoticeDays: number;
+  };
 };
 
 export const US_FL: RulePack = {
@@ -64,5 +71,10 @@ export const US_FL: RulePack = {
   earlyTermination: {
     maxFeeMonths: 2,
     maxTenantNoticeDays: 60,
+  },
+
+  nonRenewal: {
+    minNoticeDays: 30,
+    maxNoticeDays: 60,
   },
 };
