@@ -1,0 +1,274 @@
+{
+  "result": {
+    "input": {
+      "address": {
+        "address": "29090 Picana Lane, Wesley Chapel, FL 33543"
+      },
+      "vintage": {
+        "isDefault": true,
+        "id": "4",
+        "vintageName": "Current_Current",
+        "vintageDescription": "Current Vintage - Current Benchmark"
+      },
+      "benchmark": {
+        "isDefault": true,
+        "benchmarkDescription": "Public Address Ranges - Current Benchmark",
+        "id": "4",
+        "benchmarkName": "Public_AR_Current"
+      }
+    },
+    "addressMatches": [
+      {
+        "tigerLine": {
+          "side": "L",
+          "tigerLineId": "650546563"
+        },
+        "geographies": {
+          "States": [
+            {
+              "STATENS": "00294478",
+              "GEOID": "12",
+              "CENTLAT": "+28.4062029",
+              "AREAWATER": "45960299374",
+              "STATE": "12",
+              "BASENAME": "Florida",
+              "STUSAB": "FL",
+              "OID": "2749046365780",
+              "LSADC": "00",
+              "FUNCSTAT": "A",
+              "INTPTLAT": "+28.3942569",
+              "DIVISION": "5",
+              "NAME": "Florida",
+              "REGION": "3",
+              "OBJECTID": 51,
+              "CENTLON": "-082.5022125",
+              "AREALAND": "138973996104",
+              "INTPTLON": "-082.5173706",
+              "MTFCC": "G4000"
+            }
+          ],
+          "County Subdivisions": [
+            {
+              "COUSUB": "90481",
+              "GEOID": "1210190481",
+              "CENTLAT": "+28.3065846",
+              "AREAWATER": "24498652",
+              "STATE": "12",
+              "BASENAME": "Central Pasco",
+              "OID": "27690366528965",
+              "LSADC": "22",
+              "FUNCSTAT": "S",
+              "INTPTLAT": "+28.3111983",
+              "NAME": "Central Pasco CCD",
+              "OBJECTID": 26255,
+              "CENTLON": "-082.3650045",
+              "COUSUBCC": "Z5",
+              "AREALAND": "692715588",
+              "INTPTLON": "-082.3544265",
+              "MTFCC": "G4040",
+              "COUSUBNS": "01935718",
+              "COUNTY": "101"
+            }
+          ],
+          "Census Designated Places": [
+            {
+              "DISP_CLR": 3,
+              "NECTAPCI": "N",
+              "GEOID": "1275875",
+              "CENTLAT": "+28.2106106",
+              "AREAWATER": "334133",
+              "BASENAME": "Wesley Chapel",
+              "STATE": "12",
+              "OID": "28090366537143",
+              "LSADC": "57",
+              "PLACE": "75875",
+              "FUNCSTAT": "S",
+              "INTPTLAT": "+28.2052887",
+              "NAME": "Wesley Chapel CDP",
+              "OBJECTID": 32555,
+              "PLACECC": "U1",
+              "CENTLON": "-082.3237924",
+              "CBSAPCI": "N",
+              "AREALAND": "113866108",
+              "INTPTLON": "-082.3169318",
+              "PLACENS": "02402996",
+              "MTFCC": "G4210"
+            }
+          ],
+          "Urban Areas": [
+            {
+              "GEOID": "86599",
+              "CENTLAT": "+28.0100855",
+              "AREAWATER": "207890210",
+              "BASENAME": "Tampa--St. Petersburg, FL",
+              "OID": "2702188506891",
+              "UA": "86599",
+              "LSADC": "67",
+              "FUNCSTAT": "S",
+              "INTPTLAT": "+28.0104268",
+              "NAME": "Tampa--St. Petersburg, FL Urban Area",
+              "OBJECTID": 1209,
+              "CENTLON": "-082.5175792",
+              "AREALAND": "2510467559",
+              "INTPTLON": "-082.5183592",
+              "MTFCC": "G3500"
+            }
+          ],
+          "Counties": [
+            {
+              "GEOID": "12101",
+              "CENTLAT": "+28.3057825",
+              "AREAWATER": "694062846",
+              "STATE": "12",
+              "BASENAME": "Pasco",
+              "OID": "27590366517485",
+              "LSADC": "06",
+              "FUNCSTAT": "A",
+              "INTPTLAT": "+28.3047398",
+              "NAME": "Pasco County",
+              "OBJECTID": 1169,
+              "CENTLON": "-082.5051638",
+              "COUNTYCC": "H1",
+              "COUNTYNS": "00295739",
+              "AREALAND": "1934024017",
+              "INTPTLON": "-082.5023672",
+              "MTFCC": "G4020",
+              "COUNTY": "101"
+            }
+          ],
+          "2024 State Legislative Districts - Upper": [
+            {
+              "GEOID": "12023",
+              "CENTLAT": "+28.2228882",
+              "AREAWATER": "58042970",
+              "STATE": "12",
+              "BASENAME": "23",
+              "OID": "2129035963375441",
+              "SLDU": "023",
+              "LSADC": "LU",
+              "FUNCSTAT": "N",
+              "INTPTLAT": "+28.2296641",
+              "NAME": "State Senate District 23",
+              "OBJECTID": 1682,
+              "CENTLON": "-082.2641073",
+              "LSY": "2024",
+              "AREALAND": "2153863169",
+              "INTPTLON": "-082.2644462",
+              "MTFCC": "G5210",
+              "LDTYP": "O"
+            }
+          ],
+          "2024 State Legislative Districts - Lower": [
+            {
+              "GEOID": "12054",
+              "CENTLAT": "+28.3160057",
+              "SLDL": "054",
+              "AREAWATER": "14800211",
+              "STATE": "12",
+              "BASENAME": "54",
+              "OID": "2139035963375774",
+              "LSADC": "LL",
+              "FUNCSTAT": "N",
+              "INTPTLAT": "+28.3161564",
+              "NAME": "State House District 54",
+              "OBJECTID": 3068,
+              "CENTLON": "-082.2048297",
+              "LSY": "2024",
+              "AREALAND": "863781575",
+              "INTPTLON": "-082.2047587",
+              "MTFCC": "G5220",
+              "LDTYP": "O"
+            }
+          ],
+          "2020 Census Blocks": [
+            {
+              "SUFFIX": "",
+              "GEOID": "121010321074003",
+              "CENTLAT": "+28.2139466",
+              "BLOCK": "4003",
+              "AREAWATER": "0",
+              "STATE": "12",
+              "BASENAME": "4003",
+              "OID": "210701000645534",
+              "LSADC": "BK",
+              "FUNCSTAT": "S",
+              "INTPTLAT": "+28.2139466",
+              "NAME": "Block 4003",
+              "OBJECTID": 760693,
+              "TRACT": "032107",
+              "CENTLON": "-082.3450275",
+              "BLKGRP": "4",
+              "AREALAND": "531893",
+              "INTPTLON": "-082.3450275",
+              "MTFCC": "G5040",
+              "LWBLKTYP": "L",
+              "UR": "U",
+              "COUNTY": "101"
+            }
+          ],
+          "Census Tracts": [
+            {
+              "GEOID": "12101032107",
+              "CENTLAT": "+28.2165032",
+              "AREAWATER": "31298",
+              "STATE": "12",
+              "BASENAME": "321.07",
+              "OID": "207903717578940",
+              "LSADC": "CT",
+              "FUNCSTAT": "S",
+              "INTPTLAT": "+28.2202718",
+              "NAME": "Census Tract 321.07",
+              "OBJECTID": 81193,
+              "TRACT": "032107",
+              "CENTLON": "-082.3244221",
+              "AREALAND": "27750313",
+              "INTPTLON": "-082.3173058",
+              "MTFCC": "G5020",
+              "COUNTY": "101"
+            }
+          ],
+          "119th Congressional Districts": [
+            {
+              "GEOID": "1215",
+              "CENTLAT": "+28.1094221",
+              "CDSESSN": "119",
+              "AREAWATER": "53276847",
+              "BASENAME": "15",
+              "STATE": "12",
+              "OID": "2119035951820919",
+              "LSADC": "C2",
+              "FUNCSTAT": "N",
+              "INTPTLAT": "+28.1021826",
+              "NAME": "Congressional District 15",
+              "OBJECTID": 402,
+              "CENTLON": "-082.2219187",
+              "CD119": "15",
+              "AREALAND": "1694624455",
+              "INTPTLON": "-082.2167871",
+              "MTFCC": "G5200"
+            }
+          ]
+        },
+        "coordinates": {
+          "x": -82.346317284134,
+          "y": 28.215875697358
+        },
+        "addressComponents": {
+          "zip": "33543",
+          "streetName": "PICANA",
+          "preType": "",
+          "city": "WESLEY CHAPEL",
+          "preDirection": "",
+          "suffixDirection": "",
+          "fromAddress": "29298",
+          "state": "FL",
+          "suffixType": "LN",
+          "toAddress": "29000",
+          "suffixQualifier": "",
+          "preQualifier": ""
+        },
+        "matchedAddress": "29090 PICANA LN, WESLEY CHAPEL, FL, 33543"
+      }
+    ]
+  }
+}
