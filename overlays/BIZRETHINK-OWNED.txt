@@ -40,3 +40,11 @@ apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases*.tsx
 # with an upstream component is impossible short of upstream shipping a lease
 # builder of their own.
 apps/remix/app/components/general/lease/*.tsx
+
+# The reviewer's side of the review loop. Lives in `_recipient+` because that
+# group exists for exactly this case — upstream's own comment: "a layout to
+# handle scenarios where the user is a recipient of a given resource where we
+# do not care whether they are authenticated or not". It also already carries
+# `noindex, nofollow`, which a review link must have.
+apps/remix/app/routes/_recipient+/lease-review.$token.tsx
+apps/remix/app/routes/_recipient+/lease-review.$token.document.tsx
