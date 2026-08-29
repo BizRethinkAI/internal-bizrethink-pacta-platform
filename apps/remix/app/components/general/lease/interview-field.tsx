@@ -4,7 +4,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
-import { Scale } from 'lucide-react';
+import { Lightbulb, Scale } from 'lucide-react';
 
 /**
  * One question in the lease interview.
@@ -56,6 +56,37 @@ export const InterviewFieldControl = ({ field, value, onChange, error }: Intervi
               <div className="text-sm">
                 <span className="font-medium">{field.statute.cite}</span>
                 <p className="mt-0.5 text-muted-foreground leading-relaxed">{field.statute.note}</p>
+              </div>
+            </div>
+          )}
+
+          {/*
+            Only ever on a field no statute constrains — the two are mutually
+            exclusive by type and by test. Where Florida sets a limit, the
+            limit is the only thing shown; offering a number there would be
+            advising on the statute rather than stating it.
+
+            Phrased as an observation and applied by an explicit click, so the
+            answer on the document is always one somebody chose.
+          */}
+          {field.suggestion && (
+            <div className="mt-3 flex items-start gap-2 rounded-md border border-border border-dashed p-3">
+              <Lightbulb className="mt-0.5 h-4 w-4 flex-none text-muted-foreground" />
+              <div className="text-sm">
+                <p className="text-muted-foreground leading-relaxed">{field.suggestion.note}</p>
+                {value !== field.suggestion.value && (
+                  <button
+                    type="button"
+                    className="mt-1.5 font-medium text-foreground text-sm underline underline-offset-2 hover:no-underline"
+                    onClick={() => onChange(field.suggestion?.value ?? null)}
+                  >
+                    Use{' '}
+                    {typeof field.suggestion.value === 'number'
+                      ? field.suggestion.value
+                      : (field.options?.find((o) => o.value === field.suggestion?.value)?.label ??
+                        field.suggestion.value)}
+                  </button>
+                )}
               </div>
             </div>
           )}
