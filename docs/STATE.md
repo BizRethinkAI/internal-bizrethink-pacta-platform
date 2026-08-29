@@ -137,10 +137,27 @@ precede it, are in flight as #26 and #27.
 
    **Still needs an actual attorney.** The mechanism is built; nobody has
    approved anything.
-4. **Guardrails + AI (~3–4 days).** Non-waivable-area scan, answer-contradiction
-   checks, clause drafting from plain English. The deterministic layers may
-   block; the AI layer may only raise a question with a citation. A false "this
-   clause is fine" is worse than no check, because it manufactures confidence.
+4. **Guardrails — BUILT 2026-08-29** (#35). Non-waivable-area scan over the
+   seven areas Florida reserves (§83.47 waiver and liability, §83.67 utilities,
+   access and removal, §83.51(1) building codes, §83.682(5) servicemember) plus
+   answer-contradiction checks on pets and the monthly-rent figure.
+
+   **Two tiers, and the distinction is the design.** Explicit waiver formulas
+   block; subject-matter proximity only warns — a clause that RESTATES a
+   protection must not be blocked for mentioning what the statute governs, or
+   people learn to ignore the mechanism. A negation before a match flips it:
+   "Tenant does not waive any rights" warns, while "Landlord shall not be
+   liable", whose *not* is part of the waiver formula itself, blocks.
+
+   It reports the statute and the exact words matched, and stops. **A regex is
+   not entitled to a verdict on a specific provision.**
+
+   **AI layer NOT built, and it needs a decision:**
+   `BizrethinkInstanceAiConfig` is Vertex-only while the master stack has
+   Claude as primary — so either extend that model with an Anthropic provider,
+   or put Vertex credentials in `/admin`. When built it may only raise a
+   question with a citation attached, never block and never conclude: a false
+   "this clause is fine" manufactures confidence and is worse than no check.
 5. **Deferred:** paid property data. Blocked on a spending decision and worth
    six manual questions per property until then — see *Property data* below.
 6. Close the remaining documentation lie (`scripts/apply-overlays.sh`).
