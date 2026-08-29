@@ -8,8 +8,10 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
 import { Building2, Lock, Plus } from 'lucide-react';
+import { useState } from 'react';
 import { useLoaderData, useNavigate, useRevalidator } from 'react-router';
 
+import { PropertyForm } from '~/components/general/lease/property-form';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/leases._index';
@@ -91,9 +93,7 @@ export default function LeasesPage() {
   const navigate = useNavigate();
   const revalidator = useRevalidator();
 
-  const createProperty = trpc.bizrethink.leaseBuilder.property.create.useMutation({
-    onSuccess: () => revalidator.revalidate(),
-  });
+  const [addingProperty, setAddingProperty] = useState(false);
 
   const createMatter = trpc.bizrethink.leaseBuilder.matter.create.useMutation({
     onSuccess: ({ id }) => navigate(`/t/${teamUrl}/leases/${id}`),
@@ -175,33 +175,9 @@ export default function LeasesPage() {
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-lg">Properties</h2>
 
-          {/* Seeded rather than a blank form: the one property this is being
-              dogfooded on. A property form is the next thing to build. */}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={createProperty.isPending || properties.length > 0}
-            onClick={() =>
-              createProperty.mutate({
-                organisationId,
-                label: '29090 Picana Ln',
-                addressLine: '29090 Picana Lane',
-                city: 'Wesley Chapel',
-                state: 'FL',
-                postalCode: '33543',
-                county: 'Pasco',
-                propertyType: 'single-family',
-                yearBuilt: 2005,
-                hasPool: true,
-                hasHoa: true,
-                hoaName: 'Estancia at Wiregrass Ranch',
-                includedAppliances:
-                  'refrigerator, oven and range, microwave, dishwasher, clothes washer and clothes dryer',
-              })
-            }
-          >
+          <Button variant="outline" size="sm" onClick={() => setAddingProperty(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Add 29090 Picana Ln
+            Add a property
           </Button>
         </div>
 
@@ -235,6 +211,13 @@ export default function LeasesPage() {
           </ul>
         )}
       </section>
+
+      <PropertyForm
+        organisationId={organisationId}
+        open={addingProperty}
+        onOpenChange={setAddingProperty}
+        onCreated={() => revalidator.revalidate()}
+      />
 
       <section className="mt-10 mb-16">
         <h2 className="font-semibold text-lg">Leases</h2>

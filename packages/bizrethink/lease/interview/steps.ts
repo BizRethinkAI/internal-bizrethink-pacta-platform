@@ -45,6 +45,20 @@ export type InterviewField = {
   help?: string;
   /** Shown inline where Florida constrains the answer. */
   statute?: { cite: string; note: string };
+  /**
+   * A common value, offered on fields no statute constrains.
+   *
+   * MUTUALLY EXCLUSIVE WITH `statute`, enforced by test. Where Florida sets a
+   * limit the field shows the limit and the citation; suggesting a number
+   * there would be advising on the statute, which is the line this project
+   * holds everywhere else. Where Florida sets no limit, an empty box teaches
+   * nothing, and stating what is common does.
+   *
+   * The note must read as an OBSERVATION, not a recommendation — "most leases
+   * use X", never "we recommend X" — and a test asserts both the absence of
+   * advice wording and the presence of an attributing word.
+   */
+  suggestion?: { value: string | number; note: string };
   options?: { value: string; label: string }[];
   showWhen?: (answers: InterviewAnswers) => boolean;
   required?: boolean;
@@ -161,6 +175,10 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'number',
         label: 'How many hours does the tenant have to forward you an association notice?',
+        suggestion: {
+          value: 48,
+          note: 'Association covenants commonly allow the owner 24 to 48 hours to act on a notice, so leases typically require it to be passed on inside that window.',
+        },
         showWhen: (a) => a.facts.hasHoa,
         required: true,
       },
@@ -263,6 +281,11 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'number',
         label: 'After how many nights does a guest need your written consent?',
+        help: 'Below this, a guest is a guest. Above it, staying on without consent is a breach you can act on.',
+        suggestion: {
+          value: 14,
+          note: 'Most residential leases set this between 7 and 14 consecutive nights.',
+        },
         required: true,
       },
     ],
@@ -293,6 +316,10 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'money',
         kind: 'select',
         label: 'How should a partial month be apportioned?',
+        suggestion: {
+          value: 'actual-days-in-month',
+          note: 'Most leases prorate on the actual number of days in the month the tenancy begins, which is also the method that matches what a tenant can check on a calendar.',
+        },
         showWhen: (a) => a.facts.prorationApplies,
         options: [
           { value: 'actual-days-in-month', label: 'By the actual days in that month' },
