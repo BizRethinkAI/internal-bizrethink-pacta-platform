@@ -13,6 +13,7 @@ import { selectClauses } from '../engine/select-clauses';
 import type { RenderedDocument, RenderLeaseInput } from '../render/render-lease';
 import { renderLease } from '../render/render-lease';
 import type { LeaseParty } from '../render/signature-blocks';
+import { loadClauseApprovals, statusWithApproval } from './clause-approvals';
 
 /**
  * Hand the rendered lease to upstream's signing platform.
@@ -175,8 +176,16 @@ export const createEnvelopeFromMatter = async ({
   */
   const draftRenderingAllowed = await canRenderDraftClauses({ organisationId, userId });
 
+  /*
+    Attorney sign-off is read here, not baked into the clause. The library is
+    TypeScript so an approval cannot live in it; it lives in the database and
+    is pinned to a fingerprint of the clause as approved, so a later edit
+    lapses it rather than silently inheriting review of words nobody read.
+  */
+  const approvals = await loadClauseApprovals();
+
   const unpublishable = [...selection.selected, ...selection.addenda, ...selection.standaloneDisclosures]
-    .filter((clause) => !canRenderClause({ status: clause.status, draftRenderingAllowed }))
+    .filter((clause) => !canRenderClause({ status: statusWithApproval(clause, approvals), draftRenderingAllowed }))
     .map((clause) => clause.slug);
 
   if (unpublishable.length > 0) {

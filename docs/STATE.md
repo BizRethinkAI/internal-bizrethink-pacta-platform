@@ -115,10 +115,28 @@ precede it, are in flight as #26 and #27.
    defect report; dismissal reasons are written into the **executed document's
    audit trail**, not the matter history, because the envelope log is sealed
    alongside the signed PDF while matter history is mutable.
-3. **Library sign-off (~2 days), built on the same primitive.** Per-clause
-   attorney review writing `reviewedBy` / `verbatimVerifiedAt` / `published`.
-   **This is the milestone after which a lease may lawfully reach a third
-   party.**
+3. **Library sign-off — BUILT 2026-08-29** (#34). Per-clause approval recorded
+   in `BizrethinkClauseApproval` and overriding the code's `status`, because
+   the library is TypeScript and a reviewing attorney cannot edit it.
+
+   **The safety property is that an approval LAPSES.** It is pinned to a
+   fingerprint of everything a signer reads — body, heading, version, and the
+   condition selecting the clause — so editing a clause returns it to
+   unapproved rather than silently inheriting sign-off on words nobody read.
+   `sortKey` is deliberately excluded: lapsing over a reordering would train a
+   reviewer to re-approve without reading.
+
+   **It records, it does not sign.** The landlord enters the approval under the
+   attorney's name and bar number; `approvedByUserId` records who typed it, and
+   those differing is the honest description. A signature by the attorney is a
+   different feature and pretending otherwise would be worse than not having it.
+
+   The four `verbatimRequired: true` statutory clauses get a distinct prompt:
+   approving them confirms the wording matches the statute as published, which
+   is what `verbatimVerifiedAt: null` has been recording the absence of.
+
+   **Still needs an actual attorney.** The mechanism is built; nobody has
+   approved anything.
 4. **Guardrails + AI (~3–4 days).** Non-waivable-area scan, answer-contradiction
    checks, clause drafting from plain English. The deterministic layers may
    block; the AI layer may only raise a question with a citation. A false "this
