@@ -1742,4 +1742,72 @@ model BizrethinkLeaseMatter {
   @@index([propertyId])
 }
 
+/// Sending a lease out to be read before it is signed.
+///
+/// One mechanism, two audiences, governed differently: an ATTORNEY's comments
+/// block the send until dispositioned, a TENANT's never do. See
+/// packages/bizrethink/lease/review/types.ts for why.
+model BizrethinkLeaseReview {
+  id       String @id
+  matterId String
+
+  /// 'attorney' | 'tenant'
+  audience String
+
+  /// Unauthenticated link, same shape as upstream's signing links. Indexed
+  /// unique because it is the sole lookup key for the public route.
+  token String @unique
+
+  /// 'open' | 'returned' | 'closed'
+  status String @default("open")
+
+  reviewerName  String
+  reviewerEmail String
+
+  /// The answer set as it stood when the link was issued, so a reviewer
+  /// returning after an edit can be shown what moved. Without it, "I already
+  /// reviewed this" silently stops being true the moment a clause changes.
+  answersHash String
+
+  createdByUserId Int
+  expiresAt       DateTime?
+  returnedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([matterId])
+}
+
+/// One comment, and what was decided about it.
+///
+/// APPEND-ONLY ONCE DISPOSITIONED. A dismissal reason that can be edited
+/// afterwards is not evidence of anything — the whole value of the record is
+/// that it was written at the time and could not be revised once the lease
+/// went out. Enforced in applyDisposition() and asserted by test.
+model BizrethinkReviewComment {
+  id       String @id
+  reviewId String
+
+  /// Null when the comment is about the document as a whole rather than one
+  /// clause.
+  clauseSlug String?
+
+  body       String
+  authorName String
+
+  /// 'pending' | 'accepted' | 'edited' | 'dismissed'
+  disposition String @default("pending")
+
+  /// Required to dismiss. Recorded because it is the evidence of why a lease
+  /// was sent over a reviewer's note.
+  dispositionReason     String?
+  dispositionedAt       DateTime?
+  dispositionedByUserId Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([reviewId])
+}
+
 // BIZRETHINK_ADDITIONS_END

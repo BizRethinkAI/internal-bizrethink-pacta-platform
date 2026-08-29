@@ -3,7 +3,7 @@ import { prefixedId } from '@documenso/lib/universal/id';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import { authenticatedProcedure, router } from '@documenso/trpc/server/trpc';
+import { authenticatedProcedure, procedure, router } from '@documenso/trpc/server/trpc';
 import { z } from 'zod';
 
 import { lookupAddress } from '../../lease/address/census';
@@ -15,6 +15,14 @@ import { deriveFacts } from '../../lease/interview/derive-facts';
 import type { LeasePartyInput } from '../../lease/parties/derive-parties';
 import { derivePartyValues, partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
 import { buildLeaseDocuments } from '../../lease/render/render-lease';
+import {
+  applyDisposition,
+  hashAnswers,
+  isReviewUsable,
+  REVIEW_LINK_TTL_DAYS,
+  sendBlockers,
+} from '../../lease/review/disposition';
+import type { Disposition, LeaseReview, ReviewAudience, ReviewComment, ReviewStatus } from '../../lease/review/types';
 import { US_FL } from '../../lease/rule-packs/us-fl';
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
@@ -143,6 +151,71 @@ const loadMatter = async (id: string, userId: number) => {
   await assertAccess(matter.organisationId, userId);
 
   return matter;
+};
+
+/**
+ * The review loop's blockers for one matter.
+ *
+ * Two queries rather than a join. These are both BizRethink models so a Prisma
+ * relation between them would be legal, but the rest of this feature reads
+ * without one and a relation declared for a single call site is a schema
+ * change earning nothing.
+ */
+/*
+  Prisma stores `audience`, `status` and `disposition` as plain strings — the
+  schema has no enums, because an enum addition is a migration every time the
+  set grows and these are ours to widen. The casts are narrowed here, at the
+  single boundary between the database and the domain, rather than scattered
+  through the handlers.
+*/
+const toDomainReview = (review: {
+  id: string;
+  matterId: string;
+  audience: string;
+  status: string;
+  expiresAt: Date | null;
+  answersHash: string;
+}): LeaseReview => ({
+  id: review.id,
+  matterId: review.matterId,
+  audience: review.audience as ReviewAudience,
+  status: review.status as ReviewStatus,
+  expiresAt: review.expiresAt,
+  answersHash: review.answersHash,
+});
+
+const toDomainComment = (comment: {
+  id: string;
+  reviewId: string;
+  clauseSlug: string | null;
+  body: string;
+  authorName: string;
+  disposition: string;
+  dispositionReason: string | null;
+  dispositionedAt: Date | null;
+}): ReviewComment => ({
+  id: comment.id,
+  reviewId: comment.reviewId,
+  clauseSlug: comment.clauseSlug,
+  body: comment.body,
+  authorName: comment.authorName,
+  disposition: comment.disposition as Disposition,
+  dispositionReason: comment.dispositionReason,
+  dispositionedAt: comment.dispositionedAt,
+});
+
+const reviewBlockersFor = async (matterId: string): Promise<string[]> => {
+  const reviews = await prisma.bizrethinkLeaseReview.findMany({ where: { matterId } });
+
+  const comments = await prisma.bizrethinkReviewComment.findMany({
+    where: { reviewId: { in: reviews.map((review) => review.id) } },
+  });
+
+  return sendBlockers({
+    reviews: reviews.map(toDomainReview),
+    comments: comments.map(toDomainComment),
+    now: new Date(),
+  });
 };
 
 /**
@@ -432,15 +505,30 @@ export const leaseBuilderRouter = router({
       */
       const partyFindings = validateParties(answers.parties);
 
+      /*
+        The review loop's own blockers, kept separate from statutory findings
+        because they are resolved by a different act entirely: not by changing
+        an answer, but by deciding what to do about somebody's comment.
+      */
+      const reviewFindings = await reviewBlockersFor(matter.id);
+
       return {
         findings,
         missing,
         partyFindings,
+        reviewFindings,
         duplicateAssertions: selection.duplicateAssertions,
         unreviewedClauses: [...new Set(unreviewed)],
-        blocking: findings.filter((f) => f.severity === 'blocks').length + missing.length + partyFindings.length,
+        blocking:
+          findings.filter((f) => f.severity === 'blocks').length +
+          missing.length +
+          partyFindings.length +
+          reviewFindings.length,
         readyToSend:
-          findings.every((f) => f.severity !== 'blocks') && missing.length === 0 && partyFindings.length === 0,
+          findings.every((f) => f.severity !== 'blocks') &&
+          missing.length === 0 &&
+          partyFindings.length === 0 &&
+          reviewFindings.length === 0,
         rulePackVersion: US_FL.version,
       };
     }),
@@ -481,6 +569,21 @@ export const leaseBuilderRouter = router({
         throw new AppError(AppErrorCode.INVALID_REQUEST, { message: partyFindings.join(' ') });
       }
 
+      /*
+        Re-checked HERE, not merely surfaced by `validate`.
+
+        `validate` is advisory — it is a query, it powers a panel, and nothing
+        forces a client to call it. This mutation is the only thing standing
+        between a draft and real signers, so every rule that must hold is
+        re-asserted at this point. An attorney's outstanding comment blocking
+        the send is exactly such a rule, and a gate that lives only in a
+        read-only query is not a gate.
+      */
+      const reviewFindings = await reviewBlockersFor(matter.id);
+
+      if (reviewFindings.length > 0) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, { message: reviewFindings.join(' ') });
+      }
       const envelope = await createEnvelopeFromMatter({
         input: {
           facts: answers.facts,
@@ -516,5 +619,250 @@ export const leaseBuilderRouter = router({
 
       return { envelopeId: envelope.id };
     }),
+  }),
+  /**
+   * The review loop.
+   *
+   * `create`, `list` and `disposition` are the landlord's side and are
+   * authenticated. `open` and `submit` are the REVIEWER's side, reached with a
+   * token and no account — a lawyer or a tenant must not have to sign up to
+   * read a lease they were sent.
+   */
+  review: router({
+    create: authenticatedProcedure
+      .input(
+        z.object({
+          matterId: z.string(),
+          audience: z.enum(['attorney', 'tenant']),
+          reviewerName: z.string().min(1),
+          reviewerEmail: z.string().email(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const matter = await loadMatter(input.matterId, ctx.user.id);
+
+        if (matter.status !== 'draft') {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'This lease has already been sent; there is nothing left to review.',
+          });
+        }
+
+        /*
+          The answer set is pinned at issue time so a reviewer returning after
+          an edit can be shown what moved. Without it, "I already reviewed
+          this" silently stops being true the moment a clause changes.
+        */
+        const answersHash = hashAnswers({
+          facts: matter.facts,
+          money: matter.money,
+          values: matter.values,
+          customClauses: matter.customClauses,
+          parties: matter.parties,
+        });
+
+        return await prisma.bizrethinkLeaseReview.create({
+          data: {
+            id: prefixedId('lease_review', 16),
+            matterId: matter.id,
+            audience: input.audience,
+            token: prefixedId('lrv', 32),
+            reviewerName: input.reviewerName,
+            reviewerEmail: input.reviewerEmail,
+            answersHash,
+            createdByUserId: ctx.user.id,
+            expiresAt: new Date(Date.now() + REVIEW_LINK_TTL_DAYS * 24 * 60 * 60 * 1000),
+          },
+          select: { id: true, token: true, expiresAt: true, audience: true },
+        });
+      }),
+
+    list: authenticatedProcedure.input(z.object({ matterId: z.string() })).query(async ({ ctx, input }) => {
+      const matter = await loadMatter(input.matterId, ctx.user.id);
+
+      const reviews = await prisma.bizrethinkLeaseReview.findMany({
+        where: { matterId: matter.id },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      const comments = await prisma.bizrethinkReviewComment.findMany({
+        where: { reviewId: { in: reviews.map((review) => review.id) } },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      return { reviews, comments };
+    }),
+
+    /**
+     * Decide one comment. Once.
+     *
+     * The append-only rule lives in `applyDisposition`. The write is
+     * additionally conditioned on the row still being pending, so two tabs
+     * cannot both succeed with the later reason silently overwriting the
+     * earlier one.
+     */
+    disposition: authenticatedProcedure
+      .input(
+        z.object({
+          commentId: z.string(),
+          disposition: z.enum(['accepted', 'edited', 'dismissed']),
+          reason: z.string().nullable().default(null),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const comment = await prisma.bizrethinkReviewComment.findUnique({ where: { id: input.commentId } });
+
+        if (!comment) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Comment not found' });
+        }
+
+        const review = await prisma.bizrethinkLeaseReview.findUnique({
+          where: { id: comment.reviewId },
+          select: { matterId: true },
+        });
+
+        if (!review) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Comment not found' });
+        }
+
+        // Establishes org membership and the feature gate for this matter.
+        await loadMatter(review.matterId, ctx.user.id);
+
+        const result = applyDisposition({
+          comment: toDomainComment(comment),
+          disposition: input.disposition,
+          reason: input.reason,
+          now: new Date(),
+        });
+
+        if (!result.ok) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: result.error });
+        }
+
+        const written = await prisma.bizrethinkReviewComment.updateMany({
+          // `disposition: 'pending'` in the WHERE is the concurrency guard.
+          where: { id: comment.id, disposition: 'pending' },
+          data: {
+            disposition: result.comment.disposition,
+            dispositionReason: result.comment.dispositionReason,
+            dispositionedAt: result.comment.dispositionedAt,
+            dispositionedByUserId: ctx.user.id,
+          },
+        });
+
+        if (written.count === 0) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'This comment was dispositioned a moment ago. Reload to see the decision.',
+          });
+        }
+
+        return { dispositioned: true };
+      }),
+
+    /**
+     * The reviewer's side. No account, no session — a token.
+     *
+     * Returns this lease and this reviewer's own comments, and nothing about
+     * the organisation, the other party, or any other matter.
+     */
+    open: procedure.input(z.object({ token: z.string() })).query(async ({ input }) => {
+      const review = await prisma.bizrethinkLeaseReview.findUnique({ where: { token: input.token } });
+
+      /*
+        One error for "no such token", "expired" and "already returned". A
+        reviewer cannot act on the difference, and distinguishing them would
+        confirm to anyone holding a guessed token that it once existed.
+      */
+      if (!review || !isReviewUsable(toDomainReview(review), new Date())) {
+        throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+      }
+
+      const matter = await prisma.bizrethinkLeaseMatter.findUnique({
+        where: { id: review.matterId },
+        select: { id: true, title: true, facts: true, money: true, values: true, customClauses: true, parties: true },
+      });
+
+      if (!matter) {
+        throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+      }
+
+      const comments = await prisma.bizrethinkReviewComment.findMany({
+        where: { reviewId: review.id },
+        orderBy: { createdAt: 'asc' },
+        // Dispositions are the landlord's business, not the reviewer's feed.
+        select: { id: true, clauseSlug: true, body: true, authorName: true, createdAt: true },
+      });
+
+      /*
+        Both audiences see the whole lease, so this flag is the only thing
+        separating "you reviewed this" from "you reviewed something else".
+      */
+      const changedSinceIssued =
+        hashAnswers({
+          facts: matter.facts,
+          money: matter.money,
+          values: matter.values,
+          customClauses: matter.customClauses,
+          parties: matter.parties,
+        }) !== review.answersHash;
+
+      return {
+        review: {
+          id: review.id,
+          audience: review.audience,
+          reviewerName: review.reviewerName,
+          expiresAt: review.expiresAt,
+        },
+        matter: { id: matter.id, title: matter.title },
+        comments,
+        changedSinceIssued,
+      };
+    }),
+
+    /**
+     * Leave comments and hand the lease back.
+     *
+     * All comments arrive together rather than one at a time: a review is a
+     * single act, and a link that stays live after "I am done" is a link that
+     * can be reused by whoever else has the URL.
+     */
+    submit: procedure
+      .input(
+        z.object({
+          token: z.string(),
+          comments: z
+            .array(z.object({ clauseSlug: z.string().nullable().default(null), body: z.string().min(1).max(5000) }))
+            .max(200),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const review = await prisma.bizrethinkLeaseReview.findUnique({ where: { token: input.token } });
+
+        if (!review || !isReviewUsable(toDomainReview(review), new Date())) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+        }
+
+        await prisma.$transaction([
+          prisma.bizrethinkReviewComment.createMany({
+            data: input.comments.map((comment) => ({
+              id: prefixedId('lease_comment', 16),
+              reviewId: review.id,
+              clauseSlug: comment.clauseSlug,
+              body: comment.body,
+              authorName: review.reviewerName,
+            })),
+          }),
+          /*
+            Closing the link is in the same transaction as recording the
+            comments. A submit that stored comments and left the link open
+            would let a second submission double every comment.
+          */
+          prisma.bizrethinkLeaseReview.updateMany({
+            where: { id: review.id, status: 'open' },
+            data: { status: 'returned', returnedAt: new Date() },
+          }),
+        ]);
+
+        return { submitted: true, commentCount: input.comments.length };
+      }),
   }),
 });
