@@ -15,10 +15,7 @@ describe('ZSiteSettingsWebhookSchema', () => {
         ssrfBypassHosts: ['internal-api.docker.local', 'circularpay-stripe-sandbox.test'],
       },
     });
-    expect(parsed.data?.ssrfBypassHosts).toEqual([
-      'internal-api.docker.local',
-      'circularpay-stripe-sandbox.test',
-    ]);
+    expect(parsed.data?.ssrfBypassHosts).toEqual(['internal-api.docker.local', 'circularpay-stripe-sandbox.test']);
   });
 
   it('rejects wrong id literal', () => {

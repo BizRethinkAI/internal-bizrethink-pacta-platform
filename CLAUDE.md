@@ -2,14 +2,34 @@
 
 BizRethink AI's document signing platform. **Additive fork of [documenso/documenso](https://github.com/documenso/documenso).** All BizRethink customization lives in `packages/bizrethink/` and `overlays/*.patch`; upstream files in `apps/` and `packages/*` (except `bizrethink/`) are NEVER modified directly.
 
+---
+
+## Read this first
+
+**Start every session with [`docs/STATE.md`](docs/STATE.md). Update it last.**
+It is the only memory that survives between sessions — where things stand, what
+is in flight, what is blocked, and what has bitten us before. It replaced a
+user-local memory directory on 2026-08-29.
+
+| | |
+|---|---|
+| **Where things stand** | [`docs/STATE.md`](docs/STATE.md) |
+| **How we work** | [`docs/engineering-standard.md`](docs/engineering-standard.md) |
+| **Why it's like this** | [`docs/adr/`](docs/adr/) |
+| **Upstream merges** | [`UPSTREAM.md`](UPSTREAM.md) |
+| **The E2E baseline** | [`FORK-TESTING.md`](FORK-TESTING.md) |
+
+**Definition of done: CI green on a pull request, and not before.** Not "builds
+locally". If CI cannot run, the task is blocked — say so.
+
+**The session that writes a change opens the PR and stops.** A human merges it.
+
 ## Background — read before designing anything
 
 **This project replaces a deprecated DocuSeal CLI attempt** (`internal-bizrethink-docuseal-deprecated`, deleted from local 2026-05-10 — never pushed to GitHub; safety tarball at `/tmp/docuseal-deprecated-backup-2026-05-10.tar.gz`). Five working days were spent attempting to build a CLI for self-hosted DocuSeal Pro before discovering that on-prem DocuSeal lacks the multi-tenant API surface the bootstrap spec assumed. Documenso has the correct surface (per-team API tokens, first-class multi-team primitives) and matches BizRethink's TypeScript stack.
 
-- **Decision rationale + paywall audit:** `~/.claude/projects/-Users-shwet-github-bizrethink-internal-bizrethink-pacta-platform/memory/`
-  - `documenso_paywall_audit.md` — confirms self-host unlock = 1 env var + 1-line patch
-  - `lessons_from_docuseal_attempt.md` — what we learned + patterns worth carrying forward
-  - `coolify_api.md` — Coolify access pattern (still valid)
+- **Decision rationale:** [ADR 0003 — Documenso over DocuSeal](docs/adr/0003-documenso-over-docuseal.md), which records both the choice and the process lesson: verify a vendor's endpoints respond on the deployment model you will actually run, not their Cloud tier.
+- **Self-host unlock:** one env var plus overlay 001. See [`overlays/README.md`](overlays/README.md).
 - **Setup Guide (deprecated):** `~/Desktop/Claude Cowork/BizRethink/Platform/DocuSeal_Setup_Guide.md` — has a deprecation banner; §10 (business model) still valid, everything DocuSeal-specific is stale
 - **Cutover target unchanged: 2026-05-10** (MFG-only acceptable on day one; MORG CAP can roll out the following week)
 
@@ -41,7 +61,7 @@ internal-bizrethink-pacta-platform/
 │       └── README.md                ← how to add a feature
 ├── overlays/                        ← targeted patches to upstream files
 │   ├── README.md                    ← every patch documented with rationale + line-anchor
-│   └── *.patch                      ← discrete patches; applied via scripts/apply-overlays.sh
+│   └── *.patch                      ← discrete patches (committed applied; see UPSTREAM.md)
 ├── .github/workflows/
 │   └── upstream-sync.yml            ← weekly: pull documenso/main, attempt merge, open PR
 ├── UPSTREAM.md                      ← runbook for handling merge conflicts + patch re-application
@@ -110,4 +130,5 @@ That's it. See `overlays/README.md` for status.
 - npm package manager (Documenso uses npm; the master BizRethink stack prefers pnpm but switching here would fight every upstream sync)
 - Conventional commits where possible
 - No secrets in code or logs
-- Coolify env vars hold all production secrets, never in repo
+- **Instance config is DB-backed with an admin UI, never a Coolify env var** — see [ADR 0004](docs/adr/0004-db-backed-instance-config.md). Coolify env vars hold only bootstrap secrets (encryption key, database URL); everything an admin should be able to see and change lives in `/admin/*`.
+- Full rules, including the ones learned the hard way: [`docs/engineering-standard.md`](docs/engineering-standard.md)

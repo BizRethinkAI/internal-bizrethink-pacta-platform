@@ -1,6 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { prisma } from '@documenso/prisma';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   encryptBase64String,
@@ -142,9 +141,7 @@ describe('invalidateSigningConfig', () => {
 
     invalidateSigningConfig();
 
-    mockedFindUnique.mockResolvedValueOnce(
-      dbRow({ signingContactInfo: 'new-contact@bizrethink.ai' }) as never,
-    );
+    mockedFindUnique.mockResolvedValueOnce(dbRow({ signingContactInfo: 'new-contact@bizrethink.ai' }) as never);
     const cfg = await getInstanceSigningConfig();
     expect(cfg!.signingContactInfo).toBe('new-contact@bizrethink.ai');
     expect(mockedFindUnique).toHaveBeenCalledTimes(2);

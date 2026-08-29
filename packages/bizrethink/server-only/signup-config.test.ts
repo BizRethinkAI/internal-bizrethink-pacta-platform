@@ -1,13 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import { prisma } from '@documenso/prisma';
 import { env } from '@documenso/lib/utils/env';
 
-import {
-  getAllowedSignupDomains,
-  isInviteRequiredForSignup,
-  isSignupDisabled,
-} from './signup-config';
+import { prisma } from '@documenso/prisma';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { getAllowedSignupDomains, isInviteRequiredForSignup, isSignupDisabled } from './signup-config';
 
 vi.mock('@documenso/prisma', () => ({
   prisma: {

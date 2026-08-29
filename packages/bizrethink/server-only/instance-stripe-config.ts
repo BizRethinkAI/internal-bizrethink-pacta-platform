@@ -1,9 +1,8 @@
-import { bytesToUtf8 } from '@noble/ciphers/utils';
-
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { prisma } from '@documenso/prisma';
+import { bytesToUtf8 } from '@noble/ciphers/utils';
 
 // Phase K (overlay 045): DB-backed Stripe billing config loader.
 //
@@ -63,8 +62,7 @@ const setCachedConfig = (v: DecryptedStripeConfig | null) => {
 const requireKey = () => {
   if (!DOCUMENSO_ENCRYPTION_KEY) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message:
-        'NEXT_PRIVATE_ENCRYPTION_KEY is not set; cannot encrypt/decrypt instance Stripe config',
+      message: 'NEXT_PRIVATE_ENCRYPTION_KEY is not set; cannot encrypt/decrypt instance Stripe config',
     });
   }
   return DOCUMENSO_ENCRYPTION_KEY;

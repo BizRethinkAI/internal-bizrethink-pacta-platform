@@ -1,12 +1,7 @@
+import { prisma } from '@documenso/prisma';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { prisma } from '@documenso/prisma';
-
-import {
-  buildHstsValue,
-  getSecurityHeadersConfig,
-  invalidateSecurityHeadersConfig,
-} from './security-headers-config';
+import { buildHstsValue, getSecurityHeadersConfig, invalidateSecurityHeadersConfig } from './security-headers-config';
 
 vi.mock('@documenso/prisma', () => ({
   prisma: {
@@ -83,9 +78,7 @@ describe('getSecurityHeadersConfig', () => {
   });
 
   it('returns DEFAULTS when DB row data fails schema validation', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ hsts: { maxAgeSeconds: 'not-a-number' } }) as never,
-    );
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ hsts: { maxAgeSeconds: 'not-a-number' } }) as never);
     const cfg = await getSecurityHeadersConfig();
     expect(cfg.hsts).toEqual(DEFAULT_HSTS);
   });

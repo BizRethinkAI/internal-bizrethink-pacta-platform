@@ -1,10 +1,9 @@
-import { bytesToUtf8 } from '@noble/ciphers/utils';
-
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
+import { bytesToUtf8 } from '@noble/ciphers/utils';
 
 // Phase F (overlay 014): DB-backed SSO provider config.
 //
@@ -42,12 +41,13 @@ const requireKey = () => {
 };
 
 const decryptString = (cipher: string | null): string => {
-  if (!cipher) return '';
+  if (!cipher) {
+    return '';
+  }
   return bytesToUtf8(symmetricDecrypt({ key: requireKey(), data: cipher }));
 };
 
-export const encryptSsoString = (plain: string): string =>
-  symmetricEncrypt({ key: requireKey(), data: plain });
+export const encryptSsoString = (plain: string): string => symmetricEncrypt({ key: requireKey(), data: plain });
 
 const envFallback = (provider: Provider): ProviderConfig => {
   if (provider === 'google') {
@@ -94,7 +94,9 @@ const envFallback = (provider: Provider): ProviderConfig => {
 export const getProviderConfig = async (provider: Provider): Promise<ProviderConfig> => {
   if (cacheBuiltForAllProviders) {
     const cached = cache.get(provider);
-    if (cached) return cached;
+    if (cached) {
+      return cached;
+    }
   }
 
   // Defensive: if DB is unreachable (Postgres down, network flap, test env),

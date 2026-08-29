@@ -1,13 +1,8 @@
-import { z } from 'zod';
-
 import { prisma } from '@documenso/prisma';
 import { adminProcedure, router } from '@documenso/trpc/server/trpc';
+import { z } from 'zod';
 
-import {
-  encryptStorageString,
-  getInstanceStorageConfig,
-  invalidateStorageConfig,
-} from '../instance-storage-config';
+import { encryptStorageString, getInstanceStorageConfig, invalidateStorageConfig } from '../instance-storage-config';
 import { testInstanceStorage } from '../test-instance-storage';
 
 // Phase E (overlay 013 prerequisite): TRPC router for instance storage config.
@@ -49,7 +44,9 @@ export const instanceStorageRouter = router({
     const row = await prisma.bizrethinkInstanceStorageConfig.findUnique({
       where: { id: 'singleton' },
     });
-    if (!row) return null;
+    if (!row) {
+      return null;
+    }
     return {
       transport: row.transport === 's3' ? 's3' : 'database',
       s3Endpoint: row.s3Endpoint,
@@ -71,8 +68,7 @@ export const instanceStorageRouter = router({
         where: { id: 'singleton' },
       });
 
-      const enc = (val: string, prev: string | null) =>
-        val ? encryptStorageString(val) : (prev ?? null);
+      const enc = (val: string, prev: string | null) => (val ? encryptStorageString(val) : (prev ?? null));
 
       const data = {
         transport: input.transport,
@@ -84,10 +80,7 @@ export const instanceStorageRouter = router({
         s3SecretAccessKey: enc(input.s3SecretAccessKey, existing?.s3SecretAccessKey ?? null),
         s3DistributionDomain: input.s3DistributionDomain || null,
         s3DistributionKeyId: enc(input.s3DistributionKeyId, existing?.s3DistributionKeyId ?? null),
-        s3DistributionKeyPem: enc(
-          input.s3DistributionKeyPem,
-          existing?.s3DistributionKeyPem ?? null,
-        ),
+        s3DistributionKeyPem: enc(input.s3DistributionKeyPem, existing?.s3DistributionKeyPem ?? null),
         updatedByUserId: ctx.user.id,
       };
 
@@ -141,8 +134,12 @@ export const instanceStorageRouter = router({
       if (!accessKeyId || !secretAccessKey) {
         const saved = await getInstanceStorageConfig();
         if (saved) {
-          if (!accessKeyId) accessKeyId = saved.s3AccessKeyId ?? '';
-          if (!secretAccessKey) secretAccessKey = saved.s3SecretAccessKey ?? '';
+          if (!accessKeyId) {
+            accessKeyId = saved.s3AccessKeyId ?? '';
+          }
+          if (!secretAccessKey) {
+            secretAccessKey = saved.s3SecretAccessKey ?? '';
+          }
         }
       }
 

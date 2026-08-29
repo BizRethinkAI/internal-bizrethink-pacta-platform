@@ -1,7 +1,6 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-
 import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { prisma } from '@documenso/prisma';
+import { OrganisationMemberInviteStatus } from '@prisma/client';
 
 // Phase L (2026-05-11): auto-accept ALL pending OrganisationMemberInvite
 // rows that match a newly-signed-up user's email.
@@ -98,10 +97,7 @@ export const autoClaimInvitesOnSignup = async ({
     } catch (err) {
       // Log + continue. We don't want one bad invite to fail the whole
       // signup. The user still gets account created; admin can re-invite.
-      console.error(
-        `[auto-claim-invites] Failed to accept invite ${invite.id} for ${userEmail}:`,
-        err,
-      );
+      console.error(`[auto-claim-invites] Failed to accept invite ${invite.id} for ${userEmail}:`, err);
     }
   }
 

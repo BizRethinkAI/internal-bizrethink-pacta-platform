@@ -1,8 +1,7 @@
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { prisma } from '@documenso/prisma';
+import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { autoClaimInvitesOnSignup } from './auto-claim-invites-on-signup';
 
@@ -91,8 +90,16 @@ describe('autoClaimInvitesOnSignup', () => {
 
   it('accepts multiple PENDING invites across different orgs', async () => {
     mockedFindMany.mockResolvedValueOnce([
-      inviteFixture({ id: 'inv-a', organisation: { id: 'org-a', name: 'Org A', groups: [] }, organisationRole: 'ADMIN' }),
-      inviteFixture({ id: 'inv-b', organisation: { id: 'org-b', name: 'Org B', groups: [] }, organisationRole: 'MANAGER' }),
+      inviteFixture({
+        id: 'inv-a',
+        organisation: { id: 'org-a', name: 'Org A', groups: [] },
+        organisationRole: 'ADMIN',
+      }),
+      inviteFixture({
+        id: 'inv-b',
+        organisation: { id: 'org-b', name: 'Org B', groups: [] },
+        organisationRole: 'MANAGER',
+      }),
     ] as never);
     const result = await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' });
 
@@ -136,9 +143,7 @@ describe('autoClaimInvitesOnSignup', () => {
       inviteFixture({ id: 'inv-a', organisation: { id: 'org-a', name: 'A', groups: [] } }),
       inviteFixture({ id: 'inv-b', organisation: { id: 'org-b', name: 'B', groups: [] } }),
     ] as never);
-    mockedUpdate
-      .mockRejectedValueOnce(new Error('update failed'))
-      .mockResolvedValueOnce({} as never);
+    mockedUpdate.mockRejectedValueOnce(new Error('update failed')).mockResolvedValueOnce({} as never);
 
     const consoleErrSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -156,8 +161,6 @@ describe('autoClaimInvitesOnSignup', () => {
     mockedFindMany.mockRejectedValueOnce(new Error('DB down'));
     // The helper does NOT catch the findMany error — caller (onCreateUserHook
     // in create-user.ts) has its own catch that falls back to Personal Org.
-    await expect(
-      autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' }),
-    ).rejects.toThrow('DB down');
+    await expect(autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' })).rejects.toThrow('DB down');
   });
 });

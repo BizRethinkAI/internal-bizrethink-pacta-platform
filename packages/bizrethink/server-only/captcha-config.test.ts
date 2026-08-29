@@ -1,6 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { prisma } from '@documenso/prisma';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getTurnstileSecretKey, getTurnstileSiteKey } from './captcha-config';
 
@@ -35,16 +34,12 @@ afterEach(() => {
 
 describe('getTurnstileSiteKey', () => {
   it('returns DB siteKey when row is enabled and siteKey is set', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ siteKey: 'db-site-key', secretKey: 'db-secret' }) as never,
-    );
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ siteKey: 'db-site-key', secretKey: 'db-secret' }) as never);
     expect(await getTurnstileSiteKey()).toBe('db-site-key');
   });
 
   it('falls back to env when DB siteKey is empty string', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ siteKey: '', secretKey: 'db-secret' }) as never,
-    );
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ siteKey: '', secretKey: 'db-secret' }) as never);
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = 'env-site-key';
     expect(await getTurnstileSiteKey()).toBe('env-site-key');
   });
@@ -56,9 +51,7 @@ describe('getTurnstileSiteKey', () => {
   });
 
   it('falls back to env when DB row is disabled', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ siteKey: 'db-key', secretKey: 'db-secret' }, false) as never,
-    );
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ siteKey: 'db-key', secretKey: 'db-secret' }, false) as never);
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = 'env-site-key';
     expect(await getTurnstileSiteKey()).toBe('env-site-key');
   });
@@ -77,16 +70,12 @@ describe('getTurnstileSiteKey', () => {
 
 describe('getTurnstileSecretKey', () => {
   it('returns DB secretKey when row is enabled and secretKey is set', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ siteKey: 'db-site', secretKey: 'db-secret-key' }) as never,
-    );
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ siteKey: 'db-site', secretKey: 'db-secret-key' }) as never);
     expect(await getTurnstileSecretKey()).toBe('db-secret-key');
   });
 
   it('falls back to env when DB secretKey is empty string', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ siteKey: 'db-site', secretKey: '' }) as never,
-    );
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ siteKey: 'db-site', secretKey: '' }) as never);
     process.env.NEXT_PRIVATE_TURNSTILE_SECRET_KEY = 'env-secret-key';
     expect(await getTurnstileSecretKey()).toBe('env-secret-key');
   });

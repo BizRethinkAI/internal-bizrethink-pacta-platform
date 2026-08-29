@@ -1,6 +1,5 @@
-import { type PDF, rgb } from '@libpdf/core';
-
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { type PDF, rgb } from '@libpdf/core';
 
 /**
  * BizRethink overlay 036 (Tier 1 verification footer).
@@ -48,8 +47,8 @@ export async function addVerificationFooterToPdf(
   const mi = String(signedAt.getUTCMinutes()).padStart(2, '0');
   const stamp = `Verified by ${verificationDomain}  ·  Envelope ${envelopeId}  ·  Signed ${yyyy}-${mm}-${dd} ${hh}:${mi} UTC`;
 
-  const fontBytes = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
-    async (res) => res.arrayBuffer(),
+  const fontBytes = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) =>
+    res.arrayBuffer(),
   );
   const font = pdf.embedFont(new Uint8Array(fontBytes));
 

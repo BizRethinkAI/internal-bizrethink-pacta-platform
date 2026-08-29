@@ -1,9 +1,8 @@
-import { bytesToUtf8 } from '@noble/ciphers/utils';
-
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { prisma } from '@documenso/prisma';
+import { bytesToUtf8 } from '@noble/ciphers/utils';
 
 // Phase C (overlay 011): DB-backed signing config loader.
 //
@@ -59,8 +58,7 @@ const setCachedConfig = (v: DecryptedSigningConfig | null) => {
 const requireKey = () => {
   if (!DOCUMENSO_ENCRYPTION_KEY) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message:
-        'NEXT_PRIVATE_ENCRYPTION_KEY is not set; cannot encrypt/decrypt instance signing config',
+      message: 'NEXT_PRIVATE_ENCRYPTION_KEY is not set; cannot encrypt/decrypt instance signing config',
     });
   }
   return DOCUMENSO_ENCRYPTION_KEY;

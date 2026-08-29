@@ -1,9 +1,8 @@
-import { bytesToUtf8 } from '@noble/ciphers/utils';
-
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { prisma } from '@documenso/prisma';
+import { bytesToUtf8 } from '@noble/ciphers/utils';
 
 // Phase E (overlay 013): DB-backed storage config loader.
 //
@@ -47,16 +46,21 @@ const requireKey = () => {
 };
 
 const decryptString = (cipher: string | null): string | null => {
-  if (!cipher) return null;
+  if (!cipher) {
+    return null;
+  }
   return bytesToUtf8(symmetricDecrypt({ key: requireKey(), data: cipher }));
 };
 
-export const encryptStorageString = (plain: string): string =>
-  symmetricEncrypt({ key: requireKey(), data: plain });
+export const encryptStorageString = (plain: string): string => symmetricEncrypt({ key: requireKey(), data: plain });
 
 export const getInstanceStorageConfig = async (): Promise<DecryptedStorageConfig | null> => {
-  if (cachedConfig) return cachedConfig;
-  if (cachedNullProbed) return null;
+  if (cachedConfig) {
+    return cachedConfig;
+  }
+  if (cachedNullProbed) {
+    return null;
+  }
 
   // Defensive: DB unreachable returns null (callers fall back to env-based
   // S3 config). Throwing here would break uploads entirely during outages.

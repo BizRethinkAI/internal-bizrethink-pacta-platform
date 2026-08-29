@@ -35,9 +35,7 @@ const makePdf = () => {
 beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date('2026-05-25T14:30:00.000Z'));
-  global.fetch = vi.fn(async () =>
-    Promise.resolve(new Response(FONT_BYTES)),
-  ) as unknown as typeof fetch;
+  global.fetch = vi.fn(async () => Promise.resolve(new Response(FONT_BYTES))) as unknown as typeof fetch;
 });
 
 afterEach(() => {
