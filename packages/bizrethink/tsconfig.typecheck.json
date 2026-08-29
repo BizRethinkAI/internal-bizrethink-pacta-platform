@@ -1,5 +1,5 @@
 {
-  "//": "Type gate for the lease builder. vitest strips types without checking them, so a test fixture missing a required ClauseFacts field passes green while silently feeding `undefined` into every includeWhen predicate — which is exactly what happened, and what this caught. Scoped to lease/ plus its own server-only module: the wider package has pre-existing type errors in sso-provider-config.test.ts that are out of scope for this feature.",
+  "//": "Type gate for the lease builder. vitest strips types without checking them, so a test fixture missing a required ClauseFacts field passes green while silently feeding `undefined` into every includeWhen predicate \u2014 which is exactly what happened, and what this caught. Scoped to lease/ plus its own server-only module: the wider package has pre-existing type errors in sso-provider-config.test.ts that are out of scope for this feature.",
   "extends": "../tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
@@ -9,5 +9,10 @@
     "moduleResolution": "bundler",
     "skipLibCheck": true
   },
-  "include": ["lease/**/*.ts", "server-only/feature-access.ts", "server-only/feature-access.test.ts"]
+  "include": [
+    "lease/**/*.ts",
+    "server-only/feature-access.ts",
+    "server-only/feature-access.test.ts",
+    "server-only/trpc/lease-builder-router.ts"
+  ]
 }

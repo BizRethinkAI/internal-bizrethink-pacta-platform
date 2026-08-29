@@ -1,3 +1,5 @@
+import type { CustomClauseInput } from '../clauses/custom';
+import { toCustomClause } from '../clauses/custom';
 import type { ClauseFacts } from '../clauses/types';
 import { FL_LIBRARY } from '../clauses/us-fl';
 import { selectClauses } from '../engine/select-clauses';
@@ -24,6 +26,12 @@ export type RenderLeaseInput = {
   values: Record<string, InterpolationValue>;
   parties: LeaseParty[];
   propertyAddress: string;
+  /**
+   * Clauses the landlord wrote. Appended to the library rather than handled
+   * separately, so they are selected, ordered, numbered and duplicate-checked
+   * by exactly the same code as everything else.
+   */
+  customClauses?: CustomClauseInput[];
 };
 
 export type RenderedDocument = {
@@ -48,9 +56,11 @@ export type RenderLeaseResult = {
 };
 
 export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: LeaseDocumentSpec[]; missing: string[] } => {
-  const { facts, money, values, propertyAddress } = input;
+  const { facts, money, values, propertyAddress, customClauses = [] } = input;
 
-  const selection = selectClauses({ facts, library: FL_LIBRARY });
+  const library = [...FL_LIBRARY, ...customClauses.map((clause, index) => toCustomClause(clause, index))];
+
+  const selection = selectClauses({ facts, library });
   const derived = deriveMoney(money);
 
   /*
