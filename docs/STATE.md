@@ -261,6 +261,13 @@ passed, or appeared to:
 - **vitest strips types without checking them.** A fixture missing required
   fields passes green while feeding `undefined` into every predicate. Run
   `npm run typecheck:lease --workspace=@bizrethink/customizations`.
+- **Four BizRethink admin pages live in upstream's `admin+/` directory** —
+  `ai`, `signing`, `storage`, `sso-providers`. Each was added by its own
+  overlay-phase commit and none exists upstream; they sit there because that is
+  where the admin layout and nav are. All four are declared in
+  `overlays/BIZRETHINK-OWNED.txt`, one by one rather than as a glob, because
+  that directory is overwhelmingly upstream's and a wildcard would exempt
+  twenty of their files to cover four of ours.
 - **A permanently-red guard hides every guard behind it.** The `Governance`
   workflow's fork-discipline check decided "is this upstream?" by path, so it
   failed on **every** lease-builder PR — #21, #23, #24, #25 and both open ones —

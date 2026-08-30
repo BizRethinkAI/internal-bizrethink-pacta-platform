@@ -48,3 +48,17 @@ apps/remix/app/components/general/lease/*.tsx
 # `noindex, nofollow`, which a review link must have.
 apps/remix/app/routes/_recipient+/lease-review.$token.tsx
 apps/remix/app/routes/_recipient+/lease-review.$token.document.tsx
+
+# ── BizRethink admin pages ───────────────────────────────────────────────────
+# Instance configuration we added, each created by its own overlay-phase commit
+# and none of it present upstream — Documenso administers none of these things.
+# They must live under routes/_authenticated+/admin+/ because that is where the
+# admin layout and nav live.
+#
+# Listed one by one rather than as a glob: that directory is overwhelmingly
+# upstream's, and a wildcard there would exempt twenty of their files to cover
+# four of ours.
+apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+apps/remix/app/routes/_authenticated+/admin+/signing.tsx
+apps/remix/app/routes/_authenticated+/admin+/storage.tsx
+apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
