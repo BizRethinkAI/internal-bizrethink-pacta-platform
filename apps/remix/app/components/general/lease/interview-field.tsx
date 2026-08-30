@@ -1,10 +1,12 @@
 import type { InterviewField } from '@bizrethink/customizations/lease/interview/steps';
+import { trpc } from '@documenso/trpc/react';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
-import { Lightbulb, Scale } from 'lucide-react';
+import { Check, Lightbulb, Loader2, MapPin, Scale } from 'lucide-react';
+import { useState } from 'react';
 
 /**
  * One question in the lease interview.
@@ -29,9 +31,11 @@ export type InterviewFieldProps = {
   onChange: (value: FieldValue) => void;
   /** A blocking finding tied to this field, if any. */
   error?: string;
+  /** Needed only by address fields, which look up through an access-gated procedure. */
+  organisationId?: string;
 };
 
-export const InterviewFieldControl = ({ field, value, onChange, error }: InterviewFieldProps) => {
+export const InterviewFieldControl = ({ field, value, onChange, error, organisationId }: InterviewFieldProps) => {
   const id = `field-${field.name}`;
 
   return (
@@ -94,6 +98,10 @@ export const InterviewFieldControl = ({ field, value, onChange, error }: Intervi
 
         <div>
           <FieldInput id={id} field={field} value={value} onChange={onChange} />
+
+          {field.address === true && organisationId !== undefined && (
+            <AddressLookup organisationId={organisationId} value={value} onChange={onChange} />
+          )}
 
           {error && <p className="mt-2 font-medium text-destructive text-sm">{error}</p>}
         </div>
@@ -168,6 +176,90 @@ const FieldInput = ({ id, field, value, onChange }: { id: string } & Omit<Interv
           onChange(raw === '' ? null : Number(raw));
         }}
       />
+    </div>
+  );
+};
+
+/**
+ * Address normalisation, offered rather than applied.
+ *
+ * The free national source is the US Census geocoder, which is a LOOKUP and
+ * not a typeahead — so this fires when the field loses focus, not per
+ * keystroke. Free national autocomplete effectively does not exist: Google
+ * Places requires billing, and Nominatim's terms discourage per-character
+ * queries. Census is also a shared public service, and one request per
+ * focus-loss is fair use of it where one per character is not.
+ *
+ * It never overwrites what was typed. Applying the match is a click, because
+ * silently rewriting an address someone just entered is how a form loses an
+ * apartment number.
+ */
+const AddressLookup = ({
+  organisationId,
+  value,
+  onChange,
+}: {
+  organisationId: string;
+  value: FieldValue;
+  onChange: (value: FieldValue) => void;
+}) => {
+  const [query, setQuery] = useState('');
+  const typed = value === null ? '' : String(value);
+
+  const lookup = trpc.bizrethink.leaseBuilder.property.lookupAddress.useQuery(
+    { organisationId, address: query },
+    { enabled: query.length > 8, staleTime: 5 * 60 * 1000, retry: false },
+  );
+
+  const match = lookup.data?.match ?? null;
+  const formatted = match ? `${match.addressLine}, ${match.city}, ${match.state} ${match.postalCode}` : null;
+
+  // Nothing useful to say when the match is what is already in the box.
+  if (formatted !== null && formatted === typed.trim()) {
+    return null;
+  }
+
+  return (
+    <div className="mt-2">
+      {query.length <= 8 && (
+        <button
+          type="button"
+          className="text-muted-foreground text-xs underline underline-offset-2 hover:text-foreground"
+          onClick={() => setQuery(typed)}
+        >
+          Check this address
+        </button>
+      )}
+
+      {lookup.isFetching && (
+        <p className="flex items-center gap-2 text-muted-foreground text-xs">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          Checking…
+        </p>
+      )}
+
+      {!lookup.isFetching && query.length > 8 && formatted && (
+        <div className="flex items-start justify-between gap-3 rounded-md border bg-muted/40 p-2.5">
+          <p className="flex gap-2 text-xs">
+            <MapPin className="mt-0.5 h-3 w-3 flex-none text-muted-foreground" />
+            <span>{formatted}</span>
+          </p>
+          <button
+            type="button"
+            className="flex flex-none items-center gap-1 font-medium text-xs underline underline-offset-2"
+            onClick={() => onChange(formatted)}
+          >
+            <Check className="h-3 w-3" />
+            Use this
+          </button>
+        </div>
+      )}
+
+      {!lookup.isFetching && query.length > 8 && !formatted && (
+        <p className="text-muted-foreground text-xs">
+          No match from the US Census address service. Common for new construction — leave it as you typed it.
+        </p>
+      )}
     </div>
   );
 };
