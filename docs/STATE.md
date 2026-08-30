@@ -223,6 +223,17 @@ passed, or appeared to:
   "hung" indistinguishable.
 - **Upstream syncs drop features silently.** The 2026-08-13 audit found three
   (admin org-delete, signing-page branding, signup flags). Nothing was red.
+- **A free-text answer prints exactly as typed.** The occupancy clause read
+  "The following people are authorised to occupy the Premises:
+  {{authorisedOccupants}}". A real answer was "daughters and father" — which
+  identifies nobody, and, because the clause listed only that field, left the
+  SIGNING TENANT off the list of people allowed to live in their own home. The
+  question said "who is authorised to occupy it" and the load-bearing word,
+  *named*, sat mid-sentence in the help. Fixed in #41: the tenants are named
+  automatically from the party list, naming anyone else is optional, and there
+  are two clause variants so a household with nobody extra does not print
+  "together with ." **Where the SHAPE of a free-text answer matters, show an
+  example in the control — a label alone did not carry it.**
 - **Asking twice for the same fact hid a correctness bug.** The interview asked
   `landlordNoticeEmail` and `tenantNoticeEmail` by hand, after the same
   addresses had been entered against each signer. The redundancy was the

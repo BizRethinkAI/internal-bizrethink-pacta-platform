@@ -74,6 +74,15 @@ export type ClauseFacts = {
   advanceRentCarriedInUsd: number;
   propertyYearBuilt: number | null;
   petsPermitted: boolean;
+  /**
+   * Whether anyone beyond the signing tenants was named as an occupant.
+   *
+   * Derived, never asked: it is simply whether `authorisedOccupants` has
+   * anything in it. It picks between the two occupancy clauses, so a lease
+   * with nobody extra does not print "together with ." at the end of a
+   * sentence.
+   */
+  hasNamedOccupants: boolean;
   hasHoa: boolean;
   /** True when the term does not begin on the rent due day. */
   prorationApplies: boolean;

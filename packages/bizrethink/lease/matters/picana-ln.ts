@@ -33,6 +33,9 @@ export const PICANA_FACTS: ClauseFacts = {
   // Estancia at Wiregrass Ranch, built well after 1978, so no lead disclosure.
   propertyYearBuilt: 2005,
   petsPermitted: true,
+  // The fixture names occupants beyond the signing tenants, so it exercises
+  // the `use.occupancy-limit-with-others` variant.
+  hasNamedOccupants: true,
   hasHoa: true,
   prorationApplies: false,
   propertyType: 'single-family',
@@ -93,7 +96,7 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   depositClaimNoticeDays: 30,
 
   occupantLimit: 5,
-  authorisedOccupants: 'TENANT ONE, TENANT TWO and their immediate family',
+  authorisedOccupants: 'Ava Example and Rohan Example',
   guestNightsLimit: 14,
 
   tenantUtilities: 'electricity, natural gas, water and sewer, telephone, cable television and internet',

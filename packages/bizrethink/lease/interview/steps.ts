@@ -59,6 +59,8 @@ export type InterviewField = {
    * advice wording and the presence of an attributing word.
    */
   suggestion?: { value: string | number; note: string };
+  /** Shown in the empty control. Use where the SHAPE of the answer matters. */
+  placeholder?: string;
   /**
    * Offer US Census address normalisation when this field loses focus.
    *
@@ -99,6 +101,7 @@ export const DERIVED_FACTS = [
   'advanceRentCarriedInUsd',
   'prorationApplies',
   'termMonths',
+  'hasNamedOccupants',
 ];
 
 export const DERIVED_VALUES = [
@@ -174,9 +177,20 @@ export const FL_INTERVIEW: InterviewStep[] = [
         name: 'authorisedOccupants',
         target: 'value',
         kind: 'textarea',
-        label: 'Who is authorised to occupy it?',
-        help: 'Named occupants beyond the signing tenants — children, family members.',
-        required: true,
+        label: 'Anyone else living there, by name?',
+        /*
+          A real answer was "daughters and father", which identifies nobody and
+          printed into the lease exactly as typed. The label asked "who is
+          authorised to occupy it" and the word doing the work — "named" — was
+          buried mid-sentence in the help. Both now say names, and an example
+          shows the shape.
+
+          No longer required. The tenants are named automatically from the
+          party list, so a household with nobody else is an ordinary answer
+          rather than something to invent an entry for.
+        */
+        help: 'Full names of anyone beyond the signing tenants — children, a parent, a partner who is not signing. The tenants themselves are added automatically. Leave blank if it is only the tenants.',
+        placeholder: 'Ava Shetty, Rohan Shetty',
       },
       {
         name: 'guestNightsLimit',

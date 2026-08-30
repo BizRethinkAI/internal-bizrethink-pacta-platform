@@ -43,21 +43,53 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     asserts: ['residential-use-only'],
   },
 
+  /*
+    TWO VARIANTS, because a lease with no additional occupants is ordinary and
+    a single clause with an optional variable would print "together with ."
+
+    THE TENANTS ARE NAMED IN BOTH. The original clause listed only the free-text
+    answer, so answering "daughters and father" produced a lease stating those
+    were the people authorised to occupy the Premises — leaving the signing
+    tenant, the person actually renting it, off the list of people allowed to
+    live there.
+  */
   {
     slug: 'use.occupancy-limit',
+    version: 2,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'use',
+    sortKey: 20,
+    heading: 'Occupants',
+    body: "The Premises may be occupied by no more than {{occupantLimit}} people. The people authorised to occupy the Premises are {{tenantNames}}. Any other person staying at the Premises for more than {{guestNightsLimit}} nights in any calendar month requires Landlord's prior written consent.",
+    source: drafted(),
+    status: 'draft',
+    includeWhen: (facts) => !facts.hasNamedOccupants,
+    variables: [
+      { name: 'occupantLimit', type: 'number', label: 'Maximum occupants', required: true },
+      { name: 'tenantNames', type: 'string', label: 'Tenant name(s)', required: true },
+      { name: 'guestNightsLimit', type: 'number', label: 'Guest nights before consent needed', required: true },
+    ],
+    supersedes: [],
+    asserts: ['occupancy-limit'],
+  },
+
+  {
+    slug: 'use.occupancy-limit-with-others',
     version: 1,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'use',
     sortKey: 20,
     heading: 'Occupants',
-    body: "The Premises may be occupied by no more than {{occupantLimit}} people. The following people are authorised to occupy the Premises: {{authorisedOccupants}}. Any other person staying at the Premises for more than {{guestNightsLimit}} nights in any calendar month requires Landlord's prior written consent.",
+    body: "The Premises may be occupied by no more than {{occupantLimit}} people. The people authorised to occupy the Premises are {{tenantNames}}, together with {{authorisedOccupants}}. Any other person staying at the Premises for more than {{guestNightsLimit}} nights in any calendar month requires Landlord's prior written consent.",
     source: drafted(),
     status: 'draft',
-    includeWhen: null,
+    includeWhen: (facts) => facts.hasNamedOccupants,
     variables: [
       { name: 'occupantLimit', type: 'number', label: 'Maximum occupants', required: true },
-      { name: 'authorisedOccupants', type: 'string', label: 'Authorised occupants', required: true },
+      { name: 'tenantNames', type: 'string', label: 'Tenant name(s)', required: true },
+      { name: 'authorisedOccupants', type: 'string', label: 'Other authorised occupants', required: true },
       { name: 'guestNightsLimit', type: 'number', label: 'Guest nights before consent needed', required: true },
     ],
     supersedes: [],
