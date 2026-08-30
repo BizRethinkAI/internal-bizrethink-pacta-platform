@@ -29,6 +29,7 @@ import { US_FL } from '../../lease/rule-packs/us-fl';
 import { FL_NON_WAIVABLE } from '../../lease/rule-packs/us-fl-non-waivable';
 import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only/clause-approvals';
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
+import { seedMatterFromProperty } from '../../lease/server-only/seed-from-property';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
 
 /**
@@ -287,6 +288,64 @@ export const leaseBuilderRouter = router({
       });
     }),
 
+    /**
+     * Start a lease with everything the property already knows.
+     *
+     * Seeding happens on the SERVER rather than in the browser, so the client
+     * cannot claim a landlord the property does not have — the party list is
+     * who signs, and it is not something a caller gets to assert.
+     */
+    startLease: authenticatedProcedure
+      .input(z.object({ organisationId: z.string(), teamId: z.number(), propertyId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+        await assertTeamAccess(input.teamId, input.organisationId, ctx.user.id);
+
+        const property = await prisma.bizrethinkProperty.findFirst({
+          where: { id: input.propertyId, organisationId: input.organisationId },
+        });
+
+        if (!property) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Property not found.' });
+        }
+
+        const seeded = seedMatterFromProperty({
+          id: property.id,
+          label: property.label,
+          addressLine: property.addressLine,
+          city: property.city,
+          state: property.state,
+          postalCode: property.postalCode,
+          county: property.county,
+          propertyType: property.propertyType,
+          yearBuilt: property.yearBuilt,
+          hasPool: property.hasPool,
+          hasHoa: property.hasHoa,
+          hoaName: property.hoaName,
+          includedAppliances: property.includedAppliances,
+          landlords: (property.landlords ?? []) as { name: string; email: string }[],
+          noticeName: property.noticeName,
+          noticeAddress: property.noticeAddress,
+        });
+
+        return await prisma.bizrethinkLeaseMatter.create({
+          data: {
+            id: prefixedId('lease_matter', 16),
+            organisationId: input.organisationId,
+            teamId: input.teamId,
+            createdByUserId: ctx.user.id,
+            propertyId: property.id,
+            title: `${property.label} — lease`,
+            facts: seeded.facts,
+            money: seeded.money,
+            values: seeded.values,
+            parties: seeded.parties,
+            customClauses: [],
+          },
+          select: { id: true },
+        });
+      }),
+
     create: authenticatedProcedure
       .input(
         z.object({
@@ -303,6 +362,14 @@ export const leaseBuilderRouter = router({
           hasHoa: z.boolean(),
           hoaName: z.string().nullable(),
           includedAppliances: z.string().nullable(),
+          /*
+            The landlord and the §83.50 notice details live here rather than on
+            each lease: none of it changes between tenancies. Copied into a
+            matter at creation, never referenced live.
+          */
+          landlords: z.array(z.object({ name: z.string().min(1), email: z.string() })).default([]),
+          noticeName: z.string().nullable().default(null),
+          noticeAddress: z.string().nullable().default(null),
         }),
       )
       .mutation(async ({ ctx, input }) => {

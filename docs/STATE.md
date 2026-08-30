@@ -196,6 +196,13 @@ passed, or appeared to:
   "hung" indistinguishable.
 - **Upstream syncs drop features silently.** The 2026-08-13 audit found three
   (admin org-delete, signing-page branding, signup flags). Nothing was red.
+- **A clean merge can silently revert a feature.** Resolving #38 against #37:
+  both touched `interview/steps.ts`, #38 having MOVED two fields that #37 then
+  edited in place. Git resolved it by keeping #38's moved copy — which was the
+  older text, so `address: true` quietly vanished and the address lookup on
+  that field stopped existing. Nothing conflicted, nothing was red, 523 tests
+  still passed. **After resolving a conflict, check that the other side's
+  change is still present, not just that the file compiles.**
 - **A failed query must never blank a page.** The review step returned `null`
   whenever validation produced no data, which removed the findings, the
   "send for review" panel and the Send button together, with no explanation.
@@ -276,6 +283,28 @@ Both create a valid envelope and produce a lease countersigned by the wrong
 person with no error anywhere. `validateParties` rejects both. **Party order is
 load-bearing** — placeholders are numbered positionally and resolved by index, so
 nothing may sort or regroup that list.
+
+### The interview's shape
+
+Reordered 2026-08-30 (#38) after a real run through it. **The landlord and the
+§83.50 notice details now live on the PROPERTY**, not on each lease — none of it
+changes between tenancies and it was being re-typed every time.
+
+**Copied into a matter at creation, never referenced live.** A lease that read
+its party list from the property row would have its signers silently rewritten
+whenever that row was edited, and party order decides where signature fields
+land — a lease countersigned by the wrong person, with nothing red anywhere.
+
+**The interview now opens with "Who is renting it".** It used to open with a
+property step in which six of eight answers already came from the property
+record — a screen confirming facts nobody had been asked for, standing in front
+of the question a landlord actually arrives with. That step still exists as
+*Confirm the property*, placed immediately before Maintenance because
+`propertyType` decides which duties Florida permits a lease to shift. Close
+enough to matter, late enough not to be a toll gate.
+
+Seeding runs on the server: the party list is who signs, and a browser does not
+get to assert it.
 
 ### Property data
 
