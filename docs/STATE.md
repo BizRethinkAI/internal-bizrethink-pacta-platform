@@ -196,6 +196,15 @@ passed, or appeared to:
   "hung" indistinguishable.
 - **Upstream syncs drop features silently.** The 2026-08-13 audit found three
   (admin org-delete, signing-page branding, signup flags). Nothing was red.
+- **A one-sided bound is a bound that is missing.** Found in production
+  2026-08-29: the only real matter carried `depositReturnDays: -124`. Every
+  statutory check in `validate.ts` compared in one direction only
+  (`returnDays > 15`), so a negative sailed through and the lease would have
+  told a tenant their deposit is returned within minus 124 days, with nothing
+  objecting. `graceDays` and `monthlyUsd` had no check at all. The fix is not
+  more `if`s — bounds now live in a `COHERENCE_CHECKS` table, and a test
+  enumerates the numeric leaves of a real answer set and fails when one is
+  missing from it. Fixed in #36.
 - **Green tests do not mean complete code.** On 2026-08-28 a clause module was
   imported and never added to the library array: seven clauses missing from every
   lease, 286 tests still green, `noUnusedLocals` off so nothing complained.
