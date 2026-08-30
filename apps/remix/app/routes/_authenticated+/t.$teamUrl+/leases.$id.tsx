@@ -245,6 +245,7 @@ export default function LeaseInterviewPage() {
             sections={step.customClauseSections ?? []}
             clauses={customClauses}
             onChange={setCustomClauses}
+            organisationId={organisationId}
           />
         )}
 

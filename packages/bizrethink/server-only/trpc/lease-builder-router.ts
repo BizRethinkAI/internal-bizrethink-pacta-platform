@@ -29,6 +29,7 @@ import { US_FL } from '../../lease/rule-packs/us-fl';
 import { FL_NON_WAIVABLE } from '../../lease/rule-packs/us-fl-non-waivable';
 import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only/clause-approvals';
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
+import { draftClause } from '../../lease/server-only/draft-clause';
 import { seedMatterFromProperty } from '../../lease/server-only/seed-from-property';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
 
@@ -985,6 +986,30 @@ export const leaseBuilderRouter = router({
    * signature by the attorney themselves would be a different feature, and
    * pretending this is one would be worse than not having it.
    */
+  /**
+   * Drafting help.
+   *
+   * Returns a PROPOSAL. Nothing is written to the matter here — the draft goes
+   * back to the editor for the landlord to read, change and keep or discard.
+   * A model that could write directly into a lease would be a model that could
+   * put words in front of a signer that nobody read.
+   */
+  ai: router({
+    draftClause: authenticatedProcedure
+      .input(
+        z.object({
+          organisationId: z.string(),
+          request: z.string().min(10).max(2000),
+          sections: z.array(z.string()).min(1),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        return await draftClause({ request: input.request, sections: input.sections });
+      }),
+  }),
+
   clauseLibrary: router({
     list: authenticatedProcedure.input(z.object({ organisationId: z.string() })).query(async ({ ctx, input }) => {
       await assertAccess(input.organisationId, ctx.user.id);

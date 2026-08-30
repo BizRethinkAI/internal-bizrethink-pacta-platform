@@ -4,13 +4,23 @@ import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/cry
 import { prisma } from '@documenso/prisma';
 import { bytesToUtf8 } from '@noble/ciphers/utils';
 
-// Phase H (overlay 016): DB-backed Vertex AI config.
+import type { AiProvider } from '../lease/ai/providers';
+import { isAiProvider } from '../lease/ai/providers';
+
+/*
+  DB-backed AI credentials.
+
+  Added 2026-05-01 as forward scaffolding for an upstream AI feature that never
+  shipped, in a Vertex shape: project ID, location and API key. Simplified
+  2026-08-30 when the clause drafter became its first consumer — the Gemini API
+  and Anthropic both authenticate with a key alone, and the other two fields
+  could never have been load-bearing alongside one.
+*/
 
 export type DecryptedAiConfig = {
   enabled: boolean;
-  vertexProjectId: string | null;
-  vertexLocation: string | null;
-  vertexApiKey: string | null;
+  provider: AiProvider;
+  apiKey: string | null;
 };
 
 let cachedConfig: DecryptedAiConfig | null = null;
@@ -59,9 +69,10 @@ export const getInstanceAiConfig = async (): Promise<DecryptedAiConfig | null> =
 
   const fresh: DecryptedAiConfig = {
     enabled: row.enabled,
-    vertexProjectId: row.vertexProjectId,
-    vertexLocation: row.vertexLocation,
-    vertexApiKey: decryptString(row.vertexApiKey),
+    // Falls back rather than throwing: an unrecognised provider in the column
+    // should degrade to the default, not take the page down.
+    provider: isAiProvider(row.provider) ? row.provider : 'gemini',
+    apiKey: decryptString(row.apiKey),
   };
   setCachedConfig(fresh);
   return fresh;
@@ -73,21 +84,26 @@ export const invalidateAiConfig = () => {
 };
 
 /**
- * Resolved Vertex config: DB row first, env fallback.
- * Returns null when neither source has credentials configured.
+ * Credentials, or null when the instance has none.
+ *
+ * Env fallback kept from the original design: a self-hosted instance may
+ * prefer to inject a key rather than store one, and the DB row wins where both
+ * exist. `BIZRETHINK_AI_API_KEY` replaces the three `GOOGLE_VERTEX_*` vars.
  */
-export const getResolvedVertexConfig = async (): Promise<{
-  projectId: string;
-  location: string;
-  apiKey: string;
-} | null> => {
+export const getResolvedAiConfig = async (): Promise<{ provider: AiProvider; apiKey: string } | null> => {
   const db = await getInstanceAiConfig();
-  const projectId = db?.vertexProjectId || process.env.GOOGLE_VERTEX_PROJECT_ID || '';
-  const location = db?.vertexLocation || process.env.GOOGLE_VERTEX_LOCATION || '';
-  const apiKey = db?.vertexApiKey || process.env.GOOGLE_VERTEX_API_KEY || '';
 
-  if (!projectId || !apiKey) {
+  if (db && !db.enabled) {
     return null;
   }
-  return { projectId, location, apiKey };
+
+  const envProvider = process.env.BIZRETHINK_AI_PROVIDER;
+  const provider: AiProvider = db?.provider ?? (isAiProvider(envProvider) ? envProvider : 'gemini');
+  const apiKey = db?.apiKey || process.env.BIZRETHINK_AI_API_KEY || '';
+
+  if (!apiKey) {
+    return null;
+  }
+
+  return { provider, apiKey };
 };

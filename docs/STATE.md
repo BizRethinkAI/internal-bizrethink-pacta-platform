@@ -152,12 +152,39 @@ precede it, are in flight as #26 and #27.
    It reports the statute and the exact words matched, and stops. **A regex is
    not entitled to a verdict on a specific provision.**
 
-   **AI layer NOT built, and it needs a decision:**
-   `BizrethinkInstanceAiConfig` is Vertex-only while the master stack has
-   Claude as primary — so either extend that model with an Anthropic provider,
-   or put Vertex credentials in `/admin`. When built it may only raise a
-   question with a citation attached, never block and never conclude: a false
-   "this clause is fine" manufactures confidence and is worse than no check.
+   **AI clause drafting — BUILT 2026-08-30** (#40). Vertex confirmed as the
+   right provider for this app (Claude is the fallback), so no Anthropic
+   provider was added.
+
+   Describe a term in plain English, get a clause back to edit. **It proposes
+   into the editor and never inserts** — the draft is appended as an ordinary
+   customer-authored clause and goes through the same guardrails as a typed
+   one. The output shape has nowhere to put a verdict (no `enforceable`, no
+   severity; unknown keys are dropped), and prose stating a legal conclusion
+   about its own clause is REJECTED rather than shown, with a message saying
+   why so the landlord can rephrase.
+
+   **No SDK.** A `fetch` against the documented REST endpoint: a dependency
+   lands in upstream's lockfile and must be reconciled every weekly sync,
+   which is a recurring cost for one POST.
+
+   **The AI config was simplified to a provider and a key.** It had asked for a
+   GCP project ID, a location AND an API key — credentials for two different
+   products at once, since the Gemini API takes a key alone while Vertex proper
+   needs a service account. At least two fields could never have been
+   load-bearing, and none were: the model was **forward scaffolding added
+   2026-05-01** for an upstream AI feature that never shipped, and its own
+   commit says "NO upstream consumer reads these vars yet". Nothing read it
+   until the clause drafter. Gemini and Anthropic are both supported, Claude
+   being the house fallback. `/admin/ai` now has a **Save and test connection**
+   button, which every other instance-config page already had.
+
+   **The lesson:** scaffolding built against a guess about someone else's
+   roadmap sat unused for four months and shaped a UI around the wrong
+   product. YAGNI applies to config schemas too.
+
+   **Not configured in production.** `BizrethinkInstanceAiConfig` has no row at
+   all; the feature fails closed and says so, pointing at `/admin/ai`.
 5. **Deferred:** paid property data. Blocked on a spending decision and worth
    six manual questions per property until then — see *Property data* below.
 6. Close the remaining documentation lie (`scripts/apply-overlays.sh`).
@@ -234,6 +261,13 @@ passed, or appeared to:
 - **vitest strips types without checking them.** A fixture missing required
   fields passes green while feeding `undefined` into every predicate. Run
   `npm run typecheck:lease --workspace=@bizrethink/customizations`.
+- **Four BizRethink admin pages live in upstream's `admin+/` directory** —
+  `ai`, `signing`, `storage`, `sso-providers`. Each was added by its own
+  overlay-phase commit and none exists upstream; they sit there because that is
+  where the admin layout and nav are. All four are declared in
+  `overlays/BIZRETHINK-OWNED.txt`, one by one rather than as a glob, because
+  that directory is overwhelmingly upstream's and a wildcard would exempt
+  twenty of their files to cover four of ours.
 - **A permanently-red guard hides every guard behind it.** The `Governance`
   workflow's fork-discipline check decided "is this upstream?" by path, so it
   failed on **every** lease-builder PR — #21, #23, #24, #25 and both open ones —
