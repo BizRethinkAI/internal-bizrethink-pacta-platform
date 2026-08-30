@@ -196,6 +196,19 @@ passed, or appeared to:
   "hung" indistinguishable.
 - **Upstream syncs drop features silently.** The 2026-08-13 audit found three
   (admin org-delete, signing-page branding, signup flags). Nothing was red.
+- **A clean merge can silently revert a feature.** Resolving #38 against #37:
+  both touched `interview/steps.ts`, #38 having MOVED two fields that #37 then
+  edited in place. Git resolved it by keeping #38's moved copy — which was the
+  older text, so `address: true` quietly vanished and the address lookup on
+  that field stopped existing. Nothing conflicted, nothing was red, 523 tests
+  still passed. **After resolving a conflict, check that the other side's
+  change is still present, not just that the file compiles.**
+- **A failed query must never blank a page.** The review step returned `null`
+  whenever validation produced no data, which removed the findings, the
+  "send for review" panel and the Send button together, with no explanation.
+  Sending a lease to a lawyer is exactly what you would do when something is
+  wrong with it, so that path cannot be gated on the checks succeeding. Fixed
+  in #37.
 - **A one-sided bound is a bound that is missing.** Found in production
   2026-08-29: the only real matter carried `depositReturnDays: -124`. Every
   statutory check in `validate.ts` compared in one direction only

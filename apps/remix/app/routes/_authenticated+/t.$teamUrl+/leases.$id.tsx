@@ -63,6 +63,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   return {
     teamUrl,
+    organisationId: team.organisationId,
     matter: {
       id: matter.id,
       title: matter.title,
@@ -117,7 +118,7 @@ const writeMoney = (money: Record<string, unknown>, name: string, value: FieldVa
 };
 
 export default function LeaseInterviewPage() {
-  const { teamUrl, matter } = useLoaderData<typeof loader>();
+  const { teamUrl, organisationId, matter } = useLoaderData<typeof loader>();
 
   const [facts, setFacts] = useState<Record<string, FieldValue>>(matter.facts);
   const [money, setMoney] = useState<Record<string, unknown>>(matter.money);
@@ -234,6 +235,7 @@ export default function LeaseInterviewPage() {
                     : (values[field.name] ?? null)
               }
               onChange={(value) => setField(field.target, field.name, value)}
+              organisationId={organisationId}
             />
           ))}
         </div>
@@ -370,15 +372,31 @@ const ReviewPanel = ({
     );
   }
 
-  const data = query.data;
+  /*
+    VALIDATION FAILING MUST NOT HIDE THE PAGE.
 
-  if (!data) {
-    return null;
-  }
+    This used to `return null` when the query produced no data, which meant a
+    single failing request blanked the entire review step — no findings, no
+    "send for review", no Send button, and no explanation. Sending a lease to
+    a lawyer is precisely what you would want to do when something is wrong
+    with it, so that path cannot be gated on the checks succeeding.
+  */
+  const data = query.data;
 
   return (
     <div className="mt-6 space-y-4">
-      {data.findings.map((finding) => (
+      {!data && (
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>The checks could not be run</AlertTitle>
+          <AlertDescription>
+            Nothing has been validated against Florida law, so nothing below says whether this lease is ready. You can
+            still preview it and send it for review. Reload to try the checks again.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {data?.findings.map((finding) => (
         <Alert key={finding.code} variant={finding.severity === 'blocks' ? 'destructive' : 'warning'}>
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>{finding.citation}</AlertTitle>
@@ -386,13 +404,13 @@ const ReviewPanel = ({
         </Alert>
       ))}
 
-      {data.missing.length > 0 && (
+      {(data?.missing.length ?? 0) > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>{data.missing.length} answers still outstanding</AlertTitle>
+          <AlertTitle>{data?.missing.length} answers still outstanding</AlertTitle>
           <AlertDescription>
             <ul className="mt-2 list-disc space-y-1 pl-4 font-mono text-xs">
-              {data.missing.map((item) => (
+              {data?.missing.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
@@ -400,13 +418,13 @@ const ReviewPanel = ({
         </Alert>
       )}
 
-      {data.partyFindings.length > 0 && (
+      {(data?.partyFindings.length ?? 0) > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>The signer list needs attention</AlertTitle>
           <AlertDescription>
             <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
-              {data.partyFindings.map((finding) => (
+              {data?.partyFindings.map((finding) => (
                 <li key={finding}>{finding}</li>
               ))}
             </ul>
@@ -414,13 +432,13 @@ const ReviewPanel = ({
         </Alert>
       )}
 
-      {data.reviewFindings.length > 0 && (
+      {(data?.reviewFindings.length ?? 0) > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>A reviewer is still waiting on you</AlertTitle>
           <AlertDescription>
             <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
-              {data.reviewFindings.map((finding) => (
+              {data?.reviewFindings.map((finding) => (
                 <li key={finding}>{finding}</li>
               ))}
             </ul>
@@ -434,7 +452,7 @@ const ReviewPanel = ({
         judge the match for themselves. A collapsed summary would hide the one
         thing that makes this honest.
       */}
-      {data.clauseFindings.map((finding) => (
+      {data?.clauseFindings.map((finding) => (
         <Alert
           key={`${finding.ruleId}-${finding.clauseHeading}`}
           variant={finding.severity === 'blocks' ? 'destructive' : 'warning'}
@@ -459,13 +477,13 @@ const ReviewPanel = ({
         </Alert>
       ))}
 
-      {data.duplicateAssertions.length > 0 && (
+      {(data?.duplicateAssertions.length ?? 0) > 0 && (
         <Alert variant="warning">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Two clauses cover the same ground</AlertTitle>
           <AlertDescription>
             <ul className="mt-2 space-y-1 text-sm">
-              {data.duplicateAssertions.map((d) => (
+              {data?.duplicateAssertions.map((d) => (
                 <li key={d.assertion}>
                   <span className="font-mono text-xs">{d.assertion}</span> — {d.slugs.join(', ')}
                 </li>
@@ -475,7 +493,7 @@ const ReviewPanel = ({
         </Alert>
       )}
 
-      {data.readyToSend && (
+      {data?.readyToSend && (
         <Alert>
           <Check className="h-4 w-4" />
           <AlertTitle>Nothing is blocking this lease</AlertTitle>
@@ -503,7 +521,7 @@ const ReviewPanel = ({
           </a>
         </Button>
 
-        <Button disabled={!data.readyToSend || send.isPending} onClick={() => setConfirming(true)}>
+        <Button disabled={!data?.readyToSend || send.isPending} onClick={() => setConfirming(true)}>
           <Send className="mr-2 h-4 w-4" />
           Send for signature
         </Button>

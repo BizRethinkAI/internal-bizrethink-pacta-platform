@@ -91,7 +91,8 @@ export const PartyEditor = ({ parties, onChange }: PartyEditorProps) => {
               <div>
                 <Label htmlFor={`party-email-${index}`}>Email</Label>
                 <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">
-                  Where their signing link goes. Not printed in the lease.
+                  Where their signing link goes. Not printed in the lease — the notice address above is the one the
+                  lease states.
                 </p>
                 <Input
                   id={`party-email-${index}`}

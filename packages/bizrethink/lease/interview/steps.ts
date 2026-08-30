@@ -59,6 +59,19 @@ export type InterviewField = {
    * advice wording and the presence of an attributing word.
    */
   suggestion?: { value: string | number; note: string };
+  /**
+   * Offer US Census address normalisation when this field loses focus.
+   *
+   * On blur, never per keystroke: the Census geocoder is a lookup service
+   * rather than a typeahead, and it is a shared public resource — one request
+   * when a field loses focus is fair use of it, one per character is not.
+   * Free national autocomplete does not exist; Google Places requires billing
+   * and Nominatim's terms discourage per-keystroke queries.
+   *
+   * The match is offered, never applied. Silently rewriting an address someone
+   * just typed is how a form loses an apartment number.
+   */
+  address?: boolean;
   options?: { value: string; label: string }[];
   showWhen?: (answers: InterviewAnswers) => boolean;
   required?: boolean;
@@ -142,7 +155,15 @@ export const FL_INTERVIEW: InterviewStep[] = [
         name: 'landlordNoticeEmail',
         target: 'value',
         kind: 'text',
-        label: 'Landlord email for notices',
+        label: 'Landlord email for notices under the lease',
+        /*
+          Distinct from the signing email captured against each party below,
+          and the page has to say so — they look identical and mean different
+          things. This one is written into the §83.505 addendum as the address
+          at which the landlord accepts legal notice for the whole tenancy; the
+          other is only where a signing link is delivered once.
+        */
+        help: 'Written into the lease as the address where the landlord accepts legal notice. Separate from the signing email below, though it is usually the same address.',
         showWhen: (a) => a.facts.electronicNoticesElected,
         required: true,
       },
@@ -150,14 +171,16 @@ export const FL_INTERVIEW: InterviewStep[] = [
         name: 'tenantNoticeEmail',
         target: 'value',
         kind: 'text',
-        label: 'Tenant email for notices',
+        label: 'Tenant email for notices under the lease',
+        help: 'Written into the lease as the address where the tenant accepts legal notice. Separate from the signing email you add below, though it is usually the same address.',
         showWhen: (a) => a.facts.electronicNoticesElected,
         required: true,
       },
       {
         name: 'tenantPreTermAddress',
         target: 'value',
-        kind: 'textarea',
+        kind: 'text',
+        address: true,
         label: 'Where should notices go to the tenant BEFORE they move in?',
         help: 'After the start date notices go to the property itself. This covers the gap between signing and moving in.',
         required: true,
@@ -460,7 +483,8 @@ export const FL_INTERVIEW: InterviewStep[] = [
       {
         name: 'noticeAddress',
         target: 'value',
-        kind: 'textarea',
+        kind: 'text',
+        address: true,
         label: 'At what address?',
         statute: { cite: 'Fla. Stat. §83.50', note: 'The address must be given in writing.' },
         required: true,
