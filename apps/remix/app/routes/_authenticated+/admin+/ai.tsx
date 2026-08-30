@@ -1,24 +1,32 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
-// Phase H (overlay 016): Vertex AI config admin UI. Replaces 3 env vars
-// (GOOGLE_VERTEX_PROJECT_ID / _LOCATION / _API_KEY) with a singleton DB row.
-// Used by AI-assisted contract review when wired upstream. The per-org/team
-// `aiFeaturesEnabled` flag is upstream-managed (in OrganisationGlobalSettings
-// and TeamGlobalSettings); this row supplies the instance-wide credentials.
+/*
+  Instance AI credentials.
+
+  Added 2026-05-01 as forward scaffolding for an upstream AI feature, in a
+  Vertex shape: project ID, location and API key. Simplified 2026-08-30 when
+  the lease clause drafter became its first consumer — those three collected
+  credentials for two different products at once, since the Gemini API takes a
+  key alone while Vertex proper needs a service account, so at least two of the
+  fields could never be load-bearing.
+
+  The per-org/team `aiFeaturesEnabled` flag is upstream-managed (in
+  OrganisationGlobalSettings and TeamGlobalSettings); this row supplies the
+  instance-wide credentials.
+*/
 
 export function meta() {
   return appMetaTags(msg`AI Config`);
@@ -26,16 +34,14 @@ export function meta() {
 
 type FormState = {
   enabled: boolean;
-  vertexProjectId: string;
-  vertexLocation: string;
-  vertexApiKey: string;
+  provider: 'gemini' | 'anthropic';
+  apiKey: string;
 };
 
 const DEFAULT_FORM: FormState = {
   enabled: false,
-  vertexProjectId: '',
-  vertexLocation: '',
-  vertexApiKey: '',
+  provider: 'gemini',
+  apiKey: '',
 };
 
 export default function AdminAiConfigPage() {
@@ -46,6 +52,7 @@ export default function AdminAiConfigPage() {
   const { data: existing, isLoading } = trpc.bizrethink.instanceAi.get.useQuery();
   const updateMutation = trpc.bizrethink.instanceAi.update.useMutation();
   const resetMutation = trpc.bizrethink.instanceAi.reset.useMutation();
+  const testMutation = trpc.bizrethink.instanceAi.test.useMutation();
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
 
@@ -53,9 +60,9 @@ export default function AdminAiConfigPage() {
     if (existing) {
       setForm({
         enabled: existing.enabled,
-        vertexProjectId: existing.vertexProjectId ?? '',
-        vertexLocation: existing.vertexLocation ?? '',
-        vertexApiKey: '',
+        provider: existing.provider === 'anthropic' ? 'anthropic' : 'gemini',
+        // Never populated from the server; an empty box means "keep the stored key".
+        apiKey: '',
       });
     } else if (existing === null) {
       setForm(DEFAULT_FORM);
@@ -66,7 +73,7 @@ export default function AdminAiConfigPage() {
     try {
       await updateMutation.mutateAsync(form);
       toast({ title: t`AI config saved` });
-      setForm((prev) => ({ ...prev, vertexApiKey: '' }));
+      setForm((prev) => ({ ...prev, apiKey: '' }));
       await utils.bizrethink.instanceAi.get.invalidate();
     } catch (err) {
       toast({
@@ -77,8 +84,39 @@ export default function AdminAiConfigPage() {
     }
   };
 
+  /*
+    Saves first, deliberately.
+
+    An admin who types a key and hits Test expects the key they can see to be
+    the one tested. Testing the stored value instead would report a pass for a
+    key they had just replaced, which is worse than having no button.
+  */
+  const handleTest = async () => {
+    try {
+      await updateMutation.mutateAsync(form);
+      setForm((prev) => ({ ...prev, apiKey: '' }));
+      await utils.bizrethink.instanceAi.get.invalidate();
+
+      const result = await testMutation.mutateAsync();
+
+      if (result.ok) {
+        toast({ title: t`Connection works`, description: t`Saved, and ${result.provider ?? ''} answered.` });
+      } else {
+        toast({ title: t`Connection failed`, description: result.error, variant: 'destructive' });
+      }
+    } catch (err) {
+      toast({
+        title: t`Could not test the connection`,
+        description: err instanceof Error ? err.message : t`Unknown error`,
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleReset = async () => {
-    if (!window.confirm(t`Reset AI config? Falls back to environment variables.`)) return;
+    if (!window.confirm(t`Reset AI config? Falls back to environment variables.`)) {
+      return;
+    }
     try {
       await resetMutation.mutateAsync();
       setForm(DEFAULT_FORM);
@@ -93,61 +131,59 @@ export default function AdminAiConfigPage() {
     }
   };
 
-  if (isLoading) return <SpinnerBox className="py-32" />;
+  if (isLoading) {
+    return <SpinnerBox className="py-32" />;
+  }
 
   return (
     <div>
       <SettingsHeader
         title={t`AI Config`}
-        subtitle={t`Google Vertex AI credentials for AI-assisted contract review. Stored encrypted at rest.`}
+        subtitle={t`An API key for Gemini or Claude, used by the lease clause drafter. Stored encrypted at rest.`}
       />
 
       <div className="mt-6 max-w-2xl space-y-4">
         <div className="flex items-center gap-2">
-          <Switch
-            checked={form.enabled}
-            onCheckedChange={(v) => setForm({ ...form, enabled: v })}
-            id="ai-enabled"
-          />
+          <Switch checked={form.enabled} onCheckedChange={(v) => setForm({ ...form, enabled: v })} id="ai-enabled" />
           <Label htmlFor="ai-enabled">
             <Trans>Enabled</Trans>
           </Label>
         </div>
 
         <div>
-          <Label htmlFor="vertex-project">
-            <Trans>Vertex project ID</Trans>
+          <Label htmlFor="ai-provider">
+            <Trans>Provider</Trans>
           </Label>
-          <Input
-            id="vertex-project"
-            value={form.vertexProjectId}
-            onChange={(e) => setForm({ ...form, vertexProjectId: e.target.value })}
-            placeholder="my-gcp-project-id"
-          />
+          <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">
+            <Trans>Both authenticate with an API key alone — no cloud project or region is needed.</Trans>
+          </p>
+          <Select
+            value={form.provider}
+            onValueChange={(v) => setForm({ ...form, provider: v as FormState['provider'] })}
+          >
+            <SelectTrigger id="ai-provider">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gemini">Google Gemini</SelectItem>
+              <SelectItem value="anthropic">Anthropic Claude</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
-          <Label htmlFor="vertex-location">
-            <Trans>Vertex location</Trans>
+          <Label htmlFor="ai-api-key">
+            <Trans>API key</Trans>
           </Label>
+          <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">
+            <Trans>Encrypted at rest. It is never sent back to this page once saved.</Trans>
+          </p>
           <Input
-            id="vertex-location"
-            value={form.vertexLocation}
-            onChange={(e) => setForm({ ...form, vertexLocation: e.target.value })}
-            placeholder="us-central1"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="vertex-api-key">
-            <Trans>Vertex API key</Trans>
-          </Label>
-          <Input
-            id="vertex-api-key"
+            id="ai-api-key"
             type="password"
-            value={form.vertexApiKey}
-            onChange={(e) => setForm({ ...form, vertexApiKey: e.target.value })}
-            placeholder={existing?.hasVertexApiKey ? t`(leave empty to keep)` : t`Required`}
+            value={form.apiKey}
+            onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
+            placeholder={existing?.hasApiKey ? t`(leave empty to keep)` : t`Required`}
           />
         </div>
 
@@ -155,13 +191,17 @@ export default function AdminAiConfigPage() {
           <Button onClick={handleSave} loading={updateMutation.isPending}>
             <Trans>Save AI config</Trans>
           </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleTest}
+            loading={testMutation.isPending || updateMutation.isPending}
+            disabled={!form.apiKey && !existing?.hasApiKey}
+          >
+            <Trans>Save and test connection</Trans>
+          </Button>
           {existing && (
-            <Button
-              variant="destructive"
-              onClick={handleReset}
-              loading={resetMutation.isPending}
-              className="ml-auto"
-            >
+            <Button variant="destructive" onClick={handleReset} loading={resetMutation.isPending} className="ml-auto">
               <Trans>Reset to env</Trans>
             </Button>
           )}

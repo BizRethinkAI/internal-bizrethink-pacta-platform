@@ -1475,12 +1475,19 @@ model BizrethinkInstanceAiConfig {
 
   enabled Boolean @default(false)
 
-  // Plain text — project IDs are not sensitive.
-  vertexProjectId String?
-  vertexLocation  String?
+  /// 'gemini' | 'anthropic'. Both authenticate with a key and nothing else.
+  ///
+  /// This replaced `vertexProjectId` / `vertexLocation` / `vertexApiKey` on
+  /// 2026-08-30. Those three collected credentials for two different products
+  /// at once — the Gemini API takes a key alone, while Vertex proper needs a
+  /// project, a location and a service account — so at least two of them could
+  /// never be load-bearing. None of them were: the model was forward
+  /// scaffolding written in May 2026 for an upstream AI feature that never
+  /// shipped, and nothing read it until the clause drafter.
+  provider String @default("gemini")
 
   // Encrypted at rest with NEXT_PRIVATE_ENCRYPTION_KEY.
-  vertexApiKey String?
+  apiKey String?
 
   updatedAt       DateTime @updatedAt
   updatedByUserId Int?

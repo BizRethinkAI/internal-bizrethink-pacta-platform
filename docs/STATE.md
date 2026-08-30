@@ -168,11 +168,20 @@ precede it, are in flight as #26 and #27.
    lands in upstream's lockfile and must be reconciled every weekly sync,
    which is a recurring cost for one POST.
 
-   **Express mode.** Vertex accepts an API key only in express mode, which uses
-   the global endpoint and takes NEITHER a project NOR a location — so
-   `vertexProjectId` and `vertexLocation` on the instance config are unused on
-   this path. They belong to the OAuth service-account flow, whose credentials
-   the config does not hold.
+   **The AI config was simplified to a provider and a key.** It had asked for a
+   GCP project ID, a location AND an API key — credentials for two different
+   products at once, since the Gemini API takes a key alone while Vertex proper
+   needs a service account. At least two fields could never have been
+   load-bearing, and none were: the model was **forward scaffolding added
+   2026-05-01** for an upstream AI feature that never shipped, and its own
+   commit says "NO upstream consumer reads these vars yet". Nothing read it
+   until the clause drafter. Gemini and Anthropic are both supported, Claude
+   being the house fallback. `/admin/ai` now has a **Save and test connection**
+   button, which every other instance-config page already had.
+
+   **The lesson:** scaffolding built against a guess about someone else's
+   roadmap sat unused for four months and shaped a UI around the wrong
+   product. YAGNI applies to config schemas too.
 
    **Not configured in production.** `BizrethinkInstanceAiConfig` has no row at
    all; the feature fails closed and says so, pointing at `/admin/ai`.
