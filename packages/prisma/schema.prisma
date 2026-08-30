@@ -1684,6 +1684,24 @@ model BizrethinkProperty {
   hoaName            String?
   includedAppliances String?
 
+  /// Who signs as landlord, and where the landlord accepts notice.
+  ///
+  /// Held here because none of it changes between tenancies, and re-typing it
+  /// every lease is how an interview earns a reputation for being tedious. It
+  /// is COPIED into a matter at creation, never referenced live: a lease that
+  /// read its party list from here would have its signers silently rewritten
+  /// when this row was edited, and party order decides where signatures land.
+  ///
+  /// Property-level rather than organisation-level on purpose. It legitimately
+  /// differs — a different entity owns a different property, or a manager
+  /// receives notice for one and not another. Organisation-level with a
+  /// per-property override is more machinery than two properties justify.
+  landlords Json @default("[]") // [{ name, email }]
+
+  /// Fla. Stat. §83.50 — the person authorised to receive notices, and where.
+  noticeName    String?
+  noticeAddress String?
+
   archivedAt DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt

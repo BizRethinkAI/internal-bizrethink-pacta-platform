@@ -81,8 +81,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   };
 }
 
-type LoadedProperty = Awaited<ReturnType<typeof loader>>['properties'][number];
-
 export default function LeasesPage() {
   const { teamUrl, organisationId, teamId, draftRenderingAllowed, properties, matters } =
     useLoaderData<typeof loader>();
@@ -92,61 +90,15 @@ export default function LeasesPage() {
 
   const [addingProperty, setAddingProperty] = useState(false);
 
-  const createMatter = trpc.bizrethink.leaseBuilder.matter.create.useMutation({
+  /*
+    Seeded on the SERVER, not here. The party list is who signs, and it is not
+    something a browser gets to assert — a client-built payload could claim a
+    landlord the property does not have. It also means the seeding rules live
+    in one tested place rather than in a page.
+  */
+  const startLease = trpc.bizrethink.leaseBuilder.property.startLease.useMutation({
     onSuccess: ({ id }) => navigate(`/t/${teamUrl}/leases/${id}`),
   });
-
-  const startLease = (property: LoadedProperty) => {
-    /*
-      The property answers what it can — type, year built, pool, association,
-      appliances, county — so the interview opens partly filled and a renewal is
-      minutes rather than an hour.
-
-      Everything else is null rather than a plausible default. A number nobody
-      typed is a number nobody checked, and this document gets signed.
-    */
-    createMatter.mutate({
-      organisationId,
-      teamId,
-      propertyId: property.id,
-      title: `${property.label} — lease`,
-      supersedesMatterId: null,
-      answers: {
-        facts: {
-          propertyType: property.propertyType,
-          propertyYearBuilt: property.yearBuilt,
-          hasPool: property.hasPool,
-          hasHoa: property.hasHoa,
-          petsPermitted: false,
-          landlordProvidesLawnService: false,
-          lateFeePolicy: 'flat',
-          terminationOnSale: false,
-          holdoverPenalty: false,
-          earlyTerminationOffered: false,
-        },
-        money: {
-          rent: { monthlyUsd: null, dueDayOfMonth: 1 },
-          term: { startDate: null },
-          deposit: {
-            securityUsd: null,
-            alreadyHeldUsd: 0,
-            advanceRentUsd: null,
-            advanceRentHeldUsd: 0,
-            prepaidRentUsd: 0,
-          },
-          prorationMethod: 'actual-days-in-month',
-        },
-        values: {
-          propertyAddress: `${property.addressLine}, ${property.city}, ${property.state} ${property.postalCode}`,
-          propertyTypeLabel: property.propertyType.replace('-', ' '),
-          venueCounty: property.county,
-          hoaName: property.hoaName,
-          includedAppliances: property.includedAppliances,
-        },
-        customClauses: [],
-      },
-    });
-  };
 
   return (
     <div className="mx-auto w-full max-w-screen-lg px-4 md:px-8">
@@ -207,7 +159,11 @@ export default function LeasesPage() {
                   </div>
                 </div>
 
-                <Button size="sm" disabled={createMatter.isPending} onClick={() => startLease(property)}>
+                <Button
+                  size="sm"
+                  disabled={startLease.isPending}
+                  onClick={() => startLease.mutate({ organisationId, teamId, propertyId: property.id })}
+                >
                   New lease
                 </Button>
               </li>

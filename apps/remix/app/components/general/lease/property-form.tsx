@@ -6,7 +6,7 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { Textarea } from '@documenso/ui/primitives/textarea';
-import { Check, Loader2, MapPin } from 'lucide-react';
+import { Check, Loader2, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 /**
@@ -42,6 +42,9 @@ type Draft = {
   hasHoa: boolean;
   hoaName: string;
   includedAppliances: string;
+  landlords: { name: string; email: string }[];
+  noticeName: string;
+  noticeAddress: string;
 };
 
 const EMPTY: Draft = {
@@ -59,6 +62,9 @@ const EMPTY: Draft = {
   hasHoa: false,
   hoaName: '',
   includedAppliances: '',
+  landlords: [{ name: '', email: '' }],
+  noticeName: '',
+  noticeAddress: '',
 };
 
 export type PropertyFormProps = {
@@ -310,6 +316,100 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated }: 
             </div>
           )}
 
+          {/*
+            The landlord lives on the property, not on each lease. None of it
+            changes between tenancies, and it was being re-typed every time —
+            along with the §83.50 notice details, which are equally stable.
+
+            Copied into a lease at creation, never referenced live: a lease
+            that read its signers from here would have them silently rewritten
+            when this form was next edited.
+          */}
+          <div className="border-t pt-5">
+            <h3 className="font-medium">Who signs as landlord</h3>
+            <p className="mt-0.5 text-muted-foreground text-xs">
+              Pre-filled on every lease written against this property. You can still change it per lease.
+            </p>
+
+            <div className="mt-3 space-y-3">
+              {draft.landlords.map((landlord, index) => (
+                // Index as key: rows have no id and are never reordered.
+                <div key={index} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                  <Input
+                    aria-label={`Landlord ${index + 1} name`}
+                    value={landlord.name}
+                    placeholder="Full legal name"
+                    onChange={(e) =>
+                      set(
+                        'landlords',
+                        draft.landlords.map((l, i) => (i === index ? { ...l, name: e.target.value } : l)),
+                      )
+                    }
+                  />
+                  <Input
+                    aria-label={`Landlord ${index + 1} email`}
+                    type="email"
+                    value={landlord.email}
+                    placeholder="Email for signing"
+                    onChange={(e) =>
+                      set(
+                        'landlords',
+                        draft.landlords.map((l, i) => (i === index ? { ...l, email: e.target.value } : l)),
+                      )
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Remove this landlord"
+                    disabled={draft.landlords.length === 1}
+                    onClick={() =>
+                      set(
+                        'landlords',
+                        draft.landlords.filter((_, i) => i !== index),
+                      )
+                    }
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={() => set('landlords', [...draft.landlords, { name: '', email: '' }])}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add another landlord
+            </Button>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="prop-notice-name">Who receives notices for the landlord?</Label>
+              <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">
+                Fla. Stat. §83.50 — the lease must name the landlord, or whoever is authorised to receive notices.
+              </p>
+              <Input
+                id="prop-notice-name"
+                value={draft.noticeName}
+                onChange={(e) => set('noticeName', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="prop-notice-address">At what address?</Label>
+              <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">§83.50 — must be given in writing.</p>
+              <Input
+                id="prop-notice-address"
+                value={draft.noticeAddress}
+                onChange={(e) => set('noticeAddress', e.target.value)}
+              />
+            </div>
+          </div>
+
           <div>
             <Label htmlFor="prop-appliances">Appliances included</Label>
             <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">
@@ -350,6 +450,12 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated }: 
                 hasHoa: draft.hasHoa,
                 hoaName: draft.hasHoa && draft.hoaName.trim() !== '' ? draft.hoaName.trim() : null,
                 includedAppliances: draft.includedAppliances.trim() === '' ? null : draft.includedAppliances.trim(),
+                // Blank rows are dropped rather than saved as a nameless signer.
+                landlords: draft.landlords
+                  .filter((l) => l.name.trim() !== '')
+                  .map((l) => ({ name: l.name.trim(), email: l.email.trim() })),
+                noticeName: draft.noticeName.trim() === '' ? null : draft.noticeName.trim(),
+                noticeAddress: draft.noticeAddress.trim() === '' ? null : draft.noticeAddress.trim(),
               })
             }
           >

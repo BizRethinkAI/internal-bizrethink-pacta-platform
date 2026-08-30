@@ -214,6 +214,13 @@ export default function LeaseInterviewPage() {
         <h2 className="font-semibold text-xl">{step.title}</h2>
         {step.intro && <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">{step.intro}</p>}
 
+        {/*
+          Above the fields on this step, not below them. The step now opens the
+          interview and the party list is the question it is asking; leaving it
+          under half a dozen notice questions is what made it easy to miss.
+        */}
+        {step.id === 'parties' && <PartyEditor parties={parties} onChange={setParties} />}
+
         <div className="mt-4">
           {visibleFields.map((field) => (
             <InterviewFieldControl
@@ -230,8 +237,6 @@ export default function LeaseInterviewPage() {
             />
           ))}
         </div>
-
-        {step.id === 'parties' && <PartyEditor parties={parties} onChange={setParties} />}
 
         {step.id === 'custom-clauses' && (
           <CustomClauseEditor

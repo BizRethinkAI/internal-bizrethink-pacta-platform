@@ -115,117 +115,18 @@ const singleFamilyOrDuplex = (a: InterviewAnswers) =>
 
 export const FL_INTERVIEW: InterviewStep[] = [
   {
-    id: 'property',
-    title: 'The property',
-    intro: 'Most of this comes from the property record. It decides which clauses Florida lets you agree.',
-    fields: [
-      {
-        name: 'propertyType',
-        target: 'fact',
-        kind: 'select',
-        label: 'What kind of property is this?',
-        help: 'This is load-bearing, not descriptive. Florida only lets you shift certain maintenance duties to a tenant in a single-family home or duplex — on a condo or a unit in a multi-family building those clauses are not offered at all.',
-        statute: {
-          cite: 'Fla. Stat. §83.51(2)',
-          note: "The landlord's obligations under §83.51(2) may be altered in writing for a single-family home or duplex, and only for those.",
-        },
-        options: [
-          { value: 'single-family', label: 'Single-family home' },
-          { value: 'duplex', label: 'Duplex' },
-          { value: 'condo', label: 'Condominium' },
-          { value: 'multi-family', label: 'Unit in a multi-family building' },
-        ],
-        required: true,
-      },
-      {
-        name: 'propertyYearBuilt',
-        target: 'fact',
-        kind: 'number',
-        label: 'What year was it built?',
-        help: 'Anything before 1978 requires a federal lead-paint disclosure and the EPA pamphlet. Leave it blank if you are unsure — the disclosure is then included, because not knowing is not evidence of a later build.',
-        statute: {
-          cite: '42 U.S.C. §4852d',
-          note: 'Pre-1978 housing requires a lead-based paint disclosure and a federally approved pamphlet before the lease takes effect.',
-        },
-      },
-      {
-        name: 'hasPool',
-        target: 'fact',
-        kind: 'boolean',
-        label: 'Is there a pool or hot tub?',
-        help: 'Adds a clause splitting pool duties — who services it, who keeps the water level and reports faults.',
-      },
-      {
-        name: 'hasHoa',
-        target: 'fact',
-        kind: 'boolean',
-        label: 'Is the property in an HOA or condominium association?',
-        help: 'Adds a clause binding the tenant to the association rules and passing association fines through to them.',
-      },
-      {
-        name: 'hoaName',
-        target: 'value',
-        kind: 'text',
-        label: 'What is the association called?',
-        showWhen: (a) => a.facts.hasHoa,
-        required: true,
-      },
-      {
-        name: 'hoaNoticeHours',
-        target: 'value',
-        kind: 'number',
-        label: 'How many hours does the tenant have to forward you an association notice?',
-        suggestion: {
-          value: 48,
-          note: 'Association covenants commonly allow the owner 24 to 48 hours to act on a notice, so leases typically require it to be passed on inside that window.',
-        },
-        showWhen: (a) => a.facts.hasHoa,
-        required: true,
-      },
-      {
-        name: 'includedAppliances',
-        target: 'value',
-        kind: 'textarea',
-        label: 'Which appliances and equipment come with the property?',
-        help: 'Listed in the lease as included on the start date. Anything not listed is not part of what you are agreeing to provide.',
-        required: true,
-      },
-      {
-        name: 'venueCounty',
-        target: 'value',
-        kind: 'text',
-        label: 'Which Florida county is the property in?',
-        help: 'Sets the venue for any proceeding — which is where a Florida eviction is actually filed.',
-        required: true,
-      },
-    ],
-  },
-
-  {
     id: 'parties',
-    title: 'Who is signing',
-    intro: 'Everyone listed here becomes a signer on the lease and on every addendum.',
+    title: 'Who is renting it',
+    /*
+      FIRST STEP AS OF 2026-08-30. It used to sit behind a screen confirming
+      property facts that the property record had already answered. This is the
+      question a landlord actually arrives with, and the landlord side of it is
+      now pre-filled from the property, so what is genuinely being asked is:
+      who are the tenants.
+    */
+    intro:
+      'The landlord comes from the property record and is already filled in below. Add each tenant — everyone listed becomes a signer on the lease and on every addendum.',
     fields: [
-      {
-        name: 'noticeName',
-        target: 'value',
-        kind: 'text',
-        label: 'Who receives notices for the landlord?',
-        help: 'Florida requires the lease to name the landlord, or whoever is authorised to receive notices on their behalf.',
-        statute: {
-          cite: 'Fla. Stat. §83.50',
-          note: 'The name and address of the landlord, or of a person authorised to receive notices and demands, must be disclosed in writing.',
-        },
-        required: true,
-      },
-      {
-        name: 'noticeAddress',
-        target: 'value',
-        kind: 'textarea',
-        label: 'At what address?',
-        statute: { cite: 'Fla. Stat. §83.50', note: 'The address must be given in writing.' },
-        required: true,
-      },
       {
         name: 'electronicNoticesElected',
         target: 'fact',
@@ -443,6 +344,125 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'usd',
         label: "What minimum liability cover must the tenant's renter's insurance carry?",
+        required: true,
+      },
+    ],
+  },
+
+  {
+    id: 'property',
+    title: 'Confirm the property',
+    /*
+      DEMOTED FROM FIRST, 2026-08-30. Six of these eight answers already come
+      from the property record, so as an opening step it confirmed facts nobody
+      had been asked for while the question a landlord actually arrives with —
+      who is renting it — sat behind it.
+
+      Not removed, and not hidden. `propertyType` decides which maintenance
+      duties Florida permits a lease to shift, so it is placed immediately
+      before the maintenance step it governs: close enough to matter, late
+      enough not to be a toll gate.
+    */
+    intro:
+      'These come from the property record and are already filled in. They decide which clauses Florida lets you agree, so it is worth a moment — change anything that is wrong for this particular lease.',
+    fields: [
+      {
+        name: 'propertyType',
+        target: 'fact',
+        kind: 'select',
+        label: 'What kind of property is this?',
+        help: 'This is load-bearing, not descriptive. Florida only lets you shift certain maintenance duties to a tenant in a single-family home or duplex — on a condo or a unit in a multi-family building those clauses are not offered at all.',
+        statute: {
+          cite: 'Fla. Stat. §83.51(2)',
+          note: "The landlord's obligations under §83.51(2) may be altered in writing for a single-family home or duplex, and only for those.",
+        },
+        options: [
+          { value: 'single-family', label: 'Single-family home' },
+          { value: 'duplex', label: 'Duplex' },
+          { value: 'condo', label: 'Condominium' },
+          { value: 'multi-family', label: 'Unit in a multi-family building' },
+        ],
+        required: true,
+      },
+      {
+        name: 'propertyYearBuilt',
+        target: 'fact',
+        kind: 'number',
+        label: 'What year was it built?',
+        help: 'Anything before 1978 requires a federal lead-paint disclosure and the EPA pamphlet. Leave it blank if you are unsure — the disclosure is then included, because not knowing is not evidence of a later build.',
+        statute: {
+          cite: '42 U.S.C. §4852d',
+          note: 'Pre-1978 housing requires a lead-based paint disclosure and a federally approved pamphlet before the lease takes effect.',
+        },
+      },
+      {
+        name: 'hasPool',
+        target: 'fact',
+        kind: 'boolean',
+        label: 'Is there a pool or hot tub?',
+        help: 'Adds a clause splitting pool duties — who services it, who keeps the water level and reports faults.',
+      },
+      {
+        name: 'hasHoa',
+        target: 'fact',
+        kind: 'boolean',
+        label: 'Is the property in an HOA or condominium association?',
+        help: 'Adds a clause binding the tenant to the association rules and passing association fines through to them.',
+      },
+      {
+        name: 'hoaName',
+        target: 'value',
+        kind: 'text',
+        label: 'What is the association called?',
+        showWhen: (a) => a.facts.hasHoa,
+        required: true,
+      },
+      {
+        name: 'hoaNoticeHours',
+        target: 'value',
+        kind: 'number',
+        label: 'How many hours does the tenant have to forward you an association notice?',
+        suggestion: {
+          value: 48,
+          note: 'Association covenants commonly allow the owner 24 to 48 hours to act on a notice, so leases typically require it to be passed on inside that window.',
+        },
+        showWhen: (a) => a.facts.hasHoa,
+        required: true,
+      },
+      {
+        name: 'includedAppliances',
+        target: 'value',
+        kind: 'textarea',
+        label: 'Which appliances and equipment come with the property?',
+        help: 'Listed in the lease as included on the start date. Anything not listed is not part of what you are agreeing to provide.',
+        required: true,
+      },
+      {
+        name: 'venueCounty',
+        target: 'value',
+        kind: 'text',
+        label: 'Which Florida county is the property in?',
+        help: 'Sets the venue for any proceeding — which is where a Florida eviction is actually filed.',
+        required: true,
+      },
+      {
+        name: 'noticeName',
+        target: 'value',
+        kind: 'text',
+        label: 'Who receives notices for the landlord?',
+        help: 'Florida requires the lease to name the landlord, or whoever is authorised to receive notices on their behalf.',
+        statute: {
+          cite: 'Fla. Stat. §83.50',
+          note: 'The name and address of the landlord, or of a person authorised to receive notices and demands, must be disclosed in writing.',
+        },
+        required: true,
+      },
+      {
+        name: 'noticeAddress',
+        target: 'value',
+        kind: 'textarea',
+        label: 'At what address?',
+        statute: { cite: 'Fla. Stat. §83.50', note: 'The address must be given in writing.' },
         required: true,
       },
     ],
