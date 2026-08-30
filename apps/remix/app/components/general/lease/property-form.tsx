@@ -67,16 +67,31 @@ const EMPTY: Draft = {
   noticeAddress: '',
 };
 
+export type ExistingProperty = Draft & { id: string };
+
 export type PropertyFormProps = {
   organisationId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated: () => void;
+  /** Present when editing rather than adding. */
+  existing?: ExistingProperty | null;
 };
 
-export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated }: PropertyFormProps) => {
-  const [draft, setDraft] = useState<Draft>(EMPTY);
+export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated, existing }: PropertyFormProps) => {
+  const [draft, setDraft] = useState<Draft>(existing ?? EMPTY);
+  const [loadedId, setLoadedId] = useState<string | null>(existing?.id ?? null);
   const [lookupAddress, setLookupAddress] = useState('');
+
+  /*
+    Reseeded when the dialog is pointed at a different property. Keyed on the
+    id rather than on `open`, so reopening the same one does not discard edits
+    made and not yet saved.
+  */
+  if ((existing?.id ?? null) !== loadedId) {
+    setLoadedId(existing?.id ?? null);
+    setDraft(existing ?? EMPTY);
+  }
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => setDraft((prev) => ({ ...prev, [key]: value }));
 
@@ -85,14 +100,19 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated }: 
     { enabled: lookupAddress.length > 5, staleTime: 5 * 60 * 1000, retry: false },
   );
 
-  const create = trpc.bizrethink.leaseBuilder.property.create.useMutation({
-    onSuccess: () => {
-      setDraft(EMPTY);
-      setLookupAddress('');
-      onCreated();
-      onOpenChange(false);
-    },
-  });
+  const onSaved = () => {
+    setDraft(EMPTY);
+    setLoadedId(null);
+    setLookupAddress('');
+    onCreated();
+    onOpenChange(false);
+  };
+
+  const create = trpc.bizrethink.leaseBuilder.property.create.useMutation({ onSuccess: onSaved });
+  const update = trpc.bizrethink.leaseBuilder.property.update.useMutation({ onSuccess: onSaved });
+
+  const saving = create.isPending || update.isPending;
+  const error = create.error ?? update.error;
 
   const match = lookup.data?.match ?? null;
 
@@ -135,10 +155,11 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add a property</DialogTitle>
+          <DialogTitle>{existing ? 'Edit property' : 'Add a property'}</DialogTitle>
           <DialogDescription>
-            Set up once. Every lease written against this property opens with these answers already filled — a renewal
-            becomes minutes rather than an hour.
+            {existing
+              ? 'Changes apply to leases you start from now on. Leases already drafted keep what they were built with, so correcting a typo here cannot rewrite a document someone is reading.'
+              : 'Set up once. Every lease written against this property opens with these answers already filled — a renewal becomes minutes rather than an hour.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -428,13 +449,13 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated }: 
         </div>
 
         <div className="flex items-center justify-end gap-3 border-t pt-4">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={create.isPending}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={saving}>
             Cancel
           </Button>
           <Button
-            disabled={!canSubmit || create.isPending}
-            onClick={() =>
-              create.mutate({
+            disabled={!canSubmit || saving}
+            onClick={() => {
+              const fields = {
                 organisationId,
                 label: draft.label.trim(),
                 addressLine: draft.addressLine.trim(),
@@ -456,14 +477,22 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated }: 
                   .map((l) => ({ name: l.name.trim(), email: l.email.trim() })),
                 noticeName: draft.noticeName.trim() === '' ? null : draft.noticeName.trim(),
                 noticeAddress: draft.noticeAddress.trim() === '' ? null : draft.noticeAddress.trim(),
-              })
-            }
+              };
+
+              if (existing) {
+                update.mutate({ ...fields, id: existing.id });
+              } else {
+                create.mutate(fields);
+              }
+            }}
           >
-            {create.isPending ? (
+            {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding…
+                Saving…
               </>
+            ) : existing ? (
+              'Save changes'
             ) : (
               'Add property'
             )}
