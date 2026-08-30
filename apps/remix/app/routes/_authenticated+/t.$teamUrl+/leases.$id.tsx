@@ -1,5 +1,6 @@
 import type { InterviewAnswers } from '@bizrethink/customizations/lease/interview/steps';
 import { FL_INTERVIEW, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
+import { delegableFieldNames } from '@bizrethink/customizations/lease/interview/tenant-answers';
 import type { LeasePartyInput } from '@bizrethink/customizations/lease/parties/derive-parties';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
@@ -74,6 +75,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       values: matter.values as Record<string, FieldValue>,
       customClauses: matter.customClauses as InterviewAnswers['customClauses'],
       parties: matter.parties as LeasePartyInput[],
+      delegatedFields: (matter.delegatedFields ?? []) as string[],
       envelopeId: matter.envelopeId,
     },
   };
@@ -125,6 +127,11 @@ export default function LeaseInterviewPage() {
   const [values, setValues] = useState<Record<string, FieldValue>>(matter.values);
   const [customClauses, setCustomClauses] = useState<InterviewAnswers['customClauses']>(matter.customClauses);
   const [parties, setParties] = useState<LeasePartyInput[]>(matter.parties);
+  const [delegatedFields, setDelegatedFields] = useState<string[]>(matter.delegatedFields);
+
+  // Which fields may be put to the tenant at all. Server-side this is
+  // recomputed from the same definitions, so the UI cannot widen it.
+  const delegable = useMemo(() => new Set(delegableFieldNames(FL_INTERVIEW)), []);
 
   const answers = useMemo(
     () => ({ facts, money, values, customClauses, parties }) as unknown as InterviewAnswers,
@@ -167,6 +174,7 @@ export default function LeaseInterviewPage() {
       id: matter.id,
       currentStepId: target.id,
       answers: { facts, money, values, customClauses, parties } as never,
+      delegatedFields,
     });
 
     setStepIndex(index);
@@ -236,6 +244,17 @@ export default function LeaseInterviewPage() {
               }
               onChange={(value) => setField(field.target, field.name, value)}
               organisationId={organisationId}
+              delegation={
+                delegable.has(field.name)
+                  ? {
+                      asked: delegatedFields.includes(field.name),
+                      onToggle: (asked) =>
+                        setDelegatedFields((prev) =>
+                          asked ? [...new Set([...prev, field.name])] : prev.filter((name) => name !== field.name),
+                        ),
+                    }
+                  : undefined
+              }
             />
           ))}
         </div>

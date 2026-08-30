@@ -1,0 +1,14 @@
+-- Interview fields the landlord asked the TENANT to answer.
+--
+-- The names of their children, the breed and weight of their dog, where they
+-- live before moving in — things a landlord otherwise guesses and then
+-- corrects over email. The lease already goes to the tenant for review, so it
+-- carries the questions with it.
+--
+-- This column is a SELECTION, not an authority. What may be delegated at all
+-- is computed from the interview field definitions on every read, and money
+-- fields and statutorily-constrained fields are refused there whatever this
+-- column says. The write path is unauthenticated — reached with a link — so a
+-- wrong or tampered list here must not be able to put a rent box in front of
+-- a tenant.
+ALTER TABLE "BizrethinkLeaseMatter" ADD COLUMN "delegatedFields" JSONB NOT NULL DEFAULT '[]';

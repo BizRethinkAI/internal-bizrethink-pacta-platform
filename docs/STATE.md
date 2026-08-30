@@ -361,6 +361,31 @@ enough to matter, late enough not to be a toll gate.
 Seeding runs on the server: the party list is who signs, and a browser does not
 get to assert it.
 
+### Asking the tenant directly
+
+Added 2026-08-30 (#42). A landlord can mark a question "ask the tenant instead";
+it appears on the tenant's review link and the answer writes back into the
+lease. Three fields qualify today — `authorisedOccupants`, `permittedPets`,
+`tenantPreTermAddress` — all things a tenant knows and a landlord would
+otherwise guess and then correct by email.
+
+**This is the most dangerous surface in the lease builder.** It is an
+unauthenticated endpoint, reached with a link, writing into a document destined
+for signature. The rules, all in `interview/tenant-answers.ts`:
+
+- **The field definitions are the authority.** The allowlist is computed from
+  `tenantCanAnswer` on every read. The stored `delegatedFields` column is only a
+  SELECTION from it — a wrong or tampered list cannot widen what may be written.
+- **No money field, ever**, whatever it declares. Asserted across the whole
+  interview by test.
+- **No field a statute constrains**, for the same reason: that answer has legal
+  consequence and is the landlord's to give.
+- Strings only, trimmed, empty means unanswered, capped at 2000 characters.
+- Only a `tenant` review may write; an attorney link carries no questions and
+  so may not write answers either.
+- A matter that is no longer `draft` is never touched — a sent lease must not
+  move under its signers.
+
 ### Property data
 
 Settled 2026-08-29 after checking what "national, fast, free" actually buys.

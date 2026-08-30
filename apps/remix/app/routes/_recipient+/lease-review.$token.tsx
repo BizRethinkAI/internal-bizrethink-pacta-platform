@@ -36,10 +36,21 @@ export function meta() {
 
 type Draft = { clauseSlug: string; body: string };
 
+type AskedField = {
+  name: string;
+  label: string;
+  help: string | null;
+  placeholder: string | null;
+  kind: string;
+  answer: string;
+};
+
 export default function LeaseReviewPage() {
   const { token } = useParams();
 
   const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [seeded, setSeeded] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const review = trpc.bizrethink.leaseBuilder.review.open.useQuery(
@@ -79,6 +90,13 @@ export default function LeaseReviewPage() {
 
   const { review: meta, matter, comments, changedSinceIssued } = review.data;
   const isAttorney = meta.audience === 'attorney';
+  const askedFields = ((review.data as { askedFields?: AskedField[] }).askedFields ?? []) as AskedField[];
+
+  // Seeded once, so a re-render never overwrites what is being typed.
+  if (!seeded && askedFields.length > 0) {
+    setSeeded(true);
+    setAnswers(Object.fromEntries(askedFields.map((field) => [field.name, field.answer])));
+  }
 
   if (submitted) {
     return (
@@ -146,6 +164,38 @@ export default function LeaseReviewPage() {
           something.
         */}
       </div>
+
+      {/*
+        Questions the landlord passed to the tenant rather than guessing at:
+        their children's names, their dog's breed, where they live now. Placed
+        ABOVE the comment box, because they are the thing being asked for —
+        a form under a free-text box is a form people scroll past.
+      */}
+      {askedFields.length > 0 && (
+        <section className="mt-10">
+          <h2 className="font-semibold text-lg">A few details only you can give</h2>
+          <p className="mt-1 text-muted-foreground text-sm">
+            The landlord has asked you to fill these in rather than guess. They appear in the lease exactly as you write
+            them, and the landlord sees them before anything is sent for signature.
+          </p>
+
+          <div className="mt-4 space-y-4">
+            {askedFields.map((field) => (
+              <div key={field.name}>
+                <Label htmlFor={`asked-${field.name}`}>{field.label}</Label>
+                {field.help && <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">{field.help}</p>}
+                <Textarea
+                  id={`asked-${field.name}`}
+                  rows={2}
+                  placeholder={field.placeholder ?? undefined}
+                  value={answers[field.name] ?? ''}
+                  onChange={(e) => setAnswers((prev) => ({ ...prev, [field.name]: e.target.value }))}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {comments.length > 0 && (
         <section className="mt-10">
@@ -244,6 +294,7 @@ export default function LeaseReviewPage() {
                   clauseSlug: draft.clauseSlug.trim() === '' ? null : draft.clauseSlug.trim(),
                   body: draft.body.trim(),
                 })),
+                answers,
               })
             }
           >
@@ -252,6 +303,8 @@ export default function LeaseReviewPage() {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Sending…
               </>
+            ) : usable.length === 0 && askedFields.length > 0 ? (
+              'Send these back'
             ) : usable.length === 0 ? (
               'Send back with no comments'
             ) : (
