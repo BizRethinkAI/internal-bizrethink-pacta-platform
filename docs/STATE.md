@@ -361,6 +361,24 @@ enough to matter, late enough not to be a toll gate.
 Seeding runs on the server: the party list is who signs, and a browser does not
 get to assert it.
 
+### AI providers
+
+Gemini and Anthropic, each authenticating with a key alone. Configured at
+`/admin/ai`, which has a Save-and-test button.
+
+**A failure must say which failure it was.** The first version reported only the
+HTTP status, so a wrong model name, a revoked key, a key from the wrong product
+and an exhausted quota all read the same — which is precisely the hole a
+working Gemini key and a failing Anthropic key fell into on 2026-08-30. The
+provider's own `error.message` is now surfaced.
+
+Narrowly, and this is the constraint: **Gemini takes its key in the URL**, so
+only that one field is read, never the raw body, and the key is redacted from
+it afterwards in case the provider quoted the request back. Redaction has a
+16-character floor — with a short key the guard rewrote "The API key was not
+accepted" as "The API [redacted]ey was not accepted", mangling messages while
+protecting nothing. Real keys are 39–100 characters.
+
 ### Asking the tenant directly
 
 Added 2026-08-30 (#42). A landlord can mark a question "ask the tenant instead";
