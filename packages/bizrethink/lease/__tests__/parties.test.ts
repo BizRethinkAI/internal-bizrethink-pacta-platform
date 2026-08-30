@@ -63,6 +63,59 @@ describe('derivePartyValues', () => {
   });
 });
 
+describe('the §83.505 notice addresses', () => {
+  /*
+    These used to be two separate interview questions, `landlordNoticeEmail`
+    and `tenantNoticeEmail`, typed by hand after the same addresses had already
+    been entered against each signer. That was not merely double entry — it was
+    WRONG. §83.505 requires a valid email address for EACH party, and a single
+    `tenantNoticeEmail` cannot represent two tenants: the addendum named one of
+    them and the second had elected nothing.
+
+    Derived from the party list instead, which already holds one address per
+    person and validates that each is distinct.
+  */
+  it('names every landlord and their address', () => {
+    const values = derivePartyValues(TWO_LANDLORDS_TWO_TENANTS);
+
+    expect(values.landlordNoticeEmails).toBe(
+      'Shwet Prabhat (shwet@example.com) and Ambika Prabhat (ambika@example.com)',
+    );
+  });
+
+  it('names every tenant, so a second one is not silently left out', () => {
+    expect(derivePartyValues(TWO_LANDLORDS_TWO_TENANTS).tenantNoticeEmails).toBe(
+      'Tenant One (one@example.com) and Tenant Two (two@example.com)',
+    );
+  });
+
+  it('reads plainly for a single party', () => {
+    const one = derivePartyValues([{ name: 'Alone', role: 'tenant', email: 'a@example.com' }]);
+
+    expect(one.tenantNoticeEmails).toBe('Alone (a@example.com)');
+  });
+
+  it('uses the serial comma for three, as the name list does', () => {
+    const three = derivePartyValues([
+      { name: 'A', role: 'tenant', email: 'a@example.com' },
+      { name: 'B', role: 'tenant', email: 'b@example.com' },
+      { name: 'C', role: 'tenant', email: 'c@example.com' },
+    ]);
+
+    expect(three.tenantNoticeEmails).toBe('A (a@example.com), B (b@example.com), and C (c@example.com)');
+  });
+
+  it('is empty when nobody holds that role', () => {
+    expect(derivePartyValues([{ name: 'X', role: 'tenant', email: 'x@example.com' }]).landlordNoticeEmails).toBe('');
+  });
+
+  it('trims the address, so a stray space is not printed into an addendum', () => {
+    const values = derivePartyValues([{ name: 'A', role: 'tenant', email: '  a@example.com  ' }]);
+
+    expect(values.tenantNoticeEmails).toBe('A (a@example.com)');
+  });
+});
+
 describe('toLeaseParties', () => {
   it('preserves order exactly, because recipient numbering is positional', () => {
     const parties = toLeaseParties(TWO_LANDLORDS_TWO_TENANTS);

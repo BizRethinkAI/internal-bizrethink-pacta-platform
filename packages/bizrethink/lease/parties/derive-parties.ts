@@ -48,9 +48,34 @@ const joinNames = (names: string[]): string => {
 const namesFor = (parties: LeasePartyInput[], role: PartyRole) =>
   parties.filter((party) => party.role === role).map((party) => clean(party.name));
 
-export const derivePartyValues = (parties: LeasePartyInput[]): { landlordNames: string; tenantNames: string } => ({
+/*
+  "Name (address)" per person, for the §83.505 addendum.
+
+  These were once two hand-typed interview questions, asked after the same
+  addresses had already been entered against each signer. That was not merely
+  double entry, it was WRONG: §83.505 requires a valid email address for EACH
+  party, and one `tenantNoticeEmail` field cannot represent two tenants — the
+  addendum named one of them and the second had elected nothing at all.
+
+  The party list already holds one address per person, and already refuses two
+  people sharing one. Deriving from it makes the addendum correct by
+  construction and removes two questions.
+*/
+const noticeAddressesFor = (parties: LeasePartyInput[], role: PartyRole) =>
+  parties.filter((party) => party.role === role).map((party) => `${clean(party.name)} (${party.email.trim()})`);
+
+export type PartyValues = {
+  landlordNames: string;
+  tenantNames: string;
+  landlordNoticeEmails: string;
+  tenantNoticeEmails: string;
+};
+
+export const derivePartyValues = (parties: LeasePartyInput[]): PartyValues => ({
   landlordNames: joinNames(namesFor(parties, 'landlord')),
   tenantNames: joinNames(namesFor(parties, 'tenant')),
+  landlordNoticeEmails: joinNames(noticeAddressesFor(parties, 'landlord')),
+  tenantNoticeEmails: joinNames(noticeAddressesFor(parties, 'tenant')),
 });
 
 /** The render layer's view: names and roles, no contact details. */
