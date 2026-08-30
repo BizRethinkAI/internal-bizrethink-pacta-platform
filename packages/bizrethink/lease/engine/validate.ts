@@ -43,8 +43,95 @@ const formatHour = (hour: number): string => {
   return `${h}:${String(m).padStart(2, '0')}`;
 };
 
-export const validateAnswers = ({ answers, pack }: ValidateAnswersOptions): Finding[] => {
+/**
+ * A floor beneath every numeric answer.
+ *
+ * FOUND IN PRODUCTION 2026-08-29: the one real matter carried
+ * `depositReturnDays: -124`. Every statutory check here was one-sided
+ * (`returnDays > 15`), so a negative number sailed through and the lease would
+ * have told a tenant their deposit is returned within minus one hundred and
+ * twenty-four days, with nothing anywhere objecting.
+ *
+ * The bug was not a wrong bound — it was a bound nobody wrote, in a function
+ * where bounds are scattered `if`s. So the floors are a table rather than more
+ * `if`s, and a test enumerates the numeric leaves of a real answer set and
+ * fails when one of them is missing from here. Adding a numeric question now
+ * forces a decision about its floor.
+ *
+ * This is a different class of problem from a statutory breach and is reported
+ * as one: no statute says a number of days cannot be negative. It is simply
+ * not an answer to the question that was asked.
+ */
+export type CoherenceCheck = {
+  /** Dotted path into ValidateAnswersInput. */
+  path: string;
+  /** How the question reads to a person, for the message. */
+  label: string;
+  /** Smallest value that is an answer at all. */
+  min: number;
+};
+
+export const COHERENCE_CHECKS: CoherenceCheck[] = [
+  { path: 'rent.monthlyUsd', label: 'the monthly rent', min: 1 },
+  { path: 'deposit.returnDays', label: 'the deposit return window', min: 0 },
+  { path: 'deposit.claimNoticeDays', label: 'the deposit claim notice window', min: 0 },
+  { path: 'access.noticeHours', label: 'the notice before entry', min: 0 },
+  { path: 'access.earliestHour', label: 'the earliest hour for entry', min: 0 },
+  { path: 'access.latestHour', label: 'the latest hour for entry', min: 0 },
+  { path: 'earlyTermination.feeUsd', label: 'the early termination fee', min: 0 },
+  { path: 'earlyTermination.tenantNoticeDays', label: 'the early termination notice', min: 0 },
+  { path: 'lateFee.graceDays', label: 'the late-fee grace period', min: 0 },
+  { path: 'nonRenewal.noticeDays', label: 'the non-renewal notice', min: 0 },
+];
+
+/** Every numeric leaf in an answer set, as dotted paths. Used by the invariant test. */
+export const numericLeafPaths = (value: unknown, prefix = ''): string[] => {
+  if (typeof value !== 'object' || value === null) {
+    return [];
+  }
+
+  return Object.entries(value as Record<string, unknown>).flatMap(([key, child]) => {
+    const path = prefix === '' ? key : `${prefix}.${key}`;
+
+    if (typeof child === 'number') {
+      return [path];
+    }
+
+    return numericLeafPaths(child, path);
+  });
+};
+
+const readPath = (answers: ValidateAnswersInput, path: string): unknown =>
+  path.split('.').reduce<unknown>((node, key) => (node as Record<string, unknown>)?.[key], answers);
+
+const checkCoherence = (answers: ValidateAnswersInput): Finding[] => {
   const findings: Finding[] = [];
+
+  for (const entry of COHERENCE_CHECKS) {
+    const value = readPath(answers, entry.path);
+
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < entry.min) {
+      findings.push({
+        code: 'answer-not-coherent',
+        severity: 'blocks',
+        // Deliberately not a statute. Citing one would be inventing law to
+        // explain a typo.
+        citation: 'Your answers',
+        message: `${String(value)} is not an answer to ${entry.label}. It would be printed into the lease exactly as written.`,
+      });
+    }
+  }
+
+  return findings;
+};
+
+export const validateAnswers = ({ answers, pack }: ValidateAnswersOptions): Finding[] => {
+  /*
+    Coherence first: a value that is not an answer at all makes every
+    statutory comparison below meaningless, and reporting both would bury the
+    one the reader can act on.
+  */
+  const findings: Finding[] = checkCoherence(answers);
 
   const { deposit, access, earlyTermination, rent } = answers;
 
