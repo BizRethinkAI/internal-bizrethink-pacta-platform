@@ -25,6 +25,43 @@ describe('.github/workflows — runners must be GitHub-hosted', () => {
     expect(workflowFiles.length).toBeGreaterThan(0);
   });
 
+  /*
+    The warp-* ban below catches the label this fork actually got burned by.
+    It does not catch the general case: ANY runner label with no runner behind
+    it leaves the job `queued` forever, and a required check that never reports
+    blocks the PR on a verdict that never arrives — indistinguishable from a
+    slow run.
+
+    A larger runner is provisioned by NAME at the organisation level, so a typo
+    in `runs-on` is exactly that failure. This allowlist is the cheap guard: a
+    label not on it fails here, in two seconds, instead of hanging CI.
+
+    Adding a runner? Provision it on the org first, then add the label here.
+  */
+  const KNOWN_RUNNERS = new Set([
+    'ubuntu-latest', // GitHub standard, 2 cores
+    'ubuntu-4core', // org larger runner, provisioned 2026-08-30
+  ]);
+
+  it.each(workflowFiles)('%s only uses runner labels that exist', (file) => {
+    const content = readFileSync(resolve(workflowsDir, file), 'utf8');
+
+    const labels = [...content.matchAll(/runs-on:\s*([^\s#]+)/g)]
+      .map((match) => match[1].trim())
+      // Expressions are resolved at run time and cannot be checked here.
+      .filter((label) => !label.startsWith('${{'));
+
+    const unknown = [...new Set(labels)].filter((label) => !KNOWN_RUNNERS.has(label));
+
+    expect(
+      unknown,
+      `${file} runs on ${unknown.join(', ')}, which is not a runner this organisation has ` +
+        'provisioned. A label with no runner behind it leaves the job queued forever, and a ' +
+        'required check that never reports blocks the pull request on a verdict that never ' +
+        'arrives. Provision it on the org, then add it to KNOWN_RUNNERS.',
+    ).toEqual([]);
+  });
+
   it.each(workflowFiles)('%s uses no WarpBuild (warp-*) runner label', (file) => {
     const content = readFileSync(resolve(workflowsDir, file), 'utf8');
     const warpRunners = content

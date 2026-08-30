@@ -204,6 +204,16 @@ passed, or appeared to:
   PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
   longer a reason to stack. Always verify a merge landed by checking the FILE
   on `main`, never by trusting the PR's MERGED badge.
+- **Shards and workers buy the same thing; only one of them is free.** A worker
+  is another browser on a core you already have. A shard is a whole machine
+  re-paying ~3.5 min of checkout, install, browsers, services and seed. At one
+  worker, sharding was the only parallelism available and it worked twice
+  (59 → 31 → 20 min), but 8 shards × 1 worker spends 28 min of setup compute to
+  buy parallelism a single 8-core box gives for 3.5. **If cores go up, the shard
+  count should come DOWN.** Org runner `ubuntu-4core` provisioned 2026-08-30 for
+  the experiment; `KNOWN_RUNNERS` in `workflow-runners.test.ts` allowlists every
+  label, because a label with no runner behind it hangs queued forever and a
+  required check that never reports is indistinguishable from a slow one.
 - **The E2E suite was never the slow part — the setup was.** Measured
   2026-08-30 on a real shard: **2.0 min running tests, 6.7 min of setup**, and
   `npm run build` was 3.6 of those, repeated identically in all 8 shards (plus a
