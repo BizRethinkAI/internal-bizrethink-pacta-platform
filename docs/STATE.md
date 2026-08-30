@@ -361,6 +361,26 @@ enough to matter, late enough not to be a toll gate.
 Seeding runs on the server: the party list is who signs, and a browser does not
 get to assert it.
 
+### Editing and deleting
+
+Added 2026-08-31 (#44), because neither existed: a property could be created
+and never corrected, and a draft lease could be started and never removed —
+trying the interview out for ten minutes leaves several.
+
+**A property may be edited freely, and that is safe because of the seeding
+rule** (see above): a lease copies what it needs at creation and never reads
+back, so correcting a typo cannot rewrite the signers or address on a lease
+already drafted, still less one out for signature. Archiving is soft, since
+leases reference a property by id.
+
+**Only a draft with no envelope may be deleted.** `canDeleteMatter` allowlists
+`draft` rather than denylisting the sent states, so a status invented later is
+refused by default instead of becoming quietly deletable. Its reviews and
+comments are deleted in the same transaction — they carry no foreign key, and
+an orphaned comment is not just clutter: `sendBlockers` treats one whose review
+is missing as BLOCKING, precisely so deleting a review cannot erase an
+objection.
+
 ### Asking the tenant directly
 
 Added 2026-08-30 (#42). A landlord can mark a question "ask the tenant instead";
