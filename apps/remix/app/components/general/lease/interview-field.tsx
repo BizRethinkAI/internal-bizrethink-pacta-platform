@@ -33,9 +33,18 @@ export type InterviewFieldProps = {
   error?: string;
   /** Needed only by address fields, which look up through an access-gated procedure. */
   organisationId?: string;
+  /** Present when this field may be put to the tenant instead. */
+  delegation?: { asked: boolean; onToggle: (asked: boolean) => void };
 };
 
-export const InterviewFieldControl = ({ field, value, onChange, error, organisationId }: InterviewFieldProps) => {
+export const InterviewFieldControl = ({
+  field,
+  value,
+  onChange,
+  error,
+  organisationId,
+  delegation,
+}: InterviewFieldProps) => {
   const id = `field-${field.name}`;
 
   return (
@@ -98,6 +107,30 @@ export const InterviewFieldControl = ({ field, value, onChange, error, organisat
 
         <div>
           <FieldInput id={id} field={field} value={value} onChange={onChange} />
+
+          {/*
+            Only the things a tenant knows and a landlord would otherwise
+            guess — their children's names, their dog's breed, where they live
+            now. Which fields may appear here is decided server-side from the
+            field definitions; this toggle only selects among them.
+          */}
+          {delegation && (
+            <label className="mt-3 flex items-start gap-2.5 rounded-md border border-dashed p-3">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={delegation.asked}
+                onChange={(event) => delegation.onToggle(event.target.checked)}
+              />
+              <span className="text-sm">
+                <span className="font-medium">Ask the tenant instead</span>
+                <span className="mt-0.5 block text-muted-foreground text-xs">
+                  They answer it on the review link, so you are not guessing and then correcting it by email. You see
+                  what they wrote before anything is sent for signature.
+                </span>
+              </span>
+            </label>
+          )}
 
           {field.address === true && organisationId !== undefined && (
             <AddressLookup organisationId={organisationId} value={value} onChange={onChange} />

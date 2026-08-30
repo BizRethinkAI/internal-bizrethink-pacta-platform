@@ -62,6 +62,19 @@ export type InterviewField = {
   /** Shown in the empty control. Use where the SHAPE of the answer matters. */
   placeholder?: string;
   /**
+   * May the landlord ask the TENANT to answer this, on the review link?
+   *
+   * Only for things the tenant knows and the landlord would otherwise guess:
+   * the names of their children, the breed and weight of their dog, where they
+   * live before moving in.
+   *
+   * Declaring it is not sufficient — `tenant-answers.ts` additionally refuses
+   * any money field and any field a statute constrains, whatever it declares,
+   * because the answer to those has legal consequence and is the landlord's to
+   * give.
+   */
+  tenantCanAnswer?: boolean;
+  /**
    * Offer US Census address normalisation when this field loses focus.
    *
    * On blur, never per keystroke: the Census geocoder is a lookup service
@@ -159,6 +172,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'tenantPreTermAddress',
+        tenantCanAnswer: true,
         target: 'value',
         kind: 'text',
         address: true,
@@ -175,6 +189,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'authorisedOccupants',
+        tenantCanAnswer: true,
         target: 'value',
         kind: 'textarea',
         label: 'Anyone else living there, by name?',
@@ -704,6 +719,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
     fields: [
       {
         name: 'permittedPets',
+        tenantCanAnswer: true,
         target: 'value',
         kind: 'textarea',
         label: 'Which animals are permitted? Give breed, weight and number.',

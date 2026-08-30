@@ -455,6 +455,15 @@ model BizrethinkLeaseMatter {
   values        Json
   customClauses Json @default("[]")
 
+  /// Interview fields the landlord asked the TENANT to answer, by name.
+  ///
+  /// Rendered on the tenant's review link and written back on submit. The list
+  /// is server-written, but it is still only a SELECTION — what may be
+  /// delegated at all is computed from the interview definitions on every
+  /// read, so a wrong list here cannot put a rent box in front of a tenant.
+  /// See packages/bizrethink/lease/interview/tenant-answers.ts.
+  delegatedFields Json @default("[]")
+
   /// Who signs, in order. `[{ name, role, email }]`.
   ///
   /// ORDER IS LOAD-BEARING: recipient placeholders (`r1`, `r2`, …) are assigned

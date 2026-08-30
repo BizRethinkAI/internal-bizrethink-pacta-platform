@@ -14,6 +14,8 @@ import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
 import { deriveFacts } from '../../lease/interview/derive-facts';
+import { FL_INTERVIEW } from '../../lease/interview/steps';
+import { applyTenantAnswers, tenantFieldsFor } from '../../lease/interview/tenant-answers';
 import type { LeasePartyInput } from '../../lease/parties/derive-parties';
 import { derivePartyValues, partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
 import { buildLeaseDocuments } from '../../lease/render/render-lease';
@@ -484,7 +486,20 @@ export const leaseBuilderRouter = router({
      * nobody finishes.
      */
     saveStep: authenticatedProcedure
-      .input(z.object({ id: z.string(), currentStepId: z.string(), answers: ZAnswers }))
+      .input(
+        z.object({
+          id: z.string(),
+          currentStepId: z.string(),
+          answers: ZAnswers,
+          /*
+            Which questions to put to the tenant. Stored as given — it is only
+            a selection, and `tenantFieldsFor` re-checks it against the field
+            definitions on every read, so nothing here can widen what a tenant
+            is able to write.
+          */
+          delegatedFields: z.array(z.string()).max(50).default([]),
+        }),
+      )
       .mutation(async ({ ctx, input }) => {
         const matter = await loadMatter(input.id, ctx.user.id);
 
@@ -503,6 +518,7 @@ export const leaseBuilderRouter = router({
             values: input.answers.values,
             customClauses: input.answers.customClauses,
             parties: input.answers.parties,
+            delegatedFields: input.delegatedFields,
           },
         });
 
@@ -883,7 +899,16 @@ export const leaseBuilderRouter = router({
 
       const matter = await prisma.bizrethinkLeaseMatter.findUnique({
         where: { id: review.matterId },
-        select: { id: true, title: true, facts: true, money: true, values: true, customClauses: true, parties: true },
+        select: {
+          id: true,
+          title: true,
+          facts: true,
+          money: true,
+          values: true,
+          customClauses: true,
+          parties: true,
+          delegatedFields: true,
+        },
       });
 
       if (!matter) {
@@ -910,6 +935,28 @@ export const leaseBuilderRouter = router({
           parties: matter.parties,
         }) !== review.answersHash;
 
+      /*
+        Questions for the tenant, resolved from the field DEFINITIONS and
+        merely selected by the stored list — so a wrong list cannot put a rent
+        box in front of them. Only a tenant is asked: an attorney is reviewing
+        the document, not living in it.
+      */
+      const storedDelegated = ((matter.delegatedFields ?? []) as unknown[]).filter(
+        (name): name is string => typeof name === 'string',
+      );
+
+      const askedFields =
+        review.audience === 'tenant'
+          ? tenantFieldsFor(FL_INTERVIEW, storedDelegated).map((field) => ({
+              name: field.name,
+              label: field.label,
+              help: field.help ?? null,
+              placeholder: field.placeholder ?? null,
+              kind: field.kind,
+              answer: String((matter.values as Record<string, unknown>)[field.name] ?? ''),
+            }))
+          : [];
+
       return {
         review: {
           id: review.id,
@@ -919,6 +966,7 @@ export const leaseBuilderRouter = router({
         },
         matter: { id: matter.id, title: matter.title },
         comments,
+        askedFields,
         changedSinceIssued,
       };
     }),
@@ -937,6 +985,13 @@ export const leaseBuilderRouter = router({
           comments: z
             .array(z.object({ clauseSlug: z.string().nullable().default(null), body: z.string().min(1).max(5000) }))
             .max(200),
+          /*
+            Answers to the questions the landlord delegated. UNTRUSTED — this
+            procedure is reached with a link and no session. The keys are
+            filtered against the field definitions before anything is written;
+            see applyTenantAnswers.
+          */
+          answers: z.record(z.string(), z.unknown()).default({}),
         }),
       )
       .mutation(async ({ input }) => {
@@ -944,6 +999,36 @@ export const leaseBuilderRouter = router({
 
         if (!review || !isReviewUsable(toDomainReview(review), new Date())) {
           throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+        }
+
+        /*
+          Written only for a tenant review, and only through the allowlist. An
+          attorney's link carries no questions, so it may not write answers
+          either — the narrower the write, the less a leaked link is worth.
+        */
+        if (review.audience === 'tenant' && Object.keys(input.answers).length > 0) {
+          const matter = await prisma.bizrethinkLeaseMatter.findUnique({
+            where: { id: review.matterId },
+            select: { values: true, delegatedFields: true, status: true },
+          });
+
+          // A sent lease is frozen. Its answers must not move under signers.
+          if (matter && matter.status === 'draft') {
+            const delegated = ((matter.delegatedFields ?? []) as unknown[]).filter(
+              (name): name is string => typeof name === 'string',
+            );
+
+            await prisma.bizrethinkLeaseMatter.update({
+              where: { id: review.matterId },
+              data: {
+                values: applyTenantAnswers({
+                  values: (matter.values ?? {}) as Record<string, unknown>,
+                  delegated,
+                  submitted: input.answers,
+                }) as never,
+              },
+            });
+          }
         }
 
         await prisma.$transaction([
