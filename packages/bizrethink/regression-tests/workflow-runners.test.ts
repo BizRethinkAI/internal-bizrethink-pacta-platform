@@ -60,9 +60,16 @@ describe('.github/workflows/e2e-tests.yml — job cap must leave headroom', () =
   it(`sets timeout-minutes >= ${MINIMUM_TIMEOUT_MINUTES} so the suite can finish`, () => {
     const content = readFileSync(workflowPath, 'utf8');
 
-    const match = content.match(/timeout-minutes:\s*(\d+)/);
+    /*
+      Scoped to the SHARD job. Read as "the first timeout-minutes in the file"
+      this silently began measuring the build job when that was added ahead of
+      the matrix — a guard about the suite's cap, quietly asserting something
+      about a three-minute build instead.
+    */
+    const shardJob = content.slice(content.indexOf('e2e_tests:'));
+    const match = shardJob.match(/timeout-minutes:\s*(\d+)/);
 
-    expect(match, 'e2e-tests.yml declares no timeout-minutes; it would inherit the 360 min default').not.toBeNull();
+    expect(match, 'the E2E shard job declares no timeout-minutes; it would inherit the 360 min default').not.toBeNull();
 
     expect(
       Number(match?.[1]),
@@ -144,9 +151,44 @@ describe('.github/workflows/e2e-tests.yml — job cap must leave headroom', () =
         'forever instead of going red.',
     ).toBe(true);
 
+    // Contains, not equals: the gate also depends on the build job, and a
+    // future job may join it. What matters is that the matrix is in there.
     expect(
-      /needs:\s*\[e2e_tests\]/.test(gate),
+      /needs:\s*\[[^\]]*\be2e_tests\b[^\]]*\]/.test(gate),
       'The gate must depend on the shard matrix, or it reports success without waiting for ' + 'any test to run.',
+    ).toBe(true);
+  });
+
+  it('builds the app once and shares it, rather than once per shard', () => {
+    /*
+      Measured 2026-08-30: a shard spent 6.7 minutes on setup to run 2 minutes
+      of tests, and `npm run build` was 3.6 of those — repeated in all eight
+      shards for the identical artifact. Adding shards therefore bought wall
+      clock by adding setup, which is the trap Playwright's own sharding
+      guidance describes.
+
+      This asserts the fix cannot silently regress: exactly one build, and the
+      shards fetching it.
+    */
+    const content = readFileSync(workflowPath, 'utf8');
+
+    const builds = content.match(/npm run build -- --filter=@documenso\/remix/g) ?? [];
+
+    expect(
+      builds.length,
+      `The app is built ${builds.length} times in this workflow. It must be built once in a ` +
+        'separate job and downloaded by the shards; a build per shard is 3.6 minutes of ' +
+        'identical work multiplied by the shard count.',
+    ).toBe(1);
+
+    expect(
+      /uses:\s*actions\/download-artifact/.test(content),
+      'No shard downloads the shared build. Without it the shards have no app to serve.',
+    ).toBe(true);
+
+    expect(
+      /uses:\s*actions\/upload-artifact[\s\S]{0,200}name:\s*remix-build/.test(content),
+      'Nothing uploads the shared build artifact the shards expect.',
     ).toBe(true);
   });
 

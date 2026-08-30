@@ -204,6 +204,15 @@ passed, or appeared to:
   PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
   longer a reason to stack. Always verify a merge landed by checking the FILE
   on `main`, never by trusting the PR's MERGED badge.
+- **The E2E suite was never the slow part — the setup was.** Measured
+  2026-08-30 on a real shard: **2.0 min running tests, 6.7 min of setup**, and
+  `npm run build` was 3.6 of those, repeated identically in all 8 shards (plus a
+  9th in `ci.yml`). Adding shards therefore bought wall clock by *adding setup* —
+  the 4→8 change earlier that day was itself treating the symptom. Playwright's
+  own sharding guidance names the trap: "if that overhead is 2 minutes and each
+  shard only runs 3 minutes of tests, you are not gaining much."
+  Fixed in #45 by building once and sharing the artifact. **Before adding
+  parallelism, measure what fraction of a job is actually work.**
 - **A slow gate gets bypassed, and that is a design failure, not a discipline
   one.** The E2E suite took ~50 minutes of wall clock on every PR, which on a
   solo-maintained repo means it does not get waited for. PRs #26 and #27 were
