@@ -1,11 +1,14 @@
 import type { CustomClauseInput } from '@bizrethink/customizations/lease/clauses/custom';
 import { ASSERTION_TAGS } from '@bizrethink/customizations/lease/clauses/custom';
+import { trpc } from '@documenso/trpc/react';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
-import { Plus, Trash2 } from 'lucide-react';
+import { AlertTriangle, Loader2, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 /**
  * Writing your own clauses.
@@ -26,6 +29,8 @@ export type CustomClauseEditorProps = {
   sections: string[];
   clauses: CustomClauseInput[];
   onChange: (clauses: CustomClauseInput[]) => void;
+  /** Needed for the access-gated drafting call. Omit to hide the drafting box. */
+  organisationId?: string;
 };
 
 const SECTION_LABELS: Record<string, string> = {
@@ -43,7 +48,7 @@ const SECTION_LABELS: Record<string, string> = {
   general: 'General provisions',
 };
 
-export const CustomClauseEditor = ({ sections, clauses, onChange }: CustomClauseEditorProps) => {
+export const CustomClauseEditor = ({ sections, clauses, onChange, organisationId }: CustomClauseEditorProps) => {
   const update = (index: number, patch: Partial<CustomClauseInput>) => {
     onChange(clauses.map((clause, i) => (i === index ? { ...clause, ...patch } : clause)));
   };
@@ -54,6 +59,14 @@ export const CustomClauseEditor = ({ sections, clauses, onChange }: CustomClause
 
   return (
     <div className="mt-4 space-y-5">
+      {organisationId !== undefined && (
+        <ClauseDrafter
+          organisationId={organisationId}
+          sections={sections}
+          onDrafted={(draft) => onChange([...clauses, draft])}
+        />
+      )}
+
       {clauses.length === 0 && (
         <p className="rounded-lg border border-dashed p-6 text-center text-muted-foreground text-sm">
           No clauses of your own yet. Anything the library does not cover goes here and becomes a numbered clause in the
@@ -146,6 +159,96 @@ export const CustomClauseEditor = ({ sections, clauses, onChange }: CustomClause
       <Button variant="outline" onClick={add}>
         <Plus className="mr-2 h-4 w-4" />
         Add a clause
+      </Button>
+    </div>
+  );
+};
+
+/**
+ * Describe a term in plain English; get a clause back to edit.
+ *
+ * IT PROPOSES, IT DOES NOT INSERT. The draft is appended to the list below as
+ * an ordinary editable clause, exactly as if it had been typed — same fields,
+ * same guardrail checks on the review step, same customer-authored status
+ * outside the reviewed library. Nothing reaches a document without the
+ * landlord reading it.
+ *
+ * A rejected draft says why. The model is refused when it states a legal
+ * conclusion about its own clause rather than drafting a term, and a landlord
+ * who is told that can rephrase; one who is told "something went wrong"
+ * cannot.
+ */
+const ClauseDrafter = ({
+  organisationId,
+  sections,
+  onDrafted,
+}: {
+  organisationId: string;
+  sections: string[];
+  onDrafted: (clause: CustomClauseInput) => void;
+}) => {
+  const [request, setRequest] = useState('');
+
+  const draft = trpc.bizrethink.leaseBuilder.ai.draftClause.useMutation({
+    onSuccess: (result) => {
+      if (result.ok) {
+        onDrafted({
+          heading: result.draft.heading,
+          body: result.draft.body,
+          section: result.draft.section,
+          asserts: [],
+        });
+        setRequest('');
+      }
+    },
+  });
+
+  const rejected = draft.data && !draft.data.ok ? draft.data : null;
+
+  return (
+    <div className="rounded-lg border border-dashed p-4">
+      <Label htmlFor="clause-request" className="flex items-center gap-2 font-medium">
+        <Sparkles className="h-4 w-4" />
+        Describe the term in your own words
+      </Label>
+      <p className="mt-0.5 mb-2 text-muted-foreground text-xs">
+        You get a draft to read and edit below — nothing is added to the lease until you say so. It is your own clause,
+        outside the reviewed library, and prints as such.
+      </p>
+
+      <Textarea
+        id="clause-request"
+        rows={3}
+        value={request}
+        placeholder="Tenant handles repairs under $150. I cover the A/C, but they change the filter monthly."
+        onChange={(e) => setRequest(e.target.value)}
+      />
+
+      {rejected && (
+        <Alert variant={rejected.reason === 'not-configured' ? 'warning' : 'destructive'} className="mt-3">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>
+            {rejected.reason === 'not-configured' ? 'Drafting is not switched on' : 'That draft was discarded'}
+          </AlertTitle>
+          <AlertDescription>{rejected.error}</AlertDescription>
+        </Alert>
+      )}
+
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-3"
+        disabled={request.trim().length < 10 || draft.isPending}
+        onClick={() => draft.mutate({ organisationId, request: request.trim(), sections })}
+      >
+        {draft.isPending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Drafting…
+          </>
+        ) : (
+          'Draft a clause from this'
+        )}
       </Button>
     </div>
   );

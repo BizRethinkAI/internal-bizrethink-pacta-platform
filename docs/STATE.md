@@ -152,12 +152,30 @@ precede it, are in flight as #26 and #27.
    It reports the statute and the exact words matched, and stops. **A regex is
    not entitled to a verdict on a specific provision.**
 
-   **AI layer NOT built, and it needs a decision:**
-   `BizrethinkInstanceAiConfig` is Vertex-only while the master stack has
-   Claude as primary — so either extend that model with an Anthropic provider,
-   or put Vertex credentials in `/admin`. When built it may only raise a
-   question with a citation attached, never block and never conclude: a false
-   "this clause is fine" manufactures confidence and is worse than no check.
+   **AI clause drafting — BUILT 2026-08-30** (#40). Vertex confirmed as the
+   right provider for this app (Claude is the fallback), so no Anthropic
+   provider was added.
+
+   Describe a term in plain English, get a clause back to edit. **It proposes
+   into the editor and never inserts** — the draft is appended as an ordinary
+   customer-authored clause and goes through the same guardrails as a typed
+   one. The output shape has nowhere to put a verdict (no `enforceable`, no
+   severity; unknown keys are dropped), and prose stating a legal conclusion
+   about its own clause is REJECTED rather than shown, with a message saying
+   why so the landlord can rephrase.
+
+   **No SDK.** A `fetch` against the documented REST endpoint: a dependency
+   lands in upstream's lockfile and must be reconciled every weekly sync,
+   which is a recurring cost for one POST.
+
+   **Express mode.** Vertex accepts an API key only in express mode, which uses
+   the global endpoint and takes NEITHER a project NOR a location — so
+   `vertexProjectId` and `vertexLocation` on the instance config are unused on
+   this path. They belong to the OAuth service-account flow, whose credentials
+   the config does not hold.
+
+   **Not configured in production.** `BizrethinkInstanceAiConfig` has no row at
+   all; the feature fails closed and says so, pointing at `/admin/ai`.
 5. **Deferred:** paid property data. Blocked on a spending decision and worth
    six manual questions per property until then — see *Property data* below.
 6. Close the remaining documentation lie (`scripts/apply-overlays.sh`).
