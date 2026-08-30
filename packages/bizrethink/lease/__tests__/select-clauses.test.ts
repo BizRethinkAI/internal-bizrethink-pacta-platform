@@ -20,6 +20,7 @@ const NEW_TENANCY: ClauseFacts = {
   advanceRentCarriedInUsd: 0,
   propertyYearBuilt: 2005,
   petsPermitted: true,
+  hasNamedOccupants: false,
   hasHoa: true,
   prorationApplies: false,
   propertyType: 'single-family',

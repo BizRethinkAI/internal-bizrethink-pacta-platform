@@ -54,7 +54,16 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
   const endDate = String(values.endDate ?? money.term.startDate);
 
   return {
-    facts: { ...facts, ...deriveFacts(money, endDate) } as RenderLeaseInput['facts'],
+    facts: {
+      ...facts,
+      ...deriveFacts(money, endDate),
+      /*
+        Derived rather than asked. It is only "did they name anybody else?",
+        and asking it as a separate question would be asking the answerer to
+        keep two fields in step for no reason.
+      */
+      hasNamedOccupants: String((values as Record<string, unknown>).authorisedOccupants ?? '').trim() !== '',
+    } as RenderLeaseInput['facts'],
     money,
     values: {
       ...values,

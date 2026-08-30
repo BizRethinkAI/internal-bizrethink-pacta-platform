@@ -142,6 +142,7 @@ const FieldInput = ({ id, field, value, onChange }: { id: string } & Omit<Interv
       <Textarea
         id={id}
         rows={4}
+        placeholder={field.placeholder}
         value={value === null ? '' : String(value)}
         onChange={(event) => onChange(event.target.value)}
       />
@@ -168,6 +169,7 @@ const FieldInput = ({ id, field, value, onChange }: { id: string } & Omit<Interv
         */
         min={isNumeric ? 0 : undefined}
         className={field.kind === 'usd' ? 'pl-7 tabular-nums' : isNumeric ? 'tabular-nums' : undefined}
+        placeholder={field.placeholder}
         value={value === null ? '' : String(value)}
         onChange={(event) => {
           const raw = event.target.value;
