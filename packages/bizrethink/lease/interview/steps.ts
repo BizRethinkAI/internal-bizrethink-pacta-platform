@@ -116,6 +116,9 @@ export const DERIVED_VALUES = [
   // Assembled from the party list rather than typed.
   'landlordNames',
   'tenantNames',
+  // §83.505 addresses, one per signer, assembled from the same list.
+  'landlordNoticeEmails',
+  'tenantNoticeEmails',
   'propertyAddress',
   'propertyTypeLabel',
   'effectiveDate',
@@ -150,31 +153,6 @@ export const FL_INTERVIEW: InterviewStep[] = [
           cite: 'Fla. Stat. §83.505',
           note: 'Electronic delivery of notices requires a signed addendum stating that the election is voluntary and revocable, with a valid email address for each party.',
         },
-      },
-      {
-        name: 'landlordNoticeEmail',
-        target: 'value',
-        kind: 'text',
-        label: 'Landlord email for notices under the lease',
-        /*
-          Distinct from the signing email captured against each party below,
-          and the page has to say so — they look identical and mean different
-          things. This one is written into the §83.505 addendum as the address
-          at which the landlord accepts legal notice for the whole tenancy; the
-          other is only where a signing link is delivered once.
-        */
-        help: 'Written into the lease as the address where the landlord accepts legal notice. Separate from the signing email below, though it is usually the same address.',
-        showWhen: (a) => a.facts.electronicNoticesElected,
-        required: true,
-      },
-      {
-        name: 'tenantNoticeEmail',
-        target: 'value',
-        kind: 'text',
-        label: 'Tenant email for notices under the lease',
-        help: 'Written into the lease as the address where the tenant accepts legal notice. Separate from the signing email you add below, though it is usually the same address.',
-        showWhen: (a) => a.facts.electronicNoticesElected,
-        required: true,
       },
       {
         name: 'tenantPreTermAddress',

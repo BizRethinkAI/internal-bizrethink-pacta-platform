@@ -89,14 +89,21 @@ export const FL_BOILERPLATE: Clause[] = [
       Offered only when elected. A landlord who does not want email notice
       should not be handed an addendum inviting it.
     */
-    body: 'Fla. Stat. §83.505 permits notices required under Part II of Chapter 83 to be delivered by email only where both parties agree in a signed addendum. This is that addendum. Election is voluntary. Either party may revoke it, or update the email address given, at any time by written notice to the other, and a revocation does not affect the validity of a notice already sent.\n\nLandlord elects to receive notices by email at: {{landlordNoticeEmail}}\n\nTenant elects to receive notices by email at: {{tenantNoticeEmail}}\n\nA notice sent by email is delivered when sent, unless it is returned as undeliverable. The sender shall keep a copy of the notice and evidence of its transmission.',
+    body: 'Fla. Stat. §83.505 permits notices required under Part II of Chapter 83 to be delivered by email only where both parties agree in a signed addendum. This is that addendum. Election is voluntary. Either party may revoke it, or update the email address given, at any time by written notice to the other, and a revocation does not affect the validity of a notice already sent.\n\nLandlord elects to receive notices by email at: {{landlordNoticeEmails}}\n\nTenant elects to receive notices by email at: {{tenantNoticeEmails}}\n\nA notice sent by email is delivered when sent, unless it is returned as undeliverable. The sender shall keep a copy of the notice and evidence of its transmission.',
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.505',
     includeWhen: (facts) => facts.electronicNoticesElected,
     variables: [
-      { name: 'landlordNoticeEmail', type: 'string', label: 'Landlord email for notices', required: true },
-      { name: 'tenantNoticeEmail', type: 'string', label: 'Tenant email for notices', required: true },
+      /*
+        Derived from the party list, not asked. §83.505 requires a valid email
+        address for EACH party, and the single-field version could not
+        represent two tenants — it named one and the second had elected
+        nothing. One address per signer already exists, and the party list
+        already refuses two people sharing one.
+      */
+      { name: 'landlordNoticeEmails', type: 'string', label: 'Landlord notice addresses', required: true },
+      { name: 'tenantNoticeEmails', type: 'string', label: 'Tenant notice addresses', required: true },
     ],
     supersedes: [],
     asserts: ['electronic-notice-elected'],

@@ -196,6 +196,16 @@ passed, or appeared to:
   "hung" indistinguishable.
 - **Upstream syncs drop features silently.** The 2026-08-13 audit found three
   (admin org-delete, signing-page branding, signup flags). Nothing was red.
+- **Asking twice for the same fact hid a correctness bug.** The interview asked
+  `landlordNoticeEmail` and `tenantNoticeEmail` by hand, after the same
+  addresses had been entered against each signer. The redundancy was the
+  visible symptom; the real defect was that §83.505 requires a valid email
+  address for EACH party, and one singular `tenantNoticeEmail` cannot represent
+  two tenants — the addendum named one and the second had elected nothing, and
+  it rendered perfectly because one field had one value. Now derived from the
+  party list, which already holds one address per person and refuses two people
+  sharing one. Fixed in #39. **When a form asks for something it already
+  knows, check whether the duplicate can even represent the real answer.**
 - **A clean merge can silently revert a feature.** Resolving #38 against #37:
   both touched `interview/steps.ts`, #38 having MOVED two fields that #37 then
   edited in place. Git resolved it by keeping #38's moved copy — which was the
