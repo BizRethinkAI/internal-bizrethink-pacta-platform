@@ -151,6 +151,14 @@ const FieldInput = ({ id, field, value, onChange }: { id: string } & Omit<Interv
         id={id}
         type={field.kind === 'date' ? 'date' : isNumeric ? 'number' : 'text'}
         inputMode={isNumeric ? 'decimal' : undefined}
+        /*
+          A floor on the control itself, so the spinner and the arrow keys
+          cannot produce a value that is not an answer. Belt to the validation
+          layer's braces: a real matter reached production carrying
+          `depositReturnDays: -124`, which every statutory check let through
+          because they were all one-sided.
+        */
+        min={isNumeric ? 0 : undefined}
         className={field.kind === 'usd' ? 'pl-7 tabular-nums' : isNumeric ? 'tabular-nums' : undefined}
         value={value === null ? '' : String(value)}
         onChange={(event) => {
