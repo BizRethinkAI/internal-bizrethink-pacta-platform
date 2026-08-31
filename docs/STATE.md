@@ -57,6 +57,38 @@ organisation.
 
 ## Blocked
 
+- **AGPL §13 needs an attorney's eye, and it is not a CI question.** Raised
+  2026-08-31 while diagnosing the runner; it turned out to be orthogonal to it
+  and more urgent.
+
+  ADR 0003 line 29 and `CLAUDE.md` both record the obligation as *"dormant
+  while we do not distribute modified versions"*. That is
+  **distribution-triggered reasoning**, which is GPL's test. **AGPL §13 is
+  triggered by remote network interaction** and requires Corresponding Source
+  to be offered *prominently, from the running program, to the users
+  interacting with it*.
+
+  **What is true of the deployed app, verified:** no source-offer link renders
+  anywhere a signer goes. Overlay 056 deliberately removed the one
+  "Built on the Documenso open-source core" sentence, reasoning that the
+  attribution "still lives in the marketing site's About + Security pages" —
+  but that is `internal-bizrethink-pacta-web` (pacta.ink), a **separate
+  property signers never visit**. The signing routes under `_recipient+`
+  render no footer at all.
+
+  **Repo visibility is not the lever.** A public repo signers were never
+  pointed to does not discharge §13, and source can be offered while the repo
+  is private. So the runner's public-repo decision does not turn on this.
+
+  **Scale:** 118 distinct signer emails, 729 recipients, 468 envelopes.
+
+  Two questions genuinely for the attorney, not for us: whether the deployed
+  build is "modified" in the copyright sense, and whether signers count as
+  users interacting remotely. If both hold, the obligation is live now.
+  Cheapest possible remedy if so: a source link on the signing surface.
+
+## Blocked
+
 - **Lease builder cannot reach a third party** until a Florida attorney reviews
   the clause library. That is deliberate and enforced in code, not by memory.
   **52 clauses**, all `attorney-drafted, author: null` — meaning drafted by a
