@@ -210,19 +210,29 @@ passed, or appeared to:
   Playwright workers where a 2-core `ubuntu-latest` gives 1. The switch is one
   line plus dropping the shard matrix to `[1]`.
 
-  It sat **queued 8 minutes with no runner assigned** while the runner showed
-  online, idle, in a `visibility=all` group, with org policy permitting
-  self-hosted runners for all repos. Everything checkable from the GitHub side
-  is correct, so the next step needs shell access to the runner box —
-  `journalctl -u actions.runner.*` and whether the BizRethinkAI listener is
-  actually connected, as distinct from the service being up.
+  **Root cause: the runner group has `allows_public_repositories: false`, and
+  this repository is PUBLIC.** That is a SECOND gate, separate from
+  `visibility: all` — they read like synonyms, they are not, and it is false by
+  default on every group GitHub creates. I checked the first and not the
+  second. A public repo matches the label, finds no eligible runner, and queues
+  forever — the same shape as the $0 spending-limit hang the day before.
 
-  **SHARD COUNT MUST TRACK RUNNER CONCURRENCY.** One runner instance processes
-  ONE job at a time, so the homelab switch REQUIRES dropping to a single shard;
-  eight shards against one instance run serially and re-pay setup eight times.
-  More parallelism means **more runner instances first**, then shards to match.
-  The guards are now conditional on the runner rather than demanding shards
-  unconditionally.
+  **Now a security decision, not a technical one.** Enabling it lets anyone
+  open a fork PR against a public repo and execute arbitrary code on a LAN box
+  with docker-group access, on the same Proxmox node as the production Coolify
+  control plane. **Note before making the repo private instead:** 118 distinct
+  signer emails have interacted with this modified AGPLv3 service over the
+  network, and ADR 0003's "the AGPL obligation is dormant while we do not
+  distribute" does not address §13, which is triggered by network interaction
+  rather than distribution. Worth a lawyer's eye before changing visibility.
+
+  **`matrix: [1]` is the END STATE, not a step down.** One runner instance
+  processes ONE job at a time, so the switch requires a single shard. And extra
+  instances would share the SAME 8-core box — they add concurrency, not CPU, so
+  two parallel shards would get 2 workers each rather than 4. The 20 → ~5 min
+  target comes from one shard with 4 workers; real shard parallelism needs a
+  **second runner VM**. The guards are conditional on the runner rather than
+  demanding shards unconditionally.
 - **Two CI experiments that produced nothing, both worth not repeating.**
   Building once and sharing across 8 shards removed 25 min of duplicated
   compute and moved wall clock **0.1 min** — the build simply moved from inside

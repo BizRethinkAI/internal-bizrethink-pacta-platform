@@ -181,16 +181,31 @@ jobs:
     # is one line: `runs-on: [self-hosted, linux, x64]` with the shard matrix
     # dropped to [1].
     #
-    # THE MATRIX MUST DROP WITH IT. One runner instance processes ONE job at a
-    # time, so eight shards against a single instance run SERIALLY — eight
-    # setups plus the whole suite, far worse than what they replace. Shard
-    # count and runner concurrency move together, always.
+    # THE MATRIX MUST DROP WITH IT, AND STAY DOWN. One runner instance
+    # processes ONE job at a time, so eight shards against a single instance
+    # run SERIALLY — eight setups plus the whole suite, far worse than what
+    # they replace.
     #
-    # Held because the job would not start: online, idle, group visibility
-    # `all`, org policy permitting self-hosted for all repos — and the job sat
-    # queued 8 minutes with no runner assigned. Diagnosis needs shell access to
-    # the runner box, so it goes back to whoever owns it rather than blocking
-    # CI here.
+    # `matrix: [1]` is the END STATE here, not a step down on the way back to
+    # eight. Extra runner instances would live on the SAME 8-core box: they add
+    # concurrency, not CPU, so two shards in parallel would get 2 Playwright
+    # workers each rather than 4. The 20 -> ~5 min target comes from one shard
+    # with 4 workers. Real shard parallelism needs a SECOND runner VM.
+    #
+    # HELD ON A SECURITY DECISION, not a technical one. Root cause found
+    # 2026-08-31: the runner group has `allows_public_repositories: false`, and
+    # this repository is PUBLIC. That is a SECOND gate, distinct from
+    # `visibility: all` — they read like synonyms and are not, and it is false
+    # by default on every group GitHub creates. A public repo matches the
+    # label, finds no eligible runner, and queues forever.
+    #
+    # Not ephemeral registration, which was the first hypothesis: a later job
+    # from a PRIVATE repo in the same org hit the same runner instantly.
+    #
+    # Flipping the flag would let anyone open a fork PR against this public
+    # repo and execute arbitrary code on a LAN box with docker-group access,
+    # on the same node as the production Coolify control plane. That is the
+    # owner's decision to make, not something to enable in passing.
     #
     # PRIOR ATTEMPT, 2026-08-30: a GitHub 4-core larger runner behaved
     # identically — Ready, and every job queued 30 minutes unassigned. That one
