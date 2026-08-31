@@ -617,6 +617,19 @@ things about the real shape would not have been guessed — the match returns AL
 CAPS, and `addressComponents` carries no house number at all (`fromAddress`/
 `toAddress` are the block range).
 
+### Notice addresses are POSTAL, and the copy said otherwise
+
+The §83.50 field read "The address must be given in writing", which is true of
+an email address too — so it invited being filled with one. It cannot be: the
+§83.49(3)(a) notice this lease prints verbatim says the landlord "MUST MAIL YOU
+NOTICE, WITHIN 30 DAYS AFTER YOU MOVE OUT", and that the deposit must be
+returned outright if that mailing is not timely. An email address there is
+somewhere a statutory notice cannot be sent.
+
+**Email is additive, never a substitute.** §83.505 permits it only under a
+signed addendum — the "Deliver notices by email?" election on step 1 — and that
+addendum names each party's address separately.
+
 ### Utilities live on the property
 
 Added 2026-08-31 (#50). They were two free-text boxes on the interview, and a

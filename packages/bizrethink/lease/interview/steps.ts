@@ -177,7 +177,9 @@ export const FL_INTERVIEW: InterviewStep[] = [
         kind: 'text',
         address: true,
         label: 'Where should notices go to the tenant BEFORE they move in?',
-        help: 'After the start date notices go to the property itself. This covers the gap between signing and moving in.',
+        // Postal, for the same reason as the landlord's: a mailed statutory
+        // notice has to reach somewhere before the tenancy begins.
+        help: 'A postal address. After the start date notices go to the property itself; this covers the gap between signing and moving in.',
         required: true,
       },
       {
@@ -503,8 +505,27 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'text',
         address: true,
-        label: 'At what address?',
-        statute: { cite: 'Fla. Stat. §83.50', note: 'The address must be given in writing.' },
+        label: 'At what mailing address?',
+        /*
+          A POSTAL address, and the old wording invited the opposite reading.
+          "The address must be given in writing" is true of an email address
+          too, so the field asked to be filled with one.
+
+          It cannot be. The §83.49(3)(a) notice this lease prints verbatim says
+          the landlord "MUST MAIL YOU NOTICE, WITHIN 30 DAYS AFTER YOU MOVE
+          OUT", and that the deposit must be returned outright if that mailing
+          is not timely. An email address here is somewhere that notice cannot
+          be sent.
+
+          Email is additive and separate: §83.505 permits it only under a
+          signed addendum, which is the "Deliver notices by email?" election on
+          step 1. Never a substitute for this.
+        */
+        help: 'A postal address. Statutory notices are served here — including the deposit claim, which must be mailed within 30 days of move-out. Email is a separate election on step 1 and does not replace this.',
+        statute: {
+          cite: 'Fla. Stat. §83.50',
+          note: 'The name and address must be disclosed in writing. §83.49(3)(a) then requires the deposit claim notice to be MAILED, so this has to be an address post can reach.',
+        },
         required: true,
       },
     ],
