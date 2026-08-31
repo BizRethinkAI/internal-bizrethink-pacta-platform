@@ -244,6 +244,23 @@ precede it, are in flight as #26 and #27.
 **This repo's characteristic failure is silence, not breakage.** Everything below
 passed, or appeared to:
 
+- **STATE.md union-merges, and that has a silent failure mode.**
+  `.gitattributes` sets `docs/STATE.md merge=union`, because the governance
+  guard requires this file on every PR and concurrent branches therefore
+  collided by construction — three times on 2026-08-31, always two different
+  sections at the same anchor with nothing actually in dispute.
+
+  Union merge keeps BOTH sides of a conflicting region and leaves **no marker**.
+  For added sections and bullets that is exactly right. For a CORRECTED entry it
+  is not: if one branch fixes an entry while another touches the same lines, you
+  silently keep the fix *and* the thing it corrected, sitting next to each
+  other. Several entries here were corrected rather than appended on
+  2026-08-31, including one that reversed its own recommendation.
+
+  **So after any merge touching this file, read the result.** A section
+  appearing twice, or an entry contradicting the one below it, is union merge
+  and needs a human. The conflict-proof alternative — one note file per change
+  under `docs/notes/` — was considered and passed over for the one-liner.
 - **Do NOT stack pull requests in this repo.** It has now lost work twice, the
   same way both times. A PR whose base is another branch merges into THAT
   branch, and if the base PR merges into `main` first at an earlier commit, the
