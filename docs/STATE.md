@@ -204,15 +204,25 @@ passed, or appeared to:
   PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
   longer a reason to stack. Always verify a merge landed by checking the FILE
   on `main`, never by trusting the PR's MERGED badge.
-- **CI runs on the homelab, and SHARD COUNT MUST TRACK RUNNER CONCURRENCY.**
-  `ci-runner-01` (Proxmox VM 102, `10.10.10.41`, 8 cores, org-level for
-  BizRethinkAI and lombardpay, outbound-only) gives 4 Playwright workers where
-  a 2-core `ubuntu-latest` gave 1. **One runner instance processes ONE job at a
-  time**, so the suite is deliberately UNSHARDED — eight shards against a
-  single instance would run serially and re-pay setup eight times, far worse
-  than the 20 min it replaced. More parallelism means **more runner instances
-  first**, then a shard count to match. Guards are now conditional on the
-  runner rather than demanding shards unconditionally.
+- **The homelab runner is built but does not pick up jobs — HELD, not
+  abandoned.** `ci-runner-01` (Proxmox VM 102, `10.10.10.41`, 8 cores,
+  org-level for BizRethinkAI and lombardpay, outbound-only) would give 4
+  Playwright workers where a 2-core `ubuntu-latest` gives 1. The switch is one
+  line plus dropping the shard matrix to `[1]`.
+
+  It sat **queued 8 minutes with no runner assigned** while the runner showed
+  online, idle, in a `visibility=all` group, with org policy permitting
+  self-hosted runners for all repos. Everything checkable from the GitHub side
+  is correct, so the next step needs shell access to the runner box —
+  `journalctl -u actions.runner.*` and whether the BizRethinkAI listener is
+  actually connected, as distinct from the service being up.
+
+  **SHARD COUNT MUST TRACK RUNNER CONCURRENCY.** One runner instance processes
+  ONE job at a time, so the homelab switch REQUIRES dropping to a single shard;
+  eight shards against one instance run serially and re-pay setup eight times.
+  More parallelism means **more runner instances first**, then shards to match.
+  The guards are now conditional on the runner rather than demanding shards
+  unconditionally.
 - **Two CI experiments that produced nothing, both worth not repeating.**
   Building once and sharing across 8 shards removed 25 min of duplicated
   compute and moved wall clock **0.1 min** — the build simply moved from inside
