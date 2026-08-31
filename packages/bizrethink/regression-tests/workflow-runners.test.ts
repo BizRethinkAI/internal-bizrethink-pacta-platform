@@ -25,6 +25,62 @@ describe('.github/workflows — runners must be GitHub-hosted', () => {
     expect(workflowFiles.length).toBeGreaterThan(0);
   });
 
+  /*
+    The warp-* ban below catches the label this fork actually got burned by.
+    It does not catch the general case: ANY runner label with no runner behind
+    it leaves the job `queued` forever, and a required check that never reports
+    blocks the PR on a verdict that never arrives — indistinguishable from a
+    slow run.
+
+    A larger runner is provisioned by NAME at the organisation level, so a typo
+    in `runs-on` is exactly that failure. This allowlist is the cheap guard: a
+    label not on it fails here, in two seconds, instead of hanging CI.
+
+    Adding a runner? Provision it on the org first, then add the label here.
+  */
+  const KNOWN_RUNNERS = new Set([
+    'ubuntu-latest', // GitHub standard, 2 cores
+    'self-hosted', // ci-runner-01, homelab Proxmox VM 102, 8 cores
+    'linux',
+    'x64',
+    // NOT ubuntu-4core. It is provisioned on the org and reports Ready, but
+    // jobs labelled with it sat queued for 30 minutes with no runner assigned
+    // and no steps run — larger runners are gated by the Actions spending
+    // limit, and entitlement is not the same as being schedulable. Add it back
+    // only once a job has actually executed on it.
+  ]);
+
+  it.each(workflowFiles)('%s only uses runner labels that exist', (file) => {
+    const content = readFileSync(resolve(workflowsDir, file), 'utf8');
+
+    /*
+      `runs-on` takes a scalar OR a list — `[self-hosted, linux, x64]` — and a
+      scalar-only regex would silently scan nothing on the list form, passing
+      while checking no labels at all.
+    */
+    const labels = [...content.matchAll(/runs-on:\s*(\[[^\]]*\]|[^\s#]+)/g)]
+      .flatMap((match) =>
+        match[1].startsWith('[')
+          ? match[1]
+              .slice(1, -1)
+              .split(',')
+              .map((part) => part.trim())
+          : [match[1].trim()],
+      )
+      // Expressions are resolved at run time and cannot be checked here.
+      .filter((label) => label !== '' && !label.startsWith('${{'));
+
+    const unknown = [...new Set(labels)].filter((label) => !KNOWN_RUNNERS.has(label));
+
+    expect(
+      unknown,
+      `${file} runs on ${unknown.join(', ')}, which is not a runner this organisation has ` +
+        'provisioned. A label with no runner behind it leaves the job queued forever, and a ' +
+        'required check that never reports blocks the pull request on a verdict that never ' +
+        'arrives. Provision it on the org, then add it to KNOWN_RUNNERS.',
+    ).toEqual([]);
+  });
+
   it.each(workflowFiles)('%s uses no WarpBuild (warp-*) runner label', (file) => {
     const content = readFileSync(resolve(workflowsDir, file), 'utf8');
     const warpRunners = content
@@ -60,9 +116,16 @@ describe('.github/workflows/e2e-tests.yml — job cap must leave headroom', () =
   it(`sets timeout-minutes >= ${MINIMUM_TIMEOUT_MINUTES} so the suite can finish`, () => {
     const content = readFileSync(workflowPath, 'utf8');
 
-    const match = content.match(/timeout-minutes:\s*(\d+)/);
+    /*
+      Scoped to the SHARD job. Read as "the first timeout-minutes in the file"
+      this silently began measuring the build job when that was added ahead of
+      the matrix — a guard about the suite's cap, quietly asserting something
+      about a three-minute build instead.
+    */
+    const shardJob = content.slice(content.indexOf('e2e_tests:'));
+    const match = shardJob.match(/timeout-minutes:\s*(\d+)/);
 
-    expect(match, 'e2e-tests.yml declares no timeout-minutes; it would inherit the 360 min default').not.toBeNull();
+    expect(match, 'the E2E shard job declares no timeout-minutes; it would inherit the 360 min default').not.toBeNull();
 
     expect(
       Number(match?.[1]),
@@ -144,32 +207,87 @@ describe('.github/workflows/e2e-tests.yml — job cap must leave headroom', () =
         'forever instead of going red.',
     ).toBe(true);
 
+    // Contains, not equals: the gate also depends on the build job, and a
+    // future job may join it. What matters is that the matrix is in there.
     expect(
-      /needs:\s*\[e2e_tests\]/.test(gate),
+      /needs:\s*\[[^\]]*\be2e_tests\b[^\]]*\]/.test(gate),
       'The gate must depend on the shard matrix, or it reports success without waiting for ' + 'any test to run.',
     ).toBe(true);
   });
 
-  it('shards the suite rather than running it serially on one runner', () => {
+  it('does not rebuild the app once per shard', () => {
+    /*
+      CONDITIONAL, because the right answer changed with the runner.
+
+      With 8 shards on GitHub-hosted runners the build ran eight times for the
+      identical artifact — 3.6 minutes each — so it had to be built once in its
+      own job and downloaded. On a single self-hosted shard there is nothing to
+      share, and a separate build job would only add a serial hop plus an
+      artifact round trip.
+
+      So the invariant is not "always build once in a separate job". It is
+      "never build the same artifact once per shard", which is what actually
+      cost the time. Raise the shard count without sharing the build and this
+      fails.
+    */
     const content = readFileSync(workflowPath, 'utf8');
 
     const shardMatch = content.match(/shard:\s*\[([\d,\s]+)\]/);
+    const shards = shardMatch?.[1].split(',').filter((s) => s.trim() !== '').length ?? 1;
+
+    if (shards <= 1) {
+      return;
+    }
 
     expect(
-      shardMatch,
-      'The shard matrix is gone. playwright.config.ts derives workers from `cores / 2`, so on ' +
-        'a 2-core ubuntu-latest runner the suite runs with ONE worker and takes ~59 minutes. ' +
-        'Sharding is what replaces the parallelism the runner cannot provide.',
-    ).not.toBeNull();
+      /uses:\s*actions\/download-artifact/.test(content),
+      `The suite runs ${shards} shards but none downloads a shared build, so each rebuilds the ` +
+        'app — 3.6 minutes of identical work per shard. Build once in its own job and share it.',
+    ).toBe(true);
+  });
 
-    const shards = shardMatch?.[1].split(',').length ?? 0;
+  it('never runs the whole suite single-threaded', () => {
+    /*
+      THE FAILURE THIS GUARDS, restated for a world with more than one core.
 
-    expect(shards, 'Expected more than one shard.').toBeGreaterThan(1);
+      Originally: the suite ran unsharded on a 2-core ubuntu-latest, where
+      playwright.config.ts computes workers as `cores / 2` — one worker, 59
+      minutes. Sharding was the only parallelism available, so the guard
+      demanded more than one shard.
+
+      That is now wrong as written. On ci-runner-01 (8 cores, 4 workers)
+      parallelism comes from WORKERS, and a single runner instance processes
+      ONE job at a time — so sharding against it would run the shards SERIALLY
+      and re-pay setup for each. Demanding shards there makes things worse.
+
+      The invariant underneath both cases: the suite must never end up with one
+      worker AND one shard. So the check is now conditional on the runner —
+      2-core GitHub hosts need shards; a multi-core self-hosted host does not.
+    */
+    const content = readFileSync(workflowPath, 'utf8');
+
+    const shardMatch = content.match(/shard:\s*\[([\d,\s]+)\]/);
+    const shards = shardMatch?.[1].split(',').filter((s) => s.trim() !== '').length ?? 0;
+
+    expect(shards, 'No shard matrix at all — the suite would run as a single job.').toBeGreaterThan(0);
+
+    const shardJob = content.slice(content.indexOf('e2e_tests:'), content.indexOf('e2e_gate:'));
+    const onGitHubHosted = /runs-on:\s*ubuntu-latest/.test(shardJob);
+
+    if (onGitHubHosted) {
+      expect(
+        shards,
+        'The shards run on a 2-core ubuntu-latest, where playwright.config.ts gives ONE worker. ' +
+          'Unsharded there, the suite takes ~59 minutes. Either shard it or move it to a ' +
+          'multi-core runner.',
+      ).toBeGreaterThan(1);
+    }
 
     expect(
       new RegExp(`--shard=\\$\\{\\{ matrix.shard \\}\\}/${shards}`).test(content),
-      `The matrix declares ${shards} shards but the --shard argument does not divide by ${shards}. ` +
-        'A mismatch silently runs only part of the suite while reporting green.',
+      `The matrix declares ${shards} shard(s) but the --shard argument does not divide by ` +
+        `${shards}. Playwright would run the wrong slice, or the same slice repeatedly, and ` +
+        'the gate would go green having skipped tests.',
     ).toBe(true);
   });
 });

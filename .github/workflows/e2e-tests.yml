@@ -80,7 +80,7 @@ jobs:
       # tests broke is much less useful than the whole one.
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1]
     # overlay 061 (2026-08-13, second revision): raised from 60 to 120.
     # The curated suite took 51 min on the green baseline, and the 142-commit
     # upstream sync pushed it past the 60 min cap — GitHub killed the job
@@ -97,7 +97,7 @@ jobs:
     # so that label sat queued forever and silently disabled the E2E gate.
     # GitHub-hosted ubuntu-latest has Docker (for dx:up) + is always available.
     # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       # fetch-depth: 0 so the docs-only detection below can diff against the
       # PR base. A shallow clone does not contain base.sha.
@@ -204,11 +204,11 @@ jobs:
       # E2E_TEST_PATH is interpolated straight into `playwright test $E2E_TEST_PATH`
       # by the upstream script, which makes it the seam for --shard without
       # touching upstream's package.json.
-      - name: Run Playwright shard ${{ matrix.shard }} of 8
+      - name: Run Playwright shard ${{ matrix.shard }} of 1
         if: steps.scope.outputs.code == 'true'
         run: npm run test:e2e -w @documenso/app-tests
         env:
-          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/8'
+          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/1'
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
