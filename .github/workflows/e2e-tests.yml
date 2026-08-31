@@ -212,9 +212,13 @@ jobs:
         if: steps.scope.outputs.code == 'true'
         run: npm run prisma:seed
 
-      - name: Install playwright browsers
-        if: steps.scope.outputs.code == 'true'
-        run: npx playwright install --with-deps
+      # REDUNDANT AND NOW REMOVED (2026-08-31). `./.github/actions/playwright-install`
+      # ran nine steps earlier and does exactly this. Two copies meant fixing
+      # the sudo problem in one of them and watching the run fail again on the
+      # other — the second failure looked like a new bug and was the same one.
+      #
+      # If browsers ever need installing here, call the action rather than
+      # inlining the command a second time.
 
       # Was `npm run ci`, which is
       #   turbo run build --filter=@documenso/remix && turbo run test && turbo run test:e2e
