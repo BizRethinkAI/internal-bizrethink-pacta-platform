@@ -85,7 +85,25 @@ organisation.
   Two questions genuinely for the attorney, not for us: whether the deployed
   build is "modified" in the copyright sense, and whether signers count as
   users interacting remotely. If both hold, the obligation is live now.
-  Cheapest possible remedy if so: a source link on the signing surface.
+
+  **The remedy is NOT simply "add a link", and I recorded that wrongly first
+  time.** Two things make it bigger:
+
+  - A link is only cheap **while the repo stays public**. Under the private-repo
+    option it would 404 for exactly the 118 people it is owed to, and §13 asks
+    for source offered "through some standard or customary means of
+    facilitating copying" — so going private would need a separate mechanism: a
+    public mirror of the deployed source, or a tarball endpoint served by the
+    app.
+  - **Corresponding Source must match the RUNNING build.** A link to a repo
+    that drifts from what is deployed is not Corresponding Source, so whatever
+    the mechanism it has to track releases. That is a small ongoing obligation,
+    not a one-time change.
+
+  **Therefore the ordering matters: ask the attorney BEFORE committing to the
+  private-repo move**, because the answer changes the work. It does not change
+  which runner option is safest — private still wins on security — only the
+  sequence.
 
 ## Blocked
 
