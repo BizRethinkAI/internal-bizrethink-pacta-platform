@@ -3,6 +3,26 @@ description: 'Install playwright'
 runs:
   using: 'composite'
   steps:
-    - name: Install playwright
+    # MODIFIED for BizRethink (2026-08-31): `--with-deps` only on
+    # GitHub-hosted runners.
+    #
+    # `--with-deps` shells out to apt-get, which needs passwordless sudo. The
+    # GitHub-hosted images grant the runner user exactly that; ci-runner-01
+    # does not, and should not — it sits on the LAN with docker-group access,
+    # on the same Proxmox node as the production Coolify control plane, so
+    # widening its sudo to make a CI step convenient would be trading a real
+    # boundary for a install flag.
+    #
+    # It does not need to. The system libraries are installed once by the
+    # `github_runner` Ansible role at provisioning time (verified there by
+    # launching all three browsers), which is the whole point of a persistent
+    # runner: do it once rather than on every run.
+    - name: Install playwright browsers (with system deps)
+      if: runner.environment == 'github-hosted'
       run: npx playwright install --with-deps
+      shell: bash
+
+    - name: Install playwright browsers
+      if: runner.environment != 'github-hosted'
+      run: npx playwright install
       shell: bash
