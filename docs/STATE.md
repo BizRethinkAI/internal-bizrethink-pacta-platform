@@ -57,6 +57,56 @@ organisation.
 
 ## Blocked
 
+- **AGPL §13 needs an attorney's eye, and it is not a CI question.** Raised
+  2026-08-31 while diagnosing the runner; it turned out to be orthogonal to it
+  and more urgent.
+
+  ADR 0003 line 29 and `CLAUDE.md` both record the obligation as *"dormant
+  while we do not distribute modified versions"*. That is
+  **distribution-triggered reasoning**, which is GPL's test. **AGPL §13 is
+  triggered by remote network interaction** and requires Corresponding Source
+  to be offered *prominently, from the running program, to the users
+  interacting with it*.
+
+  **What is true of the deployed app, verified:** no source-offer link renders
+  anywhere a signer goes. Overlay 056 deliberately removed the one
+  "Built on the Documenso open-source core" sentence, reasoning that the
+  attribution "still lives in the marketing site's About + Security pages" —
+  but that is `internal-bizrethink-pacta-web` (pacta.ink), a **separate
+  property signers never visit**. The signing routes under `_recipient+`
+  render no footer at all.
+
+  **Repo visibility is not the lever.** A public repo signers were never
+  pointed to does not discharge §13, and source can be offered while the repo
+  is private. So the runner's public-repo decision does not turn on this.
+
+  **Scale:** 118 distinct signer emails, 729 recipients, 468 envelopes.
+
+  Two questions genuinely for the attorney, not for us: whether the deployed
+  build is "modified" in the copyright sense, and whether signers count as
+  users interacting remotely. If both hold, the obligation is live now.
+
+  **The remedy is NOT simply "add a link", and I recorded that wrongly first
+  time.** Two things make it bigger:
+
+  - A link is only cheap **while the repo stays public**. Under the private-repo
+    option it would 404 for exactly the 118 people it is owed to, and §13 asks
+    for source offered "through some standard or customary means of
+    facilitating copying" — so going private would need a separate mechanism: a
+    public mirror of the deployed source, or a tarball endpoint served by the
+    app.
+  - **Corresponding Source must match the RUNNING build.** A link to a repo
+    that drifts from what is deployed is not Corresponding Source, so whatever
+    the mechanism it has to track releases. That is a small ongoing obligation,
+    not a one-time change.
+
+  **Therefore the ordering matters: ask the attorney BEFORE committing to the
+  private-repo move**, because the answer changes the work. It does not change
+  which runner option is safest — private still wins on security — only the
+  sequence.
+
+## Blocked
+
 - **Lease builder cannot reach a third party** until a Florida attorney reviews
   the clause library. That is deliberate and enforced in code, not by memory.
   **52 clauses**, all `attorney-drafted, author: null` — meaning drafted by a
@@ -204,6 +254,37 @@ passed, or appeared to:
   PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
   longer a reason to stack. Always verify a merge landed by checking the FILE
   on `main`, never by trusting the PR's MERGED badge.
+- **CI runs on the homelab. TWO GATES HAD TO BE OPEN, and only one is
+  obvious.** `ci-runner-01` (Proxmox VM 102, `10.10.10.41`, 8 cores, org-level
+  for BizRethinkAI and lombardpay, outbound-only) gives 4 Playwright workers
+  where a 2-core `ubuntu-latest` gave 1.
+
+  It hung for an hour on the runner group's **`allows_public_repositories`**,
+  which is `false` by default on every group GitHub creates and is a SEPARATE
+  gate from `visibility: all` despite reading like a synonym. This repo is
+  public, so it matched the label, found no eligible runner, and queued
+  forever.
+
+  What makes opening that safe is the second gate: the repo's fork-PR policy is
+  now **`all_external_contributors`**, so an outside PR executes nothing here
+  without explicit approval. **Do not loosen it** — the runner sits on the LAN
+  with docker-group access, on the same Proxmox node as the production Coolify
+  control plane. Chosen over making the repo private, which would have dragged
+  in the AGPL §13 question below.
+
+  **`matrix: [1]` is the END STATE, not a step down.** One instance processes
+  ONE job at a time, and extra instances share the same 8 cores — they add
+  concurrency, not CPU, so two parallel shards would get 2 workers each rather
+  than 4. Real shard parallelism needs a **second runner VM**. Never raise the
+  matrix without adding hardware first.
+
+- **Two CI experiments that produced nothing, both worth not repeating.**
+  Building once and sharing across 8 shards removed 25 min of duplicated
+  compute and moved wall clock **0.1 min** — the build simply moved from inside
+  the shards to in front of them. A GitHub 4-core larger runner was
+  provisioned, reported `Ready`, and every job sat **queued for 30 minutes**
+  with none assigned: larger runners are gated by the Actions **spending
+  limit**, which defaults to $0. **Entitlement is not schedulability.**
 - **A slow gate gets bypassed, and that is a design failure, not a discipline
   one.** The E2E suite took ~50 minutes of wall clock on every PR, which on a
   solo-maintained repo means it does not get waited for. PRs #26 and #27 were
