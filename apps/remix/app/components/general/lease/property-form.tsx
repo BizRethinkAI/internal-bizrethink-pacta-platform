@@ -45,6 +45,7 @@ type Draft = {
   landlords: { name: string; email: string }[];
   noticeName: string;
   noticeAddress: string;
+  utilities: { service: string; provider: string; phone: string; paidBy: 'tenant' | 'landlord' }[];
 };
 
 const EMPTY: Draft = {
@@ -65,6 +66,7 @@ const EMPTY: Draft = {
   landlords: [{ name: '', email: '' }],
   noticeName: '',
   noticeAddress: '',
+  utilities: [],
 };
 
 export type ExistingProperty = Draft & { id: string };
@@ -431,6 +433,107 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated, ex
             </div>
           </div>
 
+          {/*
+            One list, split by payer when the lease renders. Two separate boxes
+            was how the tenant-paid and landlord-paid lists came to disagree —
+            a utility could sit on both or vanish from both with nothing able
+            to notice.
+          */}
+          <div className="border-t pt-5">
+            <h3 className="font-medium">Utilities</h3>
+            <p className="mt-0.5 text-muted-foreground text-xs">
+              Entered once for the property. The lease lists the tenant's and yours separately, from this.
+            </p>
+
+            <div className="mt-3 space-y-3">
+              {draft.utilities.map((utility, index) => (
+                // Index as key: rows have no id and are never reordered.
+                <div key={index} className="grid gap-2 sm:grid-cols-[1.1fr_1.4fr_1fr_auto_auto]">
+                  <Input
+                    aria-label={`Utility ${index + 1} service`}
+                    value={utility.service}
+                    placeholder="electricity"
+                    onChange={(e) =>
+                      set(
+                        'utilities',
+                        draft.utilities.map((u, i) => (i === index ? { ...u, service: e.target.value } : u)),
+                      )
+                    }
+                  />
+                  <Input
+                    aria-label={`Utility ${index + 1} provider`}
+                    value={utility.provider}
+                    placeholder="Withlacoochee River Electric"
+                    onChange={(e) =>
+                      set(
+                        'utilities',
+                        draft.utilities.map((u, i) => (i === index ? { ...u, provider: e.target.value } : u)),
+                      )
+                    }
+                  />
+                  <Input
+                    aria-label={`Utility ${index + 1} phone`}
+                    value={utility.phone}
+                    placeholder="352-588-5115"
+                    onChange={(e) =>
+                      set(
+                        'utilities',
+                        draft.utilities.map((u, i) => (i === index ? { ...u, phone: e.target.value } : u)),
+                      )
+                    }
+                  />
+                  <Select
+                    value={utility.paidBy}
+                    onValueChange={(next) =>
+                      set(
+                        'utilities',
+                        draft.utilities.map((u, i) =>
+                          i === index ? { ...u, paidBy: next as 'tenant' | 'landlord' } : u,
+                        ),
+                      )
+                    }
+                  >
+                    <SelectTrigger aria-label={`Utility ${index + 1} paid by`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tenant">Tenant pays</SelectItem>
+                      <SelectItem value="landlord">You pay</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Remove ${utility.service || 'this utility'}`}
+                    onClick={() =>
+                      set(
+                        'utilities',
+                        draft.utilities.filter((_, i) => i !== index),
+                      )
+                    }
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={() =>
+                set('utilities', [
+                  ...draft.utilities,
+                  { service: '', provider: '', phone: '', paidBy: 'tenant' as const },
+                ])
+              }
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add a utility
+            </Button>
+          </div>
+
           <div>
             <Label htmlFor="prop-appliances">Appliances included</Label>
             <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">
@@ -477,6 +580,15 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated, ex
                   .map((l) => ({ name: l.name.trim(), email: l.email.trim() })),
                 noticeName: draft.noticeName.trim() === '' ? null : draft.noticeName.trim(),
                 noticeAddress: draft.noticeAddress.trim() === '' ? null : draft.noticeAddress.trim(),
+                // Blank rows dropped rather than saved as a nameless service.
+                utilities: draft.utilities
+                  .filter((u) => u.service.trim() !== '')
+                  .map((u) => ({
+                    service: u.service.trim(),
+                    provider: u.provider.trim(),
+                    phone: u.phone.trim(),
+                    paidBy: u.paidBy,
+                  })),
               };
 
               if (existing) {

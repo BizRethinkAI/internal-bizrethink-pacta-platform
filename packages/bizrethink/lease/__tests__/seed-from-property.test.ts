@@ -37,6 +37,11 @@ const property: SeedProperty = {
   ],
   noticeName: 'Shwet Prabhat',
   noticeAddress: '537 Lochaven Rd, Wesley Chapel, FL 33543',
+  utilities: [
+    { service: 'electricity', provider: 'Withlacoochee River Electric', phone: '352-588-5115', paidBy: 'tenant' },
+    { service: 'water and sewer', provider: 'Pasco County Utilities', phone: '', paidBy: 'tenant' },
+    { service: 'trash collection', provider: 'Coastal', phone: '800-255-7172', paidBy: 'landlord' },
+  ],
 };
 
 describe('the landlord comes from the property', () => {
@@ -57,6 +62,28 @@ describe('the landlord comes from the property', () => {
     // Recipient placeholders are numbered positionally across this list, so
     // the order a lease starts in is the order signatures attach in.
     expect(seedMatterFromProperty(property).parties[0].role).toBe('landlord');
+  });
+
+  it('renders both utility lists from the one property list', () => {
+    const { values } = seedMatterFromProperty(property);
+
+    expect(values.tenantUtilities).toContain('electricity');
+    expect(values.tenantUtilities).toContain('352-588-5115');
+    expect(values.landlordUtilities).toContain('trash collection');
+  });
+
+  it('never puts a utility on both sides', () => {
+    const { values } = seedMatterFromProperty(property);
+
+    expect(String(values.landlordUtilities)).not.toContain('electricity');
+    expect(String(values.tenantUtilities)).not.toContain('trash');
+  });
+
+  it('says "none" rather than leaving the clause with a dangling colon', () => {
+    const bare = seedMatterFromProperty({ ...property, utilities: [] });
+
+    expect(bare.values.tenantUtilities).toBe('none');
+    expect(bare.values.landlordUtilities).toBe('none');
   });
 
   it('seeds the §83.50 notice name and address', () => {

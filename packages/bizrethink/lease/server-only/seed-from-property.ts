@@ -1,4 +1,6 @@
 import type { LeasePartyInput } from '../parties/derive-parties';
+import type { UtilityRow } from '../utilities/derive-utilities';
+import { splitByPayer } from '../utilities/derive-utilities';
 
 /**
  * Opening a new lease with everything the property already knows.
@@ -35,6 +37,7 @@ export type SeedProperty = {
   landlords: { name: string; email: string }[];
   noticeName: string | null;
   noticeAddress: string | null;
+  utilities: UtilityRow[];
 };
 
 export type SeededMatter = {
@@ -108,6 +111,17 @@ export const seedMatterFromProperty = (property: SeedProperty): SeededMatter => 
     // existed, so the interview still asks rather than printing a blank.
     ...(property.noticeName ? { noticeName: property.noticeName } : {}),
     ...(property.noticeAddress ? { noticeAddress: property.noticeAddress } : {}),
+    /*
+      Both sides rendered from ONE list, so they cannot disagree about who
+      pays for what. Seeded as text and still editable per lease: a tenancy
+      where this tenant takes over the trash is an ordinary variation, and the
+      property record should not be edited to describe one lease.
+    */
+    ...(() => {
+      const { tenant, landlord } = splitByPayer(property.utilities ?? []);
+
+      return { tenantUtilities: tenant, landlordUtilities: landlord };
+    })(),
   },
 
   /*

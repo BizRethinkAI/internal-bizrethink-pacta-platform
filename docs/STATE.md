@@ -617,6 +617,30 @@ things about the real shape would not have been guessed — the match returns AL
 CAPS, and `addressComponents` carries no house number at all (`fromAddress`/
 `toAddress` are the block range).
 
+### Utilities live on the property
+
+Added 2026-08-31 (#50). They were two free-text boxes on the interview, and a
+real answer went in as a hand-typed numbered list with company names and phone
+numbers — all of it property data retyped every lease.
+
+Structured rows on the property, `[{ service, provider, phone, paidBy }]`, and
+**both clause variables render from that ONE list split by payer**, so a
+utility cannot sit on both sides or vanish from both. Seeded as text and still
+editable per lease: a tenancy where the tenant takes over the trash is an
+ordinary variation, and the property record should not be edited to describe
+one lease.
+
+Prose with a serial comma, not a numbered list — the clause interpolates it
+mid-sentence ("Tenant shall arrange and pay for the following directly with the
+supplier: …"). An empty side renders "none" rather than leaving a dangling
+colon.
+
+**No provider auto-lookup.** [NREL's Utility Rates API](https://developer.nlr.gov/docs/electricity/utility-rates-v3/)
+is free and returns the ELECTRIC utility from a lat/lon, which the Census
+geocoder already gives us — but water, sewer and trash are municipal with no
+national dataset, and no source carries phone numbers. One row of four, so it
+was not worth building.
+
 ### The UPL line, now structural
 
 A field carrying a `statute` shows the bound and the citation and may **never**

@@ -34,6 +34,7 @@ import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { draftClause } from '../../lease/server-only/draft-clause';
 import { seedMatterFromProperty } from '../../lease/server-only/seed-from-property';
+import type { UtilityRow } from '../../lease/utilities/derive-utilities';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
 
 /**
@@ -330,6 +331,7 @@ export const leaseBuilderRouter = router({
           landlords: (property.landlords ?? []) as { name: string; email: string }[],
           noticeName: property.noticeName,
           noticeAddress: property.noticeAddress,
+          utilities: (property.utilities ?? []) as UtilityRow[],
         });
 
         return await prisma.bizrethinkLeaseMatter.create({
@@ -372,6 +374,17 @@ export const leaseBuilderRouter = router({
             matter at creation, never referenced live.
           */
           landlords: z.array(z.object({ name: z.string().min(1), email: z.string() })).default([]),
+          utilities: z
+            .array(
+              z.object({
+                service: z.string(),
+                provider: z.string().default(''),
+                phone: z.string().default(''),
+                paidBy: z.enum(['tenant', 'landlord']),
+              }),
+            )
+            .max(30)
+            .default([]),
           noticeName: z.string().nullable().default(null),
           noticeAddress: z.string().nullable().default(null),
         }),
@@ -415,6 +428,17 @@ export const leaseBuilderRouter = router({
           hoaName: z.string().nullable(),
           includedAppliances: z.string().nullable(),
           landlords: z.array(z.object({ name: z.string().min(1), email: z.string() })).default([]),
+          utilities: z
+            .array(
+              z.object({
+                service: z.string(),
+                provider: z.string().default(''),
+                phone: z.string().default(''),
+                paidBy: z.enum(['tenant', 'landlord']),
+              }),
+            )
+            .max(30)
+            .default([]),
           noticeName: z.string().nullable().default(null),
           noticeAddress: z.string().nullable().default(null),
         }),

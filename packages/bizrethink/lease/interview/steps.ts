@@ -374,6 +374,17 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'usd',
         label: "What minimum liability cover must the tenant's renter's insurance carry?",
+        /*
+          Eligible for a suggestion precisely because Florida says nothing: it
+          neither requires renter's insurance nor sets a minimum, so there is no
+          statutory bound to advise on. The note states what is common and
+          attributes it; it does not recommend. A field carrying a `statute`
+          may never have one of these — asserted by test.
+        */
+        suggestion: {
+          value: 100000,
+          note: "Most residential leases that require renter's insurance set the liability minimum at $100,000; $300,000 is common on higher-value properties.",
+        },
         required: true,
       },
     ],

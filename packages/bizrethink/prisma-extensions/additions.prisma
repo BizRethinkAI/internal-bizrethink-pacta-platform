@@ -425,6 +425,15 @@ model BizrethinkProperty {
   /// per-property override is more machinery than two properties justify.
   landlords Json @default("[]") // [{ name, email }]
 
+  /// Which utilities serve this property, who arranges each, and who to ring.
+  /// `[{ service, provider, phone, paidBy }]`.
+  ///
+  /// Property-level for the same reason the landlord is: the electric co-op
+  /// and the trash contractor do not change between tenancies. Both clause
+  /// variables are rendered from this ONE list split by payer, so a utility
+  /// cannot end up on both sides or neither.
+  utilities Json @default("[]")
+
   /// Fla. Stat. §83.50 — the person authorised to receive notices, and where.
   noticeName    String?
   noticeAddress String?

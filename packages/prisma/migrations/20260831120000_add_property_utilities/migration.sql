@@ -1,0 +1,12 @@
+-- Which utilities serve a property, who arranges each, and who to ring.
+--
+-- This lived in two free-text boxes on the interview, and a real answer went
+-- in as a hand-typed numbered list with company names and phone numbers. All
+-- of it is property data — the electric co-op and the trash contractor at a
+-- given address are the same for every tenancy — so it was retyped every
+-- lease, and the tenant-paid and landlord-paid lists could drift apart with
+-- nothing able to notice.
+--
+-- Both clause variables are now rendered from this one list split by payer, so
+-- a utility cannot appear on both sides or vanish from both.
+ALTER TABLE "BizrethinkProperty" ADD COLUMN "utilities" JSONB NOT NULL DEFAULT '[]';
