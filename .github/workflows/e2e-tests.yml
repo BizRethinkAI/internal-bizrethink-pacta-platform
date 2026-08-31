@@ -174,7 +174,20 @@ jobs:
       fail-fast: false
       matrix:
         shard: [1, 2, 3, 4, 5, 6, 7, 8]
-    # EXPERIMENT 2026-08-30: a 4-core larger runner for the shards only.
+    # EXPERIMENT 2026-08-30 — REVERTED, and the reason is worth keeping.
+    #
+    # A 4-core larger runner was provisioned on the org and the shards pointed
+    # at it. The runner reported Ready; the jobs sat `queued` with a
+    # `ubuntu-4core` label, no runner assigned, and ZERO steps executed for 30
+    # minutes before being cancelled. Entitlement to larger runners is not the
+    # same as being able to use one — the Actions SPENDING LIMIT gates them,
+    # and at the $0 default they never get scheduled.
+    #
+    # Left on ubuntu-latest until that setting is changed deliberately. The
+    # `ubuntu-4core` label is deliberately NOT in KNOWN_RUNNERS, so pointing a
+    # job at it again fails a test in two seconds instead of hanging CI.
+    #
+    # ORIGINAL RATIONALE, still valid and still unfixed:
     #
     # `calculateWorkers()` in playwright.config.ts is `cores / 2`, so a 2-core
     # ubuntu-latest gives ONE worker — the slow shards were logging "Running
@@ -209,7 +222,7 @@ jobs:
     # so that label sat queued forever and silently disabled the E2E gate.
     # GitHub-hosted ubuntu-latest has Docker (for dx:up) + is always available.
     # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
-    runs-on: ubuntu-4core
+    runs-on: ubuntu-latest
     steps:
       # fetch-depth: 0 so the docs-only detection below can diff against the
       # PR base. A shallow clone does not contain base.sha.

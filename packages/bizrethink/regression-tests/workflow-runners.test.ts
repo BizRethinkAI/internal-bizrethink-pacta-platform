@@ -40,7 +40,11 @@ describe('.github/workflows — runners must be GitHub-hosted', () => {
   */
   const KNOWN_RUNNERS = new Set([
     'ubuntu-latest', // GitHub standard, 2 cores
-    'ubuntu-4core', // org larger runner, provisioned 2026-08-30
+    // NOT ubuntu-4core. It is provisioned on the org and reports Ready, but
+    // jobs labelled with it sat queued for 30 minutes with no runner assigned
+    // and no steps run — larger runners are gated by the Actions spending
+    // limit, and entitlement is not the same as being schedulable. Add it back
+    // only once a job has actually executed on it.
   ]);
 
   it.each(workflowFiles)('%s only uses runner labels that exist', (file) => {

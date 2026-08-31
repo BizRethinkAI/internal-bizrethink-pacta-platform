@@ -204,6 +204,14 @@ passed, or appeared to:
   PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
   longer a reason to stack. Always verify a merge landed by checking the FILE
   on `main`, never by trusting the PR's MERGED badge.
+- **Entitlement to a larger runner is not the same as being able to use one.**
+  A 4-core runner was provisioned on the org 2026-08-30 and reported `Ready`;
+  jobs labelled with it sat `queued` for 30 minutes with **no runner assigned
+  and zero steps executed**, then were cancelled. Larger runners are gated by
+  the Actions **spending limit**, which defaults to $0. The runner still exists
+  (idle costs nothing) but `ubuntu-4core` is deliberately absent from
+  `KNOWN_RUNNERS`, so pointing a job at it again fails a test in two seconds
+  rather than hanging CI. **Raise the spending limit first, then re-test.**
 - **Shards and workers buy the same thing; only one of them is free.** A worker
   is another browser on a core you already have. A shard is a whole machine
   re-paying ~3.5 min of checkout, install, browsers, services and seed. At one
