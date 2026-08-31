@@ -43,12 +43,20 @@ export const buildAiRequest = (provider: AiProvider, apiKey: string, prompt: str
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
+      /*
+        NO `temperature`. The current Claude models reject it outright —
+        `400: \`temperature\` is deprecated for this model` — so sending it
+        fails the whole request rather than being ignored.
+
+        The intent it expressed still holds: a lease clause is not the place
+        for invention. That now rests on the prompt, which pins the output to a
+        JSON shape with fixed keys and forbids commentary, and on
+        `parseClauseDraft`, which discards anything that strays. Gemini keeps
+        the low temperature because it still honours it.
+      */
       body: {
         model: MODEL.anthropic,
         max_tokens: 1024,
-        // Low, not zero: this is drafting prose, but a lease clause is not the
-        // place for invention.
-        temperature: 0.2,
         messages: [{ role: 'user', content: prompt }],
       },
     };

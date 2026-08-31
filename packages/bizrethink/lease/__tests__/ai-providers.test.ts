@@ -52,10 +52,24 @@ describe('buildAiRequest', () => {
     expect(request.url).toContain('a%26b%3Dc');
   });
 
-  it('asks both providers for a low temperature — a lease is not the place to invent', () => {
-    for (const provider of AI_PROVIDERS) {
-      expect(JSON.stringify(buildAiRequest(provider, 'k', 'p').body)).toMatch(/temperature/);
-    }
+  it('asks Gemini for a low temperature, and does NOT send one to Anthropic', () => {
+    /*
+      Not symmetric, and the asymmetry is forced. The current Claude models
+      REJECT `temperature` — `400: \`temperature\` is deprecated for this
+      model` — so sending it fails the whole request rather than being ignored.
+      Found in production once the error surfacing from #43 made the reason
+      visible; before that it read as a bare 400.
+
+      The intent survives elsewhere: the prompt pins the output to a fixed JSON
+      shape and forbids commentary, and parseClauseDraft discards anything that
+      strays. A lease clause is still not the place for invention.
+    */
+    expect(JSON.stringify(buildAiRequest('gemini', 'k', 'p').body)).toMatch(/temperature/);
+
+    expect(
+      JSON.stringify(buildAiRequest('anthropic', 'k', 'p').body),
+      'Anthropic rejects `temperature` outright; sending it 400s the request.',
+    ).not.toMatch(/temperature/);
   });
 });
 

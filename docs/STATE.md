@@ -481,6 +481,27 @@ objection.
 
 ### AI providers
 
+`/admin/ai` has **Save**, **Save and test connection**, and **Test saved
+connection**. The last tests what is stored without writing — before it, an
+admin verifying a working config had to re-submit the form to check it. It is
+disabled while the key box has text in it, because that text is not saved yet
+and testing would report on the old key while the page shows the new one.
+
+The key field reveals what has been **typed**, never what is stored: the saved
+key is encrypted at rest and the server only ever tells the page `hasApiKey`.
+A secret that never reaches the browser cannot leak from it, and that is worth
+more than being able to re-read it.
+
+**Anthropic rejects `temperature`.** The current Claude models return
+`400: \`temperature\` is deprecated for this model` rather than ignoring it, so
+sending it fails the whole request. Gemini still honours it and keeps 0.2. The
+intent — a lease clause is not the place for invention — now rests on the
+prompt's fixed JSON shape and on `parseClauseDraft` discarding anything that
+strays.
+
+This was found only because the error surfacing landed first: before that it
+read as a bare 400, which is every failure at once.
+
 Gemini and Anthropic, each authenticating with a key alone. Configured at
 `/admin/ai`, which has a Save-and-test button.
 
