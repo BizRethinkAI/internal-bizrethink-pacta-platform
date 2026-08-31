@@ -2,7 +2,7 @@ import { getResolvedAiConfig } from '../../server-only/instance-ai-config';
 import type { ClauseDraft } from '../ai/clause-draft';
 import { buildClauseDraftPrompt, parseClauseDraft } from '../ai/clause-draft';
 import type { AiProvider } from '../ai/providers';
-import { buildAiRequest, extractAiText } from '../ai/providers';
+import { buildAiRequest, describeAiError, extractAiText } from '../ai/providers';
 
 /**
  * The HTTP shell around clause drafting. Everything that decides anything
@@ -24,9 +24,15 @@ const NOT_CONFIGURED: AiCallFailure = {
 /**
  * One model call. Returns the raw text, or a failure that is safe to show.
  *
- * NOTHING FROM AN ERROR RESPONSE IS SURFACED OR LOGGED — only the status. A
- * provider may echo the request, and for Gemini the request URL carries the
- * API key.
+ * THE PROVIDER'S OWN REASON IS SURFACED, narrowly. Reporting only the status
+ * made every failure look the same — a wrong model name, a revoked key, a key
+ * from the wrong product and an exhausted quota all read "returned 404", which
+ * is exactly the situation an Anthropic key landed in while a Gemini key
+ * worked.
+ *
+ * Narrowly, because Gemini takes its key in the URL: only the `error.message`
+ * field is read, never the raw body, and the key is redacted from it
+ * afterwards in case the provider quoted the request back.
  */
 export const callAi = async (
   provider: AiProvider,
@@ -43,10 +49,14 @@ export const callAi = async (
     });
 
     if (!response.ok) {
+      // Parsed defensively: a gateway may return HTML, which must not throw
+      // here and turn a bad key into an unhandled error.
+      const body = await response.json().catch(() => null);
+
       return {
         ok: false,
         reason: 'call-failed',
-        error: `The ${provider} API returned ${response.status}. Nothing has been changed.`,
+        error: `${provider} — ${describeAiError(response.status, body, apiKey)}`,
       };
     }
 

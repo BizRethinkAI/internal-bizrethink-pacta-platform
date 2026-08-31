@@ -108,3 +108,77 @@ export const extractAiText = (provider: AiProvider, payload: unknown): string =>
 
   return parts.map((part) => (part as { text?: unknown })?.text ?? '').join('');
 };
+
+/*
+  What actually went wrong.
+
+  The first version reported only the HTTP status, which is every failure at
+  once — a wrong model name, a revoked key, a key from the wrong product, an
+  exhausted quota. A Gemini key worked and an Anthropic key did not, and
+  "returned 404" could not tell them apart. The provider had said exactly
+  which, and we discarded it.
+
+  It was discarded for a reason: Gemini takes its key IN THE URL, so echoing a
+  raw error body risks echoing the credential. So this extracts only the one
+  field both providers put the reason in, and then redacts anything that still
+  looks like the key — because a rule that depends on a provider never quoting
+  the request is a rule that holds right up until it does not.
+*/
+
+const MAX_MESSAGE = 300;
+
+/**
+ * Shortest string treated as a credential when redacting.
+ *
+ * Below this it is a substring of ordinary English rather than a key, and
+ * redacting it corrupts the message instead of protecting anything — with the
+ * literal "k", "The API key was not accepted" became "The API [redacted]ey was
+ * not accepted".
+ *
+ * Set above the longest word likely to appear in an error message, and far
+ * below any real credential: Anthropic keys are ~100 characters and Google's
+ * ~39, so nothing that needs hiding comes close to this floor.
+ */
+const MIN_REDACTABLE_KEY = 16;
+
+/** What a bare status means, when the body is unreadable. */
+const BY_STATUS: Record<number, string> = {
+  400: 'The request was rejected — often a model name the account cannot use.',
+  401: 'The API key was not accepted.',
+  403: 'The API key was accepted but is not permitted to use this model.',
+  404: 'The model was not found for this account.',
+  429: 'Rate limited, or the account is out of quota.',
+};
+
+const readMessage = (body: unknown): string | null => {
+  if (typeof body !== 'object' || body === null) {
+    return null;
+  }
+
+  const error = (body as { error?: unknown }).error;
+
+  if (typeof error !== 'object' || error === null) {
+    return null;
+  }
+
+  const message = (error as { message?: unknown }).message;
+
+  return typeof message === 'string' && message.trim() !== '' ? message.trim() : null;
+};
+
+export const describeAiError = (status: number, body: unknown, apiKey: string): string => {
+  const detail = readMessage(body) ?? BY_STATUS[status] ?? 'No further detail was given.';
+
+  /*
+    Redacted AFTER extraction rather than trusted to be absent.
+
+    Only for a string long enough to be a credential. A short one is a
+    substring of ordinary words — redacting the literal "k" turned "The API key
+    was not accepted" into "The API [redacted]ey was not accepted", mangling
+    every message it touched. Real keys are far longer than this floor, so
+    nothing that needs hiding escapes it.
+  */
+  const safe = apiKey.length >= MIN_REDACTABLE_KEY ? detail.split(apiKey).join('[redacted]') : detail;
+
+  return `${status}: ${safe.slice(0, MAX_MESSAGE)}`;
+};
