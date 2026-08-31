@@ -12,7 +12,7 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-08-29_
+_Last updated: 2026-08-31_
 
 ---
 
@@ -20,8 +20,12 @@ _Last updated: 2026-08-29_
 
 Pacta is an **additive fork of `documenso/documenso`** — a document-signing
 platform running at `sign.pacta.ink` on Coolify, auto-deploying from `main`.
-Production holds **468 envelopes**: real, signed, customer contracts. Treat every
-production action accordingly.
+Production holds **450 documents and 34 templates**: real, signed, customer
+contracts. Treat every production action accordingly.
+
+**Pacta now hosts a second tenant.** Until 2026-08-31 every production
+organisation was BizRethink's own; `lombard` is the first outside one. That
+changes the blast radius of instance-wide changes — see *Lombard tenancy* below.
 
 All customisation lives in `packages/bizrethink/` plus **42 overlay patches**,
 which are the only sanctioned way to modify upstream files (plus the paths declared in `overlays/BIZRETHINK-OWNED.txt`, which were never upstream). Upstream is merged
@@ -406,6 +410,55 @@ passed, or appeared to:
 
 ## Open threads
 
+### Lombard tenancy — first outside tenant
+
+Stood up 2026-08-31 for Lombard Pay's contract e-signing, driven from the
+`lombard-platform` session. Production now carries:
+
+- **Organisation `lombard`** (`org_tfvwxmvbtyhumbba`), **team `lombard-api`**
+  (id 40). The slug is exact and load-bearing — Lombard's client defaults to it.
+- **Webhook** `ccpmq3h3r4e756ua0ng16pnln` → `app.lombardpay.com/api/webhooks/pacta`,
+  all seven document events, plain `X-Documenso-Secret`. Test Connection passed.
+- **16 templates, ids 61–76** (FRPA, Payzli split-funding, subscription,
+  permission-to-release, ISO PRA, and eleven state disclosures).
+
+**The org claim is `bizrethink`, applied by SQL, not by the admin UI.** New orgs
+are created on the `pro` claim by the SaaS signup path, which caps teams at 1 and
+leaves `unlimitedDocuments` false — the team creation had already failed once
+against that cap. The admin UI's inherited-claim panel is **read-only**, so the
+claim was set directly on `OrganisationClaim`, and `BizrethinkOrganisationBilling.
+bizrethinkInternal` was set true so the trial-expire cron skips the org. Overlay
+001/002's route-everything-through-BIZRETHINK only covers the org-creation paths
+that predate the billing work. **Any future outside tenant needs the same two
+writes** or it silently degrades to free-plan limits.
+
+**Templates must be uploaded through the UI, one per template.** Documenso does
+not expose the auto-place primitive over REST: the UI's `createEnvelope` parses
+`{{SIGNATURE, r<n>}}` out of the PDF text layer, bootstraps placeholder
+recipients, positions the fields and whites the markers out of the stored PDF,
+all in one transaction. Reproducing that in SQL means reimplementing placeholder
+geometry, and a wrong row set looks healthy until a signer opens a broken
+envelope. After upload, `publish-to-documenso.mjs sync` emits the specs the
+consumer reads. Every new template was verified against its source-era
+counterpart on recipient and field counts before being handed over.
+
+**Contract sources are Lombard's, not ours.** They live in
+`~/github/lombard/lombard-contracts` (copied from the read-only BizRethink
+Contracts library, which was not modified). Regeneration removed all
+CircularPayments/MFG branding from PDF *contents* — it is baked into cover
+pages, footers and recitals, so clone-and-retitle was never viable — and stripped
+the ACH-debit collection machinery per Lombard's ADR 0019, leaving `[Reserved]`
+stubs rather than renumbering, so the disclosures' cross-references stay valid.
+
+**Nothing here is cleared for a real signer.** Open gates, all owner/counsel:
+states of organization for both Lombard entities (currently the working text "a
+Florida limited liability company"), prescribed-form literals for all eleven
+disclosures unverified against the vendored `state-disclosures/regulatory-source/`
+PDFs, hardcoded economics, NY-law choice, subscription affiliate cross-default,
+guaranty breadth, arbitration-vs-courts inconsistency. `processor2` is
+deliberately **not** built: its source is vendor-authored and immutable, so it
+needs fresh authoring, and its entity assignment is contested.
+
 ### Lease builder (29090 Picana Ln)
 
 Internal-tool-first by decision: build the real architecture, ship it gated, defer
@@ -593,4 +646,10 @@ market statistics to fill more would be worse than an empty box.
   propose converting them to native `{{...}}` placeholders** — it was tried and
   does not work. Fix the seal flow or the send-helper instead. This does not
   apply to newly generated PDFs, which have no AcroForm layer.
+- `lombard-platform` consumes this platform for contract signing via team
+  `lombard-api` — the first outside tenant. Same rule as CircularPayments: **do
+  not edit it from a Pacta session** without explicit per-change consent. Its
+  contract sources are `lombard-contracts`, which is Lombard-owned; the
+  BizRethink Contracts library on the Desktop stays read-only. See *Lombard
+  tenancy* above.
 - `infra-gitops` manages the VPS fleet Coolify runs on.
