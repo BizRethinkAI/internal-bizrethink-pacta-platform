@@ -8,6 +8,7 @@ import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { Eye, EyeOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { SettingsHeader } from '~/components/general/settings-header';
@@ -56,6 +57,18 @@ export default function AdminAiConfigPage() {
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
 
+  /*
+    Reveals what has been TYPED, never what is stored. The saved key is
+    encrypted at rest and the server only ever tells this page `hasApiKey`, so
+    there is nothing to reveal for an existing key and that property is worth
+    keeping — a secret that never reaches the browser cannot leak from it.
+
+    Still useful: pasting a 100-character key and being unable to see whether
+    it arrived intact is how a bad paste turns into a 401 and a wasted
+    debugging session.
+  */
+  const [revealKey, setRevealKey] = useState(false);
+
   useEffect(() => {
     if (existing) {
       setForm({
@@ -74,6 +87,7 @@ export default function AdminAiConfigPage() {
       await updateMutation.mutateAsync(form);
       toast({ title: t`AI config saved` });
       setForm((prev) => ({ ...prev, apiKey: '' }));
+      setRevealKey(false);
       await utils.bizrethink.instanceAi.get.invalidate();
     } catch (err) {
       toast({
@@ -95,12 +109,41 @@ export default function AdminAiConfigPage() {
     try {
       await updateMutation.mutateAsync(form);
       setForm((prev) => ({ ...prev, apiKey: '' }));
+      setRevealKey(false);
       await utils.bizrethink.instanceAi.get.invalidate();
 
       const result = await testMutation.mutateAsync();
 
       if (result.ok) {
         toast({ title: t`Connection works`, description: t`Saved, and ${result.provider ?? ''} answered.` });
+      } else {
+        toast({ title: t`Connection failed`, description: result.error, variant: 'destructive' });
+      }
+    } catch (err) {
+      toast({
+        title: t`Could not test the connection`,
+        description: err instanceof Error ? err.message : t`Unknown error`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  /*
+    Tests what is STORED, without saving. Separate from Save-and-test on
+    purpose: once a key is saved there was no way to re-check it without
+    re-submitting the form, which meant an admin verifying a working config had
+    to write to it first.
+
+    Disabled while the key box has something typed in it — that text is not
+    saved yet, so testing would report on the OLD key while the page shows the
+    new one. Save-and-test is the button for that case.
+  */
+  const handleTestSaved = async () => {
+    try {
+      const result = await testMutation.mutateAsync();
+
+      if (result.ok) {
+        toast({ title: t`Connection works`, description: t`${result.provider ?? ''} answered.` });
       } else {
         toast({ title: t`Connection failed`, description: result.error, variant: 'destructive' });
       }
@@ -178,13 +221,31 @@ export default function AdminAiConfigPage() {
           <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">
             <Trans>Encrypted at rest. It is never sent back to this page once saved.</Trans>
           </p>
-          <Input
-            id="ai-api-key"
-            type="password"
-            value={form.apiKey}
-            onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
-            placeholder={existing?.hasApiKey ? t`(leave empty to keep)` : t`Required`}
-          />
+          <div className="relative">
+            <Input
+              id="ai-api-key"
+              type={revealKey ? 'text' : 'password'}
+              className="pr-10 font-mono"
+              value={form.apiKey}
+              onChange={(e) => setForm({ ...form, apiKey: e.target.value })}
+              placeholder={existing?.hasApiKey ? t`(leave empty to keep)` : t`Required`}
+            />
+
+            <button
+              type="button"
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-40"
+              disabled={form.apiKey === ''}
+              aria-label={revealKey ? t`Hide the key` : t`Reveal the key`}
+              title={
+                form.apiKey === ''
+                  ? t`Nothing typed. A saved key is encrypted at rest and never sent back to this page, so it cannot be revealed.`
+                  : undefined
+              }
+              onClick={() => setRevealKey((prev) => !prev)}
+            >
+              {revealKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 pt-4">
@@ -195,10 +256,24 @@ export default function AdminAiConfigPage() {
           <Button
             variant="outline"
             onClick={handleTest}
-            loading={testMutation.isPending || updateMutation.isPending}
+            loading={updateMutation.isPending}
             disabled={!form.apiKey && !existing?.hasApiKey}
           >
             <Trans>Save and test connection</Trans>
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleTestSaved}
+            loading={testMutation.isPending}
+            disabled={!existing?.hasApiKey || form.apiKey !== ''}
+            title={
+              form.apiKey !== ''
+                ? t`You have typed a new key. Use "Save and test connection" — this button tests the saved one.`
+                : undefined
+            }
+          >
+            <Trans>Test saved connection</Trans>
           </Button>
           {existing && (
             <Button variant="destructive" onClick={handleReset} loading={resetMutation.isPending} className="ml-auto">
