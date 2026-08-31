@@ -73,29 +73,81 @@ permissions:
 # documentation, which changes nothing the app is built from.
 
 jobs:
-  # Build ONCE, then share it.
-  #
-  # Every shard used to run `npm run build` itself: 3.6 minutes each, eight
-  # times, producing the identical artifact — and ci.yml built it a ninth time
-  # in parallel. Measured on a real run, a shard spent 6.7 minutes on setup to
-  # run 2 minutes of tests, so adding shards bought wall clock by adding more
-  # setup. Playwright's own sharding guidance names this trap exactly: "each
-  # shard has a startup cost... if that overhead is 2 minutes and each shard
-  # only runs 3 minutes of tests, you are not gaining much."
-  #
-  # This job also owns the docs-only decision the shards consume. Eight copies
-  # of one `git diff` was the same duplication in miniature.
-  build_app:
-    name: 'Build for E2E'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    outputs:
-      code: ${{ steps.scope.outputs.code }}
+  e2e_tests:
+    name: 'E2E Shard ${{ matrix.shard }}'
+    strategy:
+      # One shard failing must not cancel the rest. A partial picture of which
+      # tests broke is much less useful than the whole one.
+      fail-fast: false
+      matrix:
+        shard: [1]
+    # ON THE HOMELAB RUNNER, DELIBERATELY UNSHARDED (2026-08-31).
+    #
+    # ci-runner-01 — Proxmox VM 102, 10.10.10.41, 8 cores. calculateWorkers()
+    # in playwright.config.ts is `cores / 2`, so the UI project gets 4 workers
+    # where a 2-core ubuntu-latest gave 1. The slow shards used to log
+    # "Running 137 tests using 1 worker"; 55 minutes of test time ran
+    # single-file no matter how it was divided.
+    #
+    # `matrix: [1]` IS THE END STATE, NOT A STEP DOWN. One runner instance
+    # processes ONE job at a time, so shards against a single instance run
+    # SERIALLY and re-pay setup each time. Extra instances would share these
+    # same 8 cores — they add concurrency, not CPU, so two parallel shards
+    # would get 2 workers each rather than 4. Real shard parallelism needs a
+    # SECOND runner VM. Never raise this matrix without adding hardware first.
+    #
+    # NO SEPARATE BUILD JOB, and that is not an oversight. Building once and
+    # sharing an artifact was right for eight GitHub-hosted shards — 3.6 min of
+    # identical work, eight times — but with one shard there is nothing to
+    # share, and a build job on a GitHub runner would add a serial hop plus an
+    # artifact round trip in front of everything. The guard in
+    # workflow-runners.test.ts enforces sharing only when shards > 1.
+    #
+    # TWO GATES HAD TO BE OPEN, and only one of them is obvious:
+    #   - the runner group's `allows_public_repositories` (this repo is public;
+    #     the flag is false by default on every group GitHub creates, and is a
+    #     SEPARATE gate from `visibility: all` despite reading like a synonym)
+    #   - the repo's fork-PR policy, now `all_external_contributors`, so an
+    #     outside PR cannot execute anything here without explicit approval.
+    # The second is what makes the first safe. Do not loosen it.
+    #
+    # overlay 061 (2026-08-13, second revision): raised from 60 to 120.
+    # The curated suite took 51 min on the green baseline, and the 142-commit
+    # upstream sync pushed it past the 60 min cap — GitHub killed the job
+    # mid-run, which reports neither pass nor fail and silently darkens the
+    # gate. This fork runs on a 2-core ubuntu-latest instead of upstream's
+    # 8-core WarpBuild box, so our wall-clock is structurally higher.
+    # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
+    # Kept at 120 per shard: generous now that each shard runs an eighth of the
+    # suite, but the failure it guards against (killed mid-run = no verdict) is
+    # unchanged and costs nothing to over-provision against.
+    timeout-minutes: 120
+    # overlay 061 (2026-08-13): upstream runs Playwright on WarpBuild
+    # (warp-ubuntu-2204-x64-8x). This fork has no WarpBuild runner integration,
+    # so that label sat queued forever and silently disabled the E2E gate.
+    # GitHub-hosted ubuntu-latest has Docker (for dx:up) + is always available.
+    # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
+    runs-on: [self-hosted, linux, x64]
     steps:
+      # fetch-depth: 0 so the docs-only detection below can diff against the
+      # PR base. A shallow clone does not contain base.sha.
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # MODIFIED for BizRethink (2026-08-29): skip the suite on docs-only PRs.
+      #
+      # The narrow, safe exception to "run everything": a change that alters
+      # nothing the application is built from cannot break a browser test.
+      #
+      # The filter gates the STEPS, never the job. E2E Tests is a required
+      # check, and a job skipped by a workflow-level `paths` filter reports
+      # nothing at all — the PR then waits forever for a status that never
+      # arrives. Same silent-gate failure as a cancelled run, reached a
+      # different way.
+      #
+      # Fail-safe toward running: skipped only when EVERY changed file is
+      # documentation. One source file anywhere and the full suite runs.
       - name: Detect docs-only change
         id: scope
         env:
@@ -145,135 +197,23 @@ jobs:
       - uses: ./.github/actions/node-install
         if: steps.scope.outputs.code == 'true'
 
-      - name: Build the app
-        if: steps.scope.outputs.code == 'true'
-        run: npm run build -- --filter=@documenso/remix
-
-      # `apps/remix/build` is the whole runtime output — client and server,
-      # with translations and the Sentry entry point already copied in by
-      # build.sh. Everything else the server needs it resolves from
-      # node_modules, which each shard installs anyway.
-      #
-      # Compression off: 89 MB of already-minified JS gains little from gzip,
-      # and the CPU cost would be paid nine times over (once up, eight down).
-      - uses: actions/upload-artifact@v4
-        if: steps.scope.outputs.code == 'true'
-        with:
-          name: remix-build
-          path: apps/remix/build
-          retention-days: 1
-          compression-level: 0
-          if-no-files-found: error
-
-  e2e_tests:
-    name: 'E2E Shard ${{ matrix.shard }}'
-    needs: [build_app]
-    strategy:
-      # One shard failing must not cancel the rest. A partial picture of which
-      # tests broke is much less useful than the whole one.
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
-    # THE HOMELAB RUNNER IS WRITTEN AND HELD, NOT ABANDONED (2026-08-31).
-    #
-    # ci-runner-01 (Proxmox VM 102, 10.10.10.41, 8 cores) would give 4
-    # Playwright workers where a 2-core ubuntu-latest gives 1, and the switch
-    # is one line: `runs-on: [self-hosted, linux, x64]` with the shard matrix
-    # dropped to [1].
-    #
-    # THE MATRIX MUST DROP WITH IT, AND STAY DOWN. One runner instance
-    # processes ONE job at a time, so eight shards against a single instance
-    # run SERIALLY — eight setups plus the whole suite, far worse than what
-    # they replace.
-    #
-    # `matrix: [1]` is the END STATE here, not a step down on the way back to
-    # eight. Extra runner instances would live on the SAME 8-core box: they add
-    # concurrency, not CPU, so two shards in parallel would get 2 Playwright
-    # workers each rather than 4. The 20 -> ~5 min target comes from one shard
-    # with 4 workers. Real shard parallelism needs a SECOND runner VM.
-    #
-    # HELD ON A SECURITY DECISION, not a technical one. Root cause found
-    # 2026-08-31: the runner group has `allows_public_repositories: false`, and
-    # this repository is PUBLIC. That is a SECOND gate, distinct from
-    # `visibility: all` — they read like synonyms and are not, and it is false
-    # by default on every group GitHub creates. A public repo matches the
-    # label, finds no eligible runner, and queues forever.
-    #
-    # Not ephemeral registration, which was the first hypothesis: a later job
-    # from a PRIVATE repo in the same org hit the same runner instantly.
-    #
-    # Flipping the flag would let anyone open a fork PR against this public
-    # repo and execute arbitrary code on a LAN box with docker-group access,
-    # on the same node as the production Coolify control plane. That is the
-    # owner's decision to make, not something to enable in passing.
-    #
-    # PRIOR ATTEMPT, 2026-08-30: a GitHub 4-core larger runner behaved
-    # identically — Ready, and every job queued 30 minutes unassigned. That one
-    # was the Actions spending limit, which gates larger runners and defaults
-    # to $0. Two different causes, one symptom: a label with nothing servicing
-    # it does not fail, it hangs.
-    #
-    # overlay 061 (2026-08-13, second revision): raised from 60 to 120.
-    # The curated suite took 51 min on the green baseline, and the 142-commit
-    # upstream sync pushed it past the 60 min cap — GitHub killed the job
-    # mid-run, which reports neither pass nor fail and silently darkens the
-    # gate. This fork runs on a 2-core ubuntu-latest instead of upstream's
-    # 8-core WarpBuild box, so our wall-clock is structurally higher.
-    # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
-    # Kept at 120 per shard: generous now that each shard runs an eighth of the
-    # suite, but the failure it guards against (killed mid-run = no verdict) is
-    # unchanged and costs nothing to over-provision against.
-    timeout-minutes: 120
-    # overlay 061 (2026-08-13): upstream runs Playwright on WarpBuild
-    # (warp-ubuntu-2204-x64-8x). This fork has no WarpBuild runner integration,
-    # so that label sat queued forever and silently disabled the E2E gate.
-    # GitHub-hosted ubuntu-latest has Docker (for dx:up) + is always available.
-    # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
-    runs-on: ubuntu-latest
-    steps:
-      # fetch-depth: 0 so the docs-only detection below can diff against the
-      # PR base. A shallow clone does not contain base.sha.
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # MODIFIED for BizRethink (2026-08-29): skip the suite on docs-only PRs.
-      #
-      # The narrow, safe exception to "run everything": a change that alters
-      # nothing the application is built from cannot break a browser test.
-      #
-      # The filter gates the STEPS, never the job. E2E Tests is a required
-      # check, and a job skipped by a workflow-level `paths` filter reports
-      # nothing at all — the PR then waits forever for a status that never
-      # arrives. Same silent-gate failure as a cancelled run, reached a
-      # different way.
-      #
-      # Fail-safe toward running: skipped only when EVERY changed file is
-      # documentation. One source file anywhere and the full suite runs.
-      - name: Copy env
-        if: needs.build_app.outputs.code == 'true'
-        run: cp .env.example .env
-
-      - uses: ./.github/actions/node-install
-        if: needs.build_app.outputs.code == 'true'
-
       - name: Start Services
-        if: needs.build_app.outputs.code == 'true'
+        if: steps.scope.outputs.code == 'true'
         run: npm run dx:up
 
       - uses: ./.github/actions/playwright-install
-        if: needs.build_app.outputs.code == 'true'
+        if: steps.scope.outputs.code == 'true'
 
       - name: Create the database
-        if: needs.build_app.outputs.code == 'true'
+        if: steps.scope.outputs.code == 'true'
         run: npm run prisma:migrate-dev
 
       - name: Seed the database
-        if: needs.build_app.outputs.code == 'true'
+        if: steps.scope.outputs.code == 'true'
         run: npm run prisma:seed
 
       - name: Install playwright browsers
-        if: needs.build_app.outputs.code == 'true'
+        if: steps.scope.outputs.code == 'true'
         run: npx playwright install --with-deps
 
       # Was `npm run ci`, which is
@@ -282,13 +222,9 @@ jobs:
       # AND ran the whole unit-test suite, before getting to Playwright. The
       # build is genuinely needed here (Playwright serves the built app); the
       # unit tests are not, and belong to ci.yml.
-      # Downloaded, not rebuilt. See the build_app job for why.
-      - name: Fetch the built app
-        if: needs.build_app.outputs.code == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: remix-build
-          path: apps/remix/build
+      - name: Build the app
+        if: steps.scope.outputs.code == 'true'
+        run: npm run build -- --filter=@documenso/remix
 
       # Called directly rather than through `turbo run test:e2e`, because turbo
       # v2 defaults to strict env mode and would not pass E2E_TEST_PATH through
@@ -298,17 +234,17 @@ jobs:
       # E2E_TEST_PATH is interpolated straight into `playwright test $E2E_TEST_PATH`
       # by the upstream script, which makes it the seam for --shard without
       # touching upstream's package.json.
-      - name: Run Playwright shard ${{ matrix.shard }} of 8
-        if: needs.build_app.outputs.code == 'true'
+      - name: Run Playwright shard ${{ matrix.shard }} of 1
+        if: steps.scope.outputs.code == 'true'
         run: npm run test:e2e -w @documenso/app-tests
         env:
-          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/8'
+          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/1'
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
 
       - uses: actions/upload-artifact@v4
-        if: always() && needs.build_app.outputs.code == 'true'
+        if: always() && steps.scope.outputs.code == 'true'
         with:
           # Per shard, or the four uploads collide.
           name: test-results-shard-${{ matrix.shard }}
@@ -318,7 +254,7 @@ jobs:
       # Make the skip visible in the check output. A green E2E check that ran
       # nothing should say so, not look identical to one that ran everything.
       - name: Report skip
-        if: needs.build_app.outputs.code != 'true'
+        if: steps.scope.outputs.code != 'true'
         run: |
           echo "E2E suite SKIPPED — this pull request changes documentation only."
           echo "The check reports success so the required-check gate is satisfied."
@@ -341,25 +277,15 @@ jobs:
   # failure, leaving the PR blocked forever on a verdict that never comes.
   e2e_gate:
     name: 'E2E Tests'
-    needs: [build_app, e2e_tests]
+    needs: [e2e_tests]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Verify every shard succeeded
         env:
           RESULT: ${{ needs.e2e_tests.result }}
-          BUILD: ${{ needs.build_app.result }}
         run: |
-          echo "Build result:        $BUILD"
           echo "Shard matrix result: $RESULT"
-
-          # A failed build skips the matrix, and a skipped matrix must not read
-          # as a pass — the same silent-gate failure as a cancelled run.
-          if [ "$BUILD" != "success" ]; then
-            echo ""
-            echo "The shared build did not succeed, so no shard ran."
-            exit 1
-          fi
 
           # 'success' means every shard passed. 'skipped' means the whole matrix
           # was skipped, which should not happen — the shards no-op internally

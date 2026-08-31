@@ -254,35 +254,30 @@ passed, or appeared to:
   PRs to `main` only.** With auto-merge on and a 20-minute gate there is no
   longer a reason to stack. Always verify a merge landed by checking the FILE
   on `main`, never by trusting the PR's MERGED badge.
-- **The homelab runner is built but does not pick up jobs — HELD, not
-  abandoned.** `ci-runner-01` (Proxmox VM 102, `10.10.10.41`, 8 cores,
-  org-level for BizRethinkAI and lombardpay, outbound-only) would give 4
-  Playwright workers where a 2-core `ubuntu-latest` gives 1. The switch is one
-  line plus dropping the shard matrix to `[1]`.
+- **CI runs on the homelab. TWO GATES HAD TO BE OPEN, and only one is
+  obvious.** `ci-runner-01` (Proxmox VM 102, `10.10.10.41`, 8 cores, org-level
+  for BizRethinkAI and lombardpay, outbound-only) gives 4 Playwright workers
+  where a 2-core `ubuntu-latest` gave 1.
 
-  **Root cause: the runner group has `allows_public_repositories: false`, and
-  this repository is PUBLIC.** That is a SECOND gate, separate from
-  `visibility: all` — they read like synonyms, they are not, and it is false by
-  default on every group GitHub creates. I checked the first and not the
-  second. A public repo matches the label, finds no eligible runner, and queues
-  forever — the same shape as the $0 spending-limit hang the day before.
+  It hung for an hour on the runner group's **`allows_public_repositories`**,
+  which is `false` by default on every group GitHub creates and is a SEPARATE
+  gate from `visibility: all` despite reading like a synonym. This repo is
+  public, so it matched the label, found no eligible runner, and queued
+  forever.
 
-  **Now a security decision, not a technical one.** Enabling it lets anyone
-  open a fork PR against a public repo and execute arbitrary code on a LAN box
+  What makes opening that safe is the second gate: the repo's fork-PR policy is
+  now **`all_external_contributors`**, so an outside PR executes nothing here
+  without explicit approval. **Do not loosen it** — the runner sits on the LAN
   with docker-group access, on the same Proxmox node as the production Coolify
-  control plane. **Note before making the repo private instead:** 118 distinct
-  signer emails have interacted with this modified AGPLv3 service over the
-  network, and ADR 0003's "the AGPL obligation is dormant while we do not
-  distribute" does not address §13, which is triggered by network interaction
-  rather than distribution. Worth a lawyer's eye before changing visibility.
+  control plane. Chosen over making the repo private, which would have dragged
+  in the AGPL §13 question below.
 
-  **`matrix: [1]` is the END STATE, not a step down.** One runner instance
-  processes ONE job at a time, so the switch requires a single shard. And extra
-  instances would share the SAME 8-core box — they add concurrency, not CPU, so
-  two parallel shards would get 2 workers each rather than 4. The 20 → ~5 min
-  target comes from one shard with 4 workers; real shard parallelism needs a
-  **second runner VM**. The guards are conditional on the runner rather than
-  demanding shards unconditionally.
+  **`matrix: [1]` is the END STATE, not a step down.** One instance processes
+  ONE job at a time, and extra instances share the same 8 cores — they add
+  concurrency, not CPU, so two parallel shards would get 2 workers each rather
+  than 4. Real shard parallelism needs a **second runner VM**. Never raise the
+  matrix without adding hardware first.
+
 - **Two CI experiments that produced nothing, both worth not repeating.**
   Building once and sharing across 8 shards removed 25 min of duplicated
   compute and moved wall clock **0.1 min** — the build simply moved from inside
