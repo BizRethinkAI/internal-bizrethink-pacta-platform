@@ -1,0 +1,23 @@
+# STATE.md is append-mostly and every pull request touches it — the governance
+# guard requires it — so two concurrent branches collide by construction. That
+# happened three times on 2026-08-31 alone, always the same shape: both sides
+# adding a different section at the same anchor, nothing actually in dispute.
+#
+# `merge=union` makes git keep BOTH sides of a conflicting region instead of
+# stopping. For sections and bullets being ADDED, which is the overwhelming
+# case here, that is exactly right and the conflict simply stops happening.
+#
+# KNOW THE FAILURE MODE BEFORE TRUSTING IT. Union merge is not clever: it
+# concatenates conflicting regions blindly and leaves NO marker. If one branch
+# CORRECTS an existing entry while another touches the same lines, you keep the
+# correction and the thing it corrected, silently, side by side. That is a real
+# risk in this file — several entries were corrected rather than appended on
+# 2026-08-31, including one that reversed its own recommendation.
+#
+# So: after any merge that touches STATE.md, read the result. If a section
+# appears twice, or an entry contradicts the one below it, union merge did
+# that and it needs a human. The alternative considered was one note file per
+# change (docs/notes/<date>-<slug>.md), which is conflict-proof by
+# construction; this was chosen as the one-line option, and that trade is the
+# reason this comment is long.
+docs/STATE.md merge=union
