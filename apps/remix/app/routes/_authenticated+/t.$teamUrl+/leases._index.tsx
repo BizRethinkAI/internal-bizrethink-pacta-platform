@@ -7,10 +7,11 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
-import { Building2, Lock, Plus, ShieldCheck } from 'lucide-react';
+import { Building2, Lock, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useLoaderData, useNavigate, useRevalidator } from 'react-router';
 
+import type { ExistingProperty } from '~/components/general/lease/property-form';
 import { PropertyForm } from '~/components/general/lease/property-form';
 import { appMetaTags } from '~/utils/meta';
 
@@ -52,7 +53,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     prisma.bizrethinkLeaseMatter.findMany({
       where: { organisationId: team.organisationId },
       orderBy: { updatedAt: 'desc' },
-      select: { id: true, title: true, status: true, propertyId: true, updatedAt: true },
+      select: { id: true, title: true, status: true, propertyId: true, updatedAt: true, envelopeId: true },
     }),
     canRenderDraftClauses({ organisationId: team.organisationId, userId: user.id }),
   ]);
@@ -76,6 +77,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       hasHoa: p.hasHoa,
       hoaName: p.hoaName,
       includedAppliances: p.includedAppliances,
+      landlords: (p.landlords ?? []) as { name: string; email: string }[],
+      noticeName: p.noticeName,
+      noticeAddress: p.noticeAddress,
     })),
     matters: matters.map((m) => ({ ...m, updatedAt: m.updatedAt.toISOString() })),
   };
@@ -89,6 +93,11 @@ export default function LeasesPage() {
   const revalidator = useRevalidator();
 
   const [addingProperty, setAddingProperty] = useState(false);
+  const [editing, setEditing] = useState<ExistingProperty | null>(null);
+
+  const deleteMatter = trpc.bizrethink.leaseBuilder.matter.delete.useMutation({
+    onSuccess: () => revalidator.revalidate(),
+  });
 
   /*
     Seeded on the SERVER, not here. The party list is who signs, and it is not
@@ -131,7 +140,14 @@ export default function LeasesPage() {
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-lg">Properties</h2>
 
-          <Button variant="outline" size="sm" onClick={() => setAddingProperty(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setEditing(null);
+              setAddingProperty(true);
+            }}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add a property
           </Button>
@@ -159,13 +175,45 @@ export default function LeasesPage() {
                   </div>
                 </div>
 
-                <Button
-                  size="sm"
-                  disabled={startLease.isPending}
-                  onClick={() => startLease.mutate({ organisationId, teamId, propertyId: property.id })}
-                >
-                  New lease
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    aria-label={`Edit ${property.label}`}
+                    onClick={() => {
+                      setEditing({
+                        id: property.id,
+                        label: property.label,
+                        addressLine: property.addressLine,
+                        city: property.city,
+                        state: property.state,
+                        postalCode: property.postalCode,
+                        county: property.county,
+                        propertyType: property.propertyType as ExistingProperty['propertyType'],
+                        yearBuilt: property.yearBuilt === null ? '' : String(property.yearBuilt),
+                        hasPool: property.hasPool,
+                        hasHoa: property.hasHoa,
+                        hoaName: property.hoaName ?? '',
+                        includedAppliances: property.includedAppliances ?? '',
+                        landlords: property.landlords.length > 0 ? property.landlords : [{ name: '', email: '' }],
+                        noticeName: property.noticeName ?? '',
+                        noticeAddress: property.noticeAddress ?? '',
+                      });
+                      setAddingProperty(true);
+                    }}
+                  >
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    disabled={startLease.isPending}
+                    onClick={() => startLease.mutate({ organisationId, teamId, propertyId: property.id })}
+                  >
+                    New lease
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>
@@ -175,7 +223,14 @@ export default function LeasesPage() {
       <PropertyForm
         organisationId={organisationId}
         open={addingProperty}
-        onOpenChange={setAddingProperty}
+        existing={editing}
+        onOpenChange={(open) => {
+          setAddingProperty(open);
+
+          if (!open) {
+            setEditing(null);
+          }
+        }}
         onCreated={() => revalidator.revalidate()}
       />
 
@@ -199,7 +254,30 @@ export default function LeasesPage() {
                   </p>
                 </div>
 
-                <Badge variant={matter.status === 'draft' ? 'neutral' : 'default'}>{matter.status}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant={matter.status === 'draft' ? 'neutral' : 'default'}>{matter.status}</Badge>
+
+                  {/*
+                    Only on a draft. A lease that has been sent is not the
+                    landlord's to erase — recipients hold links to it, and the
+                    server refuses regardless of what this renders.
+                  */}
+                  {matter.status === 'draft' && matter.envelopeId === null && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Delete ${matter.title}`}
+                      disabled={deleteMatter.isPending}
+                      onClick={() => {
+                        if (window.confirm(`Delete "${matter.title}"? This draft and its answers are gone for good.`)) {
+                          deleteMatter.mutate({ id: matter.id });
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>

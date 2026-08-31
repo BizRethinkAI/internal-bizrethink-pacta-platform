@@ -16,6 +16,7 @@ import { validateAnswers } from '../../lease/engine/validate';
 import { deriveFacts } from '../../lease/interview/derive-facts';
 import { FL_INTERVIEW } from '../../lease/interview/steps';
 import { applyTenantAnswers, tenantFieldsFor } from '../../lease/interview/tenant-answers';
+import { canDeleteMatter } from '../../lease/matters/lifecycle';
 import type { LeasePartyInput } from '../../lease/parties/derive-parties';
 import { derivePartyValues, partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
 import { buildLeaseDocuments } from '../../lease/render/render-lease';
@@ -388,6 +389,80 @@ export const leaseBuilderRouter = router({
       }),
 
     /**
+     * Edit a property.
+     *
+     * SAFE BY THE SEEDING RULE, not by luck. A lease copies what it needs at
+     * creation and never reads back, so correcting a typo here cannot rewrite
+     * the signers or the address on a lease already drafted — still less one
+     * out for signature. Existing leases keep what they were built with; new
+     * ones pick this up.
+     */
+    update: authenticatedProcedure
+      .input(
+        z.object({
+          organisationId: z.string(),
+          id: z.string(),
+          label: z.string().min(1),
+          addressLine: z.string().min(1),
+          city: z.string().min(1),
+          state: z.string(),
+          postalCode: z.string().min(1),
+          county: z.string().min(1),
+          propertyType: z.enum(['single-family', 'duplex', 'condo', 'multi-family']),
+          yearBuilt: z.number().int().nullable(),
+          hasPool: z.boolean(),
+          hasHoa: z.boolean(),
+          hoaName: z.string().nullable(),
+          includedAppliances: z.string().nullable(),
+          landlords: z.array(z.object({ name: z.string().min(1), email: z.string() })).default([]),
+          noticeName: z.string().nullable().default(null),
+          noticeAddress: z.string().nullable().default(null),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        const { id, organisationId, ...fields } = input;
+
+        /*
+          Scoped in the WHERE rather than fetched and checked. An id belonging
+          to another organisation updates nothing and reports the same as an id
+          that does not exist, which is not something to confirm to an outsider.
+        */
+        const updated = await prisma.bizrethinkProperty.updateMany({
+          where: { id, organisationId },
+          data: fields,
+        });
+
+        if (updated.count === 0) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Property not found.' });
+        }
+
+        return { updated: true };
+      }),
+
+    /**
+     * Archive a property. Soft, because leases reference it by id and a hard
+     * delete would orphan every lease ever written against it.
+     */
+    archive: authenticatedProcedure
+      .input(z.object({ organisationId: z.string(), id: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        const archived = await prisma.bizrethinkProperty.updateMany({
+          where: { id: input.id, organisationId: input.organisationId, archivedAt: null },
+          data: { archivedAt: new Date() },
+        });
+
+        if (archived.count === 0) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Property not found.' });
+        }
+
+        return { archived: true };
+      }),
+
+    /**
      * Normalise an address and derive its county, via the US Census geocoder.
      *
      * Server-side rather than from the browser: the endpoint sets no CORS
@@ -637,6 +712,49 @@ export const leaseBuilderRouter = router({
           clauseFindings.every((f) => f.severity !== 'blocks'),
         rulePackVersion: US_FL.version,
       };
+    }),
+
+    /**
+     * Throw away a draft.
+     *
+     * Only a draft, and only one with no envelope — `canDeleteMatter` holds
+     * that rule and refuses any status it does not recognise, so a state
+     * invented later is not quietly deletable.
+     *
+     * Its reviews and comments go with it, in the same transaction. They carry
+     * no foreign key (ADR 0002 — no relations into upstream models, and the
+     * convention is kept between our own for consistency), so nothing would
+     * remove them otherwise. Orphaned comments are not merely clutter:
+     * `sendBlockers` treats a comment whose review is missing as blocking,
+     * precisely so that deleting a review cannot erase an objection.
+     */
+    delete: authenticatedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+      const matter = await loadMatter(input.id, ctx.user.id);
+
+      const verdict = canDeleteMatter({ status: matter.status, envelopeId: matter.envelopeId });
+
+      if (!verdict.ok) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, { message: verdict.reason });
+      }
+
+      const reviews = await prisma.bizrethinkLeaseReview.findMany({
+        where: { matterId: matter.id },
+        select: { id: true },
+      });
+
+      await prisma.$transaction([
+        prisma.bizrethinkReviewComment.deleteMany({
+          where: { reviewId: { in: reviews.map((review) => review.id) } },
+        }),
+        prisma.bizrethinkLeaseReview.deleteMany({ where: { matterId: matter.id } }),
+        // Guarded again at the write: two tabs must not race a send against
+        // a delete and leave an envelope pointing at nothing.
+        prisma.bizrethinkLeaseMatter.deleteMany({
+          where: { id: matter.id, status: 'draft', envelopeId: null },
+        }),
+      ]);
+
+      return { deleted: true };
     }),
 
     /**

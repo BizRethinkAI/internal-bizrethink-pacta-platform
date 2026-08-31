@@ -80,7 +80,37 @@ jobs:
       # tests broke is much less useful than the whole one.
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+        shard: [1]
+    # ON THE HOMELAB RUNNER, DELIBERATELY UNSHARDED (2026-08-31).
+    #
+    # ci-runner-01 — Proxmox VM 102, 10.10.10.41, 8 cores. calculateWorkers()
+    # in playwright.config.ts is `cores / 2`, so the UI project gets 4 workers
+    # where a 2-core ubuntu-latest gave 1. The slow shards used to log
+    # "Running 137 tests using 1 worker"; 55 minutes of test time ran
+    # single-file no matter how it was divided.
+    #
+    # `matrix: [1]` IS THE END STATE, NOT A STEP DOWN. One runner instance
+    # processes ONE job at a time, so shards against a single instance run
+    # SERIALLY and re-pay setup each time. Extra instances would share these
+    # same 8 cores — they add concurrency, not CPU, so two parallel shards
+    # would get 2 workers each rather than 4. Real shard parallelism needs a
+    # SECOND runner VM. Never raise this matrix without adding hardware first.
+    #
+    # NO SEPARATE BUILD JOB, and that is not an oversight. Building once and
+    # sharing an artifact was right for eight GitHub-hosted shards — 3.6 min of
+    # identical work, eight times — but with one shard there is nothing to
+    # share, and a build job on a GitHub runner would add a serial hop plus an
+    # artifact round trip in front of everything. The guard in
+    # workflow-runners.test.ts enforces sharing only when shards > 1.
+    #
+    # TWO GATES HAD TO BE OPEN, and only one of them is obvious:
+    #   - the runner group's `allows_public_repositories` (this repo is public;
+    #     the flag is false by default on every group GitHub creates, and is a
+    #     SEPARATE gate from `visibility: all` despite reading like a synonym)
+    #   - the repo's fork-PR policy, now `all_external_contributors`, so an
+    #     outside PR cannot execute anything here without explicit approval.
+    # The second is what makes the first safe. Do not loosen it.
+    #
     # overlay 061 (2026-08-13, second revision): raised from 60 to 120.
     # The curated suite took 51 min on the green baseline, and the 142-commit
     # upstream sync pushed it past the 60 min cap — GitHub killed the job
@@ -97,7 +127,7 @@ jobs:
     # so that label sat queued forever and silently disabled the E2E gate.
     # GitHub-hosted ubuntu-latest has Docker (for dx:up) + is always available.
     # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       # fetch-depth: 0 so the docs-only detection below can diff against the
       # PR base. A shallow clone does not contain base.sha.
@@ -182,9 +212,13 @@ jobs:
         if: steps.scope.outputs.code == 'true'
         run: npm run prisma:seed
 
-      - name: Install playwright browsers
-        if: steps.scope.outputs.code == 'true'
-        run: npx playwright install --with-deps
+      # REDUNDANT AND NOW REMOVED (2026-08-31). `./.github/actions/playwright-install`
+      # ran nine steps earlier and does exactly this. Two copies meant fixing
+      # the sudo problem in one of them and watching the run fail again on the
+      # other — the second failure looked like a new bug and was the same one.
+      #
+      # If browsers ever need installing here, call the action rather than
+      # inlining the command a second time.
 
       # Was `npm run ci`, which is
       #   turbo run build --filter=@documenso/remix && turbo run test && turbo run test:e2e
@@ -204,11 +238,11 @@ jobs:
       # E2E_TEST_PATH is interpolated straight into `playwright test $E2E_TEST_PATH`
       # by the upstream script, which makes it the seam for --shard without
       # touching upstream's package.json.
-      - name: Run Playwright shard ${{ matrix.shard }} of 8
+      - name: Run Playwright shard ${{ matrix.shard }} of 1
         if: steps.scope.outputs.code == 'true'
         run: npm run test:e2e -w @documenso/app-tests
         env:
-          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/8'
+          E2E_TEST_PATH: '--shard=${{ matrix.shard }}/1'
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
