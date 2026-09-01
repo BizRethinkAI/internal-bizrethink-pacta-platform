@@ -169,7 +169,20 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     // A deposit carried over from a prior tenancy is still held. The obligation
     // does not lapse because nothing is collected at signing — the trap the
     // 2026 lease fell into.
-    includeWhen: (facts) => facts.depositHeldUsd > 0,
+    /*
+      MONEY HELD, not a deposit specifically.
+
+      This read `depositHeldUsd > 0` alone, but §83.49(1) attaches to money
+      deposited "as security for performance of the rental agreement OR as
+      advance rent for other than the next immediate rental period" — and the
+      notice's own opening sentence is about advance rents.
+
+      So a last-month's-rent-only lease, an ordinary Florida structure, went
+      out holding the tenant's money with no disclosure and no depository
+      notice. That is precisely the omission §83.49(3)(a) penalises, by
+      forfeiting the landlord's right to impose a claim against the money.
+    */
+    includeWhen: (facts) => facts.depositHeldUsd > 0 || facts.advanceRentHeldUsd > 0,
     variables: [],
     supersedes: [],
     asserts: ['deposit-notice-given'],
@@ -201,7 +214,20 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     },
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.49(2)',
-    includeWhen: (facts) => facts.depositHeldUsd > 0,
+    /*
+      MONEY HELD, not a deposit specifically.
+
+      This read `depositHeldUsd > 0` alone, but §83.49(1) attaches to money
+      deposited "as security for performance of the rental agreement OR as
+      advance rent for other than the next immediate rental period" — and the
+      notice's own opening sentence is about advance rents.
+
+      So a last-month's-rent-only lease, an ordinary Florida structure, went
+      out holding the tenant's money with no disclosure and no depository
+      notice. That is precisely the omission §83.49(3)(a) penalises, by
+      forfeiting the landlord's right to impose a claim against the money.
+    */
+    includeWhen: (facts) => facts.depositHeldUsd > 0 || facts.advanceRentHeldUsd > 0,
     variables: [],
     supersedes: [],
     asserts: ['deposit-escrow-notice'],

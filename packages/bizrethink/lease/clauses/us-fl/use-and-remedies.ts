@@ -275,7 +275,15 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
 
   {
     slug: 'termination.early-election',
-    version: 1,
+    /*
+      v2: one dollar sign, not two.
+
+      The body read "pay ${{earlyTerminationFeeUsd}}" and the `usd` formatter
+      already emits a currency symbol, so this rendered "pay $$4,600.00" — in
+      the one paragraph of the whole library whose wording Fla. Stat. §83.595(4)
+      prescribes.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     // A SEPARATE addendum, because §83.595(4) makes the remedy available only
     // where the tenant signed one containing the election. Folding it into the
@@ -284,7 +292,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'termination',
     sortKey: 10,
     heading: 'Early Termination Addendum',
-    body: "Fla. Stat. §83.595 gives Landlord a choice of remedies where Tenant breaches the Lease and vacates before the end of the term. This Addendum records the parties' election under §83.595(4).\n\nI agree, as provided in the rental agreement, to pay ${{earlyTerminationFeeUsd}} as liquidated damages or an early termination fee if I elect to terminate the rental agreement, and Landlord waives the right to seek additional rent beyond the month in which Landlord retakes possession.\n\nTenant shall give Landlord at least {{earlyTerminationNoticeDays}} days' written notice of a termination under this Addendum. This Addendum does not release Tenant from liability for unpaid rent accrued before the termination date, or for damage to the Premises beyond fair wear and tear.",
+    body: "Fla. Stat. §83.595 gives Landlord a choice of remedies where Tenant breaches the Lease and vacates before the end of the term. This Addendum records the parties' election under §83.595(4).\n\nI agree, as provided in the rental agreement, to pay {{earlyTerminationFeeUsd}} as liquidated damages or an early termination fee if I elect to terminate the rental agreement, and Landlord waives the right to seek additional rent beyond the month in which Landlord retakes possession.\n\nTenant shall give Landlord at least {{earlyTerminationNoticeDays}} days' written notice of a termination under this Addendum. This Addendum does not release Tenant from liability for unpaid rent accrued before the termination date, or for damage to the Premises beyond fair wear and tear.",
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.595(4)',
