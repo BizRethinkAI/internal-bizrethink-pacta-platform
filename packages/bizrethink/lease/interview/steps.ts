@@ -274,7 +274,26 @@ export const FL_INTERVIEW: InterviewStep[] = [
           value: 'actual-days-in-month',
           note: 'Most leases prorate on the actual number of days in the month the tenancy begins, which is also the method that matches what a tenant can check on a calendar.',
         },
-        showWhen: (a) => a.facts.prorationApplies,
+        /*
+          READ FROM `money`, NOT FROM A DERIVED FACT.
+
+          This was `a.facts.prorationApplies`, which `deriveFacts` computes
+          inside `hydrateMatter` on the SERVER. The interview holds the raw
+          stored facts, `seedMatterFromProperty` never seeds it, and `saveStep`
+          persists the client's facts verbatim — so the key was always
+          undefined and this question could never appear.
+
+          A lease starting mid-month therefore got the proration clause,
+          computed on the seeded default, and the landlord was never shown the
+          question that chooses the method. Same rule as `deriveFacts` uses,
+          against the answers the browser actually has.
+        */
+        showWhen: (a) => {
+          const startDate = String(a.money?.term?.startDate ?? '');
+          const dueDay = Number(a.money?.rent?.dueDayOfMonth ?? 0);
+
+          return startDate !== '' && Number(startDate.split('-')[2]) !== dueDay;
+        },
         options: [
           { value: 'actual-days-in-month', label: 'By the actual days in that month' },
           { value: 'thirty-day-month', label: 'By a 30-day month' },

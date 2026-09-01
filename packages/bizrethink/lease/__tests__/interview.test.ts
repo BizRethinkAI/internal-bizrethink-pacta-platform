@@ -321,3 +321,50 @@ describe('fields that add or remove steps', () => {
     expect(flood?.fields.every((f) => /flood/i.test(f.name))).toBe(true);
   });
 });
+
+/**
+ * A question the answerer can never reach is not progressive disclosure.
+ *
+ * `prorationMethod`'s `showWhen` read `facts.prorationApplies`, which
+ * `deriveFacts` computes inside `hydrateMatter` — on the server. The interview
+ * holds the raw stored facts, the seeder never writes that key, and `saveStep`
+ * persists the client's facts verbatim, so it was always undefined and the
+ * question never appeared.
+ *
+ * A lease starting mid-month still got the proration clause, computed on the
+ * seeded default, with the landlord never shown the choice between the
+ * 30-day, actual-days and 365-day conventions.
+ */
+describe('the proration question', () => {
+  const step = FL_INTERVIEW.find((s) => s.id === 'term');
+  const field = step?.fields.find((f) => f.name === 'prorationMethod');
+
+  const withStart = (startDate: string, dueDayOfMonth: number) =>
+    answers({
+      money: {
+        ...PICANA_MONEY,
+        term: { ...PICANA_MONEY.term, startDate },
+        rent: { ...PICANA_MONEY.rent, dueDayOfMonth },
+      },
+    });
+
+  it('appears when the term does not begin on the rent due day', () => {
+    expect(field?.showWhen?.(withStart('2026-09-15', 1))).toBe(true);
+  });
+
+  it('stays hidden when it does', () => {
+    expect(field?.showWhen?.(withStart('2026-09-01', 1))).toBe(false);
+  });
+
+  /*
+    Reading a server-derived fact is the specific mistake. The browser never
+    has it, so the predicate was constant-false however the lease was answered.
+  */
+  it('does not depend on a fact the browser never has', () => {
+    expect(field?.showWhen?.({ ...withStart('2026-09-15', 1), facts: {} } as never)).toBe(true);
+  });
+
+  it('stays hidden while the start date is unanswered', () => {
+    expect(field?.showWhen?.(withStart('', 1))).toBe(false);
+  });
+});

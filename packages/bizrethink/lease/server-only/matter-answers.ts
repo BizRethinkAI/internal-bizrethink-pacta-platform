@@ -1,5 +1,6 @@
 import type { CustomClauseInput } from '../clauses/custom';
 import { deriveFacts } from '../interview/derive-facts';
+import { propertyTypeLabelFor } from '../interview/property-type';
 import type { LeasePartyInput } from '../parties/derive-parties';
 import { derivePartyValues, toLeaseParties } from '../parties/derive-parties';
 import type { InterpolationValue } from '../render/interpolate';
@@ -59,7 +60,29 @@ export type HydratedMatter = {
 };
 
 export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
-  const money = matter.money as Parameters<typeof deriveFacts>[0];
+  /*
+    Shaped rather than trusted. `ZAnswers.money` is a bare record, so
+    `matter.create` accepts `money: {}` — and every read of that row then threw
+    on `money.term.startDate`, taking out `get`, `validate`, `send` and both PDF
+    routes. An unrenderable matter, reachable through an ordinary authenticated
+    procedure, and the two lines below already guarded `facts` and `values` the
+    same way.
+  */
+  const stored = (matter.money ?? {}) as Record<string, unknown>;
+  const money = {
+    ...stored,
+    rent: { monthlyUsd: null, dueDayOfMonth: 1, ...((stored.rent ?? {}) as object) },
+    term: { startDate: null, ...((stored.term ?? {}) as object) },
+    deposit: {
+      securityUsd: null,
+      alreadyHeldUsd: 0,
+      advanceRentUsd: null,
+      advanceRentHeldUsd: 0,
+      prepaidRentUsd: 0,
+      ...((stored.deposit ?? {}) as object),
+    },
+    prorationMethod: stored.prorationMethod ?? 'actual-days-in-month',
+  } as unknown as Parameters<typeof deriveFacts>[0];
   const values = (matter.values ?? {}) as Record<string, InterpolationValue>;
   const facts = (matter.facts ?? {}) as Record<string, unknown>;
 
@@ -102,6 +125,22 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       monthlyRentUsd: money.rent.monthlyUsd,
       // Last, so a stale stored copy of either name cannot win.
       ...derivePartyValues(partyInputs),
+      /*
+        DERIVED, not the snapshot taken at matter creation.
+
+        `propertyTypeLabel` sat in DERIVED_VALUES but was written once by
+        `seedMatterFromProperty` and never recomputed, while `propertyType` is
+        editable on the confirm-the-property step whose own intro invites
+        changing it. Correcting condo to single-family therefore selected
+        `maintenance.shift-single-family` while its body still read "The
+        Premises are a condo. As permitted by Fla. Stat. §83.51(2)…" — the
+        clause contradicting its own statutory basis, in a document that
+        rendered clean.
+
+        The old label was also `propertyType.replace('-', ' ')`, so the correct
+        path printed "The Premises are a single family."
+      */
+      propertyTypeLabel: propertyTypeLabelFor(String(facts.propertyType ?? '')),
       // Likewise: the rows are the answer, the prose is only their rendering.
       yardDuties,
       /*

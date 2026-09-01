@@ -102,11 +102,29 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated, ex
     { enabled: lookupAddress.length > 5, staleTime: 5 * 60 * 1000, retry: false },
   );
 
-  const onSaved = () => {
+  const discard = () => {
     setDraft(EMPTY);
     setLoadedId(null);
     setLookupAddress('');
+  };
+
+  const onSaved = () => {
+    discard();
     onCreated();
+    onOpenChange(false);
+  };
+
+  /*
+    Cancel has to clear the draft itself.
+
+    The reseed guard above keys on `existing?.id`, which is null both before
+    and after cancelling an ADD — so nothing reset it, and typing half a
+    property, cancelling, then pressing "Add a property" again brought the
+    abandoned half back. The edit path was safe only because the parent nulls
+    `editing`, which forces the guard to fire.
+  */
+  const onCancel = () => {
+    discard();
     onOpenChange(false);
   };
 
@@ -144,6 +162,14 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated, ex
       county: match.county ?? prev.county,
       label: prev.label === '' ? match.addressLine : prev.label,
     }));
+
+    /*
+      Clearing the lookup is what dismisses the banner. `applyMatch` only
+      touched the draft, so the suggestion and its "Use this" button sat there
+      unchanged afterwards — the landlord got no confirmation the match had
+      been applied and would reasonably click it again.
+    */
+    setLookupAddress('');
   };
 
   const canSubmit =
@@ -548,11 +574,18 @@ export const PropertyForm = ({ organisationId, open, onOpenChange, onCreated, ex
             />
           </div>
 
-          {create.error && <p className="font-medium text-destructive text-sm">{create.error.message}</p>}
+          {/*
+            BOTH mutations. `error` was computed two hundred lines above and
+            never used — noUnusedLocals is off, so it compiled — and only the
+            create error rendered. A landlord editing an existing property saw
+            the spinner stop and nothing else, and would reasonably assume it
+            had saved.
+          */}
+          {error && <p className="font-medium text-destructive text-sm">{error.message}</p>}
         </div>
 
         <div className="flex items-center justify-end gap-3 border-t pt-4">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={saving}>
+          <Button variant="ghost" onClick={onCancel} disabled={saving}>
             Cancel
           </Button>
           <Button

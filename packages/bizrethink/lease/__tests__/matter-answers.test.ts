@@ -232,3 +232,34 @@ describe('the render paths', () => {
     });
   }
 });
+
+/**
+ * A matter can be created with an unshaped money answer.
+ *
+ * `ZAnswers.money` is `z.record(z.string(), z.unknown())`, so `matter.create`
+ * accepts `money: {}`. `hydrateMatter` then dereferenced `money.term.startDate`
+ * with none of the tolerance `facts` and `values` get two lines above, and the
+ * resulting row threw on every read — `get`, `validate`, `send`, the landlord's
+ * preview and the reviewer's copy. An unrenderable matter, reachable through an
+ * ordinary authenticated procedure.
+ */
+describe('a matter stored with no money', () => {
+  const bare = { facts: {}, money: {}, values: {}, customClauses: [], parties: [] };
+
+  it('loads instead of throwing', () => {
+    expect(() => hydrateMatter(bare)).not.toThrow();
+  });
+
+  it('reports the figures as unanswered rather than as zero', () => {
+    const { money } = hydrateMatter(bare);
+
+    // Zero is a real answer here — "nothing is held" — so an absent figure must
+    // stay null and be caught as unfilled, not become a number nobody typed.
+    expect(money.rent.monthlyUsd).toBeNull();
+    expect(money.deposit.securityUsd).toBeNull();
+  });
+
+  it('survives a partially shaped money answer too', () => {
+    expect(() => hydrateMatter({ ...bare, money: { rent: { monthlyUsd: 6900 } } })).not.toThrow();
+  });
+});
