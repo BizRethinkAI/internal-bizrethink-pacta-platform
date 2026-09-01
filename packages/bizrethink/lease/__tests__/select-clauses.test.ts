@@ -26,6 +26,7 @@ const NEW_TENANCY: ClauseFacts = {
   propertyType: 'single-family',
   hasPool: true,
   hasYardAllocation: true,
+  hasTenantYardDuty: true,
   lateFeePolicy: 'tiered',
   terminationOnSale: true,
   holdoverPenalty: true,

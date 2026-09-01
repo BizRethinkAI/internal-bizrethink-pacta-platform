@@ -124,6 +124,7 @@ export const DERIVED_FACTS = [
   'termMonths',
   'hasNamedOccupants',
   'hasYardAllocation',
+  'hasTenantYardDuty',
 ];
 
 export const DERIVED_VALUES = [
@@ -468,6 +469,24 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'text',
         label: 'What is the association called?',
+        showWhen: (a) => a.facts.hasHoa,
+        required: true,
+      },
+      {
+        name: 'hoaCureDays',
+        target: 'value',
+        kind: 'number',
+        label: 'If an association notice sets no cure date, how long does the tenant have?',
+        help: 'Only used as a fallback. Where the notice names a date — and they usually do — that date governs.',
+        suggestion: {
+          value: 14,
+          /*
+            An observation about the documents themselves, not a view on what
+            is reasonable. The Estancia at Wiregrass notice of 26 August 2026
+            gave until 9 September: fourteen days.
+          */
+          note: 'Association notices commonly set a cure date about two weeks out, and typically state that date on the notice itself.',
+        },
         showWhen: (a) => a.facts.hasHoa,
         required: true,
       },

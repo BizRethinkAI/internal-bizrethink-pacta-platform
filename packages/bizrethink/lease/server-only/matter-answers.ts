@@ -77,6 +77,9 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
         the clause with no duties inside it.
       */
       hasYardAllocation: Object.values(splitByDoer(yardTasks)).some((side) => side !== ''),
+      // Narrower, and it gates hoa.cure: a yard the landlord or the
+      // association keeps is fully allocated with nothing for a tenant to cure.
+      hasTenantYardDuty: splitByDoer(yardTasks).tenant !== '',
     } as RenderLeaseInput['facts'],
     money,
     values: {

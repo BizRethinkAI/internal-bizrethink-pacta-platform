@@ -38,6 +38,7 @@ const SINGLE_FAMILY: ClauseFacts = {
   propertyType: 'single-family',
   hasPool: true,
   hasYardAllocation: true,
+  hasTenantYardDuty: true,
   lateFeePolicy: 'tiered',
   terminationOnSale: true,
   holdoverPenalty: true,

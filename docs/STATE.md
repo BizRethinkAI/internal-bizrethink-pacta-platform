@@ -617,6 +617,34 @@ things about the real shape would not have been guessed — the match returns AL
 CAPS, and `addressComponents` carries no house number at all (`fromAddress`/
 `toAddress` are the block range).
 
+### An association violation now has somebody to cure it
+
+`hoa.compliance` made the tenant FORWARD a notice and REIMBURSE a fine. It
+never said who performs the cure, or by when. The real sequence would have run:
+notice arrives 26 Aug naming dead palm fronds with a 9 Sep cure date, tenant
+forwards it inside 48 hours exactly as required, nothing is trimmed, the fine
+lands. The lease worked as written.
+
+`hoa.cure` (new, gated on `hasHoa && hasTenantYardDuty`) keys the deadline to
+**the association's own date**, not to the moment the tenant forwards — the
+association emails the owner directly, so a tenant who bins the letter cannot
+move the deadline. In exchange the landlord owes a reciprocal duty to pass on
+what he receives directly.
+
+Its last sentence is the load-bearing one: under **Fla. Stat. §720.305(1)** the
+association's remedy runs against the parcel OWNER. Allocating palm trimming to
+a tenant is an arrangement between landlord and tenant — it gives the tenant no
+standing with the association and moves nothing off the owner.
+
+`hoa.compliance` → v2: "any notice received from the association" became
+"received at or posted on the Premises". Association post is addressed to the
+owner and delivered to the house the tenant lives in; the old wording invited
+opening it (18 U.S.C. §1702).
+
+**For the attorney:** `hoa.compliance` already characterises fine reimbursement
+as *additional rent*, which makes non-payment a §83.56(3) three-day ground.
+`hoa.cure` extends that to cure costs. Her call, not ours.
+
 ### Yard duty is rows, and the router had a second derivation
 
 `landlordProvidesLawnService` was one boolean with the whole allocation

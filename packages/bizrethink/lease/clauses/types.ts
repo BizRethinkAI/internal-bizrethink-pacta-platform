@@ -105,6 +105,16 @@ export type ClauseFacts = {
    */
   hasYardAllocation: boolean;
 
+  /**
+   * Has the TENANT been given anything outdoors?
+   *
+   * Separate from `hasYardAllocation` because it answers a different question.
+   * A yard entirely maintained by the landlord or the association is fully
+   * allocated, and there is nothing for the tenant to cure — so `hoa.cure`
+   * would be an obligation with no subject.
+   */
+  hasTenantYardDuty: boolean;
+
   /*
     Elected terms. These are answers, not derived state — the landlord chooses
     them and the choice selects a clause. Kept on the facts object because

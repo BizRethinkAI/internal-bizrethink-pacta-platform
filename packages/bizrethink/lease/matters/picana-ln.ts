@@ -67,6 +67,8 @@ export const PICANA_FACTS: ClauseFacts = {
   propertyType: 'single-family',
   hasPool: true,
   hasYardAllocation: true,
+  // The tenant trims the palms here, which is what opens hoa.cure.
+  hasTenantYardDuty: true,
   lateFeePolicy: 'tiered',
   terminationOnSale: true,
   holdoverPenalty: true,
@@ -150,6 +152,8 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   inspectionRefusalFeeUsd: 75,
 
   hoaName: 'the Estancia at Wiregrass Ranch homeowners association',
+  // Fallback only. The Estancia notices state their own cure date.
+  hoaCureDays: 14,
   hoaNoticeHours: 24,
 
   noticeName: 'Shwet Prabhat',
