@@ -1,4 +1,4 @@
-import { renderLease } from '@bizrethink/customizations/lease/render/render-lease';
+import { renderLeaseForReview } from '@bizrethink/customizations/lease/render/render-lease';
 import { isReviewUsable } from '@bizrethink/customizations/lease/review/disposition';
 import type { ReviewAudience, ReviewStatus } from '@bizrethink/customizations/lease/review/types';
 import { renderInputForMatter } from '@bizrethink/customizations/lease/server-only/matter-answers';
@@ -70,16 +70,20 @@ export async function loader({ params }: Route.LoaderArgs) {
     select: { utilities: true },
   });
 
-  const { rendered } = await renderLease(
+  /*
+    EVERY document, as one file. This picked the lease out and returned it
+    alone, while the envelope uploads the lease plus every addendum and
+    standalone disclosure — so a reviewer read one document and the signers
+    received up to seven, including the two Florida requires to be separate.
+
+    Signing is unchanged: the envelope still gets distinct items. This is only
+    how they are read.
+  */
+  const pdf = await renderLeaseForReview(
     renderInputForMatter({ ...matter, propertyUtilities: property?.utilities ?? [] }),
   );
-  const lease = rendered.find((doc) => doc.key === 'lease');
 
-  if (!lease) {
-    throw new Response('Lease document was not produced', { status: 500 });
-  }
-
-  return new Response(new Uint8Array(lease.pdf), {
+  return new Response(new Uint8Array(pdf), {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="lease-for-review.pdf"',

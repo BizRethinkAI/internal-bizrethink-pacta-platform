@@ -480,6 +480,29 @@ const ReviewPanel = ({
         </Alert>
       )}
 
+      {/*
+        Shown, not merely counted. This was computed and discarded, so an
+        organisation without the draft-rendering grant saw "nothing blocking",
+        pressed Send, and got a hard failure naming raw clause slugs.
+      */}
+      {(data?.unreviewedClauses.length ?? 0) > 0 && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Clauses in this lease have not been approved yet</AlertTitle>
+          <AlertDescription>
+            <p className="text-sm">
+              These are drafted but unapproved, and this organisation may not send a lease containing them. Approve them
+              in the clause library, or remove what selects them.
+            </p>
+            <ul className="mt-2 list-disc space-y-1 pl-4 font-mono text-xs">
+              {data?.unreviewedClauses.map((slug) => (
+                <li key={slug}>{slug}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {(data?.yardFindings.length ?? 0) > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />

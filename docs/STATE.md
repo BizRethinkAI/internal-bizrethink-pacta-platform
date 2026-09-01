@@ -410,6 +410,42 @@ passed, or appeared to:
 
 ## Open threads
 
+### A reviewer must read what gets signed
+
+`buildLeaseDocuments` emits the lease PLUS one document per addendum and per
+standalone disclosure, and the envelope uploads every one. Both the landlord's
+preview and the reviewer's copy did `rendered.find(d => d.key === 'lease')` and
+returned that alone — so an attorney read one document while up to seven were
+signed, including the two Florida requires to be separate instruments.
+
+`renderLeaseForReview` concatenates them into one file **for reading only**.
+Signing is untouched: the envelope still gets distinct items, because §83.512
+and the addenda's own signature blocks make that separateness load-bearing.
+Asserted by extracting every placeholder from each signed document and
+requiring all of them in the reviewer's copy.
+
+### Gates that lived only in the advisory query
+
+`validate` is a query. Nothing forces a client to call it, and its cache is
+enabled only on the review step. Three things had that shape:
+
+- **`validateAnswers`** — the eight blocking statutory rules — ran nowhere else.
+  Its input is now built by one `statutoryInput()` so query and mutation cannot
+  drift, and the mutation re-runs it.
+- **`sendBlockers`** never compared answers to `review.answersHash`. Disposition
+  every comment, change the rent, send — with the attorney's approval attached
+  to a document that no longer exists. Now blocks on a **returned attorney**
+  review whose hash has moved. (`ReviewStatus` is `open | returned | closed`;
+  the type system caught a first attempt that tested for `'submitted'` and
+  would have been silently never true.)
+- **`unreviewedClauses`** was computed and dropped from both totals while
+  `createEnvelopeFromMatter` throws on exactly that condition — "nothing
+  blocking", then a hard failure naming raw slugs.
+
+`hashAnswers` now covers the property's utilities, via one `currentAnswersHash()`
+shared by both callers. They are read live, so editing a utility row moves a
+lease already out for review.
+
 ### Deriving an answer is not a reason to hide it
 
 Removing the two free-text utility boxes was right — they were a second,
