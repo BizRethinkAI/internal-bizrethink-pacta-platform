@@ -421,7 +421,9 @@ claim against it. And `termination.early-election` read `pay ${{...}}` while the
 paragraph §83.595(4) prescribes. A library-wide test now forbids a currency
 symbol in front of any `usd` variable.
 
-**Sent to the attorney** — the memo is in [`docs/attorney-memo-2026-09-01.md`].
+**Sent to the attorney** — the memo is published at
+https://claude.ai/code/artifact/f90c0aeb-fb52-401a-81d2-696b7d2a2ba8 (private until
+shared from the page).
 These are not "is this wrong" but "what should it say instead", which is
 drafting:
 
