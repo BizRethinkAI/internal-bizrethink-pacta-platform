@@ -136,17 +136,33 @@ export const FL_MAINTENANCE: Clause[] = [
 
   {
     slug: 'maintenance.lawn-split',
-    version: 1,
+    // v2: the allocation came out of the body and became an answer.
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'maintenance',
     sortKey: 45,
     heading: 'Lawn and Landscaping',
-    body: "Landlord shall provide lawn mowing and trimming at Landlord's cost. Tenant shall operate the irrigation system as needed to keep the lawn and planting in good condition, trim small shrubs, palms and flower beds, and clear fallen leaves. Landlord is responsible for mechanical repair of the irrigation system, including sprinkler heads and the pump. Tenant shall report any defect to Landlord in writing without delay.",
+    /*
+      v1 hard-coded the split — landlord mows, tenant waters and trims. A
+      landlord whose arrangement ran the other way could not say so, and
+      turning the clause off left the yard unallocated rather than allocating
+      it differently.
+
+      {{yardDuties}} is one variable, not three, because the sentences have to
+      vanish along with their lists: three variables would put "attend to the
+      following: ." one missing guard away. See lease/yard/derive-yard.ts.
+
+      Irrigation REPAIR stays with the landlord in the fixed text. Operating
+      the system is a chore and allocable; the pump and the sprinkler heads are
+      equipment, and a tenant made liable for replacing them is being handed a
+      capital cost dressed as yard work.
+    */
+    body: '{{yardDuties}} Landlord is responsible for mechanical repair of the irrigation system, including sprinkler heads and the pump. Tenant shall report any defect to Landlord in writing without delay.',
     source: drafted(),
     status: 'draft',
-    includeWhen: (facts) => facts.landlordProvidesLawnService,
-    variables: [],
+    includeWhen: (facts) => facts.hasYardAllocation,
+    variables: [{ name: 'yardDuties', type: 'string', label: 'Yard duties, by party', required: true }],
     supersedes: [],
     asserts: ['lawn-maintenance'],
   },

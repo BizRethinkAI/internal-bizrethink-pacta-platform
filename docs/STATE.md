@@ -617,6 +617,28 @@ things about the real shape would not have been guessed — the match returns AL
 CAPS, and `addressComponents` carries no house number at all (`fromAddress`/
 `toAddress` are the block range).
 
+### Yard duty is rows, and the router had a second derivation
+
+`landlordProvidesLawnService` was one boolean with the whole allocation
+hard-coded in the clause: landlord mows, tenant waters and trims. A landlord
+whose split ran the other way could not express it, and turning the toggle off
+did not give a different split — it gave **no clause at all, and an unallocated
+yard**. The 2026-08-26 Estancia violation notice (dead palm fronds, 14-day cure)
+is what that costs.
+
+Rows now, in `BizrethinkLeaseMatter.yardTasks`, one `doneBy` each, three duty
+lists derived from the one array. Per LEASE, not per property — the electric
+co-op does not change between tenancies, who cuts the grass is negotiated with
+the signer. An unallocated row **blocks the send**, in `validate` and again in
+the send mutation.
+
+**Found on the way:** the tRPC router still had its own copy of the answer
+derivation, the exact duplication `matter-answers.ts` was written to be the
+only copy of — its own doc comment claimed the router had been converted. It
+had not. A derived value added to one and not the other means the landlord
+previews one document and the signers receive another. The router now delegates
+to `hydrateMatter`, guarded by a source-level test.
+
 ### Notice addresses are POSTAL, and the copy said otherwise
 
 The §83.50 field read "The address must be given in writing", which is true of

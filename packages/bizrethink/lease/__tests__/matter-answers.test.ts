@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import { hydrateMatter } from '../server-only/matter-answers';
@@ -35,6 +37,51 @@ const matter = {
 };
 
 describe('hydrateMatter', () => {
+  /*
+    Yard duty was a boolean with the split hard-coded in the clause. It is rows
+    now, and BOTH the clause's gate and its prose are re-derived here rather
+    than stored — a stored copy would survive an edit to the rows and print an
+    allocation nobody agreed.
+  */
+  it('derives the yard clause gate from the rows', () => {
+    expect(hydrateMatter(matter).facts.hasYardAllocation).toBe(false);
+
+    const allocated = hydrateMatter({
+      ...matter,
+      yardTasks: [{ task: 'Mowing and edging', doneBy: 'tenant', frequency: '', notes: '' }],
+    });
+
+    expect(allocated.facts.hasYardAllocation).toBe(true);
+  });
+
+  it('derives the yard prose, and ignores a stale stored copy of it', () => {
+    const { values } = hydrateMatter({
+      ...matter,
+      values: { ...matter.values, yardDuties: 'Landlord shall do absolutely everything.' },
+      yardTasks: [{ task: 'Palm and tree trimming', doneBy: 'tenant', frequency: '', notes: '' }],
+    });
+
+    expect(values.yardDuties).toContain('Tenant shall');
+    expect(values.yardDuties).not.toContain('absolutely everything');
+  });
+
+  /*
+    An unassigned row is not an allocation. Gating on "are there rows" rather
+    than "is anything allocated" would render the clause with no duties in it.
+  */
+  it('does not open the clause for rows nobody has been given', () => {
+    const { facts } = hydrateMatter({
+      ...matter,
+      yardTasks: [{ task: 'Mowing and edging', doneBy: '', frequency: '', notes: '' }],
+    });
+
+    expect(facts.hasYardAllocation).toBe(false);
+  });
+
+  it('tolerates a matter stored before the column existed', () => {
+    expect(hydrateMatter({ ...matter, yardTasks: null }).facts.hasYardAllocation).toBe(false);
+  });
+
   it('derives the party name variables from the party list, not from stored values', () => {
     const { values } = hydrateMatter(matter);
 
@@ -77,5 +124,34 @@ describe('hydrateMatter', () => {
 
   it('tolerates a null parties column', () => {
     expect(hydrateMatter({ ...matter, parties: null }).parties).toEqual([]);
+  });
+});
+
+/**
+ * ONE derivation, not two.
+ *
+ * The doc comment on matter-answers.ts says the mapping used to live in both
+ * the tRPC router and the preview route, and that the copies drifted. It did
+ * not say that the router's copy was still there — it was, and it derived the
+ * party variables itself while the preview called hydrateMatter.
+ *
+ * That is invisible until a derived value is added to one and not the other,
+ * at which point the landlord previews one document and the signers receive a
+ * different one. Source-level because the router needs a database to run and
+ * this needs to fail on the commit that reintroduces the copy.
+ */
+describe('the router does not keep its own copy of the derivation', () => {
+  const router = readFileSync(new URL('../../server-only/trpc/lease-builder-router.ts', import.meta.url), 'utf8');
+
+  it('delegates to hydrateMatter', () => {
+    expect(router).toMatch(/import\s*{[^}]*hydrateMatter[^}]*}\s*from/);
+  });
+
+  it('does not derive party values a second time', () => {
+    expect(router).not.toMatch(/derivePartyValues\s*\(/);
+  });
+
+  it('does not derive the yard prose a second time', () => {
+    expect(router).not.toMatch(/renderYardDuties\s*\(/);
   });
 });

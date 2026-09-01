@@ -2,6 +2,7 @@ import type { CustomClauseInput } from '../clauses/custom';
 import type { ClauseFacts } from '../clauses/types';
 import type { MoneyAnswers } from '../money/types';
 import type { InterpolationValue } from '../render/interpolate';
+import type { YardTask } from '../yard/derive-yard';
 
 /**
  * The Florida lease interview, as data.
@@ -30,6 +31,13 @@ export type InterviewAnswers = {
   money: MoneyAnswers;
   values: Record<string, InterpolationValue>;
   customClauses: CustomClauseInput[];
+  /*
+    A top-level key rather than a `values` entry, for the same reason
+    customClauses is one: `values` is Record<string, InterpolationValue> and an
+    array of rows is not an interpolatable scalar. The clause reads the
+    RENDERING of these in `values.yardDuties`, derived in hydrateMatter.
+  */
+  yardTasks: YardTask[];
 };
 
 export type FieldKind = 'text' | 'textarea' | 'number' | 'usd' | 'date' | 'boolean' | 'select';
@@ -115,6 +123,7 @@ export const DERIVED_FACTS = [
   'prorationApplies',
   'termMonths',
   'hasNamedOccupants',
+  'hasYardAllocation',
 ];
 
 export const DERIVED_VALUES = [
@@ -138,6 +147,8 @@ export const DERIVED_VALUES = [
   'propertyAddress',
   'propertyTypeLabel',
   'effectiveDate',
+  // Rendered from the yard rows, not typed.
+  'yardDuties',
 ];
 
 const pets = (a: InterviewAnswers) => a.facts.petsPermitted;
@@ -534,7 +545,14 @@ export const FL_INTERVIEW: InterviewStep[] = [
   {
     id: 'maintenance',
     title: 'Maintenance',
-    intro: 'Florida fixes some of this and lets you agree the rest — but only on a single-family home or duplex.',
+    /*
+      "some of this" narrowed. §83.51 is what only bends on a single-family
+      home or duplex; the yard below is not a statutory duty at all on any
+      property type, so it is offered everywhere and the old intro over-claimed
+      the restriction.
+    */
+    intro:
+      'Florida fixes the repair duties and lets you agree the rest. The repair threshold is offered only on a single-family home or duplex; the yard is a matter of agreement anywhere.',
     fields: [
       {
         name: 'repairThresholdUsd',
@@ -548,13 +566,6 @@ export const FL_INTERVIEW: InterviewStep[] = [
         },
         showWhen: singleFamilyOrDuplex,
         required: true,
-      },
-      {
-        name: 'landlordProvidesLawnService',
-        target: 'fact',
-        kind: 'boolean',
-        label: 'Do you provide lawn service?',
-        help: 'Adds a clause splitting the duties — you mow, the tenant waters and keeps the beds tidy.',
       },
     ],
   },

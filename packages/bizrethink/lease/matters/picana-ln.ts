@@ -2,6 +2,8 @@ import type { ClauseFacts } from '../clauses/types';
 import type { MoneyAnswers } from '../money/types';
 import type { InterpolationValue } from '../render/interpolate';
 import type { LeaseParty } from '../render/signature-blocks';
+import type { YardTask } from '../yard/derive-yard';
+import { renderYardDuties } from '../yard/derive-yard';
 
 /**
  * 29090 Picana Ln, Wesley Chapel, FL 33543 — the new tenancy.
@@ -15,6 +17,30 @@ import type { LeaseParty } from '../render/signature-blocks';
  * rather than restated here, so a summary table cannot disagree with the clause
  * that produced it.
  */
+
+/**
+ * The real split at this address: the tenant does everything with a schedule
+ * to it, the landlord keeps fertiliser and pest treatment because getting the
+ * chemistry wrong on a Florida lawn is expensive to undo.
+ *
+ * Palm trimming is called out by name because the association cites it — the
+ * 2026-08-26 Estancia notice names dead fronds and seed heads specifically,
+ * with a fourteen-day cure. Buried inside "landscaping" it is a duty nobody
+ * reads; on its own row it is a duty somebody agreed to.
+ */
+export const PICANA_YARD: YardTask[] = [
+  { task: 'Mowing and edging', doneBy: 'tenant', frequency: 'Weekly', notes: '' },
+  { task: 'Irrigation and watering', doneBy: 'tenant', frequency: '', notes: '' },
+  { task: 'Shrubs, hedges and beds', doneBy: 'tenant', frequency: '', notes: '' },
+  {
+    task: 'Palm and tree trimming',
+    doneBy: 'tenant',
+    frequency: 'Twice yearly',
+    notes: 'dead fronds and seed heads',
+  },
+  { task: 'Fertilisation and pest treatment', doneBy: 'landlord', frequency: '', notes: '' },
+  { task: 'Leaf and debris clearance', doneBy: 'tenant', frequency: '', notes: '' },
+];
 
 export const PICANA_PARTIES: LeaseParty[] = [
   { name: 'Shwet Prabhat', role: 'landlord' },
@@ -40,7 +66,7 @@ export const PICANA_FACTS: ClauseFacts = {
   prorationApplies: false,
   propertyType: 'single-family',
   hasPool: true,
-  landlordProvidesLawnService: true,
+  hasYardAllocation: true,
   lateFeePolicy: 'tiered',
   terminationOnSale: true,
   holdoverPenalty: true,
@@ -100,7 +126,16 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   guestNightsLimit: 14,
 
   tenantUtilities: 'electricity, natural gas, water and sewer, telephone, cable television and internet',
-  landlordUtilities: 'refuse collection, lawn service, pool service and association assessments',
+  /*
+    "lawn service" came out. The yard is allocated by PICANA_YARD now, where
+    the tenant mows — a landlord-provided lawn service in the utility list
+    would have been the document contradicting itself two sections apart, which
+    is the exact defect this whole feature exists to prevent.
+  */
+  landlordUtilities: 'refuse collection, pool service and association assessments',
+
+  // Rendered, never hand-written: the rows are the answer.
+  yardDuties: renderYardDuties(PICANA_YARD),
   rentersInsuranceMinUsd: 300000,
 
   // Fla. Stat. §83.53(2): at least 12 hours, 7:30am to 8:00pm.

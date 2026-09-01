@@ -1,0 +1,13 @@
+-- Who does what in the yard.
+--
+-- This was one boolean, `landlordProvidesLawnService`, with the entire
+-- allocation hard-coded into the clause body: landlord mows and trims, tenant
+-- waters and keeps the beds. A landlord whose arrangement ran the other way —
+-- fertiliser his, mowing and shrubs the tenant's — had no way to say so, and
+-- switching the boolean off was worse than useless: no clause rendered at all
+-- and the yard went into the lease UNALLOCATED.
+--
+-- Rows now, one `doneBy` each. Per LEASE and not on the property, unlike the
+-- utilities: the electric co-op at an address is the same for every tenancy,
+-- but who cuts the grass is negotiated with the person signing.
+ALTER TABLE "BizrethinkLeaseMatter" ADD COLUMN "yardTasks" JSONB NOT NULL DEFAULT '[]';

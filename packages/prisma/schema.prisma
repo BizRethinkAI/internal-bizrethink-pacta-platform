@@ -1761,6 +1761,19 @@ model BizrethinkLeaseMatter {
   /// different people.
   parties Json @default("[]")
 
+  /// Who does what in the yard. `[{ task, doneBy, frequency, notes }]`.
+  ///
+  /// Its own column rather than a `values` key, because `values` holds
+  /// interpolatable scalars and this is rows. The clause reads the RENDERING
+  /// of these, `values.yardDuties`, derived in hydrateMatter and never stored
+  /// — a stored copy would survive an edit to the rows and print an allocation
+  /// nobody agreed to.
+  ///
+  /// Per LEASE, unlike the utilities on the property. The electric co-op at an
+  /// address is the same for every tenancy; who cuts the grass is negotiated
+  /// with the person signing.
+  yardTasks Json @default("[]")
+
   /// Which step the answerer stopped on, so a 68-field interview can be left
   /// and resumed rather than restarted.
   currentStepId String?

@@ -5,6 +5,8 @@ import { derivePartyValues, toLeaseParties } from '../parties/derive-parties';
 import type { InterpolationValue } from '../render/interpolate';
 import type { RenderLeaseInput } from '../render/render-lease';
 import type { LeaseParty } from '../render/signature-blocks';
+import type { YardTask } from '../yard/derive-yard';
+import { renderYardDuties, splitByDoer } from '../yard/derive-yard';
 
 /**
  * A stored matter, turned back into a full answer set.
@@ -31,6 +33,7 @@ export type StoredMatter = {
   values: unknown;
   customClauses: unknown;
   parties: unknown;
+  yardTasks?: unknown;
 };
 
 export type HydratedMatter = {
@@ -40,6 +43,7 @@ export type HydratedMatter = {
   parties: LeaseParty[];
   partyInputs: LeasePartyInput[];
   customClauses: CustomClauseInput[];
+  yardTasks: YardTask[];
 };
 
 export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
@@ -50,6 +54,10 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
   // Rows created before the parties column default to `[]`; a null is also
   // tolerated so an old matter still loads and its parties step can be filled.
   const partyInputs = (matter.parties ?? []) as LeasePartyInput[];
+
+  // Same tolerance, for matters stored before the yard column existed.
+  const yardTasks = (matter.yardTasks ?? []) as YardTask[];
+  const yardDuties = renderYardDuties(yardTasks);
 
   const endDate = String(values.endDate ?? money.term.startDate);
 
@@ -63,6 +71,12 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
         keep two fields in step for no reason.
       */
       hasNamedOccupants: String((values as Record<string, unknown>).authorisedOccupants ?? '').trim() !== '',
+      /*
+        "Is anything allocated", not "are there rows". A row nobody has been
+        given is not an allocation, and gating on the row count would render
+        the clause with no duties inside it.
+      */
+      hasYardAllocation: Object.values(splitByDoer(yardTasks)).some((side) => side !== ''),
     } as RenderLeaseInput['facts'],
     money,
     values: {
@@ -71,10 +85,13 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       monthlyRentUsd: money.rent.monthlyUsd,
       // Last, so a stale stored copy of either name cannot win.
       ...derivePartyValues(partyInputs),
+      // Likewise: the rows are the answer, the prose is only their rendering.
+      yardDuties,
     },
     parties: toLeaseParties(partyInputs),
     partyInputs,
     customClauses: (matter.customClauses ?? []) as CustomClauseInput[],
+    yardTasks,
   };
 };
 

@@ -20,6 +20,7 @@ import type { FieldValue } from '~/components/general/lease/interview-field';
 import { InterviewFieldControl } from '~/components/general/lease/interview-field';
 import { PartyEditor } from '~/components/general/lease/party-editor';
 import { LeaseReviewPanel } from '~/components/general/lease/review-panel';
+import { YardTaskEditor } from '~/components/general/lease/yard-task-editor';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/leases.$id';
@@ -74,6 +75,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       money: matter.money as Record<string, unknown>,
       values: matter.values as Record<string, FieldValue>,
       customClauses: matter.customClauses as InterviewAnswers['customClauses'],
+      yardTasks: matter.yardTasks as InterviewAnswers['yardTasks'],
       parties: matter.parties as LeasePartyInput[],
       delegatedFields: (matter.delegatedFields ?? []) as string[],
       envelopeId: matter.envelopeId,
@@ -126,6 +128,7 @@ export default function LeaseInterviewPage() {
   const [money, setMoney] = useState<Record<string, unknown>>(matter.money);
   const [values, setValues] = useState<Record<string, FieldValue>>(matter.values);
   const [customClauses, setCustomClauses] = useState<InterviewAnswers['customClauses']>(matter.customClauses);
+  const [yardTasks, setYardTasks] = useState<InterviewAnswers['yardTasks']>(matter.yardTasks ?? []);
   const [parties, setParties] = useState<LeasePartyInput[]>(matter.parties);
   const [delegatedFields, setDelegatedFields] = useState<string[]>(matter.delegatedFields);
 
@@ -134,8 +137,8 @@ export default function LeaseInterviewPage() {
   const delegable = useMemo(() => new Set(delegableFieldNames(FL_INTERVIEW)), []);
 
   const answers = useMemo(
-    () => ({ facts, money, values, customClauses, parties }) as unknown as InterviewAnswers,
-    [facts, money, values, customClauses, parties],
+    () => ({ facts, money, values, customClauses, parties, yardTasks }) as unknown as InterviewAnswers,
+    [facts, money, values, customClauses, parties, yardTasks],
   );
 
   const steps = useMemo(() => visibleSteps(FL_INTERVIEW, answers), [answers]);
@@ -173,7 +176,7 @@ export default function LeaseInterviewPage() {
     await saveStep.mutateAsync({
       id: matter.id,
       currentStepId: target.id,
-      answers: { facts, money, values, customClauses, parties } as never,
+      answers: { facts, money, values, customClauses, parties, yardTasks } as never,
       delegatedFields,
     });
 
@@ -259,6 +262,15 @@ export default function LeaseInterviewPage() {
           ))}
         </div>
 
+        {/*
+          Below the repair threshold rather than above it. The threshold is a
+          statutory question and this is a negotiated one; and unlike the
+          threshold, this section is offered on every property type — Florida
+          constrains who may be made to fix the plumbing, not who cuts the
+          grass.
+        */}
+        {step.id === 'maintenance' && <YardTaskEditor tasks={yardTasks} onChange={setYardTasks} />}
+
         {step.id === 'custom-clauses' && (
           <CustomClauseEditor
             sections={step.customClauseSections ?? []}
@@ -311,6 +323,7 @@ type ValidationResult = {
   findings: { code: string; severity: 'blocks' | 'warns'; citation: string; message: string }[];
   missing: string[];
   partyFindings: string[];
+  yardFindings: string[];
   reviewFindings: string[];
   clauseFindings: {
     ruleId: string;
@@ -445,6 +458,20 @@ const ReviewPanel = ({
           <AlertDescription>
             <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
               {data?.partyFindings.map((finding) => (
+                <li key={finding}>{finding}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {(data?.yardFindings.length ?? 0) > 0 && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Part of the yard has not been given to anybody</AlertTitle>
+          <AlertDescription>
+            <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
+              {data?.yardFindings.map((finding) => (
                 <li key={finding}>{finding}</li>
               ))}
             </ul>

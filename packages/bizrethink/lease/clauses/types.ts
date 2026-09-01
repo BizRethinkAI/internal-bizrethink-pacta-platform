@@ -95,7 +95,15 @@ export type ClauseFacts = {
    */
   propertyType: 'single-family' | 'duplex' | 'multi-family' | 'condo';
   hasPool: boolean;
-  landlordProvidesLawnService: boolean;
+  /**
+   * Has any yard task been allocated to anybody?
+   *
+   * Replaced `landlordProvidesLawnService`, which decided the ALLOCATION as
+   * well as the presence of the clause — off meant no clause at all, and a
+   * yard nobody had been made responsible for. Derived in `hydrateMatter` from
+   * `yardTasks`, never stored.
+   */
+  hasYardAllocation: boolean;
 
   /*
     Elected terms. These are answers, not derived state — the landlord chooses
