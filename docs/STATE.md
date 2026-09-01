@@ -410,6 +410,36 @@ passed, or appeared to:
 
 ## Open threads
 
+### Two of tier 3 were mechanical, four are the attorney's
+
+**Fixed here.** §83.49(1) attaches to money taken as security **or** as advance
+rent, and both notices gated on `depositHeldUsd > 0` alone — so a
+last-month's-rent-only lease held the tenant's money with no disclosure and no
+depository notice, the omission §83.49(3)(a) punishes by forfeiting the right to
+claim against it. And `termination.early-election` read `pay ${{...}}` while the
+`usd` formatter emits its own symbol, rendering **`pay $$4,600.00`** in the one
+paragraph §83.595(4) prescribes. A library-wide test now forbids a currency
+symbol in front of any `usd` variable.
+
+**Sent to the attorney** — the memo is in [`docs/attorney-memo-2026-09-01.md`].
+These are not "is this wrong" but "what should it say instead", which is
+drafting:
+
+1. `general.waiver` states the opposite of §83.56(5) — accepting rent with
+   knowledge of a breach **does** waive the right to terminate for it.
+2. Answering "no pets" produces a lease silent on pets, under an integration
+   clause making the document the entire agreement.
+3. `fees.administrative` has `includeWhen: null`, charging lockout and
+   key-replacement fees on condo and multi-family, where §83.51(2) makes locks
+   and keys a landlord duty that may not be shifted.
+4. `disclosure.lead-paint` carries `requiredBy: 42 U.S.C. §4852d` but holds only
+   the Lead Warning Statement, not the three further items 24 C.F.R. §35.92(b)
+   requires.
+
+Also for her, carried from tier 3: `hoa.compliance` characterises fine
+reimbursement as **additional rent**, making non-payment a §83.56(3) three-day
+ground, and `hoa.cure` extends that to cure costs.
+
 ### A reviewer must read what gets signed
 
 `buildLeaseDocuments` emits the lease PLUS one document per addendum and per

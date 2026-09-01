@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { ClauseFacts } from '../clauses/types';
 import { assertPublishable } from '../clauses/types';
+import { FL_LIBRARY } from '../clauses/us-fl';
 import { FL_STATUTORY_DISCLOSURES, RADON_STATUTORY_TEXT } from '../clauses/us-fl/statutory-disclosures';
+import { selectClauses } from '../engine/select-clauses';
 
 /**
  * Tier 1 of the clause library: text the State of Florida and the federal
@@ -105,8 +107,18 @@ describe('security deposit notice — Fla. Stat. §83.49(3)', () => {
     expect(notice.includeWhen?.(facts({ depositHeldUsd: 6300 }))).toBe(true);
   });
 
-  it('is omitted when no deposit is held at all', () => {
-    expect(bySlug('deposit.statutory-notice').includeWhen?.(facts({ depositHeldUsd: 0 }))).toBe(false);
+  /*
+    "No money held", not "no deposit". This asserted `depositHeldUsd: 0` while
+    the fixture still held 6,900 of advance rent — and passed, because the gate
+    ignored advance rent. §83.49(1) does not: it attaches to money taken as
+    security OR as advance rent, and the notice's own first sentence is about
+    advance rents.
+  */
+  it('is omitted only when the landlord holds nothing at all', () => {
+    const notice = bySlug('deposit.statutory-notice');
+
+    expect(notice.includeWhen?.(facts({ depositHeldUsd: 0, advanceRentHeldUsd: 0 }))).toBe(false);
+    expect(notice.includeWhen?.(facts({ depositHeldUsd: 0, advanceRentHeldUsd: 6900 }))).toBe(true);
   });
 });
 
@@ -160,5 +172,87 @@ describe('library invariants', () => {
     expect(assertPublishable(unverified)).toEqual([
       'disclosure.radon: statutory text published without a verification date',
     ]);
+  });
+});
+
+/**
+ * §83.49 attaches to money held, and advance rent is money held.
+ *
+ * Both notices gated on `depositHeldUsd > 0` alone. But §83.49(1) covers money
+ * deposited "as security for performance of the rental agreement OR as advance
+ * rent for other than the next immediate rental period", and the notice's own
+ * first sentence is about advance rents — "THE LANDLORD MAY TRANSFER ADVANCE
+ * RENTS TO THE LANDLORD'S ACCOUNT AS THEY ARE DUE".
+ *
+ * So a last-month's-rent-only lease — an ordinary Florida structure — went out
+ * holding the tenant's money with no disclosure and no depository notice. That
+ * is the omission §83.49(3)(a) penalises by forfeiting the landlord's right to
+ * impose a claim against the money at all.
+ */
+const allSlugs = (f: ClauseFacts) => {
+  const { selected, addenda, standaloneDisclosures } = selectClauses({ facts: f, library: FL_LIBRARY });
+
+  return [...selected, ...addenda, ...standaloneDisclosures].map((clause) => clause.slug);
+};
+
+describe('deposit notices on a lease with advance rent and no deposit', () => {
+  const advanceRentOnly = facts({ depositHeldUsd: 0, advanceRentHeldUsd: 6900 });
+
+  it('gives the §83.49(3) disclosure', () => {
+    expect(allSlugs(advanceRentOnly)).toContain('deposit.statutory-notice');
+  });
+
+  it('gives the §83.49(2) depository notice', () => {
+    expect(allSlugs(advanceRentOnly)).toContain('deposit.escrow-notice');
+  });
+
+  it('still gives both where there is a deposit and no advance rent', () => {
+    const depositOnly = facts({ depositHeldUsd: 6900, advanceRentHeldUsd: 0 });
+
+    expect(allSlugs(depositOnly)).toContain('deposit.statutory-notice');
+    expect(allSlugs(depositOnly)).toContain('deposit.escrow-notice');
+  });
+
+  /*
+    And not where nothing is held. A notice about money the landlord does not
+    have is noise in a document that is already long.
+  */
+  it('gives neither where the landlord holds nothing', () => {
+    const nothing = facts({ depositHeldUsd: 0, advanceRentHeldUsd: 0 });
+
+    expect(allSlugs(nothing)).not.toContain('deposit.statutory-notice');
+    expect(allSlugs(nothing)).not.toContain('deposit.escrow-notice');
+  });
+});
+
+/**
+ * The §83.595(4) election is the one paragraph Florida writes for you.
+ *
+ * You may use that remedy only if you use the statute's words, and the body
+ * read "pay ${{earlyTerminationFeeUsd}}" while the `usd` formatter already
+ * emits a currency symbol. It rendered "pay $$4,600.00" — on a signed
+ * addendum, in prescribed text.
+ */
+describe('the early-termination election', () => {
+  const clause = FL_LIBRARY.find((entry) => entry.slug === 'termination.early-election');
+
+  it('does not double the currency symbol', () => {
+    expect(clause?.body).not.toContain('${{earlyTerminationFeeUsd}}');
+    expect(clause?.body).toContain('{{earlyTerminationFeeUsd}}');
+  });
+
+  /*
+    The general rule, since one hand-typed symbol in front of a formatted
+    amount is easy to write twice: a `usd` variable formats its own currency,
+    so no clause body may put a symbol in front of one.
+  */
+  it('and no clause anywhere does', () => {
+    for (const entry of FL_LIBRARY) {
+      const usd = entry.variables.filter((variable) => variable.type === 'usd').map((variable) => variable.name);
+
+      for (const name of usd) {
+        expect(entry.body, `${entry.slug} prefixes {{${name}}} with a dollar sign`).not.toContain(`\${{${name}}}`);
+      }
+    }
   });
 });
