@@ -388,13 +388,25 @@ export const FL_LEASE_BODY: Clause[] = [
 
   {
     slug: 'hoa.compliance',
-    version: 1,
+    // v2: forwarding reworded, and the cure moved to its own clause.
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 60,
     heading: 'Association Rules',
-    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them. Tenant shall reimburse Landlord as additional rent for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward any notice received from the association to Landlord within {{hoaNoticeHours}} hours.',
+    /*
+      "any notice received from the association" became "received at or posted
+      on the Premises".
+
+      Association post is addressed to the OWNER and delivered to the property
+      the tenant is living in. An obligation to forward whatever the
+      association sends invites the tenant to open mail that is not theirs,
+      which is 18 U.S.C. §1702 territory. What the clause actually needs is
+      what ARRIVES there — an envelope they can pass on unopened, or a notice
+      taped to the door.
+    */
+    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them. Tenant shall reimburse Landlord as additional rent for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours, any association notice received at or posted on the Premises.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa,
@@ -404,5 +416,49 @@ export const FL_LEASE_BODY: Clause[] = [
     ],
     supersedes: [],
     asserts: ['hoa-compliance', 'hoa-fines-passed-through'],
+  },
+
+  {
+    slug: 'hoa.cure',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'rules',
+    sortKey: 61,
+    heading: 'Curing an Association Violation',
+    /*
+      hoa.compliance made the tenant forward the notice and reimburse the fine.
+      It never said who CURES, or by when — so the real sequence ran: notice
+      arrives naming dead palm fronds with a fourteen-day cure, tenant forwards
+      it inside 48 hours exactly as required, nothing is trimmed, fine lands.
+      The lease worked as written.
+
+      THE DEADLINE IS THE ASSOCIATION'S, NOT THE TENANT'S. Keying it to the
+      moment the tenant forwards would let a tenant who binned the letter move
+      the date. The landlord is on the association's own distribution list and
+      learns of these independently, which is exactly why the deadline can be
+      the one the notice states.
+
+      AND THE LANDLORD OWES THE SAME DUTY BACK. He receives these by email
+      directly. Charging a tenant for failing to cure something the landlord
+      knew about and never passed on is not a provision worth drafting.
+
+      THE LAST SENTENCE IS THE ONE THAT MATTERS. Fla. Stat. §720.305(1) gives
+      the association its remedy against the parcel OWNER. Allocating palm
+      trimming to a tenant is an arrangement between landlord and tenant: it
+      gives the tenant no standing with the association and moves nothing off
+      the owner. A landlord reading "the tenant handles the yard" will assume
+      the opposite unless the document says so.
+    */
+    body: 'Where the association gives notice of a violation arising from work this Lease allocates to Tenant, Tenant shall cure it by the date stated in the notice, or within {{hoaCureDays}} days of receiving it if the notice states no date. Landlord shall notify Tenant of any such notice Landlord receives directly from the association. If Tenant has not cured by that date, Landlord may cure and Tenant shall reimburse the reasonable cost as additional rent. This clause allocates work between Landlord and Tenant only; it does not make Tenant a party to the governing documents, and it does not limit the association’s remedies against the owner of the Premises.',
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Fla. Stat. §720.305(1)',
+    includeWhen: (facts) => facts.hasHoa && facts.hasTenantYardDuty,
+    variables: [
+      { name: 'hoaCureDays', type: 'number', label: 'Days to cure where the notice sets no date', required: true },
+    ],
+    supersedes: [],
+    asserts: ['hoa-cure'],
   },
 ];

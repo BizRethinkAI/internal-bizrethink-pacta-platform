@@ -95,7 +95,25 @@ export type ClauseFacts = {
    */
   propertyType: 'single-family' | 'duplex' | 'multi-family' | 'condo';
   hasPool: boolean;
-  landlordProvidesLawnService: boolean;
+  /**
+   * Has any yard task been allocated to anybody?
+   *
+   * Replaced `landlordProvidesLawnService`, which decided the ALLOCATION as
+   * well as the presence of the clause — off meant no clause at all, and a
+   * yard nobody had been made responsible for. Derived in `hydrateMatter` from
+   * `yardTasks`, never stored.
+   */
+  hasYardAllocation: boolean;
+
+  /**
+   * Has the TENANT been given anything outdoors?
+   *
+   * Separate from `hasYardAllocation` because it answers a different question.
+   * A yard entirely maintained by the landlord or the association is fully
+   * allocated, and there is nothing for the tenant to cure — so `hoa.cure`
+   * would be an obligation with no subject.
+   */
+  hasTenantYardDuty: boolean;
 
   /*
     Elected terms. These are answers, not derived state — the landlord chooses

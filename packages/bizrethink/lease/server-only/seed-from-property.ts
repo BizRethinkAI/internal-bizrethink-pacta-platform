@@ -1,4 +1,8 @@
 import type { LeasePartyInput } from '../parties/derive-parties';
+import type { UtilityRow } from '../utilities/derive-utilities';
+import { splitByPayer } from '../utilities/derive-utilities';
+import type { YardTask } from '../yard/derive-yard';
+import { seedYardTasks } from '../yard/derive-yard';
 
 /**
  * Opening a new lease with everything the property already knows.
@@ -35,6 +39,7 @@ export type SeedProperty = {
   landlords: { name: string; email: string }[];
   noticeName: string | null;
   noticeAddress: string | null;
+  utilities: UtilityRow[];
 };
 
 export type SeededMatter = {
@@ -53,6 +58,7 @@ export type SeededMatter = {
   };
   values: Record<string, string | number | boolean | null>;
   parties: LeasePartyInput[];
+  yardTasks: YardTask[];
   customClauses: never[];
 };
 
@@ -68,7 +74,6 @@ export const seedMatterFromProperty = (property: SeedProperty): SeededMatter => 
       them keeps the first render of the document honest.
     */
     petsPermitted: false,
-    landlordProvidesLawnService: false,
     lateFeePolicy: 'flat',
     terminationOnSale: false,
     holdoverPenalty: false,
@@ -108,6 +113,17 @@ export const seedMatterFromProperty = (property: SeedProperty): SeededMatter => 
     // existed, so the interview still asks rather than printing a blank.
     ...(property.noticeName ? { noticeName: property.noticeName } : {}),
     ...(property.noticeAddress ? { noticeAddress: property.noticeAddress } : {}),
+    /*
+      Both sides rendered from ONE list, so they cannot disagree about who
+      pays for what. Seeded as text and still editable per lease: a tenancy
+      where this tenant takes over the trash is an ordinary variation, and the
+      property record should not be edited to describe one lease.
+    */
+    ...(() => {
+      const { tenant, landlord } = splitByPayer(property.utilities ?? []);
+
+      return { tenantUtilities: tenant, landlordUtilities: landlord };
+    })(),
   },
 
   /*
@@ -120,6 +136,21 @@ export const seedMatterFromProperty = (property: SeedProperty): SeededMatter => 
     role: 'landlord' as const,
     email: landlord.email,
   })),
+
+  /*
+    The standard Florida list, with nobody assigned to anything.
+
+    Not filtered by property type or by anything else the property record
+    knows. Whether an address has palms is not in it, and seeding a shorter
+    list from a guess drops the row the landlord most needed to be asked about
+    — which is how a yard goes out unallocated. Deleting an inapplicable row
+    costs a click; noticing an absent one costs a violation notice.
+
+    Per LEASE and not copied from the property, unlike the landlords and the
+    utilities above. The electric co-op does not change between tenancies. Who
+    cuts the grass is negotiated with the person signing.
+  */
+  yardTasks: seedYardTasks(),
 
   customClauses: [],
 });

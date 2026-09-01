@@ -37,7 +37,8 @@ const SINGLE_FAMILY: ClauseFacts = {
   prorationApplies: false,
   propertyType: 'single-family',
   hasPool: true,
-  landlordProvidesLawnService: true,
+  hasYardAllocation: true,
+  hasTenantYardDuty: true,
   lateFeePolicy: 'tiered',
   terminationOnSale: true,
   holdoverPenalty: true,
@@ -129,9 +130,22 @@ describe('pool and lawn', () => {
     expect(allSlugs({ ...SINGLE_FAMILY, hasPool: false })).not.toContain('maintenance.pool-split');
   });
 
-  it('includes the lawn split only where the landlord provides the service', () => {
+  /*
+    The gate used to be "does the landlord provide lawn service", which decided
+    the ALLOCATION as well as the presence of the clause: off meant no clause,
+    and a yard nobody had been made responsible for. It is now simply "has
+    anything been allocated".
+  */
+  it('includes the lawn split only where something has been allocated', () => {
     expect(allSlugs(SINGLE_FAMILY)).toContain('maintenance.lawn-split');
-    expect(allSlugs({ ...SINGLE_FAMILY, landlordProvidesLawnService: false })).not.toContain('maintenance.lawn-split');
+    expect(allSlugs({ ...SINGLE_FAMILY, hasYardAllocation: false })).not.toContain('maintenance.lawn-split');
+  });
+
+  it('no longer hard-codes who mows, since that is now an answer', () => {
+    const clause = FL_LIBRARY.find((entry) => entry.slug === 'maintenance.lawn-split');
+
+    expect(clause?.body).toContain('{{yardDuties}}');
+    expect(clause?.body).not.toMatch(/Landlord shall provide lawn mowing/);
   });
 });
 

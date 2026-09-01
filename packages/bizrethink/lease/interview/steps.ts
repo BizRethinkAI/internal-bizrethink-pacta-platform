@@ -2,6 +2,7 @@ import type { CustomClauseInput } from '../clauses/custom';
 import type { ClauseFacts } from '../clauses/types';
 import type { MoneyAnswers } from '../money/types';
 import type { InterpolationValue } from '../render/interpolate';
+import type { YardTask } from '../yard/derive-yard';
 
 /**
  * The Florida lease interview, as data.
@@ -30,6 +31,13 @@ export type InterviewAnswers = {
   money: MoneyAnswers;
   values: Record<string, InterpolationValue>;
   customClauses: CustomClauseInput[];
+  /*
+    A top-level key rather than a `values` entry, for the same reason
+    customClauses is one: `values` is Record<string, InterpolationValue> and an
+    array of rows is not an interpolatable scalar. The clause reads the
+    RENDERING of these in `values.yardDuties`, derived in hydrateMatter.
+  */
+  yardTasks: YardTask[];
 };
 
 export type FieldKind = 'text' | 'textarea' | 'number' | 'usd' | 'date' | 'boolean' | 'select';
@@ -115,6 +123,8 @@ export const DERIVED_FACTS = [
   'prorationApplies',
   'termMonths',
   'hasNamedOccupants',
+  'hasYardAllocation',
+  'hasTenantYardDuty',
 ];
 
 export const DERIVED_VALUES = [
@@ -138,6 +148,8 @@ export const DERIVED_VALUES = [
   'propertyAddress',
   'propertyTypeLabel',
   'effectiveDate',
+  // Rendered from the yard rows, not typed.
+  'yardDuties',
 ];
 
 const pets = (a: InterviewAnswers) => a.facts.petsPermitted;
@@ -177,7 +189,9 @@ export const FL_INTERVIEW: InterviewStep[] = [
         kind: 'text',
         address: true,
         label: 'Where should notices go to the tenant BEFORE they move in?',
-        help: 'After the start date notices go to the property itself. This covers the gap between signing and moving in.',
+        // Postal, for the same reason as the landlord's: a mailed statutory
+        // notice has to reach somewhere before the tenancy begins.
+        help: 'A postal address. After the start date notices go to the property itself; this covers the gap between signing and moving in.',
         required: true,
       },
       {
@@ -374,6 +388,17 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'usd',
         label: "What minimum liability cover must the tenant's renter's insurance carry?",
+        /*
+          Eligible for a suggestion precisely because Florida says nothing: it
+          neither requires renter's insurance nor sets a minimum, so there is no
+          statutory bound to advise on. The note states what is common and
+          attributes it; it does not recommend. A field carrying a `statute`
+          may never have one of these — asserted by test.
+        */
+        suggestion: {
+          value: 100000,
+          note: "Most residential leases that require renter's insurance set the liability minimum at $100,000; $300,000 is common on higher-value properties.",
+        },
         required: true,
       },
     ],
@@ -448,6 +473,24 @@ export const FL_INTERVIEW: InterviewStep[] = [
         required: true,
       },
       {
+        name: 'hoaCureDays',
+        target: 'value',
+        kind: 'number',
+        label: 'If an association notice sets no cure date, how long does the tenant have?',
+        help: 'Only used as a fallback. Where the notice names a date — and they usually do — that date governs.',
+        suggestion: {
+          value: 14,
+          /*
+            An observation about the documents themselves, not a view on what
+            is reasonable. The Estancia at Wiregrass notice of 26 August 2026
+            gave until 9 September: fourteen days.
+          */
+          note: 'Association notices commonly set a cure date about two weeks out, and typically state that date on the notice itself.',
+        },
+        showWhen: (a) => a.facts.hasHoa,
+        required: true,
+      },
+      {
         name: 'hoaNoticeHours',
         target: 'value',
         kind: 'number',
@@ -492,8 +535,27 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'text',
         address: true,
-        label: 'At what address?',
-        statute: { cite: 'Fla. Stat. §83.50', note: 'The address must be given in writing.' },
+        label: 'At what mailing address?',
+        /*
+          A POSTAL address, and the old wording invited the opposite reading.
+          "The address must be given in writing" is true of an email address
+          too, so the field asked to be filled with one.
+
+          It cannot be. The §83.49(3)(a) notice this lease prints verbatim says
+          the landlord "MUST MAIL YOU NOTICE, WITHIN 30 DAYS AFTER YOU MOVE
+          OUT", and that the deposit must be returned outright if that mailing
+          is not timely. An email address here is somewhere that notice cannot
+          be sent.
+
+          Email is additive and separate: §83.505 permits it only under a
+          signed addendum, which is the "Deliver notices by email?" election on
+          step 1. Never a substitute for this.
+        */
+        help: 'A postal address. Statutory notices are served here — including the deposit claim, which must be mailed within 30 days of move-out. Email is a separate election on step 1 and does not replace this.',
+        statute: {
+          cite: 'Fla. Stat. §83.50',
+          note: 'The name and address must be disclosed in writing. §83.49(3)(a) then requires the deposit claim notice to be MAILED, so this has to be an address post can reach.',
+        },
         required: true,
       },
     ],
@@ -502,7 +564,14 @@ export const FL_INTERVIEW: InterviewStep[] = [
   {
     id: 'maintenance',
     title: 'Maintenance',
-    intro: 'Florida fixes some of this and lets you agree the rest — but only on a single-family home or duplex.',
+    /*
+      "some of this" narrowed. §83.51 is what only bends on a single-family
+      home or duplex; the yard below is not a statutory duty at all on any
+      property type, so it is offered everywhere and the old intro over-claimed
+      the restriction.
+    */
+    intro:
+      'Florida fixes the repair duties and lets you agree the rest. The repair threshold is offered only on a single-family home or duplex; the yard is a matter of agreement anywhere.',
     fields: [
       {
         name: 'repairThresholdUsd',
@@ -516,13 +585,6 @@ export const FL_INTERVIEW: InterviewStep[] = [
         },
         showWhen: singleFamilyOrDuplex,
         required: true,
-      },
-      {
-        name: 'landlordProvidesLawnService',
-        target: 'fact',
-        kind: 'boolean',
-        label: 'Do you provide lawn service?',
-        help: 'Adds a clause splitting the duties — you mow, the tenant waters and keeps the beds tidy.',
       },
     ],
   },

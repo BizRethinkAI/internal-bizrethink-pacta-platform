@@ -617,6 +617,93 @@ things about the real shape would not have been guessed — the match returns AL
 CAPS, and `addressComponents` carries no house number at all (`fromAddress`/
 `toAddress` are the block range).
 
+### An association violation now has somebody to cure it
+
+`hoa.compliance` made the tenant FORWARD a notice and REIMBURSE a fine. It
+never said who performs the cure, or by when. The real sequence would have run:
+notice arrives 26 Aug naming dead palm fronds with a 9 Sep cure date, tenant
+forwards it inside 48 hours exactly as required, nothing is trimmed, the fine
+lands. The lease worked as written.
+
+`hoa.cure` (new, gated on `hasHoa && hasTenantYardDuty`) keys the deadline to
+**the association's own date**, not to the moment the tenant forwards — the
+association emails the owner directly, so a tenant who bins the letter cannot
+move the deadline. In exchange the landlord owes a reciprocal duty to pass on
+what he receives directly.
+
+Its last sentence is the load-bearing one: under **Fla. Stat. §720.305(1)** the
+association's remedy runs against the parcel OWNER. Allocating palm trimming to
+a tenant is an arrangement between landlord and tenant — it gives the tenant no
+standing with the association and moves nothing off the owner.
+
+`hoa.compliance` → v2: "any notice received from the association" became
+"received at or posted on the Premises". Association post is addressed to the
+owner and delivered to the house the tenant lives in; the old wording invited
+opening it (18 U.S.C. §1702).
+
+**For the attorney:** `hoa.compliance` already characterises fine reimbursement
+as *additional rent*, which makes non-payment a §83.56(3) three-day ground.
+`hoa.cure` extends that to cure costs. Her call, not ours.
+
+### Yard duty is rows, and the router had a second derivation
+
+`landlordProvidesLawnService` was one boolean with the whole allocation
+hard-coded in the clause: landlord mows, tenant waters and trims. A landlord
+whose split ran the other way could not express it, and turning the toggle off
+did not give a different split — it gave **no clause at all, and an unallocated
+yard**. The 2026-08-26 Estancia violation notice (dead palm fronds, 14-day cure)
+is what that costs.
+
+Rows now, in `BizrethinkLeaseMatter.yardTasks`, one `doneBy` each, three duty
+lists derived from the one array. Per LEASE, not per property — the electric
+co-op does not change between tenancies, who cuts the grass is negotiated with
+the signer. An unallocated row **blocks the send**, in `validate` and again in
+the send mutation.
+
+**Found on the way:** the tRPC router still had its own copy of the answer
+derivation, the exact duplication `matter-answers.ts` was written to be the
+only copy of — its own doc comment claimed the router had been converted. It
+had not. A derived value added to one and not the other means the landlord
+previews one document and the signers receive another. The router now delegates
+to `hydrateMatter`, guarded by a source-level test.
+
+### Notice addresses are POSTAL, and the copy said otherwise
+
+The §83.50 field read "The address must be given in writing", which is true of
+an email address too — so it invited being filled with one. It cannot be: the
+§83.49(3)(a) notice this lease prints verbatim says the landlord "MUST MAIL YOU
+NOTICE, WITHIN 30 DAYS AFTER YOU MOVE OUT", and that the deposit must be
+returned outright if that mailing is not timely. An email address there is
+somewhere a statutory notice cannot be sent.
+
+**Email is additive, never a substitute.** §83.505 permits it only under a
+signed addendum — the "Deliver notices by email?" election on step 1 — and that
+addendum names each party's address separately.
+
+### Utilities live on the property
+
+Added 2026-08-31 (#50). They were two free-text boxes on the interview, and a
+real answer went in as a hand-typed numbered list with company names and phone
+numbers — all of it property data retyped every lease.
+
+Structured rows on the property, `[{ service, provider, phone, paidBy }]`, and
+**both clause variables render from that ONE list split by payer**, so a
+utility cannot sit on both sides or vanish from both. Seeded as text and still
+editable per lease: a tenancy where the tenant takes over the trash is an
+ordinary variation, and the property record should not be edited to describe
+one lease.
+
+Prose with a serial comma, not a numbered list — the clause interpolates it
+mid-sentence ("Tenant shall arrange and pay for the following directly with the
+supplier: …"). An empty side renders "none" rather than leaving a dangling
+colon.
+
+**No provider auto-lookup.** [NREL's Utility Rates API](https://developer.nlr.gov/docs/electricity/utility-rates-v3/)
+is free and returns the ELECTRIC utility from a lat/lon, which the Census
+geocoder already gives us — but water, sewer and trash are municipal with no
+national dataset, and no source carries phone numbers. One row of four, so it
+was not worth building.
+
 ### The UPL line, now structural
 
 A field carrying a `statute` shows the bound and the citation and may **never**

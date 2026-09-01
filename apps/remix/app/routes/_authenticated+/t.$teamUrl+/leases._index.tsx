@@ -78,6 +78,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       hoaName: p.hoaName,
       includedAppliances: p.includedAppliances,
       landlords: (p.landlords ?? []) as { name: string; email: string }[],
+      utilities: (p.utilities ?? []) as ExistingProperty['utilities'],
       noticeName: p.noticeName,
       noticeAddress: p.noticeAddress,
     })),
@@ -198,6 +199,7 @@ export default function LeasesPage() {
                         landlords: property.landlords.length > 0 ? property.landlords : [{ name: '', email: '' }],
                         noticeName: property.noticeName ?? '',
                         noticeAddress: property.noticeAddress ?? '',
+                        utilities: property.utilities,
                       });
                       setAddingProperty(true);
                     }}

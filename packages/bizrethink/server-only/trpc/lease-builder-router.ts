@@ -13,12 +13,12 @@ import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
-import { deriveFacts } from '../../lease/interview/derive-facts';
+import type { deriveFacts } from '../../lease/interview/derive-facts';
 import { FL_INTERVIEW } from '../../lease/interview/steps';
 import { applyTenantAnswers, tenantFieldsFor } from '../../lease/interview/tenant-answers';
 import { canDeleteMatter } from '../../lease/matters/lifecycle';
 import type { LeasePartyInput } from '../../lease/parties/derive-parties';
-import { derivePartyValues, partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
+import { partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
 import { buildLeaseDocuments } from '../../lease/render/render-lease';
 import {
   applyDisposition,
@@ -33,7 +33,11 @@ import { FL_NON_WAIVABLE } from '../../lease/rule-packs/us-fl-non-waivable';
 import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only/clause-approvals';
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { draftClause } from '../../lease/server-only/draft-clause';
+import { hydrateMatter } from '../../lease/server-only/matter-answers';
 import { seedMatterFromProperty } from '../../lease/server-only/seed-from-property';
+import type { UtilityRow } from '../../lease/utilities/derive-utilities';
+import type { YardTask } from '../../lease/yard/derive-yard';
+import { unassignedYardTasks } from '../../lease/yard/derive-yard';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
 
 /**
@@ -66,6 +70,21 @@ const ZAnswers = z.object({
   money: z.record(z.string(), z.unknown()),
   values: z.record(z.string(), z.unknown()),
   customClauses: z.array(ZCustomClause).default([]),
+  /*
+    `doneBy` admits '' on purpose. An unfinished interview must stay saveable,
+    and an unallocated task is a real intermediate state — it is `validate`
+    that refuses to send one, not the save.
+  */
+  yardTasks: z
+    .array(
+      z.object({
+        task: z.string(),
+        doneBy: z.enum(['tenant', 'landlord', 'association', '']),
+        frequency: z.string(),
+        notes: z.string(),
+      }),
+    )
+    .default([]),
   /*
     Not `.email()` here. A half-finished interview must stay saveable, so the
     shape is checked on the way in and the content on the way out — the same
@@ -245,39 +264,24 @@ const hydrate = (matter: {
   values: unknown;
   customClauses: unknown;
   parties: unknown;
+  yardTasks?: unknown;
 }): {
   facts: never;
   money: Parameters<typeof deriveFacts>[0];
   values: HydratedValues;
   customClauses: z.infer<typeof ZCustomClause>[];
   parties: LeasePartyInput[];
+  yardTasks: YardTask[];
 } => {
-  const money = matter.money as Parameters<typeof deriveFacts>[0];
-  const values = matter.values as HydratedValues;
-  const facts = matter.facts as Record<string, unknown>;
-  const parties = (matter.parties ?? []) as LeasePartyInput[];
-
-  const endDate = String(values.endDate ?? money.term.startDate);
+  const hydrated = hydrateMatter(matter);
 
   return {
-    facts: { ...facts, ...deriveFacts(money, endDate) } as never,
-    money,
-    values: {
-      ...values,
-      rentDueDay: money.rent.dueDayOfMonth,
-      monthlyRentUsd: money.rent.monthlyUsd,
-      /*
-        The opening clause names the parties, and both variables are required.
-        Derived here on every read rather than stored, for the same reason the
-        money figures are: a stored derived value is a value that can go stale,
-        and a lease whose first sentence names someone who is no longer a
-        signer is exactly the class of contradiction this feature exists to
-        prevent.
-      */
-      ...derivePartyValues(parties),
-    },
-    customClauses: (matter.customClauses ?? []) as z.infer<typeof ZCustomClause>[],
-    parties,
+    facts: hydrated.facts as never,
+    money: hydrated.money,
+    values: hydrated.values as HydratedValues,
+    customClauses: hydrated.customClauses as z.infer<typeof ZCustomClause>[],
+    parties: hydrated.partyInputs,
+    yardTasks: hydrated.yardTasks,
   };
 };
 
@@ -330,6 +334,7 @@ export const leaseBuilderRouter = router({
           landlords: (property.landlords ?? []) as { name: string; email: string }[],
           noticeName: property.noticeName,
           noticeAddress: property.noticeAddress,
+          utilities: (property.utilities ?? []) as UtilityRow[],
         });
 
         return await prisma.bizrethinkLeaseMatter.create({
@@ -344,6 +349,7 @@ export const leaseBuilderRouter = router({
             money: seeded.money,
             values: seeded.values,
             parties: seeded.parties,
+            yardTasks: seeded.yardTasks,
             customClauses: [],
           },
           select: { id: true },
@@ -372,6 +378,17 @@ export const leaseBuilderRouter = router({
             matter at creation, never referenced live.
           */
           landlords: z.array(z.object({ name: z.string().min(1), email: z.string() })).default([]),
+          utilities: z
+            .array(
+              z.object({
+                service: z.string(),
+                provider: z.string().default(''),
+                phone: z.string().default(''),
+                paidBy: z.enum(['tenant', 'landlord']),
+              }),
+            )
+            .max(30)
+            .default([]),
           noticeName: z.string().nullable().default(null),
           noticeAddress: z.string().nullable().default(null),
         }),
@@ -415,6 +432,17 @@ export const leaseBuilderRouter = router({
           hoaName: z.string().nullable(),
           includedAppliances: z.string().nullable(),
           landlords: z.array(z.object({ name: z.string().min(1), email: z.string() })).default([]),
+          utilities: z
+            .array(
+              z.object({
+                service: z.string(),
+                provider: z.string().default(''),
+                phone: z.string().default(''),
+                paidBy: z.enum(['tenant', 'landlord']),
+              }),
+            )
+            .max(30)
+            .default([]),
           noticeName: z.string().nullable().default(null),
           noticeAddress: z.string().nullable().default(null),
         }),
@@ -550,6 +578,7 @@ export const leaseBuilderRouter = router({
             values: input.answers.values,
             customClauses: input.answers.customClauses,
             parties: input.answers.parties,
+            yardTasks: input.answers.yardTasks,
           },
           select: { id: true },
         });
@@ -593,6 +622,7 @@ export const leaseBuilderRouter = router({
             values: input.answers.values,
             customClauses: input.answers.customClauses,
             parties: input.answers.parties,
+            yardTasks: input.answers.yardTasks,
             delegatedFields: input.delegatedFields,
           },
         });
@@ -671,6 +701,17 @@ export const leaseBuilderRouter = router({
       const partyFindings = validateParties(answers.parties);
 
       /*
+        Also its own list, and for the same kind of reason: a yard job nobody
+        has been given produces a document that is not visibly wrong. It reads
+        perfectly — it simply never mentions who trims the palms, which is a
+        thing you discover from an association's violation notice rather than
+        from the lease.
+      */
+      const yardFindings = unassignedYardTasks(answers.yardTasks).map(
+        (task) => `Nobody has been given "${task}". Assign it, or delete it if it does not apply here.`,
+      );
+
+      /*
         The review loop's own blockers, kept separate from statutory findings
         because they are resolved by a different act entirely: not by changing
         an answer, but by deciding what to do about somebody's comment.
@@ -694,6 +735,7 @@ export const leaseBuilderRouter = router({
         findings,
         missing,
         partyFindings,
+        yardFindings,
         reviewFindings,
         clauseFindings,
         duplicateAssertions: selection.duplicateAssertions,
@@ -702,12 +744,14 @@ export const leaseBuilderRouter = router({
           findings.filter((f) => f.severity === 'blocks').length +
           missing.length +
           partyFindings.length +
+          yardFindings.length +
           reviewFindings.length +
           clauseFindings.filter((f) => f.severity === 'blocks').length,
         readyToSend:
           findings.every((f) => f.severity !== 'blocks') &&
           missing.length === 0 &&
           partyFindings.length === 0 &&
+          yardFindings.length === 0 &&
           reviewFindings.length === 0 &&
           clauseFindings.every((f) => f.severity !== 'blocks'),
         rulePackVersion: US_FL.version,
@@ -823,6 +867,16 @@ export const leaseBuilderRouter = router({
           message: blockingClauses.map((finding) => `${finding.clauseHeading}: ${finding.message}`).join(' '),
         });
       }
+      // Same reason again: this mutation is the only thing between a draft and
+      // real signers, so every rule that must hold is checked here too.
+      const unallocated = unassignedYardTasks(answers.yardTasks);
+
+      if (unallocated.length > 0) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Nobody has been given ${unallocated.map((task) => `"${task}"`).join(', ')} in the yard. Assign each, or delete any that do not apply.`,
+        });
+      }
+
       const envelope = await createEnvelopeFromMatter({
         input: {
           facts: answers.facts,
@@ -897,6 +951,9 @@ export const leaseBuilderRouter = router({
           values: matter.values,
           customClauses: matter.customClauses,
           parties: matter.parties,
+          // In the hash: moving palm trimming from you to the tenant changes
+          // the lease an attorney signed off on.
+          yardTasks: matter.yardTasks,
         });
 
         return await prisma.bizrethinkLeaseReview.create({
@@ -1025,6 +1082,7 @@ export const leaseBuilderRouter = router({
           values: true,
           customClauses: true,
           parties: true,
+          yardTasks: true,
           delegatedFields: true,
         },
       });
@@ -1051,6 +1109,7 @@ export const leaseBuilderRouter = router({
           values: matter.values,
           customClauses: matter.customClauses,
           parties: matter.parties,
+          yardTasks: matter.yardTasks,
         }) !== review.answersHash;
 
       /*

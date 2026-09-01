@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { FL_LIBRARY, FL_SECTION_ORDER } from '../clauses/us-fl';
 import type { InterviewAnswers } from '../interview/steps';
 import { allFields, DERIVED_FACTS, DERIVED_VALUES, FL_INTERVIEW, visibleSteps } from '../interview/steps';
-import { PICANA_FACTS, PICANA_MONEY, PICANA_VALUES } from '../matters/picana-ln';
+import { PICANA_FACTS, PICANA_MONEY, PICANA_VALUES, PICANA_YARD } from '../matters/picana-ln';
 
 /**
  * The interview is the part a human touches, and the way it fails is by being
@@ -19,6 +19,7 @@ const answers = (overrides: Partial<InterviewAnswers> = {}): InterviewAnswers =>
   money: PICANA_MONEY,
   values: PICANA_VALUES,
   customClauses: [],
+  yardTasks: PICANA_YARD,
   ...overrides,
 });
 
