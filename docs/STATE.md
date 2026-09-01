@@ -410,6 +410,78 @@ passed, or appeared to:
 
 ## Open threads
 
+### A one-shot link has to say what it needs before it closes
+
+`review.submit` closes the link in the same transaction. So on the reviewer's
+page: `required` was dropped when the router mapped `askedFields`, nothing
+marked a mandatory answer, and nothing checked completeness — a tenant could
+leave `tenantPreTermAddress` blank, the link died, and the landlord had to
+issue a fresh review for an answer nobody had told them was mandatory.
+
+A draft comment with a clause reference and an empty body was also silently
+discarded, while the button still offered to "send back with no comments".
+
+Both now block the send and say why. Asked fields also honour their own `kind`
+— everything rendered as a textarea, so a single-line answer could carry
+newlines into the lease.
+
+### Conflict resolution reverted a fix, again
+
+Taking `origin/main`'s side on the `statutoryInput` extraction silently undid
+the entry-hours fix that lived in the literal main had extracted. Caught by
+grepping for the change afterwards, not by the merge.
+
+**The rule stands and is worth re-reading every time:** after resolving a
+conflict, verify BOTH sides' changes are still present. A clean merge is not
+evidence that nothing was lost.
+
+### A tenant's returned answers could be destroyed in silence
+
+The interview seeds every answer into React state once at mount and writes the
+whole set back on each step change. It is not the only writer:
+`applyTenantAnswers` writes a tenant's returned answers into the same `values`
+column. A landlord with the page open when the tenant returned their review link
+wiped what they sent on the next click of Next — unrecoverably, and against the
+delegation control's own promise that *"you see what they wrote before anything
+is sent"*.
+
+**Refused, not merged, and not resynced.** Merging by key would not help: the
+stale copy holds the SAME keys with the answers as they were before the tenant
+filled them, so a merge overwrites with blanks just as surely. Resyncing would
+throw away whatever the landlord had typed. A lost update must not be settled by
+guessing which writer mattered — `saveStep` now carries `expectedUpdatedAt` and
+refuses a write built on a stale read.
+
+Recovery is a **full page reload**, not `revalidator.revalidate()`: state is
+mount-seeded and nothing resyncs it, which is the defect itself.
+
+### A failed save was invisible
+
+`saveStep.error` was rendered nowhere, and `goTo` awaited the mutation with no
+catch while every caller was `void goTo(...)`. The page did not move, the
+rejection went to the console, and the caption still read *"Progress saves as
+you move between steps"*. Now shown, and the step deliberately does not advance.
+
+### Checks that ran against constants, not answers
+
+- **§83.53(2) entry hours.** Both entry times are free text and the rule pack
+  was handed `earliestHour: 9, latestHour: 18` — hardcoded. "6:00am" to
+  "11:00pm" produced zero findings. `parseHour` reads what was typed; an
+  unreadable answer falls back INSIDE the window, because citing a statute at
+  someone for a typo is worse than missing one.
+- **`prorationMethod`'s `showWhen`** read `facts.prorationApplies`, computed
+  server-side in `hydrateMatter`. The browser never has it, so the question
+  could never appear and a mid-month lease used the seeded default.
+- **`propertyTypeLabel`** was a snapshot taken at matter creation while
+  `propertyType` stays editable — correcting condo to single-family left the
+  clause reading *"The Premises are a condo. As permitted by §83.51(2)…"*. Also
+  `.replace('-', ' ')` printed *"a single family"*.
+
+### A draft with no start date crashed every read
+
+`deriveFacts` split `money.term.startDate`, which the seeder writes as null on
+purpose. Absent dates now derive nothing rather than zero.
+
 ### A reviewer must read what gets signed
 
 `buildLeaseDocuments` emits the lease PLUS one document per addendum and per

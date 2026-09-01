@@ -148,7 +148,7 @@ export const CustomClauseEditor = ({ sections, clauses, onChange, organisationId
               variant="ghost"
               size="sm"
               onClick={() => onChange(clauses.filter((_, i) => i !== index))}
-              aria-label="Remove this clause"
+              aria-label={`Remove ${clause.heading || `clause ${index + 1}`}`}
             >
               <Trash2 className="h-4 w-4" />
             </Button>

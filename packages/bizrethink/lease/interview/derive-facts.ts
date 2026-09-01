@@ -38,12 +38,31 @@ export type DerivableFacts = Pick<
   | 'termMonths'
 >;
 
-export const deriveFacts = (money: MoneyAnswers, endDate: string): DerivableFacts => ({
-  depositHeldUsd: money.deposit.securityUsd,
-  depositCarriedInUsd: money.deposit.alreadyHeldUsd,
-  advanceRentHeldUsd: money.deposit.advanceRentUsd,
-  advanceRentCarriedInUsd: money.deposit.advanceRentHeldUsd,
-  // True exactly when the term does not begin on the rent due day.
-  prorationApplies: Number(money.term.startDate.split('-')[2]) !== money.rent.dueDayOfMonth,
-  termMonths: monthsBetween(money.term.startDate, endDate),
-});
+/*
+  A DRAFT LEGITIMATELY HAS NO START DATE YET, and this threw on one.
+
+  `money.term.startDate` is null until the landlord answers step 2 — the money
+  seeder writes null on purpose, because a date nobody typed is a date nobody
+  checked. Splitting it took out `get`, `validate`, `send` and both PDF routes
+  for any matter whose term was still unanswered.
+
+  Absent dates derive nothing rather than deriving zero: `prorationApplies`
+  false and `termMonths` 0 mean "not yet known", and the unfilled-variable
+  check is what reports the gap. Guessing here would put a term length into a
+  document from an answer that does not exist.
+*/
+const isIsoDate = (value: unknown): value is string => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value);
+
+export const deriveFacts = (money: MoneyAnswers, endDate: string): DerivableFacts => {
+  const startDate = money.term.startDate;
+
+  return {
+    depositHeldUsd: money.deposit.securityUsd,
+    depositCarriedInUsd: money.deposit.alreadyHeldUsd,
+    advanceRentHeldUsd: money.deposit.advanceRentUsd,
+    advanceRentCarriedInUsd: money.deposit.advanceRentHeldUsd,
+    // True exactly when the term does not begin on the rent due day.
+    prorationApplies: isIsoDate(startDate) ? Number(startDate.split('-')[2]) !== money.rent.dueDayOfMonth : false,
+    termMonths: isIsoDate(startDate) && isIsoDate(endDate) ? monthsBetween(startDate, endDate) : 0,
+  };
+};

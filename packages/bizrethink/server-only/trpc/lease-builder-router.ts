@@ -14,8 +14,10 @@ import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
 import type { deriveFacts } from '../../lease/interview/derive-facts';
+import { entryWindow } from '../../lease/interview/entry-hours';
 import { FL_INTERVIEW } from '../../lease/interview/steps';
 import { applyTenantAnswers, tenantFieldsFor } from '../../lease/interview/tenant-answers';
+import { staleWriteMessage } from '../../lease/matters/concurrency';
 import { canDeleteMatter } from '../../lease/matters/lifecycle';
 import type { LeasePartyInput } from '../../lease/parties/derive-parties';
 import { partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
@@ -355,8 +357,17 @@ const statutoryInput = (answers: ReturnType<typeof hydrate>) => ({
   },
   access: {
     noticeHours: Number(answers.values.entryNoticeHours ?? 0),
-    earliestHour: 9,
-    latestHour: 18,
+    /*
+      The ANSWERS, not constants. Both entry times are free text and these were
+      hardcoded, so the §83.53(2) check ran against numbers nobody had entered:
+      a landlord could type "6:00am" to "11:00pm", see zero findings, and print
+      that window into the lease under a chip telling them the statute
+      constrains it.
+    */
+    ...entryWindow(answers.values.entryEarliestLabel, answers.values.entryLatestLabel, {
+      earliestHour: US_FL.access.earliestHour,
+      latestHour: US_FL.access.latestHour,
+    }),
   },
   earlyTermination: {
     offered: Boolean((answers.facts as Record<string, unknown>).earlyTerminationOffered),
@@ -687,6 +698,20 @@ export const leaseBuilderRouter = router({
             is able to write.
           */
           delegatedFields: z.array(z.string()).max(50).default([]),
+          /*
+            The row's `updatedAt` as the client last saw it.
+
+            The interview seeds every answer into React state at mount and
+            writes the whole set back on each step change, and it is not the
+            only writer: `applyTenantAnswers` writes a tenant's returned
+            answers into the same `values` column. A landlord with the page
+            open when the tenant returned their review link therefore destroyed
+            what the tenant sent, on the next click of Next, with no warning.
+
+            Optional so an older client keeps working rather than having every
+            save fail.
+          */
+          expectedUpdatedAt: z.string().optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -698,7 +723,21 @@ export const leaseBuilderRouter = router({
           });
         }
 
-        await prisma.bizrethinkLeaseMatter.update({
+        /*
+          Refused rather than merged. Merging by key would not help — the
+          landlord's stale copy holds the SAME keys with the answers as they
+          were before the tenant filled them, so a merge overwrites with blanks
+          just as surely. And resyncing the page would throw away whatever the
+          landlord had typed since it loaded. A lost update must not be settled
+          by guessing which writer mattered.
+        */
+        const stale = staleWriteMessage({ expected: input.expectedUpdatedAt, actual: matter.updatedAt });
+
+        if (stale !== null) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: stale });
+        }
+
+        const saved = await prisma.bizrethinkLeaseMatter.update({
           where: { id: input.id },
           data: {
             currentStepId: input.currentStepId,
@@ -710,9 +749,12 @@ export const leaseBuilderRouter = router({
             yardTasks: input.answers.yardTasks,
             delegatedFields: input.delegatedFields,
           },
+          select: { updatedAt: true },
         });
 
-        return { saved: true };
+        // Returned so the client can carry it into its next write; without it
+        // the second save of a session would always look stale.
+        return { saved: true, updatedAt: saved.updatedAt.toISOString() };
       }),
 
     /**
@@ -1232,6 +1274,15 @@ export const leaseBuilderRouter = router({
               help: field.help ?? null,
               placeholder: field.placeholder ?? null,
               kind: field.kind,
+              /*
+                Dropped here before, so the reviewer's page could not mark a
+                required answer or refuse an incomplete submit — and the link
+                closes permanently in the same transaction. A tenant left
+                `tenantPreTermAddress` blank, the link died, and the landlord
+                had to issue a fresh review to get an answer nobody had told
+                them was mandatory.
+              */
+              required: field.required === true,
               answer: String((matter.values as Record<string, unknown>)[field.name] ?? ''),
             }))
           : [];
