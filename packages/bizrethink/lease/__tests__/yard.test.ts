@@ -233,3 +233,33 @@ describe('the send gate', () => {
     expect(send.slice(0, 4000)).toMatch(/unassignedYardTasks\(/);
   });
 });
+
+/**
+ * A lease that predates the yard rows starts with nothing.
+ *
+ * `seedYardTasks` runs at matter CREATION, so every draft opened before this
+ * feature existed has an empty list — and the only thing offered was "Add a
+ * job", one blank row at a time, six times, retyping a list the code already
+ * knows. That is the moment somebody reasonably asks whether AI could fill it
+ * in, and the honest answer is that nothing needs to be predicted: the job
+ * names are a constant, and only the allocation is a decision.
+ */
+describe('the standard list is offered, not only seeded', () => {
+  const editor = readFileSync(
+    new URL('../../../../apps/remix/app/components/general/lease/yard-task-editor.tsx', import.meta.url),
+    'utf8',
+  );
+
+  it('is reachable from the editor for a lease that has none', () => {
+    expect(editor).toMatch(/seedYardTasks/);
+  });
+
+  /*
+    The allocation is never filled in for them. Choosing who mows is the one
+    part of this that is a decision rather than a list, and a pre-filled answer
+    to it reads as agreed.
+  */
+  it('still leaves every job unassigned', () => {
+    expect(seedYardTasks().every((row) => row.doneBy === '')).toBe(true);
+  });
+});

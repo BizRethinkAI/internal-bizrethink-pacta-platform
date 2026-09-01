@@ -2,6 +2,7 @@ import type { InterviewAnswers } from '@bizrethink/customizations/lease/intervie
 import { FL_INTERVIEW, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
 import { delegableFieldNames } from '@bizrethink/customizations/lease/interview/tenant-answers';
 import type { LeasePartyInput } from '@bizrethink/customizations/lease/parties/derive-parties';
+import type { UtilityRow } from '@bizrethink/customizations/lease/utilities/derive-utilities';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -20,6 +21,7 @@ import type { FieldValue } from '~/components/general/lease/interview-field';
 import { InterviewFieldControl } from '~/components/general/lease/interview-field';
 import { PartyEditor } from '~/components/general/lease/party-editor';
 import { LeaseReviewPanel } from '~/components/general/lease/review-panel';
+import { UtilitySummary } from '~/components/general/lease/utility-summary';
 import { YardTaskEditor } from '~/components/general/lease/yard-task-editor';
 import { appMetaTags } from '~/utils/meta';
 
@@ -63,9 +65,20 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
+  /*
+    The utility rows live on the property and are read live rather than copied
+    into the matter. Fetched here so step 4 can SHOW what the lease will say —
+    deriving an answer is not a reason to hide it.
+  */
+  const property = await prisma.bizrethinkProperty.findUnique({
+    where: { id: matter.propertyId },
+    select: { utilities: true },
+  });
+
   return {
     teamUrl,
     organisationId: team.organisationId,
+    utilities: (property?.utilities ?? []) as UtilityRow[],
     matter: {
       id: matter.id,
       title: matter.title,
@@ -122,7 +135,7 @@ const writeMoney = (money: Record<string, unknown>, name: string, value: FieldVa
 };
 
 export default function LeaseInterviewPage() {
-  const { teamUrl, organisationId, matter } = useLoaderData<typeof loader>();
+  const { teamUrl, organisationId, matter, utilities } = useLoaderData<typeof loader>();
 
   const [facts, setFacts] = useState<Record<string, FieldValue>>(matter.facts);
   const [money, setMoney] = useState<Record<string, unknown>>(matter.money);
@@ -269,6 +282,8 @@ export default function LeaseInterviewPage() {
           constrains who may be made to fix the plumbing, not who cuts the
           grass.
         */}
+        {step.id === 'utilities' && <UtilitySummary utilities={utilities} propertiesHref={`/t/${teamUrl}/leases`} />}
+
         {step.id === 'maintenance' && <YardTaskEditor tasks={yardTasks} onChange={setYardTasks} />}
 
         {step.id === 'custom-clauses' && (
