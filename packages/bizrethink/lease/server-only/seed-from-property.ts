@@ -1,6 +1,5 @@
 import type { LeasePartyInput } from '../parties/derive-parties';
 import type { UtilityRow } from '../utilities/derive-utilities';
-import { splitByPayer } from '../utilities/derive-utilities';
 import type { YardTask } from '../yard/derive-yard';
 import { seedYardTasks } from '../yard/derive-yard';
 
@@ -114,16 +113,11 @@ export const seedMatterFromProperty = (property: SeedProperty): SeededMatter => 
     ...(property.noticeName ? { noticeName: property.noticeName } : {}),
     ...(property.noticeAddress ? { noticeAddress: property.noticeAddress } : {}),
     /*
-      Both sides rendered from ONE list, so they cannot disagree about who
-      pays for what. Seeded as text and still editable per lease: a tenancy
-      where this tenant takes over the trash is an ordinary variation, and the
-      property record should not be edited to describe one lease.
+      The utility prose is NOT seeded. It is derived from the property's rows
+      on every read — see hydrateMatter. Seeding it here is what left a matter
+      created before its property had utilities holding two empty required
+      boxes that adding them to the property afterwards could not reach.
     */
-    ...(() => {
-      const { tenant, landlord } = splitByPayer(property.utilities ?? []);
-
-      return { tenantUtilities: tenant, landlordUtilities: landlord };
-    })(),
   },
 
   /*

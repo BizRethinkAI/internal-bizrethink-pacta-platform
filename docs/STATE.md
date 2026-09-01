@@ -410,6 +410,39 @@ passed, or appeared to:
 
 ## Open threads
 
+### `<SelectItem value="">` throws, and only once a row exists
+
+Radix reserves the empty string — setting a Select's VALUE to `''` clears it
+and shows the placeholder, so an ITEM may not claim it. It is a runtime throw
+inside the item, so the yard editor's "Not decided" option passed review,
+passed 666 tests, and rendered fine on every lease that had no yard rows. The
+first press of **Add a job** on a lease with none was a full-page 500.
+
+`''` is still the right value in the DATA — an unassigned job is a real state
+and `unassignedYardTasks` keys off it. The sentinel exists only at the Radix
+boundary. Guarded by `regression-tests/radix-select-empty-value.test.ts`, which
+checks the mapped-options shape as well as the JSX literal.
+
+### Utilities are read live from the property, not copied at creation
+
+Two free-text boxes on step 4, `required`, seeded once at matter creation. A
+lease created before its property had utilities recorded therefore held two
+empty required boxes **that adding the utilities to the property afterwards
+could not reach** — and the two boxes could be edited into disagreeing with
+each other, which is the defect the property rows were introduced to remove.
+
+Derived in `hydrateMatter` from the property's rows now, on every read, and no
+longer asked. Unlike the party list nothing here is order-dependent or signed
+positionally, so there is no reason to freeze a copy — the trade is that
+editing a property's utilities changes what a DRAFT will print. A sent lease is
+unaffected: its PDF is already in the envelope.
+
+**Three render paths, and the reviewer's is the one that hides.** The
+landlord's preview and the router sit together; `_recipient+/lease-review.
+$token.document.tsx` does not, and it would have handed a lawyer a lease
+reading "none" on both sides while the landlord's preview read correctly. All
+three are now guarded by test.
+
 ### Lombard tenancy — first outside tenant
 
 Stood up 2026-08-31 for Lombard Pay's contract e-signing, driven from the

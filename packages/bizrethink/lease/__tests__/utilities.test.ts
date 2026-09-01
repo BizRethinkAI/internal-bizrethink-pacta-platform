@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+
+import { allFields, DERIVED_VALUES, FL_INTERVIEW } from '../interview/steps';
 import type { UtilityRow } from '../utilities/derive-utilities';
 import { renderUtilityList, splitByPayer } from '../utilities/derive-utilities';
 
@@ -95,5 +97,28 @@ describe('splitByPayer', () => {
 
   it('handles a property recorded before utilities existed', () => {
     expect(splitByPayer([])).toEqual({ tenant: 'none', landlord: 'none' });
+  });
+});
+
+/**
+ * The interview must not ask for what the property already answers.
+ *
+ * Two free-text boxes — "Which utilities does the tenant arrange and pay for?"
+ * and "Which do you provide?" — sat on step 4 and were `required`. They were
+ * the pre-rows design, and after the rows landed they were two ways to state
+ * the same fact, in a document whose entire reason for existing is that a
+ * lease must not contradict itself.
+ */
+describe('utilities are not asked twice', () => {
+  it('are derived, not questions', () => {
+    const asked = allFields(FL_INTERVIEW).map((field) => field.name);
+
+    expect(asked).not.toContain('tenantUtilities');
+    expect(asked).not.toContain('landlordUtilities');
+  });
+
+  it('are declared derived, so the coverage test knows the clause is still filled', () => {
+    expect(DERIVED_VALUES).toContain('tenantUtilities');
+    expect(DERIVED_VALUES).toContain('landlordUtilities');
   });
 });

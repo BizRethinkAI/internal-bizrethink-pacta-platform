@@ -150,6 +150,14 @@ export const DERIVED_VALUES = [
   'effectiveDate',
   // Rendered from the yard rows, not typed.
   'yardDuties',
+  /*
+    Rendered from the PROPERTY's utility rows. These were two free-text boxes
+    on step 4 and `required`, which meant a lease could state a different
+    division of utilities from the property it was for, and a matter created
+    before its property had any kept two empty boxes that nothing could fill.
+  */
+  'tenantUtilities',
+  'landlordUtilities',
 ];
 
 const pets = (a: InterviewAnswers) => a.facts.petsPermitted;
@@ -374,15 +382,6 @@ export const FL_INTERVIEW: InterviewStep[] = [
     id: 'utilities',
     title: 'Utilities and insurance',
     fields: [
-      {
-        name: 'tenantUtilities',
-        target: 'value',
-        kind: 'textarea',
-        label: 'Which utilities does the tenant arrange and pay for?',
-        help: 'Only what applies is listed. Nothing renders as "N/A".',
-        required: true,
-      },
-      { name: 'landlordUtilities', target: 'value', kind: 'textarea', label: 'Which do you provide?', required: true },
       {
         name: 'rentersInsuranceMinUsd',
         target: 'value',

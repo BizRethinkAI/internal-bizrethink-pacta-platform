@@ -44,12 +44,24 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
 
   /*
+    The utility rows live on the property and are read live, not copied into
+    the matter — see hydrateMatter. This route renders the same document the
+    router does, so it has to supply the same input.
+  */
+  const property = await prisma.bizrethinkProperty.findUnique({
+    where: { id: matter.propertyId },
+    select: { utilities: true },
+  });
+
+  /*
     Hydrated through the shared mapping rather than unpacked here. This route
     used to do its own, and drifted: it built signers from
     `values.landlordNames`, which became DERIVED when the party list landed, so
     every preview said "LANDLORD — TO BE CONFIRMED" whoever was signing.
   */
-  const { rendered } = await renderLease(renderInputForMatter(matter));
+  const { rendered } = await renderLease(
+    renderInputForMatter({ ...matter, propertyUtilities: property?.utilities ?? [] }),
+  );
 
   const lease = rendered.find((doc) => doc.key === 'lease');
 

@@ -38,6 +38,55 @@ const matter = {
 
 describe('hydrateMatter', () => {
   /*
+    Utilities were SEEDED into `values` at matter creation and then editable as
+    two free-text boxes. Three things followed, and a real lease hit all three:
+
+      - a matter created before the property had utilities kept two empty
+        required boxes forever, and adding the utilities to the property
+        afterwards could not reach it;
+      - the two boxes could be edited into disagreeing about who pays for what,
+        which is the defect the property rows were introduced to remove;
+      - the property row set and the lease prose could drift with nothing able
+        to notice.
+
+    Derived from the property now, on every read. Unlike the party list, no
+    order here is load-bearing and nothing is signed positionally, so there is
+    no reason to freeze a copy at creation.
+  */
+  it('derives both utility lists from the property, not from stored values', () => {
+    const { values } = hydrateMatter({
+      ...matter,
+      values: { ...matter.values, tenantUtilities: 'whatever was typed here in March' },
+      propertyUtilities: [
+        { service: 'electricity', provider: 'Withlacoochee', phone: '', paidBy: 'tenant' },
+        { service: 'trash collection', provider: 'Coastal', phone: '', paidBy: 'landlord' },
+      ],
+    });
+
+    expect(values.tenantUtilities).toBe('electricity (Withlacoochee)');
+    expect(values.landlordUtilities).toBe('trash collection (Coastal)');
+    expect(values.tenantUtilities).not.toContain('March');
+  });
+
+  it('never puts a utility on both sides or on neither', () => {
+    const { values } = hydrateMatter({
+      ...matter,
+      propertyUtilities: [{ service: 'water', provider: '', phone: '', paidBy: 'tenant' }],
+    });
+
+    expect(values.tenantUtilities).toBe('water');
+    // 'none' rather than empty: the clause interpolates this mid-sentence.
+    expect(values.landlordUtilities).toBe('none');
+  });
+
+  it('says "none" rather than leaving a required variable unfilled', () => {
+    const { values } = hydrateMatter({ ...matter, propertyUtilities: [] });
+
+    expect(values.tenantUtilities).toBe('none');
+    expect(values.landlordUtilities).toBe('none');
+  });
+
+  /*
     Yard duty was a boolean with the split hard-coded in the clause. It is rows
     now, and BOTH the clause's gate and its prose are re-derived here rather
     than stored — a stored copy would survive an edit to the rows and print an
@@ -154,4 +203,32 @@ describe('the router does not keep its own copy of the derivation', () => {
   it('does not derive the yard prose a second time', () => {
     expect(router).not.toMatch(/renderYardDuties\s*\(/);
   });
+});
+
+/**
+ * Every render path supplies the property.
+ *
+ * There are three: the landlord's preview, the reviewer's copy, and the tRPC
+ * router that actually sends. The reviewer's is the one that matters most —
+ * a lawyer marking up a document that differs from the one being signed is
+ * worse than no review at all — and it is also the one most easily forgotten,
+ * because it lives in `_recipient+` rather than next to the other two.
+ *
+ * Utilities are read live from the property, so a caller that does not pass
+ * them renders a lease whose utility clause says "none" on both sides.
+ */
+describe('the render paths', () => {
+  const routes = [
+    'apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.preview.tsx',
+    'apps/remix/app/routes/_recipient+/lease-review.$token.document.tsx',
+  ];
+
+  for (const route of routes) {
+    it(`${route.split('/').pop()} passes the property's utilities`, () => {
+      const body = readFileSync(new URL(`../../../../${route}`, import.meta.url), 'utf8');
+
+      expect(body).toContain('renderInputForMatter');
+      expect(body).toMatch(/propertyUtilities:/);
+    });
+  }
 });

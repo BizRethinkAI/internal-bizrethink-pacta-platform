@@ -64,26 +64,21 @@ describe('the landlord comes from the property', () => {
     expect(seedMatterFromProperty(property).parties[0].role).toBe('landlord');
   });
 
-  it('renders both utility lists from the one property list', () => {
+  /*
+    Deliberately NOT seeded, and this is the fix for a real failure: a matter
+    created before its property had any utilities held two empty required boxes
+    forever, because seeding happens once at creation and adding the utilities
+    to the property afterwards had no way to reach the lease.
+
+    They are derived from the property's rows on every read instead — see
+    hydrateMatter. Nothing here is order-dependent or signed positionally, so
+    unlike the party list there is no reason to freeze a copy.
+  */
+  it('does not seed the utility prose, which is derived from the property', () => {
     const { values } = seedMatterFromProperty(property);
 
-    expect(values.tenantUtilities).toContain('electricity');
-    expect(values.tenantUtilities).toContain('352-588-5115');
-    expect(values.landlordUtilities).toContain('trash collection');
-  });
-
-  it('never puts a utility on both sides', () => {
-    const { values } = seedMatterFromProperty(property);
-
-    expect(String(values.landlordUtilities)).not.toContain('electricity');
-    expect(String(values.tenantUtilities)).not.toContain('trash');
-  });
-
-  it('says "none" rather than leaving the clause with a dangling colon', () => {
-    const bare = seedMatterFromProperty({ ...property, utilities: [] });
-
-    expect(bare.values.tenantUtilities).toBe('none');
-    expect(bare.values.landlordUtilities).toBe('none');
+    expect(values.tenantUtilities).toBeUndefined();
+    expect(values.landlordUtilities).toBeUndefined();
   });
 
   it('seeds the §83.50 notice name and address', () => {
