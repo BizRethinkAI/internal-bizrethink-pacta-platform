@@ -104,7 +104,11 @@ export const seedMatterFromProperty = (property: SeedProperty): SeededMatter => 
 
   values: {
     propertyAddress: `${property.addressLine}, ${property.city}, ${property.state} ${property.postalCode}`,
-    propertyTypeLabel: property.propertyType.replace('-', ' '),
+    /*
+      No propertyTypeLabel here. It was seeded once and never recomputed, while
+      the property type stays editable per lease — so a corrected type left the
+      clause describing the old one. Derived in hydrateMatter now.
+    */
     venueCounty: property.county,
     hoaName: property.hoaName,
     includedAppliances: property.includedAppliances,

@@ -92,6 +92,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       parties: matter.parties as LeasePartyInput[],
       delegatedFields: (matter.delegatedFields ?? []) as string[],
       envelopeId: matter.envelopeId,
+      // Carried into every save so a write built on a stale read is refused
+      // rather than silently overwriting a tenant's returned answers.
+      updatedAt: matter.updatedAt.toISOString(),
     },
   };
 }
@@ -145,6 +148,22 @@ export default function LeaseInterviewPage() {
   const [parties, setParties] = useState<LeasePartyInput[]>(matter.parties);
   const [delegatedFields, setDelegatedFields] = useState<string[]>(matter.delegatedFields);
 
+  /*
+    The row's `updatedAt` as this page last saw it, advanced by each successful
+    save. Without carrying the new value forward the second save of a session
+    would always look stale to the server.
+  */
+  const [seenUpdatedAt, setSeenUpdatedAt] = useState(matter.updatedAt);
+
+  /*
+    A failed save used to be completely invisible: the error was rendered
+    nowhere, and `goTo` awaited the mutation with no catch while every caller
+    was `void goTo(...)`. The page simply did not move, an unhandled rejection
+    went to the console, and the caption underneath still said progress saves
+    as you move between steps.
+  */
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   // Which fields may be put to the tenant at all. Server-side this is
   // recomputed from the same definitions, so the UI cannot widen it.
   const delegable = useMemo(() => new Set(delegableFieldNames(FL_INTERVIEW)), []);
@@ -186,12 +205,31 @@ export default function LeaseInterviewPage() {
   const goTo = async (index: number) => {
     const target = steps[Math.max(0, Math.min(index, steps.length - 1))];
 
-    await saveStep.mutateAsync({
-      id: matter.id,
-      currentStepId: target.id,
-      answers: { facts, money, values, customClauses, parties, yardTasks } as never,
-      delegatedFields,
-    });
+    try {
+      const { updatedAt } = await saveStep.mutateAsync({
+        id: matter.id,
+        currentStepId: target.id,
+        answers: { facts, money, values, customClauses, parties, yardTasks } as never,
+        delegatedFields,
+        expectedUpdatedAt: seenUpdatedAt,
+      });
+
+      setSeenUpdatedAt(updatedAt);
+      setSaveError(null);
+    } catch (error) {
+      /*
+        The step deliberately does NOT advance. Moving on from a step whose
+        answers were not stored is how a 68-field interview quietly stops
+        persisting — which is exactly what happened before, in silence.
+      */
+      setSaveError(error instanceof Error ? error.message : 'Your answers could not be saved.');
+
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0 });
+      }
+
+      return;
+    }
 
     setStepIndex(index);
 
@@ -306,6 +344,39 @@ export default function LeaseInterviewPage() {
           />
         )}
       </section>
+
+      {/*
+        A failed save was rendered nowhere at all. The page did not move, the
+        rejection went to the console unhandled, and the caption below still
+        promised that progress saves as you move between steps.
+      */}
+      {saveError !== null && (
+        <Alert variant="destructive" className="mt-8">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Your answers were not saved</AlertTitle>
+          <AlertDescription>
+            <p className="text-sm">{saveError}</p>
+            {/*
+              A full reload, not `revalidator.revalidate()`. Every answer is
+              seeded into React state once at mount and nothing resyncs it —
+              which is the defect this alert exists to report — so re-running
+              the loader would leave exactly the stale copy that was refused.
+            */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.reload();
+                }
+              }}
+            >
+              Reload this lease
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="mt-10 flex items-center justify-between border-t py-6">
         <Button variant="outline" disabled={safeIndex === 0} onClick={() => void goTo(safeIndex - 1)}>
@@ -554,9 +625,9 @@ const ReviewPanel = ({
         judge the match for themselves. A collapsed summary would hide the one
         thing that makes this honest.
       */}
-      {data?.clauseFindings.map((finding) => (
+      {data?.clauseFindings.map((finding, index) => (
         <Alert
-          key={`${finding.ruleId}-${finding.clauseHeading}`}
+          key={`${finding.ruleId}-${finding.clauseHeading}-${index}`}
           variant={finding.severity === 'blocks' ? 'destructive' : 'warning'}
         >
           <AlertTriangle className="h-4 w-4" />

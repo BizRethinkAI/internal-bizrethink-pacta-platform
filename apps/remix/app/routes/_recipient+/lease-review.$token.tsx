@@ -43,6 +43,7 @@ type AskedField = {
   placeholder: string | null;
   kind: string;
   answer: string;
+  required: boolean;
 };
 
 export default function LeaseReviewPage() {
@@ -117,6 +118,21 @@ export default function LeaseReviewPage() {
 
   const usable = drafts.filter((draft) => draft.body.trim() !== '');
 
+  /*
+    A draft with a clause reference and no body was dropped without a word. A
+    reviewer who typed "7.2" into "Which clause?" and got distracted saw the
+    button still offering to send back with no comments, sent, and the link
+    closed on a comment that was never delivered.
+  */
+  const abandoned = drafts.filter((draft) => draft.body.trim() === '' && draft.clauseSlug.trim() !== '');
+
+  /*
+    Required answers, enforced here because this link is one-shot: submitting
+    closes it in the same transaction, so an incomplete send costs a whole
+    round trip through the landlord.
+  */
+  const unanswered = askedFields.filter((field) => field.required && (answers[field.name] ?? '').trim() === '');
+
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10">
       <h1 className="font-semibold text-2xl">{matter.title}</h1>
@@ -182,15 +198,33 @@ export default function LeaseReviewPage() {
           <div className="mt-4 space-y-4">
             {askedFields.map((field) => (
               <div key={field.name}>
-                <Label htmlFor={`asked-${field.name}`}>{field.label}</Label>
+                <Label htmlFor={`asked-${field.name}`}>
+                  {field.label}
+                  {field.required && <span className="ml-1 text-destructive">*</span>}
+                </Label>
                 {field.help && <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">{field.help}</p>}
-                <Textarea
-                  id={`asked-${field.name}`}
-                  rows={2}
-                  placeholder={field.placeholder ?? undefined}
-                  value={answers[field.name] ?? ''}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, [field.name]: e.target.value }))}
-                />
+                {/*
+                  The field's own kind. Every asked field rendered as a
+                  two-row textarea regardless, so a single-line answer like
+                  the pre-move-in address could carry newlines straight into
+                  the lease text.
+                */}
+                {field.kind === 'textarea' ? (
+                  <Textarea
+                    id={`asked-${field.name}`}
+                    rows={2}
+                    placeholder={field.placeholder ?? undefined}
+                    value={answers[field.name] ?? ''}
+                    onChange={(e) => setAnswers((prev) => ({ ...prev, [field.name]: e.target.value }))}
+                  />
+                ) : (
+                  <Input
+                    id={`asked-${field.name}`}
+                    placeholder={field.placeholder ?? undefined}
+                    value={answers[field.name] ?? ''}
+                    onChange={(e) => setAnswers((prev) => ({ ...prev, [field.name]: e.target.value }))}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -256,7 +290,7 @@ export default function LeaseReviewPage() {
                   variant="ghost"
                   size="sm"
                   className="mt-6"
-                  aria-label="Remove this comment"
+                  aria-label={`Remove ${draft.clauseSlug || `comment ${index + 1}`}`}
                   onClick={() => setDrafts((prev) => prev.filter((_, i) => i !== index))}
                 >
                   <Trash2 className="h-4 w-4" />
@@ -286,7 +320,7 @@ export default function LeaseReviewPage() {
         */}
         <div className="mt-8 flex items-center gap-4 border-t pt-6">
           <Button
-            disabled={submit.isPending}
+            disabled={submit.isPending || unanswered.length > 0 || abandoned.length > 0}
             onClick={() =>
               submit.mutate({
                 token: token ?? '',
@@ -315,6 +349,27 @@ export default function LeaseReviewPage() {
           <p className="text-muted-foreground text-xs">
             Sending closes this link. Add everything you want to say first.
           </p>
+
+          {/*
+            Both of these are only worth saying because the link is ONE-SHOT.
+            Submitting closes it in the same transaction, so anything missed
+            here costs a whole round trip back through the landlord.
+          */}
+          {unanswered.length > 0 && (
+            <p className="text-destructive text-xs">
+              {unanswered.length === 1 ? 'One answer is' : `${unanswered.length} answers are`} still needed:{' '}
+              {unanswered.map((field) => field.label).join('; ')}
+            </p>
+          )}
+
+          {abandoned.length > 0 && (
+            <p className="text-destructive text-xs">
+              {abandoned.length === 1
+                ? 'One comment names a clause but has nothing written in it, and would not be sent.'
+                : `${abandoned.length} comments name a clause but have nothing written in them, and would not be sent.`}{' '}
+              Write them, or remove them.
+            </p>
+          )}
         </div>
       </section>
     </div>

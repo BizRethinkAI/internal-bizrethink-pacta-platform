@@ -155,7 +155,20 @@ const FieldInput = ({ id, field, value, onChange }: { id: string } & Omit<Interv
 
   if (field.kind === 'select') {
     return (
-      <Select value={value === null ? undefined : String(value)} onValueChange={(next) => onChange(next)}>
+      /*
+        '' rather than undefined for an unanswered select.
+
+        `undefined` puts Radix's useControllableState in UNCONTROLLED mode, and
+        the first answer flips it to controlled — React logs the warning, and
+        the answer can then never be cleared back to the placeholder, because
+        passing undefined again no longer resets the internal value. Radix
+        reserves the empty string for exactly this: it clears the value and
+        shows the placeholder.
+      */
+      <Select
+        value={value === null || value === undefined ? '' : String(value)}
+        onValueChange={(next) => onChange(next)}
+      >
         <SelectTrigger id={id}>
           <SelectValue placeholder="Choose…" />
         </SelectTrigger>
