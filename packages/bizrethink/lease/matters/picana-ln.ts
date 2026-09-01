@@ -38,7 +38,7 @@ export const PICANA_YARD: YardTask[] = [
     frequency: 'Twice yearly',
     notes: 'dead fronds and seed heads',
   },
-  { task: 'Fertilisation and pest treatment', doneBy: 'landlord', frequency: '', notes: '' },
+  { task: 'Fertilisation and lawn pest treatment', doneBy: 'landlord', frequency: 'Quarterly', notes: '' },
   { task: 'Leaf and debris clearance', doneBy: 'tenant', frequency: '', notes: '' },
 ];
 

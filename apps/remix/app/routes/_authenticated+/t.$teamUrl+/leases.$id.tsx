@@ -1,3 +1,4 @@
+import { describeMissingUnique } from '@bizrethink/customizations/lease/interview/describe-missing';
 import type { InterviewAnswers } from '@bizrethink/customizations/lease/interview/steps';
 import { FL_INTERVIEW, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
 import { delegableFieldNames } from '@bizrethink/customizations/lease/interview/tenant-answers';
@@ -15,7 +16,6 @@ import { msg } from '@lingui/core/macro';
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useLoaderData, useRevalidator } from 'react-router';
-
 import { CustomClauseEditor } from '~/components/general/lease/custom-clause-editor';
 import type { FieldValue } from '~/components/general/lease/interview-field';
 import { InterviewFieldControl } from '~/components/general/lease/interview-field';
@@ -452,14 +452,31 @@ const ReviewPanel = ({
         </Alert>
       ))}
 
+      {/*
+        The QUESTION, not the clause slug and variable name the renderer emits.
+        This printed `parties.recital: effectiveDate` in monospace — the
+        landlord could not tell which question they had skipped, and in that
+        particular case there was none, so no answer of theirs would ever have
+        cleared it.
+      */}
       {(data?.missing.length ?? 0) > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>{data?.missing.length} answers still outstanding</AlertTitle>
+          <AlertTitle>{describeMissingUnique(data?.missing ?? []).length} answers still outstanding</AlertTitle>
           <AlertDescription>
-            <ul className="mt-2 list-disc space-y-1 pl-4 font-mono text-xs">
-              {data?.missing.map((item) => (
-                <li key={item}>{item}</li>
+            <ul className="mt-2 space-y-2 pl-4">
+              {describeMissingUnique(data?.missing ?? []).map((entry) => (
+                <li key={entry.raw} className="list-disc text-sm">
+                  {entry.question}
+                  {/*
+                    The step TITLE, not a number. Which steps are visible
+                    depends on the answers, so a number computed here goes
+                    stale and sends someone to the wrong page.
+                  */}
+                  {entry.stepTitle !== null && (
+                    <span className="block text-muted-foreground text-xs">{entry.stepTitle}</span>
+                  )}
+                </li>
               ))}
             </ul>
           </AlertDescription>

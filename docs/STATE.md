@@ -445,6 +445,42 @@ enabled only on the review step. Three things had that shape:
 `hashAnswers` now covers the property's utilities, via one `currentAnswersHash()`
 shared by both callers. They are read live, so editing a utility row moves a
 lease already out for review.
+### No lease had ever been sendable
+
+An adversarial review (four passes, 45 findings) opened with this: `readyToSend`
+was false for **every lease ever built through the product**, for two reasons,
+and no answer a landlord could give would clear either.
+
+- **`effectiveDate`** sat in `DERIVED_VALUES` — so no step asked for it — and
+  nothing derived it. The only assignment in the repo was a checked-in fixture.
+- **`startDate`** is asked with `target: 'money'`, so it lands in
+  `money.term.startDate`, while `term.fixed` declares it as a required VALUE.
+
+**The test written to catch exactly this compared by field NAME and ignored
+`target`**, so a money-targeted answer falsely satisfied a value variable, and
+membership of `DERIVED_VALUES` was accepted as proof of derivation. Both now
+checked properly, plus a test that renders the reference matter and asserts
+nothing in `DERIVED_VALUES` is left outstanding.
+
+`effectiveDate` turned out not to need deriving at all: `general.execution`
+already says *"The effective date is the date of the last signature"*, so two
+always-on clauses were fixing it two different ways. The recital no longer
+states a date.
+
+### A toggle may not sit on a step it can renumber
+
+`petsPermitted` was the last field of the FLOOD step and gated the PETS step
+declared before it. Switching it on inserted a step at the index the answerer
+was standing on — the page silently became "Pets" with two flood questions
+unanswered behind them. The Pets step is always visible now and asks the
+question itself.
+
+### `missing` is the renderer's vocabulary, not the landlord's
+
+The review panel printed `parties.recital: effectiveDate` in monospace.
+`describeMissing` turns each entry into the question and its step — and where
+nothing asks for the variable, says so, because telling someone to go and
+answer it sends them hunting for a question that does not exist.
 
 ### Deriving an answer is not a reason to hide it
 

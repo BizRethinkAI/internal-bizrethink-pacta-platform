@@ -69,6 +69,17 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
   */
   const allValues: Record<string, InterpolationValue> = {
     ...values,
+    /*
+      Asked with `target: 'money'`, so the answer lands in `money.term.startDate`
+      and never reaches `values` on its own — while `term.fixed` declares
+      `startDate` as a required VALUE variable. Every lease rendered "The term
+      of this Lease begins on {{startDate}}", `missing` was permanently
+      non-empty, and readyToSend was false for every lease ever built here.
+
+      Bridged at this seam rather than in hydrateMatter because this is the one
+      funnel every render path goes through, including the checked-in matter.
+    */
+    startDate: money.term.startDate,
     monthlyRentUsd: money.rent.monthlyUsd,
     depositHeldUsd: derived.depositHeldUsd,
     depositCarriedInUsd: money.deposit.alreadyHeldUsd,
