@@ -1,4 +1,4 @@
-import { renderLease } from '@bizrethink/customizations/lease/render/render-lease';
+import { renderLeaseForReview } from '@bizrethink/customizations/lease/render/render-lease';
 import { renderInputForMatter } from '@bizrethink/customizations/lease/server-only/matter-answers';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
@@ -59,17 +59,20 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     `values.landlordNames`, which became DERIVED when the party list landed, so
     every preview said "LANDLORD — TO BE CONFIRMED" whoever was signing.
   */
-  const { rendered } = await renderLease(
+  /*
+    EVERY document, as one file. This picked the lease out and returned it
+    alone, while the envelope uploads the lease plus every addendum and
+    standalone disclosure — so a reviewer read one document and the signers
+    received up to seven, including the two Florida requires to be separate.
+
+    Signing is unchanged: the envelope still gets distinct items. This is only
+    how they are read.
+  */
+  const pdf = await renderLeaseForReview(
     renderInputForMatter({ ...matter, propertyUtilities: property?.utilities ?? [] }),
   );
 
-  const lease = rendered.find((doc) => doc.key === 'lease');
-
-  if (!lease) {
-    throw new Response('Lease document was not produced', { status: 500 });
-  }
-
-  return new Response(new Uint8Array(lease.pdf), {
+  return new Response(new Uint8Array(pdf), {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="lease-preview.pdf"',

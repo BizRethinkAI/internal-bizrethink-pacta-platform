@@ -202,9 +202,30 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
  * so a signer receives them as distinct documents rather than as later pages of
  * the lease.
  */
-export const renderDocumentPdf = async (spec: LeaseDocumentSpec, parties: LeaseParty[]): Promise<Buffer> => {
-  const doc = h(Document, null, renderDocument(spec, parties));
+export const renderDocumentPdf = async (spec: LeaseDocumentSpec, parties: LeaseParty[]): Promise<Buffer> =>
+  await toBuffer(h(Document, null, renderDocument(spec, parties)));
 
+/**
+ * Every spec, one PDF — for READING only.
+ *
+ * The separateness above is legally load-bearing at SIGNING time and stays
+ * exactly as it is: §83.512 requires the flood disclosure to be a separate
+ * written disclosure, an addendum is its own instrument with its own signature
+ * block, and each becomes its own envelope item.
+ *
+ * But the landlord's preview and the reviewer's copy both did
+ * `rendered.find((doc) => doc.key === 'lease')` and returned that alone, so an
+ * attorney read one document while the signers received up to seven. A review
+ * of a document that is not the document being signed produces a record of
+ * approval that was never given.
+ *
+ * Reading them is not signing them, so for reading they are concatenated. The
+ * envelope is untouched.
+ */
+export const renderCombinedPdf = async (specs: LeaseDocumentSpec[], parties: LeaseParty[]): Promise<Buffer> =>
+  await toBuffer(h(Document, null, ...specs.map((spec) => renderDocument(spec, parties))));
+
+const toBuffer = async (doc: ReturnType<typeof h>): Promise<Buffer> => {
   const stream = await renderToStream(doc);
   const chunks: Buffer[] = [];
 

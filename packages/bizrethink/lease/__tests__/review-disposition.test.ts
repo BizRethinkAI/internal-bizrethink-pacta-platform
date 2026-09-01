@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -202,5 +204,164 @@ describe('hashAnswers', () => {
 
   it('hashes nested structures, not just the top level', () => {
     expect(hashAnswers({ m: { rent: 1 } })).not.toBe(hashAnswers({ m: { rent: 2 } }));
+  });
+});
+
+/**
+ * An attorney's approval must not survive the document changing.
+ *
+ * `sendBlockers` blocked only on PENDING comments. Once each was dispositioned
+ * it could never block again — and it never compared the current answers to
+ * the hash taken when the review was issued. So: send it to the lawyer, get
+ * comments back, disposition them, then change the rent, the term, a clause,
+ * anything at all, and the send is clear with her review recorded against a
+ * document that no longer exists.
+ *
+ * `changedSinceIssued` did exist, but only inside `review.open`, which becomes
+ * unreachable the moment the reviewer submits — so nothing consulted it at the
+ * one time it mattered.
+ */
+describe('sendBlockers and staleness', () => {
+  const review = {
+    id: 'rev_1',
+    matterId: 'mat_1',
+    audience: 'attorney' as const,
+    status: 'returned' as const,
+    expiresAt: new Date('2099-01-01'),
+    answersHash: 'HASH-AT-ISSUE',
+  };
+
+  it('does not block when the answers are the ones that were reviewed', () => {
+    expect(sendBlockers({ reviews: [review], comments: [], now: new Date(), answersHash: 'HASH-AT-ISSUE' })).toEqual(
+      [],
+    );
+  });
+
+  it('blocks when the lease has changed since the attorney read it', () => {
+    const blockers = sendBlockers({
+      reviews: [review],
+      comments: [],
+      now: new Date(),
+      answersHash: 'A-DIFFERENT-HASH',
+    });
+
+    expect(blockers).toHaveLength(1);
+    expect(blockers[0]).toMatch(/changed/i);
+  });
+
+  /*
+    A tenant's read is not an approval, so a tenant review going stale is not a
+    reason to stop a send — the same asymmetry the rest of this module holds.
+  */
+  it('ignores staleness on a tenant review', () => {
+    expect(
+      sendBlockers({
+        reviews: [{ ...review, audience: 'tenant' as const }],
+        comments: [],
+        now: new Date(),
+        answersHash: 'A-DIFFERENT-HASH',
+      }),
+    ).toEqual([]);
+  });
+
+  it('does not block on a review the attorney never returned', () => {
+    expect(
+      sendBlockers({
+        reviews: [{ ...review, status: 'open' as const }],
+        comments: [],
+        now: new Date(),
+        answersHash: 'A-DIFFERENT-HASH',
+      }),
+    ).toEqual([]);
+  });
+
+  /*
+    Called without a hash — an older caller, or one that cannot compute it —
+    must not silently become non-blocking. It falls back to the previous
+    behaviour rather than pretending the check passed.
+  */
+  it('is unchanged when no hash is supplied', () => {
+    expect(sendBlockers({ reviews: [review], comments: [], now: new Date() })).toEqual([]);
+  });
+});
+
+/**
+ * Every rule that must hold is checked in the MUTATION.
+ *
+ * `validate` is a query. It powers a panel, nothing forces a client to call it,
+ * and its React Query cache is only enabled on the review step — so a rule that
+ * lives there alone is a rule a send can walk past. The custom-clause scan, the
+ * party list and the yard allocation all re-check in `send`.
+ *
+ * `validateAnswers` — the eight blocking statutory rules, §83.49(3)(a),
+ * §83.53(2), §83.575 and §83.595(4) — did not. The oldest gate in the file had
+ * exactly the shape the newer ones were written to avoid.
+ *
+ * Source-level because the router needs a database, and this has to fail on the
+ * commit that removes the check rather than in production.
+ */
+describe('the send mutation re-checks everything advisory', () => {
+  const router = readFileSync(new URL('../../server-only/trpc/lease-builder-router.ts', import.meta.url), 'utf8');
+
+  const sendBody = router.slice(
+    router.indexOf('const envelope = await createEnvelopeFromMatter') - 6000,
+    router.indexOf('const envelope = await createEnvelopeFromMatter'),
+  );
+
+  for (const check of [
+    'validateAnswers',
+    'validateParties',
+    'scanCustomClauses',
+    'unassignedYardTasks',
+    'reviewBlockersFor',
+  ]) {
+    it(`re-runs ${check}`, () => {
+      expect(sendBody).toContain(`${check}(`);
+    });
+  }
+
+  /*
+    The property's utilities are read LIVE and rendered into the lease, so
+    editing a utility row rewrites a lease that is out for review. If they are
+    not in the hash, staleness reports "nothing moved".
+  */
+  it('hashes the utilities it renders from', () => {
+    expect(router).toMatch(/utilities: (matter\.)?propertyUtilities|propertyUtilities,/);
+  });
+});
+
+/**
+ * A condition that stops the send must be shown as one.
+ *
+ * `unreviewedClauses` was computed in `validate` and then excluded from both
+ * `blocking` and `readyToSend`, and no alert rendered it. Meanwhile
+ * `createEnvelopeFromMatter` throws UNAUTHORIZED on exactly that condition.
+ *
+ * So an organisation without the draft-rendering grant saw "Nothing is blocking
+ * this lease", an enabled Send button, and then a hard failure naming raw
+ * clause slugs — with no way in the product to find out what was wrong.
+ */
+describe('unreviewed clauses', () => {
+  const router = readFileSync(new URL('../../server-only/trpc/lease-builder-router.ts', import.meta.url), 'utf8');
+
+  const route = readFileSync(
+    new URL('../../../../apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.tsx', import.meta.url),
+    'utf8',
+  );
+
+  it('count toward blocking', () => {
+    const summary = router.slice(router.indexOf('blocking:'), router.indexOf('rulePackVersion: US_FL.version'));
+
+    expect(summary).toContain('unreviewed.length');
+  });
+
+  it('withhold readyToSend', () => {
+    const summary = router.slice(router.indexOf('readyToSend:'), router.indexOf('rulePackVersion: US_FL.version'));
+
+    expect(summary).toContain('unreviewed.length === 0');
+  });
+
+  it('are shown to the landlord rather than only counted', () => {
+    expect(route).toMatch(/unreviewedClauses\.\w*\s*\.?map|unreviewedClauses\?\.map/);
   });
 });

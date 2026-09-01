@@ -89,13 +89,21 @@ export type SendBlockersOptions = {
   reviews: LeaseReview[];
   comments: ReviewComment[];
   now: Date;
+  /**
+   * The answers as they stand NOW, hashed the same way `answersHash` was when
+   * each review was issued.
+   *
+   * Optional so a caller that cannot compute it falls back to the previous
+   * behaviour rather than silently reporting "nothing is blocking".
+   */
+  answersHash?: string;
 };
 
 /**
  * Everything standing between this lease and its signers, from the review loop
  * alone. Empty means the review loop is not what is holding it up.
  */
-export const sendBlockers = ({ reviews, comments }: SendBlockersOptions): string[] => {
+export const sendBlockers = ({ reviews, comments, answersHash }: SendBlockersOptions): string[] => {
   const byId = new Map(reviews.map((review) => [review.id, review]));
   const blockers: string[] = [];
 
@@ -124,6 +132,30 @@ export const sendBlockers = ({ reviews, comments }: SendBlockersOptions): string
     blockers.push(
       `${outstanding.length} attorney comment(s) have no disposition yet. Accept, edit, or dismiss each one before sending.`,
     );
+  }
+
+  /*
+    A DISPOSITIONED REVIEW IS NOT A PERMANENT CLEARANCE.
+
+    Without this, the loop had an obvious hole: send it to the attorney, take
+    her comments, disposition each one, then change the rent — and the send is
+    clear, with her review recorded against a document that no longer exists.
+    Every check above is about the comments; none was about the lease.
+
+    Only an ATTORNEY review blocks, and only one that came back ('returned'). A tenant's
+    read is not an approval, and a review still out is already covered by the
+    pending-comment rule.
+  */
+  if (answersHash !== undefined) {
+    const stale = reviews.filter(
+      (review) => review.audience === 'attorney' && review.status === 'returned' && review.answersHash !== answersHash,
+    );
+
+    if (stale.length > 0) {
+      blockers.push(
+        `The lease has changed since ${stale.length === 1 ? 'the attorney review' : `${stale.length} attorney reviews`} came back. Send a fresh review, or restore the answers that were reviewed.`,
+      );
+    }
   }
 
   return blockers;

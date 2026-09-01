@@ -247,7 +247,37 @@ const toDomainComment = (comment: {
   dispositionedAt: comment.dispositionedAt,
 });
 
-const reviewBlockersFor = async (matterId: string): Promise<string[]> => {
+/**
+ * The answer set as it stands, hashed the way `answersHash` was at issue.
+ *
+ * One function so the two callers cannot drift: a hash that omits something the
+ * lease renders from turns "has this changed since the attorney read it?" into
+ * a question that always answers no.
+ */
+const currentAnswersHash = (matter: {
+  facts: unknown;
+  money: unknown;
+  values: unknown;
+  customClauses: unknown;
+  parties: unknown;
+  yardTasks: unknown;
+  propertyUtilities: unknown;
+}): string =>
+  hashAnswers({
+    facts: matter.facts,
+    money: matter.money,
+    values: matter.values,
+    customClauses: matter.customClauses,
+    parties: matter.parties,
+    // Moving palm trimming from you to the tenant changes the lease an
+    // attorney signed off on.
+    yardTasks: matter.yardTasks,
+    // Read LIVE from the property rather than copied, so editing a utility row
+    // rewrites the utility clause of a lease already out for review.
+    utilities: matter.propertyUtilities,
+  });
+
+const reviewBlockersFor = async (matterId: string, answersHash?: string): Promise<string[]> => {
   const reviews = await prisma.bizrethinkLeaseReview.findMany({ where: { matterId } });
 
   const comments = await prisma.bizrethinkReviewComment.findMany({
@@ -258,6 +288,12 @@ const reviewBlockersFor = async (matterId: string): Promise<string[]> => {
     reviews: reviews.map(toDomainReview),
     comments: comments.map(toDomainComment),
     now: new Date(),
+    /*
+      Without this the loop had an obvious hole: disposition every comment,
+      then change the rent, and the send is clear with the attorney's review
+      recorded against a document that no longer exists.
+    */
+    answersHash,
   });
 };
 
@@ -301,6 +337,38 @@ const hydrate = (matter: {
     yardTasks: hydrated.yardTasks,
   };
 };
+
+/**
+ * The statutory rule pack's input, built once.
+ *
+ * It used to be assembled inline inside the `validate` QUERY, which is why the
+ * `send` mutation never ran these rules at all — there was nothing to call.
+ * `validate` is advisory: it powers a panel, nothing forces a client to call
+ * it, and its cache is enabled only on the review step. A rule that lives
+ * there alone is a rule a send walks past.
+ */
+const statutoryInput = (answers: ReturnType<typeof hydrate>) => ({
+  rent: { monthlyUsd: answers.money.rent.monthlyUsd },
+  deposit: {
+    returnDays: Number(answers.values.depositReturnDays ?? 0),
+    claimNoticeDays: Number(answers.values.depositClaimNoticeDays ?? 0),
+  },
+  access: {
+    noticeHours: Number(answers.values.entryNoticeHours ?? 0),
+    earliestHour: 9,
+    latestHour: 18,
+  },
+  earlyTermination: {
+    offered: Boolean((answers.facts as Record<string, unknown>).earlyTerminationOffered),
+    feeUsd: Number(answers.values.earlyTerminationFeeUsd ?? 0),
+    tenantNoticeDays: Number(answers.values.earlyTerminationNoticeDays ?? 0),
+  },
+  lateFee: { graceDays: Number(answers.values.graceDays ?? 0) },
+  nonRenewal: {
+    required: Boolean((answers.facts as Record<string, unknown>).nonRenewalNoticeRequired),
+    noticeDays: Number(answers.values.nonRenewalNoticeDays ?? 0),
+  },
+});
 
 export const leaseBuilderRouter = router({
   property: router({
@@ -678,28 +746,7 @@ export const leaseBuilderRouter = router({
       });
 
       const findings = validateAnswers({
-        answers: {
-          rent: { monthlyUsd: answers.money.rent.monthlyUsd },
-          deposit: {
-            returnDays: Number(answers.values.depositReturnDays ?? 0),
-            claimNoticeDays: Number(answers.values.depositClaimNoticeDays ?? 0),
-          },
-          access: {
-            noticeHours: Number(answers.values.entryNoticeHours ?? 0),
-            earliestHour: 9,
-            latestHour: 18,
-          },
-          earlyTermination: {
-            offered: Boolean((answers.facts as Record<string, unknown>).earlyTerminationOffered),
-            feeUsd: Number(answers.values.earlyTerminationFeeUsd ?? 0),
-            tenantNoticeDays: Number(answers.values.earlyTerminationNoticeDays ?? 0),
-          },
-          lateFee: { graceDays: Number(answers.values.graceDays ?? 0) },
-          nonRenewal: {
-            required: Boolean((answers.facts as Record<string, unknown>).nonRenewalNoticeRequired),
-            noticeDays: Number(answers.values.nonRenewalNoticeDays ?? 0),
-          },
-        },
+        answers: statutoryInput(answers),
         pack: US_FL,
       });
 
@@ -733,7 +780,7 @@ export const leaseBuilderRouter = router({
         because they are resolved by a different act entirely: not by changing
         an answer, but by deciding what to do about somebody's comment.
       */
-      const reviewFindings = await reviewBlockersFor(matter.id);
+      const reviewFindings = await reviewBlockersFor(matter.id, currentAnswersHash(matter));
 
       /*
         Clauses the landlord wrote themselves, checked against the areas
@@ -762,6 +809,13 @@ export const leaseBuilderRouter = router({
           missing.length +
           partyFindings.length +
           yardFindings.length +
+          /*
+            It was computed here and then left out of both totals, while
+            createEnvelopeFromMatter throws UNAUTHORIZED on exactly this — so
+            the panel said nothing was blocking, the Send button was enabled,
+            and the send failed naming raw slugs.
+          */
+          unreviewed.length +
           reviewFindings.length +
           clauseFindings.filter((f) => f.severity === 'blocks').length,
         readyToSend:
@@ -769,6 +823,7 @@ export const leaseBuilderRouter = router({
           missing.length === 0 &&
           partyFindings.length === 0 &&
           yardFindings.length === 0 &&
+          unreviewed.length === 0 &&
           reviewFindings.length === 0 &&
           clauseFindings.every((f) => f.severity !== 'blocks'),
         rulePackVersion: US_FL.version,
@@ -864,7 +919,7 @@ export const leaseBuilderRouter = router({
         the send is exactly such a rule, and a gate that lives only in a
         read-only query is not a gate.
       */
-      const reviewFindings = await reviewBlockersFor(matter.id);
+      const reviewFindings = await reviewBlockersFor(matter.id, currentAnswersHash(matter));
 
       if (reviewFindings.length > 0) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, { message: reviewFindings.join(' ') });
@@ -884,6 +939,24 @@ export const leaseBuilderRouter = router({
           message: blockingClauses.map((finding) => `${finding.clauseHeading}: ${finding.message}`).join(' '),
         });
       }
+      /*
+        THE OLDEST GATE HAD THE SHAPE THE NEWER ONES AVOID.
+
+        Everything else here re-checks; the eight statutory rules — §83.49(3)(a),
+        §83.53(2), §83.575, §83.595(4) — ran only in the advisory query. A
+        five-day deposit-return window or an early-termination fee above the
+        two-month cap reached real signers whenever the panel was one edit stale.
+      */
+      const statutory = validateAnswers({ answers: statutoryInput(answers), pack: US_FL }).filter(
+        (finding) => finding.severity === 'blocks',
+      );
+
+      if (statutory.length > 0) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: statutory.map((finding) => `${finding.citation}: ${finding.message}`).join(' '),
+        });
+      }
+
       // Same reason again: this mutation is the only thing between a draft and
       // real signers, so every rule that must hold is checked here too.
       const unallocated = unassignedYardTasks(answers.yardTasks);
@@ -971,6 +1044,13 @@ export const leaseBuilderRouter = router({
           // In the hash: moving palm trimming from you to the tenant changes
           // the lease an attorney signed off on.
           yardTasks: matter.yardTasks,
+          /*
+            And the property's utilities, which are read LIVE rather than
+            copied — so editing a utility row rewrites the utility clause of a
+            lease already out for review. Omitted, staleness reported "nothing
+            moved".
+          */
+          utilities: matter.propertyUtilities,
         });
 
         return await prisma.bizrethinkLeaseReview.create({
@@ -1101,6 +1181,8 @@ export const leaseBuilderRouter = router({
           parties: true,
           yardTasks: true,
           delegatedFields: true,
+          // For the live utility read below.
+          propertyId: true,
         },
       });
 
@@ -1116,18 +1198,21 @@ export const leaseBuilderRouter = router({
       });
 
       /*
+        The property's utilities are part of what the lease renders and are read
+        live, so they belong in the hash — otherwise editing a utility row moves
+        the document while this flag still says nothing changed.
+      */
+      const property = await prisma.bizrethinkProperty.findUnique({
+        where: { id: matter.propertyId },
+        select: { utilities: true },
+      });
+
+      /*
         Both audiences see the whole lease, so this flag is the only thing
         separating "you reviewed this" from "you reviewed something else".
       */
       const changedSinceIssued =
-        hashAnswers({
-          facts: matter.facts,
-          money: matter.money,
-          values: matter.values,
-          customClauses: matter.customClauses,
-          parties: matter.parties,
-          yardTasks: matter.yardTasks,
-        }) !== review.answersHash;
+        currentAnswersHash({ ...matter, propertyUtilities: property?.utilities ?? [] }) !== review.answersHash;
 
       /*
         Questions for the tenant, resolved from the field DEFINITIONS and

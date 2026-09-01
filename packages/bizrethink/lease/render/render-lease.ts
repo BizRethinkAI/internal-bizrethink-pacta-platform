@@ -7,7 +7,7 @@ import { deriveMoney } from '../money/derive';
 import type { MoneyAnswers } from '../money/types';
 import type { InterpolationValue } from './interpolate';
 import type { LeaseDocumentSpec } from './lease-document';
-import { buildClauseText, renderDocumentPdf } from './lease-document';
+import { buildClauseText, renderCombinedPdf, renderDocumentPdf } from './lease-document';
 import type { LeaseParty } from './signature-blocks';
 
 /**
@@ -162,4 +162,22 @@ export const renderLease = async (input: RenderLeaseInput): Promise<RenderLeaseR
   );
 
   return { rendered, missing, readyToSend: missing.length === 0, documents };
+};
+
+/**
+ * The whole instrument set as one file, for reading.
+ *
+ * The landlord's preview and the reviewer's copy both picked the lease out of
+ * `rendered` and returned it alone, while the envelope uploaded every document
+ * `buildLeaseDocuments` produced. The attorney read one; the signers received
+ * up to seven, including the two Florida requires to be separate.
+ *
+ * Signing is unchanged — `renderLease` still returns them separately and the
+ * envelope still gets distinct items. This is only how a human reads them
+ * before anyone signs anything.
+ */
+export const renderLeaseForReview = async (input: RenderLeaseInput): Promise<Buffer> => {
+  const { documents } = buildLeaseDocuments(input);
+
+  return await renderCombinedPdf(documents, input.parties);
 };
