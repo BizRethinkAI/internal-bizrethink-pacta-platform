@@ -27,8 +27,24 @@ export type YardTaskEditorProps = {
   onChange: (tasks: YardTask[]) => void;
 };
 
-const DOERS: { value: YardTask['doneBy']; label: string }[] = [
-  { value: '', label: 'Not decided' },
+/*
+  Radix RESERVES the empty string. Setting a Select's value to '' is how you
+  clear it and show the placeholder, so an item may not claim it:
+
+    "A <Select.Item /> must have a value prop that is not an empty string."
+
+  It is a runtime throw inside the item, which means it only fires when a row
+  is actually drawn — this shipped, rendered fine on every lease that had no
+  yard rows, and took down the first page where somebody pressed "Add a job".
+
+  '' stays the value in the DATA. An unassigned job is a real state and
+  `unassignedYardTasks` keys off it. The sentinel exists only for the width of
+  this control.
+*/
+const UNASSIGNED = 'unassigned';
+
+const DOERS: { value: string; label: string }[] = [
+  { value: UNASSIGNED, label: 'Not decided' },
   { value: 'tenant', label: 'Tenant' },
   { value: 'landlord', label: 'You' },
   { value: 'association', label: 'The association' },
@@ -76,11 +92,13 @@ export const YardTaskEditor = ({ tasks, onChange }: YardTaskEditorProps) => {
                 <div>
                   <Label htmlFor={`yard-doneby-${index}`}>Done by</Label>
                   <Select
-                    value={task.doneBy}
-                    onValueChange={(next) => update(index, { doneBy: next as YardTask['doneBy'] })}
+                    value={task.doneBy === '' ? UNASSIGNED : task.doneBy}
+                    onValueChange={(next) =>
+                      update(index, { doneBy: next === UNASSIGNED ? '' : (next as YardTask['doneBy']) })
+                    }
                   >
                     <SelectTrigger id={`yard-doneby-${index}`}>
-                      <SelectValue placeholder="Not decided" />
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {DOERS.map((doer) => (

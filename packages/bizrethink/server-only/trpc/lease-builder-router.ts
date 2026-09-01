@@ -178,7 +178,22 @@ const loadMatter = async (id: string, userId: number) => {
   // Membership is established; this is the feature gate on top of it.
   await assertAccess(matter.organisationId, userId);
 
-  return matter;
+  /*
+    A third query, for the same reason there are already two: ADR 0002 keeps
+    our models free of Prisma relations into upstream ones, and the convention
+    is kept between our own.
+
+    The utility rows are read LIVE rather than copied at creation. Which
+    company supplies the electricity at an address does not change between
+    tenancies, and a lease created before its property had utilities recorded
+    would otherwise hold two empty required boxes that nothing could fill.
+  */
+  const property = await prisma.bizrethinkProperty.findUnique({
+    where: { id: matter.propertyId },
+    select: { utilities: true },
+  });
+
+  return { ...matter, propertyUtilities: property?.utilities ?? [] };
 };
 
 /**
@@ -265,6 +280,8 @@ const hydrate = (matter: {
   customClauses: unknown;
   parties: unknown;
   yardTasks?: unknown;
+  // Read live from the property by loadMatter, not stored on the matter.
+  propertyUtilities?: unknown;
 }): {
   facts: never;
   money: Parameters<typeof deriveFacts>[0];

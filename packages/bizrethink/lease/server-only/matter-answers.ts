@@ -5,6 +5,8 @@ import { derivePartyValues, toLeaseParties } from '../parties/derive-parties';
 import type { InterpolationValue } from '../render/interpolate';
 import type { RenderLeaseInput } from '../render/render-lease';
 import type { LeaseParty } from '../render/signature-blocks';
+import type { UtilityRow } from '../utilities/derive-utilities';
+import { splitByPayer } from '../utilities/derive-utilities';
 import type { YardTask } from '../yard/derive-yard';
 import { renderYardDuties, splitByDoer } from '../yard/derive-yard';
 
@@ -34,6 +36,16 @@ export type StoredMatter = {
   customClauses: unknown;
   parties: unknown;
   yardTasks?: unknown;
+  /**
+   * The PROPERTY's utility rows, passed in by the caller.
+   *
+   * Not on the matter. Which company supplies the electricity at an address
+   * does not change between tenancies, so it is recorded once on the property
+   * and read live from here — there is nothing order-dependent about it and
+   * nothing signed positionally, so unlike the party list it has no reason to
+   * be frozen at creation.
+   */
+  propertyUtilities?: unknown;
 };
 
 export type HydratedMatter = {
@@ -58,6 +70,8 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
   // Same tolerance, for matters stored before the yard column existed.
   const yardTasks = (matter.yardTasks ?? []) as YardTask[];
   const yardDuties = renderYardDuties(yardTasks);
+
+  const utilities = splitByPayer((matter.propertyUtilities ?? []) as UtilityRow[]);
 
   const endDate = String(values.endDate ?? money.term.startDate);
 
@@ -90,6 +104,15 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       ...derivePartyValues(partyInputs),
       // Likewise: the rows are the answer, the prose is only their rendering.
       yardDuties,
+      /*
+        Also last, and for the reason the party names are. These were SEEDED
+        into `values` at creation and then editable as two free-text boxes, so
+        a matter created before its property had utilities kept two empty
+        required boxes forever, and the two boxes could be edited into
+        disagreeing with each other.
+      */
+      tenantUtilities: utilities.tenant,
+      landlordUtilities: utilities.landlord,
     },
     parties: toLeaseParties(partyInputs),
     partyInputs,

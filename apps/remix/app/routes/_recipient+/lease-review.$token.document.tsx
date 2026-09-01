@@ -58,7 +58,21 @@ export async function loader({ params }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const { rendered } = await renderLease(renderInputForMatter(matter));
+  /*
+    The utility rows live on the property and are read live rather than copied
+    into the matter — see hydrateMatter. Omitting them here would hand a
+    reviewer a lease whose utility clause reads "none" on both sides while the
+    landlord's own preview reads correctly, which is precisely the divergence
+    the shared mapping exists to prevent.
+  */
+  const property = await prisma.bizrethinkProperty.findUnique({
+    where: { id: matter.propertyId },
+    select: { utilities: true },
+  });
+
+  const { rendered } = await renderLease(
+    renderInputForMatter({ ...matter, propertyUtilities: property?.utilities ?? [] }),
+  );
   const lease = rendered.find((doc) => doc.key === 'lease');
 
   if (!lease) {
