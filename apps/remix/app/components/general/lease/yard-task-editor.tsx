@@ -1,5 +1,6 @@
 import type { YardTask } from '@bizrethink/customizations/lease/yard/derive-yard';
 import {
+  exampleFor,
   renderYardDuties,
   seedYardTasks,
   unassignedYardTasks,
@@ -130,17 +131,22 @@ export const YardTaskEditor = ({ tasks, onChange }: YardTaskEditorProps) => {
                   <Input
                     id={`yard-frequency-${index}`}
                     value={task.frequency}
-                    placeholder="Twice yearly"
+                    placeholder="Weekly"
                     onChange={(e) => update(index, { frequency: e.target.value })}
                   />
                 </div>
 
+                {/*
+                  The example belongs to the JOB, not to the column. One shared
+                  placeholder put the palms' "dead fronds and seed heads" on
+                  the mowing row and on every other.
+                */}
                 <div>
                   <Label htmlFor={`yard-notes-${index}`}>What it covers</Label>
                   <Input
                     id={`yard-notes-${index}`}
                     value={task.notes}
-                    placeholder="dead fronds and seed heads"
+                    placeholder={exampleFor(task.task)}
                     onChange={(e) => update(index, { notes: e.target.value })}
                   />
                 </div>

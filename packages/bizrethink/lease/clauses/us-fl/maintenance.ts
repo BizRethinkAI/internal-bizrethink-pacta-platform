@@ -58,7 +58,16 @@ export const FL_MAINTENANCE: Clause[] = [
 
   {
     slug: 'maintenance.shift-single-family',
-    version: 1,
+    /*
+      v2: "extermination of pests" became the statute's own list.
+
+      §83.51(2)(a)4 names rats, mice, roaches, ants, wood-destroying organisms
+      and bedbugs. Written as "pests" it also read on lawn treatment, which the
+      yard rows allocate separately — so a lease could give the tenant "pests"
+      here and the landlord "pest treatment" two sections later. They are
+      different jobs; the statute's words say which one this is.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'maintenance',
@@ -66,7 +75,7 @@ export const FL_MAINTENANCE: Clause[] = [
     heading: 'Allocation of Maintenance for a Single-Family Home',
     // The written modification §83.51(2) expressly permits. Its existence in
     // the document is what makes the clauses below effective.
-    body: "The Premises are a {{propertyTypeLabel}}. As permitted by Fla. Stat. §83.51(2), Landlord and Tenant agree in writing that Tenant is responsible for the matters allocated to Tenant in this section, being extermination of pests, replacement of keys, removal of garbage and maintenance of outside receptacles. This allocation does not affect Landlord's obligations under Fla. Stat. §83.51(1).",
+    body: "The Premises are a {{propertyTypeLabel}}. As permitted by Fla. Stat. §83.51(2), Landlord and Tenant agree in writing that Tenant is responsible for the matters allocated to Tenant in this section, being extermination of rats, mice, roaches, ants, wood-destroying organisms and bedbugs, replacement of keys, removal of garbage and maintenance of outside receptacles. This allocation does not affect Landlord's obligations under Fla. Stat. §83.51(1).",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => alterableUnder8351(facts.propertyType),

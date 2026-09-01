@@ -25,18 +25,37 @@ const drafted = () => ({ kind: 'attorney-drafted' as const, author: null });
 export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'parties.recital',
-    version: 1,
+    // v2: the effective date moved out — see the note on the body.
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'parties',
     sortKey: 10,
     heading: 'Parties',
-    body: 'This Residential Lease is made on {{effectiveDate}} between {{landlordNames}} ("Landlord") and {{tenantNames}} ("Tenant"). Where more than one person signs as Landlord or as Tenant, each is jointly and severally liable for every obligation of that party under this Lease.',
+    /*
+      v2: the date came out.
+
+      Two always-on clauses were fixing the effective date two different ways.
+      This one said "made on {{effectiveDate}}"; general.execution says "The
+      effective date is the date of the last signature". On any lease not
+      counter-signed on the stated day the document contradicted itself about
+      when it took effect — which is the trigger for the term, the proration,
+      and the §83.49(2) and §83.49(3) clocks.
+
+      And nothing ever produced {{effectiveDate}}. It sat in DERIVED_VALUES,
+      so no step asked for it, and the only assignment anywhere was a
+      checked-in fixture. Every real lease rendered the raw token, `missing`
+      was never empty, and the Send button could not be reached by any lease
+      built through the product.
+
+      One statement of the effective date, in the clause that already made it,
+      resolves both.
+    */
+    body: 'This Residential Lease is made between {{landlordNames}} ("Landlord") and {{tenantNames}} ("Tenant"). Where more than one person signs as Landlord or as Tenant, each is jointly and severally liable for every obligation of that party under this Lease. The effective date is stated in the Execution clause.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
     variables: [
-      { name: 'effectiveDate', type: 'date', label: 'Effective date', required: true },
       { name: 'landlordNames', type: 'string', label: 'Landlord name(s)', required: true },
       { name: 'tenantNames', type: 'string', label: 'Tenant name(s)', required: true },
     ],
