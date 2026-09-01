@@ -340,6 +340,7 @@ export default function LeaseInterviewPage() {
             status={matter.status}
             envelopeId={matter.envelopeId}
             parties={parties}
+            delegatedFields={delegatedFields}
             query={{ isLoading: validate.isLoading, data: validate.data as ValidationResult | undefined }}
           />
         )}
@@ -438,6 +439,7 @@ const ReviewPanel = ({
   status,
   envelopeId,
   parties,
+  delegatedFields,
   query,
 }: {
   teamUrl: string;
@@ -445,6 +447,8 @@ const ReviewPanel = ({
   status: string;
   envelopeId: string | null;
   parties: LeasePartyInput[];
+  /** So a question put to the tenant is not reported as one the landlord skipped. */
+  delegatedFields: string[];
   query: { isLoading: boolean; data: ValidationResult | undefined };
 }) => {
   const revalidator = useRevalidator();
@@ -533,10 +537,12 @@ const ReviewPanel = ({
       {(data?.missing.length ?? 0) > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>{describeMissingUnique(data?.missing ?? []).length} answers still outstanding</AlertTitle>
+          <AlertTitle>
+            {describeMissingUnique(data?.missing ?? [], delegatedFields).length} answers still outstanding
+          </AlertTitle>
           <AlertDescription>
             <ul className="mt-2 space-y-2 pl-4">
-              {describeMissingUnique(data?.missing ?? []).map((entry) => (
+              {describeMissingUnique(data?.missing ?? [], delegatedFields).map((entry) => (
                 <li key={entry.raw} className="list-disc text-sm">
                   {entry.question}
                   {/*
@@ -544,8 +550,18 @@ const ReviewPanel = ({
                     depends on the answers, so a number computed here goes
                     stale and sends someone to the wrong page.
                   */}
+                  {/*
+                    A delegated question still blocks — a lease cannot go out
+                    with a raw token in it — but it is not one the landlord
+                    skipped, and a red list that cannot tell the two apart
+                    sends them to answer what they have already dealt with.
+                  */}
                   {entry.stepTitle !== null && (
-                    <span className="block text-muted-foreground text-xs">{entry.stepTitle}</span>
+                    <span className="block text-muted-foreground text-xs">
+                      {entry.awaitingTenant
+                        ? `${entry.stepTitle} · asked of the tenant, not yet answered`
+                        : entry.stepTitle}
+                    </span>
                   )}
                 </li>
               ))}

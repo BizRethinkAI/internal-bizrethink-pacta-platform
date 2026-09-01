@@ -7,7 +7,7 @@ import type { SelectedClause } from '../engine/select-clauses';
 import type { MoneyLine } from '../money/types';
 import type { InterpolationValue } from './interpolate';
 import { interpolateClause } from './interpolate';
-import type { LeaseParty } from './signature-blocks';
+import type { LeaseParty, PartyRole } from './signature-blocks';
 import { buildSignatureBlocks } from './signature-blocks';
 
 /**
@@ -27,48 +27,179 @@ import { buildSignatureBlocks } from './signature-blocks';
  * Converting to `.tsx` is a readability cleanup, not a functional change.
  */
 
-const FONT_BODY = 'Times-Roman';
-const FONT_BOLD = 'Helvetica-Bold';
+/*
+  THE TYPEFACE PALETTE IS FIXED BY THE COMPLIANCE CONSTRAINT ABOVE, and it is
+  wider than it looks. All seven of these are standard-14 and none is embedded,
+  so `page.findText()` still finds every placeholder — which is the whole reason
+  a custom face is not an option.
 
-/** Must match `LINE_TEXT_HEIGHT` in signature-blocks.ts. */
+  Times for the instrument itself, because a contract that reads as a contract
+  is set in a book face. Helvetica for the apparatus around it — running head,
+  section labels, table columns, footer — so the reader can tell at a glance
+  what is the agreement and what is the furniture.
+*/
+const SERIF = 'Times-Roman';
+const SERIF_ITALIC = 'Times-Italic';
+const SANS = 'Helvetica';
+const SANS_BOLD = 'Helvetica-Bold';
+
+const INK = '#15191d';
+const MUTED = '#5c6772';
+const HAIRLINE = '#c9ced4';
+/** Prints legibly in greyscale, which a signed lease frequently is. */
+const ACCENT = '#1c3d5a';
+
+/**
+ * MUST STAY 11, and must match `LINE_TEXT_HEIGHT` in signature-blocks.ts.
+ *
+ * The page default is what a signature placeholder renders at, and the sized
+ * widget's reserved leading is computed from it. Changing it moves every
+ * signature widget off the line it was measured for. Body text carries its own
+ * size instead.
+ */
 const BASE_FONT_SIZE = 11;
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 64,
-    paddingBottom: 72,
-    paddingHorizontal: 64,
-    fontFamily: FONT_BODY,
+    // 1.25in sides. The old 64pt gave a ~98-character measure, which is why the
+    // body read as an undifferentiated slab.
+    paddingTop: 74,
+    paddingBottom: 76,
+    paddingHorizontal: 90,
+    fontFamily: SERIF,
     fontSize: BASE_FONT_SIZE,
     lineHeight: 1.5,
+    color: INK,
   },
-  docTitle: { fontFamily: FONT_BOLD, fontSize: 18, marginBottom: 4 },
-  docSubtitle: { fontSize: 11, marginBottom: 24 },
-  sectionHeading: { fontFamily: FONT_BOLD, fontSize: 11, marginTop: 14, marginBottom: 4 },
-  bodyText: { textAlign: 'justify', marginBottom: 8 },
-  footer: {
+
+  /* ---- running head and foot ---- */
+
+  runningHead: {
     position: 'absolute',
-    bottom: 36,
-    left: 64,
-    right: 64,
-    fontSize: 8,
-    color: '#555555',
+    top: 40,
+    left: 90,
+    right: 90,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    borderBottomWidth: 0.5,
+    borderBottomColor: HAIRLINE,
+    paddingBottom: 5,
+    fontFamily: SANS,
+    fontSize: 7,
+    letterSpacing: 0.7,
+    color: MUTED,
   },
-  tocRow: { flexDirection: 'row', marginBottom: 2 },
-  tocNumber: { width: 40 },
+  footer: {
+    position: 'absolute',
+    bottom: 42,
+    left: 90,
+    right: 90,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    fontFamily: SANS,
+    fontSize: 7,
+    letterSpacing: 0.7,
+    color: MUTED,
+  },
+
+  /* ---- the cover block ---- */
+
+  eyebrow: {
+    fontFamily: SANS_BOLD,
+    fontSize: 7.5,
+    letterSpacing: 1.6,
+    color: ACCENT,
+    marginBottom: 10,
+  },
+  docTitle: {
+    fontFamily: SANS_BOLD,
+    fontSize: 23,
+    letterSpacing: -0.2,
+    lineHeight: 1.15,
+    color: INK,
+  },
+  titleRule: { borderBottomWidth: 2, borderBottomColor: ACCENT, marginTop: 12, marginBottom: 12 },
+  docSubtitle: { fontFamily: SERIF_ITALIC, fontSize: 11.5, color: MUTED, marginBottom: 4 },
+  recital: { fontSize: 10.5, lineHeight: 1.5, marginTop: 10, marginBottom: 26 },
+
+  /* ---- contents ---- */
+
+  blockLabel: {
+    fontFamily: SANS_BOLD,
+    fontSize: 8,
+    letterSpacing: 1.4,
+    color: ACCENT,
+    marginTop: 4,
+    marginBottom: 9,
+  },
+  tocRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 4.5,
+  },
+  tocNumber: { width: 34, fontFamily: SANS, fontSize: 8.5, color: MUTED },
+  // The leader. A dotted rule under a flexed cell is how a contents table has
+  // carried the eye across a gap since long before any of this was digital.
+  tocLeader: {
+    flexGrow: 1,
+    borderBottomWidth: 0.5,
+    borderBottomColor: HAIRLINE,
+    borderBottomStyle: 'dotted',
+    marginBottom: 2.5,
+  },
+  tocHeading: { fontSize: 9.5, paddingRight: 6 },
+
+  /* ---- clauses ---- */
+
+  sectionRow: { flexDirection: 'row', marginTop: 17, marginBottom: 5 },
+  sectionNumber: { width: 34, fontFamily: SANS_BOLD, fontSize: 9, color: ACCENT },
+  sectionHeadingText: {
+    flex: 1,
+    fontFamily: SANS_BOLD,
+    fontSize: 9,
+    letterSpacing: 0.85,
+    color: INK,
+  },
+  bodyText: { textAlign: 'justify', fontSize: 10.5, lineHeight: 1.55, marginBottom: 2 },
+
+  /* ---- amounts ---- */
+
+  moneyTableTop: { borderTopWidth: 1, borderTopColor: INK, marginTop: 2 },
   moneyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 0.5,
-    borderBottomColor: '#cccccc',
-    paddingVertical: 3,
+    borderBottomColor: HAIRLINE,
+    paddingVertical: 5,
+    fontSize: 10,
   },
-  moneyTotal: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, fontFamily: FONT_BOLD },
-  sigGroupHeading: { fontFamily: FONT_BOLD, fontSize: 9, marginTop: 18, marginBottom: 6 },
-  sigName: { fontSize: 9, color: '#555555' },
-  sigBlock: { marginBottom: 10 },
+  moneyTotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    borderTopColor: INK,
+    paddingTop: 6,
+    marginTop: 1,
+    fontFamily: SANS_BOLD,
+    fontSize: 10,
+  },
+  // Figures line up in a column, so they are set to line up.
+  amount: { fontFamily: SERIF },
+
+  /* ---- signatures ---- */
+
+  sigSection: { marginTop: 26, borderTopWidth: 1, borderTopColor: ACCENT, paddingTop: 12 },
+  sigGroupHeading: {
+    fontFamily: SANS_BOLD,
+    fontSize: 8,
+    letterSpacing: 1.4,
+    color: ACCENT,
+    marginTop: 14,
+    marginBottom: 8,
+  },
+  sigName: { fontFamily: SANS_BOLD, fontSize: 9.5, color: INK },
+  sigRole: { fontFamily: SANS, fontSize: 7.5, letterSpacing: 0.8, color: MUTED, marginBottom: 2 },
+  sigBlock: { marginBottom: 14 },
 });
 
 export type RenderedClause = {
@@ -79,30 +210,75 @@ export type RenderedClause = {
 
 const text = (content: string, style?: Style | Style[], key?: string) => h(Text, { style, key }, content);
 
-/** Running footer. `render` gives react-pdf the page numbers it computes itself. */
-const footer = (documentTitle: string) =>
+/**
+ * Running head. Names the instrument and the property on every page.
+ *
+ * A signed lease gets printed, photocopied and pulled apart; a loose page with
+ * nothing on it but body text belongs to no document. Both halves are `fixed`
+ * so react-pdf repeats them.
+ */
+const runningHead = (documentTitle: string, subtitle: string) =>
+  h(
+    View,
+    { style: styles.runningHead, fixed: true },
+    h(Text, {}, documentTitle.toUpperCase()),
+    h(Text, {}, subtitle.toUpperCase()),
+  );
+
+/** Running foot. `render` gives react-pdf the page numbers it computes itself. */
+const footer = () =>
   h(
     View,
     { style: styles.footer, fixed: true },
-    h(Text, {}, documentTitle),
+    h(Text, {}, 'PACTA'),
     h(Text, {
       render: ({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
-        `Page ${pageNumber} of ${totalPages}`,
+        `PAGE ${pageNumber} OF ${totalPages}`,
     }),
   );
+
+/**
+ * The cover block: what this is, what it is about, and between whom.
+ *
+ * The recital line is here because a reader opening a lease asks "whose is
+ * this?" before anything else, and the answer used to be buried in clause 1.
+ */
+const coverBlock = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
+  const named = (role: PartyRole) =>
+    parties
+      .filter((party) => party.role === role)
+      .map((party) => party.name)
+      .join(' and ');
+
+  const landlords = named('landlord');
+  const tenants = named('tenant');
+
+  return h(
+    View,
+    { key: 'cover' },
+    text(spec.withInitials ? 'Addendum' : 'Agreement', styles.eyebrow),
+    text(spec.title, styles.docTitle),
+    h(View, { style: styles.titleRule, key: 'title-rule' }),
+    text(spec.subtitle, styles.docSubtitle),
+    ...(landlords !== '' && tenants !== ''
+      ? [text(`Between ${landlords}, as Landlord, and ${tenants}, as Tenant.`, styles.recital, 'recital')]
+      : []),
+  );
+};
 
 /** Reads the same rendered clauses the body does, so the two cannot drift. */
 const tableOfContents = (clauses: RenderedClause[]) =>
   h(
     View,
     { key: 'toc' },
-    text('Contents', styles.sectionHeading),
+    text('Contents', styles.blockLabel),
     ...clauses.map((rendered) =>
       h(
         View,
         { style: styles.tocRow, key: `toc-${rendered.clause.slug}` },
         h(Text, { style: styles.tocNumber }, rendered.number ?? ''),
-        h(Text, {}, rendered.clause.heading),
+        h(Text, { style: styles.tocHeading }, rendered.clause.heading),
+        h(View, { style: styles.tocLeader }),
       ),
     ),
   );
@@ -113,20 +289,21 @@ const amountsDueTable = (lines: MoneyLine[], totalUsd: number) => {
   return h(
     View,
     { key: 'amounts', wrap: false },
-    text('Amounts Due on Execution', styles.sectionHeading),
+    text('Amounts Due on Execution', styles.blockLabel),
+    h(View, { style: styles.moneyTableTop, key: 'money-top' }),
     ...lines.map((line, i) =>
       h(
         View,
         { style: styles.moneyRow, key: `money-${i}` },
         h(Text, {}, line.label),
-        h(Text, {}, money.format(line.amountUsd)),
+        h(Text, { style: styles.amount }, money.format(line.amountUsd)),
       ),
     ),
     h(
       View,
       { style: styles.moneyTotal, key: 'money-total' },
-      h(Text, {}, 'Total'),
-      h(Text, {}, money.format(totalUsd)),
+      h(Text, {}, 'Total due at execution'),
+      h(Text, { style: styles.amount }, money.format(totalUsd)),
     ),
   );
 };
@@ -137,8 +314,9 @@ const amountsDueTable = (lines: MoneyLine[], totalUsd: number) => {
  * widget on its own text line and it overprints the name above and the date
  * below. See the no-overlap invariant in placeholder-roundtrip.test.ts.
  */
-const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitials: boolean) =>
-  buildSignatureBlocks({ parties, documentKey, withInitials }).map((block) =>
+const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitials: boolean) => [
+  h(View, { key: `${documentKey}-sig-rule`, style: styles.sigSection }, text('Signatures', styles.blockLabel)),
+  ...buildSignatureBlocks({ parties, documentKey, withInitials }).map((block) =>
     h(
       View,
       { key: `${documentKey}-${block.heading}`, wrap: false },
@@ -148,6 +326,12 @@ const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitial
           View,
           { style: styles.sigBlock, key: signer.recipient },
           text(signer.name, styles.sigName),
+          /*
+            The placeholder Text carries NO style, deliberately. It inherits the
+            page's 11pt, which is what `LINE_TEXT_HEIGHT` was measured against
+            and what the sized widget's reserved leading is computed from.
+            Styling it moves the widget off the line it was measured for.
+          */
           ...signer.placeholders.map((placeholder, i) =>
             text(
               placeholder.token,
@@ -160,7 +344,8 @@ const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitial
         ),
       ),
     ),
-  );
+  ),
+];
 
 export type LeaseDocumentSpec = {
   key: string;
@@ -176,16 +361,25 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
   h(
     Page,
     { size: 'LETTER', style: styles.page, key: spec.key },
-    footer(spec.title),
-    text(spec.title, styles.docTitle),
-    text(spec.subtitle, styles.docSubtitle),
+    runningHead(spec.title, spec.subtitle),
+    footer(),
+    coverBlock(spec, parties),
     ...(spec.showToc ? [tableOfContents(spec.clauses)] : []),
     ...(spec.amountsDue ? [amountsDueTable(spec.amountsDue.lines, spec.amountsDue.totalUsd)] : []),
     ...spec.clauses.flatMap((rendered) => [
-      text(
-        rendered.number ? `${rendered.number}. ${rendered.clause.heading}` : rendered.clause.heading,
-        styles.sectionHeading,
-        `h-${rendered.clause.slug}`,
+      /*
+        The number HANGS in its own column rather than running into the heading
+        as "8.2. Allocation of…". It is how a numbered instrument is set, and it
+        lets the eye find a clause by number without reading any of the words.
+
+        `wrap: false` keeps a heading from being orphaned at the foot of a page
+        with its clause overleaf.
+      */
+      h(
+        View,
+        { style: styles.sectionRow, key: `h-${rendered.clause.slug}`, wrap: false },
+        h(Text, { style: styles.sectionNumber }, rendered.number ?? ''),
+        h(Text, { style: styles.sectionHeadingText }, rendered.clause.heading.toUpperCase()),
       ),
       text(rendered.text, styles.bodyText, `b-${rendered.clause.slug}`),
     ]),

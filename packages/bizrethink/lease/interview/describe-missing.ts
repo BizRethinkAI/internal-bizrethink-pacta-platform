@@ -23,6 +23,14 @@ export type MissingAnswer = {
   stepId: string | null;
   /** Kept so the raw form is still recoverable when reporting a bug. */
   raw: string;
+  /**
+   * The landlord asked the TENANT this, and the tenant has not answered yet.
+   *
+   * It still blocks — a lease cannot go out with a raw token in it — but it is
+   * not a question the landlord skipped, and a red list that does not
+   * distinguish the two sends them looking for work they have already done.
+   */
+  awaitingTenant: boolean;
 };
 
 const FIELD_INDEX = new Map(
@@ -42,8 +50,10 @@ const variableOf = (entry: string): string => {
   return at === -1 ? entry.trim() : entry.slice(at + 2).trim();
 };
 
-export const describeMissing = (missing: string[]): MissingAnswer[] =>
-  missing.map((raw) => {
+export const describeMissing = (missing: string[], delegatedFields: string[] = []): MissingAnswer[] => {
+  const delegated = new Set(delegatedFields);
+
+  return missing.map((raw) => {
     const variable = variableOf(raw);
     const field = FIELD_INDEX.get(variable);
 
@@ -60,17 +70,25 @@ export const describeMissing = (missing: string[]): MissingAnswer[] =>
         stepTitle: null,
         stepId: null,
         raw,
+        awaitingTenant: false,
       };
     }
 
-    return { question: field.label, stepTitle: field.stepTitle, stepId: field.stepId, raw };
+    return {
+      question: field.label,
+      stepTitle: field.stepTitle,
+      stepId: field.stepId,
+      raw,
+      awaitingTenant: delegated.has(variable),
+    };
   });
+};
 
 /** De-duplicated: one variable can be required by several clauses at once. */
-export const describeMissingUnique = (missing: string[]): MissingAnswer[] => {
+export const describeMissingUnique = (missing: string[], delegatedFields: string[] = []): MissingAnswer[] => {
   const seen = new Set<string>();
 
-  return describeMissing(missing).filter((entry) => {
+  return describeMissing(missing, delegatedFields).filter((entry) => {
     const key = variableOf(entry.raw);
 
     if (seen.has(key)) {

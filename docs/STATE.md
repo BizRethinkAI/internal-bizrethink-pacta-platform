@@ -410,6 +410,37 @@ passed, or appeared to:
 
 ## Open threads
 
+### The lease PDF got a typographic pass
+
+The constraint is unchanged and load-bearing: **standard-14, non-embedded fonts
+only**, because `page.findText()` is how signature placeholders are located and
+an embedded or subset face defeats it. So no custom typeface — but the
+standard-14 set has seven usable faces, which is enough.
+
+Times for the instrument, Helvetica for the apparatus around it (running head,
+section labels, table columns, footer), so a reader can tell the agreement from
+the furniture. Beyond type: a cover block that names the parties, a contents
+table with dotted leaders, clause numbers hanging in their own column instead of
+running into the heading, a running head on every page, ruled money table, and a
+signature section that starts with a rule.
+
+Margins went 64pt → 90pt. The old measure was ~98 characters, which is most of
+why the body read as an undifferentiated slab.
+
+**What must not move:** the page's base font size stays 11 and placeholder
+`Text` carries no style. `LINE_TEXT_HEIGHT` in signature-blocks.ts is measured
+against it, and the sized widget's reserved leading is computed from it — style
+the placeholder and every signature widget shifts off the line it was measured
+for. The placeholder round-trip test is the guard.
+
+### A delegated question is not a skipped one
+
+Ticking "ask the tenant" does not fill the field, so `missing` still reports it —
+and the review panel listed it in red beside the landlord's own unanswered
+questions with nothing to tell them apart. It still blocks, correctly, but it now
+says *"asked of the tenant, not yet answered"* rather than sending the landlord
+to answer something they have already dealt with.
+
 ### Two of tier 3 were mechanical, four are the attorney's
 
 **Fixed here.** §83.49(1) attaches to money taken as security **or** as advance
