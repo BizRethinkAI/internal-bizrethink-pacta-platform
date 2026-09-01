@@ -146,14 +146,43 @@ export const unassignedYardTasks = (rows: YardTask[]): string[] =>
  * it, and a pool row here would allocate it a second time, in a second clause,
  * with nothing keeping the two answers the same.
  */
-export const DEFAULT_YARD_TASKS: string[] = [
-  'Mowing and edging',
-  'Irrigation and watering',
-  'Shrubs, hedges and beds',
-  'Palm and tree trimming',
-  'Fertilisation and pest treatment',
-  'Leaf and debris clearance',
+export const DEFAULT_YARD_TASKS: { task: string; frequency: string; example: string }[] = [
+  /*
+    Each job carries its own frequency and its own example.
+
+    Both used to be one hard-coded placeholder shared by every row — "Twice
+    yearly" and "dead fronds and seed heads", which belong to the palms — so a
+    mowing row ghost-suggested it covered dead fronds, twice a year. And a
+    single blank frequency meant typing the same answer six times.
+
+    Florida mowing genuinely splits by season, which is why the mowing entry
+    says so rather than "as needed": "as needed" is what the association and
+    the tenant disagreed about in the first place.
+  */
+  {
+    task: 'Mowing and edging',
+    frequency: 'Weekly March to October, fortnightly otherwise',
+    example: 'lawn, verges and edging along paths and beds',
+  },
+  {
+    task: 'Irrigation and watering',
+    frequency: 'As the season requires',
+    example: 'running the system; reporting a failed head or a leak',
+  },
+  { task: 'Shrubs, hedges and beds', frequency: 'Quarterly', example: 'trimming, weeding and mulch' },
+  { task: 'Palm and tree trimming', frequency: 'Twice yearly', example: 'dead fronds and seed heads' },
+  {
+    task: 'Fertilisation and lawn pest treatment',
+    frequency: 'Quarterly',
+    example: 'lawn feed, chinch bug and grub treatment',
+  },
+  { task: 'Leaf and debris clearance', frequency: 'Monthly', example: 'leaves, fallen limbs and storm debris' },
 ];
 
+/** The example for a job, for the "what it covers" placeholder. */
+export const exampleFor = (task: string): string =>
+  DEFAULT_YARD_TASKS.find((entry) => entry.task.toLowerCase() === clean(task).toLowerCase())?.example ??
+  'what this job includes';
+
 export const seedYardTasks = (): YardTask[] =>
-  DEFAULT_YARD_TASKS.map((task) => ({ task, doneBy: '', frequency: '', notes: '' }));
+  DEFAULT_YARD_TASKS.map(({ task, frequency }) => ({ task, doneBy: '', frequency, notes: '' }));

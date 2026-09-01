@@ -145,9 +145,10 @@ export const DERIVED_VALUES = [
   // §83.505 addresses, one per signer, assembled from the same list.
   'landlordNoticeEmails',
   'tenantNoticeEmails',
+  // Bridged out of `money` in render-lease: asked there, needed as a value here.
+  'startDate',
   'propertyAddress',
   'propertyTypeLabel',
-  'effectiveDate',
   // Rendered from the yard rows, not typed.
   'yardDuties',
   /*
@@ -776,10 +777,30 @@ export const FL_INTERVIEW: InterviewStep[] = [
   {
     id: 'pets',
     title: 'Pets',
-    showWhen: pets,
+    /*
+      ALWAYS SHOWN, and it asks the gating question itself.
+
+      The toggle used to sit at the bottom of the flood-disclosure step, which
+      is declared AFTER this one. Switching it on inserted a step at the index
+      the answerer was standing on, so the page silently became "Pets" with two
+      flood questions unanswered behind them.
+
+      A field that changes which steps exist cannot live on a step the change
+      can renumber. Keeping this step visible and putting the question on it
+      removes the reordering entirely — nothing appears or disappears, only the
+      fields below the toggle.
+    */
     fields: [
       {
+        name: 'petsPermitted',
+        target: 'fact',
+        kind: 'boolean',
+        label: 'Are pets permitted at the property?',
+        help: 'Adds a pet addendum as its own signed document, with its own signature block.',
+      },
+      {
         name: 'permittedPets',
+        showWhen: pets,
         tenantCanAnswer: true,
         target: 'value',
         kind: 'textarea',
@@ -787,8 +808,15 @@ export const FL_INTERVIEW: InterviewStep[] = [
         help: 'Only the animals named here are permitted. An assistance animal required by a person with a disability is not a pet under the addendum — no fee, no pet rent, and no breed or weight limit applies to it.',
         required: true,
       },
-      { name: 'petFeeUsd', target: 'value', kind: 'usd', label: 'One-off pet fee', required: true },
-      { name: 'petRentMonthlyUsd', target: 'value', kind: 'usd', label: 'Monthly pet rent', required: true },
+      { name: 'petFeeUsd', target: 'value', kind: 'usd', label: 'One-off pet fee', showWhen: pets, required: true },
+      {
+        name: 'petRentMonthlyUsd',
+        target: 'value',
+        kind: 'usd',
+        label: 'Monthly pet rent',
+        showWhen: pets,
+        required: true,
+      },
     ],
   },
 
@@ -796,7 +824,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
     id: 'disclosures',
     title: 'Flood disclosure',
     intro:
-      'Florida requires you to state your own knowledge of flooding, as a separate document given at or before signing. These three answers are yours alone — nothing is defaulted for you.',
+      'Florida requires you to state your own knowledge of flooding, as a separate document given at or before signing. These answers are yours alone — nothing here is defaulted for you.',
     fields: [
       {
         name: 'landlordKnowsOfFlooding',
@@ -834,13 +862,6 @@ export const FL_INTERVIEW: InterviewStep[] = [
           { value: 'has', label: 'Yes' },
         ],
         required: true,
-      },
-      {
-        name: 'petsPermitted',
-        target: 'fact',
-        kind: 'boolean',
-        label: 'Are pets permitted at the property?',
-        help: 'Adds a pet addendum as its own signed document.',
       },
     ],
   },

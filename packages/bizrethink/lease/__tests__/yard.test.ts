@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { YardTask } from '../yard/derive-yard';
 import {
   DEFAULT_YARD_TASKS,
+  exampleFor,
   renderYardDuties,
   renderYardList,
   seedYardTasks,
@@ -169,8 +170,56 @@ describe('seedYardTasks', () => {
     expect(seeded.every((row) => row.doneBy === '')).toBe(true);
   });
 
+  /*
+    Frequency IS seeded, unlike the allocation. Typing "as needed" six times is
+    not a decision anybody is making, and "as needed" is precisely what the
+    association and the tenant disagreed about.
+  */
+  it('seeds a frequency for each job, since that is a fact and not a decision', () => {
+    expect(seedYardTasks().every((row) => row.frequency !== '')).toBe(true);
+  });
+
+  it('varies the frequency by job rather than repeating one answer', () => {
+    const mowing = seedYardTasks().find((row) => /mowing/i.test(row.task));
+    const palms = seedYardTasks().find((row) => /palm/i.test(row.task));
+
+    expect(mowing?.frequency).not.toBe(palms?.frequency);
+    // Florida mowing is seasonal; a flat answer is the thing that gets argued about.
+    expect(mowing?.frequency.toLowerCase()).toMatch(/march|season|weekly/);
+  });
+
+  /*
+    The "what it covers" hint was one hard-coded string — the palms' own
+    example — shown on every row, so a mowing row suggested it covered dead
+    fronds and seed heads.
+  */
+  it('gives each job its own example', () => {
+    expect(exampleFor('Palm and tree trimming')).toBe('dead fronds and seed heads');
+    expect(exampleFor('Mowing and edging')).not.toMatch(/frond/i);
+    expect(exampleFor('Mowing and edging')).toMatch(/lawn|edging/i);
+  });
+
+  it('falls back to something generic for a job the landlord typed themselves', () => {
+    expect(exampleFor('Pressure washing the driveway')).toBe('what this job includes');
+  });
+
+  /*
+    §83.51(2)(a) makes EXTERMINATION a landlord duty, alterable in writing only
+    on a single-family home or duplex, and maintenance.shift-single-family
+    allocates it to the tenant in those words. A yard row called "pest
+    treatment" allocated to the landlord therefore contradicted it two sections
+    later. They are genuinely different jobs — roaches indoors, chinch bugs in
+    the lawn — so the row says which one it means.
+  */
+  it('does not collide with the statutory extermination duty', () => {
+    const pest = DEFAULT_YARD_TASKS.find((entry) => /pest/i.test(entry.task));
+
+    expect(pest?.task).toMatch(/lawn/i);
+    expect(pest?.task).not.toMatch(/extermination/i);
+  });
+
   it('includes palm trimming, which is what the association actually cites', () => {
-    expect(DEFAULT_YARD_TASKS.some((task) => /palm/i.test(task))).toBe(true);
+    expect(DEFAULT_YARD_TASKS.some((entry) => /palm/i.test(entry.task))).toBe(true);
   });
 
   /*
@@ -179,7 +228,7 @@ describe('seedYardTasks', () => {
     keeping the two answers the same.
   */
   it('leaves the pool to the pool clause', () => {
-    expect(DEFAULT_YARD_TASKS.some((task) => /pool|spa|hot tub/i.test(task))).toBe(false);
+    expect(DEFAULT_YARD_TASKS.some((entry) => /pool|spa|hot tub/i.test(entry.task))).toBe(false);
   });
 
   /*
