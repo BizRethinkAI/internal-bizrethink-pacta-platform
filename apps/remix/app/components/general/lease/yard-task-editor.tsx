@@ -1,5 +1,9 @@
 import type { YardTask } from '@bizrethink/customizations/lease/yard/derive-yard';
-import { renderYardDuties, unassignedYardTasks } from '@bizrethink/customizations/lease/yard/derive-yard';
+import {
+  renderYardDuties,
+  seedYardTasks,
+  unassignedYardTasks,
+} from '@bizrethink/customizations/lease/yard/derive-yard';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
@@ -67,10 +71,21 @@ export const YardTaskEditor = ({ tasks, onChange }: YardTaskEditorProps) => {
       </p>
 
       {tasks.length === 0 && (
-        <p className="mt-4 rounded-lg border border-dashed p-6 text-center text-muted-foreground text-sm">
-          No yard jobs listed. If the property has no outdoor space to speak of, leave this empty and no lawn clause is
-          printed.
-        </p>
+        <div className="mt-4 rounded-lg border border-dashed p-6 text-center">
+          <p className="text-muted-foreground text-sm">
+            No yard jobs listed. If the property has no outdoor space to speak of, leave this empty and no lawn clause
+            is printed.
+          </p>
+          {/*
+            Offered, not only seeded at creation. Every draft started before
+            this feature existed has an empty list, and adding six blank rows
+            one at a time to retype a list the code already holds is not work
+            anybody should be doing.
+          */}
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => onChange(seedYardTasks())}>
+            Start from the usual Florida list
+          </Button>
+        </div>
       )}
 
       <div className="mt-4 space-y-3">

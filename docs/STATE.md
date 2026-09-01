@@ -410,6 +410,34 @@ passed, or appeared to:
 
 ## Open threads
 
+### Deriving an answer is not a reason to hide it
+
+Removing the two free-text utility boxes was right — they were a second,
+editable copy of what the property records. It left step 4, *"Utilities and
+insurance"*, showing only insurance, with nothing anywhere in the interview
+saying what the lease would print about utilities.
+
+Step 4 now shows the derived allocation read-only, with a link to the one place
+it can be edited. Guarded by `regression-tests/interview-step-content.test.ts`,
+which also refuses their return as answerable fields.
+
+**The general rule, worth keeping:** every field in this interview shows its
+consequence at the moment it can still be changed. That is the premise the
+whole thing rests on, and it does not stop applying when an answer becomes
+derived.
+
+### AI in the lease builder: one place, deliberately
+
+`ai.draftClause`, on step 12 (*Your own clauses*), is the only AI call in the
+product. It drafts prose the landlord then owns, and everything it writes goes
+through `scanCustomClauses` against the §83.47 non-waivable list.
+
+It is not offered for the yard rows, and the reason is structural rather than
+squeamish: the job NAMES are a constant the code already holds — now offered as
+*"Start from the usual Florida list"* — and the only other column is the
+allocation, which is the one genuine decision on that step. A pre-filled
+`doneBy` reads as agreed.
+
 ### `<SelectItem value="">` throws, and only once a row exists
 
 Radix reserves the empty string — setting a Select's VALUE to `''` clears it
