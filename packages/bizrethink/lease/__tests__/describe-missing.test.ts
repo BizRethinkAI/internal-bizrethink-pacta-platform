@@ -49,3 +49,46 @@ describe('describeMissing', () => {
     expect(entries).toHaveLength(1);
   });
 });
+
+/**
+ * A question put to the TENANT is not a question the landlord skipped.
+ *
+ * Ticking "ask the tenant" on a field does not fill it — it records that the
+ * tenant will. But the outstanding list is built from the renderer's `missing`,
+ * which only knows the variable is unfilled, so a delegated field appeared
+ * alongside the landlord's own unanswered questions with nothing to tell them
+ * apart. The landlord sees "Which animals are permitted?" in a red blocking
+ * list, goes to answer it, and finds they have already dealt with it.
+ *
+ * It still BLOCKS — a lease cannot go out with a raw token in it — but blocking
+ * and being someone's fault are different things, and the panel has to say
+ * which.
+ */
+describe('delegated questions', () => {
+  const missing = ['pets.addendum: permittedPets', 'fees.administrative: lockoutFeeUsd'];
+
+  it('are marked as waiting on the tenant', () => {
+    const [pets] = describeMissingUnique(missing, ['permittedPets']);
+
+    expect(pets.awaitingTenant).toBe(true);
+    expect(pets.question).toContain('animals');
+  });
+
+  it('leave the landlord’s own questions alone', () => {
+    const [, lockout] = describeMissingUnique(missing, ['permittedPets']);
+
+    expect(lockout.awaitingTenant).toBe(false);
+  });
+
+  it('treat nothing as delegated when no list is given', () => {
+    expect(describeMissingUnique(missing).every((entry) => entry.awaitingTenant === false)).toBe(true);
+  });
+
+  /*
+    A field the landlord answered anyway is no longer waiting on anybody. The
+    delegation list is a record of who was ASKED, not of what is outstanding.
+  */
+  it('are still reported, since a delegated answer that never arrives blocks the send', () => {
+    expect(describeMissingUnique(missing, ['permittedPets'])).toHaveLength(2);
+  });
+});
