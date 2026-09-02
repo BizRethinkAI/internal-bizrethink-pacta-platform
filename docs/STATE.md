@@ -410,6 +410,31 @@ passed, or appeared to:
 
 ## Open threads
 
+### A bare anchor only scrolls when the hash CHANGES
+
+The jump list looked correct — matching ids, no duplicates, target at y=2733 —
+and a first click worked. Measured in the browser: hash `#section-5`, scrollY 0,
+click section 5, **scrollY still 0**. Once a reader has visited a section,
+clicking it again is a no-op, and because the rail is sticky and always on
+screen, clicking the same entry after scrolling away is the natural thing to do.
+
+The jump handles its own `scrollIntoView` now, with `replaceState` — a jump
+within one document is not a place in the reader's history, and `pushState`
+would risk a router location change that scroll restoration could undo.
+
+**My first hypothesis was `<ScrollRestoration>` and it was wrong.** Loading the
+page with the hash already in the URL works fine. Reading the live DOM in a
+browser found the real cause in minutes; reasoning about the framework would not
+have.
+
+### One colour, one meaning
+
+Amber marks work the reader still owes. Red means something went wrong. The
+required asterisk measured `rgb(255,0,0)` while the rail dot beside it was
+amber — the same fact in two colours. `text-destructive` is now absent from the
+reviewer page; the two `Alert variant="destructive"` uses (dead link, failed
+submit) are real errors and stay.
+
 ### The CSP eats unnonced `<style>` elements, silently
 
 Both lease pages shipped their design as a `<style>` element carrying scoped
