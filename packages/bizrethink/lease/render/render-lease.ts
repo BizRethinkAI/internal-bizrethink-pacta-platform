@@ -56,6 +56,54 @@ export type RenderLeaseResult = {
 };
 
 /**
+ * The deal, for the face of the instrument.
+ *
+ * Built from the SAME figures the clauses interpolate — `money` and the derived
+ * values — rather than from a second set of answers. A particulars block that
+ * can disagree with the document beneath it is the defect this whole product
+ * exists to prevent, so it is derived, and a test asserts the two agree.
+ *
+ * It restates rather than replaces: the term and the rent stay operative
+ * clauses. A fact that lives only in a table is a fact that has only been
+ * described.
+ */
+const keyTermsFor = ({
+  money,
+  values,
+  propertyAddress,
+}: {
+  money: RenderLeaseInput['money'];
+  values: Record<string, InterpolationValue>;
+  propertyAddress: string;
+}): { label: string; value: string }[] => {
+  const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+  const date = (iso: unknown) =>
+    typeof iso === 'string' && iso !== ''
+      ? new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '—';
+
+  const start = money.term.startDate;
+  const end = values.endDate;
+  const rent = money.rent.monthlyUsd;
+  const deposit = money.deposit.securityUsd;
+  const advance = money.deposit.advanceRentUsd;
+
+  return [
+    { label: 'Premises', value: propertyAddress },
+    { label: 'Term', value: `${date(start)} to ${date(end)}` },
+    {
+      label: 'Rent',
+      value:
+        typeof rent === 'number'
+          ? `${usd.format(rent)} per month, due on day ${money.rent.dueDayOfMonth} of each month`
+          : '—',
+    },
+    { label: 'Security deposit', value: typeof deposit === 'number' ? usd.format(deposit) : '—' },
+    { label: 'Advance rent', value: typeof advance === 'number' ? usd.format(advance) : '—' },
+  ];
+};
+
+/**
  * The street line alone, for the running head.
  *
  * The head has one line and shares it with the document name; the full
@@ -113,6 +161,7 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
       kind: 'lease',
       title: 'Residential Lease',
       shortTitle: 'Residential Lease',
+      keyTerms: keyTermsFor({ money, values: allValues, propertyAddress }),
       runningRef: shortAddress(propertyAddress),
       subtitle: propertyAddress,
       clauses: body.rendered,

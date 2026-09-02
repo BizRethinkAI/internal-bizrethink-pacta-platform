@@ -3,6 +3,7 @@ import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
 
 import type { Clause } from '../clauses/types';
+import { FL_SECTION_NAMES } from '../clauses/us-fl';
 import type { SelectedClause } from '../engine/select-clauses';
 import type { MoneyLine } from '../money/types';
 import type { InterpolationValue } from './interpolate';
@@ -71,6 +72,8 @@ const BASE_FONT_SIZE = 11;
 export const PAGE_WIDTH = 612;
 export const PAD_H = 90;
 export const MEASURE = PAGE_WIDTH - 2 * PAD_H;
+export const SIG_GUTTER = 24;
+export const SIG_COL = (MEASURE - SIG_GUTTER) / 2;
 
 const styles = StyleSheet.create({
   page: {
@@ -127,11 +130,6 @@ const styles = StyleSheet.create({
     bottom: 48,
     left: PAD_H,
     right: PAD_H,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderTopWidth: 0.5,
-    borderTopColor: HAIRLINE,
-    paddingTop: 6,
     fontFamily: SANS,
     fontSize: 7,
     letterSpacing: 0.7,
@@ -156,7 +154,10 @@ const styles = StyleSheet.create({
   },
   titleRule: { borderBottomWidth: 2, borderBottomColor: ACCENT, marginTop: 12, marginBottom: 12 },
   docSubtitle: { fontFamily: SERIF_ITALIC, fontSize: 11.5, color: MUTED, marginBottom: 4 },
-  recital: { fontSize: 10.5, lineHeight: 1.5, marginTop: 10, marginBottom: 26 },
+  recital: { fontSize: 10.5, lineHeight: 1.5, marginTop: 10, marginBottom: 22 },
+  termRow: { flexDirection: 'row', paddingVertical: 4.5 },
+  termLabel: { width: 130, fontFamily: SANS, fontSize: 8, letterSpacing: 0.9, color: MUTED, paddingTop: 1.5 },
+  termValue: { flex: 1, fontSize: 10.5 },
 
   /* ---- contents ---- */
 
@@ -168,12 +169,57 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 9,
   },
-  tocRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    marginBottom: 4.5,
-  },
-  tocNumber: { width: 34, fontFamily: SANS, fontSize: 8.5, color: MUTED },
+  /*
+    SECTION LEVEL, not clause level. Listing all 43 clauses ran to two pages
+    and gave a reader of a residential lease more detail than they can use;
+    fourteen sections fit on part of one, with the clause headings beneath each
+    as a muted run so nothing is actually lost.
+  */
+  tocRow: { flexDirection: 'row', marginBottom: 2 },
+  /*
+    Tied to the head ABOVE it, not floating between two — almost no space above,
+    a clear gap below. Otherwise a reader scanning the list reads each run as
+    belonging to the section that follows it.
+  */
+  tocClauses: { marginLeft: 30, fontSize: 7.5, color: MUTED, marginBottom: 9, lineHeight: 1.35 },
+  tocNumber: { width: 30, fontFamily: SANS_BOLD, fontSize: 9.5, color: ACCENT },
+  tocSection: { flex: 1, fontFamily: SANS_BOLD, fontSize: 9.5, letterSpacing: 0.7 },
+
+  /*
+    The printed section head. Its absence is why the numbering read as half a
+    scheme — `4.2` and `4.3` with no `4.` anywhere.
+  */
+  /*
+    RULES ARE PAINTED, NOT BORDERED, anywhere they sit in the flowing body.
+
+    react-pdf 4.9 emits a degenerate coordinate out of clipBorderTop/Bottom
+    ("unsupported number: -2.2e+22") when a bordered node meets a page break,
+    and then no PDF renders at all. A 1pt View with a background colour draws
+    the identical line and never goes near the border clipper. The same bug is
+    what makes `minPresenceAhead` unusable.
+  */
+  sectionHead: { flexDirection: 'row', marginTop: 30, marginBottom: 4 },
+  /*
+    NO RULE UNDER THE SECTION HEAD, and it is not a design preference.
+
+    Any rule in the FLOWING body — drawn as a border, as a painted 1pt View,
+    stretched, or pinned to an explicit width — makes react-pdf 4.9 emit its
+    undefined sentinel (-2.2e+22) when it lands on a page boundary, and then no
+    PDF renders at all. Four mechanisms, one failure. It is the same family of
+    bug that makes `minPresenceAhead` and `break` unusable here.
+
+    The rules that survive are the ones in ABSOLUTE chrome (running head,
+    footer) and inside `wrap: false` blocks that never split (the money table,
+    the signature cells), because neither is ever asked to resolve across a
+    break.
+
+    So the section head is marked by weight and space instead — larger, tracked,
+    with room above it. That is a legitimate setting in its own right; it is
+    simply not the one I would have chosen freely.
+  */
+  sectionHeadNumber: { width: 30, fontFamily: SANS_BOLD, fontSize: 12, color: ACCENT },
+  sectionHeadName: { flex: 1, fontFamily: SANS_BOLD, fontSize: 12, letterSpacing: 1.6, color: ACCENT },
+  tocNumberOld: { width: 34, fontFamily: SANS, fontSize: 8.5, color: MUTED },
   // The leader. A dotted rule under a flexed cell is how a contents table has
   // carried the eye across a gap since long before any of this was digital.
   tocLeader: {
@@ -200,7 +246,7 @@ const styles = StyleSheet.create({
 
   /* ---- amounts ---- */
 
-  moneyTableTop: { borderTopWidth: 1, borderTopColor: INK, marginTop: 2 },
+  moneyTableTop: { width: MEASURE, height: 1, backgroundColor: INK, marginTop: 2 },
   moneyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -212,8 +258,6 @@ const styles = StyleSheet.create({
   moneyTotal: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: INK,
     paddingTop: 6,
     marginTop: 1,
     fontFamily: SANS_BOLD,
@@ -225,12 +269,15 @@ const styles = StyleSheet.create({
     tabular — but this was also applied to the TOTAL row, where it reset the
     bold the row had just set, leaving a bold label beside a regular figure.
   */
+  footerRule: { width: MEASURE, height: 0.5, backgroundColor: HAIRLINE, marginBottom: 6 },
+  footerRow: { flexDirection: 'row', justifyContent: 'space-between' },
   amount: { fontFamily: SERIF },
   amountTotal: { fontFamily: SANS_BOLD },
 
   /* ---- signatures ---- */
 
-  sigSection: { marginTop: 26, borderTopWidth: 1, borderTopColor: ACCENT, paddingTop: 12 },
+  sigSection: { marginTop: 26 },
+  sigSectionRule: { width: MEASURE, height: 1, backgroundColor: ACCENT, marginBottom: 12 },
   sigGroupHeading: {
     fontFamily: SANS_BOLD,
     fontSize: 8,
@@ -239,9 +286,23 @@ const styles = StyleSheet.create({
     marginTop: 14,
     marginBottom: 8,
   },
-  sigName: { fontFamily: SANS_BOLD, fontSize: 9.5, color: INK },
-  sigRole: { fontFamily: SANS, fontSize: 7.5, letterSpacing: 0.8, color: MUTED, marginBottom: 2 },
-  sigBlock: { marginBottom: 14 },
+  testimonium: { fontSize: 10.5, lineHeight: 1.55, marginTop: 4, marginBottom: 16 },
+  /*
+    Two across, and it is safer than the stack it replaced rather than riskier.
+    The left widget spans x 90-250 and the right cell starts at 318, so the
+    no-overlap invariant holds HORIZONTALLY by construction — whatever the
+    ±16.5pt reserved leading does vertically, it now only has to be defended
+    within a column.
+  */
+  sigRow: { flexDirection: 'row', marginBottom: 16 },
+  sigCell: { width: SIG_COL },
+  sigGutter: { width: SIG_GUTTER },
+  // A signature sits ON a rule. Emitted as a sibling View rather than a border
+  // on the token's own Text, which would move the char boxes the extractor
+  // merges into the widget's bbox.
+  sigRule: { width: SIG_COL, height: 0.75, backgroundColor: INK, marginTop: 4 },
+  sigName: { fontFamily: SANS_BOLD, fontSize: 9, color: INK, marginTop: 4 },
+  sigDate: { fontSize: 10, marginTop: 6 },
 });
 
 export type RenderedClause = {
@@ -272,17 +333,24 @@ const footer = (spec: LeaseDocumentSpec) =>
   h(
     View,
     { style: styles.footer, fixed: true },
-    h(Text, { style: styles.headLeft }, `PACTA · ${spec.key.toUpperCase()}`),
-    /*
-      subPage, not page. Each spec is its own Page, and an addendum IS its own
-      instrument — the whole reason renderLease keeps them separate. In the
-      combined reading copy the old counter read "PAGE 12 OF 27" on a two-page
-      addendum.
-    */
-    h(Text, {
-      render: ({ subPageNumber, subPageTotalPages }: { subPageNumber: number; subPageTotalPages: number }) =>
-        `PAGE ${subPageNumber} OF ${subPageTotalPages}`,
-    }),
+    h(View, { style: styles.footerRule, key: 'rule' }),
+    h(
+      View,
+      { style: styles.footerRow, key: 'row' },
+      h(Text, { style: styles.headLeft }, `PACTA · ${spec.key.toUpperCase()}`),
+      /*
+        subPage, not page. Each spec is its own Page, and an addendum IS its own
+        instrument — the whole reason renderLease keeps them separate. In the
+        combined reading copy the old counter read "PAGE 12 OF 27" on a two-page
+        addendum.
+      */
+      h(Text, {
+        // Document-wide: the three parts are separate Page components now, so a
+        // subPage counter would restart on each of them.
+        render: ({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
+          `PAGE ${pageNumber} OF ${totalPages}`,
+      }),
+    ),
   );
 
 /**
@@ -317,8 +385,46 @@ const coverBlock = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
     ...(landlords !== '' && tenants !== ''
       ? [text(`Between ${landlords}, as Landlord, and ${tenants}, as Tenant.`, styles.recital, 'recital')]
       : []),
+    ...(spec.keyTerms && spec.keyTerms.length > 0
+      ? [
+          text('Key Terms', styles.blockLabel, 'kt-label'),
+          ...spec.keyTerms.map((term) =>
+            h(
+              View,
+              { style: styles.termRow, key: `kt-${term.label}` },
+              h(Text, { style: styles.termLabel }, term.label.toUpperCase()),
+              h(Text, { style: styles.termValue }, term.value),
+            ),
+          ),
+        ]
+      : []),
   );
 };
+
+/**
+ * The clauses grouped under the section they belong to, in document order.
+ *
+ * Grouped on the leading component of the derived number rather than on the
+ * section slug, so the grouping and the printed numbering can never disagree
+ * about where a section begins.
+ */
+type Section = { number: string; name: string; clauses: RenderedClause[] };
+
+const groupIntoSections = (clauses: RenderedClause[]): Section[] =>
+  clauses.reduce<Section[]>((sections, rendered) => {
+    const number = (rendered.number ?? '').split('.')[0];
+    const last = sections[sections.length - 1];
+
+    if (last !== undefined && last.number === number) {
+      last.clauses.push(rendered);
+
+      return sections;
+    }
+
+    const slug = rendered.clause.section as keyof typeof FL_SECTION_NAMES;
+
+    return [...sections, { number, name: FL_SECTION_NAMES[slug] ?? rendered.clause.section, clauses: [rendered] }];
+  }, []);
 
 /** Reads the same rendered clauses the body does, so the two cannot drift. */
 const tableOfContents = (clauses: RenderedClause[]) =>
@@ -326,15 +432,37 @@ const tableOfContents = (clauses: RenderedClause[]) =>
     View,
     { key: 'toc' },
     text('Contents', styles.blockLabel),
-    ...clauses.map((rendered) =>
+    /*
+      THE CLAUSE HEADINGS ARE BACK, because the contents now has a page.
+
+      Listing all 43 clauses as numbered rows ran to two pages and gave a reader
+      of a residential lease more detail than they can use. Section names alone
+      fitted but said too little. Sections with their clause headings beneath as
+      a muted run is the middle, and it fits now that the cover carries the key
+      terms and ends before this begins.
+
+      No dot leaders. They used to run the eye across to NOTHING — react-pdf
+      cannot resolve a forward page reference in one pass — and a leader
+      pointing at empty space is worse than no leader. They come back when the
+      folios do, via a two-pass render.
+    */
+    ...groupIntoSections(clauses).flatMap((section) => [
       h(
         View,
-        { style: styles.tocRow, key: `toc-${rendered.clause.slug}` },
-        h(Text, { style: styles.tocNumber }, rendered.number ?? ''),
-        h(Text, { style: styles.tocHeading }, rendered.clause.heading),
-        h(View, { style: styles.tocLeader }),
+        { style: styles.tocRow, key: `toc-${section.number}` },
+        h(Text, { style: styles.tocNumber }, section.number),
+        h(Text, { style: styles.tocSection }, section.name.toUpperCase()),
       ),
-    ),
+      ...(section.clauses.length > 1
+        ? [
+            h(
+              Text,
+              { style: styles.tocClauses, key: `toc-sub-${section.number}` },
+              section.clauses.map((rendered) => rendered.clause.heading).join(' · '),
+            ),
+          ]
+        : []),
+    ]),
   );
 
 const amountsDueTable = (lines: MoneyLine[], totalUsd: number) => {
@@ -353,6 +481,7 @@ const amountsDueTable = (lines: MoneyLine[], totalUsd: number) => {
         h(Text, { style: styles.amount }, money.format(line.amountUsd)),
       ),
     ),
+    h(View, { style: styles.moneyTableTop, key: 'total-rule' }),
     h(
       View,
       { style: styles.moneyTotal, key: 'money-total' },
@@ -368,54 +497,133 @@ const amountsDueTable = (lines: MoneyLine[], totalUsd: number) => {
  * widget on its own text line and it overprints the name above and the date
  * below. See the no-overlap invariant in placeholder-roundtrip.test.ts.
  */
-const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitials: boolean) => [
-  h(View, { key: `${documentKey}-sig-rule`, style: styles.sigSection }, text('Signatures', styles.blockLabel)),
-  ...buildSignatureBlocks({ parties, documentKey, withInitials }).map((block) =>
+/** Left to right, then down — recipient order is what a reader maps to a party. */
+const inPairs = <T>(items: T[]): T[][] =>
+  items.reduce<T[][]>((rows, item, i) => (i % 2 ? (rows[rows.length - 1].push(item), rows) : [...rows, [item]]), []);
+
+/**
+ * The execution page.
+ *
+ * WHAT THIS REPLACED: a five-item vertical stack per signer — printed name,
+ * NAME token, SIGNATURE token with its reserved leading, DATE, INITIALS —
+ * roughly 100pt each, so four signers took most of a page. It was also not the
+ * shape of an execution block: no rule for the signature to sit on, the printed
+ * name ABOVE the signature rather than beneath it, and a NAME field that
+ * autofills from the recipient printing the party's name a second time.
+ *
+ * The model is Ontario form 2229E: group by role, then a repeating
+ * name/signature/date row. It maps onto a signature-field array with a variable
+ * party count, which is exactly the situation here.
+ *
+ * `wrap: false` is on the PAIR ROW, not the role block. The invariant that
+ * matters is "a signer's cell never splits across a page"; "a role never
+ * splits" is both stricter than needed and unbounded in the number of signers.
+ */
+const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitials: boolean) => {
+  const blocks = buildSignatureBlocks({ parties, documentKey, withInitials });
+
+  return [
+    /*
+      THE WHOLE EXECUTION AREA IS ONE UNBREAKABLE BLOCK, and that is what gives
+      it a page of its own.
+
+      Without it the testimonium and the role heading printed at a page foot,
+      the first signature row did not fit in what was left, and the reader got a
+      heading, two-thirds of a page of white, and cells under the NEXT
+      document's running head.
+
+      `break: true` is the obvious fix and it does not work here: on the styled
+      node OR as a bare sibling, react-pdf 4.9 resolves a child box to its
+      undefined sentinel (-2.2e+22) and no PDF renders at all — the same family
+      of pagination bug that makes `minPresenceAhead` unusable. `wrap: false`
+      achieves the same thing by a different route: when the block does not fit
+      in what remains, react-pdf moves the whole of it to a fresh page, which is
+      the dedicated execution page an engrossed instrument wants anyway.
+
+      Four signers come to roughly 500pt against 642pt of usable height. A party
+      list long enough to exceed a page would overflow rather than break; that
+      is a real limit and it is far outside anything this product will meet.
+    */
     h(
       View,
-      { key: `${documentKey}-${block.heading}`, wrap: false },
-      text(block.heading, styles.sigGroupHeading),
-      ...block.signers.map((signer) =>
-        h(
-          View,
-          { style: styles.sigBlock, key: signer.recipient },
-          text(signer.name, styles.sigName),
-          /*
-            The placeholder Text carries NO style, deliberately. It inherits the
-            page's 11pt, which is what `LINE_TEXT_HEIGHT` was measured against
-            and what the sized widget's reserved leading is computed from.
-            Styling it moves the widget off the line it was measured for.
-          */
-          /*
-            NEVER HYPHENATE A TOKEN. react-pdf ships Knuth-Liang hyphenation
-            with en-us patterns on by default, so "height=44}}" is a split
-            candidate the moment a line is tight — and a token broken across
-            two lines is still FOUND by the extractor (it joins lines with a
-            newline and `[^}]` matches it), still parses, and lands a real
-            signature widget several points off where it belongs.
+      { key: `${documentKey}-execution`, style: styles.sigSection, wrap: false },
+      h(View, { style: styles.sigSectionRule, key: 'exec-rule' }),
+      text('Execution', styles.blockLabel),
+      text(
+        'IN WITNESS WHEREOF, the parties have executed this Lease as of the date first written above.',
+        styles.testimonium,
+      ),
+      ...blocks.flatMap((block) => [
+        text(block.heading, styles.sigGroupHeading, `${documentKey}-${block.heading}`),
+        ...inPairs(block.signers).map((pair, row) =>
+          h(
+            View,
+            { key: `${documentKey}-${block.heading}-${row}`, style: styles.sigRow },
+            ...pair.flatMap((signer, column) => {
+              const signature = signer.placeholders.find((p) => p.token.includes('SIGNATURE'));
+              const date = signer.placeholders.find((p) => p.token.includes('DATE'));
+              const initials = signer.placeholders.filter((p) => p.token.includes('INITIALS'));
 
-            A node prop, not a style, so the 11pt the reserved leading was
-            measured against is untouched.
-          */
-          ...signer.placeholders.map((placeholder, i) =>
-            h(
-              Text,
-              {
-                key: `${signer.recipient}-${i}`,
-                hyphenationCallback: (word: string) => [word],
-                style:
-                  placeholder.reservedLeadingPt > 0
-                    ? { marginTop: placeholder.reservedLeadingPt, marginBottom: placeholder.reservedLeadingPt }
-                    : undefined,
-              },
-              placeholder.token,
-            ),
+              const cell = h(
+                View,
+                { key: signer.recipient, style: styles.sigCell },
+                /*
+                  No style on the token, and no hyphenation. It inherits the
+                  page's 11pt, which is what LINE_TEXT_HEIGHT was measured
+                  against and what the reserved leading is computed from.
+                */
+                h(
+                  Text,
+                  {
+                    hyphenationCallback: (word: string) => [word],
+                    style:
+                      signature && signature.reservedLeadingPt > 0
+                        ? { marginTop: signature.reservedLeadingPt, marginBottom: signature.reservedLeadingPt }
+                        : undefined,
+                  },
+                  signature?.token ?? '',
+                ),
+                h(View, { style: styles.sigRule, key: 'rule' }),
+                // The party's name, pre-printed. This identifies them whether
+                // or not anybody ever signs, which is why it is not a field.
+                text(signer.name, styles.sigName, 'name'),
+                h(
+                  Text,
+                  { style: styles.sigDate, hyphenationCallback: (word: string) => [word], key: 'date' },
+                  `Date: ${date?.token ?? ''}`,
+                ),
+                /*
+                  Initials, on addenda only, and still in the cell. They belong
+                  in the page margin — the Florida Supreme Court lease
+                  (SC09-250, Appendix B) sets them as a footer doing
+                  initialling, receipt and pagination in one line, which makes a
+                  swapped page detectable. Not done here because
+                  {{INITIALS, rN}} is 82pt at 11pt Times and four plus labels
+                  exceed the 432pt measure; moving them needs shorter tokens and
+                  its own proof. Left in the cell rather than dropped — the
+                  set-equality test caught exactly that when this layout landed.
+                */
+                ...initials.map((placeholder, i) =>
+                  h(
+                    Text,
+                    { key: `initials-${i}`, style: styles.sigDate, hyphenationCallback: (word: string) => [word] },
+                    placeholder.token,
+                  ),
+                ),
+              );
+
+              // A lone signer keeps the column width; the rules line up down
+              // the page rather than stretching to fill.
+              return column === 0 && pair.length > 1
+                ? [cell, h(View, { key: `gutter-${row}`, style: styles.sigGutter })]
+                : [cell];
+            }),
           ),
         ),
-      ),
+      ]),
     ),
-  ),
-];
+  ];
+};
 
 export type LeaseDocumentSpec = {
   key: string;
@@ -428,6 +636,21 @@ export type LeaseDocumentSpec = {
    * agreement, announced itself as "Agreement".
    */
   kind: 'lease' | 'addendum' | 'disclosure';
+  /**
+   * The deal, on the face of the instrument.
+   *
+   * A particulars block — what the UK Model Commercial Lease does with its
+   * prescribed clauses and what a US commercial lease calls Basic Lease
+   * Information. It RESTATES; it does not replace. The term and the rent remain
+   * operative clauses, because a fact that lives only in a table is a fact that
+   * is only described.
+   *
+   * Derived from the same figures the clauses interpolate, never typed
+   * separately — a summary that can disagree with the document beneath it is
+   * the precise defect this product exists to prevent, and there is a test
+   * asserting the two cannot part company.
+   */
+  keyTerms?: { label: string; value: string }[];
   title: string;
   /** Short, for the running head. The full sentence below is for the cover. */
   shortTitle: string;
@@ -440,53 +663,101 @@ export type LeaseDocumentSpec = {
   amountsDue?: { lines: MoneyLine[]; totalUsd: number };
 };
 
-const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
-  h(
+/**
+ * THREE PAGES BY CONSTRUCTION, not by asking for a break.
+ *
+ * The front matter is the deal — key terms and the money due at execution — and
+ * it earns a page of its own: it is the first thing a reader wants and the last
+ * thing they should have to hunt for. The contents follows on its own page. The
+ * agreement starts after both.
+ *
+ * They are separate `Page` components rather than one Page with breaks in it,
+ * because every page-break control in this react-pdf build is unusable:
+ * `break`, `minPresenceAhead` and `wrap: false` on a large node all make it
+ * emit an undefined coordinate (-2.2e+22) and render nothing at all. A `Page`
+ * boundary is the one thing it cannot get wrong.
+ *
+ * THE COST, stated because it is real: `subPageNumber` counts within a `Page`
+ * component, so the folio uses the document-wide counter instead. In the signed
+ * documents that is the same thing — each instrument renders on its own. In the
+ * combined reading copy it runs continuously, which is what a reading copy
+ * wants anyway.
+ */
+const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
+  const front = spec.keyTerms !== undefined && spec.keyTerms.length > 0;
+
+  const body = h(
     Page,
-    { size: 'LETTER', style: styles.page, key: spec.key },
+    { size: 'LETTER', style: styles.page, key: `${spec.key}-body` },
     runningHead(spec),
     footer(spec),
-    coverBlock(spec, parties),
-    ...(spec.showToc ? [tableOfContents(spec.clauses)] : []),
-    ...(spec.amountsDue ? [amountsDueTable(spec.amountsDue.lines, spec.amountsDue.totalUsd)] : []),
-    ...spec.clauses.flatMap((rendered) => [
-      /*
-        The number HANGS in its own column rather than running into the heading
-        as "8.2. Allocation of…". It is how a numbered instrument is set, and it
-        lets the eye find a clause by number without reading any of the words.
-
-        `wrap: false` keeps a heading from being orphaned at the foot of a page
-        with its clause overleaf.
-      */
+    ...(front ? [] : [coverBlock(spec, parties)]),
+    ...(front || !spec.amountsDue ? [] : [amountsDueTable(spec.amountsDue.lines, spec.amountsDue.totalUsd)]),
+    /*
+      SECTION HEAD, THEN ITS CLAUSES. The heads were modelled and never printed,
+      so the document ran `4.2 LATE PAYMENT` straight into `4.3 RETURNED
+      PAYMENTS` with no `4. RENT AND CHARGES` between them — decimal numbering
+      asserting a parent the reader was never shown.
+    */
+    ...groupIntoSections(spec.clauses).flatMap((section) => [
       h(
         View,
-        {
-          style: styles.sectionRow,
-          key: `h-${rendered.clause.slug}`,
-          // Keeps a two-line heading from splitting across a page break.
-          wrap: false,
-          /*
-            KEEP-WITH-NEXT IS STILL MISSING, and `minPresenceAhead` is not the
-            answer here despite being exactly what it is documented to do.
-
-            Setting it on this node — with or without `wrap: false` — makes
-            react-pdf 4.9 emit a degenerate coordinate out of clipBorderBottom
-            ("unsupported number: -2.2e+22") and no PDF renders at all. Verified
-            by bisection: removing it alone turns the suite green.
-
-            So a heading can still be orphaned at the foot of a page with its
-            clause overleaf. Fixing it needs either a react-pdf upgrade or the
-            heading and its first paragraph wrapped in one unbreakable View,
-            and the second wants a rendered proof rather than a green suite.
-          */
-        },
-        h(Text, { style: styles.sectionNumber }, rendered.number ?? ''),
-        h(Text, { style: styles.sectionHeadingText }, rendered.clause.heading.toUpperCase()),
+        { style: styles.sectionHead, key: `sec-${section.number}` },
+        h(Text, { style: styles.sectionHeadNumber }, section.number),
+        h(Text, { style: styles.sectionHeadName }, section.name.toUpperCase()),
       ),
-      text(rendered.text, styles.bodyText, `b-${rendered.clause.slug}`),
+      /*
+        A SECTION WITH ONE CLAUSE DOES NOT REPEAT ITSELF. `numberClauses` gives
+        a lone clause the bare section number, so the document printed
+        "1 PARTIES" as the section head and "1 PARTIES" again directly beneath.
+      */
+      ...(section.clauses.length === 1
+        ? [text(section.clauses[0].text, styles.bodyText, `b-${section.clauses[0].clause.slug}`)]
+        : section.clauses.flatMap((rendered) => [
+            h(
+              View,
+              {
+                style: styles.sectionRow,
+                key: `h-${rendered.clause.slug}`,
+                // Keeps a two-line heading from splitting across a page break.
+                wrap: false,
+              },
+              h(Text, { style: styles.sectionNumber }, rendered.number ?? ''),
+              h(Text, { style: styles.sectionHeadingText }, rendered.clause.heading.toUpperCase()),
+            ),
+            text(rendered.text, styles.bodyText, `b-${rendered.clause.slug}`),
+          ])),
     ]),
     ...signatureBlocks(parties, spec.key, spec.withInitials),
   );
+
+  if (!front) {
+    return [body];
+  }
+
+  return [
+    // The deal, alone. No running head — the title block says all of it.
+    h(
+      Page,
+      { size: 'LETTER', style: styles.page, key: `${spec.key}-front` },
+      footer(spec),
+      coverBlock(spec, parties),
+      ...(spec.amountsDue ? [amountsDueTable(spec.amountsDue.lines, spec.amountsDue.totalUsd)] : []),
+    ),
+    ...(spec.showToc
+      ? [
+          h(
+            Page,
+            { size: 'LETTER', style: styles.page, key: `${spec.key}-toc` },
+            runningHead(spec),
+            footer(spec),
+            tableOfContents(spec.clauses),
+          ),
+        ]
+      : []),
+    body,
+  ];
+};
 
 /**
  * One spec, one PDF.

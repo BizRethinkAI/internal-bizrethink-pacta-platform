@@ -410,6 +410,56 @@ passed, or appeared to:
 
 ## Open threads
 
+### The lease opens with the deal
+
+Page 1 is the particulars — key terms and the money due at execution. Page 2 is
+the contents. The agreement starts on page 3. The convention is the UK Model
+Commercial Lease's prescribed-clause table and the US "Basic Lease Information"
+page; the shape was the landlord's idea and it is better than what was there.
+
+**The particulars RESTATE, they do not replace.** Term and rent stay operative
+clauses — a fact that lives only in a table is a fact that has only been
+described. They are derived from the same `money` and values the clauses
+interpolate, and **a test asserts the rent in the summary is the rent in the
+clause**, because "$0.00 here and $6,300 there" is the defect this product
+exists to prevent and a summary page reintroduces exactly that shape.
+
+**For the attorney (Q7):** whether the particulars need a governing-conflict
+line, and whether they are contractual or descriptive.
+
+### react-pdf 4.9 has no working page-break control
+
+Five mechanisms, one failure — `break`, `minPresenceAhead`, `wrap: false` on a
+large node, a bordered node meeting a break, and any rule in the FLOWING body
+(border, painted View, stretched or pinned width). Each makes it emit an
+undefined coordinate (`-2.2e+22`) and render **nothing at all**.
+
+What survives: rules in ABSOLUTE chrome (running head, footer), rules inside
+small `wrap: false` blocks that never split, and **`Page` boundaries**. So the
+three-page structure is three `Page` components, not one Page with breaks.
+
+The cost, accepted deliberately: `subPageNumber` counts within a `Page`, so the
+folio uses the document-wide counter. Identical in the signed documents, which
+render one instrument each; continuous in the combined reading copy.
+
+**Section heads are marked by weight and space, not a rule** — for the same
+reason. That is a legitimate setting; it was not a free choice.
+
+### The execution page
+
+Ontario form 2229E's pattern: group by role, two cells across, signature over a
+rule, printed name beneath, date inline. Four signers went from most of a page
+to about 160 points, and the widgets are now 228pt apart horizontally, so the
+no-overlap invariant holds by construction rather than by luck.
+
+`{{NAME}}` is gone — it autofills from the recipient and printed each party's
+name a second time. The pre-printed caption is what identifies the party
+whether or not anybody signs.
+
+Tokens keep the long `width=`/`height=` spelling: 200pt in a 204pt column,
+verified with 0 wrapped. Four points is thin, and shortening it needs an
+overlay-034 change, which is its own PR — this one touches no upstream file.
+
 ### The E2E gate was red a third of the time, and it was arithmetic
 
 Prisma's default `connection_limit` is `num_cpus * 2 + 1` **per client**, and it
