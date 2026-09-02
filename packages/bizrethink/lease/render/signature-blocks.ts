@@ -101,7 +101,16 @@ export const buildSignatureBlocks = ({
           name,
           recipient,
           placeholders: [
-            plain(`{{NAME, ${recipient}}}`),
+            /*
+              NO `{{NAME}}` FIELD, and its absence is deliberate.
+
+              It is a Documenso field that autofills from the recipient record,
+              so the block printed each party's name TWICE — once as the
+              pre-printed caption that legally identifies them, and once as an
+              autofilled field saying the same thing. The caption is the one
+              that has to be there whether or not anybody signs, so the field
+              went.
+            */
             {
               token: `{{SIGNATURE, ${recipient}, width=${widget.width}, height=${widget.height}}}`,
               reservedLeadingPt: leading,

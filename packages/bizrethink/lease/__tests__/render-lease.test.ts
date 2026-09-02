@@ -203,3 +203,71 @@ describe('nothing overlaps', () => {
     }
   });
 });
+
+/**
+ * The particulars block cannot contradict the document beneath it.
+ *
+ * A summary on the face of an instrument is a SECOND statement of facts the
+ * clauses already state — and a lease saying $0.00 in one place and $6,300 in
+ * another is the precise defect this product was built to prevent. The Zillow
+ * lease did exactly that.
+ *
+ * The protection is structural: the key terms are derived from `money` and the
+ * same derived values the clauses interpolate, never from a second set of
+ * answers. This asserts that the structure holds, because "cannot drift" is a
+ * claim, and an unasserted claim is how the last one got in.
+ */
+describe('the key terms and the clauses agree', () => {
+  // `result` is filled in beforeAll, so these read it inside each test.
+  const lease = () => result.documents.find((doc) => doc.key === 'lease');
+  const terms = () => lease()?.keyTerms ?? [];
+
+  it('states the deal on the face of the lease', () => {
+    expect(terms().length).toBeGreaterThan(0);
+    expect(terms().map((t) => t.label)).toContain('Rent');
+  });
+
+  it('shows the rent the rent clause charges', () => {
+    const shown = terms().find((t) => t.label === 'Rent')?.value ?? '';
+    const bodyText = (lease()?.clauses ?? []).map((c) => c.text).join('\n');
+    const monthly = PICANA_MONEY.rent.monthlyUsd;
+
+    expect(monthly).not.toBeNull();
+    // The same figure, formatted the same way the clause formats it.
+    expect(shown).toContain(
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(monthly)),
+    );
+    expect(bodyText).toContain(
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(monthly)),
+    );
+  });
+
+  it('shows the deposit the deposit clause holds', () => {
+    const shown = terms().find((t) => t.label === 'Security deposit')?.value ?? '';
+    const held = PICANA_MONEY.deposit.securityUsd;
+
+    expect(shown).toBe(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(held)));
+  });
+
+  /*
+    It RESTATES, it does not replace. A fact that lives only in the particulars
+    is a fact that has only been described — the term and the rent have to stay
+    operative clauses.
+  */
+  it('does not remove the term or the rent from the operative clauses', () => {
+    const headings = (lease()?.clauses ?? []).map((c) => c.clause.heading);
+
+    expect(headings).toContain('Term');
+    expect(headings).toContain('Rent');
+  });
+
+  /*
+    The particulars belong to the LEASE. An addendum restating the deal would be
+    a third statement of it, in a document that is not the agreement.
+  */
+  it('appears on the lease alone', () => {
+    for (const doc of result.documents.filter((d) => d.key !== 'lease')) {
+      expect(doc.keyTerms ?? [], doc.key).toHaveLength(0);
+    }
+  });
+});

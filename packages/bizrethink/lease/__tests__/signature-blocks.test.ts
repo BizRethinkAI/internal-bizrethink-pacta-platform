@@ -69,8 +69,18 @@ describe('the placeholders each signer gets', () => {
 
     // Extraction follows draw order within a page, so the order here is what
     // the auto-placer will see.
+    /*
+      No NAME field. It autofilled from the recipient record and said the same
+      thing as the pre-printed caption beside it, so the block named each party
+      twice. The caption stays — it identifies the party whether or not anyone
+      signs — and the field went.
+
+      The token measures 200pt at 11pt Times-Roman and a signature column is
+      204pt, so it fits — with four points to spare, which is thin. The
+      set-equality and no-newline assertions in render-lease.test.ts are what
+      would catch it if a future margin change ever closed that gap.
+    */
     expect(signer.placeholders.map((p) => p.token)).toEqual([
-      '{{NAME, r1}}',
       `{{SIGNATURE, r1, width=${SIGNATURE_WIDGET.width}, height=${SIGNATURE_WIDGET.height}}}`,
       '{{DATE, r1}}',
     ]);
@@ -78,11 +88,10 @@ describe('the placeholders each signer gets', () => {
 
   it('reserves leading around the sized signature and nowhere else', () => {
     const [landlord] = buildSignatureBlocks({ parties: PARTIES, documentKey: 'lease' });
-    const [name, signature, date] = landlord.signers[0].placeholders;
+    const [signature, date] = landlord.signers[0].placeholders;
 
     // (44 - 11) / 2 = 16.5pt above and below.
     expect(signature.reservedLeadingPt).toBe(16.5);
-    expect(name.reservedLeadingPt).toBe(0);
     expect(date.reservedLeadingPt).toBe(0);
   });
 
