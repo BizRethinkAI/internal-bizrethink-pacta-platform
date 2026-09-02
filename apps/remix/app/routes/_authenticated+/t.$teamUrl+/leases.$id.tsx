@@ -23,7 +23,7 @@ import { useMemo, useState } from 'react';
 import { useLoaderData, useRevalidator } from 'react-router';
 import { CustomClauseEditor } from '~/components/general/lease/custom-clause-editor';
 import type { FieldValue } from '~/components/general/lease/interview-field';
-import { InterviewFieldControl } from '~/components/general/lease/interview-field';
+import { InterviewFieldControl, LB_ACCENT_TEXT, LB_ACTION_TEXT } from '~/components/general/lease/interview-field';
 import { PartyEditor } from '~/components/general/lease/party-editor';
 import { LeaseReviewPanel } from '~/components/general/lease/review-panel';
 import { UtilitySummary } from '~/components/general/lease/utility-summary';
@@ -141,55 +141,6 @@ const writeMoney = (money: Record<string, unknown>, name: string, value: FieldVa
 
   return next;
 };
-
-/**
- * The design, scoped to this route — same pattern as the reviewer's page.
- *
- * THREE THINGS MEAN THREE THINGS, and the app's tokens cannot say so. A
- * statutory bound is a limit the answerer may not cross. A suggestion is help
- * they may take or leave. An unanswered required field is work still owed. All
- * three were rendered as grey boxes with dashed borders, so the interview had
- * no way to say which was which — and the one thing a lease builder must
- * communicate is which of its constraints come from Florida and which come
- * from the landlord.
- *
- * ACTION IS RESERVED. It appears on outstanding work and nowhere else; a page
- * that marks everything has no way left to mark one thing.
- */
-const SCOPED_CSS = `
-  .lease-builder {
-    --lb-accent: #1f3a5f;
-    --lb-accent-soft: #eef2f7;
-    --lb-action: #a2560c;
-    --lb-action-soft: #fdf4e8;
-    --lb-help: #2f6b4f;
-    --lb-help-soft: #edf5f0;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .lease-builder:not([data-theme='light']) {
-      --lb-accent: #8fb3d9;
-      --lb-accent-soft: #1a2431;
-      --lb-action: #d99a4e;
-      --lb-action-soft: #2a2114;
-      --lb-help: #6bab8a;
-      --lb-help-soft: #17251d;
-    }
-  }
-
-  /* The law: a bound the answerer may not cross. */
-  .lb-statute { border-left: 3px solid var(--lb-accent); background: var(--lb-accent-soft); }
-  .lb-statute-cite { color: var(--lb-accent); }
-
-  /* Help: a common value they may take or leave. */
-  .lb-suggest { border-left: 3px solid var(--lb-help); background: var(--lb-help-soft); }
-  .lb-suggest-act { color: var(--lb-help); }
-
-  /* Work still owed. */
-  .lb-owed { border-color: var(--lb-action) !important; background: var(--lb-action-soft); }
-  .lb-action { color: var(--lb-action); }
-  .lb-accent { color: var(--lb-accent); }
-`;
 
 export default function LeaseInterviewPage() {
   const { teamUrl, organisationId, matter, utilities } = useLoaderData<typeof loader>();
@@ -327,8 +278,7 @@ export default function LeaseInterviewPage() {
     }).length;
 
   return (
-    <div className="lease-builder mx-auto w-full max-w-screen-xl px-4 pb-24 md:px-8">
-      <style dangerouslySetInnerHTML={{ __html: SCOPED_CSS }} />
+    <div className="mx-auto w-full max-w-screen-xl px-4 pb-24 md:px-8">
       <div className="mt-8 border-b pb-5">
         <h1 className="font-semibold text-2xl">{matter.title}</h1>
         <p className="mt-1 text-muted-foreground text-sm">Draft · progress saves as you move between steps</p>
@@ -372,8 +322,8 @@ export default function LeaseInterviewPage() {
                           i === safeIndex
                             ? 'font-semibold text-xs'
                             : left > 0
-                              ? 'lb-action font-semibold text-xs'
-                              : 'lb-accent font-semibold text-xs'
+                              ? `${LB_ACTION_TEXT} font-semibold text-xs`
+                              : `${LB_ACCENT_TEXT} font-semibold text-xs`
                         }
                       >
                         {left > 0 ? left : '✓'}
@@ -401,7 +351,7 @@ export default function LeaseInterviewPage() {
 
         <div className="min-w-0">
           <section>
-            <p className="lb-accent font-semibold text-xs uppercase tracking-widest">
+            <p className={`${LB_ACCENT_TEXT} font-semibold text-xs uppercase tracking-widest`}>
               Step {safeIndex + 1} of {steps.length}
             </p>
             <h2 className="mt-1.5 font-semibold text-2xl">{step.title}</h2>

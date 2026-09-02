@@ -133,15 +133,28 @@ describe('the reviewer page carries its design', () => {
     'utf8',
   );
 
+  const code = () => page.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+
+  /*
+    THE ONE THAT MATTERS. The design first shipped as a `<style>` element with
+    scoped custom properties; this app serves a NONCED `style-src-elem` CSP, so
+    the browser dropped it without a word. The markup rendered, the class names
+    existed, and every one of them was inert — the page looked untouched while
+    the diff said otherwise.
+  */
+  it('never styles itself through an unnonced style element', () => {
+    expect(code()).not.toContain('dangerouslySetInnerHTML');
+    expect(code()).not.toMatch(/<style/);
+  });
+
   it('sets the lease in a serif, so a lease reads as a document', () => {
-    expect(page).toContain('--lr-doc');
-    expect(page).toMatch(/className="lr-doc/);
+    expect(code()).toMatch(/font-family:'Iowan_Old_Style'/);
   });
 
   it('carries a rail, since forty-three clauses is a long page', () => {
-    expect(page).toContain('Where you are');
-    expect(page).toContain('Jump to');
-    expect(page).toMatch(/lg:sticky/);
+    expect(code()).toContain('Where you are');
+    expect(code()).toContain('Jump to');
+    expect(code()).toMatch(/lg:sticky/);
   });
 
   /*
@@ -149,8 +162,12 @@ describe('the reviewer page carries its design', () => {
     page that shouts everywhere has no way left to say "this one".
   */
   it('reserves one colour for the reader’s own outstanding work', () => {
-    expect(page).toContain('--lr-action');
-    expect(page).toContain('lr-asked');
+    expect(code()).toContain('#a2560c');
+    expect(code()).toMatch(/ACTION_PANEL/);
+  });
+
+  it('writes dark variants out, since the app’s dark: is a class strategy', () => {
+    expect(code()).toMatch(/dark:text-\[#/);
   });
 
   /*
@@ -158,14 +175,6 @@ describe('the reviewer page carries its design', () => {
     carries a band of empty space and the page reads as half-loaded.
   */
   it('does not hide the comment control behind opacity', () => {
-    /*
-      Comments stripped first. The prose above the control quotes `opacity-0`
-      in order to explain why it went, and an assertion that reads the
-      explanation as the thing itself would fail forever — which it did, twice
-      in this file's history.
-    */
-    const code = page.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
-
-    expect(code).not.toContain('opacity-0');
+    expect(code()).not.toContain('opacity-0');
   });
 });

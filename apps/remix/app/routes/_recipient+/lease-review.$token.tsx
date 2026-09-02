@@ -75,46 +75,30 @@ type AskedField = {
 type ReadableClause = { slug: string; number: string; heading: string; text: string };
 type ReadableSection = { number: string; name: string; clauses: ReadableClause[] };
 
-/**
- * The design, scoped to this route.
- *
- * A LEGAL READING SURFACE IS NOT A DASHBOARD, and the app's tokens are built
- * for a dashboard. Three things this page needs that they do not give it: a
- * serif for the document, so a lease reads as a lease; a single ACTION colour
- * used nowhere except where the reader must do something; and a quiet callout
- * that states a fact without shouting it in green.
- *
- * A system serif stack rather than a webfont. This page is opened from an email
- * by somebody who has never seen the domain, often on a phone — blocking the
- * first paint of a legal document on a third-party font request would be a poor
- * trade for a specific face, and the serif CHARACTER is what does the work.
- */
-const SCOPED_CSS = `
-  .lease-review {
-    --lr-accent: #1f3a5f;
-    --lr-accent-soft: #eef2f7;
-    --lr-action: #a2560c;
-    --lr-action-soft: #fdf4e8;
-    --lr-doc: 'Iowan Old Style', Charter, Georgia, 'Times New Roman', serif;
-  }
+/*
+  THE DESIGN IS EXPRESSED IN UTILITIES, not in an inline stylesheet.
 
-  @media (prefers-color-scheme: dark) {
-    .lease-review:not([data-theme='light']) {
-      --lr-accent: #8fb3d9;
-      --lr-accent-soft: #1a2431;
-      --lr-action: #d99a4e;
-      --lr-action-soft: #2a2114;
-    }
-  }
+  The first attempt shipped a `<style>` element carrying scoped custom
+  properties. It reached the browser and the browser refused it: this app
+  serves a NONCED `style-src-elem` CSP (apps/remix/server/security-headers.ts),
+  so an unnonced style element is dropped, silently and without an error the
+  page can show. The markup rendered, the class names existed, and every one of
+  them was inert — the page looked untouched while the diff said otherwise.
 
-  .lr-doc { font-family: var(--lr-doc); font-size: 1.02rem; line-height: 1.62; }
-  .lr-callout { border-left: 3px solid var(--lr-accent); background: var(--lr-accent-soft); }
-  .lr-asked { border: 1px solid var(--lr-action); background: var(--lr-action-soft); }
-  .lr-action { color: var(--lr-action); }
-  .lr-accent { color: var(--lr-accent); }
-  .lr-comment { border-left: 3px solid var(--lr-action); }
-  .lr-dot { width: 0.5rem; height: 0.5rem; border-radius: 9999px; }
-`;
+  Utilities cannot fail that way. They compile into the app's own stylesheet,
+  which is served with the nonce it expects.
+
+  Navy carries structure. Amber marks work the reader still owes, and appears
+  nowhere else — a page that marks everything has no way left to mark one
+  thing. Dark variants are written out because the app's `dark:` is a class
+  strategy, not a media query.
+*/
+const DOC_SERIF = "[font-family:'Iowan_Old_Style',Charter,Georgia,'Times_New_Roman',serif]";
+const ACCENT_TEXT = 'text-[#1f3a5f] dark:text-[#8fb3d9]';
+const ACCENT_PANEL = 'border-l-[3px] border-l-[#1f3a5f] bg-[#eef2f7] dark:border-l-[#8fb3d9] dark:bg-[#1a2431]';
+const ACTION_TEXT = 'text-[#a2560c] dark:text-[#d99a4e]';
+const ACTION_PANEL = 'border border-[#a2560c] bg-[#fdf4e8] dark:border-[#d99a4e] dark:bg-[#2a2114]';
+const ACTION_EDGE = 'border-l-[3px] border-l-[#a2560c] dark:border-l-[#d99a4e]';
 
 export default function LeaseReviewPage() {
   const { token } = useParams();
@@ -211,8 +195,8 @@ export default function LeaseReviewPage() {
 
   /** One comment box, wherever it sits. */
   const composer = (at: number, placeholder: string) => (
-    <div key={at} className="lr-comment mt-3 rounded-r-md bg-muted/40 p-3">
-      <p className="lr-action font-semibold text-[0.65rem] uppercase tracking-widest">Your comment</p>
+    <div key={at} className={`${ACTION_EDGE} mt-3 rounded-r-md bg-muted/40 p-3`}>
+      <p className={`${ACTION_TEXT} font-semibold text-[0.65rem] uppercase tracking-widest`}>Your comment</p>
       <Textarea
         className="mt-1 min-h-16"
         rows={2}
@@ -233,8 +217,7 @@ export default function LeaseReviewPage() {
   );
 
   return (
-    <div className="lease-review mx-auto w-full max-w-6xl px-4 py-10 pb-28">
-      <style dangerouslySetInnerHTML={{ __html: SCOPED_CSS }} />
+    <div className="mx-auto w-full max-w-6xl px-4 py-10 pb-28">
       {/*
         The mark carries the weight it has in the app header. A reviewer arrives
         from an email, on a domain they have never seen, to read a legal
@@ -242,7 +225,7 @@ export default function LeaseReviewPage() {
       */}
       <BrandingLogo className="mb-8 h-10 w-auto" />
 
-      <h1 className="lr-doc font-medium text-3xl leading-tight tracking-tight">{matter.title}</h1>
+      <h1 className={`${DOC_SERIF} font-medium text-3xl leading-tight tracking-tight`}>{matter.title}</h1>
       <p className="mt-1.5 text-muted-foreground text-sm">
         For review by <span className="font-medium text-foreground">{meta.reviewerName}</span>
         {meta.expiresAt && ` · link expires ${new Date(meta.expiresAt).toLocaleDateString()}`}
@@ -261,8 +244,9 @@ export default function LeaseReviewPage() {
               {askedFields.length > 0 && (
                 <div className="flex items-baseline gap-2.5">
                   <span
-                    className="lr-dot mt-1.5 flex-none"
-                    style={{ background: unanswered.length > 0 ? 'var(--lr-action)' : 'var(--lr-accent)' }}
+                    className={`mt-1.5 size-2 flex-none rounded-full ${
+                      unanswered.length > 0 ? 'bg-[#a2560c] dark:bg-[#d99a4e]' : 'bg-[#1f3a5f] dark:bg-[#8fb3d9]'
+                    }`}
                   />
                   <span>Questions for you</span>
                   <span className="ml-auto font-semibold tabular-nums">
@@ -272,7 +256,7 @@ export default function LeaseReviewPage() {
               )}
 
               <div className="flex items-baseline gap-2.5">
-                <span className="lr-dot mt-1.5 flex-none bg-muted-foreground/40" />
+                <span className="mt-1.5 size-2 flex-none rounded-full bg-muted-foreground/40" />
                 <span>Clauses</span>
                 <span className="ml-auto font-semibold tabular-nums">
                   {sections.reduce((n, section) => n + section.clauses.length, 0)}
@@ -281,8 +265,9 @@ export default function LeaseReviewPage() {
 
               <div className="flex items-baseline gap-2.5">
                 <span
-                  className="lr-dot mt-1.5 flex-none"
-                  style={{ background: usable.length > 0 ? 'var(--lr-accent)' : 'var(--lr-action)' }}
+                  className={`mt-1.5 size-2 flex-none rounded-full ${
+                    usable.length > 0 ? 'bg-[#1f3a5f] dark:bg-[#8fb3d9]' : 'bg-muted-foreground/40'
+                  }`}
                 />
                 <span>Your comments</span>
                 <span className="ml-auto font-semibold tabular-nums">{usable.length}</span>
@@ -307,7 +292,7 @@ export default function LeaseReviewPage() {
                     >
                       <span className="w-5 text-muted-foreground text-xs tabular-nums">{section.number}</span>
                       <span className="min-w-0 flex-1 truncate">{section.name}</span>
-                      {noted > 0 && <span className="lr-action font-semibold text-xs">{noted}</span>}
+                      {noted > 0 && <span className={`${ACTION_TEXT} font-semibold text-xs`}>{noted}</span>}
                     </a>
                   );
                 })}
@@ -328,7 +313,7 @@ export default function LeaseReviewPage() {
           green at full width — the loudest thing on the page, saying the
           least.
         */}
-          <div className="lr-callout rounded-r-md py-3 pr-4 pl-4">
+          <div className={`${ACCENT_PANEL} rounded-r-md py-3 pr-4 pl-4`}>
             <p className="text-sm leading-relaxed">
               <span className="font-semibold">
                 {isAttorney ? 'Your comments block signature.' : 'Nothing here is agreed yet.'}
@@ -357,7 +342,7 @@ export default function LeaseReviewPage() {
         blank closes the link with nothing to show for it.
       */}
           {askedFields.length > 0 && (
-            <section className="lr-asked mt-6 rounded-lg p-5">
+            <section className={`${ACTION_PANEL} mt-6 rounded-lg p-5`}>
               <h2 className="font-semibold text-lg">
                 {askedFields.length === 1
                   ? 'One thing only you can answer'
@@ -434,18 +419,22 @@ export default function LeaseReviewPage() {
               <div key={section.number}>
                 <h3
                   id={`section-${section.number}`}
-                  className="lr-accent mt-9 scroll-mt-6 border-b pb-1.5 font-semibold text-xs uppercase tracking-widest"
+                  className={`${ACCENT_TEXT} mt-9 scroll-mt-6 border-b pb-1.5 font-semibold text-xs uppercase tracking-widest`}
                 >
                   {section.number} · {section.name}
                 </h3>
 
                 {section.clauses.map((clause) => (
                   <article key={clause.slug} className="grid grid-cols-[2.75rem_1fr] gap-x-2 py-5">
-                    <div className="lr-accent pt-1 pl-1 font-semibold text-xs tabular-nums">{clause.number}</div>
+                    <div className={`${ACCENT_TEXT} pt-1 pl-1 font-semibold text-xs tabular-nums`}>{clause.number}</div>
                     <div>
                       <h4 className="font-semibold text-[0.7rem] uppercase tracking-[0.09em]">{clause.heading}</h4>
                       {/* The lease reads as a document, not as UI copy. */}
-                      <p className="lr-doc mt-1.5 max-w-[40rem] whitespace-pre-line">{clause.text}</p>
+                      <p
+                        className={`${DOC_SERIF} mt-1.5 max-w-[40rem] whitespace-pre-line text-[1.02rem] leading-[1.62]`}
+                      >
+                        {clause.text}
+                      </p>
                     </div>
 
                     <div className="col-start-2">

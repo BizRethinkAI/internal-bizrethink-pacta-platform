@@ -123,20 +123,31 @@ describe('the builder tells its three constraints apart', () => {
     ),
   );
 
-  const route = readFileSync(
-    new URL('../../../../apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.tsx', import.meta.url),
-    'utf8',
+  const route = strip(
+    readFileSync(
+      new URL('../../../../apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.tsx', import.meta.url),
+      'utf8',
+    ),
   );
 
-  it('defines the three scoped colours on a route it owns', () => {
-    for (const token of ['--lb-accent', '--lb-help', '--lb-action']) {
-      expect(route, token).toContain(token);
+  /*
+    THE ONE THAT MATTERS. Both pages first carried their design in a `<style>`
+    element, and this app serves a nonced `style-src-elem` CSP — so the browser
+    dropped it silently and every class was inert.
+  */
+  it('never styles itself through an unnonced style element', () => {
+    for (const source of [field, route]) {
+      expect(source).not.toContain('dangerouslySetInnerHTML');
+      expect(source).not.toMatch(/<style/);
     }
   });
 
   it('sets a statutory bound apart from a suggestion', () => {
-    expect(field).toContain('lb-statute');
-    expect(field).toContain('lb-suggest');
+    expect(field).toContain('LB_STATUTE');
+    expect(field).toContain('LB_SUGGEST');
+    // Different colours, or the distinction is only in the variable name.
+    expect(field).toMatch(/#1f3a5f/);
+    expect(field).toMatch(/#2f6b4f/);
   });
 
   /*
@@ -144,7 +155,7 @@ describe('the builder tells its three constraints apart', () => {
     down a step of seven questions for the two that are blank.
   */
   it('marks an unanswered required field on the field itself', () => {
-    expect(field).toContain('lb-owed');
+    expect(field).toContain('LB_OWED');
     expect(field).toMatch(/const owed =/);
   });
 
@@ -157,5 +168,9 @@ describe('the builder tells its three constraints apart', () => {
 
     expect(owed).toContain('field.required === true');
     expect(owed).toContain("field.kind !== 'boolean'");
+  });
+
+  it('marks outstanding steps in the rail with the same action colour', () => {
+    expect(route).toContain('LB_ACTION_TEXT');
   });
 });
