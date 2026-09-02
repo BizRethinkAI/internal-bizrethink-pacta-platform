@@ -431,6 +431,35 @@ was the quietest thing on the page.
 
 Design proposal:
 https://claude.ai/code/artifact/873784f0-2697-490b-9fa6-3a2ef1ffd619
+### The reviewer reads the lease, instead of a button
+
+It used to be *"Open the lease"* — the signing PDF in another tab. So a reviewer
+read in one window and, in the other, typed a clause name **from memory** into a
+free-text box captioned "Which clause? (optional)". Unvalidated, unlinked, and
+handed back to the landlord as whatever string arrived. They also saw
+`{{SIGNATURE, r2, width=160, height=44}}` inside the document they were being
+asked to comment on.
+
+The data was always there: `buildLeaseDocuments` returns every clause with its
+number, heading and interpolated text. `toReadableSections` groups it the same
+way the PDF groups it — so the reader's contents and the printed contents cannot
+disagree — and strips the signing tokens.
+
+**A comment is written ON a clause, so it carries that clause's slug.** Nothing
+is typed. A general comment about the whole document is still possible, which is
+what `clauseSlug: null` always meant and the UI never offered.
+
+Built from the same `buildLeaseDocuments` the landlord's preview and the signed
+envelope use, guarded by test — a reviewer commenting on a document nobody is
+signing produces a record of approval that was never given.
+
+Design proposal, from which this was built:
+https://claude.ai/code/artifact/97ed2cc3-d6da-4bff-a704-04ba3f60b6d1
+
+**Also:** the send bar is fixed, because a button at the foot of 43 clauses is a
+button nobody finds, and "sending closes this link" belongs where the sending
+happens. The Pacta mark carries app-header weight — a reviewer arrives from an
+email on a domain they have never seen.
 
 ### The lease opens with the deal
 

@@ -29,6 +29,7 @@ import {
   REVIEW_LINK_TTL_DAYS,
   sendBlockers,
 } from '../../lease/review/disposition';
+import { toReadableSections } from '../../lease/review/readable-lease';
 import type { Disposition, LeaseReview, ReviewAudience, ReviewComment, ReviewStatus } from '../../lease/review/types';
 import { US_FL } from '../../lease/rule-packs/us-fl';
 import { FL_NON_WAIVABLE } from '../../lease/rule-packs/us-fl-non-waivable';
@@ -1256,6 +1257,10 @@ export const leaseBuilderRouter = router({
       const changedSinceIssued =
         currentAnswersHash({ ...matter, propertyUtilities: property?.utilities ?? [] }) !== review.answersHash;
 
+      // Through the shared mapping, so the reviewer reads the document the
+      // landlord previews and the signers receive.
+      const answers = hydrateMatter({ ...matter, propertyUtilities: property?.utilities ?? [] });
+
       /*
         Questions for the tenant, resolved from the field DEFINITIONS and
         merely selected by the stored list — so a wrong list cannot put a rent
@@ -1295,6 +1300,24 @@ export const leaseBuilderRouter = router({
           expiresAt: review.expiresAt,
         },
         matter: { id: matter.id, title: matter.title },
+        /*
+          THE LEASE ITSELF, not a button that opens a PDF in another tab.
+
+          A reviewer used to read in one window and type a clause name from
+          memory into a free-text box in the other, so nothing tied a comment to
+          a clause. Built from the same `buildLeaseDocuments` the PDF is built
+          from, so the two cannot describe different documents.
+        */
+        sections: toReadableSections(
+          buildLeaseDocuments({
+            facts: answers.facts,
+            money: answers.money,
+            values: answers.values,
+            parties: answers.parties,
+            propertyAddress: String(answers.values.propertyAddress ?? ''),
+            customClauses: answers.customClauses,
+          }).documents.find((doc) => doc.key === 'lease')?.clauses ?? [],
+        ),
         comments,
         askedFields,
         changedSinceIssued,
