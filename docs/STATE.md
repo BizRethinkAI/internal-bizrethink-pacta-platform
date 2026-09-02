@@ -410,6 +410,53 @@ passed, or appeared to:
 
 ## Open threads
 
+### The CSP eats unnonced `<style>` elements, silently
+
+Both lease pages shipped their design as a `<style>` element carrying scoped
+custom properties. The element reached the browser and the browser **refused
+it**: this app serves a nonced `style-src-elem`
+(`apps/remix/server/security-headers.ts`). The markup rendered, the class names
+were in the DOM, and **every one of them was inert** — the pages looked
+untouched while the diff said otherwise, and the tests passed because they were
+asserting class names rather than outcomes.
+
+**Utilities cannot fail that way.** They compile into the app's own stylesheet,
+which is served with the nonce it expects. Dark variants written out, because
+`dark:` here is a class strategy (`&:is(.dark:not(.dark-mode-disabled) *)`), not
+a media query.
+
+The design tests now assert the OUTCOME, and the first of them is *"never
+styles itself through an unnonced style element"*.
+
+### Three kinds of constraint, three appearances
+
+Navy for a statutory bound the answerer may not cross. Green for a suggestion
+they may take or leave. Amber for work still owed — and amber appears nowhere
+else. All three were grey dashed boxes, so the interview could not say which was
+which, and **which constraints come from Florida and which come from the
+landlord is the one thing a lease builder must communicate**.
+
+`owed` excludes booleans (false is an answer) and optional fields, and marks the
+control with a ring: `[&_input]:` takes a single utility, not a class list.
+
+### Three kinds of constraint, three appearances
+
+A statutory bound is a limit the answerer may not cross. A suggestion is a
+number they may take or leave. An unanswered required field is work still owed.
+All three rendered as grey boxes with dashed borders — so the interview had no
+way to say which was which, and **which constraints come from Florida and which
+come from the landlord is the one thing a lease builder must communicate.**
+
+Navy for the law, green for help, amber for work owed — scoped to the route,
+same pattern as the reviewer's page. Amber appears on outstanding work and
+nowhere else; a page that marks everything cannot mark one thing.
+
+`owed` excludes booleans (false is an answer, not a blank) and optional fields.
+
+**Why these are tests:** the failure they guard is not broken markup. It is
+shipping the structure of a design and reporting it as the design, which
+happened on the reviewer's page and again here.
+
 ### The builder tells you where you are, and what an answer becomes
 
 Thirteen chips wrapping over two rows showed the landlord where they were and

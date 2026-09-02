@@ -23,7 +23,7 @@ import { useMemo, useState } from 'react';
 import { useLoaderData, useRevalidator } from 'react-router';
 import { CustomClauseEditor } from '~/components/general/lease/custom-clause-editor';
 import type { FieldValue } from '~/components/general/lease/interview-field';
-import { InterviewFieldControl } from '~/components/general/lease/interview-field';
+import { InterviewFieldControl, LB_ACCENT_TEXT, LB_ACTION_TEXT } from '~/components/general/lease/interview-field';
 import { PartyEditor } from '~/components/general/lease/party-editor';
 import { LeaseReviewPanel } from '~/components/general/lease/review-panel';
 import { UtilitySummary } from '~/components/general/lease/utility-summary';
@@ -322,8 +322,8 @@ export default function LeaseInterviewPage() {
                           i === safeIndex
                             ? 'font-semibold text-xs'
                             : left > 0
-                              ? 'font-semibold text-destructive text-xs'
-                              : 'font-semibold text-primary text-xs'
+                              ? `${LB_ACTION_TEXT} font-semibold text-xs`
+                              : `${LB_ACCENT_TEXT} font-semibold text-xs`
                         }
                       >
                         {left > 0 ? left : '✓'}
@@ -351,7 +351,7 @@ export default function LeaseInterviewPage() {
 
         <div className="min-w-0">
           <section>
-            <p className="font-semibold text-primary text-xs uppercase tracking-widest">
+            <p className={`${LB_ACCENT_TEXT} font-semibold text-xs uppercase tracking-widest`}>
               Step {safeIndex + 1} of {steps.length}
             </p>
             <h2 className="mt-1.5 font-semibold text-2xl">{step.title}</h2>

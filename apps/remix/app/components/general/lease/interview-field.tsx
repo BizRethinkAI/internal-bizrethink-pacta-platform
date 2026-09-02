@@ -25,6 +25,33 @@ import { useState } from 'react';
 
 export type FieldValue = string | number | boolean | null;
 
+/*
+  UTILITIES, NOT AN INLINE STYLESHEET.
+
+  The first attempt shipped a `<style>` element with scoped custom properties.
+  It reached the browser and the browser refused it: this app serves a NONCED
+  `style-src-elem` CSP (apps/remix/server/security-headers.ts), so an unnonced
+  style element is dropped silently. The markup rendered, the class names
+  existed, and every one of them was inert.
+
+  THREE KINDS OF THING MEAN THREE THINGS. A statutory bound is a limit the
+  answerer may not cross. A suggestion is a number they may take or leave. An
+  unanswered required field is work still owed. All three rendered as grey
+  dashed boxes, so the interview could not say which was which — and which of
+  its constraints come from Florida and which come from the landlord is the one
+  thing a lease builder must communicate.
+
+  Dark variants are written out because the app's `dark:` is a class strategy.
+*/
+export const LB_ACCENT_TEXT = 'text-[#1f3a5f] dark:text-[#8fb3d9]';
+export const LB_ACTION_TEXT = 'text-[#a2560c] dark:text-[#d99a4e]';
+export const LB_STATUTE = 'border-l-[3px] border-l-[#1f3a5f] bg-[#eef2f7] dark:border-l-[#8fb3d9] dark:bg-[#1a2431]';
+export const LB_SUGGEST = 'border-l-[3px] border-l-[#2f6b4f] bg-[#edf5f0] dark:border-l-[#6bab8a] dark:bg-[#17251d]';
+export const LB_SUGGEST_TEXT = 'text-[#2f6b4f] dark:text-[#6bab8a]';
+/* A ring rather than a child-selector variant: `[&_input]:` takes one utility,
+   not a class list, and the ring marks the control whatever kind it is. */
+export const LB_OWED = 'rounded-md ring-1 ring-[#a2560c] dark:ring-[#d99a4e]';
+
 export type InterviewFieldProps = {
   field: InterviewField;
   value: FieldValue;
@@ -55,13 +82,27 @@ export const InterviewFieldControl = ({
 }: InterviewFieldProps) => {
   const id = `field-${field.name}`;
 
+  /*
+    WORK STILL OWED, marked on the field itself.
+    
+    The rail counts these, but a count sends somebody hunting down a step of
+    seven questions for the two that are blank. A boolean is never owed — false
+    is an answer — and neither is an optional field.
+  */
+  const owed =
+    field.required === true &&
+    field.kind !== 'boolean' &&
+    (value === null || value === undefined || String(value).trim() === '');
+
   return (
     <div className="border-border border-b py-5 last:border-b-0">
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_320px]">
         <div>
           <Label htmlFor={id} className="font-medium text-base leading-snug">
             {field.label}
-            {field.required && <span className="ml-1 text-muted-foreground">*</span>}
+            {field.required && (
+              <span className={owed ? `${LB_ACTION_TEXT} ml-1` : 'ml-1 text-muted-foreground'}>*</span>
+            )}
           </Label>
 
           {field.help && <p className="mt-1.5 text-muted-foreground text-sm leading-relaxed">{field.help}</p>}
@@ -72,10 +113,10 @@ export const InterviewFieldControl = ({
             have already broken it is how a form teaches nothing.
           */}
           {field.statute && (
-            <div className="mt-3 flex gap-2.5 rounded-r-md border-primary border-l-[3px] bg-primary/5 py-2.5 pr-3 pl-3">
-              <Scale className="mt-0.5 h-4 w-4 flex-none text-primary" />
+            <div className={`${LB_STATUTE} mt-3 flex gap-2.5 rounded-r-md py-2.5 pr-3 pl-3`}>
+              <Scale className={`${LB_ACCENT_TEXT} mt-0.5 h-4 w-4 flex-none`} />
               <div className="text-sm">
-                <span className="font-semibold text-primary text-xs tracking-wide">{field.statute.cite}</span>
+                <span className={`${LB_ACCENT_TEXT} font-semibold text-xs tracking-wide`}>{field.statute.cite}</span>
                 <p className="mt-0.5 text-muted-foreground leading-relaxed">{field.statute.note}</p>
               </div>
             </div>
@@ -90,15 +131,21 @@ export const InterviewFieldControl = ({
             Phrased as an observation and applied by an explicit click, so the
             answer on the document is always one somebody chose.
           */}
+          {/*
+            GREEN, not the same grey box as the statute above it. One is a
+            bound Florida sets and the other is a number somebody may take or
+            leave; rendering them identically was the interview's way of saying
+            it could not tell them apart either.
+          */}
           {field.suggestion && (
-            <div className="mt-3 flex items-start gap-2 rounded-md border border-border border-dashed p-3">
-              <Lightbulb className="mt-0.5 h-4 w-4 flex-none text-muted-foreground" />
+            <div className={`${LB_SUGGEST} mt-3 flex items-start gap-2 rounded-r-md py-2.5 pr-3 pl-3`}>
+              <Lightbulb className={`${LB_SUGGEST_TEXT} mt-0.5 h-4 w-4 flex-none`} />
               <div className="text-sm">
                 <p className="text-muted-foreground leading-relaxed">{field.suggestion.note}</p>
                 {value !== field.suggestion.value && (
                   <button
                     type="button"
-                    className="mt-1.5 font-medium text-foreground text-sm underline underline-offset-2 hover:no-underline"
+                    className={`${LB_SUGGEST_TEXT} mt-1.5 font-semibold text-sm underline underline-offset-2 hover:no-underline`}
                     onClick={() => onChange(field.suggestion?.value ?? null)}
                   >
                     Use{' '}
@@ -133,7 +180,9 @@ export const InterviewFieldControl = ({
         </div>
 
         <div>
-          <FieldInput id={id} field={field} value={value} onChange={onChange} />
+          <div className={owed ? LB_OWED : undefined}>
+            <FieldInput id={id} field={field} value={value} onChange={onChange} />
+          </div>
 
           {/*
             Only the things a tenant knows and a landlord would otherwise
