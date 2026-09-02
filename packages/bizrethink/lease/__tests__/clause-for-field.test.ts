@@ -98,3 +98,64 @@ describe('the builder shows its state', () => {
     expect(route).toMatch(/onClick=\{\(\) => void goTo\(i\)\}/);
   });
 });
+
+/**
+ * Three kinds of thing, three appearances.
+ *
+ * A statutory bound is a limit the answerer may not cross. A suggestion is a
+ * number they may take or leave. An unanswered required field is work still
+ * owed. All three rendered as grey boxes with dashed borders — so the interview
+ * had no way to say which was which, and the one thing a lease builder must
+ * communicate is which of its constraints come from Florida and which come from
+ * the landlord.
+ *
+ * These are tests because the failure they guard is not broken markup. It is
+ * shipping the structure of a design and calling it the design, which has
+ * happened twice.
+ */
+describe('the builder tells its three constraints apart', () => {
+  const strip = (raw: string) => raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+
+  const field = strip(
+    readFileSync(
+      new URL('../../../../apps/remix/app/components/general/lease/interview-field.tsx', import.meta.url),
+      'utf8',
+    ),
+  );
+
+  const route = readFileSync(
+    new URL('../../../../apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.tsx', import.meta.url),
+    'utf8',
+  );
+
+  it('defines the three scoped colours on a route it owns', () => {
+    for (const token of ['--lb-accent', '--lb-help', '--lb-action']) {
+      expect(route, token).toContain(token);
+    }
+  });
+
+  it('sets a statutory bound apart from a suggestion', () => {
+    expect(field).toContain('lb-statute');
+    expect(field).toContain('lb-suggest');
+  });
+
+  /*
+    The rail counts what is outstanding, but a count sends somebody hunting
+    down a step of seven questions for the two that are blank.
+  */
+  it('marks an unanswered required field on the field itself', () => {
+    expect(field).toContain('lb-owed');
+    expect(field).toMatch(/const owed =/);
+  });
+
+  /*
+    A boolean is never owed — false is an answer, not a blank — and neither is
+    an optional field.
+  */
+  it('does not call a boolean or an optional field outstanding', () => {
+    const owed = field.slice(field.indexOf('const owed ='), field.indexOf('return ('));
+
+    expect(owed).toContain('field.required === true');
+    expect(owed).toContain("field.kind !== 'boolean'");
+  });
+});

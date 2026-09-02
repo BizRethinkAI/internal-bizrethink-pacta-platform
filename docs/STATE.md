@@ -410,6 +410,24 @@ passed, or appeared to:
 
 ## Open threads
 
+### Three kinds of constraint, three appearances
+
+A statutory bound is a limit the answerer may not cross. A suggestion is a
+number they may take or leave. An unanswered required field is work still owed.
+All three rendered as grey boxes with dashed borders — so the interview had no
+way to say which was which, and **which constraints come from Florida and which
+come from the landlord is the one thing a lease builder must communicate.**
+
+Navy for the law, green for help, amber for work owed — scoped to the route,
+same pattern as the reviewer's page. Amber appears on outstanding work and
+nowhere else; a page that marks everything cannot mark one thing.
+
+`owed` excludes booleans (false is an answer, not a blank) and optional fields.
+
+**Why these are tests:** the failure they guard is not broken markup. It is
+shipping the structure of a design and reporting it as the design, which
+happened on the reviewer's page and again here.
+
 ### The builder tells you where you are, and what an answer becomes
 
 Thirteen chips wrapping over two rows showed the landlord where they were and
