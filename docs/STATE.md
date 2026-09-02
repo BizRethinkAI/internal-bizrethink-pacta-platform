@@ -410,6 +410,28 @@ passed, or appeared to:
 
 ## Open threads
 
+### The builder tells you where you are, and what an answer becomes
+
+Thirteen chips wrapping over two rows showed the landlord where they were and
+**nothing else** — not which steps were finished, not which still wanted them.
+A sticky rail carries the same thirteen as a list with a per-step count of
+required answers still missing, computed from the live answers. Every step
+stays reachable out of order.
+
+**Each question now says which clause it becomes.** `clauseIndexForFields`
+reads the mapping that already existed implicitly — every clause declares the
+variables its body interpolates — the other way round. Recomputed from the
+SELECTED clauses on every render, because numbering is derived from what
+survives selection and a cached reference would point at a number the lease
+does not contain. Absent where the clause is not selected.
+
+The statute chip carries the accent now rather than the same grey as
+everything else. It is the difference between a form and a lease builder and it
+was the quietest thing on the page.
+
+Design proposal:
+https://claude.ai/code/artifact/873784f0-2697-490b-9fa6-3a2ef1ffd619
+
 ### The lease opens with the deal
 
 Page 1 is the particulars — key terms and the money due at execution. Page 2 is

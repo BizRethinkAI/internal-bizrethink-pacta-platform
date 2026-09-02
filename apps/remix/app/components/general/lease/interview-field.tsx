@@ -35,6 +35,13 @@ export type InterviewFieldProps = {
   organisationId?: string;
   /** Present when this field may be put to the tenant instead. */
   delegation?: { asked: boolean; onToggle: (asked: boolean) => void };
+  /**
+   * The clause this answer ends up in, where the lease includes one.
+   *
+   * Per-lease rather than per-field: numbering is derived from what survives
+   * selection, so a clause dropped earlier renumbers everything after it.
+   */
+  clause?: { number: string; heading: string };
 };
 
 export const InterviewFieldControl = ({
@@ -44,6 +51,7 @@ export const InterviewFieldControl = ({
   error,
   organisationId,
   delegation,
+  clause,
 }: InterviewFieldProps) => {
   const id = `field-${field.name}`;
 
@@ -64,10 +72,10 @@ export const InterviewFieldControl = ({
             have already broken it is how a form teaches nothing.
           */}
           {field.statute && (
-            <div className="mt-3 flex gap-2 rounded-md border border-border bg-muted/40 p-3">
-              <Scale className="mt-0.5 h-4 w-4 flex-none text-muted-foreground" />
+            <div className="mt-3 flex gap-2.5 rounded-r-md border-primary border-l-[3px] bg-primary/5 py-2.5 pr-3 pl-3">
+              <Scale className="mt-0.5 h-4 w-4 flex-none text-primary" />
               <div className="text-sm">
-                <span className="font-medium">{field.statute.cite}</span>
+                <span className="font-semibold text-primary text-xs tracking-wide">{field.statute.cite}</span>
                 <p className="mt-0.5 text-muted-foreground leading-relaxed">{field.statute.note}</p>
               </div>
             </div>
@@ -102,6 +110,25 @@ export const InterviewFieldControl = ({
                 )}
               </div>
             </div>
+          )}
+
+          {/*
+            WHAT THIS ANSWER BECOMES.
+
+            The interview asked sixty questions and never said what any of them
+            turned into. A landlord typing a figure into "what do you charge if
+            the tenant refuses access" had no way to know it lands in 8.7
+            Administrative Charges — so the question read as a form field rather
+            than as a term they were drafting.
+
+            Absent where the clause is not selected for this lease, because a
+            number pointing at a clause the document does not contain is worse
+            than no pointer.
+          */}
+          {clause && (
+            <p className="mt-2.5 text-muted-foreground text-xs">
+              Becomes clause <span className="font-semibold text-foreground">{clause.number}</span> · {clause.heading}
+            </p>
           )}
         </div>
 

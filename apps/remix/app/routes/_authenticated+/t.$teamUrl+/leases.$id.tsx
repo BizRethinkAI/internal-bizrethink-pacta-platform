@@ -1,3 +1,6 @@
+import { FL_LIBRARY } from '@bizrethink/customizations/lease/clauses/us-fl';
+import { selectClauses } from '@bizrethink/customizations/lease/engine/select-clauses';
+import { clauseIndexForFields } from '@bizrethink/customizations/lease/interview/clause-for-field';
 import {
   describeMissingUnique,
   outstandingDelegations,
@@ -14,7 +17,6 @@ import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
-import { Progress } from '@documenso/ui/primitives/progress';
 import { msg } from '@lingui/core/macro';
 import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2, MessageSquarePlus, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -247,108 +249,188 @@ export default function LeaseInterviewPage() {
 
   const visibleFields = step.fields.filter((f) => f.showWhen === undefined || f.showWhen(answers));
 
+  /*
+    Which clause each answer ends up in, for THIS lease. Numbering is derived
+    from what survives selection, so it is recomputed as the answers change
+    rather than read off the library once.
+  */
+  const clauseFor = clauseIndexForFields(selectClauses({ facts: facts as never, library: FL_LIBRARY }).selected);
+
+  /*
+    How much of a step is still outstanding, so the rail can say so. Counts
+    only REQUIRED fields that are VISIBLE — an optional blank is an answer, and
+    a hidden field is not being asked.
+  */
+  const outstandingOn = (candidate: (typeof steps)[number]) =>
+    candidate.fields.filter((f) => {
+      if (f.required !== true) {
+        return false;
+      }
+
+      if (f.showWhen !== undefined && !f.showWhen(answers)) {
+        return false;
+      }
+
+      const held =
+        f.target === 'fact' ? facts[f.name] : f.target === 'money' ? readMoney(money, f.name) : values[f.name];
+
+      return held === null || held === undefined || String(held).trim() === '';
+    }).length;
+
   return (
-    <div className="mx-auto w-full max-w-screen-lg px-4 md:px-8">
-      <div className="mt-8">
+    <div className="mx-auto w-full max-w-screen-xl px-4 pb-24 md:px-8">
+      <div className="mt-8 border-b pb-5">
         <h1 className="font-semibold text-2xl">{matter.title}</h1>
-        <p className="mt-1 text-muted-foreground text-sm">
-          Step {safeIndex + 1} of {steps.length} · {step.title}
-        </p>
-        <Progress value={((safeIndex + 1) / steps.length) * 100} className="mt-4 h-1.5" />
+        <p className="mt-1 text-muted-foreground text-sm">Draft · progress saves as you move between steps</p>
       </div>
 
-      {/* Every step is reachable. An interview that forces a strict order is
-          one you cannot correct a typo in without walking the whole thing. */}
-      <nav className="mt-4 flex flex-wrap gap-1.5">
-        {steps.map((s, i) => (
-          <button
-            key={s.id}
-            type="button"
-            onClick={() => void goTo(i)}
-            className={
-              i === safeIndex
-                ? 'rounded-md bg-foreground px-2.5 py-1 font-medium text-background text-xs'
-                : 'rounded-md bg-muted px-2.5 py-1 text-muted-foreground text-xs hover:bg-muted/70'
-            }
-          >
-            {i + 1}. {s.title}
-          </button>
-        ))}
-      </nav>
-
-      <section className="mt-8">
-        <h2 className="font-semibold text-xl">{step.title}</h2>
-        {step.intro && <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">{step.intro}</p>}
-
+      <div className="mt-6 grid gap-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12">
         {/*
+          THE RAIL. Thirteen chips wrapping over two rows showed where you were
+          and nothing else — not what was finished, not what still wanted you.
+          A list carries state.
+
+          Every step stays reachable. An interview that forces a strict order is
+          one you cannot correct a typo in without walking the whole thing.
+        */}
+        <aside className="lg:sticky lg:top-6 lg:self-start">
+          <div className="rounded-lg border p-4">
+            <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">The interview</h2>
+
+            <nav className="mt-3 flex flex-col gap-0.5">
+              {steps.map((s, i) => {
+                const left = outstandingOn(s);
+
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => void goTo(i)}
+                    className={
+                      i === safeIndex
+                        ? 'flex items-center gap-2.5 rounded-md bg-foreground px-2 py-1.5 text-left font-medium text-background text-sm'
+                        : 'flex items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted'
+                    }
+                  >
+                    <span className={i === safeIndex ? 'w-5 text-xs opacity-70' : 'w-5 text-muted-foreground text-xs'}>
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">{s.title}</span>
+                    {s.id !== 'review' && (
+                      <span
+                        className={
+                          i === safeIndex
+                            ? 'font-semibold text-xs'
+                            : left > 0
+                              ? 'font-semibold text-destructive text-xs'
+                              : 'font-semibold text-primary text-xs'
+                        }
+                      >
+                        {left > 0 ? left : '✓'}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="mt-4 rounded-lg border p-4">
+            <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">The document</h2>
+            <p className="mt-2 text-muted-foreground text-xs">
+              Everything the answers have selected so far, as one file.
+            </p>
+            <Button asChild variant="outline" size="sm" className="mt-3">
+              <a href={`/t/${teamUrl}/leases/${matter.id}/preview`} target="_blank" rel="noreferrer">
+                <FileText className="mr-2 h-4 w-4" />
+                Preview the lease
+              </a>
+            </Button>
+          </div>
+        </aside>
+
+        <div className="min-w-0">
+          <section>
+            <p className="font-semibold text-primary text-xs uppercase tracking-widest">
+              Step {safeIndex + 1} of {steps.length}
+            </p>
+            <h2 className="mt-1.5 font-semibold text-2xl">{step.title}</h2>
+            {step.intro && <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">{step.intro}</p>}
+
+            {/*
           Above the fields on this step, not below them. The step now opens the
           interview and the party list is the question it is asking; leaving it
           under half a dozen notice questions is what made it easy to miss.
         */}
-        {step.id === 'parties' && <PartyEditor parties={parties} onChange={setParties} />}
+            {step.id === 'parties' && <PartyEditor parties={parties} onChange={setParties} />}
 
-        <div className="mt-4">
-          {visibleFields.map((field) => (
-            <InterviewFieldControl
-              key={field.name}
-              field={field}
-              value={
-                field.target === 'fact'
-                  ? (facts[field.name] ?? null)
-                  : field.target === 'money'
-                    ? readMoney(money, field.name)
-                    : (values[field.name] ?? null)
-              }
-              onChange={(value) => setField(field.target, field.name, value)}
-              organisationId={organisationId}
-              delegation={
-                delegable.has(field.name)
-                  ? {
-                      asked: delegatedFields.includes(field.name),
-                      onToggle: (asked) =>
-                        setDelegatedFields((prev) =>
-                          asked ? [...new Set([...prev, field.name])] : prev.filter((name) => name !== field.name),
-                        ),
-                    }
-                  : undefined
-              }
-            />
-          ))}
-        </div>
+            <div className="mt-4">
+              {visibleFields.map((field) => (
+                <InterviewFieldControl
+                  key={field.name}
+                  field={field}
+                  value={
+                    field.target === 'fact'
+                      ? (facts[field.name] ?? null)
+                      : field.target === 'money'
+                        ? readMoney(money, field.name)
+                        : (values[field.name] ?? null)
+                  }
+                  onChange={(value) => setField(field.target, field.name, value)}
+                  organisationId={organisationId}
+                  clause={clauseFor.get(field.name)}
+                  delegation={
+                    delegable.has(field.name)
+                      ? {
+                          asked: delegatedFields.includes(field.name),
+                          onToggle: (asked) =>
+                            setDelegatedFields((prev) =>
+                              asked ? [...new Set([...prev, field.name])] : prev.filter((name) => name !== field.name),
+                            ),
+                        }
+                      : undefined
+                  }
+                />
+              ))}
+            </div>
 
-        {/*
+            {/*
           Below the repair threshold rather than above it. The threshold is a
           statutory question and this is a negotiated one; and unlike the
           threshold, this section is offered on every property type — Florida
           constrains who may be made to fix the plumbing, not who cuts the
           grass.
         */}
-        {step.id === 'utilities' && <UtilitySummary utilities={utilities} propertiesHref={`/t/${teamUrl}/leases`} />}
+            {step.id === 'utilities' && (
+              <UtilitySummary utilities={utilities} propertiesHref={`/t/${teamUrl}/leases`} />
+            )}
 
-        {step.id === 'maintenance' && <YardTaskEditor tasks={yardTasks} onChange={setYardTasks} />}
+            {step.id === 'maintenance' && <YardTaskEditor tasks={yardTasks} onChange={setYardTasks} />}
 
-        {step.id === 'custom-clauses' && (
-          <CustomClauseEditor
-            sections={step.customClauseSections ?? []}
-            clauses={customClauses}
-            onChange={setCustomClauses}
-            organisationId={organisationId}
-          />
-        )}
+            {step.id === 'custom-clauses' && (
+              <CustomClauseEditor
+                sections={step.customClauseSections ?? []}
+                clauses={customClauses}
+                onChange={setCustomClauses}
+                organisationId={organisationId}
+              />
+            )}
 
-        {step.id === 'review' && (
-          <ReviewPanel
-            teamUrl={teamUrl}
-            matterId={matter.id}
-            status={matter.status}
-            envelopeId={matter.envelopeId}
-            parties={parties}
-            delegatedFields={delegatedFields}
-            values={values}
-            query={{ isLoading: validate.isLoading, data: validate.data as ValidationResult | undefined }}
-          />
-        )}
-      </section>
+            {step.id === 'review' && (
+              <ReviewPanel
+                teamUrl={teamUrl}
+                matterId={matter.id}
+                status={matter.status}
+                envelopeId={matter.envelopeId}
+                parties={parties}
+                delegatedFields={delegatedFields}
+                values={values}
+                query={{ isLoading: validate.isLoading, data: validate.data as ValidationResult | undefined }}
+              />
+            )}
+          </section>
+        </div>
+      </div>
 
       {/*
         A failed save was rendered nowhere at all. The page did not move, the
@@ -383,20 +465,28 @@ export default function LeaseInterviewPage() {
         </Alert>
       )}
 
-      <div className="mt-10 flex items-center justify-between border-t py-6">
-        <Button variant="outline" disabled={safeIndex === 0} onClick={() => void goTo(safeIndex - 1)}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t bg-background/95 px-4 py-3 backdrop-blur md:px-8">
+        <div className="mx-auto flex max-w-screen-xl items-center gap-4">
+          <Button variant="outline" size="sm" disabled={safeIndex === 0} onClick={() => void goTo(safeIndex - 1)}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
 
-        <span className="text-muted-foreground text-xs">
-          {saveStep.isPending ? 'Saving…' : 'Progress saves as you move between steps'}
-        </span>
+          <span className="text-muted-foreground text-xs">
+            {saveStep.isPending
+              ? 'Saving…'
+              : outstandingOn(step) > 0
+                ? `${outstandingOn(step)} answer${outstandingOn(step) === 1 ? '' : 's'} still needed on this step`
+                : 'Everything on this step is answered'}
+          </span>
 
-        <Button disabled={safeIndex === steps.length - 1} onClick={() => void goTo(safeIndex + 1)}>
-          Next
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+          <div className="ml-auto flex items-center gap-3">
+            <Button disabled={safeIndex === steps.length - 1} onClick={() => void goTo(safeIndex + 1)}>
+              Next
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
