@@ -122,7 +122,6 @@ export const DERIVED_FACTS = [
   'advanceRentCarriedInUsd',
   'prorationApplies',
   'termMonths',
-  'hasNamedOccupants',
   'hasYardAllocation',
   'hasTenantYardDuty',
 ];
@@ -181,6 +180,22 @@ export const FL_INTERVIEW: InterviewStep[] = [
       'The landlord comes from the property record and is already filled in below. Add each tenant — everyone listed becomes a signer on the lease and on every addendum.',
     fields: [
       {
+        /*
+          ASKED, because it was two facts in one value.
+
+          `hasNamedOccupants` used to be DERIVED from whether the names box was
+          empty — so "nobody else lives here" and "the tenant has not told me
+          yet" were the same stored state. A landlord who put the question to
+          their tenant and never heard back got a lease saying the authorised
+          occupants are the tenants, indistinguishable from one who meant it.
+        */
+        name: 'hasNamedOccupants',
+        target: 'fact',
+        kind: 'boolean',
+        label: 'Is anyone else going to live there?',
+        help: 'Anyone beyond the signing tenants — children, a parent, a partner who is not signing. Answer no and the lease says the occupants are the tenants.',
+      },
+      {
         name: 'electronicNoticesElected',
         target: 'fact',
         kind: 'boolean',
@@ -212,6 +227,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'authorisedOccupants',
+        showWhen: (a) => a.facts.hasNamedOccupants === true,
         tenantCanAnswer: true,
         target: 'value',
         kind: 'textarea',

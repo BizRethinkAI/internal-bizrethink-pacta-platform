@@ -1,4 +1,7 @@
-import { describeMissingUnique } from '@bizrethink/customizations/lease/interview/describe-missing';
+import {
+  describeMissingUnique,
+  outstandingDelegations,
+} from '@bizrethink/customizations/lease/interview/describe-missing';
 import type { InterviewAnswers } from '@bizrethink/customizations/lease/interview/steps';
 import { FL_INTERVIEW, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
 import { delegableFieldNames } from '@bizrethink/customizations/lease/interview/tenant-answers';
@@ -13,7 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Button } from '@documenso/ui/primitives/button';
 import { Progress } from '@documenso/ui/primitives/progress';
 import { msg } from '@lingui/core/macro';
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2, Send } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2, MessageSquarePlus, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useLoaderData, useRevalidator } from 'react-router';
 import { CustomClauseEditor } from '~/components/general/lease/custom-clause-editor';
@@ -341,6 +344,7 @@ export default function LeaseInterviewPage() {
             envelopeId={matter.envelopeId}
             parties={parties}
             delegatedFields={delegatedFields}
+            values={values}
             query={{ isLoading: validate.isLoading, data: validate.data as ValidationResult | undefined }}
           />
         )}
@@ -440,6 +444,7 @@ const ReviewPanel = ({
   envelopeId,
   parties,
   delegatedFields,
+  values,
   query,
 }: {
   teamUrl: string;
@@ -449,6 +454,8 @@ const ReviewPanel = ({
   parties: LeasePartyInput[];
   /** So a question put to the tenant is not reported as one the landlord skipped. */
   delegatedFields: string[];
+  /** To tell a delegated question that came back from one that did not. */
+  values: Record<string, FieldValue>;
   query: { isLoading: boolean; data: ValidationResult | undefined };
 }) => {
   const revalidator = useRevalidator();
@@ -589,6 +596,34 @@ const ReviewPanel = ({
         organisation without the draft-rendering grant saw "nothing blocking",
         pressed Send, and got a hard failure naming raw clause slugs.
       */}
+      {/*
+        NOT blocking, and deliberately outside the red list. A delegated
+        question only reaches `missing` when it is also a required clause
+        variable — occupants is not, because blank there is a lawful answer
+        that selects a different clause. Without this the landlord asks, never
+        hears back, and finds out from the rendered lease.
+      */}
+      {outstandingDelegations(delegatedFields, values).length > 0 && (
+        <Alert>
+          <MessageSquarePlus className="h-4 w-4" />
+          <AlertTitle>Waiting on the tenant</AlertTitle>
+          <AlertDescription>
+            <p className="text-sm">
+              You asked the tenant to answer these and they have not come back yet. None of them stops you sending — the
+              lease will simply say nothing about them.
+            </p>
+            <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
+              {outstandingDelegations(delegatedFields, values).map((entry) => (
+                <li key={entry.raw}>
+                  {entry.question}
+                  <span className="block text-muted-foreground text-xs">{entry.stepTitle}</span>
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {(data?.unreviewedClauses.length ?? 0) > 0 && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />

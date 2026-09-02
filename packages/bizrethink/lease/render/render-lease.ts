@@ -55,6 +55,15 @@ export type RenderLeaseResult = {
   documents: LeaseDocumentSpec[];
 };
 
+/**
+ * The street line alone, for the running head.
+ *
+ * The head has one line and shares it with the document name; the full
+ * "29090 Picana Lane, Wesley Chapel, FL 33543" overflowed it. The city and
+ * state are on the cover of every document that carries this head.
+ */
+const shortAddress = (propertyAddress: string): string => propertyAddress.split(',')[0].trim();
+
 export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: LeaseDocumentSpec[]; missing: string[] } => {
   const { facts, money, values, propertyAddress, customClauses = [] } = input;
 
@@ -101,7 +110,10 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
   const documents: LeaseDocumentSpec[] = [
     {
       key: 'lease',
+      kind: 'lease',
       title: 'Residential Lease',
+      shortTitle: 'Residential Lease',
+      runningRef: shortAddress(propertyAddress),
       subtitle: propertyAddress,
       clauses: body.rendered,
       withInitials: false,
@@ -123,7 +135,12 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
 
     documents.push({
       key: `addendum:${addendum.slug}`,
+      kind: 'addendum',
       title: addendum.heading,
+      // The head gets the name; the full sentence stays on the cover, where
+      // there is room for it and where it is actually read.
+      shortTitle: addendum.heading,
+      runningRef: shortAddress(propertyAddress),
       subtitle: `Attached to and forming part of the Residential Lease for ${propertyAddress}`,
       clauses: rendered.rendered,
       withInitials: true,
@@ -138,7 +155,15 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
 
     documents.push({
       key: `disclosure:${disclosure.slug}`,
+      /*
+        NOT an agreement. Fla. Stat. §83.512 requires the flood disclosure to
+        be a separate written disclosure, and the eyebrow used to be inferred
+        from `withInitials`, so this document announced itself as "Agreement".
+      */
+      kind: 'disclosure',
       title: disclosure.heading,
+      shortTitle: disclosure.heading,
+      runningRef: shortAddress(propertyAddress),
       subtitle: `Given in respect of ${propertyAddress}`,
       clauses: rendered.rendered,
       withInitials: false,

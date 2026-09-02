@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { describeMissing, describeMissingUnique } from '../interview/describe-missing';
+import { describeMissing, describeMissingUnique, outstandingDelegations } from '../interview/describe-missing';
 
 /**
  * The review panel spoke the renderer's language, not the landlord's.
@@ -90,5 +90,51 @@ describe('delegated questions', () => {
   */
   it('are still reported, since a delegated answer that never arrives blocks the send', () => {
     expect(describeMissingUnique(missing, ['permittedPets'])).toHaveLength(2);
+  });
+});
+
+/**
+ * Every question put to the tenant, answered or not.
+ *
+ * `missing` only knows about variables a clause needs, so a delegated question
+ * surfaces ONLY when it also happens to be a required clause variable.
+ * `permittedPets` is; `authorisedOccupants` is not — blank there is a lawful
+ * answer that selects a different clause. So a landlord could ask their tenant
+ * for the occupant names, never get them, and have the lease print "the
+ * authorised occupants are the tenants" with no warning anywhere.
+ *
+ * Not blocking, because blank IS a valid answer. But not silent either.
+ */
+describe('outstandingDelegations', () => {
+  it('reports a delegated question with no answer', () => {
+    const outstanding = outstandingDelegations(['authorisedOccupants'], {});
+
+    expect(outstanding).toHaveLength(1);
+    expect(outstanding[0].question).toContain('Anyone else living there');
+    expect(outstanding[0].stepTitle).toBe('Who is renting it');
+  });
+
+  it('drops one the tenant has answered', () => {
+    expect(outstandingDelegations(['authorisedOccupants'], { authorisedOccupants: 'Ava Shetty' })).toEqual([]);
+  });
+
+  it('treats whitespace as no answer', () => {
+    expect(outstandingDelegations(['authorisedOccupants'], { authorisedOccupants: '   ' })).toHaveLength(1);
+  });
+
+  /*
+    A field the LANDLORD filled in after delegating is answered too. The
+    delegation list records who was asked, not who must reply.
+  */
+  it('does not care who supplied the answer', () => {
+    expect(outstandingDelegations(['permittedPets'], { permittedPets: 'One cat' })).toEqual([]);
+  });
+
+  it('ignores a name no step asks for', () => {
+    expect(outstandingDelegations(['notAFieldAnybodyAsks'], {})).toEqual([]);
+  });
+
+  it('is empty when nothing was delegated', () => {
+    expect(outstandingDelegations([], {})).toEqual([]);
   });
 });

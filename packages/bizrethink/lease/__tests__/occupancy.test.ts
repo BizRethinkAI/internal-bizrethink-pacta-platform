@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { FL_LIBRARY } from '../clauses/us-fl';
+import { allFields, DERIVED_FACTS, FL_INTERVIEW } from '../interview/steps';
 
 import { PICANA_FACTS, PICANA_MONEY, PICANA_VALUES } from '../matters/picana-ln';
 import type { LeasePartyInput } from '../parties/derive-parties';
@@ -100,5 +102,49 @@ describe('only one occupancy clause is ever selected', () => {
 
       expect(matches, `two occupancy clauses for answer ${String(answer)}`).toHaveLength(1);
     }
+  });
+});
+
+/**
+ * "Nobody else lives here" and "the tenant has not told me yet" were one value.
+ *
+ * `hasNamedOccupants` was DERIVED from whether `authorisedOccupants` was empty.
+ * So a landlord who delegated that question to the tenant and never heard back
+ * got a lease stating the authorised occupants are the tenants — indistinguish-
+ * able from a landlord who deliberately answered "just the two of them".
+ *
+ * One field carrying two facts is the defect this whole feature exists to
+ * prevent; it was simply wearing different clothes.
+ */
+describe('naming other occupants is now a question', () => {
+  it('is asked, not inferred from an empty box', () => {
+    const asked = allFields(FL_INTERVIEW).find((field) => field.name === 'hasNamedOccupants');
+
+    expect(asked).toBeDefined();
+    expect(asked?.target).toBe('fact');
+    expect(asked?.kind).toBe('boolean');
+  });
+
+  it('no longer claims to be derived', () => {
+    expect(DERIVED_FACTS).not.toContain('hasNamedOccupants');
+  });
+
+  it('only asks for the names once the landlord says there are some', () => {
+    const names = allFields(FL_INTERVIEW).find((field) => field.name === 'authorisedOccupants');
+
+    expect(names?.showWhen).toBeDefined();
+    expect(names?.showWhen?.({ facts: { hasNamedOccupants: true } } as never)).toBe(true);
+    expect(names?.showWhen?.({ facts: { hasNamedOccupants: false } } as never)).toBe(false);
+  });
+
+  /*
+    A matter stored before this existed has no such fact, and a missing boolean
+    must mean "nobody else" — the same clause it was already getting — rather
+    than flipping it to the named-occupants variant with an empty name list.
+  */
+  it('defaults an older matter to nobody else', () => {
+    const clause = FL_LIBRARY.find((entry) => entry.slug === 'use.occupancy-limit-with-others');
+
+    expect(clause?.includeWhen?.({ hasNamedOccupants: undefined } as never)).toBeFalsy();
   });
 });

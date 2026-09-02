@@ -97,20 +97,46 @@ describe('every placeholder survives into the PDF', () => {
       lease with nowhere to sign. Counting emitted against extracted is what
       turns that silence into a failing test.
     */
-    const emitted = result.documents.reduce(
-      (total, doc) =>
-        total +
-        buildSignatureBlocks({
-          parties: PICANA_PARTIES,
-          documentKey: doc.key,
-          withInitials: doc.withInitials,
-        })
-          .flatMap((block) => block.signers)
-          .flatMap((signer) => signer.placeholders).length,
-      0,
+    const emitted = result.documents.flatMap((doc) =>
+      buildSignatureBlocks({
+        parties: PICANA_PARTIES,
+        documentKey: doc.key,
+        withInitials: doc.withInitials,
+      })
+        .flatMap((block) => block.signers)
+        .flatMap((signer) => signer.placeholders)
+        .map((placeholder) => placeholder.token),
     );
 
-    expect(allPlaceholders).toHaveLength(emitted);
+    /*
+      SET EQUALITY, NOT A COUNT — and the difference is a real signing defect.
+
+      This compared lengths. A token that WRAPS across two rendered lines is
+      still found by the extractor: `@libpdf/core` joins page lines with "\n"
+      when it builds its search text, `[^}]` in the placeholder regex matches a
+      newline, and the bbox becomes the union of both lines. So a wrapped token
+      still counts as one, still parses as SIGNATURE/r1, and overlay 034 still
+      forces it to 160x44 — every assertion in this file passed while the
+      widget sat several points off where it belonged.
+
+      Comparing the STRINGS catches it: a wrapped match carries a newline where
+      the emitted token has a space, so the two sets differ.
+
+      This is currently latent, because the signature blocks are set one token
+      per line with the full measure available. It stops being latent the
+      moment they are laid out in columns.
+    */
+    expect(new Set(allPlaceholders.map((p) => p.placeholder))).toEqual(new Set(emitted));
+  });
+
+  /*
+    And nothing may reach the extractor carrying a line break, whatever the
+    set comparison above happens to cover.
+  */
+  it('never wraps a token across two lines', () => {
+    for (const placeholder of allPlaceholders) {
+      expect(placeholder.placeholder, `wrapped: ${JSON.stringify(placeholder.placeholder)}`).not.toMatch(/[\r\n]/);
+    }
   });
 
   it('gives every party a signature on every document', async () => {

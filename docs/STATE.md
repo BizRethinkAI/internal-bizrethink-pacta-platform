@@ -410,6 +410,64 @@ passed, or appeared to:
 
 ## Open threads
 
+### The E2E gate was red a third of the time, and it was arithmetic
+
+Prisma's default `connection_limit` is `num_cpus * 2 + 1` **per client**, and it
+reads the MACHINE — the same trap as Playwright's `calculateWorkers()`. Moving to
+the 12-vCPU homelab runner took it from 5 to 25 at the same moment sharding went
+8 → 1, collapsing eight databases into one:
+
+| | cores | pool/client | workers | peak |
+|---|---|---|---|---|
+| GitHub, 8 shards | 2 | 5 | ~2 | ~10 per DB |
+| homelab, 1 shard | 12 | **25** | **15** | **~375** |
+
+against `postgres:15`'s default `max_connections=100`. Main went from 0 failures
+in 7 runs to 4 in 13 after that change, always in the connection-hungry specs.
+Pinned `?connection_limit=5` on the E2E job's `NEXT_PRIVATE_DATABASE_URL` — a
+file we own, so no overlay.
+
+### The placeholder test counted tokens instead of comparing them
+
+A token that WRAPS is still found: `@libpdf/core` joins page lines with `\n`,
+`[^}]` matches it, the bbox becomes the union of both lines. So it still counted
+as one, still parsed as `SIGNATURE/r1`, overlay 034 still forced 160×44 — and the
+widget sat several points off with **every assertion passing**. Now set equality
+on the token strings, plus an explicit no-newline check, plus
+`hyphenationCallback` on the placeholder `Text` so the built-in en-us hyphenator
+cannot split `height=44}}`.
+
+Latent today, because tokens are set one per line at full measure. It stops being
+latent the moment signatures go into columns.
+
+### `minPresenceAhead` does not work in react-pdf 4.9
+
+It is documented as exactly keep-with-next and it is what the review recommended.
+Setting it on the section row — with or without `wrap: false` — makes react-pdf
+emit a degenerate coordinate out of `clipBorderBottom` (*"unsupported number:
+-2.2e+22"*) and **no PDF renders at all**. Bisected: removing it alone turns the
+suite green.
+
+So an orphaned heading is still possible. Fixing it needs a react-pdf upgrade or
+the heading and its first paragraph in one unbreakable View — and that wants a
+rendered proof, not a green suite.
+
+### Two facts in one value, again
+
+`hasNamedOccupants` was derived from whether the names box was empty, so
+*"nobody else lives here"* and *"the tenant has not told me yet"* were the same
+stored state. Asked explicitly now. A delegated question that never comes back is
+also reported on Review — non-blocking, because blank IS a lawful answer there
+that selects a different clause.
+
+### The reviewer's page carried no brand
+
+`_recipient+/_layout.tsx` renders its header only when `sessionData?.user`
+exists, and a reviewer is never signed in — so a link a landlord emails to a
+stranger arrived with nothing on it. **The tab title was already correct**
+(the route sets its own meta and the child wins); it was the logo that was
+missing. Corrected an earlier claim of mine that the tab said "Documenso".
+
 ### The lease PDF got a typographic pass
 
 The constraint is unchanged and load-bearing: **standard-14, non-embedded fonts

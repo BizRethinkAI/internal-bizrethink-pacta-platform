@@ -246,6 +246,31 @@ jobs:
           # Needed since we use next start which will set the NODE_ENV to production
           NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: './example/cert.p12'
           DANGEROUS_BYPASS_RATE_LIMITS: 'true'
+          # ---------------------------------------------------------------
+          # CAP PRISMA'S POOL. This is what stopped the gate going red.
+          #
+          # Prisma's default connection_limit is `num_cpus * 2 + 1`, PER
+          # CLIENT, and it reads the MACHINE — the same trap as Playwright's
+          # calculateWorkers(). Moving to the 12-vCPU homelab runner took it
+          # from 5 to 25 at the same moment sharding went 8 -> 1, collapsing
+          # eight databases into one:
+          #
+          #     GitHub, 8 shards :  2 cores -> 5/client x ~2 workers  ≈  10
+          #     homelab, 1 shard : 12 cores -> 25/client x 15 workers ≈ 375
+          #
+          # against a postgres:15 default of max_connections=100. Upstream
+          # already knew the shape of this — playwright.config.ts caps the API
+          # project at 10 workers with the comment "Limited by DB connections
+          # before it gets flakey."
+          #
+          # Main went from 0 failures in 7 runs to 4 in 13 after that change,
+          # always in the connection-hungry specs. 15 workers x 5 = 75, under
+          # the cap with room to spare.
+          #
+          # Set here rather than in .env.example or the compose file, both of
+          # which are upstream.
+          # ---------------------------------------------------------------
+          NEXT_PRIVATE_DATABASE_URL: 'postgres://documenso:password@127.0.0.1:54320/documenso?connection_limit=5'
 
       - uses: actions/upload-artifact@v4
         if: always() && steps.scope.outputs.code == 'true'
