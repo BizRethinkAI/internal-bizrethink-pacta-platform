@@ -56,7 +56,7 @@ export const FL_BOILERPLATE: Clause[] = [
     section: 'notices',
     sortKey: 20,
     heading: "Tenant's Address for Notices",
-    body: 'Before the start date, notices to Tenant are to be sent to {{tenantPreTermAddress}}. From the start date, notices to Tenant are to be sent to the Premises unless Tenant gives Landlord a different address in writing. Tenant shall give Landlord a forwarding address on vacating.',
+    body: 'Before the start date, notices to Tenant are to be sent to {{tenantPreTermAddress}}. From the start date, notices to Tenant are to be sent to the Premises unless Tenant gives Landlord a different address in writing.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,

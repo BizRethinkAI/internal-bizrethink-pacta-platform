@@ -281,7 +281,7 @@ export const FL_MAINTENANCE: Clause[] = [
   },
 
   {
-    slug: 'pets.addendum',
+    slug: 'pets.addendum-fees',
     version: 1,
     jurisdiction: 'US-FL',
     placement: 'addendum',
@@ -295,15 +295,38 @@ export const FL_MAINTENANCE: Clause[] = [
       housing problem rather than merely an incomplete clause, so the carve-out
       is part of the clause body and there is a test asserting it is there.
     */
-    body: "Tenant may keep only the following animals at the Premises: {{permittedPets}}. No other animal may be kept, even temporarily, without Landlord's prior written consent. Tenant shall pay a pet fee of {{petFeeUsd}} and pet rent of {{petRentMonthlyUsd}} per month as an Other Charge. Tenant is responsible for all damage caused by an animal, whether or not covered by the security deposit, and for the prompt removal of animal waste from the Premises and any common area.\n\nAn assistance animal required by a person with a disability is not a pet for the purposes of this Addendum. No pet fee, pet rent or pet deposit is payable in respect of such an animal, and no breed, size or weight restriction in this Addendum applies to it.This Addendum prevails over any conflicting provision in the body of this Lease.",
+    body: "Tenant may keep only the following animals at the Premises: {{permittedPets}}. No other animal may be kept, even temporarily, without Landlord's prior written consent. Tenant shall pay a pet fee of {{petFeeUsd}} and pet rent of {{petRentMonthlyUsd}} per month as an Other Charge. Tenant is responsible for all damage caused by an animal, whether or not covered by the security deposit, and for the prompt removal of animal waste from the Premises and any common area.\n\nAn assistance animal required by a person with a disability is not a pet for the purposes of this Addendum. No pet fee, pet rent or pet deposit is payable in respect of such an animal, and no breed, size or weight restriction in this Addendum applies to it. This Addendum prevails over any conflicting provision in the body of this Lease.",
     source: drafted(),
     status: 'draft',
-    includeWhen: (facts) => facts.petsPermitted,
+    /*
+      Two variants, because with no fee and no pet rent the single clause
+      printed "a pet fee of $0.00 and pet rent of $0.00 per month" — two
+      obligations to pay nothing, set out as operative terms. It reads as a
+      schedule someone forgot to fill in.
+    */
+    includeWhen: (facts) => facts.petsPermitted && facts.hasPetFees,
     variables: [
       { name: 'permittedPets', type: 'string', label: 'Permitted animals', required: true },
       { name: 'petFeeUsd', type: 'usd', label: 'Pet fee', required: true },
       { name: 'petRentMonthlyUsd', type: 'usd', label: 'Monthly pet rent', required: true },
     ],
+    supersedes: [],
+    asserts: ['pets-permitted'],
+  },
+
+  {
+    slug: 'pets.addendum',
+    version: 2,
+    jurisdiction: 'US-FL',
+    placement: 'addendum',
+    section: 'pets',
+    sortKey: 10,
+    heading: 'Pet Addendum',
+    body: "Tenant may keep only the following animals at the Premises: {{permittedPets}}. No other animal may be kept, even temporarily, without Landlord's prior written consent. Tenant is responsible for all damage caused by an animal, whether or not covered by the security deposit, and for the prompt removal of animal waste from the Premises and any common area.\n\nAn assistance animal required by a person with a disability is not a pet for the purposes of this Addendum. No pet fee, pet rent or pet deposit is payable in respect of such an animal, and no breed, size or weight restriction in this Addendum applies to it. This Addendum prevails over any conflicting provision in the body of this Lease.",
+    source: drafted(),
+    status: 'draft',
+    includeWhen: (facts) => facts.petsPermitted && !facts.hasPetFees,
+    variables: [{ name: 'permittedPets', type: 'string', label: 'Permitted animals', required: true }],
     supersedes: [],
     asserts: ['pets-permitted'],
   },

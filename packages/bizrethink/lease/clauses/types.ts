@@ -115,6 +115,15 @@ export type ClauseFacts = {
    */
   hasTenantYardDuty: boolean;
 
+  /**
+   * Whether any pet money is actually charged.
+   *
+   * Derived from the fee values, not asked. With both at zero the pet
+   * addendum printed "a pet fee of $0.00 and pet rent of $0.00 per month" —
+   * two obligations to pay nothing, set out as operative terms.
+   */
+  hasPetFees: boolean;
+
   /*
     Elected terms. These are answers, not derived state — the landlord chooses
     them and the choice selects a clause. Kept on the facts object because
