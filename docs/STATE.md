@@ -410,6 +410,33 @@ passed, or appeared to:
 
 ## Open threads
 
+### Splitting rent from charges, and only half doing it
+
+The statutory-notices clause was changed to say that sums other than the monthly
+rent are Other Charges and not rent — so a disputed $45 could not be swept into
+a three-day notice. Six other clauses went on calling their own charge
+"additional rent": the late fee, the returned-payment charge, the association
+fine pass-through, the association cure cost, and the pet fee and pet rent.
+
+Rendered together the lease said of the same $150 both *"as additional rent"*
+and *"Other Charges and are not rent"*. A document that contradicts itself about
+what counts as rent is worse than either version alone, because the
+contradiction resolves against the drafter.
+
+**It was invisible to every test and to the clause library.** The change and the
+contradiction lived in different files, and nothing compared them. It was found
+by rendering the real matter end to end and reading the output — not by reading
+the diff.
+
+One clause keeps the phrase: the §83.595(4) addendum reproduces prescribed
+statutory language. The guard excludes that slug explicitly rather than by
+pattern, so tidying cannot reach it.
+
+**The general shape:** a phrase that defines a term is not confined to the
+clause that defines it. After changing what a word means, grep the library for
+the word.
+
+
 ### A repealed statutory figure, defended by its own tests
 
 §83.53(2) required TWELVE hours' notice before entry until the 2013

@@ -221,7 +221,7 @@ export const FL_LEASE_BODY: Clause[] = [
     section: 'rent',
     sortKey: 44,
     heading: 'Late Payment',
-    body: "If rent is not paid in full by the end of day {{graceDays}} after it falls due, Tenant shall pay a late fee of {{lateFeeUsd}} as additional rent. Acceptance of a late payment does not waive Landlord's right to require payment on the due date.",
+    body: "If rent is not paid in full by the end of day {{graceDays}} after it falls due, Tenant shall pay a late fee of {{lateFeeUsd}} as an Other Charge. Acceptance of a late payment does not waive Landlord's right to require payment on the due date.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.lateFeePolicy === 'flat',
@@ -241,7 +241,7 @@ export const FL_LEASE_BODY: Clause[] = [
     section: 'rent',
     sortKey: 44,
     heading: 'Late Payment',
-    body: "If rent is not paid in full by the end of day {{graceDays}} after it falls due, Tenant shall pay a late fee of {{lateFeeUsd}} as additional rent. If rent remains unpaid after day {{secondTierDay}} of the month, Tenant shall pay a further {{secondTierFeeUsd}}, and Landlord may require that the outstanding amount be paid by certified funds. Acceptance of a late payment does not waive Landlord's right to require payment on the due date.",
+    body: "If rent is not paid in full by the end of day {{graceDays}} after it falls due, Tenant shall pay a late fee of {{lateFeeUsd}} as an Other Charge. If rent remains unpaid after day {{secondTierDay}} of the month, Tenant shall pay a further {{secondTierFeeUsd}}, and Landlord may require that the outstanding amount be paid by certified funds. Acceptance of a late payment does not waive Landlord's right to require payment on the due date.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.lateFeePolicy === 'tiered',
@@ -264,7 +264,7 @@ export const FL_LEASE_BODY: Clause[] = [
     section: 'rent',
     sortKey: 46,
     heading: 'Returned Payments',
-    body: 'If any payment is returned unpaid, Tenant shall pay a handling charge of {{returnedPaymentFeeUsd}} as additional rent, together with any bank charge Landlord actually incurs. Landlord may require that the replacement payment, and any subsequent payment, be made by certified funds.',
+    body: 'If any payment is returned unpaid, Tenant shall pay a handling charge of {{returnedPaymentFeeUsd}} as an Other Charge, together with any bank charge Landlord actually incurs. Landlord may require that the replacement payment, and any subsequent payment, be made by certified funds.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -425,7 +425,7 @@ export const FL_LEASE_BODY: Clause[] = [
       what ARRIVES there — an envelope they can pass on unopened, or a notice
       taped to the door.
     */
-    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them. Tenant shall reimburse Landlord as additional rent for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any association notice received at or posted on the Premises.',
+    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them. Tenant shall reimburse Landlord as an Other Charge for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any association notice received at or posted on the Premises.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa,
@@ -469,7 +469,7 @@ export const FL_LEASE_BODY: Clause[] = [
       the owner. A landlord reading "the tenant handles the yard" will assume
       the opposite unless the document says so.
     */
-    body: 'Where the association gives notice of a violation arising from work this Lease allocates to Tenant, Tenant shall cure it by the date stated in the notice, or within {{hoaCureDays}} days of receiving it if the notice states no date. Landlord shall notify Tenant of any such notice Landlord receives directly from the association. If Tenant has not cured by that date, Landlord may cure and Tenant shall reimburse the reasonable cost as additional rent. This clause allocates work between Landlord and Tenant only; it does not make Tenant a party to the governing documents, and it does not limit the association’s remedies against the owner of the Premises.',
+    body: 'Where the association gives notice of a violation arising from work this Lease allocates to Tenant, Tenant shall cure it by the date stated in the notice, or within {{hoaCureDays}} days of receiving it if the notice states no date. Landlord shall notify Tenant of any such notice Landlord receives directly from the association. If Tenant has not cured by that date, Landlord may cure and Tenant shall reimburse the reasonable cost as an Other Charge. This clause allocates work between Landlord and Tenant only; it does not make Tenant a party to the governing documents, and it does not limit the association’s remedies against the owner of the Premises.',
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §720.305(1)',
