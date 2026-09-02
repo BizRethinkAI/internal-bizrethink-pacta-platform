@@ -1,0 +1,59 @@
+# What this patches: packages/app-tests/playwright.config.ts (maxFailures).
+#   Raises the CI abort threshold from 1 to 25 so a single flaky spec no longer
+#   takes the whole suite with it.
+#
+# Why not a new file: maxFailures is a field in upstream's Playwright config and
+#   there is no override hook. Recorded here.
+#
+# Why we need it: upstream sets `maxFailures: process.env.CI ? 1 : undefined`,
+#   which aborts the run on the FIRST failure. Combined with `retries: 4`, a
+#   flaky spec has already exhausted five attempts before it counts — and then
+#   ends the run. A real run on 2026-09-02 (PR #67) reported:
+#
+#       4 failed        (find-documents team-visibility cluster)
+#       6 interrupted
+#     888 did not run
+#     183 passed
+#
+#   The change under test was entirely in packages/bizrethink/lease/ and no
+#   lease spec failed, but the result was indistinguishable from a real
+#   regression and cost a full ~25-minute re-run. This had happened three times
+#   in a single day.
+#
+#   25 still fails fast on a genuinely broken build (which fails far more than
+#   25 specs) while letting an isolated flake report next to the 800+ tests that
+#   passed. The goal is a red run you can READ rather than one you re-run.
+#
+#   This does NOT paper over the flake: the find-documents cluster is still red
+#   and still needs diagnosing (FORK-TESTING.md). It stops one flake from
+#   hiding the other 888 results.
+#
+# Upstream-merge fragility: LOW. One field on the config object; a conflict
+#   would be immediately visible and trivially re-applied.
+diff --git a/packages/app-tests/playwright.config.ts b/packages/app-tests/playwright.config.ts
+index 7cabe78a4..4663dc29f 100644
+--- a/packages/app-tests/playwright.config.ts
++++ b/packages/app-tests/playwright.config.ts
+@@ -32,7 +32,21 @@ export default defineConfig({
+   globalSetup: require.resolve('./global-setup'),
+   fullyParallel: true,
+   workers: 10, // See Projects where 10 is utilized for API tests. We're not running 10 workers for UI tests.
+-  maxFailures: process.env.CI ? 1 : undefined,
++  /*
++    OVERLAY 067. Upstream aborts the whole run on the FIRST failure in CI.
++
++    With retries: 4 a genuinely flaky spec has already burned five attempts by
++    the time it counts, and then takes the suite with it — a run on 2026-09-02
++    reported "4 failed ... 888 did not run", so a known-flaky cluster in
++    find-documents cost a full 25-minute re-run and told us nothing about the
++    change under test.
++
++    A cap of 25 still stops a catastrophic run early (a broken build fails far
++    more than 25), while letting an isolated flake report alongside everything
++    else that passed. The point is to be able to READ a red run instead of
++    re-running it.
++  */
++  maxFailures: process.env.CI ? 25 : undefined,
+   /* Fail the build on CI if you accidentally left test.only in the source code. */
+   forbidOnly: !!process.env.CI,
+   /* Retry on CI only */
