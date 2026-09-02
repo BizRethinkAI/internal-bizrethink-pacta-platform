@@ -170,15 +170,23 @@ describe('pets', () => {
   });
 });
 
+/*
+  This clause used to carry three figures: a lockout fee, a key fee expressed as
+  a floor "or the actual cost if greater", and a charge for refusing an
+  inspection. All three are gone — see out-of-state-landlord.test.ts for why
+  each one failed. What remains is a cost, not a tariff, so there is no amount
+  to ask for and nothing to characterise as rent.
+*/
 describe('administrative charges', () => {
-  it('is one clause with named variables, not a paragraph of figures', () => {
+  it('charges a documented cost rather than a schedule of figures', () => {
     const fees = bySlug('fees.administrative');
-    const names = fees.variables.map((v) => v.name);
 
-    expect(names).toEqual(expect.arrayContaining(['lockoutFeeUsd', 'keyReplacementFeeUsd', 'inspectionRefusalFeeUsd']));
+    expect(fees.variables).toEqual([]);
+    expect(fees.body).toMatch(/actual documented cost/i);
   });
 
-  it('characterises the charges as additional rent', () => {
-    expect(bySlug('fees.administrative').body).toContain('additional rent');
+  it('does not dress a cost up as rent', () => {
+    // Calling everything rent turns a key dispute into a three-day notice.
+    expect(bySlug('fees.administrative').body).not.toContain('additional rent');
   });
 });

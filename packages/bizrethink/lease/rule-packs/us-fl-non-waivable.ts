@@ -56,6 +56,14 @@ export const FL_NON_WAIVABLE: NonWaivableRule[] = [
       /\b(landlord|tenant)\s+shall\s+not\s+be\s+(liable|responsible)\s+for\s+any\b/i,
       /\b(disclaims?|excludes?)\s+(any|all)\s+liability\b/i,
       /\bhold\s+harmless\s+from\s+(any|all)\s+liability\s+arising\s+under\s+law\b/i,
+      /*
+        The formulas above are what a drafter writes when they know they are
+        allocating liability. The two below are what they write when they do
+        not — and "at their own risk" was sitting in our own pool clause,
+        invisible to this list, on a property where the risk is a drowning.
+      */
+      /\bat\s+(their|his|her|its|your|the\s+tenant's)\s+own\s+risk\b/i,
+      /\bassumes?\s+(all|any)\s+risk\b/i,
     ],
   },
   {
