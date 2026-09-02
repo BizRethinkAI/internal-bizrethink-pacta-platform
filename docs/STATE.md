@@ -410,6 +410,29 @@ passed, or appeared to:
 
 ## Open threads
 
+### A link you could mint but never take back
+
+`review.create` issues a fresh token every time, so a landlord who edited the
+lease could always send a NEW link. Nothing could kill the OLD one — it stayed
+live until its expiry, months out, whatever happened to the deal. Wrong
+recipient, changed terms, a tenancy that falls through: the link kept working.
+
+Worse in the UI: two live links for the same person rendered as **two identical
+cards** — same name, same email, same "Link live until", same Copy button —
+separated only by list order (`createdAt desc`). Copying the wrong one sends a
+reviewer a lease that has already moved on, which is exactly the failure the
+staleness banner exists to catch after the fact.
+
+`review.revoke` closes rather than deletes: the row carries the reviewer, the
+issue date and any comments already returned, and a delete would orphan those
+comments. `isReviewUsable` already rejected any status but `open`, so closing IS
+the revocation and it beats the expiry date rather than waiting for it. A
+`returned` review cannot be revoked — that would hide work the landlord still
+owes an answer to, rather than retract a link.
+
+The list now names the current link and marks the rest superseded.
+
+
 ### Splitting rent from charges, and only half doing it
 
 The statutory-notices clause was changed to say that sums other than the monthly

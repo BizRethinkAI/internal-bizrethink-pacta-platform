@@ -69,6 +69,12 @@ export const LeaseReviewPanel = ({ matterId, origin }: ReviewPanelProps) => {
     },
   });
 
+  const revoke = trpc.bizrethink.leaseBuilder.review.revoke.useMutation({
+    onSuccess: async () => {
+      await list.refetch();
+    },
+  });
+
   const reviews = (list.data?.reviews ?? []) as unknown as Review[];
   const comments = (list.data?.comments ?? []) as unknown as Comment[];
 
@@ -96,6 +102,17 @@ export const LeaseReviewPanel = ({ matterId, origin }: ReviewPanelProps) => {
             const own = comments.filter((comment) => comment.reviewId === review.id);
             const pending = own.filter((comment) => comment.disposition === 'pending').length;
 
+            /*
+              Two live links for the same person rendered as two identical
+              cards — same name, same email, same expiry, same Copy button —
+              separated only by list order. Copying the wrong one sends the
+              reviewer a lease that has already moved on. The list is newest
+              first, so the first open row is the one to send.
+            */
+            const live = reviews.filter((r) => r.status === 'open');
+            const isCurrent = review.status === 'open' && live[0]?.id === review.id;
+            const isSuperseded = review.status === 'open' && !isCurrent;
+
             return (
               <li key={review.id} className="rounded-lg border p-4">
                 <div className="flex items-start justify-between gap-4">
@@ -116,14 +133,34 @@ export const LeaseReviewPanel = ({ matterId, origin }: ReviewPanelProps) => {
                           ? `Link live until ${new Date(review.expiresAt).toLocaleDateString()}`
                           : review.status === 'returned'
                             ? `Returned ${own.length} comment${own.length === 1 ? '' : 's'}`
-                            : 'Closed'}
+                            : 'Revoked'}
                       </p>
+                      {isCurrent && (
+                        <p className="mt-1 font-medium text-[#a2560c] text-xs dark:text-[#d99a4e]">
+                          Current link — send this one
+                        </p>
+                      )}
+                      {isSuperseded && (
+                        <p className="mt-1 text-muted-foreground text-xs">
+                          Superseded by a newer link. Revoke it so it cannot be opened.
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {pending > 0 && review.audience === 'attorney' && (
                       <Badge variant="destructive">{pending} to answer</Badge>
+                    )}
+                    {review.status === 'open' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={revoke.isPending}
+                        onClick={() => revoke.mutate({ matterId, reviewId: review.id })}
+                      >
+                        Revoke
+                      </Button>
                     )}
                     {review.status === 'open' && (
                       <Button variant="outline" size="sm" onClick={() => void copy(review)}>
