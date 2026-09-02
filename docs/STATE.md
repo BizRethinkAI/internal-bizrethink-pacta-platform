@@ -431,6 +431,27 @@ was the quietest thing on the page.
 
 Design proposal:
 https://claude.ai/code/artifact/873784f0-2697-490b-9fa6-3a2ef1ffd619
+### Shipping the architecture and calling it the design
+
+The reviewer page landed with the right information architecture — clauses in
+the page, comments anchored to them, a fixed send bar — and **none of the
+design that had been proposed and approved**. No rail. No serif. The app's
+stock green Alert as the loudest thing on the page. A comment control hidden
+with `opacity-0`, which does not release its box, so every clause carried a band
+of dead space and the page read as half-loaded.
+
+It was reported as done. It was half done.
+
+**None of it was a platform limitation.** A route we own can carry its own
+scoped custom properties and its own class names; the app's tokens are built
+for a dashboard and this is a reading surface. A **system serif stack** rather
+than a webfont, deliberately: this page opens from an email, on an unfamiliar
+domain, often on a phone, and blocking the first paint of a legal document on a
+third-party font request is a poor trade for a specific face.
+
+Guarded now — `readable-lease.test.ts` asserts the serif, the rail, the reserved
+action colour, and the absence of `opacity-0` on the comment control.
+
 ### The reviewer reads the lease, instead of a button
 
 It used to be *"Open the lease"* — the signing PDF in another tab. So a reviewer
