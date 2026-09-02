@@ -437,6 +437,36 @@ clause that defines it. After changing what a word means, grep the library for
 the word.
 
 
+### The E2E gate hid 888 results behind one flake
+
+`maxFailures: process.env.CI ? 1 : undefined` aborts the run on the first
+failure. With `retries: 4` a flaky spec has already burned five attempts before
+it counts — and then ends the suite. PR #67 reported:
+
+```
+  4 failed        (find-documents team-visibility cluster)
+  6 interrupted
+888 did not run
+183 passed
+```
+
+The change under test was entirely inside `packages/bizrethink/lease/` and no
+lease spec failed, but the result was indistinguishable from a real regression.
+Three occurrences on 2026-09-02, each costing a ~25-minute re-run. Overlay 067
+raises the cap to 25.
+
+**A caution about reading these logs.** Twice I reported the failing specs as
+`admin-search` / `delete-organisation` and both times that was wrong — those
+names appear in the log's test *listing*, not its failure summary. The actual
+failures are in the `4 failed` block near the end. Grep for that block, not for
+spec paths.
+
+The underlying flake is **not** fixed and its recorded root cause is now
+suspect: the assertions fail `Expected: 3 / Received: 0`, which is a team query
+returning nothing rather than the wrong thing, and that does not obviously fit
+the counter-contention explanation in FORK-TESTING.md. Reproducing it needs the
+built app; the local build is blocked by a Node version mismatch (CI expects 22,
+this machine runs 26).
 ### A repealed statutory figure, defended by its own tests
 
 §83.53(2) required TWELVE hours' notice before entry until the 2013
