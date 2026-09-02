@@ -208,3 +208,32 @@ describe('the reviewer page carries its design', () => {
     expect(code()).not.toContain('opacity-0');
   });
 });
+
+/*
+  A TEXT BOX LOOKS LIKE A TEXT BOX. The two primitives disagree about their own
+  background: Input carries `bg-background`, Textarea carries `bg-transparent`.
+  On a white card nobody notices. Every textarea on this page sits on a tinted
+  panel — the amber "only you can answer" block, the muted comment composer — so
+  the tint showed straight through and the boxes read as part of the panel while
+  the single-line field beside them was crisp white.
+
+  Both primitives are upstream, so the background is asserted at our call sites.
+*/
+describe('every text box on the reviewer page reads as a text box', () => {
+  const page = readFileSync(
+    new URL('../../../../apps/remix/app/routes/_recipient+/lease-review.$token.tsx', import.meta.url),
+    'utf8',
+  );
+
+  const textareas = page.match(/<Textarea[\s\S]*?\/>/g) ?? [];
+
+  it('renders a textarea for the answers and one for the comment', () => {
+    expect(textareas).toHaveLength(2);
+  });
+
+  it('gives each textarea an opaque background of its own', () => {
+    for (const tag of textareas) {
+      expect(tag).toMatch(/bg-background/);
+    }
+  });
+});
