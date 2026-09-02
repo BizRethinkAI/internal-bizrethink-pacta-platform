@@ -174,6 +174,36 @@ describe('the reviewer page carries its design', () => {
     `opacity-0` hides a control without releasing its box. Every clause then
     carries a band of empty space and the page reads as half-loaded.
   */
+  /*
+    A BARE ANCHOR ONLY SCROLLS WHEN THE HASH CHANGES.
+
+    Measured in the browser: hash `#section-5`, scrollY 0, click section 5 —
+    scrollY still 0. Once a reader has visited a section, clicking it again is
+    a no-op, and because this rail is sticky and always on screen, clicking the
+    same entry after scrolling away is the most natural thing to do.
+  */
+  it('scrolls the section into view itself rather than trusting the hash', () => {
+    expect(code()).toMatch(/onClick=\{\(event\) => jumpTo\(event, section\.number\)\}/);
+    expect(code()).toContain('scrollIntoView');
+    // replaceState, not pushState: a jump within one document is not a place
+    // in the reader's history, and pushState risks a router location change.
+    expect(code()).toContain('history.replaceState');
+  });
+
+  /*
+    ONE COLOUR FOR ONE MEANING. Amber marks work the reader still owes; red
+    means something went wrong. The required asterisk measured rgb(255,0,0)
+    while the rail dot beside it was amber — two colours saying the same thing.
+  */
+  it('never uses the error colour for work the reader merely owes', () => {
+    expect(code()).not.toContain('text-destructive');
+  });
+
+  it('keeps the error colour for things that actually failed', () => {
+    // A dead link and a failed submission are errors, and stay red.
+    expect(code().match(/variant="destructive"/g) ?? []).toHaveLength(2);
+  });
+
   it('does not hide the comment control behind opacity', () => {
     expect(code()).not.toContain('opacity-0');
   });

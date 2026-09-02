@@ -188,6 +188,32 @@ export default function LeaseReviewPage() {
 
   const blocked = submit.isPending || unanswered.length > 0 || abandoned.length > 0;
 
+  /**
+   * Jumping to a section, without relying on the hash changing.
+   *
+   * A bare `<a href="#section-5">` only scrolls when the hash actually CHANGES.
+   * Once a reader has been to section 5, clicking it again does nothing — and
+   * because this rail is sticky and always on screen, clicking the same entry
+   * after scrolling away is the most natural thing to do. Measured in the
+   * browser: hash `#section-5`, scrollY 0, click section 5, scrollY still 0.
+   *
+   * `replaceState` rather than `pushState`: the URL should reflect where the
+   * reader is, but a jump within one document is not a place in their history,
+   * and it must not create a router location change that scroll restoration
+   * could then undo.
+   */
+  const jumpTo = (event: React.MouseEvent<HTMLAnchorElement>, sectionNumber: string) => {
+    const target = document.getElementById(`section-${sectionNumber}`);
+
+    if (!target) {
+      return; // Let the browser try the anchor rather than swallowing the click.
+    }
+
+    event.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.history.replaceState(null, '', `#section-${sectionNumber}`);
+  };
+
   const addDraft = (clauseSlug: string | null) => setDrafts((prev) => [...prev, { clauseSlug, body: '' }]);
   const editDraft = (at: number, body: string) =>
     setDrafts((prev) => prev.map((draft, i) => (i === at ? { ...draft, body } : draft)));
@@ -288,6 +314,7 @@ export default function LeaseReviewPage() {
                     <a
                       key={section.number}
                       href={`#section-${section.number}`}
+                      onClick={(event) => jumpTo(event, section.number)}
                       className="flex items-baseline gap-2.5 rounded-md px-1.5 py-1 text-sm hover:bg-muted"
                     >
                       <span className="w-5 text-muted-foreground text-xs tabular-nums">{section.number}</span>
@@ -358,7 +385,13 @@ export default function LeaseReviewPage() {
                   <div key={field.name}>
                     <Label htmlFor={`asked-${field.name}`}>
                       {field.label}
-                      {field.required && <span className="ml-1 text-destructive">*</span>}
+                      {/*
+                    Amber, not red. This marks work the reader still owes;
+                    red is for something having gone wrong. Measured on the
+                    live page, the asterisk was rgb(255,0,0) while the rail
+                    dot beside it was amber — three colours for one meaning.
+                  */}
+                      {field.required && <span className={`${ACTION_TEXT} ml-1`}>*</span>}
                     </Label>
                     {field.help && <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">{field.help}</p>}
                     {/*
@@ -520,12 +553,12 @@ export default function LeaseReviewPage() {
           <p className="text-muted-foreground text-xs">
             {usable.length === 0 ? 'No comments yet' : `${usable.length} comment${usable.length === 1 ? '' : 's'}`}
             {unanswered.length > 0 && (
-              <span className="ml-2 font-semibold text-destructive">
+              <span className={`${ACTION_TEXT} ml-2 font-semibold`}>
                 {unanswered.length === 1 ? '1 answer still needed' : `${unanswered.length} answers still needed`}
               </span>
             )}
             {abandoned.length > 0 && (
-              <span className="ml-2 font-semibold text-destructive">
+              <span className={`${ACTION_TEXT} ml-2 font-semibold`}>
                 {abandoned.length === 1 ? '1 empty comment' : `${abandoned.length} empty comments`}
               </span>
             )}
