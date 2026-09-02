@@ -425,7 +425,7 @@ export const FL_LEASE_BODY: Clause[] = [
       what ARRIVES there — an envelope they can pass on unopened, or a notice
       taped to the door.
     */
-    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them. Tenant shall reimburse Landlord as additional rent for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours, any association notice received at or posted on the Premises.',
+    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them. Tenant shall reimburse Landlord as additional rent for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any association notice received at or posted on the Premises.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa,

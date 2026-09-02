@@ -56,10 +56,22 @@ describe('early termination — Fla. Stat. §83.595(4)', () => {
 });
 
 describe('landlord entry — Fla. Stat. §83.53', () => {
-  it('accepts twelve hours notice', () => {
-    expect(codes({ access: { noticeHours: 12, earliestHour: 9, latestHour: 18 } })).not.toContain(
+  it('accepts twenty-four hours notice', () => {
+    expect(codes({ access: { noticeHours: 24, earliestHour: 9, latestHour: 18 } })).not.toContain(
       'entry-notice-too-short',
     );
+  });
+
+  /*
+    This test used to assert that TWELVE hours passed, and that is how the
+    repealed figure survived: the pack, its comment, the clause header and this
+    test all agreed with each other and none of them agreed with the statute.
+    §83.53(2) has required 24 hours since the 2013 landlord-tenant act.
+  */
+  it('blocks the pre-2013 twelve hours', () => {
+    const f = findings({ access: { noticeHours: 12, earliestHour: 9, latestHour: 18 } });
+
+    expect(f.find((x) => x.code === 'entry-notice-too-short')?.severity).toBe('blocks');
   });
 
   it('blocks less than twelve hours', () => {
@@ -120,6 +132,6 @@ describe('how findings are worded', () => {
   });
 
   it('is silent when every answer is within the statutory limits', () => {
-    expect(findings({ access: { noticeHours: 12, earliestHour: 8, latestHour: 19 } })).toEqual([]);
+    expect(findings({ access: { noticeHours: 24, earliestHour: 8, latestHour: 19 } })).toEqual([]);
   });
 });

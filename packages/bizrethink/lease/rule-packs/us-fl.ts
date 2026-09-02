@@ -28,7 +28,13 @@ export type RulePack = {
   };
 
   access: {
-    /** Fla. Stat. §83.53(2) — at least 12 hours' notice. */
+    /**
+     * Fla. Stat. §83.53(2) — at least 24 hours' notice.
+     *
+     * This was 12 until the 2013 landlord-tenant act raised it. The old figure
+     * sat here under a confident comment while the validator, which only fires
+     * BELOW this number, blessed 12 on every lease the product generated.
+     */
     minNoticeHours: number;
     /** §83.53(2) — "reasonable time" is 7:30am to 8:00pm. */
     earliestHour: number;
@@ -61,7 +67,7 @@ export const US_FL: RulePack = {
   },
 
   access: {
-    minNoticeHours: 12,
+    minNoticeHours: 24,
     // 7:30am. Expressed in hours with a half, not rounded to 8, because the
     // statute says 7:30 and rounding would reject a lawful answer.
     earliestHour: 7.5,

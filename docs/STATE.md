@@ -410,6 +410,40 @@ passed, or appeared to:
 
 ## Open threads
 
+### A repealed statutory figure, defended by its own tests
+
+§83.53(2) required TWELVE hours' notice before entry until the 2013
+landlord-tenant act raised it to twenty-four. The old number sat in
+`rule-packs/us-fl.ts`, in that file's doc comment, in the clause file header,
+and in two assertions in `validate.test.ts` — five places agreeing with each
+other and none agreeing with the statute. The blocking validator fired only
+BELOW the figure, so it blessed 12 on every Florida lease the product generated.
+
+It survived because the checked-in fixture uses 24. **The fixture was safe and
+the live matter was not**, so no test ever saw the wrong value. Fixing it turned
+two green tests red, which is the tell: a test that defends a number is only as
+good as the number.
+
+Three more of the same shape landed with it:
+
+- `monthsBetween` returned 11 for the twelve-month example written in its own
+  comment. Term length gates the §83.512 flood disclosure, so a plain one-year
+  lease shipped without a statutory document and nothing said so. It now counts
+  whole months to the day AFTER the end date, which makes every boundary case
+  fall out on its own.
+- The §83.47(1)(b) `waiverSignals` matched the formulas a drafter reaches for
+  when they know they are allocating liability, and missed the one they reach
+  for when they do not. **"at their own risk" was in our own pool clause**, and
+  `scanCustomClauses` never ran over the library anyway.
+- Chapter 515 appeared nowhere. A grep for `515`, `barrier` and `drowning`
+  across the whole lease package returned nothing, on a product whose pool
+  clause disclaimed liability instead of naming the safety feature.
+
+**The general shape:** a comment next to a constant is not evidence. Where a
+number encodes a statute, the test should assert the figure itself, not a lease
+that happens to use it.
+
+
 ### A textarea and an input disagreed about being white
 
 `Input` carries `bg-background`; `Textarea` carries `bg-transparent`. On a white

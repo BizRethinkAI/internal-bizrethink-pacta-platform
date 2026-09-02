@@ -18,14 +18,19 @@ const index = clauseIndexForFields(selectClauses({ facts: PICANA_FACTS, library:
 
 describe('clauseIndexForFields', () => {
   it('names the clause an answer ends up in', () => {
-    const ref = index.get('inspectionRefusalFeeUsd');
+    const ref = index.get('lateFeeUsd');
 
-    expect(ref?.heading).toBe('Administrative Charges');
+    expect(ref?.heading).toBe('Late Payment');
     expect(ref?.number).toMatch(/^\d+(\.\d+)?$/);
   });
 
+  /*
+    This list used to include lockoutFeeUsd and inspectionRefusalFeeUsd. Both
+    questions are gone, along with the charges they set — a lockout fee nobody
+    could earn from out of state, and a penalty for declining entry.
+  */
   it('covers the money questions a landlord is most unsure about', () => {
-    for (const field of ['lateFeeUsd', 'graceDays', 'returnedPaymentFeeUsd', 'lockoutFeeUsd']) {
+    for (const field of ['lateFeeUsd', 'graceDays', 'returnedPaymentFeeUsd', 'repairThresholdUsd']) {
       expect(index.get(field), field).toBeDefined();
     }
   });
