@@ -346,7 +346,7 @@ export const FL_LEASE_BODY: Clause[] = [
     section: 'deposit',
     sortKey: 52,
     heading: 'Advance Rent',
-    body: "Advance rent of {{advanceRentUsd}} is payable by Tenant on execution of this Lease in respect of the final month of the term. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement.",
+    body: "Advance rent of {{advanceRentUsd}} is payable by Tenant on execution of this Lease in respect of the final month of the term. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement. If this Lease ends before the final month of the term, however arising, Landlord shall return the advance rent to Tenant in full within 15 days after Tenant vacates. The advance rent is not subject to any claim against the security deposit.",
     source: drafted(),
     status: 'draft',
     // Selected whenever advance rent is held. Where some of it was carried in
@@ -369,7 +369,7 @@ export const FL_LEASE_BODY: Clause[] = [
     // Advance rent semantically IS one month's rent, so when rent rises the
     // carried amount falls short and the balance is a top-up rather than a new
     // figure. That distinction is the reason this variant exists.
-    body: "Advance rent of {{advanceRentUsd}} is held in respect of the final month of the term. Of that amount, {{advanceRentCarriedInUsd}} was received under a prior tenancy and is carried forward to this Lease, and {{advanceRentTrueUpUsd}} is payable by Tenant on execution as a top-up to the current monthly rent. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement.",
+    body: "Advance rent of {{advanceRentUsd}} is held in respect of the final month of the term. Of that amount, {{advanceRentCarriedInUsd}} was received under a prior tenancy and is carried forward to this Lease, and {{advanceRentTrueUpUsd}} is payable by Tenant on execution as a top-up to the current monthly rent. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement. If this Lease ends before the final month of the term, however arising, Landlord shall return the advance rent to Tenant in full within 15 days after Tenant vacates. The advance rent is not subject to any claim against the security deposit.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.advanceRentCarriedInUsd > 0,

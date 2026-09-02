@@ -160,7 +160,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'utilities',
     sortKey: 20,
     heading: "Tenant's Insurance",
-    body: "Tenant shall obtain and maintain renter's insurance covering Tenant's personal property and Tenant's liability, with liability cover of not less than {{rentersInsuranceMinUsd}}, and shall name Landlord as an interested party. Tenant shall provide evidence of that cover before taking possession and on request during the term. Landlord's insurance does not cover Tenant's possessions.",
+    body: "Tenant shall obtain and maintain renter's insurance covering Tenant's personal property and Tenant's liability, with liability cover of not less than {{rentersInsuranceMinUsd}}, and shall name Landlord as an additional interested party for notice purposes where Tenant's insurer offers that designation. Tenant shall provide evidence of that cover before taking possession and on request during the term. Landlord's insurance does not cover Tenant's possessions.",
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -247,7 +247,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'default',
     sortKey: 20,
     heading: 'Vacating the Premises',
-    body: 'On the end of the term Tenant shall remove all belongings and rubbish, return every key, remote and access device, and leave the Premises clean and in the condition in which they were received, fair wear and tear excepted. Tenant shall give Landlord a forwarding address. Landlord may recover from the deposit the cost of cleaning or repair beyond fair wear and tear, and shall account for any such deduction under the deposit sections of this Lease.',
+    body: 'On the end of the term Tenant shall remove all belongings and rubbish, return every key, remote and access device, and leave the Premises clean and in the condition in which they were received, fair wear and tear excepted. Landlord may recover from the deposit the cost of cleaning or repair beyond fair wear and tear, and shall account for any such deduction under the deposit sections of this Lease.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -325,7 +325,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     heading: 'House Rules',
     // Real rules with real content, replacing three headings that read "N/A"
     // and one labelled "Others" holding six substantive clauses.
-    body: "Tenant shall observe the following rules, which form part of this Lease:\n\n1. No garage, yard or estate sale may be held at the Premises without Landlord's prior written consent.\n2. Locks may not be changed, added or removed without Landlord's prior written consent; where consent is given, Tenant shall provide Landlord with a key.\n3. Nothing may be fixed to walls, woodwork or floors other than small nails or hooks for hanging pictures. Tenant is responsible for making good.\n4. No water-filled furniture may be kept at the Premises.\n5. Windows may not be covered with foil, paper or other reflective material.\n6. Water hoses must be fitted with an automatic shut-off nozzle. Leaks must be reported without delay.\n7. Patios, balconies, entrances and walkways may not be used for storage.\n8. No antenna or satellite dish may be installed without Landlord's prior written consent.\n9. The landscaping may not be altered without Landlord's prior written consent.\n10. No window air-conditioning unit, window fan or exhaust fan may be installed.\n11. Tenant, occupants and guests shall not cause a nuisance or unreasonably disturb neighbours.\n12. Waste must be placed in the receptacles provided and put out for collection at the times set by the collection service.",
+    body: "Tenant shall observe the following rules, which form part of this Lease:\n\n1. No garage, yard or estate sale may be held at the Premises without Landlord's prior written consent.\n2. Locks may not be changed, added or removed without Landlord's prior written consent; where consent is given, Tenant shall provide Landlord with a key.\n3. Nothing may be fixed to walls, woodwork or floors other than small nails or hooks for hanging pictures. Tenant is responsible for making good.\n4. No water-filled furniture may be kept at the Premises.\n5. Windows may not be covered with foil, paper or other reflective material.\n6. Water hoses must be fitted with an automatic shut-off nozzle. Leaks must be reported without delay.\n7. Patios, balconies, entrances and walkways may not be used for storage.\n8. No antenna or satellite dish may be installed without Landlord's prior written consent.\n9. The landscaping may not be altered without Landlord's prior written consent.\n10. No window-mounted air-conditioning unit or window-mounted fan may be installed, except temporarily while the central system is out of order and on notice to Landlord.\n11. Tenant, occupants and guests shall not cause a nuisance or unreasonably disturb neighbours.\n12. Waste must be placed in the receptacles provided and put out for collection at the times set by the collection service.",
     source: drafted(),
     status: 'draft',
     includeWhen: null,

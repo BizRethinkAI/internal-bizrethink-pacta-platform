@@ -410,6 +410,43 @@ passed, or appeared to:
 
 ## Open threads
 
+### The advance rent had no way home
+
+Advance rent was defined as covering "the final month of the term" and barred
+from any other month. Termination on sale said prepaid rent is "dealt with under
+the sections of this Lease governing them" — and the only such section,
+`deposit.return`, governs THE DEPOSIT and never mentions advance rent.
+
+So on any early end — the landlord selling, or the tenant paying the §83.595(4)
+fee — there was no final month for the money to cover and no clause returning
+it. Read literally the landlord kept $6,900 earmarked for a month that would
+never exist. On the live matter that is exactly the sum at stake.
+
+Fixed by saying what happens: returned in full within 15 days, however the term
+ends, and not reachable by a claim against the security deposit.
+
+Four smaller contradictions went with it, all found by reading the RENDERED
+document rather than the clause sources:
+
+- House rule 10 banned installing any "exhaust fan" while clause 10.3 *requires*
+  extractor fans when bathing. Now window-mounted units only, with a carve-out
+  while the central system is down — a broken AC in a Tampa August should not be
+  a lease breach.
+- The forwarding-address duty was stated three times in near-identical words.
+  The duplicate detector keys on `asserts` tags, not content, so three different
+  tags made it blind. Stated once now, where the deposit is returned.
+- Renters insurance asked the tenant to name the landlord an "interested party",
+  which is not a designation carriers issue. Evidence of cover gates possession,
+  so a carrier's refusal would have blocked move-in.
+- The pet addendum printed "a pet fee of $0.00 and pet rent of $0.00 per month"
+  — two obligations to pay nothing. Split into two variants on a derived
+  `hasPetFees`, the same shape as the yard gates.
+
+And one of mine: the addendum-prevails sentence was concatenated without a
+space (`applies to it.This Addendum`). A test now asserts no clause runs two
+sentences together.
+
+
 ### A link you could mint but never take back
 
 `review.create` issues a fresh token every time, so a landlord who edited the

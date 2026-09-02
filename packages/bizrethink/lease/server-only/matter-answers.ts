@@ -116,6 +116,8 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       // Narrower, and it gates hoa.cure: a yard the landlord or the
       // association keeps is fully allocated with nothing for a tenant to cure.
       hasTenantYardDuty: splitByDoer(yardTasks).tenant !== '',
+      // Same shape as the yard gates: a fee of zero is not a fee.
+      hasPetFees: Number(values.petFeeUsd ?? 0) > 0 || Number(values.petRentMonthlyUsd ?? 0) > 0,
     } as RenderLeaseInput['facts'],
     money,
     values: {
