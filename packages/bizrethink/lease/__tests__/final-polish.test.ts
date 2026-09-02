@@ -18,26 +18,72 @@ const body = (slug: string) => clause(slug)?.body ?? '';
   returning it. Read literally the landlord keeps $6,900 earmarked for a month
   that will never exist.
 */
-describe('advance rent comes back when the term ends early', () => {
-  it('says what happens to it before the final month', () => {
-    expect(body('deposit.advance-rent')).toMatch(/before the final month/i);
+describe('advance rent lands on a month that exists', () => {
+  /*
+    It used to cover "the final month of the TERM" — March 2028 specifically.
+    Leave in month 8 and that month never arrives, so the money was stranded:
+    barred from any other month, and returned by no clause.
+
+    "The last month of Tenant's occupancy" removes the problem at its source
+    rather than patching it with a refund. However the tenancy ends, there is
+    always a last month for the money to land on. It also matches what tenants
+    already assume they are paying for.
+  */
+  it('covers the last month lived in, not a date on the calendar', () => {
+    for (const slug of ['deposit.advance-rent', 'deposit.advance-rent-carried']) {
+      expect(body(slug)).toMatch(/last month of Tenant's occupancy/i);
+      expect(body(slug)).not.toMatch(/final month of the term/i);
+    }
   });
 
-  it('returns it in full, on a deadline', () => {
-    const text = body('deposit.advance-rent');
-
-    expect(text).toMatch(/in full/i);
-    expect(text).toMatch(/15 days/);
+  it('still refunds it if the tenancy ends before any final month is occupied', () => {
+    // The narrow case that remains: money paid, tenant never takes a last month.
+    for (const slug of ['deposit.advance-rent', 'deposit.advance-rent-carried']) {
+      expect(body(slug)).toMatch(/in full/i);
+      expect(body(slug)).toMatch(/15 days/);
+    }
   });
 
   it('keeps it out of the deposit-claim machinery', () => {
-    // Advance rent is not a security deposit — the clause says so itself, and
-    // a claim against the deposit must not reach it.
-    expect(body('deposit.advance-rent')).toMatch(/not subject to any claim|no claim/i);
+    // Advance rent is not a security deposit — the clause says so itself.
+    expect(body('deposit.advance-rent')).toMatch(/not subject to any claim/i);
+  });
+});
+
+/*
+  THE THREE POTS.
+
+  Advance rent, the security deposit and the §83.595(4) fee are three different
+  obligations under two different statutes, and a lease that lets them blur
+  invites the argument that the deposit was pre-converted into a fee — which
+  would waive the tenant's §83.49(3) notice and objection rights, and §83.47(2)
+  makes knowingly using a void provision fee-shifting.
+
+  The fee is PAYABLE. The deposit goes back under §83.49. Saying so is cheap.
+*/
+describe('the early-termination fee is money paid, not money already held', () => {
+  const addendum = () => body('termination.early-election');
+
+  it('says when the fee is payable', () => {
+    expect(addendum()).toMatch(/payable|shall pay/i);
   });
 
-  it('covers however the term ends, not just one route', () => {
-    expect(body('deposit.advance-rent')).toMatch(/however arising|for any reason/i);
+  it('says the deposit is not the fee', () => {
+    expect(addendum()).toMatch(/not the security deposit|is not satisfied by the security deposit/i);
+  });
+
+  it('sends the deposit back through the statute', () => {
+    expect(addendum()).toMatch(/§83\.49/);
+  });
+
+  it('says the advance rent still covers the last month lived in', () => {
+    expect(addendum()).toMatch(/last month of Tenant's occupancy/i);
+  });
+
+  it('keeps the prescribed election wording intact', () => {
+    // "Substantially the form" is not ours to improve.
+    expect(addendum()).toMatch(/I agree, as provided in the rental agreement, to pay/);
+    expect(addendum()).toMatch(/additional rent beyond the month in which Landlord retakes possession/);
   });
 });
 

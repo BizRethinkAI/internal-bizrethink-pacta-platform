@@ -422,8 +422,26 @@ fee — there was no final month for the money to cover and no clause returning
 it. Read literally the landlord kept $6,900 earmarked for a month that would
 never exist. On the live matter that is exactly the sum at stake.
 
-Fixed by saying what happens: returned in full within 15 days, however the term
-ends, and not reachable by a claim against the security deposit.
+Fixed at the source rather than with a refund: advance rent now covers **the
+last month of Tenant's occupancy** rather than the final month of the *term*.
+However the tenancy ends there is always a last month for the money to land on,
+so nothing is stranded — and it matches what tenants already assume they are
+paying for, and what this landlord's previous tenants actually did. The refund
+sentence survives for the narrow case where a tenant never occupies a final
+month at all.
+
+**The three pots.** The landlord's working model was that the two-month early
+termination charge simply *was* the advance rent plus the security deposit —
+nobody writes a cheque. That is one obligation short of the law: the deposit is
+§83.49 money securing performance, and pre-converting it into a fee waives the
+tenant's notice, itemisation and objection rights under §83.49(3), which
+§83.47(1)(a) voids and §83.47(2) makes fee-shifting. It also double-counts,
+because advance rent applied to a month the tenant lived in is rent earned, not
+damages.
+
+Structure chosen: the §83.595(4) fee is **payable on the termination date**, the
+deposit goes back (or is claimed against) under §83.49, and the advance rent
+covers the last month occupied. The addendum now says all three in terms.
 
 Four smaller contradictions went with it, all found by reading the RENDERED
 document rather than the clause sources:
