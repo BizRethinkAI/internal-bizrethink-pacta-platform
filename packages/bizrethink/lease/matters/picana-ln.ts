@@ -151,6 +151,8 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   keyReplacementFeeUsd: 50,
   inspectionRefusalFeeUsd: 75,
 
+  // Ch. 515 requires the feature to be named, not merely to exist.
+  poolSafetyFeature: 'exit alarms on all doors and windows with direct pool access',
   hoaName: 'the Estancia at Wiregrass Ranch homeowners association',
   // Fallback only. The Estancia notices state their own cure date.
   hoaCureDays: 14,

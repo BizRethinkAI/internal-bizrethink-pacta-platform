@@ -84,6 +84,38 @@ export const FL_MAINTENANCE: Clause[] = [
     asserts: ['maintenance-allocation'],
   },
 
+  /*
+    §83.51(2)(b) puts the duty to install working smoke detection at the
+    commencement of a single-family or duplex tenancy on the LANDLORD.
+
+    The library had no clause for it. The only occurrence of "smoke" anywhere
+    was smoke-alarm batteries, sitting in the tenant's list of minor repairs —
+    so the document delegated the chore without ever stating the duty it sits
+    under, and after a fire that was the only sentence about alarms in the
+    lease and it pointed at the tenant.
+
+    Carbon monoxide travels with it: a fossil-fuel appliance or an attached
+    garage puts CO alarms in the same conversation, and this property burns
+    natural gas.
+  */
+  {
+    slug: 'maintenance.detectors',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'maintenance',
+    sortKey: 25,
+    heading: 'Smoke and Carbon Monoxide Alarms',
+    body: 'Landlord shall install working smoke detection devices at the Premises at the commencement of the tenancy, as required by Fla. Stat. §83.51(2)(b), together with carbon monoxide alarms where required for the Premises. Landlord shall ensure they are in working order on the start date. Tenant shall test each device monthly, replace its batteries as needed, and report any device that fails to Landlord in writing without delay. Tenant shall not disable, remove or obstruct any smoke or carbon monoxide alarm. Nothing in this section makes Tenant responsible for repairing or replacing a device itself.',
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Fla. Stat. §83.51(2)(b)',
+    includeWhen: (facts) => alterableUnder8351(facts.propertyType),
+    variables: [],
+    supersedes: [],
+    asserts: ['detector-duty'],
+  },
+
   {
     slug: 'maintenance.tenant-repair-threshold',
     version: 1,
@@ -100,7 +132,7 @@ export const FL_MAINTENANCE: Clause[] = [
       rather than open-ended, and the non-waivable carve-out is stated in the
       clause instead of being left to inference.
     */
-    body: "Tenant shall carry out and pay for minor repairs and replacements to non-structural items at the Premises where the cost of the individual repair does not exceed {{repairThresholdUsd}}, including items such as tap washers and similar plumbing hardware, water filters, air-conditioning filters, light bulbs, and smoke-alarm batteries. This obligation does not extend to any matter falling within Fla. Stat. §83.51(1), which remains Landlord's responsibility regardless of cost, and does not limit Tenant's liability for damage caused by Tenant's negligence or misuse, which is not capped by that figure.",
+    body: "Tenant shall carry out and pay for minor repairs and replacements to non-structural items at the Premises where the cost of the individual repair does not exceed {{repairThresholdUsd}}, including items such as tap washers and similar plumbing hardware, water filters, air-conditioning filters, and light bulbs. Smoke and carbon monoxide alarms are dealt with separately, and the devices themselves remain Landlord's responsibility. This obligation does not extend to any matter falling within Fla. Stat. §83.51(1), which remains Landlord's responsibility regardless of cost, and does not limit Tenant's liability for damage caused by Tenant's negligence or misuse, which is not capped by that figure.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => alterableUnder8351(facts.propertyType),
@@ -134,13 +166,51 @@ export const FL_MAINTENANCE: Clause[] = [
     section: 'maintenance',
     sortKey: 40,
     heading: 'Swimming Pool',
-    body: "Landlord shall provide professional pool maintenance at Landlord's cost. Tenant shall maintain the water at its proper level, skim surface debris, and report any defect in the pool equipment to Landlord in writing without delay. Landlord is responsible for repair of the pool pump, filtration and other pool equipment. Tenant and Tenant's guests use the pool at their own risk.",
+    body: "Landlord shall provide professional pool maintenance at Landlord's cost. Tenant shall maintain the water at its proper level, skim surface debris, and report any defect in the pool equipment to Landlord in writing without delay. Landlord is responsible for repair of the pool pump, filtration and other pool equipment.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasPool,
     variables: [],
     supersedes: [],
     asserts: ['pool-maintenance'],
+  },
+  /*
+    Chapter 515 — the Residential Swimming Pool Safety Act. A pool completed
+    after 1 October 2000 must carry at least one approved safety feature, and
+    this house was built in 2018.
+
+    The library had nothing on it: a grep for 515, barrier and drowning across
+    the whole lease package returned no hits. The only pool sentence we shipped
+    disclaimed liability instead — which is void under §83.47(1)(b) AND left the
+    actual control undescribed, so a landlord reading it would believe he was
+    covered and skip the thing that stops a drowning.
+
+    The feature varies by property, so it is a variable rather than prose. A
+    lease that names the wrong feature is worse than one that names none.
+  */
+  {
+    slug: 'maintenance.pool-safety',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'maintenance',
+    sortKey: 41,
+    heading: 'Pool Safety Equipment',
+    body: "The Premises are equipped with the following pool safety feature required by Chapter 515, Florida Statutes: {{poolSafetyFeature}}. Landlord shall keep it in working order at Landlord's cost. Tenant shall not remove, disable, prop open, obstruct or otherwise defeat it, and shall not permit any occupant or guest to do so. Tenant shall report any failure of the safety feature to Landlord in writing without delay, and shall not use the pool while it is out of order.",
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Ch. 515, Fla. Stat.',
+    includeWhen: (facts) => facts.hasPool,
+    variables: [
+      {
+        name: 'poolSafetyFeature',
+        type: 'string',
+        label: 'Pool safety feature installed (Ch. 515)',
+        required: true,
+      },
+    ],
+    supersedes: [],
+    asserts: ['pool-safety-feature'],
   },
 
   {
@@ -187,15 +257,25 @@ export const FL_MAINTENANCE: Clause[] = [
     // One clause with named variables rather than a paragraph of hard-coded
     // figures, so a change of fee is an answer rather than an edit to text
     // nobody has reviewed.
-    body: "The following charges are payable by Tenant as additional rent: {{lockoutFeeUsd}} where Landlord or Landlord's agent attends to restore entry after a lockout; {{keyReplacementFeeUsd}}, or the actual replacement cost if greater, for each key, remote or access device not returned on vacating; and {{inspectionRefusalFeeUsd}} where Tenant fails to permit access for an inspection arranged on proper notice.",
+    /*
+      Three charges became one.
+
+      The lockout fee was payable "where Landlord or Landlord's agent attends".
+      Nobody attends from another state, and no agent is named. The inspection-
+      refusal fee charged a flat sum for DECLINING entry — it contemplated no
+      loss at all, which is the definition of a penalty rather than liquidated
+      damages, and §83.56(2) already supplies the remedy for a tenant who
+      unreasonably withholds access.
+
+      The key charge was "$N, or the actual replacement cost if greater". A
+      floor plus actual-cost recovery is a one-way election, and a one-way
+      election is what makes a liquidated sum unenforceable. Charge the cost.
+    */
+    body: 'Tenant shall pay the actual documented cost of replacing each key, remote or access device not returned on vacating, including the cost of re-keying where a key is not returned.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
-    variables: [
-      { name: 'lockoutFeeUsd', type: 'usd', label: 'Lockout fee', required: true },
-      { name: 'keyReplacementFeeUsd', type: 'usd', label: 'Key replacement fee', required: true },
-      { name: 'inspectionRefusalFeeUsd', type: 'usd', label: 'Inspection refusal fee', required: true },
-    ],
+    variables: [],
     supersedes: [],
     asserts: ['administrative-charges'],
   },
@@ -215,7 +295,7 @@ export const FL_MAINTENANCE: Clause[] = [
       housing problem rather than merely an incomplete clause, so the carve-out
       is part of the clause body and there is a test asserting it is there.
     */
-    body: "Tenant may keep only the following animals at the Premises: {{permittedPets}}. No other animal may be kept, even temporarily, without Landlord's prior written consent. Tenant shall pay a pet fee of {{petFeeUsd}} and pet rent of {{petRentMonthlyUsd}} per month as additional rent. Tenant is responsible for all damage caused by an animal, whether or not covered by the security deposit, and for the prompt removal of animal waste from the Premises and any common area.\n\nAn assistance animal required by a person with a disability is not a pet for the purposes of this Addendum. No pet fee, pet rent or pet deposit is payable in respect of such an animal, and no breed, size or weight restriction in this Addendum applies to it.",
+    body: "Tenant may keep only the following animals at the Premises: {{permittedPets}}. No other animal may be kept, even temporarily, without Landlord's prior written consent. Tenant shall pay a pet fee of {{petFeeUsd}} and pet rent of {{petRentMonthlyUsd}} per month as additional rent. Tenant is responsible for all damage caused by an animal, whether or not covered by the security deposit, and for the prompt removal of animal waste from the Premises and any common area.\n\nAn assistance animal required by a person with a disability is not a pet for the purposes of this Addendum. No pet fee, pet rent or pet deposit is payable in respect of such an animal, and no breed, size or weight restriction in this Addendum applies to it.This Addendum prevails over any conflicting provision in the body of this Lease.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.petsPermitted,

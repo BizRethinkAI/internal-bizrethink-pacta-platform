@@ -20,12 +20,27 @@ const monthsBetween = (startIso: string, endIso: string): number => {
   const [sy, sm, sd] = startIso.split('-').map(Number);
   const [ey, em, ed] = endIso.split('-').map(Number);
 
-  const months = (ey - sy) * 12 + (em - sm);
+  /*
+    Count whole months between the start and the day AFTER the end, because a
+    lease term includes its end date. That one shift makes every boundary case
+    fall out on its own:
 
-  // A term ending the day before the anniversary is still a full 12 months —
-  // 1 Oct 2026 to 30 Sep 2027 is a year, and the flood disclosure threshold
-  // turns on exactly that.
-  return ed >= sd - 1 ? months : months - 1;
+      1 Oct 2026 -> 30 Sep 2027   day after is 1 Oct    12 months
+      1 Oct 2026 ->  1 Oct 2027   day after is 2 Oct    12 months and a day
+      1 Oct 2026 -> 31 Mar 2028   day after is 1 Apr    18 months
+
+    Date.UTC normalises the overflow, so 31 Jan + 1 becomes 1 Feb rather than a
+    32nd of January. The previous version compared day-of-month directly and
+    returned ELEVEN for the twelve-month example written in its own comment —
+    which silently dropped the §83.512 flood disclosure, since that renders
+    only at twelve months or more.
+  */
+  const dayAfterEnd = new Date(Date.UTC(ey, em - 1, ed + 1));
+
+  const months = (dayAfterEnd.getUTCFullYear() - sy) * 12 + (dayAfterEnd.getUTCMonth() - (sm - 1));
+
+  // The final month is only complete once the term reaches the start's day.
+  return dayAfterEnd.getUTCDate() < sd ? months - 1 : months;
 };
 
 export type DerivableFacts = Pick<
