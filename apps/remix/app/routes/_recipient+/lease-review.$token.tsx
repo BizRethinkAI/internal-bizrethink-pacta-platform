@@ -75,6 +75,47 @@ type AskedField = {
 type ReadableClause = { slug: string; number: string; heading: string; text: string };
 type ReadableSection = { number: string; name: string; clauses: ReadableClause[] };
 
+/**
+ * The design, scoped to this route.
+ *
+ * A LEGAL READING SURFACE IS NOT A DASHBOARD, and the app's tokens are built
+ * for a dashboard. Three things this page needs that they do not give it: a
+ * serif for the document, so a lease reads as a lease; a single ACTION colour
+ * used nowhere except where the reader must do something; and a quiet callout
+ * that states a fact without shouting it in green.
+ *
+ * A system serif stack rather than a webfont. This page is opened from an email
+ * by somebody who has never seen the domain, often on a phone — blocking the
+ * first paint of a legal document on a third-party font request would be a poor
+ * trade for a specific face, and the serif CHARACTER is what does the work.
+ */
+const SCOPED_CSS = `
+  .lease-review {
+    --lr-accent: #1f3a5f;
+    --lr-accent-soft: #eef2f7;
+    --lr-action: #a2560c;
+    --lr-action-soft: #fdf4e8;
+    --lr-doc: 'Iowan Old Style', Charter, Georgia, 'Times New Roman', serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .lease-review:not([data-theme='light']) {
+      --lr-accent: #8fb3d9;
+      --lr-accent-soft: #1a2431;
+      --lr-action: #d99a4e;
+      --lr-action-soft: #2a2114;
+    }
+  }
+
+  .lr-doc { font-family: var(--lr-doc); font-size: 1.02rem; line-height: 1.62; }
+  .lr-callout { border-left: 3px solid var(--lr-accent); background: var(--lr-accent-soft); }
+  .lr-asked { border: 1px solid var(--lr-action); background: var(--lr-action-soft); }
+  .lr-action { color: var(--lr-action); }
+  .lr-accent { color: var(--lr-accent); }
+  .lr-comment { border-left: 3px solid var(--lr-action); }
+  .lr-dot { width: 0.5rem; height: 0.5rem; border-radius: 9999px; }
+`;
+
 export default function LeaseReviewPage() {
   const { token } = useParams();
 
@@ -170,8 +211,8 @@ export default function LeaseReviewPage() {
 
   /** One comment box, wherever it sits. */
   const composer = (at: number, placeholder: string) => (
-    <div key={at} className="mt-3 rounded-r-md border-primary border-l-2 bg-muted/40 p-3">
-      <p className="font-semibold text-[0.65rem] uppercase tracking-widest">Your comment</p>
+    <div key={at} className="lr-comment mt-3 rounded-r-md bg-muted/40 p-3">
+      <p className="lr-action font-semibold text-[0.65rem] uppercase tracking-widest">Your comment</p>
       <Textarea
         className="mt-1 min-h-16"
         rows={2}
@@ -192,7 +233,8 @@ export default function LeaseReviewPage() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 pb-28">
+    <div className="lease-review mx-auto w-full max-w-6xl px-4 py-10 pb-28">
+      <style dangerouslySetInnerHTML={{ __html: SCOPED_CSS }} />
       {/*
         The mark carries the weight it has in the app header. A reviewer arrives
         from an email, on a domain they have never seen, to read a legal
@@ -200,186 +242,274 @@ export default function LeaseReviewPage() {
       */}
       <BrandingLogo className="mb-8 h-10 w-auto" />
 
-      <h1 className="font-semibold text-2xl">{matter.title}</h1>
-      <p className="mt-1 text-muted-foreground text-sm">
-        For review by {meta.reviewerName}
+      <h1 className="lr-doc font-medium text-3xl leading-tight tracking-tight">{matter.title}</h1>
+      <p className="mt-1.5 text-muted-foreground text-sm">
+        For review by <span className="font-medium text-foreground">{meta.reviewerName}</span>
         {meta.expiresAt && ` · link expires ${new Date(meta.expiresAt).toLocaleDateString()}`}
       </p>
 
-      {/*
+      <div className="mt-8 grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-12">
+        {/*
+          THE RAIL. Forty-three clauses is a long page, and a reader needs to
+          know what is still wanted from them without scrolling to find out.
+        */}
+        <aside className="lg:sticky lg:top-6 lg:self-start">
+          <div className="rounded-lg border p-4">
+            <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">Where you are</h2>
+
+            <div className="mt-3 flex flex-col gap-2.5 text-sm">
+              {askedFields.length > 0 && (
+                <div className="flex items-baseline gap-2.5">
+                  <span
+                    className="lr-dot mt-1.5 flex-none"
+                    style={{ background: unanswered.length > 0 ? 'var(--lr-action)' : 'var(--lr-accent)' }}
+                  />
+                  <span>Questions for you</span>
+                  <span className="ml-auto font-semibold tabular-nums">
+                    {askedFields.length - unanswered.length} of {askedFields.length}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex items-baseline gap-2.5">
+                <span className="lr-dot mt-1.5 flex-none bg-muted-foreground/40" />
+                <span>Clauses</span>
+                <span className="ml-auto font-semibold tabular-nums">
+                  {sections.reduce((n, section) => n + section.clauses.length, 0)}
+                </span>
+              </div>
+
+              <div className="flex items-baseline gap-2.5">
+                <span
+                  className="lr-dot mt-1.5 flex-none"
+                  style={{ background: usable.length > 0 ? 'var(--lr-accent)' : 'var(--lr-action)' }}
+                />
+                <span>Your comments</span>
+                <span className="ml-auto font-semibold tabular-nums">{usable.length}</span>
+              </div>
+            </div>
+          </div>
+
+          {sections.length > 0 && (
+            <nav className="mt-4 rounded-lg border p-4">
+              <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">Jump to</h2>
+              <div className="mt-3 flex flex-col gap-0.5">
+                {sections.map((section) => {
+                  const noted = drafts.filter((draft) =>
+                    section.clauses.some((clause) => clause.slug === draft.clauseSlug && draft.body.trim() !== ''),
+                  ).length;
+
+                  return (
+                    <a
+                      key={section.number}
+                      href={`#section-${section.number}`}
+                      className="flex items-baseline gap-2.5 rounded-md px-1.5 py-1 text-sm hover:bg-muted"
+                    >
+                      <span className="w-5 text-muted-foreground text-xs tabular-nums">{section.number}</span>
+                      <span className="min-w-0 flex-1 truncate">{section.name}</span>
+                      {noted > 0 && <span className="lr-action font-semibold text-xs">{noted}</span>}
+                    </a>
+                  );
+                })}
+              </div>
+            </nav>
+          )}
+        </aside>
+
+        <div className="min-w-0">
+          {/*
         What happens to a comment, said up front. An attorney needs to know
         their note is binding until answered; a tenant needs to know theirs is
         not, so they raise it with the landlord rather than assuming the
         document is on hold.
       */}
-      <Alert className="mt-6">
-        <MessageSquarePlus className="h-4 w-4" />
-        <AlertTitle>{isAttorney ? 'Your comments block signature' : 'Nothing here is agreed yet'}</AlertTitle>
-        <AlertDescription>
-          {isAttorney
-            ? 'This lease cannot be sent for signature while any of your comments is unanswered. The landlord must accept it, change something in response, or dismiss it with a written reason that is recorded.'
-            : 'Comment on anything you want changed. The landlord reads every comment and decides what to do with it — a comment does not change the lease by itself, and anything still unresolved is worth raising with them before you sign.'}
-        </AlertDescription>
-      </Alert>
+          {/*
+          A statement of fact, not an alarm. The stock Alert rendered this in
+          green at full width — the loudest thing on the page, saying the
+          least.
+        */}
+          <div className="lr-callout rounded-r-md py-3 pr-4 pl-4">
+            <p className="text-sm leading-relaxed">
+              <span className="font-semibold">
+                {isAttorney ? 'Your comments block signature.' : 'Nothing here is agreed yet.'}
+              </span>{' '}
+              <span className="text-muted-foreground">
+                {isAttorney
+                  ? 'This lease cannot be sent for signature while any of your comments is unanswered. The landlord must accept it, change something in response, or dismiss it with a written reason that is recorded.'
+                  : 'Comment on anything you want changed. The landlord reads every comment and decides what to do with it — a comment does not change the lease by itself, and anything still unresolved is worth raising with them before you sign.'}
+              </span>
+            </p>
+          </div>
 
-      {changedSinceIssued && (
-        <Alert variant="warning" className="mt-4">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>The lease has changed since this link was sent</AlertTitle>
-          <AlertDescription>
-            The document below is current. Anything you were told about an earlier version may no longer hold.
-          </AlertDescription>
-        </Alert>
-      )}
+          {changedSinceIssued && (
+            <Alert variant="warning" className="mt-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>The lease has changed since this link was sent</AlertTitle>
+              <AlertDescription>
+                The document below is current. Anything you were told about an earlier version may no longer hold.
+              </AlertDescription>
+            </Alert>
+          )}
 
-      {/*
+          {/*
         Questions the landlord passed to the reviewer rather than guessing at.
         Above the document because they gate the send: a required answer left
         blank closes the link with nothing to show for it.
       */}
-      {askedFields.length > 0 && (
-        <section className="mt-8 rounded-lg border border-primary/40 bg-muted/30 p-5">
-          <h2 className="font-semibold text-lg">
-            {askedFields.length === 1
-              ? 'One thing only you can answer'
-              : `${askedFields.length} things only you can answer`}
-          </h2>
-          <p className="mt-1 text-muted-foreground text-sm">
-            These go into the lease exactly as you write them. The landlord sees them before anything is sent for
-            signature.
-          </p>
+          {askedFields.length > 0 && (
+            <section className="lr-asked mt-6 rounded-lg p-5">
+              <h2 className="font-semibold text-lg">
+                {askedFields.length === 1
+                  ? 'One thing only you can answer'
+                  : `${askedFields.length} things only you can answer`}
+              </h2>
+              <p className="mt-1 text-muted-foreground text-sm">
+                These go into the lease exactly as you write them. The landlord sees them before anything is sent for
+                signature.
+              </p>
 
-          <div className="mt-5 space-y-4">
-            {askedFields.map((field) => (
-              <div key={field.name}>
-                <Label htmlFor={`asked-${field.name}`}>
-                  {field.label}
-                  {field.required && <span className="ml-1 text-destructive">*</span>}
-                </Label>
-                {field.help && <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">{field.help}</p>}
-                {/*
+              <div className="mt-5 space-y-4">
+                {askedFields.map((field) => (
+                  <div key={field.name}>
+                    <Label htmlFor={`asked-${field.name}`}>
+                      {field.label}
+                      {field.required && <span className="ml-1 text-destructive">*</span>}
+                    </Label>
+                    {field.help && <p className="mt-0.5 mb-1.5 text-muted-foreground text-xs">{field.help}</p>}
+                    {/*
                   The field's own kind. Everything rendered as a two-row
                   textarea regardless, so a single-line answer like the
                   pre-move-in address could carry newlines into the lease.
                 */}
-                {field.kind === 'textarea' ? (
-                  <Textarea
-                    id={`asked-${field.name}`}
-                    rows={2}
-                    placeholder={field.placeholder ?? undefined}
-                    value={answers[field.name] ?? ''}
-                    onChange={(event) => setAnswers((prev) => ({ ...prev, [field.name]: event.target.value }))}
-                  />
-                ) : (
-                  <Input
-                    id={`asked-${field.name}`}
-                    placeholder={field.placeholder ?? undefined}
-                    value={answers[field.name] ?? ''}
-                    onChange={(event) => setAnswers((prev) => ({ ...prev, [field.name]: event.target.value }))}
-                  />
-                )}
+                    {field.kind === 'textarea' ? (
+                      <Textarea
+                        id={`asked-${field.name}`}
+                        rows={2}
+                        placeholder={field.placeholder ?? undefined}
+                        value={answers[field.name] ?? ''}
+                        onChange={(event) => setAnswers((prev) => ({ ...prev, [field.name]: event.target.value }))}
+                      />
+                    ) : (
+                      <Input
+                        id={`asked-${field.name}`}
+                        placeholder={field.placeholder ?? undefined}
+                        value={answers[field.name] ?? ''}
+                        onChange={(event) => setAnswers((prev) => ({ ...prev, [field.name]: event.target.value }))}
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+            </section>
+          )}
 
-      {comments.length > 0 && (
-        <section className="mt-10">
-          <h2 className="font-semibold text-lg">Comments already left</h2>
-          <ul className="mt-3 space-y-3">
-            {comments.map((comment) => (
-              <li key={comment.id} className="rounded-lg border p-4">
-                <p className="whitespace-pre-wrap text-sm">{comment.body}</p>
-                <p className="mt-2 text-muted-foreground text-xs">
-                  {comment.authorName} · {new Date(comment.createdAt).toLocaleDateString()}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+          {comments.length > 0 && (
+            <section className="mt-10">
+              <h2 className="font-semibold text-lg">Comments already left</h2>
+              <ul className="mt-3 space-y-3">
+                {comments.map((comment) => (
+                  <li key={comment.id} className="rounded-lg border p-4">
+                    <p className="whitespace-pre-wrap text-sm">{comment.body}</p>
+                    <p className="mt-2 text-muted-foreground text-xs">
+                      {comment.authorName} · {new Date(comment.createdAt).toLocaleDateString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-      {/*
+          {/*
         THE LEASE, CLAUSE BY CLAUSE. A comment written here arrives carrying the
         clause's slug, so the landlord sees the note beside the provision it is
         about rather than a string somebody typed from memory.
       */}
-      <section className="mt-12">
-        <div className="flex items-baseline gap-3 border-b pb-2">
-          <h2 className="font-semibold text-lg">The lease</h2>
-          <span className="ml-auto text-muted-foreground text-xs">Comment on any clause</span>
-        </div>
+          <section className="mt-12">
+            <div className="flex items-baseline gap-3 border-b pb-2">
+              <h2 className="font-semibold text-lg">The lease</h2>
+              <span className="ml-auto text-muted-foreground text-xs">Comment on any clause</span>
+            </div>
 
-        {sections.map((section) => (
-          <div key={section.number}>
-            <h3 className="mt-8 border-b pb-1 font-semibold text-primary text-xs uppercase tracking-widest">
-              {section.number} · {section.name}
-            </h3>
+            {sections.map((section) => (
+              <div key={section.number}>
+                <h3
+                  id={`section-${section.number}`}
+                  className="lr-accent mt-9 scroll-mt-6 border-b pb-1.5 font-semibold text-xs uppercase tracking-widest"
+                >
+                  {section.number} · {section.name}
+                </h3>
 
-            {section.clauses.map((clause) => (
-              <article key={clause.slug} className="group grid grid-cols-[3rem_1fr] gap-x-2 py-4">
-                <div className="pt-0.5 pl-2 font-semibold text-primary text-xs tabular-nums">{clause.number}</div>
-                <div>
-                  <h4 className="font-semibold text-xs uppercase tracking-wider">{clause.heading}</h4>
-                  <p className="mt-1 max-w-prose whitespace-pre-line text-sm leading-relaxed">{clause.text}</p>
-                </div>
+                {section.clauses.map((clause) => (
+                  <article key={clause.slug} className="grid grid-cols-[2.75rem_1fr] gap-x-2 py-5">
+                    <div className="lr-accent pt-1 pl-1 font-semibold text-xs tabular-nums">{clause.number}</div>
+                    <div>
+                      <h4 className="font-semibold text-[0.7rem] uppercase tracking-[0.09em]">{clause.heading}</h4>
+                      {/* The lease reads as a document, not as UI copy. */}
+                      <p className="lr-doc mt-1.5 max-w-[40rem] whitespace-pre-line">{clause.text}</p>
+                    </div>
 
-                <div className="col-start-2">
-                  {drafts.map((draft, at) =>
-                    draft.clauseSlug === clause.slug
-                      ? composer(at, 'What would you like changed, or what is unclear?')
-                      : null,
-                  )}
-                </div>
+                    <div className="col-start-2">
+                      {drafts.map((draft, at) =>
+                        draft.clauseSlug === clause.slug
+                          ? composer(at, 'What would you like changed, or what is unclear?')
+                          : null,
+                      )}
+                    </div>
 
-                {/*
-                  Revealed on hover or focus on a pointer device, always visible
-                  without one — a control that only appears on hover is a
-                  control a phone cannot reach.
+                    {/*
+                  ALWAYS PRESENT, quietly. Hiding it with `opacity-0` still
+                  reserved its box, so every clause carried a band of dead space
+                  under it and the page read as though something had failed to
+                  load. A muted always-on control is honest and reaches a phone.
                 */}
-                <div className="col-start-2 mt-2 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
-                  <Button variant="outline" size="sm" onClick={() => addDraft(clause.slug)}>
-                    <MessageSquarePlus className="mr-2 h-3.5 w-3.5" />
-                    {drafts.some((draft) => draft.clauseSlug === clause.slug)
-                      ? 'Add another'
-                      : 'Comment on this clause'}
-                  </Button>
-                </div>
-              </article>
+                    <div className="col-start-2 mt-1.5">
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1.5 text-muted-foreground text-xs hover:text-foreground"
+                        onClick={() => addDraft(clause.slug)}
+                      >
+                        <MessageSquarePlus className="h-3.5 w-3.5" />
+                        {drafts.some((draft) => draft.clauseSlug === clause.slug)
+                          ? 'Add another comment'
+                          : 'Comment on this clause'}
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
             ))}
+          </section>
+
+          {/* A note about the document as a whole, rather than about one clause. */}
+          <section className="mt-12 border-t pt-6">
+            <h2 className="font-semibold text-lg">Anything else</h2>
+            <p className="mt-1 text-muted-foreground text-sm">
+              A comment about the lease as a whole, rather than about one clause.
+            </p>
+
+            {drafts.map((draft, at) =>
+              draft.clauseSlug === null ? composer(at, 'Anything the landlord should know.') : null,
+            )}
+
+            <Button variant="outline" size="sm" className="mt-3" onClick={() => addDraft(null)}>
+              <MessageSquarePlus className="mr-2 h-4 w-4" />
+              Add a general comment
+            </Button>
+          </section>
+
+          <div className="mt-10 border-t pt-6">
+            <Button asChild variant="outline" size="sm">
+              <a href={`/lease-review/${token}/document`} target="_blank" rel="noreferrer">
+                <Download className="mr-2 h-4 w-4" />
+                Download the PDF
+              </a>
+            </Button>
+            <p className="mt-2 text-muted-foreground text-xs">
+              Everything you will be asked to sign, as one file — the lease and every addendum and disclosure attached
+              to it.
+            </p>
           </div>
-        ))}
-      </section>
-
-      {/* A note about the document as a whole, rather than about one clause. */}
-      <section className="mt-12 border-t pt-6">
-        <h2 className="font-semibold text-lg">Anything else</h2>
-        <p className="mt-1 text-muted-foreground text-sm">
-          A comment about the lease as a whole, rather than about one clause.
-        </p>
-
-        {drafts.map((draft, at) =>
-          draft.clauseSlug === null ? composer(at, 'Anything the landlord should know.') : null,
-        )}
-
-        <Button variant="outline" size="sm" className="mt-3" onClick={() => addDraft(null)}>
-          <MessageSquarePlus className="mr-2 h-4 w-4" />
-          Add a general comment
-        </Button>
-      </section>
-
-      <div className="mt-10 border-t pt-6">
-        <Button asChild variant="outline" size="sm">
-          <a href={`/lease-review/${token}/document`} target="_blank" rel="noreferrer">
-            <Download className="mr-2 h-4 w-4" />
-            Download the PDF
-          </a>
-        </Button>
-        <p className="mt-2 text-muted-foreground text-xs">
-          Everything you will be asked to sign, as one file — the lease and every addendum and disclosure attached to
-          it.
-        </p>
+        </div>
       </div>
 
       {submit.error && (
@@ -397,7 +527,7 @@ export default function LeaseReviewPage() {
         somewhere above.
       */}
       <div className="fixed inset-x-0 bottom-0 z-10 border-t bg-background/95 px-4 py-3 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-1">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-1">
           <p className="text-muted-foreground text-xs">
             {usable.length === 0 ? 'No comments yet' : `${usable.length} comment${usable.length === 1 ? '' : 's'}`}
             {unanswered.length > 0 && (

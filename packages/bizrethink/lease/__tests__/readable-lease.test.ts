@@ -115,3 +115,57 @@ describe('the reviewer sees the real lease', () => {
     expect(routeCode()).toContain('addDraft(clause.slug)');
   });
 });
+
+/**
+ * The page was built to the design, not merely to the data shape.
+ *
+ * The first cut had the right information architecture — clauses in the page,
+ * comments anchored to them — and none of the design: the app's stock green
+ * Alert, no rail, no serif, and a hidden-on-hover control that still reserved
+ * its box so every clause carried a band of dead space beneath it.
+ *
+ * Source-level because it is rendering, and because the failure was reporting
+ * a page as finished when half of it had not been done.
+ */
+describe('the reviewer page carries its design', () => {
+  const page = readFileSync(
+    new URL('../../../../apps/remix/app/routes/_recipient+/lease-review.$token.tsx', import.meta.url),
+    'utf8',
+  );
+
+  it('sets the lease in a serif, so a lease reads as a document', () => {
+    expect(page).toContain('--lr-doc');
+    expect(page).toMatch(/className="lr-doc/);
+  });
+
+  it('carries a rail, since forty-three clauses is a long page', () => {
+    expect(page).toContain('Where you are');
+    expect(page).toContain('Jump to');
+    expect(page).toMatch(/lg:sticky/);
+  });
+
+  /*
+    The action colour appears where the reader must act and nowhere else. A
+    page that shouts everywhere has no way left to say "this one".
+  */
+  it('reserves one colour for the reader’s own outstanding work', () => {
+    expect(page).toContain('--lr-action');
+    expect(page).toContain('lr-asked');
+  });
+
+  /*
+    `opacity-0` hides a control without releasing its box. Every clause then
+    carries a band of empty space and the page reads as half-loaded.
+  */
+  it('does not hide the comment control behind opacity', () => {
+    /*
+      Comments stripped first. The prose above the control quotes `opacity-0`
+      in order to explain why it went, and an assertion that reads the
+      explanation as the thing itself would fail forever — which it did, twice
+      in this file's history.
+    */
+    const code = page.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\{\/\*[\s\S]*?\*\/\}/g, '');
+
+    expect(code).not.toContain('opacity-0');
+  });
+});
