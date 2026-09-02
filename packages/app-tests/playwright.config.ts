@@ -32,7 +32,21 @@ export default defineConfig({
   globalSetup: require.resolve('./global-setup'),
   fullyParallel: true,
   workers: 10, // See Projects where 10 is utilized for API tests. We're not running 10 workers for UI tests.
-  maxFailures: process.env.CI ? 1 : undefined,
+  /*
+    OVERLAY 067. Upstream aborts the whole run on the FIRST failure in CI.
+
+    With retries: 4 a genuinely flaky spec has already burned five attempts by
+    the time it counts, and then takes the suite with it — a run on 2026-09-02
+    reported "4 failed ... 888 did not run", so a known-flaky cluster in
+    find-documents cost a full 25-minute re-run and told us nothing about the
+    change under test.
+
+    A cap of 25 still stops a catastrophic run early (a broken build fails far
+    more than 25), while letting an isolated flake report alongside everything
+    else that passed. The point is to be able to READ a red run instead of
+    re-running it.
+  */
+  maxFailures: process.env.CI ? 25 : undefined,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */

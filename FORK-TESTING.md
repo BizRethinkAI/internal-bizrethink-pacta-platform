@@ -69,6 +69,30 @@ group is DB contention on the shared document counter
 API-test project. Optional future hardening: a bounded retry on
 `incrementDocumentId` (own overlay) — not required for green.
 
+> **CORRECTION, 2026-09-02 — "accept-on-retry" is no longer true.**
+>
+> These specs now fail through **all five attempts**. A run on PR #67 shows
+> `retry #1` … `retry #4` exhausted, and the failing cluster is the
+> `find-documents.spec.ts` **Team Context** visibility group (`:562`, `:669`,
+> `:721`, `:864`) — adjacent to, but not the same as, the `:663`/`:715` entries
+> recorded above.
+>
+> The assertions fail as `Expected: 3 / Received: 0` — a team query returning
+> **nothing**, not the wrong thing. Empty-not-wrong does not obviously fit the
+> counter-contention story, so treat the root cause above as **unconfirmed**.
+>
+> Rate: 5 reds in 25 runs (~20%), three of them on 2026-09-02 alone.
+>
+> **Not yet reproduced locally.** The spec passes locally in isolation; a
+> faithful repro needs the built app (`npm run start`), and the local build is
+> currently blocked by a Node version mismatch (repo/CI expect Node 22, the dev
+> machine runs 26 — `options.recursive` was removed from `fs.rm`). That is the
+> next step, not another re-run.
+>
+> Overlay 067 raised `maxFailures` from 1 to 25 so this cluster stops hiding the
+> other ~888 results. That makes the red **readable**; it does not make it go
+> away.
+
 ## Baseline refresh — 2026-08-13 upstream sync (142 commits, upstream 2.16.0)
 
 Post-sync the curated suite reports **1028 passed / 4 flaky / 64 skipped / 0 failed**
