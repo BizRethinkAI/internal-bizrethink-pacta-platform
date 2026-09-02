@@ -410,6 +410,25 @@ passed, or appeared to:
 
 ## Open threads
 
+### A textarea and an input disagreed about being white
+
+`Input` carries `bg-background`; `Textarea` carries `bg-transparent`. On a white
+card the difference is invisible, which is why it survived every review. Every
+textarea on the reviewer page sits on a **tinted** panel — the amber "only you
+can answer" block and the muted comment composer — so the tint showed through
+and two of the three answer fields read as part of the panel while the
+single-line field beside them was crisp white. A tenant would have seen it
+before we did; the user did, on the live page, about to send the link.
+
+Both primitives are upstream, so the background is set at our call sites. The
+guard asserts every `<Textarea>` on that page carries its own opaque background,
+so a third one added later cannot quietly inherit the panel.
+
+**The general shape:** a primitive that looks correct on the background it was
+designed against is not correct on ours. Check the primitive's own defaults
+before assuming a component is neutral.
+
+
 ### A bare anchor only scrolls when the hash CHANGES
 
 The jump list looked correct — matching ids, no duplicates, target at y=2733 —

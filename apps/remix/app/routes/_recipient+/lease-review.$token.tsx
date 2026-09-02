@@ -224,7 +224,7 @@ export default function LeaseReviewPage() {
     <div key={at} className={`${ACTION_EDGE} mt-3 rounded-r-md bg-muted/40 p-3`}>
       <p className={`${ACTION_TEXT} font-semibold text-[0.65rem] uppercase tracking-widest`}>Your comment</p>
       <Textarea
-        className="mt-1 min-h-16"
+        className="mt-1 min-h-16 bg-background"
         rows={2}
         value={drafts[at].body}
         placeholder={placeholder}
@@ -402,6 +402,7 @@ export default function LeaseReviewPage() {
                     {field.kind === 'textarea' ? (
                       <Textarea
                         id={`asked-${field.name}`}
+                        className="bg-background"
                         rows={2}
                         placeholder={field.placeholder ?? undefined}
                         value={answers[field.name] ?? ''}
