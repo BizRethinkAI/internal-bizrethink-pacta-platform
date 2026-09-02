@@ -107,7 +107,6 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
         and asking it as a separate question would be asking the answerer to
         keep two fields in step for no reason.
       */
-      hasNamedOccupants: String((values as Record<string, unknown>).authorisedOccupants ?? '').trim() !== '',
       /*
         "Is anything allocated", not "are there rows". A row nobody has been
         given is not an allocation, and gating on the row count would render

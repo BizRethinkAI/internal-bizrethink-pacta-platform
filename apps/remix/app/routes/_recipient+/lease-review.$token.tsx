@@ -9,6 +9,7 @@ import { msg } from '@lingui/core/macro';
 import { AlertTriangle, Check, FileText, Loader2, MessageSquarePlus, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router';
+import { BrandingLogo } from '~/components/general/branding-logo';
 
 /**
  * The reviewer's side of the review loop. A token, no account.
@@ -29,7 +30,16 @@ import { useParams } from 'react-router';
 
 export function meta() {
   return [
-    { title: i18n._(msg`Review a lease`) },
+    /*
+      Named, because this is a link a landlord emails to a stranger and asks
+      them to read a legal document on. The parent `_recipient+` layout titles
+      everything under it "Sign Document - Documenso" and renders its header
+      only when `sessionData?.user` exists — so a reviewer, who is not signed
+      in and never will be, would otherwise land on a page with no indication
+      of whose product it is. This route's own meta wins; the missing logo did
+      not.
+    */
+    { title: i18n._(msg`Review a lease · Pacta`) },
     { name: 'robots', content: 'noindex, nofollow, noarchive, nosnippet, noimageindex' },
   ];
 }
@@ -135,6 +145,13 @@ export default function LeaseReviewPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10">
+      {/*
+        Left-aligned, alone, no nav. Same minimal chrome the sign-in pages
+        hold to: a reader who arrived from an email needs to know whose
+        product this is, and nothing else.
+      */}
+      <BrandingLogo className="mb-10 h-8 w-auto" />
+
       <h1 className="font-semibold text-2xl">{matter.title}</h1>
       <p className="mt-1 text-muted-foreground text-sm">
         For review by {meta.reviewerName}

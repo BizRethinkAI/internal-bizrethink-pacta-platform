@@ -59,13 +59,26 @@ const ACCENT = '#1c3d5a';
  */
 const BASE_FONT_SIZE = 11;
 
+/*
+  PAGE GEOMETRY AS NUMBERS, because the signature layout has to be able to
+  assert that a token fits in the space it is given.
+
+  `{{SIGNATURE, r1, width=160, height=44}}` measures 200pt at 11pt Times-Roman.
+  Any column narrower than that wraps it — and a wrapped token is still found
+  by the extractor, still parses, and lands a real signature widget in the
+  wrong place. See the set-equality assertion in render-lease.test.ts.
+*/
+export const PAGE_WIDTH = 612;
+export const PAD_H = 90;
+export const MEASURE = PAGE_WIDTH - 2 * PAD_H;
+
 const styles = StyleSheet.create({
   page: {
     // 1.25in sides. The old 64pt gave a ~98-character measure, which is why the
     // body read as an undifferentiated slab.
     paddingTop: 74,
-    paddingBottom: 76,
-    paddingHorizontal: 90,
+    paddingBottom: 84,
+    paddingHorizontal: PAD_H,
     fontFamily: SERIF,
     fontSize: BASE_FONT_SIZE,
     lineHeight: 1.5,
@@ -74,11 +87,18 @@ const styles = StyleSheet.create({
 
   /* ---- running head and foot ---- */
 
+  /*
+    Two nodes, and the split is not cosmetic. The bordered node may never be
+    the one whose `render` returns null — react-pdf still runs clipBorderBottom
+    on it and emits a degenerate coordinate ("unsupported number: 2.2e+22").
+    So the outer node is positioned and unbordered, and the inner bordered row
+    is what appears or does not.
+  */
   runningHead: {
     position: 'absolute',
     top: 40,
-    left: 90,
-    right: 90,
+    left: PAD_H,
+    right: PAD_H,
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 0.5,
@@ -89,13 +109,29 @@ const styles = StyleSheet.create({
     letterSpacing: 0.7,
     color: MUTED,
   },
+  /*
+    Clamped to one line each. The addendum head used to carry the full subtitle
+    sentence — "Attached to and forming part of the Residential Lease for 29090
+    Picana Lane, Wesley Chapel, FL 33543" — which wrapped to two lines and
+    collided with the eyebrow beneath it.
+
+    `maxLines` and `textOverflow` are implemented by @react-pdf/stylesheet but
+    are not on the exported Style type, hence the cast at the use site.
+  */
+  headLeft: { flexShrink: 1 },
+  headRight: { flexShrink: 0, maxWidth: 220, textAlign: 'right' },
   footer: {
     position: 'absolute',
-    bottom: 42,
-    left: 90,
-    right: 90,
+    // A rule is what anchors a foot. 7pt type floating in white at the very
+    // bottom of the sheet is what reads as falling off the page.
+    bottom: 48,
+    left: PAD_H,
+    right: PAD_H,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    borderTopWidth: 0.5,
+    borderTopColor: HAIRLINE,
+    paddingTop: 6,
     fontFamily: SANS,
     fontSize: 7,
     letterSpacing: 0.7,
@@ -184,7 +220,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   // Figures line up in a column, so they are set to line up.
+  /*
+    Figures set to line up. Times-Roman digits are all 500 units, so they are
+    tabular — but this was also applied to the TOTAL row, where it reset the
+    bold the row had just set, leaving a bold label beside a regular figure.
+  */
   amount: { fontFamily: SERIF },
+  amountTotal: { fontFamily: SANS_BOLD },
 
   /* ---- signatures ---- */
 
@@ -217,23 +259,29 @@ const text = (content: string, style?: Style | Style[], key?: string) => h(Text,
  * nothing on it but body text belongs to no document. Both halves are `fixed`
  * so react-pdf repeats them.
  */
-const runningHead = (documentTitle: string, subtitle: string) =>
+const runningHead = (spec: LeaseDocumentSpec) =>
   h(
     View,
     { style: styles.runningHead, fixed: true },
-    h(Text, {}, documentTitle.toUpperCase()),
-    h(Text, {}, subtitle.toUpperCase()),
+    h(Text, { style: styles.headLeft }, spec.shortTitle.toUpperCase()),
+    h(Text, { style: styles.headRight }, spec.runningRef.toUpperCase()),
   );
 
 /** Running foot. `render` gives react-pdf the page numbers it computes itself. */
-const footer = () =>
+const footer = (spec: LeaseDocumentSpec) =>
   h(
     View,
     { style: styles.footer, fixed: true },
-    h(Text, {}, 'PACTA'),
+    h(Text, { style: styles.headLeft }, `PACTA · ${spec.key.toUpperCase()}`),
+    /*
+      subPage, not page. Each spec is its own Page, and an addendum IS its own
+      instrument — the whole reason renderLease keeps them separate. In the
+      combined reading copy the old counter read "PAGE 12 OF 27" on a two-page
+      addendum.
+    */
     h(Text, {
-      render: ({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
-        `PAGE ${pageNumber} OF ${totalPages}`,
+      render: ({ subPageNumber, subPageTotalPages }: { subPageNumber: number; subPageTotalPages: number }) =>
+        `PAGE ${subPageNumber} OF ${subPageTotalPages}`,
     }),
   );
 
@@ -243,6 +291,12 @@ const footer = () =>
  * The recital line is here because a reader opening a lease asks "whose is
  * this?" before anything else, and the answer used to be buried in clause 1.
  */
+const EYEBROW: Record<LeaseDocumentSpec['kind'], string> = {
+  lease: 'Agreement',
+  addendum: 'Addendum',
+  disclosure: 'Disclosure',
+};
+
 const coverBlock = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
   const named = (role: PartyRole) =>
     parties
@@ -256,7 +310,7 @@ const coverBlock = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
   return h(
     View,
     { key: 'cover' },
-    text(spec.withInitials ? 'Addendum' : 'Agreement', styles.eyebrow),
+    text(EYEBROW[spec.kind], styles.eyebrow),
     text(spec.title, styles.docTitle),
     h(View, { style: styles.titleRule, key: 'title-rule' }),
     text(spec.subtitle, styles.docSubtitle),
@@ -303,7 +357,7 @@ const amountsDueTable = (lines: MoneyLine[], totalUsd: number) => {
       View,
       { style: styles.moneyTotal, key: 'money-total' },
       h(Text, {}, 'Total due at execution'),
-      h(Text, { style: styles.amount }, money.format(totalUsd)),
+      h(Text, { style: styles.amountTotal }, money.format(totalUsd)),
     ),
   );
 };
@@ -332,13 +386,29 @@ const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitial
             and what the sized widget's reserved leading is computed from.
             Styling it moves the widget off the line it was measured for.
           */
+          /*
+            NEVER HYPHENATE A TOKEN. react-pdf ships Knuth-Liang hyphenation
+            with en-us patterns on by default, so "height=44}}" is a split
+            candidate the moment a line is tight — and a token broken across
+            two lines is still FOUND by the extractor (it joins lines with a
+            newline and `[^}]` matches it), still parses, and lands a real
+            signature widget several points off where it belongs.
+
+            A node prop, not a style, so the 11pt the reserved leading was
+            measured against is untouched.
+          */
           ...signer.placeholders.map((placeholder, i) =>
-            text(
+            h(
+              Text,
+              {
+                key: `${signer.recipient}-${i}`,
+                hyphenationCallback: (word: string) => [word],
+                style:
+                  placeholder.reservedLeadingPt > 0
+                    ? { marginTop: placeholder.reservedLeadingPt, marginBottom: placeholder.reservedLeadingPt }
+                    : undefined,
+              },
               placeholder.token,
-              placeholder.reservedLeadingPt > 0
-                ? { marginTop: placeholder.reservedLeadingPt, marginBottom: placeholder.reservedLeadingPt }
-                : undefined,
-              `${signer.recipient}-${i}`,
             ),
           ),
         ),
@@ -349,7 +419,20 @@ const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitial
 
 export type LeaseDocumentSpec = {
   key: string;
+  /**
+   * What this document IS.
+   *
+   * The eyebrow used to read `withInitials ? 'Addendum' : 'Agreement'`, and a
+   * standalone disclosure has withInitials false — so the flood disclosure,
+   * the one document Fla. Stat. §83.512 requires to be SEPARATE from the
+   * agreement, announced itself as "Agreement".
+   */
+  kind: 'lease' | 'addendum' | 'disclosure';
   title: string;
+  /** Short, for the running head. The full sentence below is for the cover. */
+  shortTitle: string;
+  /** Short property reference for the running head's right-hand slot. */
+  runningRef: string;
   subtitle: string;
   clauses: RenderedClause[];
   withInitials: boolean;
@@ -361,8 +444,8 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
   h(
     Page,
     { size: 'LETTER', style: styles.page, key: spec.key },
-    runningHead(spec.title, spec.subtitle),
-    footer(),
+    runningHead(spec),
+    footer(spec),
     coverBlock(spec, parties),
     ...(spec.showToc ? [tableOfContents(spec.clauses)] : []),
     ...(spec.amountsDue ? [amountsDueTable(spec.amountsDue.lines, spec.amountsDue.totalUsd)] : []),
@@ -377,7 +460,26 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
       */
       h(
         View,
-        { style: styles.sectionRow, key: `h-${rendered.clause.slug}`, wrap: false },
+        {
+          style: styles.sectionRow,
+          key: `h-${rendered.clause.slug}`,
+          // Keeps a two-line heading from splitting across a page break.
+          wrap: false,
+          /*
+            KEEP-WITH-NEXT IS STILL MISSING, and `minPresenceAhead` is not the
+            answer here despite being exactly what it is documented to do.
+
+            Setting it on this node — with or without `wrap: false` — makes
+            react-pdf 4.9 emit a degenerate coordinate out of clipBorderBottom
+            ("unsupported number: -2.2e+22") and no PDF renders at all. Verified
+            by bisection: removing it alone turns the suite green.
+
+            So a heading can still be orphaned at the foot of a page with its
+            clause overleaf. Fixing it needs either a react-pdf upgrade or the
+            heading and its first paragraph wrapped in one unbreakable View,
+            and the second wants a rendered proof rather than a green suite.
+          */
+        },
         h(Text, { style: styles.sectionNumber }, rendered.number ?? ''),
         h(Text, { style: styles.sectionHeadingText }, rendered.clause.heading.toUpperCase()),
       ),

@@ -102,3 +102,31 @@ export const describeMissingUnique = (missing: string[], delegatedFields: string
 };
 
 export const allFieldNames = (): string[] => allFields(FL_INTERVIEW).map((field) => field.name);
+
+/**
+ * Questions put to the tenant that have not come back.
+ *
+ * Separate from `missing` on purpose. `missing` reports what the DOCUMENT
+ * needs, so a delegated question appears there only when it also happens to be
+ * a required clause variable — `permittedPets` is, `authorisedOccupants` is
+ * not. Blank occupants is a lawful answer that selects a different clause, so
+ * it can never block; but a landlord who asked and never heard back should not
+ * have to discover that from the rendered lease.
+ *
+ * Reported, never blocking.
+ */
+export const outstandingDelegations = (delegatedFields: string[], values: Record<string, unknown>): MissingAnswer[] =>
+  delegatedFields
+    .filter((name) => String(values[name] ?? '').trim() === '')
+    .map((name) => ({ name, field: FIELD_INDEX.get(name) }))
+    .filter(
+      (entry): entry is { name: string; field: NonNullable<ReturnType<typeof FIELD_INDEX.get>> } =>
+        entry.field !== undefined,
+    )
+    .map(({ name, field }) => ({
+      question: field.label,
+      stepTitle: field.stepTitle,
+      stepId: field.stepId,
+      raw: name,
+      awaitingTenant: true,
+    }));
