@@ -1129,6 +1129,54 @@ export const leaseBuilderRouter = router({
     }),
 
     /**
+     * Take a link back.
+     *
+     * `create` mints a fresh token every time, so a landlord who edited the
+     * lease could always issue a NEW link — but the old one stayed live until
+     * its expiry, months away, and nothing could kill it. Wrong recipient,
+     * changed terms, a deal that falls through: the link kept working.
+     *
+     * Closing rather than deleting. The row carries the reviewer, the issue
+     * date and any comments already returned; that history outlives the link's
+     * usefulness, and a delete would orphan the comments. `isReviewUsable`
+     * already rejects any status but `open`, so the close is the revocation —
+     * it beats the expiry date rather than waiting for it.
+     */
+    revoke: authenticatedProcedure
+      .input(z.object({ matterId: z.string(), reviewId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        // Ownership is checked on the MATTER, not the review, so a guessed
+        // review id from another organisation cannot be closed.
+        const matter = await loadMatter(input.matterId, ctx.user.id);
+
+        const review = await prisma.bizrethinkLeaseReview.findFirst({
+          where: { id: input.reviewId, matterId: matter.id },
+          select: { id: true, status: true },
+        });
+
+        if (!review) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'That review link no longer exists.' });
+        }
+
+        /*
+          A returned review is a record of comments the landlord still has to
+          answer. Revoking it would hide work rather than retract a link.
+        */
+        if (review.status !== 'open') {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'That link is already closed.',
+          });
+        }
+
+        await prisma.bizrethinkLeaseReview.update({
+          where: { id: review.id },
+          data: { status: 'closed' },
+        });
+
+        return { revoked: true };
+      }),
+
+    /**
      * Decide one comment. Once.
      *
      * The append-only rule lives in `applyDisposition`. The write is
