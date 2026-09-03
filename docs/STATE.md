@@ -410,6 +410,45 @@ passed, or appeared to:
 
 ## Open threads
 
+### One element of six, and a remedy left on the table
+
+**The federal lead disclosure is six things.** 40 C.F.R. §745.113(b) and
+24 C.F.R. §35.92(b) both require a contract to lease target housing to include
+the Lead Warning Statement, the lessor's disclosure of KNOWN paint and hazards,
+a list of records provided, the lessee's acknowledgment of the pamphlet, an
+agent statement, and signatures certifying accuracy. **We shipped the first.**
+
+42 U.S.C. §4852d(b)(3) provides TREBLE damages, so an incomplete disclosure is
+not a lesser version of a complete one. And the clause fails safe to INCLUDE
+when the build year is unknown — which made completeness the difference between
+a safe default and a treble-damages default.
+
+**EPA and HUD no longer agree on the Warning Statement.** EPA added "known" in
+November 2024 (89 FR 89458); HUD's §35.92(b)(1) still carries its 1999 text
+without it, confirmed against the official govinfo CFR annual edition. We follow
+EPA — later in time, tracks §4852d(a)(1)(B)'s "any known lead-based paint", and
+being narrower it satisfies HUD's substance. That reasoning is ours and is a
+counsel question, not a settled point.
+
+Deliberately NOT included: 40 C.F.R. §745.110(a)'s ten-day inspection
+opportunity runs to PURCHASERS only. It is a common drafting error and would
+promise something the regulation does not require.
+
+**§83.67(5) was a remedy we were not taking.** The statute relieves a landlord
+of the §715.104 duty to store and dispose of property a tenant leaves behind —
+but only where the lease says so, and only where it carries a prescribed legend
+"printed or clearly stamped". §83.67 appeared nowhere in the library, so the
+whole statutory storage process applied to anything left behind.
+
+The legend is a safe harbour, so the wording has latitude; it is reproduced
+exactly anyway, because there is no reason to spend it.
+
+**This is the shape a statutory walk finds and a clause review cannot.** Not a
+clause that is wrong — a clause that is absent, and whose absence costs
+something. Three adversarial reviews of our own text found neither of these,
+because there was nothing there to read.
+
+
 ### A clause whose defect was that it existed
 
 House rule 4 read *"No water-filled furniture may be kept at the Premises."*
