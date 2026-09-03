@@ -410,6 +410,46 @@ passed, or appeared to:
 
 ## Open threads
 
+### The verbatim test compared our copy to our copy
+
+`statutory-disclosures.test.ts` asserted that `RADON_STATUTORY_TEXT` equalled a
+hardcoded string in the test file, under a comment calling itself *"the actual
+compliance control, not a formatting test."* Both strings were written from the
+same memory. It could catch an accidental edit and nothing else — and what had
+actually happened was that the original was wrong.
+
+The §83.49 deposit notice carried a source comment admitting it was
+**transcribed from an executed lease, not read off the statute book**. Reading
+the statute showed the transcription was of the PRE-2025 text. Ch. 2025-16
+(HB 615), effective 1 July 2025, rewrote the disclosure to permit notice *in
+person, by mail, or by e-mail in accordance with §83.505*. Ours still said MAIL,
+opened "YOUR LEASE" where the statute says "YOUR RENTAL AGREEMENT", and dropped
+WRITTEN from two places. §83.49(2)(d) says *"Contain the following disclosure"* —
+no "substantially" — so this was a live compliance defect on a lease already
+out to a tenant, governing $13,800.
+
+The citation was wrong too: we cited §83.49(**3**), which is the notice of
+intent to impose a claim, a different document that only needs to be in
+substantially the prescribed form. The all-caps disclosure is **(2)(d)**.
+
+Radon was fetched and compared word for word: identical. Both now carry
+`verbatimVerifiedAt: '2026-09-02'` — a field that had existed since the library
+was written and had **never been set on anything**. Four remain honestly null,
+and a test pins that count so it cannot drift.
+
+**Two things worth carrying forward.** Only **two** Florida provisions require
+verbatim text — §83.49(2)(d) and §404.056(5). Everything else prescribes
+"substantially the following form", which is a safe harbour, so a diff against
+the statute is drift rather than a compliance failure; the library marks six as
+verbatim and four of those are over-strict. And the Legislature publishes
+`leg.state.fl.us/Statutes/SecChangesTab{YY}.pdf`, a section-by-section table of
+what each session changed — the whole change-detection story in one file.
+
+**The general shape:** a test that never leaves the repository cannot verify
+anything about the world. Pin the source and the date it was read, not just the
+string.
+
+
 ### The advance rent had no way home
 
 Advance rent was defined as covering "the final month of the term" and barred

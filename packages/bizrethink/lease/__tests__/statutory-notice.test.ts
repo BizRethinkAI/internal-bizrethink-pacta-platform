@@ -21,9 +21,20 @@ import { FL_STATUTORY_DISCLOSURES } from '../clauses/us-fl/statutory-disclosures
  * This test pins what we have; it does not certify it.
  */
 
+/*
+  These paragraphs were READ OFF THE STATUTE on 2 September 2026, not recalled:
+  https://www.flsenate.gov/Laws/Statutes/2025/0083.49
+
+  The previous version of this array held the pre-2025 wording and agreed with
+  the library, so both were wrong together and every assertion here passed. Ch.
+  2025-16 (HB 615) had rewritten the disclosure on 1 July 2025 to permit notice
+  in person, by mail, or by e-mail under §83.505.
+
+  A test that compares our copy to our copy proves only that we are consistent.
+*/
 const EXPECTED_PARAGRAPHS = [
-  "YOUR LEASE REQUIRES PAYMENT OF CERTAIN DEPOSITS. THE LANDLORD MAY TRANSFER ADVANCE RENTS TO THE LANDLORD'S ACCOUNT AS THEY ARE DUE AND WITHOUT NOTICE. WHEN YOU MOVE OUT, YOU MUST GIVE THE LANDLORD YOUR NEW ADDRESS SO THAT THE LANDLORD CAN SEND YOU NOTICES REGARDING YOUR DEPOSIT. THE LANDLORD MUST MAIL YOU NOTICE, WITHIN 30 DAYS AFTER YOU MOVE OUT, OF THE LANDLORD'S INTENT TO IMPOSE A CLAIM AGAINST THE DEPOSIT. IF YOU DO NOT REPLY TO THE LANDLORD STATING YOUR OBJECTION TO THE CLAIM WITHIN 15 DAYS AFTER RECEIPT OF THE LANDLORD'S NOTICE, THE LANDLORD WILL COLLECT THE CLAIM AND MUST MAIL YOU THE REMAINING DEPOSIT, IF ANY.",
-  'IF THE LANDLORD FAILS TO TIMELY MAIL YOU NOTICE, THE LANDLORD MUST RETURN THE DEPOSIT BUT MAY LATER FILE A LAWSUIT AGAINST YOU FOR DAMAGES. IF YOU FAIL TO TIMELY OBJECT TO A CLAIM, THE LANDLORD MAY COLLECT FROM THE DEPOSIT, BUT YOU MAY LATER FILE A LAWSUIT CLAIMING A REFUND.',
+  "YOUR RENTAL AGREEMENT REQUIRES PAYMENT OF CERTAIN DEPOSITS. THE LANDLORD MAY TRANSFER ADVANCE RENTS TO THE LANDLORD'S ACCOUNT AS THEY ARE DUE AND WITHOUT NOTICE. WHEN YOU MOVE OUT, YOU MUST GIVE THE LANDLORD YOUR NEW ADDRESS SO THAT THE LANDLORD CAN SEND YOU NOTICES REGARDING YOUR DEPOSIT. THE LANDLORD MUST PROVIDE YOU WRITTEN NOTICE IN PERSON, BY MAIL, OR BY E-MAIL IN ACCORDANCE WITH SECTION 83.505, FLORIDA STATUTES, WITHIN 30 DAYS AFTER YOU MOVE OUT, OF THE LANDLORD'S INTENT TO IMPOSE A CLAIM AGAINST THE DEPOSIT. IF YOU DO NOT REPLY TO THE LANDLORD STATING YOUR OBJECTION TO THE CLAIM WITHIN 15 DAYS AFTER RECEIPT OF THE LANDLORD'S WRITTEN NOTICE, THE LANDLORD WILL COLLECT THE CLAIM AND MUST MAIL YOU THE REMAINING DEPOSIT, IF ANY.",
+  'IF THE LANDLORD FAILS TO TIMELY PROVIDE YOU NOTICE, THE LANDLORD MUST RETURN THE DEPOSIT BUT MAY LATER FILE A LAWSUIT AGAINST YOU FOR DAMAGES. IF YOU FAIL TO TIMELY OBJECT TO A CLAIM, THE LANDLORD MAY COLLECT FROM THE DEPOSIT, BUT YOU MAY LATER FILE A LAWSUIT CLAIMING A REFUND.',
   'YOU SHOULD ATTEMPT TO INFORMALLY RESOLVE ANY DISPUTE BEFORE FILING A LAWSUIT. GENERALLY, THE PARTY IN WHOSE FAVOR A JUDGMENT IS RENDERED WILL BE AWARDED COSTS AND ATTORNEY FEES PAYABLE BY THE LOSING PARTY.',
   'THIS DISCLOSURE IS BASIC. PLEASE REFER TO PART II OF CHAPTER 83, FLORIDA STATUTES, TO DETERMINE YOUR LEGAL RIGHTS AND OBLIGATIONS.',
 ];
@@ -32,7 +43,7 @@ const notice = () => {
   const clause = FL_STATUTORY_DISCLOSURES.find((c) => c.slug === 'deposit.statutory-notice');
 
   if (!clause) {
-    throw new Error('The §83.49(3)(a) notice clause is missing from the library entirely.');
+    throw new Error('The §83.49(2)(d) notice clause is missing from the library entirely.');
   }
 
   return clause;
@@ -81,8 +92,17 @@ describe('the statutory deposit notice', () => {
 
     expect(source.verbatimRequired).toBe(true);
 
-    // Transcribed from an executed lease, not read off the statute book.
-    // Promoting it on the strength of looking right is the failure this guards.
-    expect(source.verbatimVerifiedAt).toBeNull();
+    /*
+      This assertion used to require the date to be NULL, with a comment saying
+      the text had been transcribed from an executed lease rather than read off
+      the statute book and must not be promoted on the strength of looking
+      right. That guard was correct, and it was correct for a real reason: the
+      text WAS wrong.
+
+      It has now been read off §83.49 (2 September 2026), so the date is set —
+      and the guard inverts. What it protects now is that nobody clears the
+      date, or sets one without changing the text it certifies.
+    */
+    expect(source.verbatimVerifiedAt).toBe('2026-09-02');
   });
 });
