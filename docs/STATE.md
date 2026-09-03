@@ -410,6 +410,59 @@ passed, or appeared to:
 
 ## Open threads
 
+### An election with one option is a term
+
+§83.595(4) prescribes a separate addendum in "substantially the following form",
+and that form has **two checkboxes** — agree, and do not agree. We shipped only
+the first. A document offering one option is not a choice.
+
+The earlier review raised this as a question for counsel. Reading the statute
+settled it: the two boxes are in the prescribed form, plainly. The remedy of
+failing is severe — no election means no liquidated damages, and the landlord
+falls back to §83.595(1)-(3) actual damages with a duty to mitigate. On the live
+matter that is $13,800.
+
+"Substantially" gives the WORDING room. It does not give the STRUCTURE room:
+two options and a way to pick between them is what makes it an election at all.
+
+### Two provisions demand exact words; four were marked as if they did
+
+Verified by reading each provision's introducing phrase:
+
+```
+§83.49(2)(d)  "Contain the following disclosure"      VERBATIM
+§404.056(5)   "shall contain the following language"  VERBATIM
+§83.49(3)(a)  "substantially the following form"      safe harbour
+§83.505       "substantially the following form"      safe harbour
+§83.512       "substantially the following form"      safe harbour
+§83.595(4)    "substantially the following form"      safe harbour
+§68.065(4)    "substantially as follows"              safe harbour
+```
+
+The flood disclosure was marked `verbatimRequired: true` and is not. The
+distinction decides what a diff MEANS: for the two verbatim provisions any
+difference is a compliance failure; for the rest it is drift worth reviewing.
+Marking everything verbatim makes every amendment look like an emergency, which
+is how a signal gets ignored.
+
+Lead paint stays verbatim and deliberately UNVERIFIED: HUD's 24 C.F.R.
+§35.92(b)(1) and EPA's 40 C.F.R. §745.113(b)(1) were duplicative for 28 years
+until EPA added "known" in November 2024 and HUD did not conform. One canonical
+string is now non-conforming to one agency. That is counsel's call.
+
+### The rule pack now records when it was last read off the statute
+
+All nine figures compared against §83.49(3)(a), §83.53(2), §83.575(1) and
+§83.595(4) on 2026-09-02 — all correct, now that the entry figure is fixed.
+`verifiedAt` sits on the pack with the URLs and a pointer to the Legislature's
+own table of section changes, `SecChangesTab{YY}.pdf`. Effective dates are not
+on the statute pages; they live in the session law at laws.flrules.org.
+
+§83.575(1) turned out to carry a reciprocity condition — a lease requiring
+tenant notice must also require the landlord to give notice under §83.56(4) —
+and our clause already satisfied it.
+
+
 ### The verbatim test compared our copy to our copy
 
 `statutory-disclosures.test.ts` asserted that `RADON_STATUTORY_TEXT` equalled a

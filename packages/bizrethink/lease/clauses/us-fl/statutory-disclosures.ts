@@ -137,7 +137,10 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     source: {
       kind: 'statute',
       citation: 'Fla. Stat. §83.512',
-      verbatimRequired: true,
+      // §83.512 says "substantially the following form" — a safe harbour, not a
+      // transcription duty. Marking it verbatim made every future amendment
+      // look like a compliance failure rather than drift worth reviewing.
+      verbatimRequired: false,
       verbatimVerifiedAt: null,
     },
     status: 'draft',
