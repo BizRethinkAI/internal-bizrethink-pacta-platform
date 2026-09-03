@@ -329,6 +329,21 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     asserts: ['early-termination-election'],
   },
 
+  /*
+    Rule 4 used to read "No water-filled furniture may be kept at the Premises."
+
+    §83.535 says a landlord may NOT prohibit a flotation bedding system that
+    complies with the building code, so the rule was void under §83.47(1)(a)
+    and carried §83.47(2) damages exposure for including it.
+
+    Read off the statute on 2026-09-03:
+    https://www.flsenate.gov/Laws/Statutes/2025/0083.535
+
+    The statute runs the other way from how the rule assumed. The tenant's
+    insurance duty and the loss-payable clause to the owner arise BY STATUTE —
+    banning the bed forfeited a protection rather than creating one. The rule
+    now recites what the statute already gives.
+  */
   {
     slug: 'rules.house-rules',
     version: 1,
@@ -339,7 +354,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     heading: 'House Rules',
     // Real rules with real content, replacing three headings that read "N/A"
     // and one labelled "Others" holding six substantive clauses.
-    body: "Tenant shall observe the following rules, which form part of this Lease:\n\n1. No garage, yard or estate sale may be held at the Premises without Landlord's prior written consent.\n2. Locks may not be changed, added or removed without Landlord's prior written consent; where consent is given, Tenant shall provide Landlord with a key.\n3. Nothing may be fixed to walls, woodwork or floors other than small nails or hooks for hanging pictures. Tenant is responsible for making good.\n4. No water-filled furniture may be kept at the Premises.\n5. Windows may not be covered with foil, paper or other reflective material.\n6. Water hoses must be fitted with an automatic shut-off nozzle. Leaks must be reported without delay.\n7. Patios, balconies, entrances and walkways may not be used for storage.\n8. No antenna or satellite dish may be installed without Landlord's prior written consent.\n9. The landscaping may not be altered without Landlord's prior written consent.\n10. No window-mounted air-conditioning unit or window-mounted fan may be installed, except temporarily while the central system is out of order and on notice to Landlord.\n11. Tenant, occupants and guests shall not cause a nuisance or unreasonably disturb neighbours.\n12. Waste must be placed in the receptacles provided and put out for collection at the times set by the collection service.",
+    body: "Tenant shall observe the following rules, which form part of this Lease:\n\n1. No garage, yard or estate sale may be held at the Premises without Landlord's prior written consent.\n2. Locks may not be changed, added or removed without Landlord's prior written consent; where consent is given, Tenant shall provide Landlord with a key.\n3. Nothing may be fixed to walls, woodwork or floors other than small nails or hooks for hanging pictures. Tenant is responsible for making good.\n4. A flotation bedding system may be used only if it complies with applicable building codes. Tenant shall carry flotation insurance in Tenant's name, as is standard in the industry, in an amount reasonable to protect Tenant and Landlord against personal injury and property damage, and the policy shall carry a loss payable clause to the owner of the building.\n5. Windows may not be covered with foil, paper or other reflective material.\n6. Water hoses must be fitted with an automatic shut-off nozzle. Leaks must be reported without delay.\n7. Patios, balconies, entrances and walkways may not be used for storage.\n8. No antenna or satellite dish may be installed without Landlord's prior written consent.\n9. The landscaping may not be altered without Landlord's prior written consent.\n10. No window-mounted air-conditioning unit or window-mounted fan may be installed, except temporarily while the central system is out of order and on notice to Landlord.\n11. Tenant, occupants and guests shall not cause a nuisance or unreasonably disturb neighbours.\n12. Waste must be placed in the receptacles provided and put out for collection at the times set by the collection service.",
     source: drafted(),
     status: 'draft',
     includeWhen: null,
