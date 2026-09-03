@@ -166,12 +166,23 @@ describe('library invariants', () => {
     expect(FL_STATUTORY_DISCLOSURES.every((c) => c.status !== 'published')).toBe(true);
   });
 
+  /*
+    Radon and the deposit notice were read off the statute on 2026-09-02 and
+    now carry a date, so this invariant needs a clause that has NOT been —
+    the flood disclosure, whose text is still unchecked.
+  */
   it('refuses to publish statutory text with no verification date', () => {
-    const unverified = { ...bySlug('disclosure.radon'), status: 'published' as const };
+    const unverified = { ...bySlug('disclosure.flood'), status: 'published' as const };
 
     expect(assertPublishable(unverified)).toEqual([
-      'disclosure.radon: statutory text published without a verification date',
+      'disclosure.flood: statutory text published without a verification date',
     ]);
+  });
+
+  it('lets verified statutory text publish', () => {
+    const verified = { ...bySlug('disclosure.radon'), status: 'published' as const };
+
+    expect(assertPublishable(verified)).toEqual([]);
   });
 });
 

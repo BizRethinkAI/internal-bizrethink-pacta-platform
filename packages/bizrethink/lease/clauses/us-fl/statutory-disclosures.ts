@@ -75,10 +75,27 @@ For purposes of this disclosure, "flooding" means a general or temporary conditi
  * is the point of the split, not an afterthought — a disclosure that drifts
  * by a word is a disclosure that has not been given.
  */
-const DEPOSIT_STATUTORY_NOTICE = [
-  "YOUR LEASE REQUIRES PAYMENT OF CERTAIN DEPOSITS. THE LANDLORD MAY TRANSFER ADVANCE RENTS TO THE LANDLORD'S ACCOUNT AS THEY ARE DUE AND WITHOUT NOTICE. WHEN YOU MOVE OUT, YOU MUST GIVE THE LANDLORD YOUR NEW ADDRESS SO THAT THE LANDLORD CAN SEND YOU NOTICES REGARDING YOUR DEPOSIT. THE LANDLORD MUST MAIL YOU NOTICE, WITHIN 30 DAYS AFTER YOU MOVE OUT, OF THE LANDLORD'S INTENT TO IMPOSE A CLAIM AGAINST THE DEPOSIT. IF YOU DO NOT REPLY TO THE LANDLORD STATING YOUR OBJECTION TO THE CLAIM WITHIN 15 DAYS AFTER RECEIPT OF THE LANDLORD'S NOTICE, THE LANDLORD WILL COLLECT THE CLAIM AND MUST MAIL YOU THE REMAINING DEPOSIT, IF ANY.",
-  'IF THE LANDLORD FAILS TO TIMELY MAIL YOU NOTICE, THE LANDLORD MUST RETURN THE DEPOSIT BUT MAY LATER FILE A LAWSUIT AGAINST YOU FOR DAMAGES. IF YOU FAIL TO TIMELY OBJECT TO A CLAIM, THE LANDLORD MAY COLLECT FROM THE DEPOSIT, BUT YOU MAY LATER FILE A LAWSUIT CLAIMING A REFUND.',
-  'YOU SHOULD ATTEMPT TO INFORMALLY RESOLVE ANY DISPUTE BEFORE FILING A LAWSUIT. GENERALLY, THE PARTY IN WHOSE FAVOR A JUDGMENT IS RENDERED WILL BE AWARDED COSTS AND ATTORNEY FEES PAYABLE BY THE LOSING PARTY.', // legal-language-ok: verbatim Fla. Stat. §83.49(3)(a) text; the statute advises, not us, and a paraphrase does not discharge the obligation
+/*
+  Fla. Stat. §83.49(2)(d), read off the statute on 2 September 2026:
+  https://www.flsenate.gov/Laws/Statutes/2025/0083.49
+
+  §83.49(2)(d) says "Contain the following disclosure" — no "substantially".
+  It is one of only TWO provisions in this library that demand exact words;
+  radon is the other. Everything else Florida prescribes is a safe-harbour
+  form, which is a materially weaker obligation.
+
+  WHAT WAS HERE BEFORE WAS THE PRE-2025 TEXT. Ch. 2025-16 (HB 615), effective
+  1 July 2025, rewrote this disclosure to permit notice in person, by mail, or
+  by e-mail under the new §83.505. Our copy still said MAIL, still opened
+  "YOUR LEASE" where the statute says "YOUR RENTAL AGREEMENT", and dropped
+  WRITTEN from two places. It had been transcribed from an executed lease
+  rather than read off the statute book, and that lease predated the amendment.
+*/
+export const DEPOSIT_STATUTORY_NOTICE = [
+  "YOUR RENTAL AGREEMENT REQUIRES PAYMENT OF CERTAIN DEPOSITS. THE LANDLORD MAY TRANSFER ADVANCE RENTS TO THE LANDLORD'S ACCOUNT AS THEY ARE DUE AND WITHOUT NOTICE. WHEN YOU MOVE OUT, YOU MUST GIVE THE LANDLORD YOUR NEW ADDRESS SO THAT THE LANDLORD CAN SEND YOU NOTICES REGARDING YOUR DEPOSIT. THE LANDLORD MUST PROVIDE YOU WRITTEN NOTICE IN PERSON, BY MAIL, OR BY E-MAIL IN ACCORDANCE WITH SECTION 83.505, FLORIDA STATUTES, WITHIN 30 DAYS AFTER YOU MOVE OUT, OF THE LANDLORD'S INTENT TO IMPOSE A CLAIM AGAINST THE DEPOSIT. IF YOU DO NOT REPLY TO THE LANDLORD STATING YOUR OBJECTION TO THE CLAIM WITHIN 15 DAYS AFTER RECEIPT OF THE LANDLORD'S WRITTEN NOTICE, THE LANDLORD WILL COLLECT THE CLAIM AND MUST MAIL YOU THE REMAINING DEPOSIT, IF ANY.",
+  'IF THE LANDLORD FAILS TO TIMELY PROVIDE YOU NOTICE, THE LANDLORD MUST RETURN THE DEPOSIT BUT MAY LATER FILE A LAWSUIT AGAINST YOU FOR DAMAGES. IF YOU FAIL TO TIMELY OBJECT TO A CLAIM, THE LANDLORD MAY COLLECT FROM THE DEPOSIT, BUT YOU MAY LATER FILE A LAWSUIT CLAIMING A REFUND.',
+  // legal-language-ok: verbatim Fla. Stat. §83.49(2)(d); the statute advises, not us, and a paraphrase does not discharge the obligation
+  'YOU SHOULD ATTEMPT TO INFORMALLY RESOLVE ANY DISPUTE BEFORE FILING A LAWSUIT. GENERALLY, THE PARTY IN WHOSE FAVOR A JUDGMENT IS RENDERED WILL BE AWARDED COSTS AND ATTORNEY FEES PAYABLE BY THE LOSING PARTY.',
   'THIS DISCLOSURE IS BASIC. PLEASE REFER TO PART II OF CHAPTER 83, FLORIDA STATUTES, TO DETERMINE YOUR LEGAL RIGHTS AND OBLIGATIONS.',
 ].join('\n\n');
 
@@ -96,7 +113,9 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
       kind: 'statute',
       citation: 'Fla. Stat. §404.056(5)',
       verbatimRequired: true,
-      verbatimVerifiedAt: null,
+      // Compared word for word against §404.056(5) on 2 September 2026 and
+      // found identical: https://www.flsenate.gov/Laws/Statutes/2025/404.056
+      verbatimVerifiedAt: '2026-09-02',
     },
     status: 'draft',
     requiredBy: 'Fla. Stat. §404.056(5)',
@@ -160,9 +179,12 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     body: DEPOSIT_STATUTORY_NOTICE,
     source: {
       kind: 'statute',
-      citation: 'Fla. Stat. §83.49(3)',
+      // (3) is the notice of intent to impose a claim — a different document,
+      // and only "substantially the following form". The all-caps disclosure
+      // below is (2)(d), which is verbatim.
+      citation: 'Fla. Stat. §83.49(2)(d)',
       verbatimRequired: true,
-      verbatimVerifiedAt: null,
+      verbatimVerifiedAt: '2026-09-02',
     },
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.49(3)',
