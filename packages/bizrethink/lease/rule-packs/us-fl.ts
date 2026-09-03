@@ -11,6 +11,8 @@
 export type RuleSeverity = 'blocks' | 'warns';
 
 export type RulePack = {
+  /** ISO date the figures were last read off the statute book. */
+  verifiedAt: string;
   jurisdiction: string;
   version: number;
 
@@ -59,6 +61,27 @@ export type RulePack = {
 export const US_FL: RulePack = {
   jurisdiction: 'US-FL',
   version: 1,
+  /*
+    ISO date on which every figure below was compared against the statute it
+    cites, on flsenate.gov. Not decoration: the entry-notice figure was the
+    PRE-2013 twelve hours, sitting under a doc comment that stated it
+    confidently, agreed with by two passing tests. Nothing in the repository
+    could have caught it, because nothing in the repository had ever looked
+    outside itself.
+
+    Checked 2026-09-02 against:
+      §83.49(3)(a)  https://www.flsenate.gov/Laws/Statutes/2025/0083.49
+      §83.53(2)     https://www.flsenate.gov/Laws/Statutes/2025/0083.53
+      §83.575(1)    https://www.flsenate.gov/Laws/Statutes/2025/0083.575
+      §83.595(4)    https://www.flsenate.gov/Laws/Statutes/2025/0083.595
+
+    When re-checking, the Legislature's own table of what each session changed
+    is the place to start:
+      https://www.leg.state.fl.us/Statutes/SecChangesTab{YY}.pdf
+    Effective dates are NOT on the statute pages — they live in the session law
+    at laws.flrules.org.
+  */
+  verifiedAt: '2026-09-02',
 
   deposit: {
     maxReturnDays: 15,
