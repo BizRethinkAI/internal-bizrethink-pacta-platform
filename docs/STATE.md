@@ -410,6 +410,67 @@ passed, or appeared to:
 
 ## Open threads
 
+### The page said what a clause was, never why it was there
+
+The clause library showed `parties.recital · v2 · parties · Unapproved`. True,
+and useless — nothing on it distinguished a disclosure Florida compels from a
+house rule somebody invented on a Tuesday. A reviewer had no way to know where
+to spend an hour.
+
+The provenance was already reaching the page. The router sent `sourceKind`,
+`citation`, `verbatimRequired` and `codeStatus`; the page's own type declared
+only slug, version, section, heading, body and requiredBy, **so it received all
+of it and dropped it**. A display gap, not missing data.
+
+Each clause now says which of three things it is, from the statutory walk:
+
+```
+COMPELLED      a statute requires this text in a lease   (6 of 57)
+IMPLEMENTS     gives effect to a statute that regulates
+               conduct — the statute did not dictate the words
+DISCRETIONARY  ours. No statute requires it.
+```
+
+Plus how hard the statute prescribes, and whether the text has been read off the
+statute book and when. `whyThisClause` lives in the library rather than the UI,
+and `fl-mandatory-coverage.test.ts` now reads the same list, so the compelled set
+has one source. The version it replaced was assembled from recollection: it
+cited §83.49(3) for the all-caps disclosure — that is the claim notice, the
+disclosure is (2)(d) — and had never heard of §83.67(5).
+
+**The number worth keeping visible is the discretionary one.** Most of a lease is
+not statute. A test fails if it ever drops below thirty, because that would mean
+drafting had quietly reclassified itself as law.
+
+### A library that could be approved but never sent
+
+The approval form asks for an attorney's name and bar number. The page sat
+behind `_authenticated+`, and `approve` calls `assertAccess`, so the only way to
+get a lawyer to it was to add them to the organisation as a user. Meanwhile the
+product had had exactly this mechanism for tenants since the reviewer page
+shipped.
+
+`clauseLibrary.share` mints a token; `/clause-review/:token` renders the library
+with its provenance and no account. Three things carried over from the
+lease-review link, all of them lessons rather than design:
+
+- **Revocable from the start.** The tenant link shipped without revoke and had
+  to be retrofitted after two live links for the same person existed.
+- **`libraryFingerprint` pins the library as sent**, so a reviewer opening it
+  days later is told the text moved rather than discovering it.
+- **One error for absent, revoked and expired.** A reviewer cannot act on the
+  difference, and distinguishing them confirms to anyone holding a guessed token
+  that it once existed.
+
+**Read-only, deliberately.** Recording an approval stays inside the organisation,
+where it is attributable to someone who signed in. Sending a link should not be
+the same act as granting write access.
+
+The page leads with the thing neither page said before: these clauses were
+drafted in-house, no attorney has reviewed them, and only six of fifty-seven are
+compelled by statute.
+
+
 ### One element of six, and a remedy left on the table
 
 **The federal lead disclosure is six things.** 40 C.F.R. §745.113(b) and

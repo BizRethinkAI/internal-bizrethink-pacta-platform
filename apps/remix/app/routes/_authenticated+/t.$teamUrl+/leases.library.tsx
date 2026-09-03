@@ -66,6 +66,11 @@ type ClauseRow = {
   sourceKind: string;
   verbatimRequired: boolean;
   citation: string | null;
+  verbatimVerifiedAt: string | null;
+  why:
+    | { kind: 'compelled'; citation: string; appliesWhen: string }
+    | { kind: 'implements'; citation: string }
+    | { kind: 'discretionary' };
   effectiveStatus: string;
   fingerprint: string;
   approval: {
@@ -184,8 +189,40 @@ const ClauseRowItem = ({
             <p className="font-medium">{clause.heading}</p>
             <p className="mt-0.5 font-mono text-muted-foreground text-xs">
               {clause.slug} · v{clause.version} · {clause.section}
-              {clause.requiredBy && ` · required by ${clause.requiredBy}`}
             </p>
+            {/*
+              WHY THIS CLAUSE EXISTS. The page used to show the slug and the
+              section — true, and useless to a reviewer, who cannot tell a
+              disclosure Florida compels from a house rule somebody invented.
+
+              Three answers, from the 2026-09-03 statutory walk. Most of the
+              library is discretionary, and saying so is the point: it tells a
+              lawyer where their hour is worth spending.
+            */}
+            <p className="mt-1 text-xs">
+              {clause.why.kind === 'compelled' && (
+                <span className="text-[#a2560c] dark:text-[#d99a4e]">
+                  Required by law — {clause.why.citation}. {clause.why.appliesWhen}
+                </span>
+              )}
+              {clause.why.kind === 'implements' && (
+                <span className="text-[#1f3a5f] dark:text-[#8fb3d9]">
+                  Implements {clause.why.citation}. The statute does not dictate this wording.
+                </span>
+              )}
+              {clause.why.kind === 'discretionary' && (
+                <span className="text-muted-foreground">Our drafting. No statute requires this clause.</span>
+              )}
+            </p>
+            <p className="mt-0.5 text-muted-foreground text-xs">
+              {clause.sourceKind === 'statute'
+                ? clause.verbatimRequired
+                  ? clause.verbatimVerifiedAt
+                    ? `Prescribed text — read off the statute on ${clause.verbatimVerifiedAt}.`
+                    : 'Prescribed text — NOT yet checked against the statute book.'
+                  : 'Safe-harbour form — the statute asks for "substantially" this.'
+                : 'Drafted in-house. No attorney has reviewed these words.'}
+            </p>{' '}
           </div>
         </div>
 

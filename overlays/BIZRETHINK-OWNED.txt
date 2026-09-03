@@ -49,6 +49,13 @@ apps/remix/app/components/general/lease/*.tsx
 apps/remix/app/routes/_recipient+/lease-review.$token.tsx
 apps/remix/app/routes/_recipient+/lease-review.$token.document.tsx
 
+# Counsel's side of the same loop. The clause library was always meant to be
+# read by an attorney — the approval form asks for a bar number — but the page
+# sat behind an authenticated route with no way to send it, so the only path
+# was to add the lawyer to the organisation. Read-only by design: sending a
+# link should not be the same act as granting write access.
+apps/remix/app/routes/_recipient+/clause-review.$token.tsx
+
 # ── BizRethink admin pages ───────────────────────────────────────────────────
 # Instance configuration we added, each created by its own overlay-phase commit
 # and none of it present upstream — Documenso administers none of these things.

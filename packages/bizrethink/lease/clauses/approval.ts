@@ -124,3 +124,21 @@ export const unapprovedSlugs = (clauses: Clause[], approvals: ClauseApproval[]):
     .filter((clause) => effectiveClauseStatus(clause, bySlug.get(clause.slug) ?? null) !== 'published')
     .map((clause) => clause.slug);
 };
+
+/**
+ * A fingerprint of the whole library, for pinning a counsel link.
+ *
+ * `clauseFingerprint` answers "has THIS clause changed since it was approved".
+ * This answers "has ANY of it changed since the link was sent" — which is what
+ * a reviewer opening a link days later needs to know, because they were sent a
+ * document, not a clause.
+ */
+export const libraryFingerprint = (clauses: Clause[]): string =>
+  createHash('sha256')
+    .update(
+      clauses
+        .map((clause) => clauseFingerprint(clause))
+        .sort()
+        .join('\n'),
+    )
+    .digest('hex');
