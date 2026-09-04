@@ -147,6 +147,9 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   inspectionsPerYear: 2,
 
   repairThresholdUsd: 150,
+  // A ceiling on the year, not just the item — ten repairs just under the
+  // threshold is real money, and each one is individually 'minor'.
+  repairAnnualCapUsd: 600,
   lockoutFeeUsd: 50,
   keyReplacementFeeUsd: 50,
   inspectionRefusalFeeUsd: 75,
