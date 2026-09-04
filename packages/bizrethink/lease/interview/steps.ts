@@ -635,6 +635,14 @@ export const FL_INTERVIEW: InterviewStep[] = [
         showWhen: singleFamilyOrDuplex,
         required: true,
       },
+      {
+        name: 'repairAnnualCapUsd',
+        target: 'value',
+        kind: 'usd',
+        label: 'Across a year, what is the most the tenant should have to spend on those repairs?',
+        help: 'A ceiling on the total, not the individual repair. Without one, ten repairs just under the threshold add up to real money and each is individually "minor".',
+        required: true,
+      },
     ],
   },
 

@@ -89,7 +89,7 @@ export const FL_MAINTENANCE: Clause[] = [
     heading: 'Allocation of Maintenance for a Single-Family Home',
     // The written modification §83.51(2) expressly permits. Its existence in
     // the document is what makes the clauses below effective.
-    body: "The Premises are a {{propertyTypeLabel}}. As permitted by Fla. Stat. §83.51(2), Landlord and Tenant agree in writing that Tenant is responsible for the matters allocated to Tenant in this section, being extermination of rats, mice, roaches, ants, wood-destroying organisms and bedbugs, replacement of keys, removal of garbage and maintenance of outside receptacles. This allocation does not affect Landlord's obligations under Fla. Stat. §83.51(1).",
+    body: "The Premises are a {{propertyTypeLabel}}. As permitted by Fla. Stat. §83.51(2), Landlord and Tenant agree in writing that Tenant is responsible for the matters allocated to Tenant in this section, being extermination of rats, mice, roaches, ants and bedbugs, replacement of keys, removal of garbage and maintenance of outside receptacles. Extermination of wood-destroying organisms remains Landlord's responsibility and is not allocated to Tenant. This allocation does not affect Landlord's obligations under Fla. Stat. §83.51(1).",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => alterableUnder8351(facts.propertyType),
@@ -112,6 +112,39 @@ export const FL_MAINTENANCE: Clause[] = [
     garage puts CO alarms in the same conversation, and this property burns
     natural gas.
   */
+  /*
+    §83.63 already gives the tenant termination and rent abatement when the
+    premises are damaged, and it is complete on that question — read on
+    2026-09-04, so a casualty clause would add nothing:
+    https://www.flsenate.gov/Laws/Statutes/2025/0083.63
+
+    What the statute says NOTHING about is who acts before and after. Verified:
+    it contains no provision on securing the property, clearing debris, or
+    preparing for a storm.
+
+    On a Florida property with a pool and a tenant-maintained yard that silence
+    had an owner by default — the association clause, which gives the tenant
+    fourteen days and a bill for fronds a hurricane brought down. Suspending the
+    yard and association duties during a declared emergency is the point of this
+    clause; the rest is housekeeping.
+  */
+  {
+    slug: 'maintenance.storm',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'maintenance',
+    sortKey: 45,
+    heading: 'Storms and Severe Weather',
+    body: "On a hurricane or tropical storm warning for the area, Tenant shall secure or bring indoors outdoor furniture, garden equipment, pool equipment and other loose items at the Premises, and shall close and secure windows and doors. Landlord is responsible for the cost of storm damage and for the removal of storm debris beyond routine yard work, including fallen trees and limbs and the clearing of the pool. Tenant's obligations for yard work, and any obligation to cure an association notice, are suspended for the duration of a declared state of emergency affecting the Premises and for a reasonable period afterwards. Nothing in this clause limits Tenant's rights under Fla. Stat. §83.63 where the Premises are damaged.",
+    source: drafted(),
+    status: 'draft',
+    includeWhen: null,
+    variables: [],
+    supersedes: [],
+    asserts: ['storm-allocation'],
+  },
+
   {
     slug: 'maintenance.detectors',
     version: 1,
@@ -146,11 +179,14 @@ export const FL_MAINTENANCE: Clause[] = [
       rather than open-ended, and the non-waivable carve-out is stated in the
       clause instead of being left to inference.
     */
-    body: "Tenant shall carry out and pay for minor repairs and replacements to non-structural items at the Premises where the cost of the individual repair does not exceed {{repairThresholdUsd}}, including items such as tap washers and similar plumbing hardware, water filters, air-conditioning filters, and light bulbs. Smoke and carbon monoxide alarms are dealt with separately, and the devices themselves remain Landlord's responsibility. This obligation does not extend to any matter falling within Fla. Stat. §83.51(1), which remains Landlord's responsibility regardless of cost, and does not limit Tenant's liability for damage caused by Tenant's negligence or misuse, which is not capped by that figure.",
+    body: "Tenant shall carry out and pay for minor repairs and replacements to non-structural items at the Premises where the cost of the individual repair does not exceed {{repairThresholdUsd}}, including items such as tap washers and similar plumbing hardware, water filters, air-conditioning filters, and light bulbs. Smoke and carbon monoxide alarms are dealt with separately, and the devices themselves remain Landlord's responsibility. Tenant's total liability under this clause may not exceed {{repairAnnualCapUsd}} in any 12-month period, and a single defect is a single repair however many parts or visits it takes to put right. This obligation does not extend to any matter falling within Fla. Stat. §83.51(1), which remains Landlord's responsibility regardless of cost, and does not limit Tenant's liability for damage caused by Tenant's negligence or misuse, which is not capped by that figure.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => alterableUnder8351(facts.propertyType),
-    variables: [{ name: 'repairThresholdUsd', type: 'usd', label: 'Tenant repair threshold', required: true }],
+    variables: [
+      { name: 'repairThresholdUsd', type: 'usd', label: 'Tenant repair threshold', required: true },
+      { name: 'repairAnnualCapUsd', type: 'usd', label: 'Annual cap on tenant repairs', required: true },
+    ],
     supersedes: [],
     asserts: ['tenant-repair-threshold'],
   },
