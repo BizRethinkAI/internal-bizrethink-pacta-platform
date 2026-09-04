@@ -198,6 +198,21 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     asserts: ['landlord-entry'],
   },
 
+  /*
+    This clause used to end "the charge set out in the administrative charges
+    section applies". That charge was the $75 inspection-refusal fee, deleted
+    because a flat sum for DECLINING entry contemplates no loss — a penalty
+    rather than liquidated damages. The reference was left behind, so the lease
+    threatened a charge that existed nowhere in the document.
+
+    Two independent adversarial reviews found it within a day of each other, both
+    by reading the rendered lease rather than the diff. Deleting a clause is not
+    finished until you have grepped for what points at it.
+
+    §83.56(2) is the remedy a landlord actually has: seven days to cure a
+    noncompliance. "Unreasonably" matters too — the old sentence was strict, so
+    a tenant in hospital owed the fee.
+  */
   {
     slug: 'access.annual-inspection',
     version: 1,
@@ -206,7 +221,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'access',
     sortKey: 20,
     heading: 'Periodic Inspection',
-    body: 'Landlord may inspect the Premises {{inspectionsPerYear}} times in each year of the term, on the notice set out above. Tenant shall permit access at the arranged time. Where Tenant does not, the charge set out in the administrative charges section applies.',
+    body: 'Landlord may inspect the Premises {{inspectionsPerYear}} times in each year of the term, on the notice set out above. Tenant shall permit access at the arranged time. Where Tenant unreasonably refuses access for an inspection arranged on proper notice, that is a noncompliance to which Fla. Stat. §83.56(2) applies.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
