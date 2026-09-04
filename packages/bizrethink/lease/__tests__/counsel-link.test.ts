@@ -76,3 +76,38 @@ describe('the counsel link opens without an account', () => {
     expect(open).not.toMatch(/BizrethinkLeaseMatter/);
   });
 });
+
+/*
+  The page that sends it. A mutation nobody can reach is not a feature — the
+  share procedure existed for a day with no button calling it.
+*/
+describe('the library page can actually send the link', () => {
+  const page = readFileSync(
+    new URL('../../../../apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.library.tsx', import.meta.url),
+    'utf8',
+  );
+
+  it('offers a control that creates one', () => {
+    expect(page).toMatch(/Send it to counsel/);
+    expect(page).toMatch(/clauseLibrary\.share\.useMutation/);
+  });
+
+  it('collects the name and email the mutation requires', () => {
+    expect(page).toMatch(/reviewerName:/);
+    expect(page).toMatch(/reviewerEmail:/);
+  });
+
+  it('lists existing links and can revoke them', () => {
+    expect(page).toMatch(/clauseLibrary\.listShares\.useQuery/);
+    expect(page).toMatch(/revokeShare\.mutate/);
+  });
+
+  it('names the current link, because identical cards got copied wrong before', () => {
+    expect(page).toMatch(/Current link — send this one/);
+    expect(page).toMatch(/Superseded/);
+  });
+
+  it('builds the URL the public route actually serves', () => {
+    expect(page).toMatch(/\/clause-review\/\$\{token\}/);
+  });
+});

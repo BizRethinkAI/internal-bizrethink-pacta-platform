@@ -1598,6 +1598,33 @@ export const leaseBuilderRouter = router({
      * and a link that cannot be revoked is a link that outlives the deal.
      * Closing rather than deleting: the row is the record of who was sent what.
      */
+    /**
+     * The counsel links that exist, newest first.
+     *
+     * Ordered deliberately. Two live links for the same person rendered as
+     * identical cards on the tenant reviewer page — same name, same email, same
+     * expiry — and the wrong one got copied. The page names the current one.
+     */
+    listShares: authenticatedProcedure.input(z.object({ organisationId: z.string() })).query(async ({ ctx, input }) => {
+      await assertAccess(input.organisationId, ctx.user.id);
+
+      const shares = await prisma.bizrethinkLibraryReview.findMany({
+        where: { organisationId: input.organisationId },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          token: true,
+          status: true,
+          reviewerName: true,
+          reviewerEmail: true,
+          expiresAt: true,
+          createdAt: true,
+        },
+      });
+
+      return { shares };
+    }),
+
     revokeShare: authenticatedProcedure
       .input(z.object({ organisationId: z.string(), shareId: z.string() }))
       .mutation(async ({ ctx, input }) => {
