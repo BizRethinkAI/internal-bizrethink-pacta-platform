@@ -72,6 +72,24 @@ export const FL_BOILERPLATE: Clause[] = [
     asserts: ['tenant-notice-address'],
   },
 
+  /*
+    §83.505 prescribes TWO MIRRORED ELECTIONS — landlord and tenant — each with
+    two checkboxes, its own designated address and its own revocation sentence.
+    Read off the statute on 2026-09-03:
+    https://www.flsenate.gov/Laws/Statutes/2025/0083.505
+
+    What we had asserted both parties had elected: "Landlord elects to receive
+    notices by email at: X". A tenant who did not want e-mail had no way to say
+    so, and a party who never chose was recorded as having chosen.
+
+    This is the THIRD clause found with one option where the statute prescribes
+    two, after §83.595(4). The pattern is ours, not Florida's: offered a choice,
+    we rendered the branch we expected instead of the choice.
+
+    Getting this wrong is not cosmetic. Without a valid addendum, e-mail service
+    of a §83.56(3) three-day notice is invalid, and the deposit disclosure now
+    cross-references this section too.
+  */
   {
     slug: 'notices.electronic-delivery',
     version: 1,
@@ -89,7 +107,8 @@ export const FL_BOILERPLATE: Clause[] = [
       Offered only when elected. A landlord who does not want email notice
       should not be handed an addendum inviting it.
     */
-    body: 'Fla. Stat. §83.505 permits notices required under Part II of Chapter 83 to be delivered by email only where both parties agree in a signed addendum. This is that addendum. Election is voluntary. Either party may revoke it, or update the email address given, at any time by written notice to the other, and a revocation does not affect the validity of a notice already sent.\n\nLandlord elects to receive notices by email at: {{landlordNoticeEmails}}\n\nTenant elects to receive notices by email at: {{tenantNoticeEmails}}\n\nA notice sent by email is delivered when sent, unless it is returned as undeliverable. The sender shall keep a copy of the notice and evidence of its transmission.',
+    body: "Fla. Stat. §83.505 permits notices required under Part II of Chapter 83 to be delivered by e-mail only where both parties have signed an addendum agreeing to it and each has given a valid e-mail address. This is that addendum. THIS ELECTION IS VOLUNTARY. Either party may revoke it, or update the address given, at any time.\n\nLANDLORD ELECTION. Notices from a tenant may contain time-sensitive information about the tenant's housing. The election to receive notices from the tenant by e-mail is voluntary.\n[ ] I, {{landlordNames}}, the landlord or the landlord's agent, agree to receive notices required by this Lease or under Part II of Chapter 83, Florida Statutes, from the tenant by e-mail. I designate the following e-mail address for receipt of notices from the tenant: {{landlordNoticeEmails}}.\n[ ] I do not agree to receive notices by e-mail.\nI may revoke my agreement to receive notices by e-mail by providing written notice to the tenant, which is effective upon delivery and does not affect the validity of any notice already sent by e-mail. I may update my e-mail address at any time by providing written notice to the tenant specifying the new address, which takes effect upon delivery.\n\nTENANT ELECTION. Notices from a landlord may contain time-sensitive information about your housing. The election to receive notices from the landlord by e-mail is voluntary.\n[ ] I, {{tenantNames}}, the tenant, agree to receive notices required by this Lease or under Part II of Chapter 83, Florida Statutes, from the landlord by e-mail. I designate the following e-mail address for receipt of notices from the landlord: {{tenantNoticeEmails}}.\n[ ] I do not agree to receive notices by e-mail.\nI may revoke my agreement to receive notices by e-mail by providing written notice to the landlord, which is effective upon delivery and does not affect the validity of any notice already sent by e-mail. I may update my e-mail address at any time by providing written notice to the landlord specifying the new address, which takes effect upon delivery.\n\nA notice sent by e-mail is delivered when sent, unless it is returned to the sender as undeliverable. The sender shall keep a copy of the notice and evidence of its transmission.",
+
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.505',
@@ -102,6 +121,8 @@ export const FL_BOILERPLATE: Clause[] = [
         nothing. One address per signer already exists, and the party list
         already refuses two people sharing one.
       */
+      { name: 'landlordNames', type: 'string', label: 'Landlord name(s)', required: true },
+      { name: 'tenantNames', type: 'string', label: 'Tenant name(s)', required: true },
       { name: 'landlordNoticeEmails', type: 'string', label: 'Landlord notice addresses', required: true },
       { name: 'tenantNoticeEmails', type: 'string', label: 'Tenant notice addresses', required: true },
     ],

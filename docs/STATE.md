@@ -410,6 +410,81 @@ passed, or appeared to:
 
 ## Open threads
 
+### A clause whose defect was that it existed
+
+House rule 4 read *"No water-filled furniture may be kept at the Premises."*
+§83.535 says **"No landlord may prohibit a tenant from using a flotation bedding
+system"** that complies with the building code. Void under §83.47(1)(a), with
+§83.47(2) damages exposure for including it — and it was on a lease already out
+to a tenant.
+
+**No review of our own clauses could have found it.** Three adversarial passes
+read that rule and had nothing to say, because the rule is well drafted. Its
+defect is that it exists. Only walking the statute — asking of each section
+"does this constrain what a lease may say?" rather than "is our clause right?"
+— surfaced it.
+
+The statute also runs the opposite way to how the rule assumed: the tenant's
+flotation-insurance duty and the loss-payable clause to the owner arise BY
+STATUTE. Banning the bed forfeited a protection rather than creating one. The
+rule now recites what §83.535 already gives.
+
+### The third one-option election
+
+§83.505 prescribes TWO MIRRORED ELECTIONS — landlord and tenant — each with two
+checkboxes, its own designated address and its own revocation sentence. Ours
+asserted both parties had elected: *"Landlord elects to receive notices by email
+at: X"*. A tenant who did not want e-mail had no way to say so, and a party who
+never chose was recorded as having chosen.
+
+That is the third clause found with one option where the statute prescribes two,
+after §83.595(4). **The pattern is ours, not Florida's:** offered a choice, we
+rendered the branch we expected instead of the choice. Worth checking for
+directly the next time a statute prescribes a form.
+
+Not cosmetic — without a valid addendum, e-mail service of a §83.56(3) three-day
+notice is invalid, and the corrected §83.49 disclosure now cross-references this
+section.
+
+### What the statutory walk found, and what it corrected
+
+Walking Ch. 83 Part II end to end, plus the adjacent Florida chapters and the
+federal set, produced a required-clause list built independently of what we had.
+Diffing our 57 against it:
+
+**Compelled and present:** §404.056(5) radon, §83.50 landlord address, §83.512
+flood (correctly a separate document), §83.49(2)(d) deposit disclosure.
+
+**Compelled and short:** lead paint. 40 C.F.R. §745.113(b) and 24 C.F.R.
+§35.92(b) require six elements — warning statement, lessor disclosure of known
+paint, records list, lessee acknowledgment, agent statement, signatures. We have
+the first. §4852d(b)(3) provides treble damages. Not triggered by a 2018 build,
+live for the library.
+
+**Optional but unlocks a remedy, and missing:** **§83.67(5)** — relief from the
+§715.104 duty to store abandoned property, available only if the lease carries a
+prescribed legend "printed or clearly stamped". §83.67 appears nowhere in the
+library. Also §83.575(2), whose liquidated damages need a landlord notice 15 days
+before the notification period listing all fees.
+
+**Two of my own claims were wrong.** Chapter 515 is **sales and construction
+only** — §515.33 runs to buyers from contractors, and "lease", "tenant" and
+"rent" appear nowhere in it. No section imposes any duty on a landlord letting a
+pool home; our Ch. 515 clause is sound risk practice, not law, and it should
+never have gone to counsel as a compliance question. §553.885 CO alarms is a
+building-code duty tied to construction, with no contract obligation.
+
+Also confirmed conduct-only, so no clause is needed: Ch. 720, §68.065, SCRA,
+FHA reasonable accommodation, and VAWA — which does not reach private unassisted
+rentals at all. §83.425 preempts local disclosure ordinances, so the state list
+is the complete list.
+
+**§83.49(2) exempts a landlord who rents fewer than five dwelling units.** The
+disclosure corrected the day before may not bind this landlord at all — though
+§83.49(1) and (3) have no such exemption and do. Correcting the text was right;
+not checking applicability was not.
+
+
 ### An election with one option is a term
 
 §83.595(4) prescribes a separate addendum in "substantially the following form",
