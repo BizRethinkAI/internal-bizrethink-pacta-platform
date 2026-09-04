@@ -31,6 +31,20 @@ const alterableUnder8351 = (propertyType: string): boolean =>
   propertyType === 'single-family' || propertyType === 'duplex';
 
 export const FL_MAINTENANCE: Clause[] = [
+  /*
+    This clause used to say the §83.51(1) obligations "may not be waived".
+    §83.51(1) ends: "The landlord's obligations under this subsection may be
+    altered or modified in writing with respect to a single-family home or
+    duplex." Read on 2026-09-04:
+    https://www.flsenate.gov/Laws/Statutes/2025/0083.51
+
+    The error favoured the tenant, so it was not dangerous. But a lease that
+    misdescribes the statute it cites invites an argument about what else it got
+    wrong — and this library is about to be read by a lawyer.
+
+    Not using the carve-out is a CHOICE, and the clause now says so. Saying the
+    duties cannot be altered was a mistake about the law.
+  */
   {
     slug: 'maintenance.landlord-statutory',
     version: 1,
@@ -46,7 +60,7 @@ export const FL_MAINTENANCE: Clause[] = [
       to the tenant. There is a test asserting nothing in the library supersedes
       it.
     */
-    body: 'Landlord shall comply with the requirements of applicable building, housing and health codes and shall maintain the roof, windows, doors, floors, steps, porches, exterior walls, foundations and all other structural components of the Premises in good repair and capable of resisting normal forces and loads, and shall keep the plumbing in reasonable working condition. Nothing in this Lease alters or limits these obligations, which are imposed by Fla. Stat. §83.51(1) and may not be waived.',
+    body: 'Landlord shall comply with the requirements of applicable building, housing and health codes and shall maintain the roof, windows, doors, floors, steps, porches, exterior walls, foundations and all other structural components of the Premises in good repair and capable of resisting normal forces and loads, and shall keep the plumbing in reasonable working condition. These obligations are imposed by Fla. Stat. §83.51(1). That subsection permits them to be altered or modified in writing for a single-family home or duplex; Landlord does not alter them, and nothing in this Lease limits them.',
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.51(1)',
