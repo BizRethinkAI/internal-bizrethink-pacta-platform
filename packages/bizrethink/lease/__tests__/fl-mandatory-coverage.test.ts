@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ClauseFacts } from '../clauses/types';
 import { FL_LIBRARY } from '../clauses/us-fl';
+import { FL_COMPELLED } from '../clauses/why-this-clause';
 import { selectClauses } from '../engine/select-clauses';
 import { PICANA_FACTS } from '../matters/picana-ln';
 
@@ -31,20 +32,28 @@ const documentFor = (f: ClauseFacts) => {
  * Slug plus the condition under which Florida compels it. `always` means every
  * residential lease in the state.
  */
-const MANDATORY: { slug: string; cite: string; when: (f: ClauseFacts) => boolean }[] = [
-  { slug: 'disclosure.radon', cite: 'Fla. Stat. §404.056(5)', when: () => true },
-  { slug: 'disclosure.landlord-identity', cite: 'Fla. Stat. §83.50', when: () => true },
-  { slug: 'maintenance.landlord-statutory', cite: 'Fla. Stat. §83.51(1)', when: () => true },
-  { slug: 'default.statutory-notices', cite: 'Fla. Stat. §83.56', when: () => true },
-  { slug: 'disclosure.flood', cite: 'Fla. Stat. §83.512', when: (f) => f.termMonths >= 12 },
-  { slug: 'deposit.statutory-notice', cite: 'Fla. Stat. §83.49(3)', when: (f) => f.depositHeldUsd > 0 },
-  { slug: 'deposit.escrow-notice', cite: 'Fla. Stat. §83.49(2)', when: (f) => f.depositHeldUsd > 0 },
-  {
-    slug: 'disclosure.lead-paint',
-    cite: '42 U.S.C. §4852d',
-    when: (f) => f.propertyYearBuilt === null || f.propertyYearBuilt < 1978,
-  },
-];
+/*
+  The compelled set now lives in `clauses/why-this-clause.ts`, as the output of
+  the 2026-09-03 statutory walk, because the library PAGE needs the same claim
+  and two copies would drift. This list adds only the render condition, which is
+  a fact about our engine rather than about Florida.
+
+  The version this replaced was assembled from recollection. It cited §83.49(3)
+  for the all-caps disclosure — that is the claim notice; the disclosure is
+  (2)(d) — and it did not know about §83.67(5) at all.
+*/
+const MANDATORY: { slug: string; cite: string; when: (f: ClauseFacts) => boolean }[] = FL_COMPELLED.map((entry) => ({
+  slug: entry.slug,
+  cite: entry.citation,
+  when:
+    entry.slug === 'disclosure.flood'
+      ? (f: ClauseFacts) => f.termMonths >= 12
+      : entry.slug === 'disclosure.lead-paint'
+        ? (f: ClauseFacts) => f.propertyYearBuilt === null || f.propertyYearBuilt < 1978
+        : entry.slug.startsWith('deposit.')
+          ? (f: ClauseFacts) => f.depositHeldUsd > 0
+          : () => true,
+}));
 
 describe('every mandatory Florida disclosure reaches the document', () => {
   for (const { slug, cite } of MANDATORY) {

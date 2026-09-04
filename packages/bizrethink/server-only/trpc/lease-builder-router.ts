@@ -7,9 +7,10 @@ import { authenticatedProcedure, procedure, router } from '@documenso/trpc/serve
 import { z } from 'zod';
 
 import { lookupAddress } from '../../lease/address/census';
-import { clauseFingerprint, isApprovalCurrent } from '../../lease/clauses/approval';
+import { clauseFingerprint, isApprovalCurrent, libraryFingerprint } from '../../lease/clauses/approval';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
+import { whyThisClause } from '../../lease/clauses/why-this-clause';
 import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
@@ -1524,6 +1525,13 @@ export const leaseBuilderRouter = router({
               */
             verbatimRequired: clause.source.kind === 'statute' && clause.source.verbatimRequired,
             citation: clause.source.kind === 'statute' ? clause.source.citation : null,
+            verbatimVerifiedAt: clause.source.kind === 'statute' ? clause.source.verbatimVerifiedAt : null,
+            /*
+              Why the clause is in the library at all — the question the page
+              could not answer. Sent rather than derived in the UI so the
+              statutory walk stays the single source of the claim.
+            */
+            why: whyThisClause(clause),
             codeStatus: clause.status,
             effectiveStatus: statusWithApproval(clause, approvals),
             fingerprint: clauseFingerprint(clause),
@@ -1541,6 +1549,159 @@ export const leaseBuilderRouter = router({
               : null,
           };
         }),
+      };
+    }),
+
+    /**
+     * Send the library to a lawyer.
+     *
+     * The approval flow was built for an attorney — it asks for a name and a
+     * bar number — and then sat behind an authenticated route with no way to
+     * send it. The only path was to add the lawyer to the organisation. This is
+     * the missing half of a mechanism the product already had for tenants.
+     *
+     * The fingerprint pins the library as it stood when the link was issued.
+     * An approval recorded against text that has since moved is worthless; the
+     * lease-review link learned that with `answersHash` and the reasoning is
+     * the same for clause text.
+     */
+    share: authenticatedProcedure
+      .input(
+        z.object({
+          organisationId: z.string(),
+          reviewerName: z.string().min(1),
+          reviewerEmail: z.string().email(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        return await prisma.bizrethinkLibraryReview.create({
+          data: {
+            id: prefixedId('library_review', 16),
+            organisationId: input.organisationId,
+            token: prefixedId('clr', 32),
+            reviewerName: input.reviewerName,
+            reviewerEmail: input.reviewerEmail,
+            libraryFingerprint: libraryFingerprint(FL_LIBRARY),
+            createdByUserId: ctx.user.id,
+            expiresAt: new Date(Date.now() + REVIEW_LINK_TTL_DAYS * 24 * 60 * 60 * 1000),
+          },
+          select: { id: true, token: true, expiresAt: true },
+        });
+      }),
+
+    /**
+     * Take a counsel link back.
+     *
+     * Built in from the start, because the lease-review link shipped without it
+     * and a link that cannot be revoked is a link that outlives the deal.
+     * Closing rather than deleting: the row is the record of who was sent what.
+     */
+    /**
+     * The counsel links that exist, newest first.
+     *
+     * Ordered deliberately. Two live links for the same person rendered as
+     * identical cards on the tenant reviewer page — same name, same email, same
+     * expiry — and the wrong one got copied. The page names the current one.
+     */
+    listShares: authenticatedProcedure.input(z.object({ organisationId: z.string() })).query(async ({ ctx, input }) => {
+      await assertAccess(input.organisationId, ctx.user.id);
+
+      const shares = await prisma.bizrethinkLibraryReview.findMany({
+        where: { organisationId: input.organisationId },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          token: true,
+          status: true,
+          reviewerName: true,
+          reviewerEmail: true,
+          expiresAt: true,
+          createdAt: true,
+        },
+      });
+
+      return { shares };
+    }),
+
+    revokeShare: authenticatedProcedure
+      .input(z.object({ organisationId: z.string(), shareId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        const share = await prisma.bizrethinkLibraryReview.findFirst({
+          where: { id: input.shareId, organisationId: input.organisationId },
+          select: { id: true, status: true },
+        });
+
+        if (!share) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'That link no longer exists.' });
+        }
+
+        await prisma.bizrethinkLibraryReview.update({
+          where: { id: share.id },
+          data: { status: 'closed' },
+        });
+
+        return { revoked: true };
+      }),
+
+    /**
+     * Open a counsel link. No account.
+     *
+     * One error for "no such token", "revoked" and "expired" — a reviewer
+     * cannot act on the difference, and distinguishing them would confirm to
+     * anyone holding a guessed token that it once existed.
+     *
+     * Returns clauses and provenance only. The holder is outside the
+     * organisation and has no business seeing a tenancy.
+     */
+    openLibrary: procedure.input(z.object({ token: z.string() })).query(async ({ input }) => {
+      const share = await prisma.bizrethinkLibraryReview.findUnique({
+        where: { token: input.token },
+        select: {
+          id: true,
+          organisationId: true,
+          status: true,
+          expiresAt: true,
+          reviewerName: true,
+          libraryFingerprint: true,
+        },
+      });
+
+      const usable =
+        share !== null &&
+        share.status === 'open' &&
+        (share.expiresAt === null || share.expiresAt.getTime() > Date.now());
+
+      if (!share || !usable) {
+        throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+      }
+
+      const approvals = await loadClauseApprovals();
+
+      return {
+        reviewerName: share.reviewerName,
+        /*
+          True when a clause has changed since the link was sent. The reviewer
+          is told rather than left to discover that the words they are reading
+          are not the words the landlord meant to send.
+        */
+        libraryMoved: share.libraryFingerprint !== libraryFingerprint(FL_LIBRARY),
+        clauses: FL_LIBRARY.map((clause) => ({
+          slug: clause.slug,
+          version: clause.version,
+          section: clause.section,
+          heading: clause.heading,
+          body: clause.body,
+          placement: clause.placement,
+          why: whyThisClause(clause),
+          sourceKind: clause.source.kind,
+          verbatimRequired: clause.source.kind === 'statute' && clause.source.verbatimRequired,
+          verbatimVerifiedAt: clause.source.kind === 'statute' ? clause.source.verbatimVerifiedAt : null,
+          approved: statusWithApproval(clause, approvals) === 'published',
+        })),
       };
     }),
 

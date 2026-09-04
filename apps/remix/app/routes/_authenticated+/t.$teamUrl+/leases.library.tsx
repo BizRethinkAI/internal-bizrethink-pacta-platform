@@ -66,6 +66,11 @@ type ClauseRow = {
   sourceKind: string;
   verbatimRequired: boolean;
   citation: string | null;
+  verbatimVerifiedAt: string | null;
+  why:
+    | { kind: 'compelled'; citation: string; appliesWhen: string }
+    | { kind: 'implements'; citation: string }
+    | { kind: 'discretionary' };
   effectiveStatus: string;
   fingerprint: string;
   approval: {
@@ -81,6 +86,42 @@ export default function ClauseLibraryPage() {
   const { organisationId } = useLoaderData<typeof loader>();
 
   const library = trpc.bizrethink.leaseBuilder.clauseLibrary.list.useQuery({ organisationId });
+
+  /*
+    Sending the library to counsel. The approval form has always asked for an
+    attorney's name and bar number, but this page sat behind an authenticated
+    route with no way to send it — so the only path was to add the lawyer to
+    the organisation as a user. This is the missing half.
+  */
+  const [sharing, setSharing] = useState(false);
+  const [counselName, setCounselName] = useState('');
+  const [counselEmail, setCounselEmail] = useState('');
+  const [copiedShare, setCopiedShare] = useState<string | null>(null);
+
+  const shares = trpc.bizrethink.leaseBuilder.clauseLibrary.listShares.useQuery({ organisationId });
+
+  const share = trpc.bizrethink.leaseBuilder.clauseLibrary.share.useMutation({
+    onSuccess: async () => {
+      setSharing(false);
+      setCounselName('');
+      setCounselEmail('');
+      await shares.refetch();
+    },
+  });
+
+  const revokeShare = trpc.bizrethink.leaseBuilder.clauseLibrary.revokeShare.useMutation({
+    onSuccess: async () => {
+      await shares.refetch();
+    },
+  });
+
+  const liveShares = (shares.data?.shares ?? []).filter((row) => row.status === 'open');
+
+  const copyShare = async (token: string, id: string) => {
+    await navigator.clipboard.writeText(`${window.location.origin}/clause-review/${token}`);
+    setCopiedShare(id);
+    window.setTimeout(() => setCopiedShare(null), 2000);
+  };
 
   const clauses = (library.data?.clauses ?? []) as unknown as ClauseRow[];
   const published = clauses.filter((clause) => clause.effectiveStatus === 'published').length;
@@ -122,6 +163,111 @@ export default function ClauseLibraryPage() {
           it, and the clause returns to unapproved.
         </AlertDescription>
       </Alert>
+
+      {/*
+        Read-only on the other end. A token holder sees every clause and why it
+        exists; recording an approval stays in here, where it is attributable to
+        someone who signed in. Sending a link should not grant write access.
+      */}
+      <div className="mt-8 rounded-lg border p-4">
+        <h2 className="font-semibold">Send the library to counsel</h2>
+        <p className="mt-1 text-muted-foreground text-sm">
+          They open a link and read every clause with its provenance — no account needed. The link is read-only, and you
+          can revoke it.
+        </p>
+
+        {liveShares.length > 0 && (
+          <ul className="mt-4 space-y-2">
+            {liveShares.map((row, index) => (
+              <li key={row.id} className="flex items-start justify-between gap-4 rounded border p-3">
+                <div>
+                  <p className="font-medium text-sm">{row.reviewerName}</p>
+                  <p className="text-muted-foreground text-xs">{row.reviewerEmail}</p>
+                  {/*
+                    Two live links for the same person rendered as identical
+                    cards on the tenant reviewer page, and the wrong one got
+                    copied. Newest first, and it says which.
+                  */}
+                  <p
+                    className={
+                      index === 0
+                        ? 'mt-1 font-medium text-[#a2560c] text-xs dark:text-[#d99a4e]'
+                        : 'mt-1 text-muted-foreground text-xs'
+                    }
+                  >
+                    {index === 0 ? 'Current link — send this one' : 'Superseded. Revoke it so it cannot be opened.'}
+                  </p>
+                </div>
+                <div className="flex flex-none items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={revokeShare.isPending}
+                    onClick={() => revokeShare.mutate({ organisationId, shareId: row.id })}
+                  >
+                    Revoke
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => void copyShare(row.token, row.id)}>
+                    {copiedShare === row.id ? 'Copied' : 'Copy link'}
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {sharing ? (
+          <div className="mt-4 space-y-3">
+            <div>
+              <Label htmlFor="counsel-name">Attorney's name</Label>
+              <Input
+                id="counsel-name"
+                className="mt-1"
+                value={counselName}
+                onChange={(event) => setCounselName(event.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="counsel-email">Email</Label>
+              <Input
+                id="counsel-email"
+                type="email"
+                className="mt-1"
+                value={counselEmail}
+                onChange={(event) => setCounselEmail(event.target.value)}
+              />
+            </div>
+
+            {share.error && (
+              <Alert variant="destructive">
+                <AlertDescription>{share.error.message}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex gap-2">
+              <Button
+                disabled={counselName.trim() === '' || counselEmail.trim() === '' || share.isPending}
+                onClick={() =>
+                  share.mutate({
+                    organisationId,
+                    reviewerName: counselName.trim(),
+                    reviewerEmail: counselEmail.trim(),
+                  })
+                }
+              >
+                Create the link
+              </Button>
+              <Button variant="ghost" onClick={() => setSharing(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button variant="outline" className="mt-4" onClick={() => setSharing(true)}>
+            Send it to counsel
+          </Button>
+        )}
+      </div>
 
       {library.isLoading && (
         <p className="mt-8 flex items-center gap-2 text-muted-foreground text-sm">
@@ -184,8 +330,40 @@ const ClauseRowItem = ({
             <p className="font-medium">{clause.heading}</p>
             <p className="mt-0.5 font-mono text-muted-foreground text-xs">
               {clause.slug} · v{clause.version} · {clause.section}
-              {clause.requiredBy && ` · required by ${clause.requiredBy}`}
             </p>
+            {/*
+              WHY THIS CLAUSE EXISTS. The page used to show the slug and the
+              section — true, and useless to a reviewer, who cannot tell a
+              disclosure Florida compels from a house rule somebody invented.
+
+              Three answers, from the 2026-09-03 statutory walk. Most of the
+              library is discretionary, and saying so is the point: it tells a
+              lawyer where their hour is worth spending.
+            */}
+            <p className="mt-1 text-xs">
+              {clause.why.kind === 'compelled' && (
+                <span className="text-[#a2560c] dark:text-[#d99a4e]">
+                  Required by law — {clause.why.citation}. {clause.why.appliesWhen}
+                </span>
+              )}
+              {clause.why.kind === 'implements' && (
+                <span className="text-[#1f3a5f] dark:text-[#8fb3d9]">
+                  Implements {clause.why.citation}. The statute does not dictate this wording.
+                </span>
+              )}
+              {clause.why.kind === 'discretionary' && (
+                <span className="text-muted-foreground">Our drafting. No statute requires this clause.</span>
+              )}
+            </p>
+            <p className="mt-0.5 text-muted-foreground text-xs">
+              {clause.sourceKind === 'statute'
+                ? clause.verbatimRequired
+                  ? clause.verbatimVerifiedAt
+                    ? `Prescribed text — read off the statute on ${clause.verbatimVerifiedAt}.`
+                    : 'Prescribed text — NOT yet checked against the statute book.'
+                  : 'Safe-harbour form — the statute asks for "substantially" this.'
+                : 'Drafted in-house. No attorney has reviewed these words.'}
+            </p>{' '}
           </div>
         </div>
 

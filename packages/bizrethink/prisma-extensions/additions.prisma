@@ -620,3 +620,40 @@ model BizrethinkClauseApproval {
 
   @@index([clauseSlug])
 }
+
+/// A link that lets counsel read the clause library without an account.
+///
+/// The approval flow was built for an attorney — it asks for a name and a bar
+/// number — and then put the page behind an authenticated route with no way to
+/// send it. The only path was to add the lawyer to the organisation. This is
+/// the missing half of a mechanism the product already had for tenants.
+///
+/// Scoped to an ORGANISATION rather than a matter: the library is the same for
+/// every lease, and an approval is pinned to clause text, not to a tenancy.
+model BizrethinkLibraryReview {
+  id             String @id
+  organisationId String
+
+  /// Unauthenticated link, same shape as the lease-review token.
+  token String @unique
+
+  /// 'open' | 'closed'. Closing is the revocation — there is no delete,
+  /// because the row is the record of who was sent what and when.
+  status String @default("open")
+
+  reviewerName  String
+  reviewerEmail String
+
+  /// Which clauses existed, and in what words, when the link was issued.
+  /// An approval recorded against text that has since moved is worthless, and
+  /// this is what lets the page say so rather than silently disagree.
+  libraryFingerprint String
+
+  createdByUserId Int
+  expiresAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organisationId])
+}
