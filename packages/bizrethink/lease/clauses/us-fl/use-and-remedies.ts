@@ -256,6 +256,42 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     asserts: ['move-out-condition'],
   },
 
+  /*
+    §83.67(5) offers relief from the Fla. Stat. §715.104 duty to store and
+    dispose of personal property a tenant leaves behind — but ONLY where the
+    lease says so, and only where it carries this legend "printed or clearly
+    stamped". Read on 2026-09-03:
+    https://www.flsenate.gov/Laws/Statutes/2025/0083.67
+
+    §83.67 appeared nowhere in this library. Without the legend the landlord
+    owes the whole statutory storage-and-disposition process on anything left
+    behind — a real operational burden the statute offers to remove for the
+    price of one paragraph.
+
+    This is the shape a statutory walk finds and a clause review cannot: not a
+    clause that is wrong, but one that is absent, and whose absence costs
+    something. The legend is a safe harbour ("substantially the following
+    form"), so the wording has room — but it is reproduced exactly, because
+    there is no reason to spend the latitude.
+  */
+  {
+    slug: 'moveout.personal-property',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'default',
+    sortKey: 21,
+    heading: 'Personal Property Left Behind',
+    body: 'Where Tenant surrenders or abandons the Premises, or Landlord recovers possession on the death of the last remaining tenant, Landlord is not required to comply with Fla. Stat. §715.104 and is not liable or responsible for the storage or disposition of Tenant’s personal property, as permitted by Fla. Stat. §83.67(5).\n\nBY SIGNING THIS RENTAL AGREEMENT, THE TENANT AGREES THAT UPON SURRENDER, ABANDONMENT, OR RECOVERY OF POSSESSION OF THE DWELLING UNIT DUE TO THE DEATH OF THE LAST REMAINING TENANT, AS PROVIDED BY CHAPTER 83, FLORIDA STATUTES, THE LANDLORD SHALL NOT BE LIABLE OR RESPONSIBLE FOR STORAGE OR DISPOSITION OF THE TENANT’S PERSONAL PROPERTY.',
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Fla. Stat. \u00a783.67(5)',
+    includeWhen: null,
+    variables: [],
+    supersedes: [],
+    asserts: ['personal-property-storage'],
+  },
+
   {
     slug: 'mould.control',
     version: 1,

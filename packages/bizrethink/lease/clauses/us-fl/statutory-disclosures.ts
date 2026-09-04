@@ -283,6 +283,27 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     asserts: ['landlord-identity-disclosed'],
   },
 
+  /*
+    40 C.F.R. §745.113(b) and 24 C.F.R. §35.92(b) require SIX elements in a
+    contract to lease target housing, not one. Read on 2026-09-03:
+    https://www.law.cornell.edu/cfr/text/40/745.113
+
+    We shipped only the Lead Warning Statement. 42 U.S.C. §4852d(b)(3) provides
+    TREBLE damages, so an incomplete disclosure is not a lesser version of a
+    complete one — and this clause fails safe to INCLUDE when the build year is
+    unknown, which made completeness the difference between a safe default and a
+    treble-damages default.
+
+    EPA AND HUD NO LONGER AGREE ON THE WARNING STATEMENT. EPA added "known" in
+    November 2024 (89 FR 89458); HUD's §35.92(b)(1) still carries its 1999 text
+    without it. We follow EPA: later in time, tracks §4852d(a)(1)(B)'s "any known
+    lead-based paint", and being narrower it satisfies HUD's substance too. That
+    reasoning is ours and is flagged for counsel.
+
+    Note what is NOT here: 40 C.F.R. §745.110(a)'s ten-day inspection
+    opportunity runs to PURCHASERS only. Putting it in a lease is a common
+    drafting error and would promise something the regulation does not require.
+  */
   {
     slug: 'disclosure.lead-paint',
     version: 1,
@@ -293,7 +314,30 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     heading: 'Disclosure of Information on Lead-Based Paint and Lead-Based Paint Hazards',
     body: `LEAD WARNING STATEMENT
 
-Housing built before 1978 may contain lead-based paint. Lead from paint, paint chips, and dust can pose health hazards if not managed properly. Lead exposure is especially harmful to young children and pregnant women. Before renting pre-1978 housing, lessors must disclose the presence of known lead-based paint and/or lead-based paint hazards in the dwelling. Lessees must also receive a federally approved pamphlet on lead poisoning prevention.`,
+Housing built before 1978 may contain lead-based paint. Lead from paint, paint chips, and dust can pose health hazards if not managed properly. Lead exposure is especially harmful to young children and pregnant women. Before renting pre-1978 housing, lessors must disclose the presence of known lead-based paint and/or lead-based paint hazards in the dwelling. Lessees must also receive a federally approved pamphlet on lead poisoning prevention.
+
+LESSOR'S DISCLOSURE
+
+(a) Presence of lead-based paint and/or lead-based paint hazards. Landlord shall mark one:
+[ ] Known lead-based paint and/or lead-based paint hazards are present in the housing. Landlord shall explain below the basis for that determination, the location of the paint or hazards, and the condition of the painted surfaces:
+[ ] Landlord has no knowledge of lead-based paint and/or lead-based paint hazards in the housing.
+
+(b) Records and reports available to Landlord. Landlord shall mark one:
+[ ] Landlord has provided Tenant with all available records and reports pertaining to lead-based paint and/or lead-based paint hazards in the housing, listed below:
+[ ] Landlord has no records or reports pertaining to lead-based paint and/or lead-based paint hazards in the housing.
+
+TENANT'S ACKNOWLEDGMENT
+
+Tenant has received copies of all information listed above, and has received the federally approved pamphlet Protect Your Family From Lead in Your Home.
+
+AGENT'S ACKNOWLEDGMENT
+
+Where a person acts as Landlord's agent in this transaction, that agent has informed the lessor of the lessor's obligations under 42 U.S.C. 4852d and is aware of the agent's duty to ensure compliance with the requirements of this subpart.
+
+CERTIFICATION OF ACCURACY
+
+The parties below have reviewed the information above and certify, to the best of their knowledge, that the information they have provided is true and accurate. Each signature is dated.`,
+
     source: {
       kind: 'statute',
       citation: '42 U.S.C. §4852d; 24 C.F.R. pt. 35',
