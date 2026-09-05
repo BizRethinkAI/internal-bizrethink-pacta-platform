@@ -136,6 +136,15 @@ Learned the hard way. Each one cost something.
   **we recommend**, **we suggest**, **is unenforceable**, **is illegal**.
   Enforced by `governance.yml`; exempt a legitimate line with a trailing
   `// legal-language-ok: <reason>`.
+- **The clause library is Florida law, not one property.** Clause text may be
+  fixed only by a statute, a regulation, or a court-approved form. Anything
+  fixed by a *private* instrument — an HOA declaration, an association rule, one
+  property's covenant — is **data**, and reaches the lease through a variable.
+  The test: *if I lease a different house in a different community, is this text
+  still true?* If no, it is an answer, not a clause. Enforced by
+  `library-invariants.test.ts`, which pins every `requiredBy` by slug rather
+  than matching a pattern — a pattern can be widened by whoever it inconveniences,
+  and once was.
 - **A clause may not reach `published` without provenance** — statutory text
   needs a verification date, attorney-drafted text needs a named reviewer.
 - **Never log or expose** API keys, tokens, passwords, PII, or financial data.

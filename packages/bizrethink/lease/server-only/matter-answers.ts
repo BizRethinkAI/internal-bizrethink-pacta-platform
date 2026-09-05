@@ -118,6 +118,8 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       hasTenantYardDuty: splitByDoer(yardTasks).tenant !== '',
       // Same shape as the yard gates: a fee of zero is not a fee.
       hasPetFees: Number(values.petFeeUsd ?? 0) > 0 || Number(values.petRentMonthlyUsd ?? 0) > 0,
+      // An association exists is not the same as an association demands.
+      hasHoaLeaseRequirements: String(values.hoaLeaseRequirements ?? '').trim() !== '',
     } as RenderLeaseInput['facts'],
     money,
     values: {

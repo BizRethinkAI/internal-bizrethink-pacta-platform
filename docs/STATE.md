@@ -410,6 +410,121 @@ passed, or appeared to:
 
 ## Open threads
 
+### A guard was weakened to admit the thing it was built to catch
+
+`library-invariants` required `requiredBy` to cite `Fla. Stat.` or `U.S.C.`. It
+rejected two new HOA clauses carrying a Pasco County recording reference. The
+response was to **widen the regex** to accept `Instr#` and `OR x/y`, with a
+confident comment explaining that a recorded covenant compels too.
+
+The premise was true. The conclusion was wrong: **a covenant compels the OWNER,
+not the LIBRARY.** The guard was right and got moved.
+
+That is the failure worth remembering — not the pollution, which was one clause,
+but the reflex to treat a red guard as an obstacle rather than a finding.
+
+### What the boundary actually is, and how the library already knew
+
+Every hard-coded figure in the library traces to a statute — 30/60 days from
+§83.575, 15 from §83.49(3)(a), 3/7 from §83.56. Exactly one did not: `two`
+parking spaces, from one declaration in one community, rendered for every
+Florida property with `hasHoa`. `hasHoa` means the property has AN association;
+it says nothing about what THAT association demands.
+
+> **The clause library is Florida law, not one property.** Text may be fixed only
+> by a statute, a regulation, or a court-approved form. Anything fixed by a
+> private instrument is data, and reaches the lease through a variable.
+
+An audit found five violations, four of them mine and one written the same day
+the rule was being discussed:
+
+- `hoa.lease-scope` — hard-coded a parking cap, a demised-premises rule ("the
+  entire Lot and the associated garage" — a condominium has neither), and the
+  assertion "The governing documents require", of every association.
+- `hoa.amenity-access` — carried a comment saying *"NOTHING OPERATIONAL IS NAMED
+  HERE ON PURPOSE"* while stating one declaration's filing list, its deadline,
+  and its suspension of the OWNER's own access. A landlord elsewhere would have
+  surrendered an amenity right they still held.
+- `maintenance.storm` — ungated, asserting a pool and an association on every
+  property.
+- `maintenance.pool-split` — hard-coded "at Landlord's cost" with no variable,
+  and `pool-safety.test.ts` **pinned** it. `lawn-split` had been refactored away
+  from exactly this defect in v2; the pool clause was still v1.
+- `maintenance.pool-safety` — told a signed lease the feature was *"required by
+  Chapter 515, Florida Statutes"*, a thirty-section chapter cited whole, while
+  `why-this-clause.ts` records that Ch. 515 imposes no lease duty at all.
+
+All now variable-driven or gated. The HOA requirements follow the `{{yardDuties}}`
+pattern: the landlord reads their own declaration and states what it requires,
+and the library supplies the frame.
+
+### Enforcement is a pinned map, not a regex
+
+`requiredBy` is now pinned slug-by-slug. Adding one forces an edit to the pin,
+which forces the conversation — and there is no pattern left to widen. A second
+tooth rejects any bare quantity in a clause selected only by `hasHoa`, which
+catches "two parking spaces" without anyone needing to know where it came from.
+
+Both were verified by reintroducing the exact original violation and watching
+them fail.
+
+**The pin found something on its first run.** `deposit.statutory-notice` carried
+`citation: §83.49(2)(d)` and `requiredBy: §83.49(3)` — the same subsection error
+corrected days earlier, fixed in one field and missed in the other.
+
+
+### A recorded covenant compels a lease term, and the model did not know it
+
+The Estancia declaration's Ninth Amendment (Instr# 2021271188, OR 10509/675,
+recorded 16 Dec 2021) rewrote Article XI §36 (Leases). Three of its
+requirements are not advice — §36(b) says every lease **shall** contain them:
+
+```
+(b)(ii)   only for the entire Lot and associated garage
+(b)(iii)  no more than two parking spaces, INCLUDING the garage
+(b)(iv)   the tenant is bound by and subject to ALL of the obligations
+          of the Owner under the Declaration
+```
+
+Our clause said the tenant "shall comply with" the governing documents, which
+is narrower than standing in the owner's shoes. The parking cap appeared
+nowhere at all — on a house with a two-car garage that is the entire allowance,
+nothing on the driveway, and a tenant would have discovered it from a towing
+notice.
+
+**`library-invariants` rejected the new clauses**, because `requiredBy` demanded
+`Fla. Stat.` or `U.S.C.` — the model assumed only legislation can compel a lease
+term. It cannot. A recorded covenant runs with the land and compels exactly as a
+statute does. The invariant was narrower than the world, and now accepts a
+recording reference while still refusing a bare assertion.
+
+### Never write the managing agent into a lease
+
+The Community Amenity Guidelines (January 2020) route tenant amenity access
+through a New Tenant Profile form filed with **Evergreen Lifestyles Management**
+and a **$25** fee. The association is now managed by CMG.
+
+The RULE survived the change of agent — approval is still required. Every
+operational detail around it did not: the form's name, the fee, the address, the
+email. A lease naming any of them would have been wrong on the day it was signed
+and wrong again at the next change of manager.
+
+So `hoa.amenity-access` names none of them, and a test asserts the absence of
+"Evergreen", "CMG", "$25" and "New Tenant Profile" specifically. It says what is
+durable: approval is the association's, on whatever process they require from
+time to time, and it is not guaranteed by the Lease. Who pays the fees is asked
+rather than assumed.
+
+**Two gates, not one.** §36(d) also bars a tenant from the common areas until
+the landlord has filed the tenant's details and the signed lease — so the
+landlord has a deadline (the date of occupancy) whose consequence lands on the
+tenant. And §36(e) suspends the landlord's own access for the term; the
+Guidelines confirm the cards are actually deactivated.
+
+**The general shape:** when a document tells you a rule and also tells you who
+administers it, only the first belongs in a contract.
+
+
 ### The page said what a clause was, never why it was there
 
 The clause library showed `parties.recital · v2 · parties · Unapproved`. True,

@@ -189,7 +189,7 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
       verbatimVerifiedAt: '2026-09-02',
     },
     status: 'draft',
-    requiredBy: 'Fla. Stat. §83.49(3)',
+    requiredBy: 'Fla. Stat. §83.49(2)(d)',
     // A deposit carried over from a prior tenancy is still held. The obligation
     // does not lapse because nothing is collected at signing — the trap the
     // 2026 lease fell into.
