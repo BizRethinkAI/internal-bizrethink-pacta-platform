@@ -23,6 +23,7 @@ import { canDeleteMatter } from '../../lease/matters/lifecycle';
 import type { LeasePartyInput } from '../../lease/parties/derive-parties';
 import { partyEmails, toLeaseParties, validateParties } from '../../lease/parties/derive-parties';
 import { buildLeaseDocuments } from '../../lease/render/render-lease';
+import { deletionBlockers } from '../../lease/review/deletion';
 import {
   applyDisposition,
   hashAnswers,
@@ -1201,6 +1202,54 @@ export const leaseBuilderRouter = router({
       }),
 
     /**
+     * Destroy a link that never carried anything.
+     *
+     * Revoke is the normal end of a link and keeps the row, because the row is
+     * the record that this document went to this person on this date, pinned to
+     * the answer set as it then stood. That is what answers "you never sent it
+     * to me".
+     *
+     * But a double-submit mints duplicates seconds apart — four of them on the
+     * Picana matter — and a row nobody ever opened and nobody commented on is a
+     * record of nothing. Those, and only those, can go. `deletionBlockers`
+     * decides, and returns EVERY reason at once so a landlord is not told about
+     * one obstacle at a time.
+     */
+    remove: authenticatedProcedure
+      .input(z.object({ matterId: z.string(), reviewId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const matter = await loadMatter(input.matterId, ctx.user.id);
+
+        const review = await prisma.bizrethinkLeaseReview.findFirst({
+          where: { id: input.reviewId, matterId: matter.id },
+          select: { id: true, status: true, firstOpenedAt: true, returnedAt: true },
+        });
+
+        if (!review) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'That review link no longer exists.' });
+        }
+
+        const commentCount = await prisma.bizrethinkReviewComment.count({ where: { reviewId: review.id } });
+
+        const blockers = deletionBlockers(
+          {
+            status: review.status as ReviewStatus,
+            firstOpenedAt: review.firstOpenedAt,
+            returnedAt: review.returnedAt,
+          },
+          commentCount,
+        );
+
+        if (blockers.length > 0) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: blockers.join(' ') });
+        }
+
+        await prisma.bizrethinkLeaseReview.delete({ where: { id: review.id } });
+
+        return { removed: true };
+      }),
+
+    /**
      * Decide one comment. Once.
      *
      * The append-only rule lives in `applyDisposition`. The write is
@@ -1283,6 +1332,30 @@ export const leaseBuilderRouter = router({
       if (!review || !isReviewUsable(toDomainReview(review), new Date())) {
         throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
       }
+
+      /*
+        Record that the link was FETCHED.
+
+        Deliberately not awaited into the response and never allowed to fail the
+        read: a reviewer opening their lease must not see an error because a
+        counter could not be written. `firstOpenedAt` is set once, by only
+        updating rows where it is still null, so a second visit cannot move it.
+
+        This is delivery evidence, not proof of reading — mail scanners fetch
+        links too, which is why the landlord's side says "opened".
+      */
+      void prisma.bizrethinkLeaseReview
+        .updateMany({
+          where: { id: review.id, firstOpenedAt: null },
+          data: { firstOpenedAt: new Date() },
+        })
+        .then(() =>
+          prisma.bizrethinkLeaseReview.update({
+            where: { id: review.id },
+            data: { lastOpenedAt: new Date(), openCount: { increment: 1 } },
+          }),
+        )
+        .catch(() => undefined);
 
       const matter = await prisma.bizrethinkLeaseMatter.findUnique({
         where: { id: review.matterId },

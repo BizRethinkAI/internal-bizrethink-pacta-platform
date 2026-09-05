@@ -435,6 +435,33 @@ pull a heading forward. Bounded by the renderer, not by effort.
 
 `orphans` and `widows` on `Text` are also inert in this build — set both to 2
 and the two single-line carries did not move.
+### Revoking is not deleting, and nobody could tell if a link had been opened
+
+Two gaps on the review panel, both visible on the Picana matter: four revoked
+duplicate links stacked above the one live one, and no way to know whether the
+tenant had ever opened any of them.
+
+**Opened was simply not recorded.** `BizrethinkLeaseReview` had no such column
+and the token loader wrote nothing, so a landlord could not distinguish a link
+the reviewer had held for a week from one that never arrived. Now
+`firstOpenedAt` / `lastOpenedAt` / `openCount`, written by the public `open`
+procedure — not awaited into the response and never allowed to fail the read,
+because a reviewer must not see an error over a counter.
+
+It says **opened**, never "read". Mail scanners and link previewers fetch links,
+and a landlord told the tenant "read" the lease would rely on it. Opened is what
+is known.
+
+**Deleting is deliberately narrow.** A revoked row is the record that this
+document went to this person on this date, pinned to the answer set as it then
+stood — the answer to "you never sent it to me". Comments hang off it too. So
+`deletionBlockers` refuses anything that carries evidence: still live, ever
+opened, returned, or commented on. What remains is the double-submit duplicate,
+which is what a landlord actually wants gone. Every reason is returned at once
+rather than one obstacle at a time.
+
+The clutter that deletion does not solve is solved by hiding: revoked rows now
+collapse behind "Show 4 revoked links".
 
 
 ### The page count that could not see 155 pages

@@ -1,3 +1,4 @@
+import { describeOpened } from '@bizrethink/customizations/lease/review/deletion';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -33,6 +34,8 @@ type Review = {
   reviewerName: string;
   reviewerEmail: string;
   expiresAt: string | Date | null;
+  firstOpenedAt: string | Date | null;
+  openCount: number;
 };
 
 type Comment = {
@@ -75,6 +78,19 @@ export const LeaseReviewPanel = ({ matterId, origin }: ReviewPanelProps) => {
     },
   });
 
+  const remove = trpc.bizrethink.leaseBuilder.review.remove.useMutation({
+    onSuccess: async () => {
+      await list.refetch();
+    },
+  });
+
+  /*
+    Spent links are kept, not deleted — the row is the record that this document
+    went to this person on this date. But four revoked duplicates above the one
+    live link is the list working against its own purpose, so they collapse.
+  */
+  const [showSpent, setShowSpent] = useState(false);
+
   const reviews = (list.data?.reviews ?? []) as unknown as Review[];
   const comments = (list.data?.comments ?? []) as unknown as Comment[];
 
@@ -98,104 +114,146 @@ export const LeaseReviewPanel = ({ matterId, origin }: ReviewPanelProps) => {
 
       {reviews.length > 0 && (
         <ul className="space-y-2">
-          {reviews.map((review) => {
-            const own = comments.filter((comment) => comment.reviewId === review.id);
-            const pending = own.filter((comment) => comment.disposition === 'pending').length;
+          {reviews
+            .filter((review) => showSpent || review.status !== 'closed')
+            .map((review) => {
+              const own = comments.filter((comment) => comment.reviewId === review.id);
+              const pending = own.filter((comment) => comment.disposition === 'pending').length;
 
-            /*
+              /*
               Two live links for the same person rendered as two identical
               cards — same name, same email, same expiry, same Copy button —
               separated only by list order. Copying the wrong one sends the
               reviewer a lease that has already moved on. The list is newest
               first, so the first open row is the one to send.
             */
-            const live = reviews.filter((r) => r.status === 'open');
-            const isCurrent = review.status === 'open' && live[0]?.id === review.id;
-            const isSuperseded = review.status === 'open' && !isCurrent;
+              const live = reviews.filter((r) => r.status === 'open');
+              const isCurrent = review.status === 'open' && live[0]?.id === review.id;
+              const isSuperseded = review.status === 'open' && !isCurrent;
 
-            return (
-              <li key={review.id} className="rounded-lg border p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex gap-3">
-                    {review.audience === 'attorney' ? (
-                      <Scale className="mt-0.5 h-4 w-4 flex-none text-muted-foreground" />
-                    ) : (
-                      <User className="mt-0.5 h-4 w-4 flex-none text-muted-foreground" />
-                    )}
-                    <div>
-                      <p className="font-medium">
-                        {review.reviewerName}{' '}
-                        <span className="font-normal text-muted-foreground text-sm">({review.audience})</span>
-                      </p>
-                      <p className="text-muted-foreground text-sm">{review.reviewerEmail}</p>
-                      <p className="mt-1 text-muted-foreground text-xs">
-                        {review.status === 'open' && review.expiresAt
-                          ? `Link live until ${new Date(review.expiresAt).toLocaleDateString()}`
-                          : review.status === 'returned'
-                            ? `Returned ${own.length} comment${own.length === 1 ? '' : 's'}`
-                            : 'Revoked'}
-                      </p>
-                      {isCurrent && (
-                        <p className="mt-1 font-medium text-[#a2560c] text-xs dark:text-[#d99a4e]">
-                          Current link — send this one
-                        </p>
+              return (
+                <li key={review.id} className="rounded-lg border p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex gap-3">
+                      {review.audience === 'attorney' ? (
+                        <Scale className="mt-0.5 h-4 w-4 flex-none text-muted-foreground" />
+                      ) : (
+                        <User className="mt-0.5 h-4 w-4 flex-none text-muted-foreground" />
                       )}
-                      {isSuperseded && (
-                        <p className="mt-1 text-muted-foreground text-xs">
-                          Superseded by a newer link. Revoke it so it cannot be opened.
+                      <div>
+                        <p className="font-medium">
+                          {review.reviewerName}{' '}
+                          <span className="font-normal text-muted-foreground text-sm">({review.audience})</span>
                         </p>
+                        <p className="text-muted-foreground text-sm">{review.reviewerEmail}</p>
+                        <p className="mt-1 text-muted-foreground text-xs">
+                          {review.status === 'open' && review.expiresAt
+                            ? `Link live until ${new Date(review.expiresAt).toLocaleDateString()}`
+                            : review.status === 'returned'
+                              ? `Returned ${own.length} comment${own.length === 1 ? '' : 's'}`
+                              : 'Revoked'}
+                        </p>
+                        {/*
+                        OPENED, not "read". This records that the URL was
+                        fetched; mail scanners fetch links too, and a landlord
+                        told the tenant "read" the lease would rely on it.
+                      */}
+                        <p className="mt-0.5 text-muted-foreground text-xs">
+                          {describeOpened(
+                            review.firstOpenedAt ? new Date(review.firstOpenedAt) : null,
+                            review.openCount ?? 0,
+                          )}
+                        </p>
+                        {isCurrent && (
+                          <p className="mt-1 font-medium text-[#a2560c] text-xs dark:text-[#d99a4e]">
+                            Current link — send this one
+                          </p>
+                        )}
+                        {isSuperseded && (
+                          <p className="mt-1 text-muted-foreground text-xs">
+                            Superseded by a newer link. Revoke it so it cannot be opened.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {pending > 0 && review.audience === 'attorney' && (
+                        <Badge variant="destructive">{pending} to answer</Badge>
+                      )}
+                      {review.status === 'open' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={revoke.isPending}
+                          onClick={() => revoke.mutate({ matterId, reviewId: review.id })}
+                        >
+                          Revoke
+                        </Button>
+                      )}
+                      {/*
+                      Only offered where there is nothing to lose: a revoked
+                      link nobody opened and nobody commented on. The server
+                      decides again — this is convenience, not the rule.
+                    */}
+                      {review.status === 'closed' && !review.firstOpenedAt && own.length === 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={remove.isPending}
+                          onClick={() => remove.mutate({ matterId, reviewId: review.id })}
+                        >
+                          Delete
+                        </Button>
+                      )}
+                      {review.status === 'open' && (
+                        <Button variant="outline" size="sm" onClick={() => void copy(review)}>
+                          {copied === review.id ? (
+                            <>
+                              <Check className="mr-2 h-4 w-4" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="mr-2 h-4 w-4" />
+                              Copy link
+                            </>
+                          )}
+                        </Button>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {pending > 0 && review.audience === 'attorney' && (
-                      <Badge variant="destructive">{pending} to answer</Badge>
-                    )}
-                    {review.status === 'open' && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={revoke.isPending}
-                        onClick={() => revoke.mutate({ matterId, reviewId: review.id })}
-                      >
-                        Revoke
-                      </Button>
-                    )}
-                    {review.status === 'open' && (
-                      <Button variant="outline" size="sm" onClick={() => void copy(review)}>
-                        {copied === review.id ? (
-                          <>
-                            <Check className="mr-2 h-4 w-4" />
-                            Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="mr-2 h-4 w-4" />
-                            Copy link
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {own.length > 0 && (
-                  <ul className="mt-4 space-y-3 border-t pt-4">
-                    {own.map((comment) => (
-                      <CommentRow
-                        key={comment.id}
-                        comment={comment}
-                        blocking={review.audience === 'attorney'}
-                        onDone={() => void list.refetch()}
-                      />
-                    ))}
-                  </ul>
-                )}
-              </li>
-            );
-          })}
+                  {own.length > 0 && (
+                    <ul className="mt-4 space-y-3 border-t pt-4">
+                      {own.map((comment) => (
+                        <CommentRow
+                          key={comment.id}
+                          comment={comment}
+                          blocking={review.audience === 'attorney'}
+                          onDone={() => void list.refetch()}
+                        />
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
         </ul>
+      )}
+
+      {reviews.some((review) => review.status === 'closed') && (
+        <button
+          type="button"
+          className="text-muted-foreground text-sm underline underline-offset-4"
+          onClick={() => setShowSpent((shown) => !shown)}
+        >
+          {showSpent
+            ? 'Hide revoked links'
+            : `Show ${reviews.filter((review) => review.status === 'closed').length} revoked link${
+                reviews.filter((review) => review.status === 'closed').length === 1 ? '' : 's'
+              }`}
+        </button>
       )}
 
       {inviting ? (
