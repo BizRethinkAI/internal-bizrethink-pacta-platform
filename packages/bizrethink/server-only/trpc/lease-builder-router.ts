@@ -193,7 +193,7 @@ const loadMatter = async (id: string, userId: number) => {
     tenancies, and a lease created before its property had utilities recorded
     would otherwise hold two empty required boxes that nothing could fill.
   */
-  return { ...matter, ...(await loadPropertyContext(matter.propertyId)) };
+  return { ...matter, ...(await loadPropertyContext(matter.propertyId, matter.id)) };
 };
 
 /**
@@ -388,6 +388,23 @@ const statutoryInput = (answers: ReturnType<typeof hydrate>) => ({
     noticeDays: Number(answers.values.nonRenewalNoticeDays ?? 0),
   },
 });
+
+/**
+ * The organisations a user may touch documents in.
+ *
+ * Every document query is scoped with this INSIDE the where clause rather than
+ * checked after the row is fetched — the same shape `loadMatter` uses, so a
+ * document in someone else's organisation is indistinguishable from one that
+ * does not exist instead of answering with a different error.
+ */
+const documentScope = async (userId: number): Promise<string[]> => {
+  const memberships = await prisma.organisation.findMany({
+    where: { members: { some: { userId } } },
+    select: { id: true },
+  });
+
+  return memberships.map((organisation) => organisation.id);
+};
 
 export const leaseBuilderRouter = router({
   property: router({
@@ -1300,7 +1317,7 @@ export const leaseBuilderRouter = router({
         live, so they belong in the hash — otherwise editing a utility row moves
         the document while this flag still says nothing changed.
       */
-      const context = await loadPropertyContext(matter.propertyId);
+      const context = await loadPropertyContext(matter.propertyId, matter.id);
 
       /*
         Both audiences see the whole lease, so this flag is the only thing
@@ -1372,6 +1389,20 @@ export const leaseBuilderRouter = router({
         comments,
         askedFields,
         changedSinceIssued,
+        /*
+          The documents the receipt addendum names, so a reviewer can open what
+          they are being asked to acknowledge receipt of. Without these the
+          receipt is a signature on a list nobody can read — which is the
+          weakness it was written to remove, reproduced one level up.
+        */
+        attachments: [...context.propertyDocuments, ...context.matterDocuments].map((document) => ({
+          id: document.id,
+          kind: document.kind,
+          label: document.label,
+          reference: document.reference,
+          documentDate: document.documentDate,
+          pageCount: document.pageCount,
+        })),
       };
     }),
 
@@ -1767,5 +1798,101 @@ export const leaseBuilderRouter = router({
 
         return { approved: true };
       }),
+  }),
+
+  /**
+   * The documents a human uploaded, as opposed to everything else here, which
+   * is assembled from clauses.
+   *
+   * Upload itself is NOT here — it is a multipart route, because tRPC carries
+   * JSON and base64 would inflate a 54 MB scan by a third on the way up. See
+   * `api+/bizrethink.lease-document.ts`. These are the operations that follow.
+   */
+  documents: router({
+    list: authenticatedProcedure
+      .input(z.object({ propertyId: z.string().optional(), matterId: z.string().optional() }))
+      .query(async ({ ctx, input }) => {
+        const scope = await documentScope(ctx.user.id);
+
+        return await prisma.bizrethinkDocument.findMany({
+          where: {
+            ...(input.propertyId ? { propertyId: input.propertyId } : { matterId: input.matterId }),
+            organisationId: { in: scope },
+            archivedAt: null,
+          },
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+          select: {
+            id: true,
+            kind: true,
+            label: true,
+            reference: true,
+            documentDate: true,
+            pageCount: true,
+            sizeBytes: true,
+            sortOrder: true,
+          },
+        });
+      }),
+
+    /**
+     * Rename, re-reference, re-date or reorder. Never re-file: a document
+     * cannot move between a property and a lease, because the two answer
+     * different questions and moving one would silently change which leases
+     * receipt it.
+     */
+    update: authenticatedProcedure
+      .input(
+        z.object({
+          id: z.string(),
+          label: z.string().min(1).optional(),
+          reference: z.string().optional(),
+          documentDate: z.string().optional(),
+          sortOrder: z.number().int().min(0).optional(),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        const scope = await documentScope(ctx.user.id);
+
+        const { count } = await prisma.bizrethinkDocument.updateMany({
+          where: { id: input.id, organisationId: { in: scope }, archivedAt: null },
+          data: {
+            ...(input.label === undefined ? {} : { label: input.label }),
+            ...(input.reference === undefined ? {} : { reference: input.reference || null }),
+            ...(input.documentDate === undefined
+              ? {}
+              : { documentDate: input.documentDate ? new Date(`${input.documentDate}T00:00:00Z`) : null }),
+            ...(input.sortOrder === undefined ? {} : { sortOrder: input.sortOrder }),
+          },
+        });
+
+        if (count === 0) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
+        }
+
+        return { updated: true };
+      }),
+
+    /**
+     * Archived, not deleted.
+     *
+     * A receipt addendum on a lease already signed names the documents that
+     * were attached when it was signed. Destroying the bytes afterwards would
+     * leave a signed statement that the tenant received something no longer
+     * producible, which is the opposite of what the receipt is for.
+     */
+    remove: authenticatedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+      const scope = await documentScope(ctx.user.id);
+
+      const { count } = await prisma.bizrethinkDocument.updateMany({
+        where: { id: input.id, organisationId: { in: scope }, archivedAt: null },
+        data: { archivedAt: new Date() },
+      });
+
+      if (count === 0) {
+        throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
+      }
+
+      return { removed: true };
+    }),
   }),
 });

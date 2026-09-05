@@ -145,6 +145,16 @@ export type ClauseFacts = {
    */
   hasHoaGoverningDocuments: boolean;
 
+  /**
+   * Whether a move-in condition report is attached to THIS tenancy.
+   *
+   * On the matter, never the property. A condition record describes one
+   * tenancy at one moment; hung on the property it would be receipted into
+   * every later lease as though the incoming tenant had agreed the outgoing
+   * tenant's scuffs — and a deposit deduction rests on that record.
+   */
+  hasConditionReport: boolean;
+
   /*
     Elected terms. These are answers, not derived state — the landlord chooses
     them and the choice selects a clause. Kept on the facts object because

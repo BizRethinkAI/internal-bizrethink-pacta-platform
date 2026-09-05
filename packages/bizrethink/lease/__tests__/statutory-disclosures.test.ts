@@ -39,6 +39,7 @@ const facts = (overrides: Partial<ClauseFacts> = {}): ClauseFacts => ({
   hasPetFees: false,
   hasHoaLeaseRequirements: false,
   hasHoaGoverningDocuments: false,
+  hasConditionReport: false,
   prorationApplies: false,
   propertyType: 'single-family',
   hasPool: true,

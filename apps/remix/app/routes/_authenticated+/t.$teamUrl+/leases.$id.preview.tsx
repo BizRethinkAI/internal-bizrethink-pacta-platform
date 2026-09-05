@@ -49,7 +49,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     the matter — see hydrateMatter. This route renders the same document the
     router does, so it has to supply the same input.
   */
-  const context = await loadPropertyContext(matter.propertyId);
+  const context = await loadPropertyContext(matter.propertyId, matter.id);
 
   /*
     Hydrated through the shared mapping rather than unpacked here. This route

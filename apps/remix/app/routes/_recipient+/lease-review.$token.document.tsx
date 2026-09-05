@@ -66,7 +66,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     landlord's own preview reads correctly, which is precisely the divergence
     the shared mapping exists to prevent.
   */
-  const context = await loadPropertyContext(matter.propertyId);
+  const context = await loadPropertyContext(matter.propertyId, matter.id);
 
   /*
     EVERY document, as one file. This picked the lease out and returned it

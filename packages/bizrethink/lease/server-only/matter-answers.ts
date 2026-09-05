@@ -57,6 +57,8 @@ export type StoredMatter = {
    * renewal is how an interview earns a reputation for being tedious.
    */
   propertyDocuments?: unknown;
+  /** Documents attached to THIS tenancy — the condition report. */
+  matterDocuments?: unknown;
 };
 
 export type HydratedMatter = {
@@ -107,6 +109,7 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
   const utilities = splitByPayer((matter.propertyUtilities ?? []) as UtilityRow[]);
 
   const documents = (matter.propertyDocuments ?? []) as LeaseDocument[];
+  const matterDocuments = (matter.matterDocuments ?? []) as LeaseDocument[];
 
   const endDate = String(values.endDate ?? money.term.startDate);
 
@@ -135,6 +138,8 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       // And an association exists is not the same as its documents being
       // attached. The receipt addendum says the tenant RECEIVED these.
       hasHoaGoverningDocuments: hasGoverningDocuments(documents),
+      // On the MATTER: a condition record describes one tenancy at one moment.
+      hasConditionReport: matterDocuments.some((document) => document.kind === 'move-in-report'),
     } as RenderLeaseInput['facts'],
     money,
     values: {
@@ -164,6 +169,7 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       // Same shape again: the rows are the answer, the numbered list is only
       // their rendering, and the clause interpolates one variable.
       governingDocuments: describeDocuments(documents),
+      conditionReports: describeDocuments(matterDocuments, 'move-in-report'),
       /*
         Also last, and for the reason the party names are. These were SEEDED
         into `values` at creation and then editable as two free-text boxes, so

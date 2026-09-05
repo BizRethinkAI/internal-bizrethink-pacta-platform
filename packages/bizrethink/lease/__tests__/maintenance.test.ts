@@ -39,6 +39,7 @@ const SINGLE_FAMILY: ClauseFacts = {
   hasPetFees: false,
   hasHoaLeaseRequirements: false,
   hasHoaGoverningDocuments: false,
+  hasConditionReport: false,
   prorationApplies: false,
   propertyType: 'single-family',
   hasPool: true,
