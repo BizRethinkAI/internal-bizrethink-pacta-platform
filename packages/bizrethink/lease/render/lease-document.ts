@@ -713,8 +713,8 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
       */
       ...(section.clauses.length === 1
         ? [text(section.clauses[0].text, styles.bodyText, `b-${section.clauses[0].clause.slug}`)]
-        : section.clauses.flatMap((rendered) => [
-            h(
+        : section.clauses.flatMap((rendered) => {
+            const headingRow = h(
               View,
               {
                 style: styles.sectionRow,
@@ -724,9 +724,35 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
               },
               h(Text, { style: styles.sectionNumber }, rendered.number ?? ''),
               h(Text, { style: styles.sectionHeadingText }, rendered.clause.heading.toUpperCase()),
-            ),
-            text(rendered.text, styles.bodyText, `b-${rendered.clause.slug}`),
-          ])),
+            );
+
+            const body = text(rendered.text, styles.bodyText, `b-${rendered.clause.slug}`);
+
+            /*
+              KEEP A HEADING WITH ITS FIRST WORDS, WITHOUT `minPresenceAhead`.
+
+              A heading emitted as a sibling of its body can be placed at a page
+              foot with the body starting overleaf — five clauses did exactly
+              that, leaving a title alone above a third of a page of white.
+
+              `minPresenceAhead` is the idiomatic fix and is UNUSABLE here: it
+              renders this lease correctly and then emits the -2.2e+22 sentinel
+              on other documents, which fails the render outright. Tried, and
+              recorded so it is not tried again.
+
+              So the pair is bound in one `wrap: false` node instead — but only
+              where the clause is SHORT. `wrap: false` on a large node is the
+              same crash, and a bound unit taller than the text area can never
+              be placed at all. Long clauses keep the old behaviour, which is
+              also where an orphan matters least: a long body fills the page
+              under its own heading.
+            */
+            const SHORT_ENOUGH = 420;
+
+            return rendered.text.length <= SHORT_ENOUGH
+              ? [h(View, { key: `k-${rendered.clause.slug}`, wrap: false }, headingRow, body)]
+              : [headingRow, body];
+          })),
     ]),
     ...signatureBlocks(parties, spec.key, spec.withInitials),
   );
