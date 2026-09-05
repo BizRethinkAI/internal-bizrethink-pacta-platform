@@ -243,17 +243,24 @@ export const LeaseReviewPanel = ({ matterId, origin }: ReviewPanelProps) => {
       )}
 
       {reviews.some((review) => review.status === 'closed') && (
-        <button
-          type="button"
-          className="text-muted-foreground text-sm underline underline-offset-4"
-          onClick={() => setShowSpent((shown) => !shown)}
-        >
-          {showSpent
-            ? 'Hide revoked links'
-            : `Show ${reviews.filter((review) => review.status === 'closed').length} revoked link${
-                reviews.filter((review) => review.status === 'closed').length === 1 ? '' : 's'
-              }`}
-        </button>
+        /*
+          A bare <button> is inline-block, so the parent's `space-y` never
+          applied to it and it shared a line with "Send it for review",
+          overlapping it. The wrapper gives it a row of its own.
+        */
+        <div>
+          <button
+            type="button"
+            className="text-muted-foreground text-sm underline underline-offset-4"
+            onClick={() => setShowSpent((shown) => !shown)}
+          >
+            {showSpent
+              ? 'Hide revoked links'
+              : `Show ${reviews.filter((review) => review.status === 'closed').length} revoked link${
+                  reviews.filter((review) => review.status === 'closed').length === 1 ? '' : 's'
+                }`}
+          </button>
+        </div>
       )}
 
       {inviting ? (

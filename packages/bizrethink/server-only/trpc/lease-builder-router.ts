@@ -1102,24 +1102,14 @@ export const leaseBuilderRouter = router({
           The answer set is pinned at issue time so a reviewer returning after
           an edit can be shown what moved. Without it, "I already reviewed
           this" silently stops being true the moment a clause changes.
+
+          THROUGH THE SAME FUNCTION THE COMPARISON USES, and that is the whole
+          point. This once wrote out its own field list, and when `documents`
+          was added to the comparison side it was not added here — so every link
+          was born stale, telling its reviewer the lease had changed before
+          anyone had touched it. One function, or they drift again.
         */
-        const answersHash = hashAnswers({
-          facts: matter.facts,
-          money: matter.money,
-          values: matter.values,
-          customClauses: matter.customClauses,
-          parties: matter.parties,
-          // In the hash: moving palm trimming from you to the tenant changes
-          // the lease an attorney signed off on.
-          yardTasks: matter.yardTasks,
-          /*
-            And the property's utilities, which are read LIVE rather than
-            copied — so editing a utility row rewrites the utility clause of a
-            lease already out for review. Omitted, staleness reported "nothing
-            moved".
-          */
-          utilities: matter.propertyUtilities,
-        });
+        const answersHash = currentAnswersHash(matter);
 
         return await prisma.bizrethinkLeaseReview.create({
           data: {

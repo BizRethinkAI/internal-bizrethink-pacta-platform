@@ -443,6 +443,27 @@ same experiment.
 
 One loose end: `pdffonts` still shows an unembedded `Helvetica` that no style
 here asks for — a react-pdf internal fallback.
+### Every new review link was born stale
+
+Mint a fresh token, open it, and the reviewer is told **"the lease has changed
+since this link was sent"** before anyone has touched anything.
+
+The answer set is hashed twice: once when a link is ISSUED, and again every time
+the reviewer's page asks whether the lease has moved. Both call `hashAnswers`,
+and both wrote out the field list **by hand**. When `documents` was added to the
+comparison side for the receipt addendum, it was not added to the issue side, so
+the two could never match.
+
+The fix is not to add `documents` to the second copy. It is that there is no
+second copy — `create` now calls `currentAnswersHash`, and a guard asserts
+`hashAnswers` is called exactly once in the router.
+
+**Links minted before this fix stay stale**, because their stored hash was
+computed without documents. Revoke and re-issue after deploy.
+
+Also: the "Show N revoked links" disclosure was a bare `<button>`, which is
+inline-block, so the parent's `space-y` never applied and it shared a line with
+"Send it for review" — overlapping it.
 
 
 ### Orphaned headings, and why `minPresenceAhead` is still unusable
