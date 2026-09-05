@@ -410,6 +410,33 @@ passed, or appeared to:
 
 ## Open threads
 
+### Orphaned headings, and why `minPresenceAhead` is still unusable
+
+Five clause headings printed alone at a page foot with their body overleaf —
+a title above a third of a page of white. `minPresenceAhead` is the idiomatic
+fix, and the pagination note in `lease-document.ts` already said it was
+unusable.
+
+**It rendered the Picana lease perfectly.** Zero orphans, 25 pages, no
+inflation. Then the suite failed: `unsupported number: -2.2127632876551446e+22`
+out of pdfkit, on the render-lease and envelope-input fixtures. The existing
+note was right, and a sample of one nearly overruled it.
+
+What works instead: bind the heading and its body in one `wrap: false` node —
+but ONLY where the clause body is short (≤420 characters). `wrap: false` on a
+large node is the same crash, and a bound unit taller than the text area can
+never be placed at all. Long clauses keep the old behaviour, which is also
+where an orphan matters least, because a long body fills the page under its own
+heading.
+
+Clause-level orphans went 5 → 0. Two SECTION heads still orphan; their first
+clause is too long to bind, and without `minPresenceAhead` there is no way to
+pull a heading forward. Bounded by the renderer, not by effort.
+
+`orphans` and `widows` on `Text` are also inert in this build — set both to 2
+and the two single-line carries did not move.
+
+
 ### The page count that could not see 155 pages
 
 Counting pages by scanning raw bytes for `/Type /Page` read the 418-page,
