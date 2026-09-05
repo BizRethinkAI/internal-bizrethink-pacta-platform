@@ -703,7 +703,21 @@ export const FL_INTERVIEW: InterviewStep[] = [
           value: 7,
           note: 'Leases that attach a condition report commonly give the first week of the term, while the tenant is still unpacking and noticing things.',
         },
-        required: true,
+        /*
+          NOT required, though the clause that uses it is.
+
+          The step rail counts required fields that are visible; the Review page
+          lists variables the SELECTED clauses could not fill. Required here put
+          a permanent "1" on this step for every lease with no condition report,
+          while Review stayed silent — because the clause is only selected once
+          a report is attached. A step that would not clear, and a Review that
+          never said why.
+
+          The clause declares the variable required, so attaching a report turns
+          a blank window into a blocking finding at the point it starts to
+          matter. Same shape as the delegated pet question.
+        */
+        required: false,
       },
     ],
   },
