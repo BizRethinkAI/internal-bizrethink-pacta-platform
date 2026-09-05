@@ -24,6 +24,8 @@
  * reference survives unedited, so it is stored and printed as typed.
  */
 
+import { pageLabel } from './count-pages';
+
 export type DocumentKind = 'hoa-governing' | 'move-in-report' | 'move-out-report';
 
 export type LeaseDocument = {
@@ -96,7 +98,7 @@ export const describeDocuments = (documents: LeaseDocument[], kind: DocumentKind
       */
       const inBrackets = [
         document.reference.trim(),
-        document.pageCount === null ? '' : `${document.pageCount} page${document.pageCount === 1 ? '' : 's'}`,
+        document.pageCount === null ? '' : pageLabel(document.pageCount),
       ].filter((part) => part !== '');
 
       const named = date === '' ? document.label.trim() : `${document.label.trim()}, dated ${date}`;

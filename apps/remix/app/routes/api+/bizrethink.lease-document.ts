@@ -1,5 +1,7 @@
+import { countPagesFromBytes } from '@bizrethink/customizations/lease/documents/count-pages';
 import { MAX_DOCUMENT_MB } from '@bizrethink/customizations/lease/documents/placement';
 import { attachLeaseDocument } from '@bizrethink/customizations/lease/server-only/attach-document';
+import { PDFDocument } from '@cantoo/pdf-lib';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 
 import type { Route } from './+types/bizrethink.lease-document';
@@ -19,7 +21,40 @@ import type { Route } from './+types/bizrethink.lease-document';
  *
  * Multipart rather than tRPC because tRPC carries JSON, and base64 in a JSON
  * body would inflate a 54 MB file by a third on the way up.
+ *
+ * The page count is settled HERE rather than in the documents package, because
+ * the exact fallback needs a real PDF parser and that dependency belongs to the
+ * app rather than to a package of pure lease logic.
  */
+
+/**
+ * Pages: the cheap scan first, a real parse only when it comes back empty.
+ *
+ * The scan reads most files exactly and costs one pass over the bytes. It
+ * cannot see the pages of a linearised PDF, whose page objects live in
+ * compressed object streams — the Estancia master declaration is one of those,
+ * 155 pages of which the scan finds none.
+ *
+ * Parsing settles it (155 in ~40 ms; the 418-page, 54 MB inspection in ~400 ms),
+ * but only on the files that need it. A parse failure is not an upload failure:
+ * an encrypted or malformed PDF still stores, and the receipt simply omits the
+ * extent rather than asserting one nobody established.
+ */
+const countPages = async (bytes: Uint8Array): Promise<number | null> => {
+  const scanned = countPagesFromBytes(bytes);
+
+  if (scanned !== null) {
+    return scanned;
+  }
+
+  try {
+    const parsed = await PDFDocument.load(bytes, { updateMetadata: false });
+
+    return parsed.getPageCount();
+  } catch {
+    return null;
+  }
+};
 export async function action({ request }: Route.ActionArgs) {
   if (request.method !== 'POST') {
     return Response.json({ message: 'Method not allowed' }, { status: 405 });
@@ -49,6 +84,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   try {
     const document = await attachLeaseDocument({
+      pageCount: await countPages(new Uint8Array(await file.arrayBuffer())),
       userId: user.id,
       propertyId: asString('propertyId'),
       matterId: asString('matterId'),
