@@ -1,3 +1,4 @@
+import { pageLabel } from '@bizrethink/customizations/lease/documents/count-pages';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -178,8 +179,7 @@ export const GoverningDocumentEditor = ({ propertyId, matterId, kind }: Governin
               </div>
 
               <p className="self-end text-muted-foreground text-xs">
-                {document.pageCount === null ? 'Extent unknown' : `${document.pageCount} pages`} ·{' '}
-                {readableSize(document.sizeBytes)}
+                {pageLabel(document.pageCount)} · {readableSize(document.sizeBytes)}
               </p>
             </div>
 

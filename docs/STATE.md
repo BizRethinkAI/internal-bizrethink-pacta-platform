@@ -410,6 +410,31 @@ passed, or appeared to:
 
 ## Open threads
 
+### The page count that could not see 155 pages
+
+Counting pages by scanning raw bytes for `/Type /Page` read the 418-page,
+54 MB move-in inspection exactly, and four other real PDFs besides. It reported
+**nothing** for the Estancia master declaration — 155 pages — because that file
+is linearised and its page objects live in **compressed object streams**, where
+no such marker survives in the plain bytes.
+
+It failed safe (null, never a wrong number) but on the largest and most
+important document in the set, which is the failure mode worth noticing: the
+scan works on everything you casually test and misses the optimized file
+somebody actually sends you.
+
+`@cantoo/pdf-lib` was already an `apps/remix` dependency, used by the signing
+pipeline, and settles it — 155 pages in ~40 ms, the 418-page scan in ~400 ms. So
+the cheap scan stays as the fast path and a real parse runs only when it returns
+null. The parse lives in the ROUTE, not the documents package, so a package of
+pure lease logic does not take on a PDF parser. A parse failure is not an upload
+failure: the file still stores and the receipt omits the extent.
+
+**The extent sentence was written twice and the two disagreed** — the addendum
+said "1 page", the editor said "1 pages" for the same one-page file. One
+`pageLabel` now, used by both.
+
+
 ### Two ways of counting "outstanding", and the field that fell between them
 
 The step rail counts interview fields that are **required and visible**. The

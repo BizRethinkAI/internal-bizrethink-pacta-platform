@@ -22,32 +22,20 @@ export type AttachDocumentInput = {
   /** ISO date on the face of the document, which is rarely the upload date. */
   documentDate?: string;
   file: File;
+  /**
+   * Pages, established by the caller.
+   *
+   * Not counted here: the exact fallback needs a real PDF parser, and that
+   * dependency belongs to the route rather than to this package. Null is a
+   * legitimate answer — the receipt then omits the extent rather than
+   * asserting one nobody verified.
+   */
+  pageCount?: number | null;
 };
 
 const KINDS: DocumentKind[] = ['hoa-governing', 'move-in-report', 'move-out-report'];
 
 const isKind = (value: string): value is DocumentKind => (KINDS as string[]).includes(value);
-
-/**
- * Pages, counted from the file itself rather than asked for.
- *
- * The count is printed on the receipt addendum, where its whole job is to let a
- * signer confirm the document they opened is the one the page names. A
- * hand-typed figure would be the landlord's claim about the file rather than a
- * fact of it, which is precisely the wrong way round.
- *
- * Counted by scanning for page objects instead of parsing the document: a
- * 54 MB scan of photographs takes real time and memory to parse fully, and an
- * approximate count that never blocks an upload is worth more here than an
- * exact one that can. Null when the shape is unrecognised — the receipt simply
- * omits the extent.
- */
-const countPages = (bytes: Uint8Array): number | null => {
-  const text = Buffer.from(bytes).toString('latin1');
-  const matches = text.match(/\/Type\s*\/Page[^s]/g);
-
-  return matches && matches.length > 0 ? matches.length : null;
-};
 
 export const attachLeaseDocument = async (input: AttachDocumentInput) => {
   if (!isKind(input.kind)) {
@@ -85,8 +73,12 @@ export const attachLeaseDocument = async (input: AttachDocumentInput) => {
     throw new Error('That property or lease could not be found.');
   }
 
-  const bytes = new Uint8Array(await input.file.arrayBuffer());
-
+  /*
+    `file.size`, not a re-read of the buffer. Counting the pages already reads
+    these bytes once and putFileServerSide reads them again; pulling a third
+    copy of a 54 MB scan into memory to learn a number the File already carries
+    is the kind of waste that only shows up on the largest upload.
+  */
   const stored = await putFileServerSide(input.file);
 
   const documentData = await prisma.documentData.create({
@@ -119,8 +111,8 @@ export const attachLeaseDocument = async (input: AttachDocumentInput) => {
       documentDate: input.documentDate ? new Date(`${input.documentDate}T00:00:00Z`) : null,
       documentDataId: documentData.id,
       contentType: input.file.type || 'application/pdf',
-      sizeBytes: bytes.byteLength,
-      pageCount: countPages(bytes),
+      sizeBytes: input.file.size,
+      pageCount: input.pageCount ?? null,
       sortOrder: (last?.sortOrder ?? -1) + 1,
       organisationId: owner.organisationId,
       uploadedByUserId: input.userId,
