@@ -1825,6 +1825,29 @@ pages, footers and recitals, so clone-and-retitle was never viable — and strip
 the ACH-debit collection machinery per Lombard's ADR 0019, leaving `[Reserved]`
 stubs rather than renumbering, so the disclosures' cross-references stay valid.
 
+**Deleting a document is a HARD delete unless it is COMPLETED**, and it takes
+the audit trail with it. `delete-document.ts` branches on status: completed
+envelopes are soft-deleted (`deletedAt` set, row and object survive), while
+**DRAFT and PENDING envelopes are destroyed** by `prisma.envelope.delete`. The
+`DOCUMENT_DELETED` audit row written immediately beforehand cascades with the
+envelope — the code says so itself — so nothing survives to show the document
+ever existed. `cancelDocument` (`POST /api/v2/envelope/cancel`, `{envelopeId,
+reason}`) is the primitive that voids without destroying; it refuses anything
+not `PENDING`, so it is not idempotent. This cost Lombard real data: every
+voiding path on their platform routed through `/document/delete`, so
+served-but-unsigned state disclosures were hard-deleted, and the loss is not
+countable from here because the audit rows went too. Fixed on their side
+(lombard-platform PR #128).
+
+**Two Pacta items are queued behind a counsel answer**, recorded here because
+they are ours and are currently written down only in Lombard's repo: a
+**four-year retention floor** that refuses deletion of any envelope served to a
+recipient (California 10 CCR §952(d) appears to require four-year retention of
+every disclosure presented to a recipient — unconfirmed), and retiring
+`/document/*` in favour of `/envelope/*`. Neither should be built before
+counsel confirms the duty is real; a guard's value is that it encodes a
+specific rule.
+
 **Nothing here is cleared for a real signer.** Open gates, all owner/counsel:
 states of organization for both Lombard entities (currently the working text "a
 Florida limited liability company"), prescribed-form literals for all eleven
