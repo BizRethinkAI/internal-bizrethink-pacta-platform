@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { PICANA_FACTS, PICANA_MONEY, PICANA_VALUES } from '../matters/picana-ln';
@@ -54,5 +55,46 @@ describe('the rendered lease', () => {
       would fail this test for a reason nobody could act on.
     */
     expect(pdf).not.toMatch(/\/BaseFont\s*\/Times-(Roman|Italic|Bold)/);
+  });
+});
+
+/*
+  THE TEST ABOVE PASSED WHILE PRODUCTION WAS BROKEN.
+
+  The fonts were first registered from a path resolved with `import.meta.url`.
+  Locally that path exists, so every test went green. In the container it does
+  not: the bundler rewrites `import.meta.url` to the bundle's own directory, and
+  the runtime image contains no `packages/bizrethink` at all. Every lease PDF
+  returned 500 with ENOENT.
+
+  No test that renders can catch that, because the thing that differs is the
+  filesystem the renderer is standing on. So this asserts the renderer never
+  asks the filesystem anything — which is the property that actually holds
+  across environments.
+*/
+describe('the renderer', () => {
+  /*
+    Comments stripped first: this file's own note explaining the bug names
+    `import.meta.url`, and a guard that its own rationale trips is a guard
+    nobody can keep.
+  */
+  const source = readFileSync(new URL('../render/lease-document.ts', import.meta.url), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/gm, '');
+
+  it('resolves no path at runtime, because the container has a different one', () => {
+    expect(source, 'import.meta.url is rewritten by the bundler and points into the build output').not.toMatch(
+      /import\.meta\.url/,
+    );
+    expect(source, 'the runtime image does not ship packages/bizrethink, so no font file can be read').not.toMatch(
+      /readFileSync|fileURLToPath/,
+    );
+  });
+
+  it('registers every face from bytes', () => {
+    const registrations = source.match(/Font\.register\(/g) ?? [];
+    expect(registrations.length).toBe(4);
+    expect(source).toMatch(/src: TINOS_REGULAR/);
+    expect(source).toMatch(/src: SANS_SEMIBOLD/);
   });
 });

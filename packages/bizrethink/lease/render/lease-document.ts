@@ -1,5 +1,3 @@
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { Document, Font, Page, renderToStream, StyleSheet, Text, View } from '@react-pdf/renderer';
 import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
@@ -8,6 +6,7 @@ import type { Clause } from '../clauses/types';
 import { FL_SECTION_NAMES } from '../clauses/us-fl';
 import type { SelectedClause } from '../engine/select-clauses';
 import type { MoneyLine } from '../money/types';
+import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_ITALIC, TINOS_REGULAR } from './fonts/font-data';
 import type { InterpolationValue } from './interpolate';
 import { interpolateClause } from './interpolate';
 import type { LeaseParty, PartyRole } from './signature-blocks';
@@ -66,8 +65,6 @@ import { buildSignatureBlocks } from './signature-blocks';
   section labels, table columns, footer — so the reader can tell at a glance
   what is the agreement and what is the furniture.
 */
-const FONT_DIR = join(dirname(fileURLToPath(import.meta.url)), 'fonts');
-
 /*
   FOUR FAMILIES, ONE FACE EACH, rather than one family with weights and styles.
 
@@ -78,10 +75,22 @@ const FONT_DIR = join(dirname(fileURLToPath(import.meta.url)), 'fonts');
   silently render regular — italic subtitles and bold headings quietly
   flattened, with nothing to fail.
 */
-Font.register({ family: 'SerifBody', src: join(FONT_DIR, 'Tinos-Regular.ttf') });
-Font.register({ family: 'SerifItalic', src: join(FONT_DIR, 'Tinos-Italic.ttf') });
-Font.register({ family: 'SansBody', src: join(FONT_DIR, 'SourceSans3-Regular.ttf') });
-Font.register({ family: 'SansBold', src: join(FONT_DIR, 'SourceSans3-SemiBold.ttf') });
+/*
+  REGISTERED FROM BYTES, NOT FROM A PATH, and that is not a style preference.
+
+  The first version resolved a directory beside this module. It worked in every
+  test and failed in production: the bundler rewrites the module's own location
+  to the bundle's directory, and the runtime image does not contain
+  `packages/bizrethink` at all. Every lease PDF returned 500 with ENOENT on a
+  directory that has never existed.
+
+  A path can be wrong in a way only production discovers. Bytes travel in the
+  bundle and cannot be in the wrong place.
+*/
+Font.register({ family: 'SerifBody', src: TINOS_REGULAR });
+Font.register({ family: 'SerifItalic', src: TINOS_ITALIC });
+Font.register({ family: 'SansBody', src: SANS_REGULAR });
+Font.register({ family: 'SansBold', src: SANS_SEMIBOLD });
 
 const SERIF = 'SerifBody';
 const SERIF_ITALIC = 'SerifItalic';
