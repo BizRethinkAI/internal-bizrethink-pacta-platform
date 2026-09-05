@@ -38,6 +38,7 @@ import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only
 import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { draftClause } from '../../lease/server-only/draft-clause';
 import { hydrateMatter } from '../../lease/server-only/matter-answers';
+import { loadPropertyContext } from '../../lease/server-only/property-context';
 import { seedMatterFromProperty } from '../../lease/server-only/seed-from-property';
 import type { UtilityRow } from '../../lease/utilities/derive-utilities';
 import type { YardTask } from '../../lease/yard/derive-yard';
@@ -192,12 +193,7 @@ const loadMatter = async (id: string, userId: number) => {
     tenancies, and a lease created before its property had utilities recorded
     would otherwise hold two empty required boxes that nothing could fill.
   */
-  const property = await prisma.bizrethinkProperty.findUnique({
-    where: { id: matter.propertyId },
-    select: { utilities: true },
-  });
-
-  return { ...matter, propertyUtilities: property?.utilities ?? [] };
+  return { ...matter, ...(await loadPropertyContext(matter.propertyId)) };
 };
 
 /**
@@ -266,6 +262,7 @@ const currentAnswersHash = (matter: {
   parties: unknown;
   yardTasks: unknown;
   propertyUtilities: unknown;
+  propertyDocuments: unknown;
 }): string =>
   hashAnswers({
     facts: matter.facts,
@@ -279,6 +276,13 @@ const currentAnswersHash = (matter: {
     // Read LIVE from the property rather than copied, so editing a utility row
     // rewrites the utility clause of a lease already out for review.
     utilities: matter.propertyUtilities,
+    /*
+      Live for the same reason, and it matters more here. The receipt addendum
+      is a signed statement that the tenant received a NAMED list of documents.
+      Attaching an amendment after a link went out changes that list, and a
+      reviewer who approved the shorter one has approved something else.
+    */
+    documents: matter.propertyDocuments,
   });
 
 const reviewBlockersFor = async (matterId: string, answersHash?: string): Promise<string[]> => {
@@ -320,8 +324,10 @@ const hydrate = (matter: {
   customClauses: unknown;
   parties: unknown;
   yardTasks?: unknown;
-  // Read live from the property by loadMatter, not stored on the matter.
+  // Read live from the property by loadPropertyContext, not stored on the
+  // matter — see property-context.ts for why both arrive together.
   propertyUtilities?: unknown;
+  propertyDocuments?: unknown;
 }): {
   facts: never;
   money: Parameters<typeof deriveFacts>[0];
@@ -1294,21 +1300,17 @@ export const leaseBuilderRouter = router({
         live, so they belong in the hash — otherwise editing a utility row moves
         the document while this flag still says nothing changed.
       */
-      const property = await prisma.bizrethinkProperty.findUnique({
-        where: { id: matter.propertyId },
-        select: { utilities: true },
-      });
+      const context = await loadPropertyContext(matter.propertyId);
 
       /*
         Both audiences see the whole lease, so this flag is the only thing
         separating "you reviewed this" from "you reviewed something else".
       */
-      const changedSinceIssued =
-        currentAnswersHash({ ...matter, propertyUtilities: property?.utilities ?? [] }) !== review.answersHash;
+      const changedSinceIssued = currentAnswersHash({ ...matter, ...context }) !== review.answersHash;
 
       // Through the shared mapping, so the reviewer reads the document the
       // landlord previews and the signers receive.
-      const answers = hydrateMatter({ ...matter, propertyUtilities: property?.utilities ?? [] });
+      const answers = hydrateMatter({ ...matter, ...context });
 
       /*
         Questions for the tenant, resolved from the field DEFINITIONS and

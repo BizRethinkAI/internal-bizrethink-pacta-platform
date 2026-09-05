@@ -1,4 +1,6 @@
 import type { CustomClauseInput } from '../clauses/custom';
+import type { LeaseDocument } from '../documents/derive-documents';
+import { describeDocuments, hasGoverningDocuments } from '../documents/derive-documents';
 import { deriveFacts } from '../interview/derive-facts';
 import { propertyTypeLabelFor } from '../interview/property-type';
 import type { LeasePartyInput } from '../parties/derive-parties';
@@ -47,6 +49,14 @@ export type StoredMatter = {
    * be frozen at creation.
    */
   propertyUtilities?: unknown;
+  /**
+   * The PROPERTY's uploaded documents, passed in by the caller.
+   *
+   * Property-level for the reason the utilities are: a recorded declaration
+   * outlives every tenancy on it, and re-uploading a hundred pages each
+   * renewal is how an interview earns a reputation for being tedious.
+   */
+  propertyDocuments?: unknown;
 };
 
 export type HydratedMatter = {
@@ -96,6 +106,8 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
 
   const utilities = splitByPayer((matter.propertyUtilities ?? []) as UtilityRow[]);
 
+  const documents = (matter.propertyDocuments ?? []) as LeaseDocument[];
+
   const endDate = String(values.endDate ?? money.term.startDate);
 
   return {
@@ -120,6 +132,9 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       hasPetFees: Number(values.petFeeUsd ?? 0) > 0 || Number(values.petRentMonthlyUsd ?? 0) > 0,
       // An association exists is not the same as an association demands.
       hasHoaLeaseRequirements: String(values.hoaLeaseRequirements ?? '').trim() !== '',
+      // And an association exists is not the same as its documents being
+      // attached. The receipt addendum says the tenant RECEIVED these.
+      hasHoaGoverningDocuments: hasGoverningDocuments(documents),
     } as RenderLeaseInput['facts'],
     money,
     values: {
@@ -146,6 +161,9 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       propertyTypeLabel: propertyTypeLabelFor(String(facts.propertyType ?? '')),
       // Likewise: the rows are the answer, the prose is only their rendering.
       yardDuties,
+      // Same shape again: the rows are the answer, the numbered list is only
+      // their rendering, and the clause interpolates one variable.
+      governingDocuments: describeDocuments(documents),
       /*
         Also last, and for the reason the party names are. These were SEEDED
         into `values` at creation and then editable as two free-text boxes, so

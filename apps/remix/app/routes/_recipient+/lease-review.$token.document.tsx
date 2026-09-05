@@ -2,6 +2,7 @@ import { renderLeaseForReview } from '@bizrethink/customizations/lease/render/re
 import { isReviewUsable } from '@bizrethink/customizations/lease/review/disposition';
 import type { ReviewAudience, ReviewStatus } from '@bizrethink/customizations/lease/review/types';
 import { renderInputForMatter } from '@bizrethink/customizations/lease/server-only/matter-answers';
+import { loadPropertyContext } from '@bizrethink/customizations/lease/server-only/property-context';
 import { prisma } from '@documenso/prisma';
 
 import type { Route } from './+types/lease-review.$token.document';
@@ -65,10 +66,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     landlord's own preview reads correctly, which is precisely the divergence
     the shared mapping exists to prevent.
   */
-  const property = await prisma.bizrethinkProperty.findUnique({
-    where: { id: matter.propertyId },
-    select: { utilities: true },
-  });
+  const context = await loadPropertyContext(matter.propertyId);
 
   /*
     EVERY document, as one file. This picked the lease out and returned it
@@ -79,9 +77,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     Signing is unchanged: the envelope still gets distinct items. This is only
     how they are read.
   */
-  const pdf = await renderLeaseForReview(
-    renderInputForMatter({ ...matter, propertyUtilities: property?.utilities ?? [] }),
-  );
+  const pdf = await renderLeaseForReview(renderInputForMatter({ ...matter, ...context }));
 
   return new Response(new Uint8Array(pdf), {
     headers: {

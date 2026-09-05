@@ -1938,4 +1938,66 @@ model BizrethinkLibraryReview {
   @@index([organisationId])
 }
 
+// ─── Uploaded documents (property and matter) ─────────────────────────────
+//
+// Everything else in the lease package is ASSEMBLED from clauses. These are
+// not. A recorded declaration and a photographic condition report exist before
+// the lease does, and no amount of drafting produces them.
+//
+// They are acknowledged rather than bound in. Upstream's EnvelopeAttachment is
+// `z.enum(['link'])` and carries no bytes, so anything inside the signing
+// package must be an EnvelopeItem the signer scrolls through — and the move-in
+// inspection for one house ran to 418 pages and 54 MB. The envelope instead
+// gets one generated page naming each document; the files are read alongside.
+//
+// `documentDataId` points at upstream's DocumentData WITHOUT a Prisma relation,
+// per the convention at the top of this file: the reverse-relation field would
+// have to be added to an upstream model. Deletion is handled in code.
+model BizrethinkDocument {
+  id String @id
+
+  // Exactly one owner, enforced in code (Prisma cannot express a check
+  // constraint). A declaration belongs to the PROPERTY: it outlives every
+  // tenancy on it, and re-uploading a few hundred pages each renewal is how an
+  // interview earns a reputation for being tedious. A condition report belongs
+  // to the MATTER: it records one tenancy at one moment and is meaningless
+  // attached to the next.
+  propertyId String?
+  matterId   String?
+
+  // 'hoa-governing' | 'move-in-report' | 'move-out-report'
+  kind String
+
+  /// How a human refers to it. "Ninth Amendment to the Declaration".
+  label String
+
+  /// As recorded, printed VERBATIM on the receipt addendum: a signer who wants
+  /// to check what they agreed to should be able to take this line to the
+  /// county recorder and pull the same instrument. "Instr# 2021271188".
+  reference String?
+
+  /// The date on the face of the document, which is rarely the upload date.
+  documentDate DateTime?
+
+  documentDataId String
+  contentType    String @default("application/pdf")
+  sizeBytes      Int
+  pageCount      Int?
+
+  /// The order they are listed in on the receipt. Recording order is not
+  /// upload order, and an amendment listed before its declaration reads wrong.
+  sortOrder Int @default(0)
+
+  organisationId   String
+  uploadedByUserId Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  archivedAt DateTime?
+
+  @@index([propertyId])
+  @@index([matterId])
+  @@index([organisationId])
+}
+
 // BIZRETHINK_ADDITIONS_END

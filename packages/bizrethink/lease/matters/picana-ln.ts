@@ -63,6 +63,11 @@ export const PICANA_FACTS: ClauseFacts = {
   // the `use.occupancy-limit-with-others` variant.
   hasNamedOccupants: true,
   hasHoa: true,
+  // Derived in hydrateMatter; stated here because these fixtures drive clause
+  // selection directly rather than going through it.
+  hasPetFees: false,
+  hasHoaLeaseRequirements: false,
+  hasHoaGoverningDocuments: false,
   prorationApplies: false,
   propertyType: 'single-family',
   hasPool: true,

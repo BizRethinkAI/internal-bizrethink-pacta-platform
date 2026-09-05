@@ -124,6 +124,16 @@ export const DERIVED_FACTS = [
   'termMonths',
   'hasYardAllocation',
   'hasTenantYardDuty',
+  /*
+    All three are the same shape: an answer exists is not the same as the thing
+    it gates being true. A pet allowed is not a pet fee; an association is not a
+    demand that association makes of the lease; and an association is not its
+    documents being attached. Each is computed in hydrateMatter from the answer
+    that actually decides it.
+  */
+  'hasPetFees',
+  'hasHoaLeaseRequirements',
+  'hasHoaGoverningDocuments',
 ];
 
 export const DERIVED_VALUES = [
@@ -150,6 +160,10 @@ export const DERIVED_VALUES = [
   'propertyTypeLabel',
   // Rendered from the yard rows, not typed.
   'yardDuties',
+  // Rendered from the PROPERTY's uploaded governing documents. Never typed:
+  // the numbered list on the receipt addendum has to match the files a signer
+  // can actually open, and a free-text box is how those two drift apart.
+  'governingDocuments',
   /*
     Rendered from the PROPERTY's utility rows. These were two free-text boxes
     on step 4 and `required`, which meant a lease could state a different

@@ -514,6 +514,48 @@ export const FL_LEASE_BODY: Clause[] = [
     asserts: ['hoa-amenity-access'],
   },
 
+  /*
+    The receipt that makes hoa.compliance mean something.
+
+    That clause binds the tenant to the governing documents and to all of the
+    Owner's obligations under them. A tenant who was handed no documents has
+    the obvious answer, and until this addendum existed the lease had no reply.
+
+    AN ADDENDUM RATHER THAN THE DOCUMENTS THEMSELVES. Upstream's
+    EnvelopeAttachment is `z.enum(['link'])` and carries no bytes, so anything
+    inside the signing package must be an EnvelopeItem the signer scrolls. A
+    declaration and its amendments run to hundreds of pages; putting them there
+    buries the lease. One page naming each instrument, with the documents
+    readable alongside, is the trade.
+
+    NOTHING ABOUT ANY PARTICULAR ASSOCIATION IS STATED HERE. What was recorded,
+    when, and under which instrument number is data — see derive-documents.
+  */
+  {
+    slug: 'hoa.governing-documents-receipt',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'addendum',
+    section: 'rules',
+    sortKey: 63,
+    heading: 'Receipt of Governing Documents',
+    body: 'Tenant acknowledges having received a copy of each of the following governing documents of {{hoaName}}, and has had the opportunity to read them:\n\n{{governingDocuments}}\n\nTenant is bound by these documents as provided in this Lease. Landlord shall give Tenant a copy of any amendment adopted during the term that changes what Tenant must do.',
+    source: drafted(),
+    status: 'draft',
+    includeWhen: (facts) => facts.hasHoa && facts.hasHoaGoverningDocuments,
+    variables: [
+      { name: 'hoaName', type: 'string', label: 'Association name', required: true },
+      {
+        name: 'governingDocuments',
+        type: 'string',
+        label: 'The documents attached, as a numbered list',
+        required: true,
+      },
+    ],
+    supersedes: [],
+    asserts: ['hoa-documents-received'],
+  },
+
   {
     slug: 'hoa.cure',
     version: 1,

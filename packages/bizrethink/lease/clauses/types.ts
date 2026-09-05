@@ -135,6 +135,16 @@ export type ClauseFacts = {
    */
   hasHoaLeaseRequirements: boolean;
 
+  /**
+   * Whether the association's governing documents are actually attached.
+   *
+   * Separate from `hasHoaLeaseRequirements` and from `hasHoa` for the reason
+   * that keeps recurring here: each is a different question. The receipt
+   * addendum is a signed statement that the tenant RECEIVED these documents,
+   * and a receipt for nothing is worse than no receipt at all.
+   */
+  hasHoaGoverningDocuments: boolean;
+
   /*
     Elected terms. These are answers, not derived state — the landlord chooses
     them and the choice selects a clause. Kept on the facts object because
