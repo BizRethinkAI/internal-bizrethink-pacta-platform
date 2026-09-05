@@ -1,6 +1,17 @@
 # Typefaces carried in the signed lease
 
-These four files are embedded into every PDF this package renders. They are here
+These four files are the SOURCE for `font-data.ts`, which is what the renderer
+actually loads. They are not read at runtime.
+
+**Why not.** The first version resolved a path beside the renderer module. Every
+test passed and production returned 500 on every lease PDF: the bundler rewrites
+the module's location to the bundle's own directory, and the runtime image
+copies only `apps/remix/build` plus a few configs — `packages/bizrethink` is not
+in the container at all. This README previously asserted the files "already
+would" ship. They do not. Regenerate with `node scripts/inline-fonts.mjs` after
+replacing a .ttf.
+
+The typefaces are embedded into every PDF this package renders. They are here
 rather than referenced by name because a standard-14 face is **not carried in
 the file**: every viewer substitutes its own metrics, so a signed lease is not
 guaranteed to render as it was signed, and PDF/A rejects it. That is a poor
