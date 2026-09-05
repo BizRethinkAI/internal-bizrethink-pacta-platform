@@ -410,6 +410,27 @@ passed, or appeared to:
 
 ## Open threads
 
+### Two ways of counting "outstanding", and the field that fell between them
+
+The step rail counts interview fields that are **required and visible**. The
+Review page lists `missing` — variables the **selected clauses** could not fill.
+Those are different questions, and `conditionObjectionDays` answered them
+differently: required on the step, so every lease was badged "1" on step 7
+forever; but its clause is only selected once a condition report is attached, so
+Review never mentioned it.
+
+A landlord saw a step that would not clear and a Review that never said why. The
+fix is to stop asserting it up front — the clause already declares the variable
+required, so attaching a report turns a blank window into a blocking finding at
+the moment it starts to mattering. Same shape as the delegated pet question,
+which is the pattern that already worked.
+
+Worth keeping in mind for any future question that only matters once something
+is attached: `required: true` on the step is a claim about EVERY lease, and the
+clause's own `variables` is the place to make a claim about the leases where the
+clause actually appears.
+
+
 ### Documents a human uploaded, as opposed to documents we generate
 
 Everything in the lease package was assembled from clauses. A recorded
