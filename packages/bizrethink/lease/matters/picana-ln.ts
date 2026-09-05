@@ -160,6 +160,9 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   // Fallback only. The Estancia notices state their own cure date.
   hoaCureDays: 14,
   hoaNoticeHours: 24,
+  // The association charges to register a tenant and issue access cards.
+  // Silence here is an argument during move-in week.
+  amenityFeesPaidBy: 'Landlord',
 
   noticeName: 'Shwet Prabhat',
   noticeAddress: '537 Lochaven Road, Waxhaw, NC 28173',

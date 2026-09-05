@@ -101,9 +101,23 @@ describe('provenance invariants', () => {
     expect(FL_LIBRARY.flatMap(assertPublishable)).toEqual([]);
   });
 
-  it('cites a statute on every clause that claims to be compelled by one', () => {
+  /*
+    `requiredBy` used to demand a statute or the U.S. Code, on the assumption
+    that only legislation can compel a lease term. It cannot.
+
+    A RECORDED COVENANT compels too, and runs with the land. The Ninth
+    Amendment to the Estancia declaration (Instr# 2021271188) says every lease
+    "shall" contain certain terms; a lease omitting them is non-compliant on
+    its face, exactly as if a statute had said it. The invariant was narrower
+    than the world.
+
+    What it still refuses is a bare assertion: whatever is cited must be
+    findable — a statute, a regulation, or an instrument with a recording
+    reference someone can pull from the county records.
+  */
+  it('cites something findable on every clause that claims to be compelled', () => {
     const uncited = FL_LIBRARY.filter((c) => c.requiredBy !== undefined).filter(
-      (c) => !/(Fla\. Stat\.|U\.S\.C\.)/.test(c.requiredBy!),
+      (c) => !/(Fla\. Stat\.|U\.S\.C\.|C\.F\.R\.|Instr#\s*\d+|OR\s*\d+\/\d+)/.test(c.requiredBy!),
     );
 
     expect(uncited.map((c) => c.slug)).toEqual([]);

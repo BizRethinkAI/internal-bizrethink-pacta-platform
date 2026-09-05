@@ -410,6 +410,58 @@ passed, or appeared to:
 
 ## Open threads
 
+### A recorded covenant compels a lease term, and the model did not know it
+
+The Estancia declaration's Ninth Amendment (Instr# 2021271188, OR 10509/675,
+recorded 16 Dec 2021) rewrote Article XI §36 (Leases). Three of its
+requirements are not advice — §36(b) says every lease **shall** contain them:
+
+```
+(b)(ii)   only for the entire Lot and associated garage
+(b)(iii)  no more than two parking spaces, INCLUDING the garage
+(b)(iv)   the tenant is bound by and subject to ALL of the obligations
+          of the Owner under the Declaration
+```
+
+Our clause said the tenant "shall comply with" the governing documents, which
+is narrower than standing in the owner's shoes. The parking cap appeared
+nowhere at all — on a house with a two-car garage that is the entire allowance,
+nothing on the driveway, and a tenant would have discovered it from a towing
+notice.
+
+**`library-invariants` rejected the new clauses**, because `requiredBy` demanded
+`Fla. Stat.` or `U.S.C.` — the model assumed only legislation can compel a lease
+term. It cannot. A recorded covenant runs with the land and compels exactly as a
+statute does. The invariant was narrower than the world, and now accepts a
+recording reference while still refusing a bare assertion.
+
+### Never write the managing agent into a lease
+
+The Community Amenity Guidelines (January 2020) route tenant amenity access
+through a New Tenant Profile form filed with **Evergreen Lifestyles Management**
+and a **$25** fee. The association is now managed by CMG.
+
+The RULE survived the change of agent — approval is still required. Every
+operational detail around it did not: the form's name, the fee, the address, the
+email. A lease naming any of them would have been wrong on the day it was signed
+and wrong again at the next change of manager.
+
+So `hoa.amenity-access` names none of them, and a test asserts the absence of
+"Evergreen", "CMG", "$25" and "New Tenant Profile" specifically. It says what is
+durable: approval is the association's, on whatever process they require from
+time to time, and it is not guaranteed by the Lease. Who pays the fees is asked
+rather than assumed.
+
+**Two gates, not one.** §36(d) also bars a tenant from the common areas until
+the landlord has filed the tenant's details and the signed lease — so the
+landlord has a deadline (the date of occupancy) whose consequence lands on the
+tenant. And §36(e) suspends the landlord's own access for the term; the
+Guidelines confirm the cards are actually deactivated.
+
+**The general shape:** when a document tells you a rule and also tells you who
+administers it, only the first belongs in a contract.
+
+
 ### The page said what a clause was, never why it was there
 
 The clause library showed `parties.recital · v2 · parties · Unapproved`. True,

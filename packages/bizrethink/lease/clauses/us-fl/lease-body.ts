@@ -425,7 +425,7 @@ export const FL_LEASE_BODY: Clause[] = [
       what ARRIVES there — an envelope they can pass on unopened, or a notice
       taped to the door.
     */
-    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them. Tenant shall reimburse Landlord as an Other Charge for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any association notice received at or posted on the Premises.',
+    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them, and Tenant shall be bound by and subject to all of the obligations of the Owner under those governing documents. Tenant shall reimburse Landlord as an Other Charge for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any association notice received at or posted on the Premises.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa,
@@ -435,6 +435,79 @@ export const FL_LEASE_BODY: Clause[] = [
     ],
     supersedes: [],
     asserts: ['hoa-compliance', 'hoa-fines-passed-through'],
+  },
+
+  /*
+    Ninth Amendment to the Amended and Restated Master Declaration for Estancia
+    at Wiregrass, Instr# 2021271188, OR BK 10509 PG 675, recorded 16 Dec 2021,
+    rewriting Article XI Section 36 (Leases). Read 2026-09-04.
+
+    §36(b) says every lease SHALL contain these. That is a different category
+    from the drafting choices elsewhere in this library: a recorded covenant
+    runs with the land, and a lease that omits what it requires is
+    non-compliant on its face.
+
+    The parking cap is the one a tenant will actually feel. Two spaces INCLUDING
+    the garage means a two-car garage is the entire allowance — nothing on the
+    driveway. Better said in the lease than discovered by a towing notice.
+  */
+  {
+    slug: 'hoa.lease-scope',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'rules',
+    sortKey: 62,
+    heading: 'Association Requirements for This Lease',
+    body: 'The governing documents require that this Lease be only for the entire Lot and the associated garage, and it is. No more than two parking spaces, including the garage, may be used by Tenant, occupants and guests at any time.',
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Ninth Amendment, Instr# 2021271188 (OR 10509/675), Art. XI §36(b)',
+    includeWhen: (facts) => facts.hasHoa,
+    variables: [],
+    supersedes: [],
+    asserts: ['hoa-lease-scope'],
+  },
+
+  /*
+    Two gates stand between a tenant and the pool, and neither is the
+    landlord's to open:
+
+      Declaration §36(d) — no tenant may use the Common Areas or recreational
+        facilities until the Owner has complied with §36, i.e. filed the
+        tenant's name, address, telephone number and a copy of the signed
+        lease no later than the date of occupancy.
+      Community Amenity Guidelines — the renter must be approved by the Board
+        or Manager, through a tenant profile form and an application fee.
+
+    NOTHING OPERATIONAL IS NAMED HERE ON PURPOSE. The Guidelines are dated
+    January 2020 and route everything through Evergreen Lifestyles Management
+    with a $25 fee; the association is now managed by CMG. The RULE survived the
+    change of agent — the form's name, the fee and the address did not. Writing
+    them into a lease would make it wrong on the day it was signed, and wrong
+    again at the next change of manager.
+
+    §36(e) also deactivates the OWNER'S access for the term. Stated so the
+    landlord is not surprised by their own card failing.
+  */
+  {
+    slug: 'hoa.amenity-access',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'rules',
+    sortKey: 64,
+    heading: 'Association Amenities',
+    body: "Use of the association's common areas and recreational facilities by Tenant is subject to the association's approval and to whatever registration process and fees the association requires from time to time. It is not guaranteed by this Lease. Landlord shall give the association Tenant's name, address and telephone number and a copy of this Lease no later than the date Tenant takes occupancy, and shall submit whatever the association requires for Tenant to be registered. Any application, access card or gate device fees charged by the association are payable by {{amenityFeesPaidBy}}. While Tenant is registered, Landlord's own right to use those facilities is suspended.",
+    source: drafted(),
+    status: 'draft',
+    requiredBy: 'Ninth Amendment, Instr# 2021271188 (OR 10509/675), Art. XI §36(d); Community Amenity Guidelines',
+    includeWhen: (facts) => facts.hasHoa,
+    variables: [
+      { name: 'amenityFeesPaidBy', type: 'string', label: 'Who pays the association amenity fees', required: true },
+    ],
+    supersedes: [],
+    asserts: ['hoa-amenity-access'],
   },
 
   {

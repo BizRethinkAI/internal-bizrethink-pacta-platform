@@ -552,6 +552,15 @@ export const FL_INTERVIEW: InterviewStep[] = [
         required: true,
       },
       {
+        name: 'amenityFeesPaidBy',
+        target: 'value',
+        kind: 'text',
+        label: 'Who pays the association’s amenity registration and access-card fees?',
+        help: 'The association charges to register a tenant and to issue access cards and gate devices. Someone pays it, and a lease that stays silent means an argument on move-in week. Answer in words that will read in a sentence — “Landlord” or “Tenant”.',
+        showWhen: (a) => a.facts.hasHoa,
+        required: true,
+      },
+      {
         name: 'includedAppliances',
         target: 'value',
         kind: 'textarea',
