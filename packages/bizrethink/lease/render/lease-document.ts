@@ -1,4 +1,6 @@
-import { Document, Page, renderToStream, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Document, Font, Page, renderToStream, StyleSheet, Text, View } from '@react-pdf/renderer';
 import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
 
@@ -14,14 +16,24 @@ import { buildSignatureBlocks } from './signature-blocks';
 /**
  * Renders the lease and its attachments to PDF.
  *
- * FONT CHOICE IS A COMPLIANCE DECISION HERE, not a design one. The Phase 0
- * spike proved placeholder extraction works with a PDF standard-14 font, and
- * flagged embedded/subset fonts as an unretired risk because they encode text
- * differently and can defeat `page.findText()`. So this uses Times-Roman and
- * Helvetica-Bold — both standard-14, neither embedded — and there is an
- * integration test that round-trips the real rendered lease back through
- * upstream's extractor. Swapping in a custom typeface means re-running that
- * test before anything is sent.
+ * FONT CHOICE IS A COMPLIANCE DECISION HERE, not a design one, and it has now
+ * been decided in both directions.
+ *
+ * The Phase 0 spike flagged embedded/subset fonts as an unretired risk: they
+ * encode text differently and can defeat `page.findText()`, which is how
+ * upstream turns `{{SIGNATURE, rN}}` into a signature field. So this used
+ * standard-14 faces, neither embedded.
+ *
+ * THE RISK IS NOW RETIRED, BY TEST RATHER THAN BY ARGUMENT.
+ * `placeholder-roundtrip.test.ts` renders the real lease and reads every
+ * placeholder back through upstream's extractor; it passes with these faces
+ * embedded and subset. Re-run it before changing them again.
+ *
+ * The reason to embed at all is the other half of the same compliance story: a
+ * standard-14 face is NOT carried in the file, so every viewer substitutes its
+ * own metrics and a signed lease is not guaranteed to render as it was signed.
+ * PDF/A rejects it outright. That is a poor footing for cryptographic signing
+ * with long-term validation.
  *
  * Built with `createElement` rather than JSX, consistent with the spike, so no
  * JSX transform configuration sits between this source and the PDF bytes.
@@ -29,20 +41,52 @@ import { buildSignatureBlocks } from './signature-blocks';
  */
 
 /*
-  THE TYPEFACE PALETTE IS FIXED BY THE COMPLIANCE CONSTRAINT ABOVE, and it is
-  wider than it looks. All seven of these are standard-14 and none is embedded,
-  so `page.findText()` still finds every placeholder — which is the whole reason
-  a custom face is not an option.
+  TINOS IS METRIC-COMPATIBLE WITH TIMES, and that is the whole reason it is here
+  rather than a face chosen for its looks.
+
+  Six of the eight faces tried CRASH this react-pdf build with
+  `unsupported number: -2.2127632876551446e+22` once they become the body face:
+  Source Serif 4, PT Serif, Spectral, Newsreader, Libre Baskerville and Lora.
+  Removing every border in this file does not help, so the clipBorder theory
+  below does not explain it and the cause is not understood. Tinos and EB
+  Garamond survive.
+
+  Tinos was taken because it has Times' exact widths: not one line break moves,
+  the document is 25 pages before and after, and none of the pagination this
+  file works hard to control is disturbed. EB Garamond also renders, and would
+  have been the better-looking choice, but it changes metrics — and shipping a
+  reflow that works for a reason nobody can name is how a lease that will not
+  render gets discovered by a tenant.
+
+  So: the archival correctness is banked now, and the appearance is left alone
+  until the renderer crash is understood.
 
   Times for the instrument itself, because a contract that reads as a contract
   is set in a book face. Helvetica for the apparatus around it — running head,
   section labels, table columns, footer — so the reader can tell at a glance
   what is the agreement and what is the furniture.
 */
-const SERIF = 'Times-Roman';
-const SERIF_ITALIC = 'Times-Italic';
-const SANS = 'Helvetica';
-const SANS_BOLD = 'Helvetica-Bold';
+const FONT_DIR = join(dirname(fileURLToPath(import.meta.url)), 'fonts');
+
+/*
+  FOUR FAMILIES, ONE FACE EACH, rather than one family with weights and styles.
+
+  Every call site already selects a face by `fontFamily`, because the
+  standard-14 names were themselves distinct families ('Times-Italic',
+  'Helvetica-Bold'). Registering weights instead would mean adding `fontStyle`
+  and `fontWeight` at each of those call sites, and any one missed would
+  silently render regular — italic subtitles and bold headings quietly
+  flattened, with nothing to fail.
+*/
+Font.register({ family: 'SerifBody', src: join(FONT_DIR, 'Tinos-Regular.ttf') });
+Font.register({ family: 'SerifItalic', src: join(FONT_DIR, 'Tinos-Italic.ttf') });
+Font.register({ family: 'SansBody', src: join(FONT_DIR, 'SourceSans3-Regular.ttf') });
+Font.register({ family: 'SansBold', src: join(FONT_DIR, 'SourceSans3-SemiBold.ttf') });
+
+const SERIF = 'SerifBody';
+const SERIF_ITALIC = 'SerifItalic';
+const SANS = 'SansBody';
+const SANS_BOLD = 'SansBold';
 
 const INK = '#15191d';
 const MUTED = '#5c6772';
