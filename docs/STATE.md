@@ -410,6 +410,41 @@ passed, or appeared to:
 
 ## Open threads
 
+### The lease now carries its own typefaces, and six of eight faces crash trying
+
+A standard-14 face is named by the PDF, not carried in it, so every viewer
+substitutes its own metrics. A signed lease was therefore not guaranteed to
+render as it was signed, and PDF/A rejects such a file — awkward for a platform
+doing CAdES signing with long-term validation.
+
+**The compliance risk that blocked this was retired by test, not by argument.**
+The Phase 0 note said embedded/subset fonts encode text differently and can
+defeat `page.findText()`, which is how `{{SIGNATURE, rN}}` becomes a signature
+field. `placeholder-roundtrip.test.ts` passes with the fonts embedded and
+subset. That note named the test as the gate; the gate opened.
+
+**Then the renderer refused most of the candidates.** Source Serif 4 — the face
+in the approved mockup — crashes with `-2.2127632876551446e+22`, and so do PT
+Serif, Spectral, Newsreader, Libre Baskerville and Lora. Only Tinos and EB
+Garamond survive. Removing *every* border in `lease-document.ts` does not help,
+so the clipBorder theory recorded in that file does not explain this case. The
+cause is not understood.
+
+Tinos was taken because it is **metric-compatible with Times**: not one line
+break moves, 25 pages before and after, and none of the pagination that file
+works to control is disturbed. EB Garamond is the better-looking choice and was
+declined — shipping a reflow that works for a reason nobody can name is how a
+lease that will not render gets found by a tenant.
+
+So the correctness is banked and the appearance is left alone. **The open
+question is bigger than fonts:** six of eight faces break a renderer that works
+only because of the exact content it is given. Any future clause edit is the
+same experiment.
+
+One loose end: `pdffonts` still shows an unembedded `Helvetica` that no style
+here asks for — a react-pdf internal fallback.
+
+
 ### Orphaned headings, and why `minPresenceAhead` is still unusable
 
 Five clause headings printed alone at a page foot with their body overleaf —
