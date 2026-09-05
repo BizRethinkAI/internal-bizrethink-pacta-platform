@@ -124,6 +124,17 @@ export type ClauseFacts = {
    */
   hasPetFees: boolean;
 
+  /**
+   * Whether the landlord has stated anything their association's governing
+   * documents require the lease itself to contain.
+   *
+   * Derived from the answer, not asked twice. `hasHoa` means the property has
+   * AN association; it says nothing about what THAT association demands, and
+   * gating on it alone is how one community's parking cap came to render on
+   * every Florida lease.
+   */
+  hasHoaLeaseRequirements: boolean;
+
   /*
     Elected terms. These are answers, not derived state — the landlord chooses
     them and the choice selects a clause. Kept on the facts object because

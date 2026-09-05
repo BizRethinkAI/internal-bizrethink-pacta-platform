@@ -27,11 +27,19 @@ describe('the pool clause allocates duty, not risk', () => {
     expect(pool?.body).not.toMatch(/assumes?\s+(all|any)\s+risk/i);
   });
 
-  it('keeps the maintenance split that was always right', () => {
+  /*
+    This used to assert the body said "professional pool maintenance at
+    Landlord's cost" — pinning a commercial allocation into shared library text,
+    so a landlord whose arrangement ran the other way could not say so. The
+    lawn split had already been refactored away from exactly this defect; the
+    pool clause had not, and a test was holding it in place.
+  */
+  it('lets the allocation be stated rather than assuming it', () => {
     const pool = clause('maintenance.pool-split');
 
-    // Landlord pays the service and owns the equipment; tenant does the chores.
-    expect(pool?.body).toMatch(/professional pool maintenance at Landlord's cost/);
+    expect(pool?.body).toMatch(/\{\{poolServicePaidBy\}\}/);
+    expect(pool?.body).not.toMatch(/at Landlord's cost/);
+    // Equipment repair stays with the landlord — that part was never optional.
     expect(pool?.body).toMatch(/pool pump, filtration/);
   });
 });

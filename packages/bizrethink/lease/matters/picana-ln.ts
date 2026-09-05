@@ -156,6 +156,7 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
 
   // Ch. 515 requires the feature to be named, not merely to exist.
   poolSafetyFeature: 'exit alarms on all doors and windows with direct pool access',
+  poolServicePaidBy: 'Landlord',
   hoaName: 'the Estancia at Wiregrass Ranch homeowners association',
   // Fallback only. The Estancia notices state their own cure date.
   hoaCureDays: 14,
@@ -163,6 +164,10 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   // The association charges to register a tenant and issue access cards.
   // Silence here is an argument during move-in week.
   amenityFeesPaidBy: 'Landlord',
+  // Read off THIS association's declaration. Another community requires
+  // something else, which is exactly why it is an answer and not a clause.
+  hoaLeaseRequirements:
+    'a minimum term of seven months; that the lease be only for the entire Lot and the associated garage; no more than two parking spaces including the garage; and that Tenant is bound by and subject to all of the obligations of the Owner under the governing documents',
 
   noticeName: 'Shwet Prabhat',
   noticeAddress: '537 Lochaven Road, Waxhaw, NC 28173',

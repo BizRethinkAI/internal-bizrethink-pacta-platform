@@ -507,6 +507,15 @@ export const FL_INTERVIEW: InterviewStep[] = [
         },
       },
       {
+        name: 'poolServicePaidBy',
+        target: 'value',
+        kind: 'text',
+        label: 'Who provides and pays for the pool service?',
+        help: 'Most landlords keep this, because neglected pool chemistry damages expensive equipment. Some tenants take it. The clause used to assume the landlord, which left a landlord whose arrangement ran the other way unable to say so. Answer in words that read in a sentence \u2014 \u201cLandlord\u201d or \u201cTenant\u201d.',
+        showWhen: (a) => a.facts.hasPool,
+        required: true,
+      },
+      {
         name: 'hasHoa',
         target: 'fact',
         kind: 'boolean',
@@ -559,6 +568,17 @@ export const FL_INTERVIEW: InterviewStep[] = [
         help: 'The association charges to register a tenant and to issue access cards and gate devices. Someone pays it, and a lease that stays silent means an argument on move-in week. Answer in words that will read in a sentence — “Landlord” or “Tenant”.',
         showWhen: (a) => a.facts.hasHoa,
         required: true,
+      },
+      {
+        name: 'hoaLeaseRequirements',
+        target: 'value',
+        kind: 'textarea',
+        label: 'Does the association require anything to be written into the lease itself?',
+        help: 'Read your declaration — it is usually a section called Leases or Leasing. Common examples: a minimum lease term, a cap on parking spaces, a requirement that the lease cover the whole lot, or that the tenant takes on all the owner\u2019s obligations. Write what yours says. Every association is different, so this cannot be filled in for you.',
+        placeholder:
+          'a minimum term of seven months; no more than two parking spaces including the garage; that Tenant is bound by all of Landlord\u2019s obligations under the governing documents',
+        showWhen: (a) => a.facts.hasHoa,
+        required: false,
       },
       {
         name: 'includedAppliances',
