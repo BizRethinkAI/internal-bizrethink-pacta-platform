@@ -124,6 +124,17 @@ export const DERIVED_FACTS = [
   'termMonths',
   'hasYardAllocation',
   'hasTenantYardDuty',
+  /*
+    All three are the same shape: an answer exists is not the same as the thing
+    it gates being true. A pet allowed is not a pet fee; an association is not a
+    demand that association makes of the lease; and an association is not its
+    documents being attached. Each is computed in hydrateMatter from the answer
+    that actually decides it.
+  */
+  'hasPetFees',
+  'hasHoaLeaseRequirements',
+  'hasHoaGoverningDocuments',
+  'hasConditionReport',
 ];
 
 export const DERIVED_VALUES = [
@@ -150,6 +161,12 @@ export const DERIVED_VALUES = [
   'propertyTypeLabel',
   // Rendered from the yard rows, not typed.
   'yardDuties',
+  // Rendered from the PROPERTY's uploaded governing documents. Never typed:
+  // the numbered list on the receipt addendum has to match the files a signer
+  // can actually open, and a free-text box is how those two drift apart.
+  'governingDocuments',
+  // Same, for the condition report attached to this tenancy.
+  'conditionReports',
   /*
     Rendered from the PROPERTY's utility rows. These were two free-text boxes
     on step 4 and `required`, which meant a lease could state a different
@@ -633,6 +650,58 @@ export const FL_INTERVIEW: InterviewStep[] = [
         statute: {
           cite: 'Fla. Stat. §83.50',
           note: 'The name and address must be disclosed in writing. §83.49(3)(a) then requires the deposit claim notice to be MAILED, so this has to be an address post can reach.',
+        },
+        required: true,
+      },
+    ],
+  },
+
+  /*
+    The one step that asks for FILES rather than answers.
+
+    It has no fields, because none of what it collects is a value the renderer
+    interpolates — the receipt addendum's list is derived from the uploaded rows
+    in `hydrateMatter`, never typed. A free-text box here would let the list a
+    tenant signs for drift away from the files they can actually open, which is
+    the single thing this addendum exists to prevent.
+
+    Gated on `hasHoa` rather than shown always: a property with no association
+    has no governing documents, and an empty upload box on every lease teaches
+    the landlord that steps can be skipped.
+  */
+  {
+    id: 'governing-documents',
+    title: 'Association documents',
+    intro:
+      'Attach the declaration, the bylaws, the rules and any amendments. The lease requires the tenant to comply with these, and one addendum records that they received them — so a tenant can open each one before signing. They are stored on the property, not on this lease, so next year\u2019s lease will already have them.',
+    fields: [],
+    showWhen: (a) => a.facts.hasHoa,
+  },
+
+  /*
+    The condition record, and the only question that goes with it.
+
+    The report itself is a file, not an answer — see the association-documents
+    step for why this collects no text. The window is an answer, and it has to
+    be: Florida requires no move-in inspection and sets no period to object to
+    one, so the number is the landlord's choice rather than a figure this
+    library may state on every lease.
+  */
+  {
+    id: 'condition',
+    title: 'Condition at move-in',
+    intro:
+      'Attach the move-in inspection or condition report for this tenancy. An addendum then records that the tenant received it and agrees it describes the property \u2014 which is what makes it worth anything when the deposit is settled. Reports are attached to this lease, not to the property, because each one describes a single tenancy.',
+    fields: [
+      {
+        name: 'conditionObjectionDays',
+        target: 'value',
+        kind: 'number',
+        label: 'How long does the tenant have to report anything the record misses?',
+        help: 'Florida requires no move-in inspection and sets no window to object to one, so this is your choice. The addendum says anything reported inside it is added to the record.',
+        suggestion: {
+          value: 7,
+          note: 'Leases that attach a condition report commonly give the first week of the term, while the tenant is still unpacking and noticing things.',
         },
         required: true,
       },

@@ -49,6 +49,17 @@ apps/remix/app/components/general/lease/*.tsx
 apps/remix/app/routes/_recipient+/lease-review.$token.tsx
 apps/remix/app/routes/_recipient+/lease-review.$token.document.tsx
 
+# One attached document — a declaration, an amendment, a condition report —
+# served to a reviewer or signer by token. Alongside the lease PDF rather than
+# inside it: upstream's EnvelopeAttachment carries a URL and not bytes, so a
+# file in the signing package would have to be an EnvelopeItem the signer
+# scrolls, and the condition report for one house is 418 pages.
+#
+# Listed individually rather than widening the two lines above to a glob, for
+# the reason the admin block gives: `_recipient+` is upstream's route group and
+# a wildcard there would exempt their files to cover ours.
+apps/remix/app/routes/_recipient+/lease-review.$token.attachment.$documentId.tsx
+
 # Counsel's side of the same loop. The clause library was always meant to be
 # read by an attorney — the approval form asks for a bar number — but the page
 # sat behind an authenticated route with no way to send it, so the only path
@@ -69,3 +80,15 @@ apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 apps/remix/app/routes/_authenticated+/admin+/signing.tsx
 apps/remix/app/routes/_authenticated+/admin+/storage.tsx
 apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
+
+# ── Upload endpoint ──────────────────────────────────────────────────────────
+# Multipart upload for lease documents. A route rather than a tRPC procedure
+# because tRPC carries JSON and base64 would inflate a 54 MB scan by a third on
+# the way up; ours rather than upstream's /api/files/upload-pdf because that
+# endpoint caps at 50 MB to protect the signing editor, which these files never
+# enter.
+#
+# `api+` is upstream's directory, so this is one line and not a glob. The
+# `bizrethink.` filename prefix is the ownership marker, and is why a future
+# upstream file cannot silently land at this path.
+apps/remix/app/routes/api+/bizrethink.lease-document.ts

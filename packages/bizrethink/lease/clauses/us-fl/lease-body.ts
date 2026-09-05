@@ -514,6 +514,97 @@ export const FL_LEASE_BODY: Clause[] = [
     asserts: ['hoa-amenity-access'],
   },
 
+  /*
+    The receipt that makes hoa.compliance mean something.
+
+    That clause binds the tenant to the governing documents and to all of the
+    Owner's obligations under them. A tenant who was handed no documents has
+    the obvious answer, and until this addendum existed the lease had no reply.
+
+    AN ADDENDUM RATHER THAN THE DOCUMENTS THEMSELVES. Upstream's
+    EnvelopeAttachment is `z.enum(['link'])` and carries no bytes, so anything
+    inside the signing package must be an EnvelopeItem the signer scrolls. A
+    declaration and its amendments run to hundreds of pages; putting them there
+    buries the lease. One page naming each instrument, with the documents
+    readable alongside, is the trade.
+
+    NOTHING ABOUT ANY PARTICULAR ASSOCIATION IS STATED HERE. What was recorded,
+    when, and under which instrument number is data — see derive-documents.
+  */
+  {
+    slug: 'hoa.governing-documents-receipt',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'addendum',
+    section: 'rules',
+    sortKey: 63,
+    heading: 'Receipt of Governing Documents',
+    body: 'Tenant acknowledges having received a copy of each of the following governing documents of {{hoaName}}, and has had the opportunity to read them:\n\n{{governingDocuments}}\n\nTenant is bound by these documents as provided in this Lease. Landlord shall give Tenant a copy of any amendment adopted during the term that changes what Tenant must do.',
+    source: drafted(),
+    status: 'draft',
+    includeWhen: (facts) => facts.hasHoa && facts.hasHoaGoverningDocuments,
+    variables: [
+      { name: 'hoaName', type: 'string', label: 'Association name', required: true },
+      {
+        name: 'governingDocuments',
+        type: 'string',
+        label: 'The documents attached, as a numbered list',
+        required: true,
+      },
+    ],
+    supersedes: [],
+    asserts: ['hoa-documents-received'],
+  },
+
+  /*
+    The signature a condition report is usually missing.
+
+    The real move-in inspection for one house ran to 418 pages of photographs
+    and ended "Jack Lipstein, Property Manager — Signed on 1/6/2025". The tenant
+    never signed it. A condition record attested only by the landlord's own
+    agent is the landlord's account of the property, and Fla. Stat. §83.49(3)(a)
+    gives thirty days to claim against the deposit on the strength of it.
+
+    Florida requires no inspection and sets no objection window, so the window
+    is the landlord's choice and is a variable. A number written into this body
+    would be the library asserting a deadline no statute supports.
+
+    THE TENANT AGREES THE CONDITION, not merely receipt of a file. "I was sent a
+    PDF" is worth nothing thirty days after move-out.
+  */
+  {
+    slug: 'condition.report-receipt',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'addendum',
+    // 'premises', not a section of its own: what the place looked like on day
+    // one is a fact about the premises, and FL_SECTION_ORDER is the printed
+    // order of the lease rather than a place to file new topics.
+    section: 'premises',
+    sortKey: 64,
+    heading: 'Condition of the Premises at Move-In',
+    body: 'The condition of the Premises at the start of the term is recorded in the following, a copy of which Tenant has received:\n\n{{conditionReports}}\n\nTenant agrees that it records the condition of the Premises, except for anything Tenant reports to Landlord in writing within {{conditionObjectionDays}} days of the start of the term. Landlord shall add any such report to this record. This record is what Landlord and Tenant will refer to when the Premises are inspected at the end of the tenancy.',
+    source: drafted(),
+    status: 'draft',
+    includeWhen: (facts) => facts.hasConditionReport,
+    variables: [
+      {
+        name: 'conditionReports',
+        type: 'string',
+        label: 'The condition reports attached, as a numbered list',
+        required: true,
+      },
+      {
+        name: 'conditionObjectionDays',
+        type: 'number',
+        label: 'Days for the tenant to report anything the record misses',
+        required: true,
+      },
+    ],
+    supersedes: [],
+    asserts: ['move-in-condition-agreed'],
+  },
+
   {
     slug: 'hoa.cure',
     version: 1,

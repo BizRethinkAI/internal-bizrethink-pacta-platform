@@ -1,5 +1,6 @@
 import { renderLeaseForReview } from '@bizrethink/customizations/lease/render/render-lease';
 import { renderInputForMatter } from '@bizrethink/customizations/lease/server-only/matter-answers';
+import { loadPropertyContext } from '@bizrethink/customizations/lease/server-only/property-context';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -48,10 +49,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     the matter — see hydrateMatter. This route renders the same document the
     router does, so it has to supply the same input.
   */
-  const property = await prisma.bizrethinkProperty.findUnique({
-    where: { id: matter.propertyId },
-    select: { utilities: true },
-  });
+  const context = await loadPropertyContext(matter.propertyId, matter.id);
 
   /*
     Hydrated through the shared mapping rather than unpacked here. This route
@@ -68,9 +66,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     Signing is unchanged: the envelope still gets distinct items. This is only
     how they are read.
   */
-  const pdf = await renderLeaseForReview(
-    renderInputForMatter({ ...matter, propertyUtilities: property?.utilities ?? [] }),
-  );
+  const pdf = await renderLeaseForReview(renderInputForMatter({ ...matter, ...context }));
 
   return new Response(new Uint8Array(pdf), {
     headers: {

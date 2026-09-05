@@ -217,6 +217,20 @@ describe('the router does not keep its own copy of the derivation', () => {
  * Utilities are read live from the property, so a caller that does not pass
  * them renders a lease whose utility clause says "none" on both sides.
  */
+/*
+  Every path that renders a lease must assemble the property's context the same
+  way, or the landlord previews one document and the reviewer reads another.
+
+  This used to assert that each route mentioned `propertyUtilities:` — which
+  caught the original omission, but only for utilities, and only by spelling.
+  Uploaded documents made that a SECOND thing four call sites had to remember,
+  and a guard that has to be extended once per field is a guard that will be
+  one field behind.
+
+  So the invariant moved: there is one loader, and these routes call it. A new
+  property-level input is then added in a single place and reaches every
+  renderer, with nothing here to update.
+*/
 describe('the render paths', () => {
   const routes = [
     'apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.preview.tsx',
@@ -224,11 +238,19 @@ describe('the render paths', () => {
   ];
 
   for (const route of routes) {
-    it(`${route.split('/').pop()} passes the property's utilities`, () => {
+    it(`${route.split('/').pop()} builds its render input through the shared loader`, () => {
       const body = readFileSync(new URL(`../../../../${route}`, import.meta.url), 'utf8');
 
       expect(body).toContain('renderInputForMatter');
-      expect(body).toMatch(/propertyUtilities:/);
+      expect(body).toContain('loadPropertyContext');
+
+      /*
+        And does not go around it. A route that queried the property itself
+        would compile, render, and quietly drop whatever the loader had grown
+        since — which is exactly how the utility clause came to read "none" on
+        both sides for one audience and correctly for the other.
+      */
+      expect(body).not.toMatch(/bizrethinkProperty\.findUnique/);
     });
   }
 });

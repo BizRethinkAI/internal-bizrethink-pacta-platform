@@ -34,6 +34,12 @@ const facts = (overrides: Partial<ClauseFacts> = {}): ClauseFacts => ({
   petsPermitted: true,
   hasNamedOccupants: false,
   hasHoa: true,
+  // Derived in hydrateMatter; stated here because this fixture drives clause
+  // selection directly rather than going through it.
+  hasPetFees: false,
+  hasHoaLeaseRequirements: false,
+  hasHoaGoverningDocuments: false,
+  hasConditionReport: false,
   prorationApplies: false,
   propertyType: 'single-family',
   hasPool: true,

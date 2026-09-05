@@ -22,6 +22,7 @@ import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2, Message
 import { useMemo, useState } from 'react';
 import { useLoaderData, useRevalidator } from 'react-router';
 import { CustomClauseEditor } from '~/components/general/lease/custom-clause-editor';
+import { GoverningDocumentEditor } from '~/components/general/lease/governing-document-editor';
 import type { FieldValue } from '~/components/general/lease/interview-field';
 import { InterviewFieldControl, LB_ACCENT_TEXT, LB_ACTION_TEXT } from '~/components/general/lease/interview-field';
 import { PartyEditor } from '~/components/general/lease/party-editor';
@@ -88,6 +89,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       id: matter.id,
       title: matter.title,
       status: matter.status,
+      // Needed by the association-documents step: uploads hang off the
+      // PROPERTY, not this lease, so next year's lease already has them.
+      propertyId: matter.propertyId,
       currentStepId: matter.currentStepId,
       facts: matter.facts as Record<string, FieldValue>,
       money: matter.money as Record<string, unknown>,
@@ -404,6 +408,12 @@ export default function LeaseInterviewPage() {
             {step.id === 'utilities' && (
               <UtilitySummary utilities={utilities} propertiesHref={`/t/${teamUrl}/leases`} />
             )}
+
+            {step.id === 'governing-documents' && (
+              <GoverningDocumentEditor propertyId={matter.propertyId} kind="hoa-governing" />
+            )}
+
+            {step.id === 'condition' && <GoverningDocumentEditor matterId={matter.id} kind="move-in-report" />}
 
             {step.id === 'maintenance' && <YardTaskEditor tasks={yardTasks} onChange={setYardTasks} />}
 

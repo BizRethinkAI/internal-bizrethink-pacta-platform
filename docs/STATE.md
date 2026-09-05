@@ -410,6 +410,65 @@ passed, or appeared to:
 
 ## Open threads
 
+### Documents a human uploaded, as opposed to documents we generate
+
+Everything in the lease package was assembled from clauses. A recorded
+declaration and a photographic condition report are not: they exist before the
+lease does, and no amount of drafting produces them. There was no way to attach
+a file to anything.
+
+**The constraint that shaped the design.** Upstream's `EnvelopeAttachment` is
+`z.enum(['link'])` — a URL, never bytes — so anything inside the signing package
+has to be an `EnvelopeItem` the signer scrolls. The real move-in inspection for
+29090 Picana Lane is **418 pages and 54.7 MB**; a declaration and its amendments
+run to a few hundred more. Putting those in front of a signer buries the lease.
+
+So the envelope gets one generated page naming each document, and the files are
+read alongside it. That page is the point, not a consolation: the lease binds the
+tenant to the governing documents, and a tenant who was never given them has the
+obvious answer.
+
+**What the RentCheck report showed.** Its last page reads *"Inspection reviewed …
+Jack Lipstein, Property Manager, Signed on 1/6/2025"*. **The tenant never signed
+it.** A condition record attested only by the landlord's own agent is the
+landlord's account of the property, and §83.49(3)(a) gives thirty days to claim
+against the deposit on the strength of it. The capture was already good; it
+stopped one signature short, which is exactly the thing this product does.
+
+**Where each kind hangs, and why it matters.** Governing documents belong to the
+PROPERTY — they outlive every tenancy, and next year's lease receipts the same
+instruments with nobody re-uploading. A condition report belongs to the MATTER:
+hung on the property it would be receipted into every later lease as though the
+incoming tenant had agreed the outgoing tenant's scuffs. `assertDocumentPlacement`
+refuses the wrong pairing rather than trusting the caller.
+
+**One loader, not a fourth thing to remember.** Utilities are read live from the
+property and four call sites had to pass them; one once forgot, and a reviewer
+read a lease whose utility clause said "none" on both sides. Documents would have
+made that a second field at four sites, so `loadPropertyContext` assembles the
+shape and every renderer calls it. The guard test moved with it — it used to
+assert each route mentioned `propertyUtilities:`, which caught the original
+omission but by spelling, and would have been one field behind from today. It now
+asserts the routes call the shared loader and do **not** query the property
+themselves.
+
+Documents also feed `currentAnswersHash`: attaching an amendment after a link
+went out changes the list the receipt names, and a reviewer who approved the
+shorter one approved something else.
+
+**Our own upload route.** `/api/files/upload-pdf` caps at 50 MB — a limit that
+exists because those files go through the signing editor, where every page is
+rendered for field placement. Chris's report is 54.7 MB, so it would have been
+rejected, and raising that ceiling would relax the editor's guard for everyone to
+fix a problem the editor does not have. `api+/bizrethink.lease-document.ts` takes
+multipart with its own 128 MB limit.
+
+Page counts are read off the file, never typed: the count's whole job on the
+receipt is to let a signer confirm the document they opened is the one the page
+names, and a typed figure would be the landlord's claim about the file rather
+than a fact of it. Verified exact on four real PDFs including the 418-page one.
+
+
 ### A guard was weakened to admit the thing it was built to catch
 
 `library-invariants` required `requiredBy` to cite `Fla. Stat.` or `U.S.C.`. It
