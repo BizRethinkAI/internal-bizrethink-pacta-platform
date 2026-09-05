@@ -625,6 +625,21 @@ model BizrethinkClauseApproval {
   approvedByUserId    Int
   notes               String?
 
+  /// The clause's jurisdiction at the moment of approval, and the bar the
+  /// approving attorney is admitted in.
+  ///
+  /// The model recorded a bar NUMBER and never which bar, so nothing could
+  /// object to a Florida attorney approving a North Carolina clause. Both are
+  /// stored rather than derived: the clause's jurisdiction can change in a
+  /// later library version, and what this row records is what was true when the
+  /// attorney signed off.
+  ///
+  /// Nullable only so the column can be added to a table that already exists.
+  /// Every approval written after this is required to carry both — there are
+  /// none today, which is why this is a field addition and not a migration.
+  clauseJurisdiction String?
+  barJurisdiction    String?
+
   approvedAt DateTime @default(now())
 
   /// Set when a later edit lapsed this approval, so the history of who
