@@ -410,6 +410,45 @@ passed, or appeared to:
 
 ## Open threads
 
+### Four clauses said things Florida does not permit, and one certified itself
+
+Two independent adversarial reviews of the Picana lease. Every finding was
+checked against the statute text before being accepted — **one was rejected on
+that check**, which is why the new tests pin what the statute says rather than
+what a reviewer said about it.
+
+- **`general.waiver`** said acceptance of a payment with knowledge of a breach
+  is not a waiver. §83.56(5) says the opposite: accepting rent with actual
+  knowledge WAIVES the right to terminate or sue for that noncompliance, and
+  §83.47(1)(a) voids a term purporting to waive what the part confers.
+- **`access.entry`** let the landlord show the premises to an "insurer".
+  §83.53(1)'s list is closed — purchasers, mortgagees, tenants, workers,
+  contractors. Checked; "insurer" is not in it.
+- **`deposit.held`** named the institution and the interest status: two of the
+  three things §83.49(1)(a) requires. The account must also be SEPARATE and not
+  commingled.
+- **`deposit.advance-rent`** never said where the advance rent sits. §83.49(1)
+  opens *"as security for performance of the rental agreement **or as advance
+  rent**"* — both are held the same way.
+
+**And the one that was ours to be embarrassed by.** `hoa.lease-requirements`
+read *"require this Lease to include the following, **and it does**"*. On the
+real lease that list included "the entire Lot and the associated garage" and
+"no more than two parking spaces", and **neither appeared anywhere else in the
+document**. The lease certified compliance it did not deliver, on the one
+document an association manager reads against the declaration.
+
+"and it does" is a claim about every other clause, which no single clause can
+see. The requirements are now agreed AS TERMS, so the lease contains them by
+construction rather than by assertion.
+
+**Rejected:** a review claimed §83.49(3)(a) runs from "termination of the rental
+agreement". It keys on vacating, and the verbatim statutory notice in the lease
+itself says "AFTER YOU MOVE OUT". A weaker version of the point survives — our
+wording omits the statute's "for termination of the lease" — and is not fixed
+here.
+
+
 ### Green tests, dead production: the fonts were never in the container
 
 Every lease PDF returned **500** after the font PR deployed. `ENOENT` on
