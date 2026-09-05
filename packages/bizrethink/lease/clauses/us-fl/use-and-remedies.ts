@@ -171,7 +171,14 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
 
   {
     slug: 'access.entry',
-    version: 1,
+    /*
+      v2: the exhibition list is closed. Fla. Stat. §83.53(1) names
+      "prospective or actual purchasers, mortgagees, tenants, workers, or
+      contractors" and nothing else; this clause added "insurer" and said
+      "lender" where the statute says mortgagee. A lease cannot enlarge the list
+      of people a tenant must admit, and §83.47(1)(a) is the reason.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'access',
@@ -184,7 +191,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
       An answer ABOVE the floor is fine — a landlord may give more notice than
       the statute demands.
     */
-    body: "Landlord may enter the Premises at reasonable times between {{entryEarliestLabel}} and {{entryLatestLabel}}, having given Tenant at least {{entryNoticeHours}} hours' notice, in order to inspect the Premises, make or arrange repairs or improvements, supply agreed services, or show the Premises to a prospective purchaser, tenant, lender, contractor or insurer. Notice is not required in an emergency, or where Tenant has consented to the entry.",
+    body: "Landlord may enter the Premises at reasonable times between {{entryEarliestLabel}} and {{entryLatestLabel}}, having given Tenant at least {{entryNoticeHours}} hours' notice, in order to inspect the Premises, make or arrange repairs or improvements, supply agreed services, or show the Premises to a prospective or actual purchaser, mortgagee, tenant, worker or contractor. Notice is not required in an emergency, or where Tenant has consented to the entry.",
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.53(2)',

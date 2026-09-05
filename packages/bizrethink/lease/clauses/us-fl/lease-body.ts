@@ -275,7 +275,13 @@ export const FL_LEASE_BODY: Clause[] = [
 
   {
     slug: 'deposit.held',
-    version: 1,
+    /*
+      v2: named the institution and said whether the account bears interest —
+      two of the three things Fla. Stat. §83.49(1)(a) requires. It also requires
+      the account be SEPARATE, and says the landlord "shall not commingle such
+      moneys with any other funds". Neither appeared.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'deposit',
@@ -288,7 +294,7 @@ export const FL_LEASE_BODY: Clause[] = [
       contradiction — and without billing a tenant twice for a deposit they
       already paid.
     */
-    body: 'A security deposit of {{depositHeldUsd}} is payable by Tenant on execution of this Lease. The deposit is held at {{depositInstitution}}, {{depositInstitutionAddress}}, in an account that {{depositInterestLabel}}.',
+    body: 'A security deposit of {{depositHeldUsd}} is payable by Tenant on execution of this Lease. The deposit is held at {{depositInstitution}}, {{depositInstitutionAddress}}, in a separate account that {{depositInterestLabel}}, and is not commingled with any other funds of Landlord, as Fla. Stat. \u00a783.49(1)(a) requires.',
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.49(2)',
@@ -340,13 +346,19 @@ export const FL_LEASE_BODY: Clause[] = [
 
   {
     slug: 'deposit.advance-rent',
-    version: 1,
+    /*
+      v2: Fla. Stat. §83.49(1) opens "as security for performance of the rental
+      agreement OR AS ADVANCE RENT". This clause said what the advance rent was
+      for and never said where it sits, which reads as though only the deposit
+      were held under §83.49. Both are.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'deposit',
     sortKey: 52,
     heading: 'Advance Rent',
-    body: "Advance rent of {{advanceRentUsd}} is payable by Tenant on execution of this Lease in respect of the last month of Tenant's occupancy of the Premises. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement. If this Lease ends without Tenant occupying a final month to which the advance rent can be applied, Landlord shall return it to Tenant in full within 15 days after Tenant vacates. The advance rent is not subject to any claim against the security deposit.",
+    body: "Advance rent of {{advanceRentUsd}} is payable by Tenant on execution of this Lease in respect of the last month of Tenant's occupancy of the Premises. Advance rent is not a security deposit and may not be applied to any other month without Landlord's written agreement. If this Lease ends without Tenant occupying a final month to which the advance rent can be applied, Landlord shall return it to Tenant in full within 15 days after Tenant vacates. The advance rent is not subject to any claim against the security deposit. Advance rent for other than the next immediate rental period is held in the same manner as the security deposit, as Fla. Stat. \u00a783.49 requires, until it becomes due as rent.",
     source: drafted(),
     status: 'draft',
     // Selected whenever advance rent is held. Where some of it was carried in
@@ -455,13 +467,28 @@ export const FL_LEASE_BODY: Clause[] = [
   */
   {
     slug: 'hoa.lease-requirements',
-    version: 1,
+    /*
+      v2: THE CLAUSE CERTIFIED THE WHOLE DOCUMENT, which no single clause can do.
+
+      It read "require this Lease to include the following, and it does:"
+      followed by whatever the landlord typed. On the first real lease that list
+      included "the entire Lot and the associated garage" and "no more than two
+      parking spaces", and neither appeared anywhere else in the document. The
+      lease certified compliance it did not deliver — on the one document an
+      association manager reads against the declaration.
+
+      "and it does" is a claim about every other clause, which this one cannot
+      see. The requirements are now AGREED AS TERMS, so the lease contains them
+      by construction rather than by assertion, and the landlord's own words
+      become operative instead of decorative.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 62,
     heading: 'Association Requirements for This Lease',
-    body: 'The governing documents of {{hoaName}} require this Lease to include the following, and it does: {{hoaLeaseRequirements}}',
+    body: 'The governing documents of {{hoaName}} require this Lease to contain the following, and Landlord and Tenant agree to them as terms of this Lease: {{hoaLeaseRequirements}}',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa && facts.hasHoaLeaseRequirements,

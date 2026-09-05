@@ -173,13 +173,22 @@ export const FL_BOILERPLATE: Clause[] = [
 
   {
     slug: 'general.waiver',
-    version: 1,
+    /*
+      v2: the clause said acceptance of a payment with knowledge of a breach was
+      not a waiver of that breach. Fla. Stat. §83.56(5) says the opposite —
+      accepting rent with actual knowledge WAIVES the right to terminate or sue
+      for that noncompliance — and §83.47(1)(a) voids a term purporting to
+      waive a right the part confers. What survives is the statute's own
+      carve-out for subsequent or continuing noncompliance, which is now all
+      this claims.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'general',
     sortKey: 30,
     heading: 'No Waiver',
-    body: "A failure or delay by either party in enforcing any provision of this Lease is not a waiver of that provision or of any other, and does not prevent that party from enforcing it later. Landlord's acceptance of a payment with knowledge of a breach is not a waiver of that breach.",
+    body: 'A failure or delay by either party in enforcing any provision of this Lease is not a waiver of that provision or of any other, and does not prevent that party from enforcing it later. Except as Fla. Stat. \u00a783.56(5) provides otherwise, acceptance of rent does not waive a subsequent or continuing noncompliance.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
