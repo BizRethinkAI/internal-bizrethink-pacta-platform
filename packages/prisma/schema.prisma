@@ -1829,6 +1829,19 @@ model BizrethinkLeaseReview {
   expiresAt       DateTime?
   returnedAt      DateTime?
 
+  /// When the token URL was first fetched, and how often since.
+  ///
+  /// FETCHED, not read. Mail scanners and link previewers open links, so this
+  /// is evidence of delivery rather than of a person having read the lease, and
+  /// the UI says "opened" for that reason. It is still the difference between
+  /// "they have not looked" and "they have had it for a week".
+  ///
+  /// Also what makes a link safe to delete: a row nobody ever opened carries no
+  /// record worth keeping. See lease/review/deletion.ts.
+  firstOpenedAt DateTime?
+  lastOpenedAt  DateTime?
+  openCount     Int       @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
