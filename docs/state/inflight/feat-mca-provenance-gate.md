@@ -58,9 +58,16 @@ Measured:
   the defect that shipped as templates 104/105.* The check that was supposed to
   catch it could not have.
 
-Each spec now names the `section` it was transcribed from. CA drops from 132,364
-characters of haystack to 11,481. Verified by mutation: setting NY's `section`
-back to null turns two tests red, including the one pinning the shipped defect.
+Each spec now names the `section` it was transcribed from:
+
+| | file | section | |
+|---|---|---|---|
+| CA | 162,784 | 11,481 | 7.1% |
+| NY | 154,033 | 11,648 | 7.6% |
+| MO | 339,461 | 18,554 | 5.5% |
+
+Verified by mutation: setting NY's `section` back to null turns two tests red,
+including the one pinning the shipped defect.
 
 ## The second finding: the field the defect lived in was never checked
 
