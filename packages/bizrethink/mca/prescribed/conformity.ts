@@ -84,12 +84,22 @@ export const checkFormConformity = (
       wrong and is not: three sentences removed from the California form under
       `ca-extra-text-in-only-rows` were each accurate and each helpful.
     */
-    if (row.onlyPrescribedContent && norm(content.replace(match[0], '')) !== '') {
+    let remainder = content.replace(match[0], '');
+
+    for (const permitted of row.alsoPermitted ?? []) {
+      const hit = remainder.match(asPattern(permitted));
+
+      if (hit) {
+        remainder = remainder.replace(hit[0], '');
+      }
+    }
+
+    if (row.onlyPrescribedContent && norm(remainder) !== '') {
       out.push({
         kind: 'unauthorised-addition',
         row: i,
         detail: `row ${i}: this row shall include only the prescribed content, but also carries ${JSON.stringify(
-          norm(content.replace(match[0], '')),
+          norm(remainder),
         )}`,
       });
     }

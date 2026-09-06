@@ -59,3 +59,42 @@ sidesteps the react-pdf `lineHeight` compounding bug patched on main
 More importantly: **this fork deliberately does not flatten AcroForm widgets**
 (overlays 018 and 040, with a regression test pinning it). An assembler that
 assumes flattening will fight the fork.
+
+## What it has found
+
+Kept as a record, because a checker's worth is the defects it catches in real
+documents and not the tests it passes.
+
+**2026-09-06, first run against a shipped form.** Lombard's California
+disclosure carried New York's phrasing of one prescribed sentence — 10 CCR
+§914(a)(2)(C)(ii) says *"on what amounts will be deducted"*, 23 NYCRR §600.6(b)
+says *"on the amounts that will be deducted"* — inside a row §914 closes with
+"shall include only". Four words. It had survived REVIEW-01, a human reading
+both regulations side by side, and had shipped to Pacta as templates 104 and
+105.
+
+Two things fell out of writing the spec that no amount of re-reading the form
+would have surfaced:
+
+- §914(a)(1) says the table has **nine rows**, and ours has ten. That is
+  correct: §914(a)(12) inserts an "Estimated Monthly Cost" row below the fourth
+  whenever payments are not monthly, and Lombard's are daily. Recorded in the
+  spec so that a later reader does not "fix" the count.
+- §914(a)(10) closes the eighth row with *"shall include only"* and
+  §914(a)(11) opens the ninth with *"shall include"* and no "only". Adjacent
+  paragraphs, describing adjacent rows, with different rules. NY §600.6(j) and
+  (k) both say "only".
+
+And one thing the spec forced into the type. The first draft flagged three
+sentences our form is *required* to carry — §914(a)(2)(C)(ii), (a)(3)(D) and
+(a)(4)(C)(ii) — as unauthorised additions, because the row's `verbatim` held
+only the unconditional sentence. That is the checker crying wolf, which is worse
+than useless: findings that are usually wrong get ignored, and the findings are
+the entire point. Hence `alsoPermitted`, which holds the rest of a row's
+authorised vocabulary.
+
+Note what `alsoPermitted` does **not** do. It records that a sentence is allowed
+in a row, not that a required sentence is present. This checker tests
+authorisation, never completeness — it can tell you that you said something you
+may not say, and cannot tell you that you failed to say something you must.
+Completeness needs the transaction's facts, which this package does not have.

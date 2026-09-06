@@ -2,7 +2,7 @@
  {
   "label": "Funding Provided",
   "value": "$ ______«2»______",
-  "content": "This is how much funding _________________________«12»_________________________ will provide. Due to deductions or payments to others, the total funds that will be provided to you directly is $ ______«3»______. For more information on what amounts will be deducted, please review the attached document “Itemization of Amount Financed.”"
+  "content": "This is how much funding _________________________«12»_________________________ will provide. Due to deductions or payments to others, the total funds that will be provided to you directly is $ ______«3»______. For more information on the amounts that will be deducted, please review the attached document “Itemization of Amount Financed.”"
  },
  {
   "label": "Estimated Annual Percentage Rate (APR)",
@@ -42,7 +42,7 @@
  {
   "label": "Prepayment",
   "value": null,
-  "content": "If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $ _____«15»______ based upon our estimates."
+  "content": "If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $ _____«15»______ based upon our estimates. Buyer does not offer a prepayment discount; the full unpaid Purchased Amount is delivered (FRPA §8.3)."
  },
  {
   "label": "Prepayment",

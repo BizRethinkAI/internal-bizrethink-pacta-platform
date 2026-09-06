@@ -67,3 +67,45 @@ describe('near-identical states must not be reconciled', () => {
     expect(out.map((d) => d.kind)).toEqual(['not-in-source']);
   });
 });
+
+/*
+  The same trap, second instance — and the one that makes the case for building
+  this at all.
+
+  The APR pair above was found by REVIEW-01, by a human reading both
+  regulations. THIS pair was not: it survived that review and shipped to Pacta
+  as templates 104 and 105. The conformity checker found it on 2026-09-06, on
+  its first run against a real document.
+
+  §914(a)(2)(C)(ii) and §600.6(b) prescribe the deduction sentence with four
+  words different, and our California form carried New York's. Note also that
+  New York is not internally uniform: §600.6(b) says "the amounts that will be
+  deducted" while §600.11 and §600.12 say "what amounts will be deducted", so
+  "the New York wording" is not even a well-formed idea — only the wording of a
+  specific section is.
+*/
+const CA_DEDUCTION = 'For more information on what amounts will be deducted';
+const NY_600_6_DEDUCTION = 'For more information on the amounts that will be deducted';
+
+describe('the deduction sentence differs between CA §914 and NY §600.6', () => {
+  const form = (verbatim: string) => ({
+    slug: 'deduction',
+    citation: 'n/a',
+    sourceFile: 'n/a',
+    rows: [{ label: 'Funding Provided', verbatim, onlyPrescribedContent: false }],
+  });
+
+  it('keeps the two prescribed texts genuinely different', () => {
+    expect(CA_DEDUCTION).not.toEqual(NY_600_6_DEDUCTION);
+  });
+
+  it('accepts each against its own regulation', () => {
+    expect(checkAgainstSource(form(CA_DEDUCTION), CA)).toEqual([]);
+    expect(checkAgainstSource(form(NY_600_6_DEDUCTION), NY)).toEqual([]);
+  });
+
+  it("rejects New York's phrasing against California — the defect that shipped", () => {
+    const out = checkAgainstSource(form(NY_600_6_DEDUCTION), CA);
+    expect(out.map((d) => d.kind)).toEqual(['not-in-source']);
+  });
+});

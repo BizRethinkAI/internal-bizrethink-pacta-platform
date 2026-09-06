@@ -30,6 +30,18 @@ export type PrescribedRow = {
    * helpful had to come out of a California form.
    */
   onlyPrescribedContent: boolean;
+  /**
+   * Sentences the regulation expressly PERMITS but does not require, in a row
+   * it otherwise closes. §914(a)(4)(C)(ii) is the clean example: the provider
+   * "may include" the statement that the finance charge will not increase if
+   * repayment takes longer. Present in our form, permitted, and not an
+   * addition.
+   *
+   * Without this the checker flags a permitted sentence as a defect, which is
+   * worse than useless: a checker that cries wolf gets its findings ignored,
+   * and the findings are the whole point.
+   */
+  alsoPermitted?: string[];
 };
 
 export type PrescribedForm = {
