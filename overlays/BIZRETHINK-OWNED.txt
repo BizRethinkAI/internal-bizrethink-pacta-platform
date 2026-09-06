@@ -36,6 +36,14 @@
 # is not a route upstream has or is likely to add.
 apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases*.tsx
 
+# The clause library moved OUT of the team namespace (2026-09-06). It is
+# instance content — clause text, citations, attorney approvals — identical for
+# every customer, and `clauseLibrary.list` ignores organisationId for data
+# entirely. Under /t/:teamUrl/ it was a route that lied about who owned the
+# thing, and it linked customers straight into our unreviewed legal text.
+# Lives under admin+/ now, behind the isAdmin gate that was already there.
+apps/remix/app/routes/_authenticated+/admin+/lease-library.tsx
+
 # Components imported by those routes. Namespaced under lease/ so a collision
 # with an upstream component is impossible short of upstream shipping a lease
 # builder of their own.

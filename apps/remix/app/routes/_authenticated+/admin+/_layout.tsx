@@ -116,6 +116,17 @@ const NAV_GROUPS: NavGroupDef[] = [
       },
       { label: <Trans>Claims</Trans>, href: '/admin/claims', icon: Wallet2, bizrethink: false },
       {
+        // Moved out of /t/:teamUrl/leases/library on 2026-09-06. The clause
+        // library is instance content — clause text, statutory citations,
+        // attorney approvals — identical for every customer, and it was
+        // readable by any member of any organisation holding the lease-builder
+        // flag.
+        label: <Trans>Clause Library</Trans>,
+        href: '/admin/lease-library',
+        icon: ScrollTextIcon,
+        bizrethink: true,
+      },
+      {
         label: <Trans>Documents</Trans>,
         href: '/admin/documents',
         icon: FileStack,
