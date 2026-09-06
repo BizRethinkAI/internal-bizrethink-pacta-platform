@@ -437,6 +437,30 @@ cost today is nothing. Done after counsel signs the Florida baseline, it would
 have silently lapsed thirty-five of them.
 
 Files have not moved yet. The guard is what makes that safe, so it goes first.
+### A delegated field read as a broken template to the person being asked
+
+The Pet Addendum in the PDF sent to the tenant said:
+
+> Tenant may keep only the following animals at the Premises: `{{permittedPets}}`.
+
+The standing rule that produced that is right and stays: a missing value never
+renders as empty, because a gap where a repair threshold belongs reads as a
+finished lease with no threshold, while a raw token reads as unfinished and the
+send is refused.
+
+**A delegated field is the one case where the reasoning inverts.** The landlord
+is never going to answer it — they deliberately handed it to the tenant — and
+the tenant is exactly who downloads the PDF. So the token appeared in the
+addendum sent to the person being asked about their own pets.
+
+Now `[to be completed by Tenant]`: legible as a blank awaiting an answer, and
+impossible to mistake for a term of the lease. **It is still reported missing**,
+so the send gate does not move — making it readable must not make the lease look
+answerable.
+
+Threaded `matter.delegatedFields → RenderLeaseInput.delegated → buildClauseText
+→ interpolateClause`, and verified against the live matter rather than a
+fixture.
 
 
 ### An approval recorded a bar number but never which bar

@@ -49,6 +49,8 @@ export type StoredMatter = {
    * be frozen at creation.
    */
   propertyUtilities?: unknown;
+  /** Variables the landlord handed to the tenant to answer. */
+  delegatedFields?: unknown;
   /**
    * The PROPERTY's uploaded documents, passed in by the caller.
    *
@@ -198,5 +200,11 @@ export const renderInputForMatter = (matter: StoredMatter): RenderLeaseInput => 
     parties: hydrated.parties,
     propertyAddress: String(hydrated.values.propertyAddress ?? ''),
     customClauses: hydrated.customClauses,
+    /*
+      Carried through so an unanswered delegated variable renders as a named
+      blank rather than a raw token. The tenant is who downloads this PDF, and
+      they are the person being asked.
+    */
+    delegated: (matter.delegatedFields ?? []) as string[],
   };
 };
