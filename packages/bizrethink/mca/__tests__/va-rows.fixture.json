@@ -1,0 +1,57 @@
+[
+  {
+    "label": "Total Amount Financed",
+    "value": null,
+    "content": "$ ______«3»______"
+  },
+  {
+    "label": "Fees Deducted or Withheld at Disbursement",
+    "value": null,
+    "content": "$ ______«4»______"
+  },
+  {
+    "label": "Disbursement Amount [Total Amount Financed minus (-) Fees Deducted or Withheld at Disbursement]",
+    "value": null,
+    "content": "$ ______«5»______"
+  },
+  {
+    "label": "Finance Charge",
+    "value": null,
+    "content": "$ ______«6»______"
+  },
+  {
+    "label": "Total Repayment Amount [Disbursement Amount plus (+) Finance Charge]",
+    "value": null,
+    "content": "$ ______«7»______"
+  },
+  {
+    "label": "Estimated Number of Payments [Number of payments expected, based on the projected sales volume, to equal the Total Repayment Amount]",
+    "value": null,
+    "content": "_«8»__"
+  },
+  {
+    "label": "Payment Schedule ☐ Fixed ☒ Variable",
+    "value": null,
+    "content": "☐ Amount of each fixed payment: $ __________ ☐ Frequency of fixed payments: __________ ☐ Variable payment schedule, or ☒ Description of the method used to calculate the amount and frequency of each variable payment: ☒ SEE PAGE 2 Method of payment: split funding via the Approved Processor. ☒ SEE PAGE 2"
+  },
+  {
+    "label": "Description of All Other Potential Fees and Charges NOT Included in the Finance Charge",
+    "value": null,
+    "content": "See page 2. ☒ SEE PAGE 2"
+  },
+  {
+    "label": "Description of Collateral Requirements or Security Interests",
+    "value": null,
+    "content": "See page 2. ☒ SEE PAGE 2"
+  },
+  {
+    "label": "Broker Compensation",
+    "value": null,
+    "content": "Is provider paying compensation directly to a broker? _____«10»_____ If Yes, amount of compensation being paid directly to broker: $ _____«11»______"
+  },
+  {
+    "label": "Description of Prepayment Policies",
+    "value": null,
+    "content": "No prepayment penalty; 100% of any unpaid finance charge remains payable. See page 2. ☒ SEE PAGE 2"
+  }
+]

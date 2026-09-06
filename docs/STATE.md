@@ -50,6 +50,7 @@ that folder. The table below is history and stays until compaction.
 | #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. You are reading its STATE update. |
 | #3 | `default-deny GITHUB_TOKEN` scope in CI workflows | Rebased 2026-08-29 |
 | #4 | AATL signing setup plan (DigiCert + GCP Cloud HSM) | Rebased 2026-08-29. AATL confirmed still live. |
+| — | MCA clause library — prescribed disclosure forms (CA, NY) | Branch `feat/mca-clause-library`, no PR yet. See [inflight note](state/inflight/feat-mca-clause-library.md). |
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
 **#21** (route), **#22** (preview link), **#23** (custom clauses + interview
@@ -60,8 +61,41 @@ gaps found by adversarial review).
 13-step, 68-field interview over **52 clauses**, with a live findings panel, a PDF
 preview, a custom-clause editor and — as of #26 — a working Send. Both gates
 remain shut: `BizrethinkFeatureAccess` grants access only to user 3, and every
-clause sits at `status: 'draft'`, which renders only for a BizRethink-internal
-organisation.
+clause sits at `status: 'draft'`, which renders only for an organisation holding
+the `lease-clause-draft-rendering` grant.
+
+**The pilot lease lives in a personal organisation, not the company's.**
+29090 Picana Ln is a personal rental. The lease names four natural persons and
+the company appears nowhere in it — it was simply created in the wrong
+organisation. Moved 2026-09-06 to `org_nkzrmhochvhmbwnt` (`/o/personal`), team
+`prabhat`, by `scripts/one-off/2026-09-06-move-picana-to-personal.sql`.
+
+Four things had to move, and the two that were nearly missed are the
+instructive ones. `BizrethinkDocument` carries its **own** `organisationId`,
+and `documents.list/update/remove` authorize on that column alone without
+checking the property belongs to the caller — so the 15 HOA documents would
+have stayed the company's, silently, since a member of both organisations sees
+no difference. And `BizrethinkLeaseMatter.teamId` is passed straight to
+`createEnvelope` by `matter.send`, so moving only the organisation would have
+filed the signed envelope back inside the company at the one moment that is
+expensive to undo.
+
+The `lease-clause-draft-rendering` grant was **transferred, not copied**. After
+the move the company organisation holds no lease work, and leaving it granted
+would recreate exactly the drift that migration `20260829100000` was written to
+remove.
+
+**That migration's comment is now stale and CANNOT be corrected.** It names
+`org_wzsyehzolibvnxal` as "the single organisation that actually holds
+lease-builder work", which stopped being true on 2026-09-06. Prisma checksums
+applied migrations, so editing the file — even to add a comment — fails every
+subsequent `migrate dev` with "was modified after it was applied". Learned by
+doing it and watching CI go red in 45 seconds. An applied migration is a record
+of what ran; when it goes out of date, the correction belongs here, not there.
+
+The move was safe only because nothing had been signed — `envelopeId` was NULL
+and the organisation had zero envelopes. **There is no code path to move an
+envelope between teams.** Anything similar must happen before the first send.
 
 ## Blocked
 
