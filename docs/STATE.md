@@ -122,12 +122,17 @@ organisation.
   the `assertPublishable` guard all exist and are all currently set by nobody;
   the planned review loop writes into them.
 
-  **The attorney is now the critical path, not a background task.** The
-  candidate identified 2026-08-29 is the new tenant's spouse, which is an
-  adverse-interest conflict (Fla. Bar R. 4-1.7, 4-1.8(i)) for the lease her
-  household signs. Split agreed: she reads the pilot lease as the TENANT's side
-  — free adversarial scrutiny, no conflict — and any paid library sign-off comes
-  later, when she is not the counterparty.
+  **The attorney is the critical path, not a background task.** Library review
+  is a professional engagement with counsel retained for it. The mechanism is
+  built and waiting: `/admin/lease-library` mints a review link, and counsel
+  records findings against individual clauses that hold those clauses until
+  answered.
+
+  *(An earlier version of this entry named a specific person and worked through
+  a conflict analysis. That was a passing thought that got written down as
+  though it were a decision, and it was never one. Removed 2026-09-06 rather
+  than corrected, because a file people trust for "where things stand" should
+  not carry speculation in the same voice as fact.)*
 - **No local development database.** Ports 5432 and 54320 are both closed and the
   only credential on the machine is `PACTA_PROD_DATABASE_URL`. Every Prisma query
   in `packages/bizrethink/server-only/` is unit-tested and has **never executed
