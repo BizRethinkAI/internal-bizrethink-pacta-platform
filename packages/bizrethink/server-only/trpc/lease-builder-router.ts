@@ -10,6 +10,7 @@ import { lookupAddress } from '../../lease/address/census';
 import { clauseFingerprint, isApprovalCurrent, libraryFingerprint } from '../../lease/clauses/approval';
 import { admissionBlocks, normaliseJurisdiction } from '../../lease/clauses/approval-jurisdiction';
 import { toCustomClause } from '../../lease/clauses/custom';
+import { findingsBlock } from '../../lease/clauses/findings';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { whyThisClause } from '../../lease/clauses/why-this-clause';
 import { scanCustomClauses } from '../../lease/engine/guardrails';
@@ -1803,6 +1804,56 @@ export const leaseBuilderRouter = router({
     }),
 
     /**
+     * The findings that came in on THIS link, so counsel can see what she said.
+     *
+     * A SEPARATE QUERY RATHER THAN A FIELD ON `openLibrary`. Recording a
+     * finding has to refetch whatever displays it, and `openLibrary` carries 52
+     * clause bodies — re-downloading the whole library to render one new line.
+     * It is also the narrower read: `openLibrary` answers "what am I
+     * reviewing", this answers "what have I said about it", and the second
+     * changes on every keystroke-ending while the first does not change at all.
+     *
+     * SCOPED BY THE REVIEW ROW, never by the caller — the same rule
+     * `recordFinding` follows. A token holder sees the findings that arrived on
+     * their own link and nobody else's, and cannot ask for anything wider,
+     * because there is no input but the token.
+     *
+     * The answer is included. A finding that was answered and a finding still
+     * outstanding are different states, and counsel is the person who most
+     * needs to know which is which before she writes the same thing twice.
+     */
+    openFindings: procedure.input(z.object({ token: z.string() })).query(async ({ input }) => {
+      const share = await prisma.bizrethinkLibraryReview.findUnique({
+        where: { token: input.token },
+        select: { id: true, status: true, expiresAt: true },
+      });
+
+      const usable =
+        share !== null &&
+        share.status === 'open' &&
+        (share.expiresAt === null || share.expiresAt.getTime() > Date.now());
+
+      if (!share || !usable) {
+        throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+      }
+
+      const findings = await prisma.bizrethinkLibraryFinding.findMany({
+        where: { reviewId: share.id },
+        orderBy: { createdAt: 'asc' },
+        select: {
+          id: true,
+          clauseSlug: true,
+          body: true,
+          answeredAt: true,
+          answer: true,
+          createdAt: true,
+        },
+      });
+
+      return { findings };
+    }),
+
+    /**
      * An attorney records a finding against one clause.
      *
      * UNAUTHENTICATED, like the tenant's comment route, because the whole point
@@ -1880,15 +1931,28 @@ export const leaseBuilderRouter = router({
       .mutation(async ({ ctx, input }) => {
         await assertAccess(input.organisationId, ctx.user.id);
 
-        return await prisma.bizrethinkLibraryFinding.update({
-          where: { id: input.findingId },
+        /*
+          SCOPED BY THE REVIEW, not only by the organisation the caller named.
+          `assertAccess` proves the caller belongs to that organisation; it says
+          nothing about the finding, whose id also came from the caller. An
+          `update` keyed on the id alone would answer a finding on another
+          tenant's review — and Pacta has hosted a second tenant since
+          2026-08-31.
+        */
+        const { count } = await prisma.bizrethinkLibraryFinding.updateMany({
+          where: { id: input.findingId, review: { organisationId: input.organisationId } },
           data: {
             answer: input.answer,
             answeredAt: new Date(),
             answeredByUserId: ctx.user.id,
           },
-          select: { id: true, answeredAt: true },
         });
+
+        if (count === 0) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'That finding no longer exists.' });
+        }
+
+        return { answered: true };
       }),
 
     /** Every finding on the library, newest first, for the staff page. */
@@ -1960,6 +2024,48 @@ export const leaseBuilderRouter = router({
 
         if (blocked !== null) {
           throw new AppError(AppErrorCode.INVALID_REQUEST, { message: blocked });
+        }
+
+        /*
+          AN UNANSWERED FINDING HOLDS THE CLAUSE. This is what four places in
+          the codebase already claimed and no line of code did: the migration
+          comment, the `findings.ts` docstring, the counsel route header and
+          the in-flight note all said a finding "blocks that clause until
+          answered", while `approve` never looked at the table.
+
+          After the admission check because admission is a fact about the
+          person that nothing here can fix — sending somebody to answer a
+          finding they could never approve past is wasted work. Before the
+          fingerprint check because that one says "reload and read it again",
+          and a second reading followed by a second refusal is the same waste
+          pointed the other way.
+
+          NOT filtered by `clauseFingerprint`. A finding against wording that
+          has since moved still blocks, because scoping it to the current text
+          would mean editing a clause silently cleared every finding against
+          it — as fast to bypass as to satisfy, which is the failure the
+          both-halves answer rule already exists to prevent. Clearing a finding
+          is answering it, and there is no other way.
+
+          SCOPED TO THIS ORGANISATION, matching `listFindings` and
+          `answerFinding` exactly. The library is instance content and an
+          approval is instance-wide, so an argument exists for blocking on
+          every organisation's findings — but the staff page can only list and
+          answer its own, and a guard that cites work the person cannot reach
+          is a dead end they will route around. Same scope in, same scope out.
+          The durable fix is the one the admin loader already names: drop
+          organisationId from BizrethinkLibraryReview, which is a migration.
+        */
+        const findings = await prisma.bizrethinkLibraryFinding.findMany({
+          where: { clauseSlug: clause.slug, review: { organisationId: input.organisationId } },
+          orderBy: { createdAt: 'asc' },
+          select: { id: true, clauseSlug: true, body: true, answeredAt: true, answer: true },
+        });
+
+        const held = findingsBlock(findings);
+
+        if (held !== null) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: held });
         }
 
         const current = clauseFingerprint(clause);

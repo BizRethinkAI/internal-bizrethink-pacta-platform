@@ -52,3 +52,28 @@ export const findingBlockers = (findings: LibraryFinding[]): string[] =>
 
     return `${finding.clauseSlug}: ${excerpt}`;
   });
+
+/**
+ * Why this clause may not be approved yet, or null if it may.
+ *
+ * A SENTENCE, NOT A BOOLEAN — the same shape as `admissionBlocks`, for the same
+ * reason: the caller shows it to whoever is recording the approval, and
+ * "blocked" without a reason is the kind of guard people route around. This one
+ * additionally has to say where the work is, because unlike an admission
+ * mismatch it IS fixable, by somebody, today.
+ *
+ * PASS ONLY THE FINDINGS FOR THE CLAUSE BEING APPROVED. The caller queries by
+ * slug; this does not filter, because a filter here and a filter there is two
+ * places to get the scope wrong.
+ */
+export const findingsBlock = (findings: LibraryFinding[]): string | null => {
+  const blockers = findingBlockers(findings);
+
+  if (blockers.length === 0) {
+    return null;
+  }
+
+  const noun = blockers.length === 1 ? 'a finding' : `${blockers.length} findings`;
+
+  return `Counsel recorded ${noun} against this clause that nobody has answered — ${blockers.join('; ')}. Answer it on the clause library before recording an approval.`;
+};

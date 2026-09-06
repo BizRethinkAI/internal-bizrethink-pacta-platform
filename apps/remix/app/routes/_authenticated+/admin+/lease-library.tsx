@@ -1,3 +1,4 @@
+import { outstandingFindings } from '@bizrethink/customizations/lease/clauses/findings';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { prisma } from '@documenso/prisma';
@@ -9,7 +10,15 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { msg } from '@lingui/core/macro';
-import { AlertTriangle, Check, ChevronDown, ChevronRight, Loader2, ShieldCheck } from 'lucide-react';
+import {
+  AlertTriangle,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Loader2,
+  MessageSquareWarning,
+  ShieldCheck,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useLoaderData } from 'react-router';
 
@@ -94,6 +103,23 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { organisationId: organisation.id };
 }
 
+/**
+ * A defect report from counsel against one clause.
+ *
+ * Not a comment. A tenant's comment on a lease is a negotiating position and
+ * does not block anything; this is an assertion that text we are calling lawful
+ * is not, and it holds the clause until somebody answers it in writing.
+ */
+type FindingRow = {
+  id: string;
+  clauseSlug: string;
+  body: string;
+  authorName: string;
+  answeredAt: string | Date | null;
+  answer: string | null;
+  createdAt: string | Date;
+};
+
 type ClauseRow = {
   slug: string;
   version: number;
@@ -154,6 +180,42 @@ export default function ClauseLibraryPage() {
   });
 
   const liveShares = (shares.data?.shares ?? []).filter((row) => row.status === 'open');
+
+  /*
+    WHAT COUNSEL SAID, AND WHETHER ANYBODY ANSWERED.
+
+    `listFindings` shipped with no UI caller at all. A finding recorded through
+    a review link landed in a table no page read, so the only way to know one
+    existed was to query the database — and the counsel page told the attorney
+    her finding would "hold this clause until somebody answers it" while
+    offering nobody any way to see it, let alone answer.
+  */
+  const findings = trpc.bizrethink.leaseBuilder.clauseLibrary.listFindings.useQuery({ organisationId });
+
+  const findingRows = (findings.data ?? []) as unknown as FindingRow[];
+  const stillOpen = outstandingFindings(findingRows);
+
+  /*
+    Grouped by clause, outstanding first, and within a group oldest first.
+
+    By clause because that is the unit a finding is answered against and the
+    unit it blocks. Outstanding first because an answered finding is a record
+    and an outstanding one is work — and the ordering the procedure returns
+    (newest first) puts them in whichever order they happened to arrive.
+  */
+  const findingsByClause = Object.entries(
+    findingRows.reduce<Record<string, FindingRow[]>>((groups, row) => {
+      groups[row.clauseSlug] = [...(groups[row.clauseSlug] ?? []), row];
+
+      return groups;
+    }, {}),
+  )
+    .map(([clauseSlug, rows]) => ({
+      clauseSlug,
+      rows: [...rows].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()),
+      open: outstandingFindings(rows).length,
+    }))
+    .sort((a, b) => b.open - a.open || a.clauseSlug.localeCompare(b.clauseSlug));
 
   const copyShare = async (token: string, id: string) => {
     await navigator.clipboard.writeText(`${window.location.origin}/clause-review/${token}`);
@@ -307,6 +369,68 @@ export default function ClauseLibraryPage() {
         )}
       </div>
 
+      {/*
+        THE OTHER END OF THE REVIEW LINK.
+
+        Counsel could record a finding and nothing on this side displayed it.
+        Findings arriving by email was the problem the feature was built to
+        solve; a finding arriving into an unread table is the same problem with
+        an extra step.
+      */}
+      <div className="mt-8 rounded-lg border p-4">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <MessageSquareWarning className="h-4 w-4" />
+            What counsel found
+          </h2>
+          {findingRows.length > 0 && (
+            <p className="text-muted-foreground text-sm">
+              {stillOpen.length} outstanding of {findingRows.length}
+            </p>
+          )}
+        </div>
+
+        <p className="mt-1 text-muted-foreground text-sm">
+          A finding is a defect report against text we are calling lawful, not a comment. It holds its clause unapproved
+          until somebody answers it here, in writing.
+        </p>
+
+        {findings.isLoading && (
+          <p className="mt-4 flex items-center gap-2 text-muted-foreground text-sm">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading findings…
+          </p>
+        )}
+
+        {!findings.isLoading && findingRows.length === 0 && (
+          <p className="mt-4 text-muted-foreground text-sm">
+            Nothing recorded yet. Findings appear here as counsel works through the link above.
+          </p>
+        )}
+
+        {findingsByClause.length > 0 && (
+          <ul className="mt-4 space-y-4">
+            {findingsByClause.map((group) => (
+              <FindingGroup
+                key={group.clauseSlug}
+                clauseSlug={group.clauseSlug}
+                heading={clauses.find((clause) => clause.slug === group.clauseSlug)?.heading ?? null}
+                rows={group.rows}
+                organisationId={organisationId}
+                onAnswered={async () => {
+                  await findings.refetch();
+                  /*
+                    The library too: answering a finding is what releases the
+                    clause for approval, and the approval form on this page
+                    refuses while one is outstanding.
+                  */
+                  await library.refetch();
+                }}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
+
       {library.isLoading && (
         <p className="mt-8 flex items-center gap-2 text-muted-foreground text-sm">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading the library…
@@ -318,6 +442,12 @@ export default function ClauseLibraryPage() {
           <ClauseRowItem
             key={clause.slug}
             clause={clause}
+            /*
+              Shown on the row rather than only discovered on submit. The guard
+              in `approve` refuses, but a refusal after somebody has typed a
+              name, a bar number and a jurisdiction is a worse way to learn it.
+            */
+            outstanding={stillOpen.filter((row) => row.clauseSlug === clause.slug).length}
             organisationId={organisationId}
             onApproved={() => void library.refetch()}
           />
@@ -327,12 +457,118 @@ export default function ClauseLibraryPage() {
   );
 }
 
+/**
+ * One clause's findings, and the box that answers them.
+ *
+ * ANSWERING REQUIRES TEXT. `answerFinding` enforces `.trim().min(1)`
+ * server-side; the button enforces it here too, because a request that fails
+ * validation and a request that succeeded look identical on a page with no
+ * error surface — and an attorney's finding silently un-answered is worse than
+ * one nobody tried to answer.
+ */
+const FindingGroup = ({
+  clauseSlug,
+  heading,
+  rows,
+  organisationId,
+  onAnswered,
+}: {
+  clauseSlug: string;
+  heading: string | null;
+  rows: FindingRow[];
+  organisationId: string;
+  onAnswered: () => void | Promise<void>;
+}) => {
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+
+  const answerFinding = trpc.bizrethink.leaseBuilder.clauseLibrary.answerFinding.useMutation({
+    onSuccess: async () => {
+      await onAnswered();
+    },
+  });
+
+  const open = outstandingFindings(rows);
+
+  return (
+    <li className="rounded border p-3">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="font-medium text-sm">{heading ?? clauseSlug}</p>
+        {open.length > 0 ? (
+          <Badge variant="destructive">{open.length} outstanding — approval held</Badge>
+        ) : (
+          <Badge variant="neutral">Answered</Badge>
+        )}
+      </div>
+      <p className="mt-0.5 font-mono text-muted-foreground text-xs">{clauseSlug}</p>
+
+      <ul className="mt-3 space-y-3">
+        {rows.map((row) => {
+          const answered = outstandingFindings([row]).length === 0;
+          const draft = drafts[row.id] ?? '';
+
+          return (
+            <li key={row.id} className="border-t pt-3 first:border-t-0 first:pt-0">
+              <p className="whitespace-pre-wrap text-sm">{row.body}</p>
+              <p className="mt-1 text-muted-foreground text-xs">
+                {row.authorName} · {new Date(row.createdAt).toLocaleDateString()}
+              </p>
+
+              {answered ? (
+                <p className="mt-2 rounded bg-muted/40 p-2 text-sm">
+                  <span className="text-muted-foreground text-xs">
+                    Answered {row.answeredAt ? new Date(row.answeredAt).toLocaleDateString() : ''}
+                  </span>
+                  <br />
+                  {row.answer}
+                </p>
+              ) : (
+                <div className="mt-2">
+                  <Label htmlFor={`answer-${row.id}`} className="text-xs">
+                    What was done about it
+                  </Label>
+                  <Textarea
+                    id={`answer-${row.id}`}
+                    className="mt-1 text-sm"
+                    rows={2}
+                    value={draft}
+                    onChange={(event) => setDrafts((prev) => ({ ...prev, [row.id]: event.target.value }))}
+                  />
+                  <Button
+                    className="mt-2"
+                    size="sm"
+                    variant="outline"
+                    disabled={draft.trim() === '' || answerFinding.isPending}
+                    onClick={() => answerFinding.mutate({ organisationId, findingId: row.id, answer: draft.trim() })}
+                  >
+                    {answerFinding.isPending ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : null}
+                    Record the answer
+                  </Button>
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      {answerFinding.error && (
+        <Alert variant="destructive" className="mt-3">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Not recorded</AlertTitle>
+          <AlertDescription>{answerFinding.error.message}</AlertDescription>
+        </Alert>
+      )}
+    </li>
+  );
+};
+
 const ClauseRowItem = ({
   clause,
+  outstanding,
   organisationId,
   onApproved,
 }: {
   clause: ClauseRow;
+  outstanding: number;
   organisationId: string;
   onApproved: () => void;
 }) => {
@@ -407,6 +643,11 @@ const ClauseRowItem = ({
         </div>
 
         <div className="flex flex-none items-center gap-2">
+          {outstanding > 0 && (
+            <Badge variant="destructive">
+              {outstanding === 1 ? '1 finding outstanding' : `${outstanding} findings outstanding`}
+            </Badge>
+          )}
           {lapsed && <Badge variant="destructive">Lapsed — text changed</Badge>}
           {approved ? (
             <Badge>
@@ -444,6 +685,17 @@ const ClauseRowItem = ({
                 were transcribed from an executed lease rather than read off
                 the statute book, which is exactly the gap being closed.
               */}
+              {outstanding > 0 && (
+                <Alert className="mt-3" variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Held by an unanswered finding</AlertTitle>
+                  <AlertDescription>
+                    Counsel recorded a finding against this clause that nobody has answered. Answer it under &ldquo;What
+                    counsel found&rdquo; above; an approval recorded now would be refused.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               {clause.verbatimRequired && (
                 <Alert className="mt-3">
                   <ShieldCheck className="h-4 w-4" />
@@ -512,7 +764,7 @@ const ClauseRowItem = ({
 
               <Button
                 className="mt-4"
-                disabled={name.trim() === '' || admitted.trim() === '' || approve.isPending}
+                disabled={outstanding > 0 || name.trim() === '' || admitted.trim() === '' || approve.isPending}
                 onClick={() =>
                   approve.mutate({
                     organisationId,
