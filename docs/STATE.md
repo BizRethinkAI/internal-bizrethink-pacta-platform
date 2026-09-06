@@ -84,6 +84,14 @@ the move the company organisation holds no lease work, and leaving it granted
 would recreate exactly the drift that migration `20260829100000` was written to
 remove.
 
+**That migration's comment is now stale and CANNOT be corrected.** It names
+`org_wzsyehzolibvnxal` as "the single organisation that actually holds
+lease-builder work", which stopped being true on 2026-09-06. Prisma checksums
+applied migrations, so editing the file — even to add a comment — fails every
+subsequent `migrate dev` with "was modified after it was applied". Learned by
+doing it and watching CI go red in 45 seconds. An applied migration is a record
+of what ran; when it goes out of date, the correction belongs here, not there.
+
 The move was safe only because nothing had been signed — `envelopeId` was NULL
 and the organisation had zero envelopes. **There is no code path to move an
 envelope between teams.** Anything similar must happen before the first send.
