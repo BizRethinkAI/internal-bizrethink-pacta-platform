@@ -47,16 +47,30 @@ describe('every spec re-verifies against its own source, now', () => {
   tables — closed-end, open-end, factoring, sales-based, lease, asset-based.
   Only one of them is ours.
 */
-describe('a form is checked against its own section, not the whole regulation', () => {
+describe('a spec is checked against its own section, not the whole file', () => {
   it.each(
-    PRESCRIBED_FORMS.filter((f) => f.section !== null).map((f) => [f.slug, f] as const),
-  )('%s resolves its section, and it is a small part of the file', (_slug, form) => {
-    const whole = readSourceText(form.sourceFile);
-    const section = sectionOf(whole, form.section);
+    MCA_DISCLOSURES.filter((d) => d.section !== null).map((d) => [d.slug, d] as const),
+  )('%s resolves its section, and it is a small part of the file', (_slug, spec) => {
+    const whole = readSourceText(spec.sourceFile);
+    const section = sectionOf(whole, spec.section);
 
     expect(section).not.toBeNull();
     expect((section ?? '').length).toBeGreaterThan(500);
     expect((section ?? '').length).toBeLessThan(whole.length / 2);
+  });
+
+  /*
+    The three that need it, and why. Missouri is the extreme case: SB 1359 is
+    an omnibus bill of eighty-odd sections, of which the Commercial Financing
+    Disclosure Law is one, so a prescribed label found "somewhere in the bill"
+    would be worth nothing at all.
+  */
+  it('scopes exactly the files that hold more than one instrument', () => {
+    expect(
+      MCA_DISCLOSURES.filter((d) => d.section !== null)
+        .map((d) => d.slug)
+        .sort(),
+    ).toEqual(['ca-offer-summary', 'mo-disclosure', 'ny-offer-summary']);
   });
 });
 
