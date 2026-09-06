@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { findingBlockers, outstandingFindings } from './findings';
+import { findingBlockers, findingsBlock, outstandingFindings } from './findings';
 
 /**
  * An attorney's finding holds the clause until somebody answers it.
@@ -79,5 +79,45 @@ describe('findingBlockers', () => {
 
   it('quotes enough of the finding to be recognisable without opening it', () => {
     expect(findingBlockers([finding()])[0]).toMatch(/83\.49/);
+  });
+});
+
+/**
+ * The half that was missing.
+ *
+ * `outstandingFindings` and `findingBlockers` shipped with no caller anywhere
+ * outside this file. Four places in the codebase said a finding "blocks that
+ * clause until answered" — the migration comment, the module docstring, the
+ * counsel route's header, and the in-flight note — and no line of code did it.
+ * `approve` never looked.
+ *
+ * This is the sentence `approve` refuses with. A sentence rather than a
+ * boolean, for the same reason `admissionBlocks` returns one: "blocked" with no
+ * reason is a guard people route around, and the person hitting it needs to
+ * know which finding and where to answer it.
+ */
+describe('findingsBlock', () => {
+  it('does not block a clause with nothing outstanding', () => {
+    expect(findingsBlock([])).toBeNull();
+    expect(findingsBlock([finding({ answeredAt: new Date(), answer: 'Reworded.' })])).toBeNull();
+  });
+
+  it('blocks a clause with an unanswered finding', () => {
+    expect(findingsBlock([finding()])).not.toBeNull();
+  });
+
+  it('quotes the finding, so the approver knows what to go and answer', () => {
+    expect(findingsBlock([finding()])).toMatch(/83\.49/);
+  });
+
+  it('names every outstanding finding, not just the first', () => {
+    const blocked = findingsBlock([finding(), finding({ id: 'f2', body: 'Entry notice is 12 hours, not 24.' })]);
+
+    expect(blocked).toMatch(/83\.49/);
+    expect(blocked).toMatch(/12 hours/);
+  });
+
+  it('says where to answer it, because a dead end is a guard people route around', () => {
+    expect(findingsBlock([finding()])).toMatch(/answer/i);
   });
 });

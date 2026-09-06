@@ -29,8 +29,24 @@ import { useParams } from 'react-router';
  * than the person whose comments are explicitly a negotiating position.
  *
  * So counsel can now record a finding per clause. It blocks that clause until
- * somebody answers it, which is what makes the review mean anything.
+ * somebody answers it, which is what makes the review mean anything — enforced
+ * in `approve`, which refuses while one is outstanding, and answered by staff
+ * on `/admin/lease-library`.
+ *
+ * She also sees what she has already said. Recording a finding used to be
+ * write-only: the box cleared, the page said "Recorded", and a reload showed
+ * nothing — no record, no confirmation it had saved, no way to see a reply.
  */
+
+/** One of counsel's own findings, as it comes back on her link. */
+type RecordedFinding = {
+  id: string;
+  clauseSlug: string;
+  body: string;
+  answeredAt: string | Date | null;
+  answer: string | null;
+  createdAt: string | Date;
+};
 
 const ACCENT = 'text-[#1f3a5f] dark:text-[#8fb3d9]';
 const ACTION = 'text-[#a2560c] dark:text-[#d99a4e]';
@@ -40,6 +56,20 @@ export default function ClauseReviewPage() {
   const { token = '' } = useParams();
 
   const query = trpc.bizrethink.leaseBuilder.clauseLibrary.openLibrary.useQuery({ token });
+
+  /*
+    A SEPARATE QUERY FROM `openLibrary`, deliberately. Recording a finding has
+    to refetch whatever shows it, and `openLibrary` carries all 52 clause
+    bodies — re-downloading the entire library to render one new line. This one
+    is small and refetched often; that one is large and does not change.
+
+    Scoped by the review row on the server, so this is the findings that came in
+    on this link and nobody else's.
+  */
+  const findings = trpc.bizrethink.leaseBuilder.clauseLibrary.openFindings.useQuery({ token });
+
+  const findingsFor = (clauseSlug: string) =>
+    (findings.data?.findings ?? []).filter((finding) => finding.clauseSlug === clauseSlug);
 
   if (query.isPending) {
     return <div className="mx-auto max-w-3xl px-6 py-16 text-muted-foreground">Loading…</div>;
@@ -152,7 +182,12 @@ export default function ClauseReviewPage() {
 
             <p className={`${DOC_SERIF} mt-3 whitespace-pre-wrap text-[0.95rem] leading-relaxed`}>{clause.body}</p>
 
-            <FindingBox token={token} clauseSlug={clause.slug} />
+            <FindingBox
+              token={token}
+              clauseSlug={clause.slug}
+              recorded={findingsFor(clause.slug)}
+              onRecorded={() => void findings.refetch()}
+            />
           </section>
         ))}
       </div>
@@ -178,30 +213,60 @@ export default function ClauseReviewPage() {
  * That stays with staff, who have an account. This is the other direction:
  * saying what is wrong, which needs no such ceremony.
  */
-function FindingBox({ token, clauseSlug }: { token: string; clauseSlug: string }) {
+function FindingBox({
+  token,
+  clauseSlug,
+  recorded,
+  onRecorded,
+}: {
+  token: string;
+  clauseSlug: string;
+  recorded: RecordedFinding[];
+  onRecorded: () => void;
+}) {
   const [body, setBody] = useState('');
-  const [sent, setSent] = useState(false);
 
   const record = trpc.bizrethink.leaseBuilder.clauseLibrary.recordFinding.useMutation({
     onSuccess: () => {
       setBody('');
-      setSent(true);
+      onRecorded();
     },
   });
 
-  if (sent) {
-    return (
-      <p className="mt-3 text-muted-foreground text-xs">
-        Recorded. It will hold this clause until somebody answers it.{' '}
-        <button className="underline" onClick={() => setSent(false)} type="button">
-          Add another
-        </button>
-      </p>
-    );
-  }
-
   return (
     <div className="mt-3">
+      {/*
+        WHAT SHE ALREADY SAID, AND WHETHER ANYBODY REPLIED.
+
+        This was write-only. The box cleared, the page said "Recorded", and a
+        reload showed nothing at all — no record it had saved, no way to read
+        back what she wrote, no way to see an answer. An attorney billing by
+        the hour cannot tell a saved finding from a lost one, so the safe move
+        is to write it twice, and the safest is to go back to email.
+      */}
+      {recorded.length > 0 && (
+        <ul className="mb-3 space-y-2">
+          {recorded.map((finding) => (
+            <li key={finding.id} className="rounded border-l-2 border-l-muted-foreground/40 bg-muted/30 p-2">
+              <p className="whitespace-pre-wrap text-sm">{finding.body}</p>
+              <p className="mt-1 text-muted-foreground text-xs">
+                Recorded {new Date(finding.createdAt).toLocaleDateString()}
+                {finding.answeredAt === null && ' · holding this clause until it is answered'}
+              </p>
+              {finding.answeredAt !== null && (
+                <p className="mt-2 border-t pt-2 text-sm">
+                  <span className="text-muted-foreground text-xs">
+                    Answered {new Date(finding.answeredAt).toLocaleDateString()}
+                  </span>
+                  <br />
+                  {finding.answer}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
       <Textarea
         aria-label={`Finding on ${clauseSlug}`}
         className="text-sm"

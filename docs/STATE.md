@@ -124,9 +124,11 @@ organisation.
 
   **The attorney is the critical path, not a background task.** Library review
   is a professional engagement with counsel retained for it. The mechanism is
-  built and waiting: `/admin/lease-library` mints a review link, and counsel
-  records findings against individual clauses that hold those clauses until
-  answered.
+  built and waiting, and as of 2026-09-06 actually wired: `/admin/lease-library`
+  mints a review link, counsel records findings against individual clauses,
+  `approve` refuses while one is outstanding, and staff answer them on the same
+  admin page. It was inert until then — see *The finding mechanism was built and
+  never plugged in* below.
 
   *(An earlier version of this entry named a specific person and worked through
   a conflict analysis. That was a passing thought that got written down as
@@ -2203,6 +2205,49 @@ fact, phrased as an observation ("most leases use…", never "we recommend…").
 Both halves are asserted by test, including a required attributing word, so the
 rule cannot be eroded by a copy edit. Only three fields qualify today; inventing
 market statistics to fill more would be worse than an empty box.
+
+### The finding mechanism was built and never plugged in
+
+PR #103 shipped every piece of counsel's finding loop — the
+`BizrethinkLibraryFinding` table and its migration, `recordFinding`,
+`answerFinding`, `listFindings`, `outstandingFindings`, `findingBlockers`, and a
+per-clause textarea on the counsel page. Each piece worked and each was unit
+tested. **Nothing called anything.**
+
+- `outstandingFindings` and `findingBlockers` had no caller outside their own
+  test file.
+- `approve` never read the findings table, so a clause carrying an unanswered
+  defect report could be approved with no obstacle whatsoever.
+- `listFindings` and `answerFinding` had no UI caller at all. A finding landed
+  in a table no page read and nobody could answer.
+- Counsel could not see the finding she had just recorded. The box cleared, the
+  page said "Recorded", and a reload showed nothing.
+
+Four places asserted the control anyway — the migration comment, the
+`findings.ts` docstring, the counsel route's header, and the in-flight note —
+each saying a finding *"blocks that clause until answered"*. None of it was
+true. This is the repo's characteristic failure exactly: a change that fails by
+being **absent**, passing CI because every unit was tested in isolation and no
+test asked whether anything used them.
+
+Wired 2026-09-06. `approve` now refuses on `findingsBlock`, between the
+admission check and the fingerprint check; `/admin/lease-library` lists and
+answers findings; the counsel page reads back her own via a token-scoped
+`openFindings`. The prose above is now true, so it stands as written.
+
+**The migration comment cannot be corrected in place.** Prisma checksums applied
+migrations, and editing `20260906210000_library_findings/migration.sql` — even a
+comment — fails every later `migrate dev` with *"was modified after it was
+applied"*. Its claim was false for the three days between #103 and this entry;
+it is true now, and the record of that gap lives here instead. **Never edit a
+file under `packages/prisma/migrations/` that has already been applied.**
+
+A second defect surfaced while wiring: `answerFinding` keyed its `update` on the
+caller-supplied `findingId` alone. `assertAccess` proved the caller belonged to
+the organisation they *named*, which said nothing about who owned the finding —
+a cross-tenant write, and Pacta has hosted a second tenant since 2026-08-31.
+Now an `updateMany` scoped by `review.organisationId`, refusing when nothing
+matched rather than reporting success.
 
 ### Paused elsewhere
 
