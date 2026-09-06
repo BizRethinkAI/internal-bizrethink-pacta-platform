@@ -34,6 +34,24 @@ const NY_TEXT =
   'APR incorporates the amount and timing of the funding you receive, finance charges you pay, and the periodic payments you make.';
 
 describe('near-identical states must not be reconciled', () => {
+  /*
+    THIS TEST IS NOT DUPLICATED CODE. Do not deduplicate it.
+
+    The two constants below look like a copy-paste slip and are the opposite:
+    they are two regulators prescribing the same sentence with one phrase
+    different, and the difference is load-bearing. A future session's instinct
+    will be to hoist them into one constant with a parameter. This assertion
+    exists so that instinct fails the build rather than the form — a comment
+    asking for restraint is not a guard, and the lesson of this codebase today
+    is that an invariant nobody can break by accident beats an invariant
+    everybody has been asked to respect.
+  */
+  it('keeps the two prescribed texts genuinely different', () => {
+    expect(CA_TEXT).not.toEqual(NY_TEXT);
+    expect(CA_TEXT).toContain('fees you pay');
+    expect(NY_TEXT).toContain('finance charges you pay');
+  });
+
   it('accepts each state against its own regulation', () => {
     expect(checkAgainstSource(apr('ca', '10 CCR §914', 'CA', CA_TEXT), CA)).toEqual([]);
     expect(checkAgainstSource(apr('ny', '23 NYCRR §600.6', 'NY', NY_TEXT), NY)).toEqual([]);

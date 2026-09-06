@@ -9,7 +9,10 @@
  * true and helpful extra sentence a defect rather than a bonus.
  *
  * `verbatimRequired` on the lease's `statute` variant cannot express that, so
- * this is a separate shape rather than a flag on the existing one.
+ * this is a separate shape rather than a flag on the existing one. The
+ * obligations differ in kind and so do their failure modes: wrong words is a
+ * wrong disclosure, wrong ROWS is not the prescribed form at all. One is a
+ * string assertion, the other is a schema.
  */
 export type PrescribedRow = {
   /** First-column text, reproduced exactly. */
