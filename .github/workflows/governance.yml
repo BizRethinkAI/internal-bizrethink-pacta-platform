@@ -174,7 +174,7 @@ jobs:
       # Exempt: bot-authored PRs. The weekly upstream-sync PR is opened by a
       # GitHub Action, and failing it would turn a five-minute chore into
       # manual intervention every Monday.
-      - name: STATE.md updated
+      - name: State recorded for this PR
         env:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           IS_BOT: ${{ github.event.pull_request.user.type == 'Bot' }}
@@ -184,17 +184,33 @@ jobs:
             exit 0
           fi
 
-          if grep -q '^docs/STATE.md$' /tmp/changed.txt; then
-            echo "✓ docs/STATE.md updated."
+          # Union merge leaves no marker of its own, but a hand-resolved
+          # merge can leave one, and nothing looked for them before. A STATE.md
+          # with markers in it is worse than a stale one: it is unreadable AND
+          # believed.
+          if grep -qE '^(<<<<<<< |>>>>>>> )' docs/STATE.md; then
+            echo "✗ docs/STATE.md contains conflict markers."
+            echo ""
+            echo "  A hand-resolved merge left them behind. Open the file and"
+            echo "  finish the resolution before this can land."
+            exit 1
+          fi
+
+          # EITHER location. A PR's own in-flight note satisfies this and
+          # touches STATE.md not at all, which is the whole point: two PRs
+          # editing different files cannot collide.
+          if grep -qE '^docs/(STATE\.md|state/inflight/.+\.md)$' /tmp/changed.txt; then
+            echo "✓ State recorded — docs/STATE.md or an in-flight note."
             exit 0
           fi
 
-          echo "✗ docs/STATE.md was not updated."
+          echo "✗ No state was recorded for this PR."
           echo ""
-          echo "  Every session updates it last. If this PR genuinely changes"
-          echo "  nothing about where things stand — a typo fix, say — add the"
-          echo "  date to STATE.md and move on. That is cheaper than deciding"
-          echo "  each time whether it counts."
+          echo "  Add docs/state/inflight/<branch-slug>.md describing what this"
+          echo "  PR changes and what is still open — see the README in that"
+          echo "  folder. Editing docs/STATE.md directly also satisfies this,"
+          echo "  but collides with every other open PR, which is why the"
+          echo "  per-PR note exists."
           exit 1
 
   lint:

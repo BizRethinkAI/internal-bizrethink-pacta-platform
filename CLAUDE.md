@@ -6,7 +6,13 @@ BizRethink AI's document signing platform. **Additive fork of [documenso/documen
 
 ## Read this first
 
-**Start every session with [`docs/STATE.md`](docs/STATE.md). Update it last.**
+**Start every session with [`docs/STATE.md`](docs/STATE.md), and with every note
+in [`docs/state/inflight/`](docs/state/inflight/). Together they are where
+things stand.**
+
+**Your PR's in-flight note is `docs/state/inflight/<branch-slug>.md`** — create
+it in the first push, edit it in place, never touch another PR's. `STATE.md`
+carries the settled narrative; merged notes are folded into it and deleted.
 It is the only memory that survives between sessions — where things stand, what
 is in flight, what is blocked, and what has bitten us before. It replaced a
 user-local memory directory on 2026-08-29.
