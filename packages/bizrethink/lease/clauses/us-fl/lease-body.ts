@@ -420,7 +420,8 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'hoa.compliance',
     // v2: forwarding reworded, and the cure moved to its own clause.
-    version: 2,
+    // v3: stopped handing the tenant the owner's assessments. See below.
+    version: 3,
     jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rules',
@@ -436,17 +437,68 @@ export const FL_LEASE_BODY: Clause[] = [
       which is 18 U.S.C. §1702 territory. What the clause actually needs is
       what ARRIVES there — an envelope they can pass on unopened, or a notice
       taped to the door.
+
+      v3: THE CLAUSE HANDED THE TENANT THE DUES. It bound them to "all of the
+      obligations of the Owner under those governing documents", and an owner's
+      obligations under a declaration include PAYING THE ASSESSMENTS. A tenant
+      read it and asked who pays them — the lease could not answer, while
+      containing language suggesting he did. Narrowed to the obligations
+      governing use, occupancy and conduct, which is what binding a tenant to
+      association rules is actually for, and the allocation is now stated.
+
+      WHO PAYS IS A TERM, NOT A RULE OF LAW, so it is a variable and never a
+      literal. Hard-coding "Landlord" here would repeat the mistake
+      hoa.lease-requirements below already records.
     */
-    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them, and Tenant shall be bound by and subject to all of the obligations of the Owner under those governing documents. Tenant shall reimburse Landlord as an Other Charge for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any association notice received at or posted on the Premises.',
+    body: 'The Premises are subject to the governing documents of {{hoaName}}. Tenant, and anyone Tenant permits at the Premises, shall comply with them, and Tenant shall be bound by and subject to the obligations of the Owner under those governing documents that govern the use, occupancy and conduct of the Premises. The regular and special assessments levied by the association are payable by {{assessmentsPaidBy}}. Tenant shall reimburse Landlord as an Other Charge for any fine or charge levied by the association arising from an act or omission of Tenant, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any association notice received at or posted on the Premises.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa,
     variables: [
       { name: 'hoaName', type: 'string', label: 'Association name', required: true },
       { name: 'hoaNoticeHours', type: 'number', label: 'Hours to forward association notices', required: true },
+      { name: 'assessmentsPaidBy', type: 'string', label: 'Who pays the association assessments', required: true },
     ],
     supersedes: [],
     asserts: ['hoa-compliance', 'hoa-fines-passed-through'],
+  },
+
+  /*
+    A COMMUNITY DEVELOPMENT DISTRICT IS NOT THE ASSOCIATION, and conflating the
+    two is how a tenant ends up arguing about a bill nobody named. A CDD is a
+    unit of local government under Ch. 190 Fla. Stat. Its assessments are
+    normally non-ad valorem charges collected on the property tax bill, which is
+    why they are ordinarily the owner's — but "ordinarily" is not "always", and
+    a lease that stays silent is exactly what produced the question.
+
+    Gated on its own fact rather than on `hasHoa`: a property can sit in a CDD
+    with no association, in an association with no CDD, in both, or in neither.
+    Selecting this off `hasHoa` would print district language for every Florida
+    property with an HOA — the error `hoa.lease-requirements` records.
+
+    US-FL because Ch. 190 is Florida law. Other states have comparable
+    creatures under other names and other statutes; when a second state arrives
+    it gets its own clause rather than a widened version of this one.
+  */
+  {
+    slug: 'cdd.assessments',
+    version: 1,
+    jurisdiction: 'US-FL',
+    placement: 'lease-body',
+    section: 'rules',
+    sortKey: 65,
+    heading: 'Community Development District',
+    body: 'The Premises lie within {{cddName}}, a community development district established under Chapter 190, Florida Statutes. The district levies assessments that are separate from any association assessment and are ordinarily collected on the annual property tax bill. Those district assessments are payable by {{cddAssessmentsPaidBy}}. Tenant shall comply with any rule the district adopts for the use of its facilities, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any district notice received at or posted on the Premises.',
+    source: drafted(),
+    status: 'draft',
+    includeWhen: (facts) => facts.hasCdd,
+    variables: [
+      { name: 'cddName', type: 'string', label: 'District name', required: true },
+      { name: 'cddAssessmentsPaidBy', type: 'string', label: 'Who pays the district assessments', required: true },
+      { name: 'hoaNoticeHours', type: 'number', label: 'Hours to forward district notices', required: true },
+    ],
+    supersedes: [],
+    asserts: ['cdd-assessments-allocated'],
   },
 
   /*

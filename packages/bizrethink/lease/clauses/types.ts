@@ -84,6 +84,16 @@ export type ClauseFacts = {
    */
   hasNamedOccupants: boolean;
   hasHoa: boolean;
+  /**
+   * The property sits in a community development district (Ch. 190 Fla. Stat.).
+   *
+   * SEPARATE FROM `hasHoa` ON PURPOSE. A CDD is a unit of local government, not
+   * the association: its assessments are usually non-ad valorem charges on the
+   * tax bill, and a property can be in one, the other, both or neither. Folding
+   * it into the association clause would print CDD language for every Florida
+   * property with an HOA.
+   */
+  hasCdd: boolean;
   /** True when the term does not begin on the rent due day. */
   prorationApplies: boolean;
 

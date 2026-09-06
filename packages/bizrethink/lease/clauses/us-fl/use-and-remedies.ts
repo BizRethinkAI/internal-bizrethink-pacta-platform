@@ -34,7 +34,20 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'use',
     sortKey: 10,
     heading: 'Use of the Premises',
-    body: 'Tenant shall use the Premises as a private residence only. Tenant shall not use the Premises for any business or commercial purpose, nor for any unlawful purpose, and shall not offer the Premises or any part of it for short-term letting through any platform or otherwise.',
+    /*
+      "ANY BUSINESS OR COMMERCIAL PURPOSE" PROHIBITED A LAPTOP. A tenant — a
+      physician — asked whether reading charts at his kitchen table breached
+      this clause. On the old wording it did, as would answering email. Every
+      professional tenant breached it on day one, which makes the term both
+      unenforceable in spirit and an obvious target for a tenant's lawyer.
+
+      The carve-out is bounded by what a neighbour or the association would
+      actually notice: no one visiting, no one employed on site, no signage, no
+      stock. That is the line between working from home and running a business
+      from a house. Association documents still win, because they can forbid
+      home occupation outright and this Lease cannot licence what they prohibit.
+    */
+    body: 'Tenant shall use the Premises as a private residence only. Tenant shall not use the Premises for any business or commercial purpose, nor for any unlawful purpose, and shall not offer the Premises or any part of it for short-term letting through any platform or otherwise. Remote work by Tenant using the Premises as a private residence is permitted, provided that no client, customer or member of the public attends the Premises for that work, no employee of Tenant works at the Premises, no signage is displayed, no stock or inventory is kept for sale, and the work is permitted by any governing documents of an association to which the Premises are subject.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,

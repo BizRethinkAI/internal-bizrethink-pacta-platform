@@ -77,7 +77,13 @@ describe('the interview knows whose law each question serves', () => {
   it('counts out the same way it was measured', () => {
     const marked = allFields(FL_INTERVIEW).filter((f) => f.jurisdictions !== undefined);
 
-    expect(marked.length).toBe(23);
+    /*
+      25 since the CDD pair (cddName, cddAssessmentsPaidBy) landed. NOT
+      assessmentsPaidBy — that feeds hoa.compliance, which is `generic`, so the
+      question travels to any state. The derived test above is what proves that
+      distinction rather than this count.
+    */
+    expect(marked.length).toBe(25);
   });
 });
 
