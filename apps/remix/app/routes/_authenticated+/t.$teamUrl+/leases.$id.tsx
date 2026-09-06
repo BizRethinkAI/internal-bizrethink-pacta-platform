@@ -79,7 +79,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   */
   const property = await prisma.bizrethinkProperty.findUnique({
     where: { id: matter.propertyId },
-    select: { utilities: true },
+    select: { utilities: true, state: true },
   });
 
   return {
@@ -93,6 +93,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       // Needed by the association-documents step: uploads hang off the
       // PROPERTY, not this lease, so next year's lease already has them.
       propertyId: matter.propertyId,
+      /*
+        WHOSE LAW THE INTERVIEW ASKS UNDER. Lives on the property, not the
+        matter, so it has to be carried explicitly. Florida asks the tenant to
+        elect under §83.595(4) and North Carolina has no such provision, so a
+        question asked of the wrong state stores an answer that renders into a
+        clause with no statute behind it.
+      */
+      propertyState: property?.state ?? null,
       currentStepId: matter.currentStepId,
       facts: matter.facts as Record<string, FieldValue>,
       money: matter.money as Record<string, unknown>,

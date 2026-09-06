@@ -29,7 +29,6 @@ const code = (path: string): string =>
     .replace(/^\s*\/\/.*$/gm, '');
 
 const BUILDER = join(__dirname, '../../../apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.tsx');
-const ROUTER = join(__dirname, '../server-only/trpc/lease-builder-router.ts');
 
 describe('the builder interview follows the property, not Florida', () => {
   it('does not hard-wire the Florida interview', () => {
@@ -44,13 +43,16 @@ describe('the builder interview follows the property, not Florida', () => {
   });
 
   /*
-    The state has to REACH the page. It lives on the property, and the matter
-    carries only a propertyId, so the payload has to say so explicitly — the
-    page cannot derive it.
+    The state has to REACH the page. It lives on the PROPERTY and the matter
+    carries only a propertyId, so the loader has to select it and carry it —
+    the page cannot derive it. The loader is the seam, not the tRPC procedure:
+    this page reads its matter from the Remix loader.
   */
-  it('is given the property state by the matter payload', () => {
-    expect(code(ROUTER), 'matter.get must expose propertyState').toMatch(/propertyState/);
-    expect(code(BUILDER), 'the page must read propertyState').toMatch(/propertyState/);
+  it('selects the state from the property and carries it to the page', () => {
+    const source = code(BUILDER);
+
+    expect(source, 'the loader must select state from the property').toMatch(/state:\s*true/);
+    expect(source, 'and carry it on the matter payload').toMatch(/propertyState/);
   });
 
   /*

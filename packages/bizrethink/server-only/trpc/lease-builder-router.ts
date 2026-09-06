@@ -654,26 +654,7 @@ export const leaseBuilderRouter = router({
     get: authenticatedProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
       const matter = await loadMatter(input.id, ctx.user.id);
 
-      /*
-        WHOSE LAW THE BUILDER IS ASKING UNDER.
-
-        The interview is split by jurisdiction — Florida asks the tenant to
-        elect under §83.595(4) and North Carolina has no such provision, so
-        asking a North Carolina landlord would store an answer that renders
-        into a clause with no statute behind it. The split cannot act on
-        anything the page does not know, and the matter carries only a
-        propertyId, so the state has to be sent explicitly.
-
-        A separate query for the same reason loadMatter uses two:
-        BizrethinkLeaseMatter deliberately has no Prisma relation into the
-        property. See ADR 0002.
-      */
-      const property = await prisma.bizrethinkProperty.findFirst({
-        where: { id: matter.propertyId },
-        select: { state: true },
-      });
-
-      return { ...matter, ...hydrate(matter), propertyState: property?.state ?? null };
+      return { ...matter, ...hydrate(matter) };
     }),
 
     create: authenticatedProcedure
