@@ -1,0 +1,52 @@
+[
+ {
+  "label": "Funding Provided",
+  "value": "$ ______«2»______",
+  "content": "This is how much funding _________________________«12»_________________________ will provide."
+ },
+ {
+  "label": "Estimated Annual Percentage Rate (APR)",
+  "value": "_«4»__%",
+  "content": "APR is the estimated cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, fees you pay, and the periodic payments you make. This calculation assumes your estimated average monthly income through your Approved Processor's card settlement will be $ _____«10»______. Since your actual income may vary from our estimate, your effective APR may also vary. APR is not an interest rate. The cost of this financing is based upon fees charged by _________________________«12»_________________________ rather than interest that accrues over time."
+ },
+ {
+  "label": "Finance Charge",
+  "value": "$ ______«5»______",
+  "content": "This is the dollar cost of your financing. Your finance charge will not increase if you take longer to pay off what you owe."
+ },
+ {
+  "label": "Estimated Total Payment Amount",
+  "value": "$ ______«6»______",
+  "content": "This is the total dollar amount of payments we estimate you will make under the contract."
+ },
+ {
+  "label": "Estimated Monthly Cost",
+  "value": "$ _____«16»______",
+  "content": "Although you do not make payments on a monthly basis, this is our calculation of your average monthly cost based upon the payment amounts disclosed below."
+ },
+ {
+  "label": "Estimated Payment",
+  "value": null,
+  "content": "$ ______«7»______ / each business day (Monday–Friday)."
+ },
+ {
+  "label": "Payment Terms",
+  "value": null,
+  "content": "Each business day, your Approved Processor will remit _«8»_% of your gross daily credit and debit card receipts to _________________________«12»_________________________ and send any remaining amounts to you. This financing does not have a fixed payment schedule and there is no minimum payment amount."
+ },
+ {
+  "label": "Estimated Term",
+  "value": "_«9»__ days",
+  "content": "This is our estimate of how long it will take to collect amounts due to us under the contract based upon assumptions about your monthly income through your Approved Processor's card settlement."
+ },
+ {
+  "label": "Prepayment",
+  "value": null,
+  "content": "If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $ _____«15»______ based upon our estimates."
+ },
+ {
+  "label": "Prepayment",
+  "value": null,
+  "content": "If you pay off the financing faster than required, you will not be required to pay additional fees."
+ }
+]

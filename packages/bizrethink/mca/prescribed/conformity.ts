@@ -143,3 +143,20 @@ export const checkAgainstSource = (form: PrescribedForm, sourceText: string): Di
     return missing;
   });
 };
+
+/**
+ * How much of a form this checker can actually see.
+ *
+ * A row whose regulation prescribes "a short explanation" rather than words has
+ * no `verbatim`, and `checkFormConformity` skips it — label checked, contents
+ * not. On New York's §600.6 that is five rows of eleven.
+ *
+ * Exported and asserted in the tests so the number is stated rather than
+ * implied. A suite that passes while checking half a form is a suite that
+ * reports the half it checked, and the danger is reading it as the whole.
+ */
+export const coverage = (form: PrescribedForm) => {
+  const checked = form.rows.filter((r) => r.verbatim !== null).length;
+
+  return { checked, total: form.rows.length, unchecked: form.rows.length - checked };
+};
