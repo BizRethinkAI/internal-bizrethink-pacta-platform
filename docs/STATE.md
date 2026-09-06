@@ -50,6 +50,7 @@ that folder. The table below is history and stays until compaction.
 | #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. You are reading its STATE update. |
 | #3 | `default-deny GITHUB_TOKEN` scope in CI workflows | Rebased 2026-08-29 |
 | #4 | AATL signing setup plan (DigiCert + GCP Cloud HSM) | Rebased 2026-08-29. AATL confirmed still live. |
+| — | MCA clause library — prescribed disclosure forms (CA, NY) | Branch `feat/mca-clause-library`, no PR yet. See [inflight note](state/inflight/feat-mca-clause-library.md). |
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
 **#21** (route), **#22** (preview link), **#23** (custom clauses + interview

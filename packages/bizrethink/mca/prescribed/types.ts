@@ -1,0 +1,101 @@
+/**
+ * A regulator-prescribed form.
+ *
+ * This is what MCA has and residential leases do not. The lease library's
+ * `statute` provenance covers text that must be reproduced word for word;
+ * California 10 CCR §914 and New York 23 NYCRR §600.6 go further and fix the
+ * STRUCTURE — nine rows in that order, these labels, and for several rows the
+ * regulation says the cell "shall include only" what it lists, which makes a
+ * true and helpful extra sentence a defect rather than a bonus.
+ *
+ * `verbatimRequired` on the lease's `statute` variant cannot express that, so
+ * this is a separate shape rather than a flag on the existing one. The
+ * obligations differ in kind and so do their failure modes: wrong words is a
+ * wrong disclosure, wrong ROWS is not the prescribed form at all. One is a
+ * string assertion, the other is a schema.
+ */
+export type PrescribedRow = {
+  /** First-column text, reproduced exactly. */
+  label: string;
+  /**
+   * Text the regulation dictates word for word, usually the third column. Null
+   * where the regulation prescribes the label and leaves the content to the
+   * provider.
+   */
+  verbatim: string | null;
+  /**
+   * True where the regulation says the row "shall include only" the content it
+   * lists. Anything beyond it is a defect — see REVIEW-01
+   * `ca-extra-text-in-only-rows`, where three sentences that were each true and
+   * helpful had to come out of a California form.
+   */
+  onlyPrescribedContent: boolean;
+  /**
+   * Sentences the regulation expressly PERMITS but does not require, in a row
+   * it otherwise closes. §914(a)(4)(C)(ii) is the clean example: the provider
+   * "may include" the statement that the finance charge will not increase if
+   * repayment takes longer. Present in our form, permitted, and not an
+   * addition.
+   *
+   * Without this the checker flags a permitted sentence as a defect, which is
+   * worse than useless: a checker that cries wolf gets its findings ignored,
+   * and the findings are the whole point.
+   */
+  alsoPermitted?: string[];
+};
+
+export type PrescribedForm = {
+  /** e.g. 'ca-offer-summary'. */
+  slug: string;
+  /** e.g. '10 CCR §914'. */
+  citation: string;
+  /**
+   * The vendored primary file this form was read out of. Never a summary: see
+   * MCA-CLAUSE-LIBRARY-PHASE0.md, where the Georgia and Texas forms were both
+   * built from secondary summaries that were broadly right and wrong in exactly
+   * the particulars that mattered.
+   */
+  sourceFile: string;
+  rows: PrescribedRow[];
+  /**
+   * How the first column is compared.
+   *
+   * 'exact' for California and New York, whose regulations say "in the first
+   * column: 'Funding Provided'" — the label IS the whole cell, so anything else
+   * in it is an addition.
+   *
+   * 'contains' for Virginia, whose first column holds the label AND tick-boxes
+   * the provider completes ("Payment Schedule ☐ Fixed ☐ Variable") AND the
+   * bracketed formulae the form prints under several labels. Demanding an exact
+   * match there would mean writing our own answers into the spec, which would
+   * make the spec a record of what we did rather than of what Virginia requires.
+   *
+   * Defaults to 'exact': the stricter reading should be the one you get by
+   * saying nothing.
+   */
+  labelMatch?: 'exact' | 'contains';
+};
+
+/** One divergence between what a form says and what the regulation prescribes. */
+export type Divergence = {
+  kind: 'row-count' | 'label' | 'verbatim' | 'unauthorised-addition' | 'not-in-source';
+  /** Index into `rows`, or null for a whole-form problem. */
+  row: number | null;
+  detail: string;
+};
+
+/** A rendered form, as read back out of the built PDF. */
+export type RenderedRow = {
+  label: string;
+  /**
+   * The second column, where the regulation gives the row three columns and
+   * does not combine them — the dollar amount, rate or count.
+   *
+   * Kept apart from `content` because merging them made every figure in the
+   * form look like unauthorised prose in a row closed by "shall include only".
+   * Null where the regulation says the second and third columns "shall be
+   * combined", which several rows do.
+   */
+  value?: string | null;
+  content: string;
+};

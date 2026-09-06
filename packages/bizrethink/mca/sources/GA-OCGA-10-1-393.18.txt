@@ -1,0 +1,121 @@
+O.C.G.A. § 10-1-393.18 — REQUIRED DISCLOSURES FOR COMMERCIAL FINANCING
+TRANSACTIONS; EXCEPTIONS; LIMITATIONS ON BROKERS; ENFORCEMENT; CIVIL PENALTIES
+
+2025 Code of Georgia, Title 10, Ch. 1, Art. 15, Pt. 2 (Fair Business Practices Act).
+Enacted by Ga. L. 2023, p. 255, § 2/SB 90, effective January 1, 2024.
+
+Retrieved 2026-09-05 from law.justia.com. Vendored because REVIEW-01 found the GA
+form had been built against a secondary summary; the primary text is not reachable
+from the sandbox (Justia 403s automated fetches; the Georgia legislature's document
+API returns an unrelated resolution), so it was captured through the browser.
+
+Definitions (subsection (a)) and the full text of subsections (b)-(k) are on the
+source page. The operative provisions for our form:
+
+--------------------------------------------------------------------------------
+(a)(10) "Provider" means a person who consummates more than five commercial
+financing transactions in this state during any calendar year...
+
+(a)(6) "Commercial financing transaction" means a business purpose transaction:
+   (A) Under which a person extends a business a commercial loan or a commercial
+       open-end credit plan; or
+   (B) That is an accounts receivable purchase transaction.
+
+(b) The provisions of this Code section shall not apply to: ...
+   (5) A provider that consummates five or fewer commercial financing transactions
+       in the state during any 12 month period;
+   (6) A commercial financing transaction secured by real property;
+   (7) A commercial financing transaction that is a lease as defined in Code
+       Section 11-2A-103;
+   (8) ... a purchase money obligation as defined in Code Section 11-9-103;
+   (11) A commercial financing transaction of more than $500,000.00; ...
+
+(c) For purposes of Chapter 1 of Title 7, a provider's characterization of an
+accounts receivable purchase transaction as a purchase shall be conclusive that the
+accounts receivable purchase transaction is not a loan or a transaction for the use,
+forbearance, or detention of money.
+
+(e)(1) Before consummating a commercial financing transaction, a provider shall
+disclose the terms of the commercial financing transaction in accordance with this
+Code section.
+
+(e)(2) Only one disclosure must be provided for each commercial financing
+transaction, and a disclosure is not required as a result of the modification,
+forbearance, or change to a consummated commercial financing transaction.
+
+(e)(3) A provider shall disclose the following information in connection with each
+commercial financing transaction:
+
+   (A) The total amount of funds provided to the business under the terms of the
+       commercial financing transaction;
+
+   (B) The total amount of funds disbursed to the business under the terms of the
+       commercial financing transaction, if less than the amount described in
+       subparagraph (A) of this paragraph, as a result of any fees deducted or
+       withheld at disbursement, any amount paid to the provider to satisfy a prior
+       balance, and any amount paid to a third party on behalf of the business;
+
+   (C) The total amount to be paid to the provider under the terms of the commercial
+       financing transaction;
+
+   (D) The total dollar cost of the commercial financing transaction, calculated by
+       finding the difference between:
+          (i) The amount described in subparagraph (A) of this paragraph; and
+         (ii) The amount described in subparagraph (C) of this paragraph;
+
+   (E)  (i) The manner, frequency, and amount of each payment; or
+       (ii) If the amount of each payment may vary, the manner, frequency, and
+            estimated amount of the initial payment; and
+
+   (F) A statement of whether there are any costs or discounts associated with
+       prepayment under the commercial financing transaction, including a reference
+       to the paragraph in the commercial financing transaction agreement that
+       creates each cost or discount.
+
+(e)(4) The commercial financing transaction agreement shall include a description of
+the methodology for calculating any variable payment amount and the circumstances
+that may cause a payment amount to vary.
+
+(e)(5) The provisions of this subsection shall apply to any commercial financing
+transaction consummated on or after January 1, 2024.
+
+(f) No broker shall:
+   (1) Assess, collect, or solicit an advance fee from a business to provide services
+       as a broker; provided, however, that nothing contained in this paragraph shall
+       preclude a broker from soliciting a potential business to pay for ... actual
+       services necessary to apply for a commercial financing transaction, including
+       ... a credit check or an appraisal of security, where such payment is made by
+       check or money order payable to a party independent of the broker;
+   (2) Make or use any false or misleading representations or omit any material fact
+       in the offer or sale of the services of a broker ...;
+   (3) Make or use any false or deceptive representation in its business dealings.
+
+(g) The Attorney General may receive and act on complaints, seek voluntary
+compliance, and commence administrative or judicial proceedings.
+
+(h) A person who violates a provision of this Code section is subject to a civil
+penalty of $500.00 per violation, not to exceed $20,000.00 for all violations arising
+from the use of the same transaction documentation or materials.
+
+(i) A person who violates a provision ... after receiving written notice of a prior
+violation is subject to a civil penalty of $1,000.00 per violation, not to exceed
+$50,000.00 for all violations arising from the use of the same transaction
+documentation or materials.
+
+(j) Nothing in this Code section creates a private right of action ...
+
+(k) A violation of this Code section shall not affect the enforceability of any
+underlying agreement.
+--------------------------------------------------------------------------------
+
+NOTES FOR THE FORM
+- Georgia prescribes CONTENT, not a form: no mandated labels, no mandated layout,
+  no APR requirement and no signature requirement. Six items, (A) through (F).
+- (B) enumerates THREE causes of a shortfall and all three must be named: fees
+  deducted or withheld, amount paid to the provider to satisfy a prior balance, and
+  amount paid to a third party on the business's behalf.
+- (E)(ii) wants the estimated amount of the INITIAL payment where payments vary --
+  not an average.
+- (F) requires a reference to the PARAGRAPH of the agreement creating each
+  prepayment cost or discount, which is stricter than any other state in our set.
+- (e)(4) puts the variable-payment methodology in the AGREEMENT, not the disclosure.
