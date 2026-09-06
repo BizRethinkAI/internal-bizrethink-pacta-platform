@@ -658,6 +658,52 @@ model BizrethinkClauseApproval {
 ///
 /// Scoped to an ORGANISATION rather than a matter: the library is the same for
 /// every lease, and an approval is pinned to clause text, not to a tenancy.
+/// What an attorney said about one clause, and whether anybody answered.
+///
+/// THE ASYMMETRY THIS FIXES. A tenant can comment on every clause of a lease
+/// and have each comment tracked to a disposition. Counsel — whose review is
+/// the critical path for the whole product — had a read-only page and no way
+/// to say anything. Findings arrived by email and were retyped.
+///
+/// A finding is not a comment. A tenant's comment is a negotiating position and
+/// does not block. An attorney's finding is a defect report against text we are
+/// asserting is lawful, so it blocks the clause until answered, and answering
+/// is a deliberate act with a reason attached.
+model BizrethinkLibraryFinding {
+  id String @id
+
+  /// The link it came in on. Findings are only ever created through a review
+  /// token, so there is no path that records one without a named reviewer.
+  reviewId String
+  review   BizrethinkLibraryReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  /// Which clause. Not a foreign key: the library is code, not rows.
+  clauseSlug String
+
+  body String
+
+  /// Copied from the review rather than joined. The row is the record of who
+  /// said what, and it has to survive the review being closed.
+  authorName  String
+  authorEmail String
+
+  /// The words of the clause when the finding was made. An answer to a finding
+  /// against text that has since moved is answering a different question.
+  clauseFingerprint String
+
+  /// Null while outstanding. Both of these are required to clear it — a
+  /// timestamp with no text is not an answer.
+  answeredAt        DateTime?
+  answer            String?
+  answeredByUserId  Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reviewId])
+  @@index([clauseSlug])
+}
+
 model BizrethinkLibraryReview {
   id             String @id
   organisationId String
@@ -679,6 +725,8 @@ model BizrethinkLibraryReview {
 
   createdByUserId Int
   expiresAt       DateTime?
+
+  findings BizrethinkLibraryFinding[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

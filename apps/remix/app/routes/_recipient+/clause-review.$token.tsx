@@ -2,6 +2,9 @@ import { trpc } from '@documenso/trpc/react';
 
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
+import { Textarea } from '@documenso/ui/primitives/textarea';
+import { useState } from 'react';
 import { useParams } from 'react-router';
 
 /**
@@ -12,10 +15,21 @@ import { useParams } from 'react-router';
  * send it. The only path was to add counsel to the organisation as a user.
  * Meanwhile the product already had this exact mechanism for tenants.
  *
- * Read-only on purpose. A token holder can see every clause and why it exists;
- * recording an approval stays inside the organisation, where it is attributable
- * to a person who signed in. Sending a link should not be the same act as
- * granting write access.
+ * WAS read-only on purpose, and half of that reasoning still holds. Recording
+ * an APPROVAL stays inside the organisation: it carries a bar number and a
+ * jurisdiction, it is checked against the clause's own jurisdiction before it is
+ * written, and it must be attributable to somebody who signed in. Sending a link
+ * should not be the same act as granting that.
+ *
+ * But the other direction was wrong. A token holder could read 52 clauses and
+ * say NOTHING — no comment, no objection, nothing. Findings came back by email
+ * and somebody retyped them into a system with nowhere to put them, while a
+ * TENANT could comment on every clause of a lease and have each one tracked to
+ * a disposition. The person whose review actually gates the product had less
+ * than the person whose comments are explicitly a negotiating position.
+ *
+ * So counsel can now record a finding per clause. It blocks that clause until
+ * somebody answers it, which is what makes the review mean anything.
  */
 
 const ACCENT = 'text-[#1f3a5f] dark:text-[#8fb3d9]';
@@ -137,8 +151,81 @@ export default function ClauseReviewPage() {
             </p>
 
             <p className={`${DOC_SERIF} mt-3 whitespace-pre-wrap text-[0.95rem] leading-relaxed`}>{clause.body}</p>
+
+            <FindingBox token={token} clauseSlug={clause.slug} />
           </section>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Where counsel says what is wrong with a clause.
+ *
+ * THE ASYMMETRY THIS CLOSES. A tenant can comment on every clause of a lease
+ * and have each comment tracked. Counsel — whose review is the critical path
+ * for the whole product, and without which no lease may reach a third party —
+ * had this page read-only: 52 clauses, approved/unapproved badges, and no way
+ * to say anything. Findings arrived by email and somebody retyped them.
+ *
+ * Deliberately per clause rather than one box at the end. A finding that names
+ * its clause can be answered against that clause; a paragraph covering four
+ * needs somebody to split it first, and that somebody is not the attorney.
+ *
+ * NOT AN APPROVAL. Recording approval carries a bar number and a jurisdiction
+ * and is checked against the clause's own jurisdiction before it is written.
+ * That stays with staff, who have an account. This is the other direction:
+ * saying what is wrong, which needs no such ceremony.
+ */
+function FindingBox({ token, clauseSlug }: { token: string; clauseSlug: string }) {
+  const [body, setBody] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const record = trpc.bizrethink.leaseBuilder.clauseLibrary.recordFinding.useMutation({
+    onSuccess: () => {
+      setBody('');
+      setSent(true);
+    },
+  });
+
+  if (sent) {
+    return (
+      <p className="mt-3 text-muted-foreground text-xs">
+        Recorded. It will hold this clause until somebody answers it.{' '}
+        <button className="underline" onClick={() => setSent(false)} type="button">
+          Add another
+        </button>
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-3">
+      <Textarea
+        aria-label={`Finding on ${clauseSlug}`}
+        className="text-sm"
+        onChange={(event) => setBody(event.target.value)}
+        placeholder="What is wrong with this clause?"
+        rows={2}
+        value={body}
+      />
+
+      <div className="mt-2 flex items-center gap-3">
+        <Button
+          disabled={body.trim() === '' || record.isPending}
+          onClick={() => record.mutate({ token, clauseSlug, body })}
+          size="sm"
+          variant="outline"
+        >
+          Record a finding
+        </Button>
+
+        {/*
+          A failed save used to be invisible on the lease page and cost a
+          reviewer their work. Not repeating that here.
+        */}
+        {record.error && <span className="text-destructive text-xs">{record.error.message}</span>}
       </div>
     </div>
   );
