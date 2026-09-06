@@ -1,58 +1,17 @@
 import type { ClauseStatus } from '../../server-only/feature-access';
+import type { ClauseSource, ClauseVariable } from '../../provenance/types';
 
-/**
- * Where a clause's words came from.
- *
- * This is a provenance record, not a label. Two of the four variants below
- * carry legal weight — statutory text must be reproduced exactly, and
- * Supreme-Court-approved form text is the strongest available answer to the
- * unauthorized-practice-of-law question because those forms exist precisely so
- * that non-lawyers may complete them.
- *
- * Note what is NOT representable here: there is no variant for text lifted
- * from someone else's lease. The executed Zillow and First In Property
- * Management leases for this property are a REQUIREMENTS INVENTORY — they tell
- * us which terms the deal needs — but their prose is the copyrighted work
- * product of Zillow and of First In's forms vendor. Making that unrepresentable
- * in the type is cheaper than remembering not to do it.
- */
-export type ClauseSource =
-  | {
-      kind: 'statute';
-      /** e.g. 'Fla. Stat. §404.056(5)'. */
-      citation: string;
-      /**
-       * True when the statute prescribes exact words and a paraphrase does not
-       * satisfy it. Such clauses must never be edited for tone or length.
-       */
-      verbatimRequired: boolean;
-      /**
-       * ISO date on which the text was last checked against the current
-       * statute. Null means unverified — see `assertPublishable`.
-       */
-      verbatimVerifiedAt: string | null;
-    }
-  | {
-      kind: 'court-approved-form';
-      /** e.g. 'RLHD-3x Rev 7/16'. */
-      form: string;
-      citation: string;
-    }
-  | {
-      kind: 'attorney-drafted';
-      /** Name and bar number. Null until the engagement happens. */
-      author: string | null;
-    }
-  | {
-      kind: 'customer-authored';
-    };
+/*
+  Provenance moved to `packages/bizrethink/provenance/` when the MCA vertical
+  needed the same guard. It was never a lease concept — `assertPublishable`
+  never looked at a lease — and a merchant-cash-advance package importing from a
+  rental-lease package would have been worse than moving it.
 
-export type ClauseVariable = {
-  name: string;
-  type: 'string' | 'number' | 'usd' | 'date' | 'boolean';
-  label: string;
-  required: boolean;
-};
+  Re-exported here so every existing `lease/clauses/types` import keeps working.
+  New code should import from `provenance/` directly.
+*/
+export type { ClauseSource, ClauseVariable } from '../../provenance/types';
+export { assertPublishable } from '../../provenance/types';
 
 /**
  * The narrow set of facts a clause may branch on. Deliberately small: a clause
@@ -222,36 +181,4 @@ export type Clause = {
   supersedes: string[];
   /** Semantic tags, for duplicate-assertion detection. */
   asserts: string[];
-};
-
-/**
- * Guard for the second lock. A clause may only reach `published` — i.e. become
- * renderable for an organisation that is not BizRethink-internal — once its
- * provenance actually supports that.
- *
- * Statutory text needs a verification date, because a statute that has been
- * amended silently invalidates a clause that still quotes the old wording.
- * Attorney-drafted text needs a named author. This is the mechanism that stops
- * unreviewed language reaching a third party; see `feature-access.ts`.
- */
-export const assertPublishable = (clause: Clause): string[] => {
-  const problems: string[] = [];
-
-  if (clause.status !== 'published') {
-    return problems;
-  }
-
-  if (clause.source.kind === 'statute' && clause.source.verbatimVerifiedAt === null) {
-    problems.push(`${clause.slug}: statutory text published without a verification date`);
-  }
-
-  if (clause.source.kind === 'attorney-drafted' && clause.source.author === null) {
-    problems.push(`${clause.slug}: attorney-drafted text published without a named reviewer`);
-  }
-
-  if (clause.source.kind === 'customer-authored') {
-    problems.push(`${clause.slug}: customer-authored text can never be published to the shared library`);
-  }
-
-  return problems;
 };
