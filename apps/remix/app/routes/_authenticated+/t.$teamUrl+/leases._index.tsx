@@ -1,3 +1,4 @@
+import { leaseState } from '@bizrethink/customizations/lease/matters/lease-state';
 import { canAccessLeaseBuilder, canRenderDraftClauses } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
@@ -58,6 +59,22 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     canRenderDraftClauses({ organisationId: team.organisationId, userId: user.id }),
   ]);
 
+  /*
+    "Somebody is reading it" is the state a landlord actually checks for, and
+    it is not a matter status — it is an open review link, in another table.
+
+    Grouped in one query rather than a count per row: this list is unbounded,
+    and a per-row count is the shape that looks fine on one lease and is a
+    problem on eighty.
+  */
+  const openReviews = await prisma.bizrethinkLeaseReview.groupBy({
+    by: ['matterId'],
+    where: { status: 'open', matterId: { in: matters.map((matter) => matter.id) } },
+    _count: { _all: true },
+  });
+
+  const openReviewsByMatter = new Map(openReviews.map((row) => [row.matterId, row._count._all]));
+
   return {
     teamUrl,
     organisationId: team.organisationId,
@@ -82,9 +99,20 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       noticeName: p.noticeName,
       noticeAddress: p.noticeAddress,
     })),
-    matters: matters.map((m) => ({ ...m, updatedAt: m.updatedAt.toISOString() })),
+    matters: matters.map((m) => ({
+      ...m,
+      updatedAt: m.updatedAt.toISOString(),
+      openReviews: openReviewsByMatter.get(m.id) ?? 0,
+    })),
   };
 }
+
+/**
+ * Three tones, three variants. Kept beside the page rather than in the shared
+ * helper because it is a rendering choice, and `leaseState` should stay usable
+ * anywhere the badge component is not.
+ */
+const BADGE_VARIANT = { quiet: 'neutral', active: 'default', done: 'secondary' } as const;
 
 export default function LeasesPage() {
   const { teamUrl, organisationId, teamId, draftRenderingAllowed, properties, matters } =
@@ -265,7 +293,14 @@ export default function LeasesPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Badge variant={matter.status === 'draft' ? 'neutral' : 'default'}>{matter.status}</Badge>
+                  {/*
+                    Was `<Badge>{matter.status}</Badge>` — the raw column
+                    value, so a landlord read "draft" / "sent" / "executed".
+                    `leaseState` derives what they actually want to know,
+                    including the one thing a status column cannot say: that
+                    somebody is reading it right now.
+                  */}
+                  <Badge variant={BADGE_VARIANT[leaseState(matter).tone]}>{leaseState(matter).label}</Badge>
 
                   {/*
                     Only on a draft. A lease that has been sent is not the
