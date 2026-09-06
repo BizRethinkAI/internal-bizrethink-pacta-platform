@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { admissionBlocks, normaliseBarJurisdiction } from '../clauses/approval-jurisdiction';
+import { admissionBlocks, normaliseJurisdiction } from '../clauses/approval-jurisdiction';
 
 /**
  * An attorney may approve a clause only where they are admitted.
@@ -18,7 +18,7 @@ import { admissionBlocks, normaliseBarJurisdiction } from '../clauses/approval-j
  * clauses depend on no state's law.
  */
 
-describe('normaliseBarJurisdiction', () => {
+describe('normaliseJurisdiction', () => {
   /*
     Typed by a human on behalf of an attorney, so it arrives however they wrote
     it. The stored value has to match the clause's `jurisdiction` exactly or the
@@ -26,20 +26,20 @@ describe('normaliseBarJurisdiction', () => {
   */
   it('accepts the forms a person actually types', () => {
     for (const input of ['FL', 'fl', 'US-FL', 'us-fl', ' Fl ', 'Florida', 'florida']) {
-      expect(normaliseBarJurisdiction(input), input).toBe('US-FL');
+      expect(normaliseJurisdiction(input), input).toBe('US-FL');
     }
   });
 
   it('handles the second state the same way', () => {
     for (const input of ['NC', 'us-nc', 'North Carolina', 'north carolina']) {
-      expect(normaliseBarJurisdiction(input), input).toBe('US-NC');
+      expect(normaliseJurisdiction(input), input).toBe('US-NC');
     }
   });
 
   it('returns null for something it does not recognise, rather than guessing', () => {
-    expect(normaliseBarJurisdiction('')).toBeNull();
-    expect(normaliseBarJurisdiction('Ontario')).toBeNull();
-    expect(normaliseBarJurisdiction('bar #12345')).toBeNull();
+    expect(normaliseJurisdiction('')).toBeNull();
+    expect(normaliseJurisdiction('Ontario')).toBeNull();
+    expect(normaliseJurisdiction('bar #12345')).toBeNull();
   });
 });
 

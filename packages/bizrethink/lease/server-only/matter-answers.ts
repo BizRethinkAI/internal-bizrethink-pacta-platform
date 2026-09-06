@@ -1,3 +1,4 @@
+import { normaliseJurisdiction } from '../clauses/approval-jurisdiction';
 import type { CustomClauseInput } from '../clauses/custom';
 import type { LeaseDocument } from '../documents/derive-documents';
 import { describeDocuments, hasGoverningDocuments } from '../documents/derive-documents';
@@ -48,6 +49,7 @@ export type StoredMatter = {
    * nothing signed positionally, so unlike the party list it has no reason to
    * be frozen at creation.
    */
+  propertyState?: unknown;
   propertyUtilities?: unknown;
   /**
    * The PROPERTY's uploaded documents, passed in by the caller.
@@ -198,5 +200,12 @@ export const renderInputForMatter = (matter: StoredMatter): RenderLeaseInput => 
     parties: hydrated.parties,
     propertyAddress: String(hydrated.values.propertyAddress ?? ''),
     customClauses: hydrated.customClauses,
+    /*
+      Whose law this lease is drafted to, taken from the property rather than
+      guessed. Falls back to Florida because that is the only state with clauses
+      of its own; the fallback stops being harmless the moment a second one has
+      any, which is why the state is threaded now rather than then.
+    */
+    jurisdiction: normaliseJurisdiction(matter.propertyState as string | null) ?? 'US-FL',
   };
 };

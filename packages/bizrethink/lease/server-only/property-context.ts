@@ -18,6 +18,8 @@ import type { LeaseDocument } from '../documents/derive-documents';
  * property id cannot get half of it.
  */
 export type PropertyContext = {
+  /** The property's state, which decides whose law the lease is drafted to. */
+  propertyState: string | null;
   propertyUtilities: unknown;
   propertyDocuments: LeaseDocument[];
   /**
@@ -68,7 +70,7 @@ export const loadPropertyContext = async (propertyId: string, matterId?: string)
   const [property, documents, matterDocuments] = await Promise.all([
     prisma.bizrethinkProperty.findUnique({
       where: { id: propertyId },
-      select: { utilities: true },
+      select: { utilities: true, state: true },
     }),
     prisma.bizrethinkDocument.findMany({
       where: { propertyId, archivedAt: null },
@@ -85,6 +87,7 @@ export const loadPropertyContext = async (propertyId: string, matterId?: string)
   ]);
 
   return {
+    propertyState: property?.state ?? null,
     propertyUtilities: property?.utilities ?? [],
     propertyDocuments: documents.map(toLeaseDocument),
     matterDocuments: matterDocuments.map(toLeaseDocument),
