@@ -83,7 +83,7 @@ describe('the counsel link opens without an account', () => {
 */
 describe('the library page can actually send the link', () => {
   const page = readFileSync(
-    new URL('../../../../apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.library.tsx', import.meta.url),
+    new URL('../../../../apps/remix/app/routes/_authenticated+/admin+/lease-library.tsx', import.meta.url),
     'utf8',
   );
 

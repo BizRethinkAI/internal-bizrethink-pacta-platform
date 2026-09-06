@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
-import { Building2, Lock, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
+import { Building2, Lock, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useLoaderData, useNavigate, useRevalidator } from 'react-router';
 
@@ -117,25 +117,33 @@ export default function LeasesPage() {
         <p className="mt-1 text-muted-foreground">
           Florida residential leases, assembled from a clause library rather than a fixed template.
         </p>
-
-        <Button asChild variant="outline" size="sm" className="mt-4">
-          <a href={`/t/${teamUrl}/leases/library`}>
-            <ShieldCheck className="mr-2 h-4 w-4" />
-            Clause library and attorney sign-off
-          </a>
-        </Button>
       </div>
 
-      <Alert variant="warning" className="mt-6">
-        <Lock className="h-4 w-4" />
-        <AlertTitle>Internal preview — clause text is unreviewed</AlertTitle>
-        <AlertDescription>
-          The clause library has not been through review by a Florida attorney. It renders here because this
-          organisation holds an explicit grant to render unreviewed clause text
-          {draftRenderingAllowed ? '' : ' — which it does NOT, so generation is blocked'}. Nothing produced here may be
-          sent to a third party.
-        </AlertDescription>
-      </Alert>
+      {/*
+        THE CUSTOMER IS NOT TOLD ABOUT OUR REVIEW STATE.
+
+        This used to render "Internal preview — clause text is unreviewed" on
+        the landlord's own home page, next to a link into Pacta's clause
+        library. Both were right for an internal tool with one user and are a
+        disclosure once there are two: whether OUR library has been through
+        counsel is our problem, not something to put in front of a customer
+        about to send a lease.
+
+        THE SAFEGUARD IS UNCHANGED. `assertPublishable` and the draft-clause
+        feature lock still gate generation, and a lease still cannot reach a
+        third party until the library has been reviewed. Only the announcement
+        moved — it now lives at /admin/lease-library, where the people who can
+        act on it are.
+      */}
+      {!draftRenderingAllowed && (
+        <Alert variant="warning" className="mt-6">
+          <Lock className="h-4 w-4" />
+          <AlertTitle>Lease generation is not enabled yet</AlertTitle>
+          <AlertDescription>
+            Leases cannot be generated for this organisation. Contact Pacta support if you believe this is wrong.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <section className="mt-8">
         <div className="flex items-center justify-between">
