@@ -51,7 +51,7 @@ export const FL_BOILERPLATE: Clause[] = [
   {
     slug: 'notices.tenant-address',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'notices',
     sortKey: 20,
@@ -133,7 +133,7 @@ export const FL_BOILERPLATE: Clause[] = [
   {
     slug: 'general.entire-agreement',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'general',
     sortKey: 10,
@@ -157,7 +157,7 @@ export const FL_BOILERPLATE: Clause[] = [
   {
     slug: 'general.severability',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'general',
     sortKey: 20,
@@ -220,7 +220,7 @@ export const FL_BOILERPLATE: Clause[] = [
   {
     slug: 'general.execution',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'general',
     sortKey: 50,

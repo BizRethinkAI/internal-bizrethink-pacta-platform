@@ -410,6 +410,35 @@ passed, or appeared to:
 
 ## Open threads
 
+### Sixty-three clauses were labelled Florida; twenty-seven of them are
+
+Every clause said `jurisdiction: 'US-FL'` except the lead-paint disclosure.
+Measured against the only question that matters — *would this text still be true
+in another state?* — the split is **35 generic, 1 federal, 27 Florida**.
+
+Adding North Carolina under the old labelling would have duplicated those 35 per
+state: a second `general.severability`, a second set of house rules, a second
+`pets.addendum`. Each copy would then have needed approving separately, by an
+attorney in each state, for text that turns on no state's law.
+
+**The classification is a pinned slug→jurisdiction map, not a pattern** — the
+same technique as `library-invariants`, and for the same reason: a pattern gets
+widened by whoever it inconveniences, and one already was. Adding a clause now
+forces an edit to the pin, which forces someone to answer the question.
+
+**Nothing an approval pins to moved.** The diff is 35 changed lines, every one a
+`jurisdiction` value; no slug, body, heading or version changed. Verified by
+filtering the diff.
+
+**Except that it did, and this is why the sequencing mattered.**
+`clauseFingerprint` includes `jurisdiction`, so reclassifying lapses the
+approval on every clause it touches. There are zero approvals recorded, so the
+cost today is nothing. Done after counsel signs the Florida baseline, it would
+have silently lapsed thirty-five of them.
+
+Files have not moved yet. The guard is what makes that safe, so it goes first.
+
+
 ### An approval recorded a bar number but never which bar
 
 `BizrethinkClauseApproval` captured `approvedByBarNumber` and nothing about the

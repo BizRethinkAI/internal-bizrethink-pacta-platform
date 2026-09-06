@@ -29,7 +29,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'use.residential-only',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'use',
     sortKey: 10,
@@ -56,7 +56,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'use.occupancy-limit',
     version: 2,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'use',
     sortKey: 20,
@@ -77,7 +77,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'use.occupancy-limit-with-others',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'use',
     sortKey: 20,
@@ -99,7 +99,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'use.no-alterations',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'use',
     sortKey: 30,
@@ -116,7 +116,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'use.no-assignment',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'use',
     sortKey: 40,
@@ -133,7 +133,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'utilities.allocation',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'utilities',
     sortKey: 10,
@@ -155,7 +155,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'insurance.renters',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'utilities',
     sortKey: 20,
@@ -264,7 +264,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'moveout.condition',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'default',
     sortKey: 20,
@@ -317,7 +317,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'mould.control',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'default',
     sortKey: 30,
@@ -405,7 +405,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
   {
     slug: 'rules.house-rules',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'addendum',
     section: 'rules',
     sortKey: 20,
