@@ -40,6 +40,10 @@ branding.
 
 ## In flight
 
+**Live work now lives in [`docs/state/inflight/`](state/inflight/), one file per
+pull request.** Reading the current state means this file plus every note in
+that folder. The table below is history and stays until compaction.
+
 | PR | What | State |
 |---|---|---|
 | #26 | Lease party list + sending wired | Open. Base of the current stack. |

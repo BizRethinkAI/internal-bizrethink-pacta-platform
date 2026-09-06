@@ -174,6 +174,10 @@ passed CI at the time.
 - [ ] Does the change **remove** anything the diff doesn't show? Upstream syncs
       have silently dropped three features this way.
 - [ ] Are the tests asserting **presence**, or only that nothing threw?
+- [ ] Is there an in-flight note at `docs/state/inflight/<branch-slug>.md`, and
+  is it **this PR's own file**? Editing `docs/STATE.md` directly still satisfies
+  the guard but collides with every other open PR — three did on 2026-09-05,
+  each costing a rebase and a full E2E re-run.
 - [ ] Did any CI job report `cancelled` rather than pass or fail?
 
 ### Fork discipline
