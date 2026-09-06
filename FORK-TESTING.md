@@ -71,6 +71,11 @@ API-test project. Optional future hardening: a bounded retry on
 
 > **CORRECTION, 2026-09-02 — "accept-on-retry" is no longer true.**
 >
+> *(RESOLVED 2026-09-06 — see the block below. The root cause proposed in this
+> note was wrong; the real defect is an unawaited seed helper, fixed by overlay
+> 068. Kept verbatim because the observations in it are accurate and were what
+> eventually led to the answer.)*
+>
 > These specs now fail through **all five attempts**. A run on PR #67 shows
 > `retry #1` … `retry #4` exhausted, and the failing cluster is the
 > `find-documents.spec.ts` **Team Context** visibility group (`:562`, `:669`,
@@ -93,86 +98,72 @@ API-test project. Optional future hardening: a bounded retry on
 > other ~888 results. That makes the red **readable**; it does not make it go
 > away.
 
-> **ROOT CAUSE INVESTIGATION, 2026-09-06 — the counter theory is disproven.**
+> **RESOLVED, 2026-09-06 — `seedDocuments()` never awaited. Overlay 068.**
 >
-> Run on `ci-runner-03` (idle, out of the CI path), driving the `api` project
-> directly. The recorded cause above — DB contention on `incrementDocumentId` —
-> is **wrong**. So are two theories raised during the investigation.
+> Not contention, not visibility, not roles. `seedDocuments()` in
+> `packages/prisma/seed/documents.ts` built a `match()` chain with **no terminal
+> call** — no `.exhaustive()`, `.otherwise()` or `.run()`. ts-pattern evaluates
+> the matching handler eagerly, so the writes start, but the chain returns a
+> `Match` object rather than the handler's Promise. The enclosing `Promise.all`
+> therefore awaited nothing and the seeding was **fire-and-forget**: specs
+> queried the API while rows were still being written and received an arbitrary
+> subset.
 >
-> **The symptom.** `:721` asserts an ADMIN sees all 6 seeded documents and
-> receives **2**. Note that the fixture seeds **2 documents at each of the three
-> visibility levels**, so the number 2 on its own distinguishes nothing — an
-> early reading of it as "exactly the EVERYONE count, therefore a role
-> downgrade" was an unsound inference and is recorded here so it is not made
-> again.
+> Measured directly: **0** documents immediately after `await seedDocuments()`,
+> all **6** five seconds later.
 >
-> **A role-downgrade mechanism was investigated and DISPROVEN.** The candidate:
-> `getTeamById` derives the role via `TeamGroup → OrganisationGroup →
-> OrganisationGroupMember → OrganisationMember → userId` (`get-team.ts:47`),
-> and `utils/teams.ts:76` returns `LOWEST_TEAM_ROLE` untouched when that list
-> comes back empty — so an empty group list is indistinguishable from "this
-> user is a MEMBER", with no error and no log. That would land in the
-> `.otherwise()` branch of `find-documents.ts:340` and allow `EVERYONE` only.
+> **A/B, same box, same database, back to back:**
 >
-> Plausible, and wrong. Querying the database directly after a failing run,
-> for the team the test actually used (`Envelope.title='Admin Doc 1'` — NOT the
-> newest team, since `seedUser()` creates a personal team as a side effect):
->
-> ```
-> admin-token          -> userId 43
-> userId 43 resolves   -> ADMIN,MEMBER      (highest = ADMIN, correct)
-> all 6 envelopes      -> COMPLETED, correct visibility, deletedAt NULL,
->                         type DOCUMENT, no folder, teamId correct
-> ```
->
-> The group chain is intact, the role resolves to ADMIN, and every document is
-> queryable. An ADMIN should therefore see all 6. **Why the API returned 2 is
-> still unexplained** — but it is not this.
->
-> **The silent fallback in `getHighestTeamRoleInGroup` remains worth fixing on
-> its own merits** — treating "no groups found" as "lowest role" turns any
-> future glitch in group resolution into a silently wrong document set, which
-> in a signing platform is a permissions answer given with no signal. It is
-> upstream code and would need its own overlay. It is simply not the cause of
-> THIS failure.
->
-> **What was ruled out, and how:**
->
-> | Theory | Experiment | Result |
+> | | isolated, 20 repeats | full file, 100 tests |
 > |---|---|---|
-> | Cross-suite interference | ran `find-documents.spec.ts` alone (50 tests) | **dead** — still fails |
-> | Concurrency / DB contention | `--workers=1` vs `--workers=10`, 20 repeats each | **dead** — 18/20 vs 17/20 |
-> | Accumulated DB state on a persistent runner | `migrate reset`: 4561 teams → 5 | **dead** — got *worse*, 19/20 |
+> | unpatched | 20 failed / 0 passed | 9 failed / 91 passed |
+> | patched | **0 failed / 20 passed** | **100 passed** |
 >
-> The accumulation theory was the plausible one (CI runs `prisma:migrate-dev`,
-> never `reset`, so a homelab runner's DB grows across runs where a
-> GitHub-hosted one started clean — and the dates fit the 08-31 move). A single
-> experiment killed it. Recorded here so nobody spends an evening re-deriving
-> it.
+> The unpatched failures land on exactly the six Team Context tests because
+> those six are the only tests in that block and **all six call
+> `seedDocuments()`**. Every other test in the file seeds through the properly
+> awaited singular helpers.
 >
-> **Reproduction, ~2 minutes instead of ~20.** On a runner, with the stack up:
+> **Why it was intermittent, and why every intuition about it was backwards.**
+> It is a race between the unawaited seeds (last row lands ~19-38ms) and the gap
+> before the query (`createApiToken` plus one HTTP round trip, ~6-12ms).
+> Comparable durations, both load-sensitive. So an **idle** box fails MORE (fast
+> round trip, smaller gap), and a **freshly reset** database fails MORE (smaller
+> DB, faster queries, smaller gap). It also explains why CI is bimodal rather
+> than a per-attempt coin flip: all five retries run on the same box in the same
+> state, so a run fast enough to lose the race loses it five times — which is
+> what the 2026-09-02 note above recorded as "fails through all five attempts".
 >
-> ```
-> npx playwright test e2e/api/v2/find-documents.spec.ts --project=api \
->   -g 'should enforce visibility across admin and manager levels' \
->   --workers=1 --repeat-each=20 --retries=0
-> ```
+> **FOUR ROOT CAUSES WERE WRONG BEFORE THIS ONE**, and the reason is worth more
+> than the fix. In order: DB contention on the document counter (recorded above,
+> self-flagged as unconfirmed); cross-suite interference; accumulated DB state
+> on a persistent runner; and a silent role downgrade via
+> `getHighestTeamRoleInGroup`, which was written into THIS FILE earlier the same
+> day and has now been deleted from it.
 >
-> **STILL OPEN.** Two gaps, not one. (a) What actually makes the API return 2
-> of 6 when the role and the data are both correct. (b) Why CI mostly passes.
-> A real CI run of PR #93 passed *on this same box* while the manual invocation
-> fails 19 times in 20. Something differs between the two — most likely
-> environment the job provides that the manual harness does not. Until that is
-> closed there is a reliable reproduction and a precise mechanism, but not the
-> full causal chain. **Next step: log `teamGroups.length` and the resolved role
-> inside `getTeamById` at query time.** Not another re-run.
+> The evidence was present throughout. Twenty repeats produced `Received:`
+> values of **0 x8, 1 x2, 2 x3, 3 x1, 4 x4, 5 x2** against `Expected: 6` — a
+> continuous distribution. No filter, role or visibility rule produces that;
+> only a partial write does. Each wrong theory came from reading a SINGLE draw
+> (`2`, then `0`) as a mechanism instead of as a sample. Arrival-order
+> instrumentation over 8 runs confirmed it: which document goes missing is
+> uncorrelated with status, visibility, recipient count or owner. It is
+> whichever loses the race.
 >
-> **Worth fixing regardless of how the test story ends.** Treating "no groups
-> found" as "lowest role" rather than as an error is what converts any glitch
-> in group resolution into a silently wrong document set. In a signing
-> platform that is a permissions answer given with no signal that anything went
-> wrong. It is upstream code, so changing it to throw would need its own
-> overlay.
+> **If you are debugging a flake in this repo, plot the distribution before
+> proposing a mechanism.** That single step would have replaced four theories
+> and several days.
+>
+> **Blast radius:** 49 call sites across 5 spec files — `api/v2/find-documents`
+> (8), `api/trpc/search-documents` (8), `documents/find-documents` (18),
+> `teams/search-documents` (4), `teams/team-documents` (11). All were racy; the
+> ones that passed had a wide enough gap.
+>
+> **Still unexplained:** `update-envelope-items:314` and
+> `stepper-component:375` do NOT use `seedDocuments` and are unrelated flakes.
+>
+> **Upstream:** a genuine documenso bug, introduced in `feat: add organisations
+> (#1820)` (Jun 2025), not fork divergence. Worth reporting.
 
 ## Baseline refresh — 2026-08-13 upstream sync (142 commits, upstream 2.16.0)
 
@@ -180,7 +171,9 @@ Post-sync the curated suite reports **1028 passed / 4 flaky / 64 skipped / 0 fai
 (up from 812 passed — upstream added ~216 tests). No new REAL-BUGs; the exclusion
 table above still holds and needed no additions.
 
-The 4 flaky remain the DB-contention group described below (accept-on-retry).
+The 4 flaky were attributed to DB contention; that was wrong. Root-caused
+2026-09-06 to `seedDocuments()` never awaiting — see the RESOLVED block above,
+fixed by overlay 068.
 
 **Job cap:** the suite now runs ~51 min of test execution / ~59 min wall-clock. The
 E2E job cap was raised 60 → 120 min because the sync pushed it past the old cap and
