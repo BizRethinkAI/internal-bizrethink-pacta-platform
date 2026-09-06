@@ -16,6 +16,16 @@ export const GA_DISCLOSURE: ContentStatute = {
   slug: 'ga-disclosure',
   citation: 'O.C.G.A. §10-1-393.18(e)(3)',
   sourceFile: 'GA-OCGA-10-1-393.18.txt',
+  jurisdiction: 'US-GA',
+  status: 'published',
+  source: {
+    kind: 'statute',
+    citation: 'O.C.G.A. §10-1-393.18(e)(3)',
+    verbatimRequired: false,
+    verbatimVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '506e5a0579c5f1cf2a8f7bebac6aa4a1a2948921c5425201bcc80ba60ce817d5',
+  section: null,
   requirements: [
     {
       citation: 'O.C.G.A. §10-1-393.18(e)(3)(A)',

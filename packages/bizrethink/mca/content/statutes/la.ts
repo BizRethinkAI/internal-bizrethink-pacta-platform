@@ -17,6 +17,16 @@ export const LA_DISCLOSURE: ContentStatute = {
   slug: 'la-disclosure',
   citation: 'La. R.S. 9:3137.10(2)',
   sourceFile: 'LA-Act-198.txt',
+  jurisdiction: 'US-LA',
+  status: 'published',
+  source: {
+    kind: 'statute',
+    citation: 'La. R.S. 9:3137.10(2)',
+    verbatimRequired: false,
+    verbatimVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '089e31b3518f0960ab4317b29d88e1853c1ff1f42cfeb5ddb8bf9c6bc479a6ac',
+  section: null,
   requirements: [
     {
       citation: 'La. R.S. 9:3137.10(2)(a)',

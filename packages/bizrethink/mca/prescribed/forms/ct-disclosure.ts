@@ -49,6 +49,23 @@ export const CT_DISCLOSURE: PrescribedForm = {
   slug: 'ct-disclosure',
   citation: 'Conn. DOB Appendix A (rev. 8/1/2024)',
   sourceFile: 'CT-DOB-Guidance.txt',
+  jurisdiction: 'US-CT',
+  status: 'published',
+  source: {
+    kind: 'regulator-prescribed-form',
+    citation: 'Conn. DOB Appendix A (rev. 8/1/2024)',
+    sourceFile: 'CT-DOB-Guidance.txt',
+    verbatimVerifiedAt: '2026-09-06',
+    structureVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '7a347bdb5046d948592edea0f968efccf80c1bcec7ef06894b08558c882d4f2b',
+  // The file is Appendix A and nothing else, so there is no neighbouring form
+  // for a label to be borrowed from.
+  section: null,
+  // The source is the FORM, printed in table order, so the row order is
+  // genuinely re-checkable — unlike California's and New York's regulations,
+  // which describe their rows in a prose order that is not the table's.
+  structureEvidence: 'source-order',
   labelMatch: 'contains',
   rows: [
     { label: 'Total Amount of the Commercial Financing', verbatim: null, onlyPrescribedContent: false },

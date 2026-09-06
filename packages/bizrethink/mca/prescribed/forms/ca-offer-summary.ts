@@ -22,6 +22,34 @@ export const CA_OFFER_SUMMARY: PrescribedForm = {
   slug: 'ca-offer-summary',
   citation: '10 CCR §914',
   sourceFile: 'CA-10CCR-900-956.txt',
+  jurisdiction: 'US-CA',
+  status: 'published',
+  source: {
+    kind: 'regulator-prescribed-form',
+    citation: '10 CCR §914',
+    sourceFile: 'CA-10CCR-900-956.txt',
+    // Both earned against the vendored text and re-earned on every run by
+    // `verifyProvenance`, which re-reads §914 and refuses a date it cannot
+    // stand behind.
+    verbatimVerifiedAt: '2026-09-06',
+    structureVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '302f878f33afa3a72f7c7b0bff6fe66afbd921658aa7a5abf4a7e01942d4199c',
+  /*
+    §914 is one of at least six prescribed tables in this file — closed-end
+    (§910), open-end (§911), factoring (§912/913), sales-based (§914), lease
+    (§915), asset-based (§916). Only this one is ours, and "Repurchase Costs"
+    is a genuine California row label that belongs to factoring. Unscoped, the
+    checker accepts it here.
+  */
+  section: {
+    from: '§ 914. Sales-Based Financing Disclosure Formatting and Contents.',
+    to: '§ 915. Lease Financing Disclosure Formatting and Contents.',
+  },
+  // The regulation introduces the Estimated Monthly Cost row LAST, as an
+  // instruction to "insert one additional row below the fourth row", while the
+  // row itself is fifth. Its prose order is not the table's order.
+  structureEvidence: 'prose-described',
   rows: [
     {
       label: 'Funding Provided',

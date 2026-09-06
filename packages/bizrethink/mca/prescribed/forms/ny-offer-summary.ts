@@ -27,6 +27,32 @@ export const NY_OFFER_SUMMARY: PrescribedForm = {
   slug: 'ny-offer-summary',
   citation: '23 NYCRR §600.6',
   sourceFile: 'NY-23NYCRR-600.txt',
+  jurisdiction: 'US-NY',
+  status: 'published',
+  source: {
+    kind: 'regulator-prescribed-form',
+    citation: '23 NYCRR §600.6',
+    sourceFile: 'NY-23NYCRR-600.txt',
+    verbatimVerifiedAt: '2026-09-06',
+    structureVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '958bec0fdf305f2eba624b330ef2197abc28e0737514512de8bfc0b9251bf0f2',
+  /*
+    THIS SCOPE IS THE ONE THAT CATCHES THE DEFECT THAT SHIPPED.
+
+    New York's own file contains CALIFORNIA's phrasing of the funding-provided
+    sentence — "on what amounts will be deducted" — in a later section
+    governing a different transaction type. Checked against the whole file, New
+    York's form carrying California's words passes. Checked against §600.6, it
+    does not. See `provenance-honesty.test.ts`, which pins exactly that.
+  */
+  section: {
+    from: 'Section 600.6 Sales-based financing disclosure formatting and contents.',
+    to: 'Section 600.7 Sales-based financing –estimated annual percentage rate.',
+  },
+  // As California: §600.6 describes the Estimated Monthly Cost row last, as an
+  // insertion below the fourth, though the row is fifth.
+  structureEvidence: 'prose-described',
   rows: [
     {
       label: 'Funding Provided',
@@ -37,12 +63,30 @@ export const NY_OFFER_SUMMARY: PrescribedForm = {
         // deducted". California §914(a)(2)(C)(ii) says "on what amounts will be
         // deducted". Our California form carried THIS sentence until 2026-09-06.
         'Due to deductions or payments to others, the total funds that will be provided to you directly is [recipient funds]. For more information on the amounts that will be deducted, please review the attached document "Itemization of Amount Financed."',
-        // §600.6(b)(3)(iii)-(iv) prescribe "a short explanation", not words, so
-        // there is nothing to pin — only the fact that such an explanation is
-        // authorised here.
-        'Part of this funding may pay down or pay off amounts you owe. The amount paid directly to you may change if the amount owed for those other obligations changes.',
         // §600.6(b)(3)(v), the double-dipping question, in a second paragraph.
         'Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? [Yes, enter amount]. If the amount is zero, the answer would be No.',
+      ],
+      /*
+        Ours, not New York's. §600.6(b)(3)(iii) requires "a short explanation
+        that the amount paid directly to the recipient may change" and supplies
+        no wording for it, so this sentence cannot be matched against the
+        regulation and must not sit among sentences that can — it spent its
+        first day in `alsoPermitted`, where the checker silently skipped it
+        along with everything else in that field.
+
+        CALIFORNIA §914(a)(2)(C)(iii) IMPOSES THE SAME OBLIGATION IN THE SAME
+        WORDS AND OUR CALIFORNIA FORM CARRIES NO SUCH EXPLANATION. Both clauses
+        are conditional — they bite only where the financing pays down other
+        obligations the provider knows about — so this is either a New York row
+        saying more than it needs to or a California row saying less than it
+        must, and which one it is depends on the product rather than on the
+        regulations. Raised for a human; not changed here.
+      */
+      providerDrafted: [
+        {
+          citation: '23 NYCRR §600.6(b)(3)(iii)',
+          text: 'Part of this funding may pay down or pay off amounts you owe. The amount paid directly to you may change if the amount owed for those other obligations changes.',
+        },
       ],
     },
     {

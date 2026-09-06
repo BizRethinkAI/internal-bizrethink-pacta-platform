@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { checkAgainstSource } from '../prescribed/conformity';
 import type { PrescribedForm } from '../prescribed/types';
+import { syntheticForm } from './synthetic-form';
 
 /*
   The trap this whole library exists to survive.
@@ -21,12 +22,13 @@ const src = (f: string) => readFileSync(join(__dirname, '../sources', f), 'utf8'
 const CA = src('CA-10CCR-900-956.txt');
 const NY = src('NY-23NYCRR-600.txt');
 
-const apr = (slug: string, citation: string, sourceFile: string, verbatim: string): PrescribedForm => ({
-  slug,
-  citation,
-  sourceFile,
-  rows: [{ label: 'Finance Charge', verbatim, onlyPrescribedContent: false }],
-});
+const apr = (slug: string, citation: string, sourceFile: string, verbatim: string): PrescribedForm =>
+  syntheticForm({
+    slug,
+    citation,
+    sourceFile,
+    rows: [{ label: 'Finance Charge', verbatim, onlyPrescribedContent: false }],
+  });
 
 const CA_TEXT =
   'APR incorporates the amount and timing of the funding you receive, fees you pay, and the periodic payments you make.';
@@ -88,12 +90,13 @@ const CA_DEDUCTION = 'For more information on what amounts will be deducted';
 const NY_600_6_DEDUCTION = 'For more information on the amounts that will be deducted';
 
 describe('the deduction sentence differs between CA §914 and NY §600.6', () => {
-  const form = (verbatim: string) => ({
-    slug: 'deduction',
-    citation: 'n/a',
-    sourceFile: 'n/a',
-    rows: [{ label: 'Funding Provided', verbatim, onlyPrescribedContent: false }],
-  });
+  const form = (verbatim: string) =>
+    syntheticForm({
+      slug: 'deduction',
+      citation: 'n/a',
+      sourceFile: 'n/a',
+      rows: [{ label: 'Funding Provided', verbatim, onlyPrescribedContent: false }],
+    });
 
   it('keeps the two prescribed texts genuinely different', () => {
     expect(CA_DEDUCTION).not.toEqual(NY_600_6_DEDUCTION);

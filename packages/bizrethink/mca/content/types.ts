@@ -1,4 +1,8 @@
+import type { ClauseSource } from '../../provenance/types';
+import type { ClauseStatus } from '../../server-only/feature-access';
+import type { McaJurisdiction } from '../jurisdictions';
 import type { RenderedRow } from '../prescribed/types';
+import type { SourceSection } from '../provenance/source-text';
 
 /**
  * The OTHER kind of disclosure statute.
@@ -53,6 +57,36 @@ export type ContentStatute = {
   citation: string;
   sourceFile: string;
   requirements: ContentRequirement[];
+  /** Which state's law this is a creature of. See `registry.ts`. */
+  jurisdiction: McaJurisdiction;
+  /**
+   * Always the `statute` variant, enforced by `verifyProvenance`.
+   *
+   * `verbatimRequired` is true only for Kansas and Missouri. They are
+   * content-only acts that nevertheless dictate every label, and a prescribed
+   * label is exact words that must be reproduced. The other five prescribe no
+   * words at all: the required information is theirs, the drafting is ours.
+   */
+  source: ClauseSource;
+  status: ClauseStatus;
+  /**
+   * `normalisedDigest` of `sourceFile` when the date on `source` was earned.
+   *
+   * For a content-only act this carries more of the weight than it does for a
+   * prescribed form, and the asymmetry is worth being plain about. Where a
+   * statute prescribes no words there is nothing of ours to match against it,
+   * so the machine can only confirm that the text the requirement list was read
+   * out of is still the text it was read out of. The list itself was a human
+   * transcription and goes back to a human when this digest breaks.
+   */
+  sourceDigest: string;
+  /**
+   * The part of `sourceFile` this act occupies, or null when the file is only
+   * this act. Missouri's SB 1359 is a 339,000-character omnibus bill in which
+   * the Commercial Financing Disclosure Law is one section of many, and a
+   * prescribed label found "somewhere in the bill" is not evidence.
+   */
+  section: SourceSection | null;
 };
 
 export type ContentGap = {

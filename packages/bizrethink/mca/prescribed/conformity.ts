@@ -18,7 +18,7 @@ const norm = (s: string): string =>
  * literal comparison fails on every row that does. The regulation writes the
  * hole as a bracketed instruction; treat it as a wildcard rather than text.
  */
-const asPattern = (verbatim: string): RegExp =>
+export const asPattern = (verbatim: string): RegExp =>
   new RegExp(
     norm(verbatim)
       .split(/\[[^\]]+\]/)
@@ -83,7 +83,9 @@ export const checkFormConformity = (form: PrescribedForm, rendered: RenderedRow[
     */
     let remainder = content.replace(match[0], '');
 
-    for (const permitted of row.alsoPermitted ?? []) {
+    const authorised = [...(row.alsoPermitted ?? []), ...(row.providerDrafted ?? []).map((p) => p.text)];
+
+    for (const permitted of authorised) {
       const hit = remainder.match(asPattern(permitted));
 
       if (hit) {

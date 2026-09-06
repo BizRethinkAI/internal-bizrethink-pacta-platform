@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { checkAgainstSource, checkFormConformity } from '../prescribed/conformity';
 import type { PrescribedForm, RenderedRow } from '../prescribed/types';
+import { syntheticForm } from './synthetic-form';
 
 /*
   Two different questions, and the second is the one that matters most.
@@ -22,7 +23,7 @@ const CA_SOURCE = `
             (A) In first column: "Finance Charge".
 `;
 
-const form: PrescribedForm = {
+const form: PrescribedForm = syntheticForm({
   slug: 'ca-test',
   citation: '10 CCR §914',
   sourceFile: 'CA-DFPI-PRO-01-18.txt',
@@ -34,7 +35,7 @@ const form: PrescribedForm = {
     },
     { label: 'Finance Charge', verbatim: null, onlyPrescribedContent: false },
   ],
-};
+});
 
 describe('checkFormConformity', () => {
   const rendered = (over: Partial<RenderedRow>[] = []): RenderedRow[] =>

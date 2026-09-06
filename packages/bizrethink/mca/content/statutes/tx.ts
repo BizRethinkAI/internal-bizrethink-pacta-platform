@@ -28,6 +28,16 @@ export const TX_DISCLOSURE: ContentStatute = {
   slug: 'tx-disclosure',
   citation: 'Tex. Fin. Code §398.051',
   sourceFile: 'TX-Fin-Code-Ch-398.txt',
+  jurisdiction: 'US-TX',
+  status: 'published',
+  source: {
+    kind: 'statute',
+    citation: 'Tex. Fin. Code §398.051',
+    verbatimRequired: false,
+    verbatimVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '3cc97e52a3314fb7c5a4253b6abfd2c4b444e41bc14a9a7844b9890103d45dbe',
+  section: null,
   requirements: [
     {
       citation: 'Tex. Fin. Code §398.051(a)(1)',
