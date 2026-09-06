@@ -10,8 +10,10 @@ opportunity to refuse anything in the vertical that most needs refusing. This
 closes that, and adds a jurisdiction axis so one state's text cannot reach
 another state's document.
 
-Three invariant tests were written first and confirmed red before any
-implementation.
+Three invariant tests carry the work. They and the implementation landed in one
+commit, so **the repository does not evidence the order they were written in** —
+read the four mutations below as the evidence that the gate is falsifiable,
+because those are reproducible and the ordering claim is not.
 
 ## Where it stands
 
@@ -29,8 +31,9 @@ implementation.
 satisfy `HasProvenance` structurally — the property that let `assertPublishable`
 move out of the lease vertical is what makes this free. The four prescribed
 forms are `regulator-prescribed-form` (two dates); the seven content-only acts
-are `statute` (one). Seven negative controls construct specs that must be
-refused, so deleting the guard turns the file red.
+are `statute` (one). `provenance-gate.test.ts` holds **five refusals**, plus a
+positive case and a draft control; the **seven** negative controls are in
+`provenance-honesty.test.ts`. Deleting the guard turns the gate file red.
 
 **2. A jurisdiction axis exists and filters.** `disclosuresFor` in
 `registry.ts`, modelled on `lease/clauses/library.ts` and importing nothing from
@@ -53,10 +56,23 @@ Measured:
 - `"Repurchase Costs"` — a genuine California label, for **factoring** — passes
   as one of our rows against the whole file.
 - **New York's own file contains California's phrasing of the funding-provided
-  sentence**, in a later section governing a different transaction type. So the
-  whole-file check accepts New York's form carrying California's words. *That is
-  the defect that shipped as templates 104/105.* The check that was supposed to
-  catch it could not have.
+  sentence**, in a later section governing a different transaction type
+  (§600.11, §600.12). So the whole-file check accepts New York's form carrying
+  California's words, and only the scope refuses them.
+
+**Correcting an over-claim I made in the first report.** I described that second
+bullet as the defect that shipped as templates 104/105. It is the **mirror** of
+it. The shipped defect was the *California* form carrying *New York's* wording,
+and New York's phrasing appears **nowhere** in the California file (verified:
+zero occurrences), so a whole-file check would have **rejected** it —
+`__tests__/near-identical-states.test.ts` runs exactly that assertion against
+the whole California source, in this very PR, and it passes.
+
+The shipped defect survived because **until PR #101 there was no checker at
+all**, which is the account already written at the top of that test file and the
+one to trust. Scoping is still worth keeping, but for the mirror direction:
+hypothetical in that nobody has made that mistake yet, real in that the words
+which would let it pass are genuinely in the file.
 
 Each spec now names the `section` it was transcribed from:
 
@@ -67,14 +83,20 @@ Each spec now names the `section` it was transcribed from:
 | MO | 339,461 | 18,554 | 5.5% |
 
 Verified by mutation: setting NY's `section` back to null turns two tests red,
-including the one pinning the shipped defect.
+including the one pinning the mirror direction.
 
-## The second finding: the field the defect lived in was never checked
+## The second finding: `alsoPermitted` was never checked against the statute
 
 `checkAgainstSource` reads a row's `label` and its `verbatim`. It never read
-`alsoPermitted` — and the CA/NY funding-provided sentence, the one that shipped
-wrong, is an `alsoPermitted` entry on row 0 of both forms. The one field the
-checker skipped is the one the defect was in. Now checked.
+`alsoPermitted`, which is a claim about the regulation every bit as strong as
+the other two. Now checked.
+
+**Scoped correctly, that gap was in spec-against-statute only.**
+`checkFormConformity` — which governs what a *rendered* document may contain —
+has always read `alsoPermitted`, subtracting it from the remainder of an "only"
+row (`conformity.ts`). The templates 104/105 defect was in a rendered document,
+so this blindness is not what let it through either. The gap is real and worth
+closing on its own merits; it is not the explanation for the shipped defect.
 
 Checking it surfaced a third thing: one NY entry is not New York's wording at
 all. §600.6(b)(3)(iii) requires *"a short explanation"* and supplies no words,
@@ -109,6 +131,15 @@ any change to a word does break it.
   MO dictate every label and those labels *are* checked.
 - **Nothing proves a human read the regulation.** The digest proves the bytes
   have not moved. Amendment breaks it and sends it back to a person.
+- **`providerDrafted` is invisible to the publish gate.** `assertPublishable`
+  judges a spec's single `source`, and a per-row drafted sentence is not part of
+  it — so a form can carry our own wording in a closed row and still be
+  publishable. `unverifiableSentences` exists to surface that, but it is called
+  only from a test, and the sole thing stopping a second drafted sentence
+  appearing silently is a hard-coded expectation of exactly one. That holds a
+  new sentence only until someone updates the expectation to make their suite
+  green. If drafted sentences become common, this needs to move into the gate
+  rather than stay a pinned count.
 
 ## For a human — two questions I could not answer
 

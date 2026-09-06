@@ -38,13 +38,17 @@ export const NY_OFFER_SUMMARY: PrescribedForm = {
   },
   sourceDigest: '958bec0fdf305f2eba624b330ef2197abc28e0737514512de8bfc0b9251bf0f2',
   /*
-    THIS SCOPE IS THE ONE THAT CATCHES THE DEFECT THAT SHIPPED.
-
     New York's own file contains CALIFORNIA's phrasing of the funding-provided
     sentence — "on what amounts will be deducted" — in a later section
-    governing a different transaction type. Checked against the whole file, New
-    York's form carrying California's words passes. Checked against §600.6, it
-    does not. See `provenance-honesty.test.ts`, which pins exactly that.
+    governing a different transaction type (§600.11, §600.12). Checked against
+    the whole file, New York's form carrying California's words passes. Checked
+    against §600.6, it does not. See `provenance-honesty.test.ts`.
+
+    THIS IS THE MIRROR OF THE DEFECT THAT SHIPPED, NOT THAT DEFECT. Templates
+    104/105 had the CALIFORNIA form carrying NEW YORK's wording, and that
+    direction needs no scoping to catch: New York's phrasing is absent from the
+    California file entirely. What let it ship was that no checker existed yet.
+    Scoping is here for the direction nobody has got wrong so far.
   */
   section: {
     from: 'Section 600.6 Sales-based financing disclosure formatting and contents.',

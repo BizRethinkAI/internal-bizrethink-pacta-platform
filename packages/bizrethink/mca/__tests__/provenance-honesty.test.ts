@@ -136,12 +136,21 @@ describe('NEGATIVE CONTROLS — each of these must be caught', () => {
   });
 
   /*
-    THE DEFECT THAT SHIPPED, PINNED.
+    THE MIRROR OF THE DEFECT THAT SHIPPED — which is a different thing, and
+    worth being exact about, because the interesting claim is easy to overstate.
 
-    New York's own file contains California's phrasing of this sentence — it
-    appears in a later section governing a different transaction type. So a
-    check run against the whole file ACCEPTS California's words inside New
-    York's form, which is how the defect survived. Scoped to §600.6 it does not.
+    New York's own file contains California's phrasing of this sentence, in a
+    later section governing a different transaction type. So a check run against
+    the whole file ACCEPTS California's words inside New York's form, and only
+    the scope to §600.6 refuses them. That hole is real and this pins it shut.
+
+    It is NOT how templates 104/105 went wrong. That was the California form
+    carrying New York's wording, and New York's phrasing appears nowhere in the
+    California file — `near-identical-states.test.ts` runs that direction
+    against the whole California source and it is correctly rejected. The
+    shipped defect survived because no checker existed until PR #101; see the
+    account at the top of that file. Nothing about the search being too wide
+    would have made a difference to it.
   */
   it("New York's form cannot carry California's sentence, though that sentence is in New York's file", () => {
     const ny = form('ny-offer-summary');

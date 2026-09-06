@@ -53,11 +53,21 @@ is bound to something re-executed on every run:
 least six different tables in one 132,000-character file — closed-end, open-end,
 factoring, sales-based, lease, asset-based — and only the sales-based one is
 ours. Checked against the whole file, `"Repurchase Costs"` (a real California
-label, for factoring) passes as one of our rows. Worse, and this is the defect
-that actually shipped: **New York's file contains California's phrasing of the
-funding-provided sentence**, in a later section governing a different
-transaction type, so a whole-file check accepts New York's form carrying
-California's words. `section` on each spec is what closes that.
+label, for factoring) passes as one of our rows. Sharper still: **New York's
+file contains California's phrasing of the funding-provided sentence**, in a
+later section governing a different transaction type (§600.11, §600.12), so a
+whole-file check accepts New York's form carrying California's words. `section`
+on each spec is what closes that.
+
+**That is the mirror of the defect that shipped, not the defect itself** — a
+distinction worth keeping, because the temptation is to claim the mechanism
+caught the thing that hurt. Templates 104/105 had the *California* form
+carrying *New York's* wording, and New York's phrasing appears nowhere in the
+California file, so a whole-file check would have rejected it;
+`__tests__/near-identical-states.test.ts` asserts precisely that. **The shipped
+defect survived because until PR #101 there was no checker at all**, which is
+the account given at the top of that file and the one to trust. Scoping earns
+its place on the direction nobody has got wrong yet.
 
 Two things it deliberately does not claim:
 

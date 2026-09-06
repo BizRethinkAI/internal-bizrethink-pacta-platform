@@ -63,10 +63,23 @@ export const normalisedDigest = (text: string): string => createHash('sha256').u
  * "Repurchase Costs" is a genuine California row label, for factoring, and a
  * whole-file check accepts it in our table without complaint.
  *
- * Worse, and this is the one that actually happened: New York's file contains
- * CALIFORNIA's phrasing of the funding-provided sentence, in a later section
- * governing a different transaction type. A whole-file check accepts New York's
- * form carrying California's words — which is the defect that shipped.
+ * The sharper case is the funding-provided sentence. New York's file contains
+ * CALIFORNIA's phrasing of it, in a later section governing a different
+ * transaction type, so a whole-file check accepts New York's form carrying
+ * California's words.
+ *
+ * NOTE WHICH DIRECTION THAT IS, BECAUSE IT IS NOT THE ONE THAT SHIPPED. The
+ * defect in templates 104/105 was the CALIFORNIA form carrying NEW YORK's
+ * wording, and New York's phrasing appears nowhere in the California file — so
+ * a whole-file check would have rejected it, and `near-identical-states.test.ts`
+ * asserts exactly that against the whole California source. That defect
+ * survived because until PR #101 there was no checker of any kind, not because
+ * the check was too wide.
+ *
+ * Scoping earns its place on the mirror direction, which is hypothetical only
+ * in the sense that nobody has made that particular mistake yet. §600.11 and
+ * §600.12 do use California's phrasing, so the file really does contain the
+ * words that would let a wrong sentence pass.
  *
  * `from` and `to` are literal anchors taken from the source's own section
  * headings rather than line numbers, because line numbers move whenever the

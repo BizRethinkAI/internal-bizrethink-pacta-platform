@@ -134,18 +134,24 @@ export const verifyProvenance = (spec: McaDisclosure): ProvenanceProblem[] => {
       }
 
       /*
-        `alsoPermitted` NEEDS CHECKING TOO, AND THIS IS WHERE THE DEFECT LIVED.
+        `alsoPermitted` NEEDS CHECKING TOO.
 
         `checkAgainstSource` reads a row's `label` and its `verbatim` and stops.
         But `alsoPermitted` is a claim about the regulation every bit as strong
         as the other two — it says the regulator EXPRESSLY permits this sentence
-        in a row it otherwise closes with "shall include only" — and it was
-        unverified.
+        in a row it otherwise closes with "shall include only" — and against the
+        statute it went unverified.
 
-        That is not a theoretical gap. The sentence that shipped California's
-        form carrying New York's wording is an `alsoPermitted` entry on the
-        first row of both forms. The one field the checker did not read is the
-        one the defect was in.
+        Not a theoretical gap: it is the field the CA/NY funding-provided
+        sentence lives in, and checking it here is what surfaced the
+        `providerDrafted` mis-filing below.
+
+        BE PRECISE ABOUT WHICH CHECKER WAS BLIND, THOUGH. The gap was in
+        spec-against-statute only. `checkFormConformity`, which governs what a
+        RENDERED document may contain, has always read `alsoPermitted` — see
+        `conformity.ts`, where it is subtracted from the remainder of an "only"
+        row. The templates 104/105 defect was in a rendered document, so this
+        particular blindness is not what let it through.
       */
       for (const [i, row] of spec.rows.entries()) {
         for (const permitted of row.alsoPermitted ?? []) {
