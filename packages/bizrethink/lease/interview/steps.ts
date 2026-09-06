@@ -1,3 +1,4 @@
+import type { ClauseJurisdiction } from '../clauses/approval-jurisdiction';
 import type { CustomClauseInput } from '../clauses/custom';
 import type { ClauseFacts } from '../clauses/types';
 import type { MoneyAnswers } from '../money/types';
@@ -47,6 +48,20 @@ export type InterviewField = {
   name: string;
   target: 'fact' | 'money' | 'value';
   kind: FieldKind;
+  /**
+   * Which jurisdictions ask this.
+   *
+   * Absent means every one — the question serves a clause that travels, or it
+   * is a fact that shapes which clauses get selected at all. Present means the
+   * question exists only where that law does: Florida asks the tenant to elect
+   * under §83.595(4), and North Carolina has no such provision, so asking would
+   * produce an answer with no clause to land in.
+   *
+   * Kept in step with the library by test rather than by memory — a field is
+   * marked for one jurisdiction exactly when every clause consuming it belongs
+   * to that jurisdiction.
+   */
+  jurisdictions?: ClauseJurisdiction[];
   /** The question, in plain language. Never the variable name. */
   label: string;
   /** What this answer does to the document. */
@@ -115,6 +130,27 @@ export type InterviewStep = {
  * human enter a figure that disagrees with the arithmetic — which is the exact
  * defect in the Keane lease, where §1.1 said $0.00 and page 22 said $6,300.
  */
+/**
+ * The interview as one jurisdiction asks it.
+ *
+ * A lease for state X asks every question that travels plus the ones X's law
+ * requires, and none that belong to another state. Florida asks the tenant to
+ * elect under §83.595(4); North Carolina has no such provision, and asking
+ * would produce an answer with no clause to land in.
+ *
+ * A step whose every question was another state's DISAPPEARS rather than
+ * rendering as a heading with nothing under it. Steps that carry no fields at
+ * all — the narrative ones like the association-documents upload — are kept,
+ * because their content is the intro text and the editor beneath it.
+ */
+export const interviewFor = (jurisdiction: ClauseJurisdiction): InterviewStep[] =>
+  FL_INTERVIEW.map((step) => ({
+    ...step,
+    fields: step.fields.filter(
+      (field) => field.jurisdictions === undefined || field.jurisdictions.includes(jurisdiction),
+    ),
+  })).filter((step) => step.fields.length > 0 || FL_INTERVIEW.find((s) => s.id === step.id)?.fields.length === 0);
+
 export const DERIVED_FACTS = [
   'depositHeldUsd',
   'depositCarriedInUsd',
@@ -358,6 +394,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'depositInstitution',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'text',
         label: 'Which institution holds the deposit?',
@@ -369,6 +406,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'depositInstitutionAddress',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'textarea',
         label: 'At what address?',
@@ -376,6 +414,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'depositInterestLabel',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'select',
         label: 'Does the account bear interest?',
@@ -387,6 +426,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'depositReturnDays',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'number',
         label: 'How many days to return the deposit when you make no claim against it?',
@@ -398,6 +438,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'depositClaimNoticeDays',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'number',
         label: 'How many days to give written notice if you do make a claim?',
@@ -409,6 +450,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'advanceRentUsd',
+        jurisdictions: ['US-FL'],
         target: 'money',
         kind: 'usd',
         label: 'How much advance rent is held for the final month?',
@@ -511,6 +553,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'poolSafetyFeature',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'text',
         label: 'Which Chapter 515 safety feature does the pool have?',
@@ -549,6 +592,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'hoaCureDays',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'number',
         label: 'If an association notice sets no cure date, how long does the tenant have?',
@@ -607,6 +651,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'venueCounty',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'text',
         label: 'Which Florida county is the property in?',
@@ -615,6 +660,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'noticeName',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'text',
         label: 'Who receives notices for the landlord?',
@@ -627,6 +673,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'noticeAddress',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'text',
         address: true,
@@ -736,6 +783,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
     fields: [
       {
         name: 'repairThresholdUsd',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'usd',
         label: 'Up to what cost is a minor repair the tenant’s responsibility?',
@@ -749,6 +797,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'repairAnnualCapUsd',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'usd',
         label: 'Across a year, what is the most the tenant should have to spend on those repairs?',
@@ -811,6 +860,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
     fields: [
       {
         name: 'entryNoticeHours',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'number',
         label: 'How much notice will you give before entering?',
@@ -822,6 +872,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'entryEarliestLabel',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'text',
         label: 'Earliest time you would enter',
@@ -831,9 +882,17 @@ export const FL_INTERVIEW: InterviewStep[] = [
         },
         required: true,
       },
-      { name: 'entryLatestLabel', target: 'value', kind: 'text', label: 'Latest time you would enter', required: true },
+      {
+        name: 'entryLatestLabel',
+        jurisdictions: ['US-FL'],
+        target: 'value',
+        kind: 'text',
+        label: 'Latest time you would enter',
+        required: true,
+      },
       {
         name: 'inspectionsPerYear',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'number',
         label: 'How many inspections per year?',
@@ -886,6 +945,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'nonRenewalNoticeDays',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'number',
         label: 'How many days notice?',
@@ -905,6 +965,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'earlyTerminationFeeUsd',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'usd',
         label: 'What is the fee?',
@@ -913,6 +974,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'earlyTerminationNoticeDays',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'number',
         label: 'How much notice must the tenant give?',
@@ -976,6 +1038,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
     fields: [
       {
         name: 'landlordKnowsOfFlooding',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'select',
         label: 'Has flooding damaged the property during your ownership?',
@@ -991,6 +1054,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'landlordFiledFloodClaim',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'select',
         label: 'Have you filed an insurance claim for flood damage here?',
@@ -1002,6 +1066,7 @@ export const FL_INTERVIEW: InterviewStep[] = [
       },
       {
         name: 'landlordReceivedFloodAssistance',
+        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'select',
         label: 'Have you received flood-damage assistance, including from FEMA?',
