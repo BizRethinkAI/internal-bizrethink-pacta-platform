@@ -33,6 +33,19 @@ export type ContentRequirement = {
    * rather than quietly breaking the disclosure.
    */
   evidence: string[];
+  /**
+   * The statute dictates this row's LABEL as well as its content.
+   *
+   * Kansas and Missouri do — "This disclosure shall be labeled 'Total of
+   * Payments'" — while Florida, Louisiana, Utah and Georgia, whose acts are
+   * otherwise near-identical, do not. That makes it a per-state fact and not a
+   * property of the model act they all descend from.
+   *
+   * When set, the rendered label must EQUAL the prescribed one. Elsewhere a
+   * containment match is right, because our labels legitimately carry extra
+   * words the statute never asked for.
+   */
+  labelPrescribed?: boolean;
 };
 
 export type ContentStatute = {
@@ -74,13 +87,17 @@ export const checkContentCoverage = (
     }
 
     const target = req.row;
-    const row = rendered.find((r) => norm(r.label).includes(norm(target)));
+    const row = req.labelPrescribed
+      ? rendered.find((r) => norm(r.label).toLowerCase() === norm(target).toLowerCase())
+      : rendered.find((r) => norm(r.label).includes(norm(target)));
 
     if (!row) {
       gaps.push({
         citation: req.citation,
         kind: 'row-missing',
-        detail: `${req.citation} is assigned to row ${JSON.stringify(target)}, which the form does not have`,
+        detail: req.labelPrescribed
+          ? `${req.citation} prescribes the label ${JSON.stringify(target)}; no row carries exactly that`
+          : `${req.citation} is assigned to row ${JSON.stringify(target)}, which the form does not have`,
       });
       continue;
     }
