@@ -47,7 +47,6 @@ type DocumentToSeed = {
 
 export const seedDocuments = async (documents: DocumentToSeed[]) => {
   await Promise.all(
-    // eslint-disable-next-line @typescript-eslint/require-await
     documents.map(async (document, i) =>
       match(document.type)
         .with(DocumentStatus.DRAFT, async () =>
@@ -67,7 +66,16 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
             key: i,
             createDocumentOptions: document.documentOptions,
           }),
-        ),
+        )
+        /*
+          MODIFIED for BizRethink (overlay 068, 2026-09-06). TERMINATES THE
+          CHAIN. Without this, match() returns a Match object rather than the
+          handler's Promise, so the Promise.all above awaits nothing and the
+          seeding is fire-and-forget. Callers then query the API while rows are
+          still being written and see an arbitrary subset. That is the
+          find-documents Team Context flake.
+        */
+        .otherwise(async () => null),
     ),
   );
 };

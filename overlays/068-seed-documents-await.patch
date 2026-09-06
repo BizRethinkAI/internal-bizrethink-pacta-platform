@@ -1,0 +1,54 @@
+# overlay 068 — seedDocuments must await the documents it seeds
+#
+# WHAT THIS PATCHES: packages/prisma/seed/documents.ts (upstream test seeding).
+#
+# WHY IT CANNOT BE A NEW FILE: the defect is inside an upstream function that
+# 49 call sites across 5 upstream spec files already import. A parallel helper
+# would leave every existing caller racy.
+#
+# WHY: the match() chain had no terminal call, so it returned a Match object
+# rather than the handler's Promise. The enclosing Promise.all awaited nothing
+# and the seeding was fire-and-forget — tests queried the API while rows were
+# still landing and saw an arbitrary subset. This is the find-documents Team
+# Context flake that failed ~1 CI run in 5 for months and produced four
+# successive wrong root causes.
+#
+# A/B, same box, same DB, back to back:
+#   unpatched   20 failed /  0 passed   |   9 failed /  91 passed
+#   patched      0 failed / 20 passed   |   0 failed / 100 passed
+#
+# UPSTREAM-MERGE FRAGILITY: LOW. One terminator on a chain upstream is unlikely
+# to restructure. Guarded by packages/bizrethink/regression-tests/
+# seed-documents-await.test.ts, which fails if the terminator is ever dropped.
+#
+# REPORT UPSTREAM: this is a genuine documenso bug, not fork divergence.
+diff --git a/packages/prisma/seed/documents.ts b/packages/prisma/seed/documents.ts
+index f3616fac8..ec678644f 100644
+--- a/packages/prisma/seed/documents.ts
++++ b/packages/prisma/seed/documents.ts
+@@ -47,7 +47,6 @@ type DocumentToSeed = {
+ 
+ export const seedDocuments = async (documents: DocumentToSeed[]) => {
+   await Promise.all(
+-    // eslint-disable-next-line @typescript-eslint/require-await
+     documents.map(async (document, i) =>
+       match(document.type)
+         .with(DocumentStatus.DRAFT, async () =>
+@@ -67,7 +66,16 @@ export const seedDocuments = async (documents: DocumentToSeed[]) => {
+             key: i,
+             createDocumentOptions: document.documentOptions,
+           }),
+-        ),
++        )
++        /*
++          MODIFIED for BizRethink (overlay 068, 2026-09-06). TERMINATES THE
++          CHAIN. Without this, match() returns a Match object rather than the
++          handler's Promise, so the Promise.all above awaits nothing and the
++          seeding is fire-and-forget. Callers then query the API while rows are
++          still being written and see an arbitrary subset. That is the
++          find-documents Team Context flake.
++        */
++        .otherwise(async () => null),
+     ),
+   );
+ };
