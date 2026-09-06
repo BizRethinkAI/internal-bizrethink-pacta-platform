@@ -53,7 +53,12 @@ export const checkFormConformity = (
       return;
     }
 
-    if (norm(actual.label) !== norm(row.label)) {
+    const labelOk =
+      form.labelMatch === 'contains'
+        ? norm(actual.label).includes(norm(row.label))
+        : norm(actual.label) === norm(row.label);
+
+    if (!labelOk) {
       out.push({
         kind: 'label',
         row: i,

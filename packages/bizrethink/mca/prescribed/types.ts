@@ -57,6 +57,23 @@ export type PrescribedForm = {
    */
   sourceFile: string;
   rows: PrescribedRow[];
+  /**
+   * How the first column is compared.
+   *
+   * 'exact' for California and New York, whose regulations say "in the first
+   * column: 'Funding Provided'" — the label IS the whole cell, so anything else
+   * in it is an addition.
+   *
+   * 'contains' for Virginia, whose first column holds the label AND tick-boxes
+   * the provider completes ("Payment Schedule ☐ Fixed ☐ Variable") AND the
+   * bracketed formulae the form prints under several labels. Demanding an exact
+   * match there would mean writing our own answers into the spec, which would
+   * make the spec a record of what we did rather than of what Virginia requires.
+   *
+   * Defaults to 'exact': the stricter reading should be the one you get by
+   * saying nothing.
+   */
+  labelMatch?: 'exact' | 'contains';
 };
 
 /** One divergence between what a form says and what the regulation prescribes. */
@@ -70,5 +87,15 @@ export type Divergence = {
 /** A rendered form, as read back out of the built PDF. */
 export type RenderedRow = {
   label: string;
+  /**
+   * The second column, where the regulation gives the row three columns and
+   * does not combine them — the dollar amount, rate or count.
+   *
+   * Kept apart from `content` because merging them made every figure in the
+   * form look like unauthorised prose in a row closed by "shall include only".
+   * Null where the regulation says the second and third columns "shall be
+   * combined", which several rows do.
+   */
+  value?: string | null;
   content: string;
 };

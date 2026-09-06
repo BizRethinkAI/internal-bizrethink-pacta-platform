@@ -1,0 +1,228 @@
+     Session of 2024
+
+                           SENATE BILL No. 345
+                       By Committee on Federal and State Affairs
+                                         1-12
+
+
+ 1   AN ACT concerning financial institutions; enacting the commercial
+ 2     financing disclosure act; requiring the disclosure of certain commercial
+ 3     financing product transaction information; providing for civil penalties;
+ 4     authorizing enforcement of such act by the attorney general.
+ 5
+ 6   Be it enacted by the Legislature of the State of Kansas:
+ 7       Section 1. (a) The provisions of sections 1 through 5, and
+ 8   amendments thereto, shall be known and may be cited as the commercial
+ 9   financing disclosure act.
+10       (b) As used in the commercial financing disclosure act:
+11       (1) (A) "Account" includes:
+12       (i) A right to payment of a monetary obligation, whether or not
+13   earned by performance, for:
+14       (a) Property that has been or is to be sold, leased, licensed, assigned
+15   or otherwise disposed of;
+16       (b) services rendered or to be rendered;
+17       (c) a policy of insurance issued or to be issued;
+18       (d) a secondary obligation incurred or to be incurred;
+19       (e) energy provided or to be provided;
+20       (f) the use or hire of a vessel under a charter or other contract;
+21       (g) arising out of the use of a credit card or charge card or
+22   information contained on or for the use with such card; or
+23       (h) winnings in a lottery or other game of chance operated or
+24   sponsored by a state, governmental unit of a state or person licensed or
+25   authorized to operate such lottery or game by a state or governmental unit
+26   of a state; and
+27       (ii) healthcare insurance receivables.
+28       (B) "Account" does not include:
+29       (i) Rights to payment evidenced by chattel paper or an instrument;
+30       (ii) commercial tort claims;
+31       (iii) deposit accounts;
+32       (iv) investment property;
+33       (v) letter-of-credit rights or letters of credit; or
+34       (vi) rights to payment for moneys advanced or sold other than rights
+35   arising out of the use of a credit card or charge card or information
+36   contained on or for use with such card.
+     SB 345                             2
+
+ 1       (2) "Accounts receivable purchase transaction" means any transaction
+ 2   in which a business forwards or otherwise sells to a provider all or a
+ 3   portion of accounts of such business, cash receipts or payment intangibles
+ 4   at a discount to the expected value of such accounts or payment
+ 5   intangibles. The provider's characterization of an accounts receivable
+ 6   purchase transaction as a purchase shall be conclusive that such accounts
+ 7   receivable purchase transaction is not a loan or a transaction for the use,
+ 8   forbearance or detention of money.
+ 9       (3) "Act" means the commercial financing disclosure act.
+10       (4) "Advance fee" means any consideration that is assessed or
+11   collected prior to the closing of a commercial financing transaction by a
+12   broker.
+13       (5) (A) "Broker" means any person who, for compensation or the
+14   expectation of compensation:
+15       (i) Arranges a commercial financing product transaction between a
+16   third party that, if executed, such transaction would be binding upon such
+17   third party; and
+18       (ii) communicates such transaction to a business in this state.
+19       (iii) "Broker" does not include a provider or any individual or entity
+20   whose compensation is not based or dependent upon the terms of the
+21   specific commercial financing product obtained or offered.
+22       (6) "Business" means an individual, group of individuals, sole
+23   proprietorship, corporation, limited liability company, trust, estate,
+24   cooperative, association, limited partnership or general partnership
+25   engaged in a business activity.
+26       (7) "Business purpose transaction" means any transaction in which
+27   the proceeds resulting therefrom are provided to a business or are intended
+28   to be used to carry on a business and are not for personal, family or
+29   household purposes. A provider may rely on any written statement of
+30   intended purpose signed by a business to determine whether such
+31   transaction is a "business purpose transaction". Such written statement
+32   may be a separate statement or may be contained in an application,
+33   agreement or other document signed by such business or the owner of such
+34   business.
+35       (8) "Commercial financing facility" means a provider's plan for
+36   purchasing multiple accounts receivable from the recipient over a period
+37   of time pursuant to an agreement that sets forth the terms and conditions
+38   governing the use of the facility.
+39       (9) "Commercial financing transaction" means any commercial loan,
+40   accounts receivable purchase transaction and commercial open-end credit
+41   plan when the transaction is a business purpose transaction.
+42       (10) "Commercial loan" means a loan to a business, whether secured
+43   or unsecured.
+     SB 345                                3
+
+ 1       (11) "Commercial open-end credit plan" means commercial financing
+ 2   extended by a provider under a plan in which:
+ 3       (A) The provider reasonably contemplates repeat transactions; and
+ 4       (B) subject to any limit set by the provider, the amount of financing
+ 5   that such provider may extend to the business during the term of the plan
+ 6   is made available to the extent that any outstanding balance is repaid.
+ 7       (12) "Depository institution" means a bank, trust company, industrial
+ 8   loan company, savings and loan association, savings bank or credit union
+ 9   doing business under the authority of a license, certificate or charter issued
+10   by the United States, this state or any other state and that is authorized to
+11   transact business in this state.
+12       (13) "General intangible" means any personal property, including
+13   things in action, other than accounts, chattel paper, commercial tort claims,
+14   deposit accounts, documents, goods, instruments, investment property,
+15   letter-of-credit rights, letters of credit, money and oil, gas or other minerals
+16   before extraction. "General intangible" includes payment intangibles and
+17   software.
+18       (14) "Payment intangible" means a general intangible under which
+19   the account debtor's principal obligation is a monetary obligation.
+20       (15) "Person" means any individual, firm, company, partnership,
+21   corporation or association.
+22       (16) "Provider" means a person who consummates more than five
+23   commercial financing transactions to a business located in this state in a
+24   calendar year. "Provider" includes a person that enters into a written
+25   agreement with a depository institution to arrange for the extension of a
+26   commercial financing transaction by such depository institution to a
+27   business through an online lending platform administered by such person.
+28       Sec. 2. (a) Before, or at the time of, consummating a commercial
+29   financing transaction, a provider shall disclose to the business the terms of
+30   such commercial financing transaction in accordance with the provisions
+31   of this section. Only one disclosure shall be required for each commercial
+32   financing transaction and disclosure shall not be required when
+33   modification, forbearance or change to a consummated commercial
+34   financing transaction occurs.
+35       (b) A provider shall disclose with each commercial financing
+36   transaction:
+37       (1) The total amount of funds provided to the business under the
+38   terms of such commercial financing transaction. Such disclosure shall be
+39   labeled "total amount of funds provided";
+40       (2) the total amount of funds disbursed to such business under the
+41   terms of such commercial financing transaction if less than the total
+42   amount of funds provided under paragraph (1). Such disclosure shall be
+43   labeled "total amount of funds disbursed";
+     SB 345                              4
+
+ 1      (3) the total amount to be paid to such provider pursuant to such
+ 2   commercial financing transaction agreement. Such disclosure shall be
+ 3   labeled "total of payments";
+ 4      (4) the total dollar cost of such commercial financing transaction
+ 5   under the terms of the agreement, which shall be determined by
+ 6   subtracting the total amount of funds provided from the total of payments.
+ 7   Such calculation shall include any fees or charges deducted by the
+ 8   provider from the amount under paragraph (1). Such disclosure shall be
+ 9   labeled "total dollar cost of financing";
+10      (5) the manner, frequency and amount of each payment. Such
+11   disclosure shall be labeled "payments". If such payments vary, the provider
+12   shall instead disclose the manner, frequency and the estimated amount of
+13   the initial payment and shall label such disclosure as "estimated
+14   payments." The commercial financing transaction agreement shall include
+15   a description of the methodology for calculating any variable payment and
+16   the circumstances for when payments may vary; and
+17      (6) a statement of whether there are any costs or discounts associated
+18   with prepayment of such commercial financing transaction, including a
+19   reference to the paragraph in such agreement that creates the contractual
+20   right to prepayment. Such disclosure shall be labeled "prepayment".
+21      (c) A provider that consummates a commercial financing facility may
+22   provide disclosures required by this act that are based on an example of a
+23   transaction that could occur under the agreement. The example shall be
+24   based on an account receivable total face amount owed of $10,000. Only
+25   one disclosure is required for each commercial financing facility, and a
+26   disclosure is not required as result of a modification, forbearance or
+27   change to the facility. A new disclosure is not required each time accounts
+28   receivables are purchased under the facility.
+29      Sec. 3. The provisions of this act shall not apply to a:
+30      (a) Provider that is a depository institution or its parent company or a
+31   subsidiary or service corporation that is:
+32      (1) Owned and controlled by a depository institution; and
+33      (2) regulated by a federal banking agency;
+34      (b) provider that is a lender regulated under the federal farm credit
+35   act, 12 U.S.C. § 2001 et seq.;
+36      (c) commercial financing transaction that is:
+37      (1) Secured by real property;
+38      (2) a lease; or
+39      (3) a purchase money obligation that is incurred as all or part of the
+40   price of the collateral or for value given to enable the business to acquire
+41   rights in or the use of such collateral if such value is so used;
+42      (d) commercial financing transaction in which the recipient is a motor
+43   vehicle dealer or a vehicle rental company, or an affiliate of a motor
+     SB 345                               5
+
+ 1   vehicle dealer or vehicle rental company or an affiliate of such a company
+ 2   pursuant to a commercial loan or commercial open-end credit plan of at
+ 3   least $50,000 or a commercial financing transaction offered by a person in
+ 4   connection with the sale or lease of products or services that such person
+ 5   manufactures, licenses or distributes or whose parent company or any of
+ 6   such parent company's directly or indirectly owned and controlled
+ 7   subsidiaries manufactures, licenses or distributes;
+ 8       (e) provider that is licensed as a money transmitter in accordance
+ 9   with the Kansas money transmitter act or the law of any other state,
+10   district, territory or commonwealth of the United States;
+11       (f) provider that consummates not more than five commercial
+12   financing transaction transactions in this state in a 12-month period; or
+13       (g) commercial financing transaction of more than $500,000.
+14       Sec. 4. No broker shall:
+15       (a) Assess, collect or solicit an advance fee from a business to
+16   provide services as a broker. Nothing in this subsection shall be construed
+17   to preclude a broker from soliciting a potential business to pay for, or
+18   preclude a potential business from paying for, actual services necessary to
+19   apply for a commercial financing transaction. Such actual services may
+20   include, but not be limited to, a credit check or an appraisal of security,
+21   where such payment is made by check or money order payable to a party
+22   independent of the broker;
+23       (b) make or use any false or misleading representations or omit any
+24   material fact in the offer or sale of the services of a broker or engage,
+25   directly or indirectly, in any act that operates or would operate as fraud or
+26   deception upon any person in connection with the offer or sale of the
+27   services of a broker, notwithstanding the absence of reliance by the buyer;
+28   or
+29       (c) make or use any false or deceptive representation in its business
+30   dealings.
+31       Sec. 5. (a) Violations of the provisions of this act shall be punishable
+32   by a civil penalty of $500 per violation, but not to exceed $20,000 for all
+33   aggregated violations. Any person who violates the provisions of this act
+34   after receiving written notice of a prior violation from the attorney general
+35   shall be punishable by a civil penalty of $1,000 per violation, but not to
+36   exceed $50,000 for all aggregated violations.
+37       (b) Violations of this act shall not affect the enforceability or validity
+38   of the underlying agreement.
+39       (c) This act shall not create a private right of action against any
+40   person based upon compliance or noncompliance with the provisions of
+41   this act.
+42       (d) Authority to enforce compliance with this act shall be vested
+43   exclusively with the attorney general.
+    SB 345                            6
+
+1      Sec. 6. This act shall take effect and be in force from and after its
+2   publication in the statute book.
+
