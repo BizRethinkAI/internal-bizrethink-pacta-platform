@@ -22,10 +22,22 @@ them.
 
 | | |
 |---|---|
-| Encoded | CA §914 (10 rows), NY §600.6 (11 rows) |
-| Checked | Lombard's four shipped CA/NY disclosures, all conforming |
-| Tests | 29, green |
-| Remaining | 9 states — CT, FL, GA, KS, LA, MO, TX, UT, VA |
+| Encoded | **all eleven states** |
+| Checked | every shipped disclosure, all conforming |
+| Tests | 57, green |
+| Remaining | nothing on the forms; two items need a human, below |
+
+Three kinds of prescription, which is why there are two checkers:
+
+| | states | what is fixed | what is checked |
+|---|---|---|---|
+| Prescribed sentences | CA, NY | rows, labels AND words, closed with "shall include only" | every word, and that nothing else is there |
+| Prescribed form | CT, VA | labels and their order | every label, as prescribed |
+| Content only | FL, GA, KS, LA, MO, TX, UT | the required information | that every item has a home, with its evidence |
+
+Kansas and Missouri straddle the line: content-only acts that dictate every
+label. A Kansas form with Florida's headings is defective while saying all the
+right things.
 
 ## What it found
 
@@ -40,7 +52,13 @@ the amounts that will be deducted"*. Four words. It had survived REVIEW-01 — a
 human reading both regulations side by side — and it was found by the checker on
 its first run against a real document.
 
+Then Virginia: its form prescribes labels in full and ours abbreviated two of
+them. Template 109 → 130.
+
 Full write-up: `lombard-contracts/change-notes/14-ca-ny-closed-row-conformity.md`.
+
+**Published this session:** 104/105 → 124/125 (CA), 106/107 → 126/127 → 128/129
+(NY, twice), 109 → 130 (VA).
 
 ## The thing to carry forward
 
@@ -66,3 +84,20 @@ Requirements row to "collateral requirements or security interests", and our row
 also describes the personal guaranty, which is neither — kept on the view that
 omitting a material credit requirement from the row meant to disclose credit
 requirements reads worse. Counsel's call.
+
+
+## Two things the checker found and left for a human
+
+**Tex. Fin. Code §398.051(a)(5)** requires the estimated period for payments to
+equal the total repayment amount. Our Texas form discloses it only as an
+unlabelled "N days" appended to the payment figure, and the income row then
+refers to "the estimated periodic payment and term above" — pointing at a term
+the form never labels. California and New York each give it a row. The item is
+present, so this is presentation rather than omission, and changing it means
+adding a row to a reviewed document. Needs a decision.
+
+**Conn. Gen. Stat. §36a-869** makes a specific offer irrevocable until midnight
+of the third calendar day after its date. That is a sending rule, not a form
+rule — nothing in the disclosure expresses it and nothing here enforces it. If
+the platform can withdraw or amend a sent offer, Connecticut needs a guard.
+Raised with `lombard-platform-59`.
