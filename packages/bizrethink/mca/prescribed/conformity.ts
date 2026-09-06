@@ -11,12 +11,7 @@ import type { Divergence, PrescribedForm, RenderedRow } from './types';
  * on the page was "Total Dollar\nCost" in the file and matched nothing.
  */
 const norm = (s: string): string =>
-  s
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/[–—]/g, '-')
-    .replace(/\s+/g, ' ')
-    .trim();
+  s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim();
 
 /**
  * A prescribed sentence names the financer where the form names Lombard, so a
@@ -32,10 +27,7 @@ const asPattern = (verbatim: string): RegExp =>
   );
 
 /** Does the form we built match the spec we wrote? */
-export const checkFormConformity = (
-  form: PrescribedForm,
-  rendered: RenderedRow[],
-): Divergence[] => {
+export const checkFormConformity = (form: PrescribedForm, rendered: RenderedRow[]): Divergence[] => {
   const out: Divergence[] = [];
 
   if (rendered.length !== form.rows.length) {

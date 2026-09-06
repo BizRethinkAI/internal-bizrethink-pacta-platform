@@ -31,11 +31,7 @@ export const GA_DISCLOSURE: ContentStatute = {
       // The statute names three categories of deduction, and the row names all
       // three. Pinned individually: a form that mentioned only fees would still
       // read as a complete sentence.
-      evidence: [
-        'fees deducted or withheld at disbursement',
-        'satisfy a prior balance',
-        'third party',
-      ],
+      evidence: ['fees deducted or withheld at disbursement', 'satisfy a prior balance', 'third party'],
     },
     {
       citation: 'O.C.G.A. §10-1-393.18(e)(3)(C)',

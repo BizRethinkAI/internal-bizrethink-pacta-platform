@@ -1,57 +1,57 @@
 [
- {
-  "label": "Funding Provided",
-  "value": "$ ______«2»______",
-  "content": "This is how much funding _________________________«12»_________________________ will provide. Due to deductions or payments to others, the total funds that will be provided to you directly is $ ______«3»______. For more information on the amounts that will be deducted, please review the attached document “Itemization of Amount Financed.” Part of this funding may pay down or pay off amounts you owe. The amount paid directly to you may change if the amount owed for those other obligations changes. Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? $ _____«24»______. If the amount is zero, the answer would be No."
- },
- {
-  "label": "Estimated Annual Percentage Rate (APR)",
-  "value": "_«4»__%",
-  "content": "APR is the estimated cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, finance charges you pay, and the periodic payments you make. This calculation assumes your estimated average monthly income through your Approved Processor's card settlement will be $ _____«10»______. Since your actual income may vary from our estimate, your effective APR may also vary. APR is not an interest rate. The cost of this financing is based upon fees charged by _________________________«12»_________________________ rather than interest that accrues over time."
- },
- {
-  "label": "Finance Charge",
-  "value": "$ ______«5»______",
-  "content": "This is the dollar cost of your financing. Your finance charge will not increase if you take longer to pay off what you owe."
- },
- {
-  "label": "Estimated Total Payment Amount",
-  "value": "$ ______«6»______",
-  "content": "This is the total dollar amount of payments we estimate you will make under the contract."
- },
- {
-  "label": "Estimated Monthly Cost",
-  "value": "$ _____«16»______",
-  "content": "Although you do not make payments on a monthly basis, this is our calculation of your average monthly cost based upon the payment amounts disclosed below."
- },
- {
-  "label": "Estimated Payment",
-  "value": null,
-  "content": "$ ______«7»______ / each business day (Monday–Friday). This estimate is based on the Specified Percentage of your gross daily credit and debit card receipts. Actual collection varies with your daily sales volume."
- },
- {
-  "label": "Payment Terms",
-  "value": null,
-  "content": "Each business day, your Approved Processor will remit _«8»_% of your gross daily credit and debit card receipts to _________________________«12»_________________________ and send any remaining amounts to you. This financing does not have a fixed payment schedule and there is no minimum payment amount. We based our estimates on information you provided about your average monthly income; if your actual income exceeds the estimate, you may pay off the financing faster, and vice versa."
- },
- {
-  "label": "Estimated Term",
-  "value": "_«9»__ days",
-  "content": "This is our estimate of how long it will take to collect amounts due to us under the contract based upon assumptions about your monthly income through your Approved Processor's card settlement."
- },
- {
-  "label": "Prepayment",
-  "value": null,
-  "content": "If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $ _____«15»______ based upon our estimates."
- },
- {
-  "label": "Prepayment",
-  "value": null,
-  "content": "If you pay off the financing faster than required, you will not be required to pay additional fees."
- },
- {
-  "label": "Collateral Requirements",
-  "value": null,
-  "content": "_________________________«12»_________________________ has a security interest in the Receipts purchased under the FRPA, the accounts they arise from, and identifiable proceeds of those Receipts including proceeds in your Approved Processor's card settlement, granted under FRPA §4.10 (UCC Article 9). The interest is precautionary and does not reach equipment, inventory, chattel paper, documents, instruments or general intangibles. A personal guaranty is given under FRPA §9.2, limited to fraud, material misrepresentation of present fact, and deliberate interference with collection of the purchased Receipts. It does not cover repayment, any other covenant, or the performance of the business."
- }
+  {
+    "label": "Funding Provided",
+    "value": "$ ______«2»______",
+    "content": "This is how much funding _________________________«12»_________________________ will provide. Due to deductions or payments to others, the total funds that will be provided to you directly is $ ______«3»______. For more information on the amounts that will be deducted, please review the attached document “Itemization of Amount Financed.” Part of this funding may pay down or pay off amounts you owe. The amount paid directly to you may change if the amount owed for those other obligations changes. Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? $ _____«24»______. If the amount is zero, the answer would be No."
+  },
+  {
+    "label": "Estimated Annual Percentage Rate (APR)",
+    "value": "_«4»__%",
+    "content": "APR is the estimated cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, finance charges you pay, and the periodic payments you make. This calculation assumes your estimated average monthly income through your Approved Processor's card settlement will be $ _____«10»______. Since your actual income may vary from our estimate, your effective APR may also vary. APR is not an interest rate. The cost of this financing is based upon fees charged by _________________________«12»_________________________ rather than interest that accrues over time."
+  },
+  {
+    "label": "Finance Charge",
+    "value": "$ ______«5»______",
+    "content": "This is the dollar cost of your financing. Your finance charge will not increase if you take longer to pay off what you owe."
+  },
+  {
+    "label": "Estimated Total Payment Amount",
+    "value": "$ ______«6»______",
+    "content": "This is the total dollar amount of payments we estimate you will make under the contract."
+  },
+  {
+    "label": "Estimated Monthly Cost",
+    "value": "$ _____«16»______",
+    "content": "Although you do not make payments on a monthly basis, this is our calculation of your average monthly cost based upon the payment amounts disclosed below."
+  },
+  {
+    "label": "Estimated Payment",
+    "value": null,
+    "content": "$ ______«7»______ / each business day (Monday–Friday). This estimate is based on the Specified Percentage of your gross daily credit and debit card receipts. Actual collection varies with your daily sales volume."
+  },
+  {
+    "label": "Payment Terms",
+    "value": null,
+    "content": "Each business day, your Approved Processor will remit _«8»_% of your gross daily credit and debit card receipts to _________________________«12»_________________________ and send any remaining amounts to you. This financing does not have a fixed payment schedule and there is no minimum payment amount. We based our estimates on information you provided about your average monthly income; if your actual income exceeds the estimate, you may pay off the financing faster, and vice versa."
+  },
+  {
+    "label": "Estimated Term",
+    "value": "_«9»__ days",
+    "content": "This is our estimate of how long it will take to collect amounts due to us under the contract based upon assumptions about your monthly income through your Approved Processor's card settlement."
+  },
+  {
+    "label": "Prepayment",
+    "value": null,
+    "content": "If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $ _____«15»______ based upon our estimates."
+  },
+  {
+    "label": "Prepayment",
+    "value": null,
+    "content": "If you pay off the financing faster than required, you will not be required to pay additional fees."
+  },
+  {
+    "label": "Collateral Requirements",
+    "value": null,
+    "content": "_________________________«12»_________________________ has a security interest in the Receipts purchased under the FRPA, the accounts they arise from, and identifiable proceeds of those Receipts including proceeds in your Approved Processor's card settlement, granted under FRPA §4.10 (UCC Article 9). The interest is precautionary and does not reach equipment, inventory, chattel paper, documents, instruments or general intangibles. A personal guaranty is given under FRPA §9.2, limited to fraud, material misrepresentation of present fact, and deliberate interference with collection of the purchased Receipts. It does not cover repayment, any other covenant, or the performance of the business."
+  }
 ]

@@ -60,19 +60,23 @@ describe('checkFormConformity', () => {
   it('catches altered verbatim text', () => {
     // the real one: NY says "finance charges you pay" where CA says "fees you
     // pay", and a session tidying them into agreement breaks one of them
-    const out = checkFormConformity(form, rendered([
-      { content: 'This is how much funding Lombard Capital LLC provides.' },
-    ]));
+    const out = checkFormConformity(
+      form,
+      rendered([{ content: 'This is how much funding Lombard Capital LLC provides.' }]),
+    );
     expect(out.map((d) => d.kind)).toContain('verbatim');
   });
 
   it('catches an addition to a shall-include-only row', () => {
-    const out = checkFormConformity(form, rendered([
-      {
-        content:
-          'This is how much funding Lombard Capital LLC will provide. Actual collection varies with your daily sales volume.',
-      },
-    ]));
+    const out = checkFormConformity(
+      form,
+      rendered([
+        {
+          content:
+            'This is how much funding Lombard Capital LLC will provide. Actual collection varies with your daily sales volume.',
+        },
+      ]),
+    );
     expect(out.map((d) => d.kind)).toContain('unauthorised-addition');
   });
 
@@ -100,10 +104,7 @@ describe('checkAgainstSource', () => {
   it('catches prescribed text the statute does not contain', () => {
     const invented: PrescribedForm = {
       ...form,
-      rows: [
-        { ...form.rows[0], verbatim: 'This is how much funding we will advance to you.' },
-        form.rows[1],
-      ],
+      rows: [{ ...form.rows[0], verbatim: 'This is how much funding we will advance to you.' }, form.rows[1]],
     };
     expect(checkAgainstSource(invented, CA_SOURCE).map((d) => d.kind)).toEqual(['not-in-source']);
   });

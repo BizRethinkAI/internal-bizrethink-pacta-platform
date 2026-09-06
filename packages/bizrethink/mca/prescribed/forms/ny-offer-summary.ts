@@ -60,14 +60,11 @@ export const NY_OFFER_SUMMARY: PrescribedForm = {
       label: 'Finance Charge',
       verbatim: 'This is the dollar cost of your financing.',
       onlyPrescribedContent: true,
-      alsoPermitted: [
-        'Your finance charge will not increase if you take longer to pay off what you owe.',
-      ],
+      alsoPermitted: ['Your finance charge will not increase if you take longer to pay off what you owe.'],
     },
     {
       label: 'Estimated Total Payment Amount',
-      verbatim:
-        'This is the total dollar amount of payments we estimate you will make under the contract.',
+      verbatim: 'This is the total dollar amount of payments we estimate you will make under the contract.',
       onlyPrescribedContent: true,
     },
     /*
@@ -93,8 +90,7 @@ export const NY_OFFER_SUMMARY: PrescribedForm = {
     },
     {
       label: 'Prepayment',
-      verbatim:
-        'If you pay off the financing faster than required, you will not be required to pay additional fees.',
+      verbatim: 'If you pay off the financing faster than required, you will not be required to pay additional fees.',
       // §600.6(k) says "only". California's §914(a)(11) does NOT. This single
       // boolean is the difference, and it is why the two forms cannot share a
       // spec.

@@ -1,77 +1,77 @@
 [
- {
-  "label": "Total Funds Provided",
-  "value": "$ ______«2»______",
-  "content": "This is the gross amount Provider will provide under the FRPA before any deductions."
- },
- {
-  "label": "Total Funds Disbursed",
-  "value": "$ ______«3»______",
-  "content": "This is the amount Recipient will receive directly after deductions for fees and third-party payments. See FRPA §1.4 (Itemization of Net Amount Funded) for the breakdown."
- },
- {
-  "label": "Total Amount to Repay",
-  "value": "$ ______«5»______",
-  "content": "This is the total dollar amount Recipient is estimated to remit to Provider under the FRPA (the Purchased Amount)."
- },
- {
-  "label": "Total Dollar Cost",
-  "value": "$ ______«4»______",
-  "content": "This is the cost of the financing: the difference between the Total Amount to Repay and the Total Funds Provided, plus every fee withheld from the proceeds at or before funding."
- },
- {
-  "label": "Estimated Periodic Payment",
-  "value": "$ ______«6»______ _«7»_% × _«8»_ days",
-  "content": "Repayments are not fixed. Each Workday, Recipient's Approved Processor will remit the Specified Percentage of Recipient's gross daily credit and debit card receipts to Provider until the Total Amount to Repay is collected. Actual payments will vary with Recipient's daily revenue."
- },
- {
-  "label": "Average Projected Monthly Payment",
-  "value": "$ _____«13»______",
-  "content": "This is the average of the estimated monthly amounts Recipient is projected to remit, derived from the assumed monthly income below. Actual amounts vary with Recipient’s daily revenue."
- },
- {
-  "label": "Estimated Average Monthly Income (assumption used)",
-  "value": "$ ______«9»______",
-  "content": "This is the assumed average monthly income through your Approved Processor's card settlement used to derive the estimated periodic payment and term above. If actual income differs, both will adjust."
- },
- {
-  "label": "Prepayment",
-  "value": "",
-  "content": "If Recipient pays the Total Amount to Repay faster than estimated, Recipient will not be charged any additional fees. There is no prepayment penalty. See FRPA §8.3 (Voluntary Prepayment). Buyer does not offer a prepayment discount; the full unpaid Purchased Amount is delivered (FRPA §8.3)."
- },
- {
-  "label": "Other Potential Fees and Charges NOT Included in the Total Dollar Cost",
-  "value": "",
-  "content": "Same-day wire fee $35 (no fee for ACH disbursement); bank account change fee $75; site visit fee $200 if an on-site inspection is required; default / diversion fee $5,000 upon an Event of Default. There is no draw fee, no late payment fee and no returned payment fee, because Recipient makes no scheduled payment — collection is a percentage of card settlement. See FRPA Appendix A."
- },
- {
-  "label": "Collateral Requirements or Security Interests",
-  "value": "",
-  "content": "Provider takes a precautionary security interest in the purchased Receipts, the accounts they arise from, and identifiable proceeds including proceeds in your Approved Processor's card settlement. It does not extend to Recipient’s equipment, inventory, chattel paper, documents, instruments or general intangibles. See FRPA §4.10. A personal guaranty is limited to fraud, material misrepresentation of present fact, and deliberate diversion of Receipts; see FRPA §9.2."
- },
- {
-  "label": "Broker Compensation",
-  "value": "$ _____«15»______",
-  "content": "Is Provider paying compensation directly to a commercial sales-based financing broker? _____«14»_____ If Yes, the amount is shown at left."
- },
- {
-  "label": "If a renewal financing transaction: Total Amount from New Financing Used to Pay Off Prepayment Charges & Unpaid Interest on Existing Financing",
-  "value": "$ _____«16»______",
-  "content": "Disclosed under Tex. Fin. Code §398.051(b). The two components are itemized below."
- },
- {
-  "label": "• Prepayment Charges Required to Be Paid",
-  "value": "$ _____«17»______",
-  "content": ""
- },
- {
-  "label": "• Unpaid Interest or Finance Charges Not Forgiven at Renewal",
-  "value": "$ _____«18»______",
-  "content": ""
- },
- {
-  "label": "Reduction in Disbursement Amount to Pay Down Existing Outstanding Balance",
-  "value": "$ _____«19»______",
-  "content": "The actual dollar amount by which the disbursement amount is reduced, disclosed under Tex. Fin. Code §398.051(b)(2)."
- }
+  {
+    "label": "Total Funds Provided",
+    "value": "$ ______«2»______",
+    "content": "This is the gross amount Provider will provide under the FRPA before any deductions."
+  },
+  {
+    "label": "Total Funds Disbursed",
+    "value": "$ ______«3»______",
+    "content": "This is the amount Recipient will receive directly after deductions for fees and third-party payments. See FRPA §1.4 (Itemization of Net Amount Funded) for the breakdown."
+  },
+  {
+    "label": "Total Amount to Repay",
+    "value": "$ ______«5»______",
+    "content": "This is the total dollar amount Recipient is estimated to remit to Provider under the FRPA (the Purchased Amount)."
+  },
+  {
+    "label": "Total Dollar Cost",
+    "value": "$ ______«4»______",
+    "content": "This is the cost of the financing: the difference between the Total Amount to Repay and the Total Funds Provided, plus every fee withheld from the proceeds at or before funding."
+  },
+  {
+    "label": "Estimated Periodic Payment",
+    "value": "$ ______«6»______ _«7»_% × _«8»_ days",
+    "content": "Repayments are not fixed. Each Workday, Recipient's Approved Processor will remit the Specified Percentage of Recipient's gross daily credit and debit card receipts to Provider until the Total Amount to Repay is collected. Actual payments will vary with Recipient's daily revenue."
+  },
+  {
+    "label": "Average Projected Monthly Payment",
+    "value": "$ _____«13»______",
+    "content": "This is the average of the estimated monthly amounts Recipient is projected to remit, derived from the assumed monthly income below. Actual amounts vary with Recipient’s daily revenue."
+  },
+  {
+    "label": "Estimated Average Monthly Income (assumption used)",
+    "value": "$ ______«9»______",
+    "content": "This is the assumed average monthly income through your Approved Processor's card settlement used to derive the estimated periodic payment and term above. If actual income differs, both will adjust."
+  },
+  {
+    "label": "Prepayment",
+    "value": "",
+    "content": "If Recipient pays the Total Amount to Repay faster than estimated, Recipient will not be charged any additional fees. There is no prepayment penalty. See FRPA §8.3 (Voluntary Prepayment). Buyer does not offer a prepayment discount; the full unpaid Purchased Amount is delivered (FRPA §8.3)."
+  },
+  {
+    "label": "Other Potential Fees and Charges NOT Included in the Total Dollar Cost",
+    "value": "",
+    "content": "Same-day wire fee $35 (no fee for ACH disbursement); bank account change fee $75; site visit fee $200 if an on-site inspection is required; default / diversion fee $5,000 upon an Event of Default. There is no draw fee, no late payment fee and no returned payment fee, because Recipient makes no scheduled payment — collection is a percentage of card settlement. See FRPA Appendix A."
+  },
+  {
+    "label": "Collateral Requirements or Security Interests",
+    "value": "",
+    "content": "Provider takes a precautionary security interest in the purchased Receipts, the accounts they arise from, and identifiable proceeds including proceeds in your Approved Processor's card settlement. It does not extend to Recipient’s equipment, inventory, chattel paper, documents, instruments or general intangibles. See FRPA §4.10. A personal guaranty is limited to fraud, material misrepresentation of present fact, and deliberate diversion of Receipts; see FRPA §9.2."
+  },
+  {
+    "label": "Broker Compensation",
+    "value": "$ _____«15»______",
+    "content": "Is Provider paying compensation directly to a commercial sales-based financing broker? _____«14»_____ If Yes, the amount is shown at left."
+  },
+  {
+    "label": "If a renewal financing transaction: Total Amount from New Financing Used to Pay Off Prepayment Charges & Unpaid Interest on Existing Financing",
+    "value": "$ _____«16»______",
+    "content": "Disclosed under Tex. Fin. Code §398.051(b). The two components are itemized below."
+  },
+  {
+    "label": "• Prepayment Charges Required to Be Paid",
+    "value": "$ _____«17»______",
+    "content": ""
+  },
+  {
+    "label": "• Unpaid Interest or Finance Charges Not Forgiven at Renewal",
+    "value": "$ _____«18»______",
+    "content": ""
+  },
+  {
+    "label": "Reduction in Disbursement Amount to Pay Down Existing Outstanding Balance",
+    "value": "$ _____«19»______",
+    "content": "The actual dollar amount by which the disbursement amount is reduced, disclosed under Tex. Fin. Code §398.051(b)(2)."
+  }
 ]

@@ -54,14 +54,11 @@ export const CA_OFFER_SUMMARY: PrescribedForm = {
       onlyPrescribedContent: true,
       // §914(a)(4)(C)(ii) — the one genuinely OPTIONAL sentence in the form.
       // "the provider may include".
-      alsoPermitted: [
-        'Your finance charge will not increase if you take longer to pay off what you owe.',
-      ],
+      alsoPermitted: ['Your finance charge will not increase if you take longer to pay off what you owe.'],
     },
     {
       label: 'Estimated Total Payment Amount',
-      verbatim:
-        'This is the total dollar amount of payments we estimate you will make under the contract.',
+      verbatim: 'This is the total dollar amount of payments we estimate you will make under the contract.',
       onlyPrescribedContent: true,
     },
     // §914(a)(12) — inserted below the fourth row; third column is described,
@@ -81,8 +78,7 @@ export const CA_OFFER_SUMMARY: PrescribedForm = {
     {
       // §914(a)(11)(B) — note: "shall include", NOT "shall include only"
       label: 'Prepayment',
-      verbatim:
-        'If you pay off the financing faster than required, you will not be required to pay additional fees.',
+      verbatim: 'If you pay off the financing faster than required, you will not be required to pay additional fees.',
       onlyPrescribedContent: false,
     },
   ],

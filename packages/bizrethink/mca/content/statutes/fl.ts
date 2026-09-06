@@ -34,8 +34,7 @@ export const FL_DISCLOSURE: ContentStatute = {
     },
     {
       citation: 'Fla. Stat. §559.9613(2)(d)',
-      requires:
-        'The total dollar cost, calculated as the difference between the amount in (a) and the amount in (c).',
+      requires: 'The total dollar cost, calculated as the difference between the amount in (a) and the amount in (c).',
       row: 'Total Dollar Cost',
       // The subtraction is against funds PROVIDED, not funds disbursed. Pinned
       // because the two differ by the origination fee, and the wrong one

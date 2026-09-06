@@ -62,18 +62,10 @@ export type ContentGap = {
 };
 
 const norm = (s: string): string =>
-  s
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/[–—]/g, '-')
-    .replace(/\s+/g, ' ')
-    .trim();
+  s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim();
 
 /** Does our form actually carry every item the statute lists? */
-export const checkContentCoverage = (
-  statute: ContentStatute,
-  rendered: RenderedRow[],
-): ContentGap[] => {
+export const checkContentCoverage = (statute: ContentStatute, rendered: RenderedRow[]): ContentGap[] => {
   const gaps: ContentGap[] = [];
 
   for (const req of statute.requirements) {

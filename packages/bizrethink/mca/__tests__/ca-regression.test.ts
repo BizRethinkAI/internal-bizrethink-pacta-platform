@@ -25,15 +25,11 @@ describe('CA disclosure as published (templates 104/105)', () => {
   const divergences = checkFormConformity(CA_OFFER_SUMMARY, asPublished);
 
   it('flags New York wording in the California funding row', () => {
-    expect(
-      divergences.some((d) => d.row === 0 && d.detail.includes('the amounts that will be deducted')),
-    ).toBe(true);
+    expect(divergences.some((d) => d.row === 0 && d.detail.includes('the amounts that will be deducted'))).toBe(true);
   });
 
   it('flags the prepayment-discount sentence in the closed eighth row', () => {
-    expect(divergences.some((d) => d.row === 8 && d.detail.includes('prepayment discount'))).toBe(
-      true,
-    );
+    expect(divergences.some((d) => d.row === 8 && d.detail.includes('prepayment discount'))).toBe(true);
   });
 
   it('finds exactly these two and no others', () => {

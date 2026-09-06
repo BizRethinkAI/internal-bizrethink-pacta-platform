@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { checkContentCoverage } from '../content/types';
 import { GA_DISCLOSURE } from '../content/statutes/ga';
 import { KS_DISCLOSURE } from '../content/statutes/ks';
 import { LA_DISCLOSURE } from '../content/statutes/la';
 import { MO_DISCLOSURE } from '../content/statutes/mo';
 import { TX_DISCLOSURE } from '../content/statutes/tx';
 import { UT_DISCLOSURE } from '../content/statutes/ut';
+import { checkContentCoverage } from '../content/types';
 import ga from './ga-rows.fixture.json';
 import ks from './ks-rows.fixture.json';
 import la from './la-rows.fixture.json';
@@ -29,7 +29,9 @@ describe.each(CASES)('$statute.citation', ({ statute, rendered }) => {
     const gaps = checkContentCoverage(statute, rendered);
 
     // eslint-disable-next-line no-console
-    if (gaps.length) console.log('\n' + gaps.map((g) => `  - ${g.detail}`).join('\n'));
+    if (gaps.length) {
+      console.log(`\n${gaps.map((g) => `  - ${g.detail}`).join('\n')}`);
+    }
 
     expect(gaps).toEqual([]);
   });

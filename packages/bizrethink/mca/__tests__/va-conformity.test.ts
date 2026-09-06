@@ -25,7 +25,9 @@ describe('Lombard_VA_Disclosure_v1 against the Commonwealth form', () => {
     const divergences = checkFormConformity(VA_DISCLOSURE, rendered);
 
     // eslint-disable-next-line no-console
-    if (divergences.length) console.log('\n' + divergences.map((d) => `  - ${d.detail}`).join('\n'));
+    if (divergences.length) {
+      console.log(`\n${divergences.map((d) => `  - ${d.detail}`).join('\n')}`);
+    }
 
     expect(divergences).toEqual([]);
   });

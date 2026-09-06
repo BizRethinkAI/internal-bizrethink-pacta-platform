@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { checkContentCoverage } from '../content/types';
 import { FL_DISCLOSURE } from '../content/statutes/fl';
+import { checkContentCoverage } from '../content/types';
 import rendered from './fl-rows.fixture.json';
 
 /*
@@ -17,7 +17,9 @@ describe('Lombard_FL_Disclosure_v1 against Fla. Stat. §559.9613(2)', () => {
     const gaps = checkContentCoverage(FL_DISCLOSURE, rendered);
 
     // eslint-disable-next-line no-console
-    if (gaps.length) console.log('\n' + gaps.map((g) => `  - ${g.detail}`).join('\n'));
+    if (gaps.length) {
+      console.log(`\n${gaps.map((g) => `  - ${g.detail}`).join('\n')}`);
+    }
 
     expect(gaps).toEqual([]);
   });

@@ -1,37 +1,37 @@
 [
- {
-  "label": "Total Amount of Funds Provided",
-  "value": "$ ______«2»______",
-  "content": "This is the gross amount Provider will provide under the FRPA before any deductions."
- },
- {
-  "label": "Total Amount of Funds Disbursed",
-  "value": "$ ______«3»______",
-  "content": "This is the amount Recipient will receive directly after deductions for fees and third-party payments. See FRPA §1.4 (Itemization of Net Amount Funded) for the breakdown."
- },
- {
-  "label": "Total of Payments",
-  "value": "$ ______«5»______",
-  "content": "This is the total dollar amount Recipient is estimated to remit to Provider under the FRPA (the Purchased Amount)."
- },
- {
-  "label": "Total Dollar Cost of Financing",
-  "value": "$ ______«4»______",
-  "content": "This is the difference between the Total of Payments and the Total Amount of Funds Provided, and it also includes every fee or charge Provider deducts from the Total Amount of Funds Provided — the origination fee and any other amount withheld at funding."
- },
- {
-  "label": "Estimated Payments",
-  "value": "$ ______«6»______ _«7»_% × _«8»_ days",
-  "content": "Repayments are not fixed. Each Workday, Recipient's Approved Processor will remit the Specified Percentage of Recipient's gross daily credit and debit card receipts to Provider until the Total of Payments is collected. Actual payments will vary with Recipient's daily revenue."
- },
- {
-  "label": "Estimated Average Monthly Income (assumption used)",
-  "value": "$ ______«9»______",
-  "content": "This is the assumed average monthly income through your Approved Processor's card settlement used to derive the estimated periodic payment and term above. If actual income differs, both will adjust."
- },
- {
-  "label": "Prepayment",
-  "value": "",
-  "content": "If Recipient pays the Total of Payments faster than estimated, Recipient will not be charged any additional fees. There is no prepayment penalty. See FRPA §8.3 (Voluntary Prepayment). Buyer does not offer a prepayment discount; the full unpaid Purchased Amount is delivered (FRPA §8.3)."
- }
+  {
+    "label": "Total Amount of Funds Provided",
+    "value": "$ ______«2»______",
+    "content": "This is the gross amount Provider will provide under the FRPA before any deductions."
+  },
+  {
+    "label": "Total Amount of Funds Disbursed",
+    "value": "$ ______«3»______",
+    "content": "This is the amount Recipient will receive directly after deductions for fees and third-party payments. See FRPA §1.4 (Itemization of Net Amount Funded) for the breakdown."
+  },
+  {
+    "label": "Total of Payments",
+    "value": "$ ______«5»______",
+    "content": "This is the total dollar amount Recipient is estimated to remit to Provider under the FRPA (the Purchased Amount)."
+  },
+  {
+    "label": "Total Dollar Cost of Financing",
+    "value": "$ ______«4»______",
+    "content": "This is the difference between the Total of Payments and the Total Amount of Funds Provided, and it also includes every fee or charge Provider deducts from the Total Amount of Funds Provided — the origination fee and any other amount withheld at funding."
+  },
+  {
+    "label": "Estimated Payments",
+    "value": "$ ______«6»______ _«7»_% × _«8»_ days",
+    "content": "Repayments are not fixed. Each Workday, Recipient's Approved Processor will remit the Specified Percentage of Recipient's gross daily credit and debit card receipts to Provider until the Total of Payments is collected. Actual payments will vary with Recipient's daily revenue."
+  },
+  {
+    "label": "Estimated Average Monthly Income (assumption used)",
+    "value": "$ ______«9»______",
+    "content": "This is the assumed average monthly income through your Approved Processor's card settlement used to derive the estimated periodic payment and term above. If actual income differs, both will adjust."
+  },
+  {
+    "label": "Prepayment",
+    "value": "",
+    "content": "If Recipient pays the Total of Payments faster than estimated, Recipient will not be charged any additional fees. There is no prepayment penalty. See FRPA §8.3 (Voluntary Prepayment). Buyer does not offer a prepayment discount; the full unpaid Purchased Amount is delivered (FRPA §8.3)."
+  }
 ]

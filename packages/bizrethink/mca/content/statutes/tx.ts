@@ -55,8 +55,7 @@ export const TX_DISCLOSURE: ContentStatute = {
     },
     {
       citation: 'Tex. Fin. Code §398.051(a)(5)',
-      requires:
-        'The estimated period for the periodic payments to equal the total repayment amount.',
+      requires: 'The estimated period for the periodic payments to equal the total repayment amount.',
       row: 'Estimated Periodic Payment',
       // Carried in the value cell as "... x N days" and nowhere else. See the
       // KNOWN WEAKNESS note above; pinning "days" is what holds it in place
@@ -94,8 +93,7 @@ export const TX_DISCLOSURE: ContentStatute = {
     },
     {
       citation: 'Tex. Fin. Code §398.051(a)(9)',
-      requires:
-        'Any ADDITIONAL fees, not included in the finance charge, payable on early pay-off or refinancing.',
+      requires: 'Any ADDITIONAL fees, not included in the finance charge, payable on early pay-off or refinancing.',
       // A separate limb from (a)(8): one is about the finance charge, the other
       // about fees outside it, and a form answering only the first has answered
       // half the question.
@@ -110,8 +108,7 @@ export const TX_DISCLOSURE: ContentStatute = {
     },
     {
       citation: 'Tex. Fin. Code §398.051(a)(11)',
-      requires:
-        'A statement of whether the provider will pay compensation directly to a broker, and if so the amount.',
+      requires: 'A statement of whether the provider will pay compensation directly to a broker, and if so the amount.',
       row: 'Broker Compensation',
       evidence: ['broker'],
     },
