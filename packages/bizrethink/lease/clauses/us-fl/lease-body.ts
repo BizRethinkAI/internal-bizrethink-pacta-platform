@@ -27,7 +27,7 @@ export const FL_LEASE_BODY: Clause[] = [
     slug: 'parties.recital',
     // v2: the effective date moved out — see the note on the body.
     version: 2,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'parties',
     sortKey: 10,
@@ -68,7 +68,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'premises.description',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'premises',
     sortKey: 20,
@@ -88,7 +88,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'term.fixed',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'term',
     sortKey: 30,
@@ -138,7 +138,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'term.holdover',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'term',
     sortKey: 35,
@@ -155,7 +155,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'term.termination-on-sale',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'term',
     sortKey: 38,
@@ -172,7 +172,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'rent.base',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rent',
     sortKey: 40,
@@ -192,7 +192,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'rent.proration',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rent',
     sortKey: 42,
@@ -216,7 +216,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'rent.late-fee-flat',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rent',
     sortKey: 44,
@@ -236,7 +236,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'rent.late-fee-tiered',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rent',
     sortKey: 44,
@@ -259,7 +259,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'rent.returned-payment',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rent',
     sortKey: 46,
@@ -421,7 +421,7 @@ export const FL_LEASE_BODY: Clause[] = [
     slug: 'hoa.compliance',
     // v2: forwarding reworded, and the cure moved to its own clause.
     version: 2,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 60,
@@ -483,7 +483,7 @@ export const FL_LEASE_BODY: Clause[] = [
       become operative instead of decorative.
     */
     version: 2,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 62,
@@ -525,7 +525,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'hoa.amenity-access',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 64,
@@ -561,7 +561,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'hoa.governing-documents-receipt',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'addendum',
     section: 'rules',
     sortKey: 63,
@@ -602,7 +602,7 @@ export const FL_LEASE_BODY: Clause[] = [
   {
     slug: 'condition.report-receipt',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'addendum',
     // 'premises', not a section of its own: what the place looked like on day
     // one is a fact about the premises, and FL_SECTION_ORDER is the printed

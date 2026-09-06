@@ -194,7 +194,7 @@ export const FL_MAINTENANCE: Clause[] = [
   {
     slug: 'maintenance.hvac-filters',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'maintenance',
     sortKey: 35,
@@ -211,7 +211,7 @@ export const FL_MAINTENANCE: Clause[] = [
   {
     slug: 'maintenance.pool-split',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'maintenance',
     sortKey: 40,
@@ -269,7 +269,7 @@ export const FL_MAINTENANCE: Clause[] = [
     slug: 'maintenance.lawn-split',
     // v2: the allocation came out of the body and became an answer.
     version: 2,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'maintenance',
     sortKey: 45,
@@ -301,7 +301,7 @@ export const FL_MAINTENANCE: Clause[] = [
   {
     slug: 'fees.administrative',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'maintenance',
     sortKey: 60,
@@ -335,7 +335,7 @@ export const FL_MAINTENANCE: Clause[] = [
   {
     slug: 'pets.addendum-fees',
     version: 1,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'addendum',
     section: 'pets',
     sortKey: 10,
@@ -369,7 +369,7 @@ export const FL_MAINTENANCE: Clause[] = [
   {
     slug: 'pets.addendum',
     version: 2,
-    jurisdiction: 'US-FL',
+    jurisdiction: 'generic',
     placement: 'addendum',
     section: 'pets',
     sortKey: 10,
