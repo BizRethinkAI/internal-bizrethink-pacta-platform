@@ -5,9 +5,9 @@ and the renderer bug that surfaced while fixing them.
 
 ## What a tenant found
 
-Harsha Setty read the pilot lease as the TENANT's side — the arrangement
-`STATE.md` records, since the attorney candidate is his spouse and cannot sign
-off a library her household is party to. Three comments on the first pass.
+Harsha Setty read the pilot lease as the tenant — the counterparty reading the
+document he is being asked to sign, which is adversarial scrutiny for free.
+Three comments on the first pass.
 
 1. `use.no-alterations` — "what credit for approved alterations?" A negotiating
    position, not a defect. No library change.
