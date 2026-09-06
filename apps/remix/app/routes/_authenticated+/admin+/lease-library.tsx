@@ -1,6 +1,6 @@
-import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
+import { isAdmin } from '@documenso/lib/utils/is-admin';
+import { prisma } from '@documenso/prisma';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -15,7 +15,7 @@ import { useLoaderData } from 'react-router';
 
 import { appMetaTags } from '~/utils/meta';
 
-import type { Route } from './+types/leases.library';
+import type { Route } from './+types/lease-library';
 
 /**
  * The clause library, and attorney sign-off on it.
@@ -39,21 +39,59 @@ export function meta() {
   return appMetaTags(msg`Clause library`);
 }
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const { teamUrl } = params;
-
-  if (!teamUrl) {
-    throw new Response('Not Found', { status: 404 });
-  }
-
+/**
+ * PACTA STAFF ONLY.
+ *
+ * This page is the instance's legal content — clause text and versions,
+ * statutory citations, attorney approvals and bar jurisdictions, draft vs
+ * publishable status. It is identical for every customer, because it IS the
+ * product. It is not a customer's data and never was.
+ *
+ * It used to live at `/t/:teamUrl/leases/library`, gated on
+ * `canAccessLeaseBuilder` — a per-ORGANISATION feature flag. Every member of
+ * any org with the lease builder could read it, and the customer's own Leases
+ * home linked them straight to it. Correct for an internal tool with one user;
+ * a disclosure the moment there are two.
+ *
+ * Gated here as well as by the admin layout: the layout's check runs for the
+ * route group, but a loader that fetches before it resolves would still read.
+ */
+export async function loader({ request }: Route.LoaderArgs) {
   const { user } = await getSession(request);
-  const team = await getTeamByUrl({ userId: user.id, teamUrl });
 
-  if (!(await canAccessLeaseBuilder({ organisationId: team.organisationId, userId: user.id }))) {
+  if (!isAdmin(user)) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  return { organisationId: team.organisationId };
+  /*
+    THE LIBRARY IS INSTANCE CONTENT; ITS SHARE LINKS ARE NOT — YET.
+
+    `clauseLibrary.list` reads FL_LIBRARY and the approval table and ignores the
+    organisationId entirely for data; it uses it only for `assertAccess`. But
+    `BizrethinkLibraryReview` — the counsel-review share links — carries an
+    organisationId column, so listing and creating one still needs an
+    organisation to stamp.
+
+    Pacta's own organisation is the right one to stamp: these are OUR shares of
+    OUR library with an attorney. Resolving it from the signed-in admin keeps
+    every procedure unchanged and records the shares exactly where they are
+    recorded today.
+
+    The honest limitation: this assumes staff operate from one organisation.
+    The durable fix is to drop organisationId from BizrethinkLibraryReview,
+    which is a migration and belongs in its own change.
+  */
+  const organisation = await prisma.organisation.findFirst({
+    where: { members: { some: { userId: user.id } } },
+    orderBy: { createdAt: 'asc' },
+    select: { id: true },
+  });
+
+  if (!organisation) {
+    throw new Response('Not Found', { status: 404 });
+  }
+
+  return { organisationId: organisation.id };
 }
 
 type ClauseRow = {
