@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { lookupAddress } from '../../lease/address/census';
 import { clauseFingerprint, isApprovalCurrent, libraryFingerprint } from '../../lease/clauses/approval';
+import { admissionBlocks, normaliseBarJurisdiction } from '../../lease/clauses/approval-jurisdiction';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { whyThisClause } from '../../lease/clauses/why-this-clause';
@@ -1810,6 +1811,14 @@ export const leaseBuilderRouter = router({
           fingerprint: z.string(),
           approvedByName: z.string().min(1),
           approvedByBarNumber: z.string().nullable().default(null),
+          /**
+           * Which bar the attorney is admitted in — "FL", "Florida", "US-FL".
+           *
+           * Required, unlike the bar number. A number identifies a person; only
+           * the jurisdiction says what their approval is worth on a given
+           * clause, and it is the thing the model was missing.
+           */
+          barJurisdiction: z.string().min(1),
           notes: z.string().nullable().default(null),
         }),
       )
@@ -1829,6 +1838,19 @@ export const leaseBuilderRouter = router({
           recorded, this refuses rather than attributing sign-off to text they
           never saw.
         */
+        /*
+          An attorney may approve only what their admission covers. Checked
+          before the fingerprint because it is a fact about the person rather
+          than about the moment: reloading the page will not fix it, so saying
+          so first is the more useful order.
+        */
+        const admission = normaliseBarJurisdiction(input.barJurisdiction);
+        const blocked = admissionBlocks(clause.jurisdiction, admission);
+
+        if (blocked !== null) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: blocked });
+        }
+
         const current = clauseFingerprint(clause);
 
         if (current !== input.fingerprint) {
@@ -1854,6 +1876,13 @@ export const leaseBuilderRouter = router({
               approvedByName: input.approvedByName.trim(),
               approvedByBarNumber: input.approvedByBarNumber?.trim() || null,
               approvedByUserId: ctx.user.id,
+              /*
+                Both stored, not derived. A clause's jurisdiction can move in a
+                later library version; this row records what was true when the
+                attorney signed off.
+              */
+              clauseJurisdiction: clause.jurisdiction,
+              barJurisdiction: admission,
               notes: input.notes?.trim() || null,
             },
           }),

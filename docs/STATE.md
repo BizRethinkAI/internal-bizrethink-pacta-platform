@@ -410,6 +410,36 @@ passed, or appeared to:
 
 ## Open threads
 
+### An approval recorded a bar number but never which bar
+
+`BizrethinkClauseApproval` captured `approvedByBarNumber` and nothing about the
+admission it belonged to. Nothing could have objected to a Florida attorney
+approving a North Carolina clause — and with North Carolina chosen as the second
+state, that stops being hypothetical.
+
+**Done first because there are zero approvals recorded.** Today it is two
+nullable columns; after counsel signs anything it is a migration with rows to
+backfill and no source for the missing values.
+
+`admissionBlocks(clauseJurisdiction, barJurisdiction)` returns a sentence rather
+than a boolean, because the caller shows it to whoever is recording the approval
+and a guard that says only "blocked" is one people route around. Checked before
+the fingerprint: an admission mismatch is a fact about the person, so reloading
+will not fix it and saying so first is the more useful order.
+
+Both jurisdictions are STORED, not derived. A clause's jurisdiction can move in
+a later library version; the row records what was true when the attorney signed
+off.
+
+**The generic tier is treated permissively and provisionally.** Federal and
+generic clauses depend on no single state's law, so any US admission covers
+them. That reading is in the counsel brief as an open question; if the answer is
+no it changes in one function.
+
+This is step 1 of the lease product plan, and the first thing on the critical
+path to a second state.
+
+
 ### Four clauses said things Florida does not permit, and one certified itself
 
 Two independent adversarial reviews of the Picana lease. Every finding was

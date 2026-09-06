@@ -301,6 +301,7 @@ const ClauseRowItem = ({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [bar, setBar] = useState('');
+  const [admitted, setAdmitted] = useState('');
   const [notes, setNotes] = useState('');
 
   const approve = trpc.bizrethink.leaseBuilder.clauseLibrary.approve.useMutation({
@@ -433,6 +434,26 @@ const ClauseRowItem = ({
                 </div>
               </div>
 
+              {/*
+                REQUIRED, unlike the bar number. A number identifies a person;
+                only the jurisdiction says what their approval is worth on this
+                clause. Without it nothing could object to a Florida attorney
+                approving a North Carolina one.
+              */}
+              <div className="mt-4">
+                <Label htmlFor={`admitted-${clause.slug}`}>Admitted in</Label>
+                <Input
+                  id={`admitted-${clause.slug}`}
+                  value={admitted}
+                  placeholder="Florida"
+                  onChange={(e) => setAdmitted(e.target.value)}
+                />
+                <p className="mt-1 text-muted-foreground text-xs">
+                  The bar this attorney is admitted in. A clause may be approved only by someone admitted where it
+                  applies; clauses that depend on no state&rsquo;s law may be approved by any US admission.
+                </p>
+              </div>
+
               <div className="mt-4">
                 <Label htmlFor={`notes-${clause.slug}`}>Notes (optional)</Label>
                 <Textarea
@@ -453,7 +474,7 @@ const ClauseRowItem = ({
 
               <Button
                 className="mt-4"
-                disabled={name.trim() === '' || approve.isPending}
+                disabled={name.trim() === '' || admitted.trim() === '' || approve.isPending}
                 onClick={() =>
                   approve.mutate({
                     organisationId,
@@ -463,6 +484,7 @@ const ClauseRowItem = ({
                     fingerprint: clause.fingerprint,
                     approvedByName: name.trim(),
                     approvedByBarNumber: bar.trim() === '' ? null : bar.trim(),
+                    barJurisdiction: admitted.trim(),
                     notes: notes.trim() === '' ? null : notes.trim(),
                   })
                 }
