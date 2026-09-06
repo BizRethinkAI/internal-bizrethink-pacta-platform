@@ -93,6 +93,69 @@ API-test project. Optional future hardening: a bounded retry on
 > other ~888 results. That makes the red **readable**; it does not make it go
 > away.
 
+> **ROOT CAUSE INVESTIGATION, 2026-09-06 — the counter theory is disproven.**
+>
+> Run on `ci-runner-03` (idle, out of the CI path), driving the `api` project
+> directly. The recorded cause above — DB contention on `incrementDocumentId` —
+> is **wrong**. So are two theories raised during the investigation.
+>
+> **The symptom is a silent role downgrade, not a missing row.** `:721` asserts
+> an ADMIN sees all 6 seeded documents and gets **2** — exactly the count of
+> `EVERYONE`-visibility documents. Not zero, not the wrong documents: the
+> visibility set of the *lowest* role. The `Received: 0` failures elsewhere are
+> the same fault in tests whose fixtures contain no `EVERYONE` documents.
+>
+> **The mechanism, traced through three files:**
+>
+> 1. `find-documents.ts:340` maps team role to visible levels. ADMIN gets all
+>    three; the trailing `.otherwise()` gets `[EVERYONE]` only.
+> 2. That role is `getTeamById(...).currentTeamRole`, derived — not stored —
+>    via `TeamGroup → OrganisationGroup → OrganisationGroupMember →
+>    OrganisationMember → userId` (`get-team.ts:47`).
+> 3. `utils/teams.ts:76` `getHighestTeamRoleInGroup` seeds its accumulator with
+>    `LOWEST_TEAM_ROLE` and returns it untouched when `groups` is empty. An
+>    empty group list is therefore indistinguishable from "this user is a
+>    MEMBER" — **no error, no log**.
+>
+> Empty groups → MEMBER → `EVERYONE` only → 2 of 6.
+>
+> **What was ruled out, and how:**
+>
+> | Theory | Experiment | Result |
+> |---|---|---|
+> | Cross-suite interference | ran `find-documents.spec.ts` alone (50 tests) | **dead** — still fails |
+> | Concurrency / DB contention | `--workers=1` vs `--workers=10`, 20 repeats each | **dead** — 18/20 vs 17/20 |
+> | Accumulated DB state on a persistent runner | `migrate reset`: 4561 teams → 5 | **dead** — got *worse*, 19/20 |
+>
+> The accumulation theory was the plausible one (CI runs `prisma:migrate-dev`,
+> never `reset`, so a homelab runner's DB grows across runs where a
+> GitHub-hosted one started clean — and the dates fit the 08-31 move). A single
+> experiment killed it. Recorded here so nobody spends an evening re-deriving
+> it.
+>
+> **Reproduction, ~2 minutes instead of ~20.** On a runner, with the stack up:
+>
+> ```
+> npx playwright test e2e/api/v2/find-documents.spec.ts --project=api \
+>   -g 'should enforce visibility across admin and manager levels' \
+>   --workers=1 --repeat-each=20 --retries=0
+> ```
+>
+> **STILL OPEN — the honest gap.** This does not explain why CI mostly passes.
+> A real CI run of PR #93 passed *on this same box* while the manual invocation
+> fails 19 times in 20. Something differs between the two — most likely
+> environment the job provides that the manual harness does not. Until that is
+> closed there is a reliable reproduction and a precise mechanism, but not the
+> full causal chain. **Next step: log `teamGroups.length` and the resolved role
+> inside `getTeamById` at query time.** Not another re-run.
+>
+> **Worth fixing regardless of how the test story ends.** Treating "no groups
+> found" as "lowest role" rather than as an error is what converts any glitch
+> in group resolution into a silently wrong document set. In a signing
+> platform that is a permissions answer given with no signal that anything went
+> wrong. It is upstream code, so changing it to throw would need its own
+> overlay.
+
 ## Baseline refresh — 2026-08-13 upstream sync (142 commits, upstream 2.16.0)
 
 Post-sync the curated suite reports **1028 passed / 4 flaky / 64 skipped / 0 failed**
