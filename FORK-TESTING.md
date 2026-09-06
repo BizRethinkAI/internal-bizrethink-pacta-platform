@@ -99,25 +99,42 @@ API-test project. Optional future hardening: a bounded retry on
 > directly. The recorded cause above — DB contention on `incrementDocumentId` —
 > is **wrong**. So are two theories raised during the investigation.
 >
-> **The symptom is a silent role downgrade, not a missing row.** `:721` asserts
-> an ADMIN sees all 6 seeded documents and gets **2** — exactly the count of
-> `EVERYONE`-visibility documents. Not zero, not the wrong documents: the
-> visibility set of the *lowest* role. The `Received: 0` failures elsewhere are
-> the same fault in tests whose fixtures contain no `EVERYONE` documents.
+> **The symptom.** `:721` asserts an ADMIN sees all 6 seeded documents and
+> receives **2**. Note that the fixture seeds **2 documents at each of the three
+> visibility levels**, so the number 2 on its own distinguishes nothing — an
+> early reading of it as "exactly the EVERYONE count, therefore a role
+> downgrade" was an unsound inference and is recorded here so it is not made
+> again.
 >
-> **The mechanism, traced through three files:**
+> **A role-downgrade mechanism was investigated and DISPROVEN.** The candidate:
+> `getTeamById` derives the role via `TeamGroup → OrganisationGroup →
+> OrganisationGroupMember → OrganisationMember → userId` (`get-team.ts:47`),
+> and `utils/teams.ts:76` returns `LOWEST_TEAM_ROLE` untouched when that list
+> comes back empty — so an empty group list is indistinguishable from "this
+> user is a MEMBER", with no error and no log. That would land in the
+> `.otherwise()` branch of `find-documents.ts:340` and allow `EVERYONE` only.
 >
-> 1. `find-documents.ts:340` maps team role to visible levels. ADMIN gets all
->    three; the trailing `.otherwise()` gets `[EVERYONE]` only.
-> 2. That role is `getTeamById(...).currentTeamRole`, derived — not stored —
->    via `TeamGroup → OrganisationGroup → OrganisationGroupMember →
->    OrganisationMember → userId` (`get-team.ts:47`).
-> 3. `utils/teams.ts:76` `getHighestTeamRoleInGroup` seeds its accumulator with
->    `LOWEST_TEAM_ROLE` and returns it untouched when `groups` is empty. An
->    empty group list is therefore indistinguishable from "this user is a
->    MEMBER" — **no error, no log**.
+> Plausible, and wrong. Querying the database directly after a failing run,
+> for the team the test actually used (`Envelope.title='Admin Doc 1'` — NOT the
+> newest team, since `seedUser()` creates a personal team as a side effect):
 >
-> Empty groups → MEMBER → `EVERYONE` only → 2 of 6.
+> ```
+> admin-token          -> userId 43
+> userId 43 resolves   -> ADMIN,MEMBER      (highest = ADMIN, correct)
+> all 6 envelopes      -> COMPLETED, correct visibility, deletedAt NULL,
+>                         type DOCUMENT, no folder, teamId correct
+> ```
+>
+> The group chain is intact, the role resolves to ADMIN, and every document is
+> queryable. An ADMIN should therefore see all 6. **Why the API returned 2 is
+> still unexplained** — but it is not this.
+>
+> **The silent fallback in `getHighestTeamRoleInGroup` remains worth fixing on
+> its own merits** — treating "no groups found" as "lowest role" turns any
+> future glitch in group resolution into a silently wrong document set, which
+> in a signing platform is a permissions answer given with no signal. It is
+> upstream code and would need its own overlay. It is simply not the cause of
+> THIS failure.
 >
 > **What was ruled out, and how:**
 >
@@ -141,7 +158,8 @@ API-test project. Optional future hardening: a bounded retry on
 >   --workers=1 --repeat-each=20 --retries=0
 > ```
 >
-> **STILL OPEN — the honest gap.** This does not explain why CI mostly passes.
+> **STILL OPEN.** Two gaps, not one. (a) What actually makes the API return 2
+> of 6 when the role and the data are both correct. (b) Why CI mostly passes.
 > A real CI run of PR #93 passed *on this same box* while the manual invocation
 > fails 19 times in 20. Something differs between the two — most likely
 > environment the job provides that the manual harness does not. Until that is
