@@ -1,3 +1,4 @@
+import { normaliseJurisdiction } from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
 import { FL_LIBRARY } from '@bizrethink/customizations/lease/clauses/us-fl';
 import { selectClauses } from '@bizrethink/customizations/lease/engine/select-clauses';
 import { clauseIndexForFields } from '@bizrethink/customizations/lease/interview/clause-for-field';
@@ -6,7 +7,7 @@ import {
   outstandingDelegations,
 } from '@bizrethink/customizations/lease/interview/describe-missing';
 import type { InterviewAnswers } from '@bizrethink/customizations/lease/interview/steps';
-import { FL_INTERVIEW, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
+import { interviewFor, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
 import { delegableFieldNames } from '@bizrethink/customizations/lease/interview/tenant-answers';
 import type { LeasePartyInput } from '@bizrethink/customizations/lease/parties/derive-parties';
 import type { UtilityRow } from '@bizrethink/customizations/lease/utilities/derive-utilities';
@@ -78,7 +79,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   */
   const property = await prisma.bizrethinkProperty.findUnique({
     where: { id: matter.propertyId },
-    select: { utilities: true },
+    select: { utilities: true, state: true },
   });
 
   return {
@@ -92,6 +93,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       // Needed by the association-documents step: uploads hang off the
       // PROPERTY, not this lease, so next year's lease already has them.
       propertyId: matter.propertyId,
+      /*
+        WHOSE LAW THE INTERVIEW ASKS UNDER. Lives on the property, not the
+        matter, so it has to be carried explicitly. Florida asks the tenant to
+        elect under §83.595(4) and North Carolina has no such provision, so a
+        question asked of the wrong state stores an answer that renders into a
+        clause with no statute behind it.
+      */
+      propertyState: property?.state ?? null,
       currentStepId: matter.currentStepId,
       facts: matter.facts as Record<string, FieldValue>,
       money: matter.money as Record<string, unknown>,
@@ -173,16 +182,32 @@ export default function LeaseInterviewPage() {
   */
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  /*
+    THE INTERVIEW FOLLOWS THE PROPERTY.
+
+    Florida asks the tenant to elect under §83.595(4); North Carolina has no
+    such provision. Asking the wrong state's question stores an answer that
+    renders into a clause with no statute behind it — a term invented by a form.
+
+    Falls back to Florida because it is the only state with clauses of its own
+    today. That fallback stops being harmless the moment a second state has
+    any, which is exactly why the state is threaded now rather than then.
+  */
+  const interview = useMemo(
+    () => interviewFor(normaliseJurisdiction(matter.propertyState ?? null) ?? 'US-FL'),
+    [matter.propertyState],
+  );
+
   // Which fields may be put to the tenant at all. Server-side this is
   // recomputed from the same definitions, so the UI cannot widen it.
-  const delegable = useMemo(() => new Set(delegableFieldNames(FL_INTERVIEW)), []);
+  const delegable = useMemo(() => new Set(delegableFieldNames(interview)), [interview]);
 
   const answers = useMemo(
     () => ({ facts, money, values, customClauses, parties, yardTasks }) as unknown as InterviewAnswers,
     [facts, money, values, customClauses, parties, yardTasks],
   );
 
-  const steps = useMemo(() => visibleSteps(FL_INTERVIEW, answers), [answers]);
+  const steps = useMemo(() => visibleSteps(interview, answers), [interview, answers]);
 
   const [stepIndex, setStepIndex] = useState(() => {
     const saved = steps.findIndex((s) => s.id === matter.currentStepId);
