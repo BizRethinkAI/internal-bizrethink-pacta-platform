@@ -887,17 +887,20 @@ const toBuffer = async (doc: ReturnType<typeof h>): Promise<Buffer> => {
 export type BuildClauseTextOptions = {
   clauses: SelectedClause[] | Clause[];
   values: Record<string, InterpolationValue>;
+  /** Names handed to the tenant; unanswered, these read as a blank not a token. */
+  delegated?: string[];
 };
 
 /** Interpolate a set of clauses, collecting every unfilled variable. */
 export const buildClauseText = ({
   clauses,
   values,
+  delegated,
 }: BuildClauseTextOptions): { rendered: RenderedClause[]; missing: string[] } => {
   const missing: string[] = [];
 
   const rendered = clauses.map((clause) => {
-    const result = interpolateClause({ body: clause.body, variables: clause.variables, values });
+    const result = interpolateClause({ body: clause.body, variables: clause.variables, values, delegated });
 
     missing.push(...result.missing.map((name) => `${clause.slug}: ${name}`));
 

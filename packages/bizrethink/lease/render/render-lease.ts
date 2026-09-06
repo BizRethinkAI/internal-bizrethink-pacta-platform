@@ -41,6 +41,14 @@ export type RenderLeaseInput = {
    * there is a second state to get wrong.
    */
   jurisdiction?: ClauseJurisdiction;
+  /**
+   * Variables the landlord delegated to the tenant.
+   *
+   * They still count as missing — the send gate does not move — but they render
+   * as a named blank rather than a raw token, because the tenant is who reads
+   * the PDF and is the person being asked.
+   */
+  delegated?: string[];
 };
 
 export type RenderedDocument = {
@@ -169,7 +177,7 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
 
   const missing: string[] = [];
 
-  const body = buildClauseText({ clauses: selection.selected, values: allValues });
+  const body = buildClauseText({ clauses: selection.selected, values: allValues, delegated: input.delegated });
 
   missing.push(...body.missing);
 
@@ -196,7 +204,7 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
     may not be folded into the lease.
   */
   for (const addendum of selection.addenda) {
-    const rendered = buildClauseText({ clauses: [addendum], values: allValues });
+    const rendered = buildClauseText({ clauses: [addendum], values: allValues, delegated: input.delegated });
 
     missing.push(...rendered.missing);
 
@@ -216,7 +224,7 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
   }
 
   for (const disclosure of selection.standaloneDisclosures) {
-    const rendered = buildClauseText({ clauses: [disclosure], values: allValues });
+    const rendered = buildClauseText({ clauses: [disclosure], values: allValues, delegated: input.delegated });
 
     missing.push(...rendered.missing);
 

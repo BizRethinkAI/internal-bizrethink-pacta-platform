@@ -23,6 +23,16 @@ export type InterpolateClauseOptions = {
   body: string;
   variables: ClauseVariable[];
   values: Record<string, InterpolationValue>;
+  /**
+   * Names the landlord handed to the tenant to answer.
+   *
+   * The rule above holds for everything the landlord can answer themselves. It
+   * inverts for these: the landlord is never going to fill one in, and the
+   * tenant is exactly who reads the PDF. `{{permittedPets}}` in the Pet
+   * Addendum of a document sent to the person being asked about their pets
+   * reads as a broken template, not a question.
+   */
+  delegated?: string[];
 };
 
 export type InterpolationResult = {
@@ -78,7 +88,21 @@ const format = (value: InterpolationValue, type: ClauseVariable['type']): string
  */
 const isMissing = (value: InterpolationValue): boolean => value === undefined || value === null || value === '';
 
-export const interpolateClause = ({ body, variables, values }: InterpolateClauseOptions): InterpolationResult => {
+/**
+ * What an unanswered delegated field reads as.
+ *
+ * Bracketed and named, so it is legible as a blank awaiting an answer and
+ * cannot be mistaken for a term of the lease.
+ */
+const DELEGATED_PLACEHOLDER = '[to be completed by Tenant]';
+
+export const interpolateClause = ({
+  body,
+  variables,
+  values,
+  delegated = [],
+}: InterpolateClauseOptions): InterpolationResult => {
+  const delegatedNames = new Set(delegated);
   const missing: string[] = [];
   let text = body;
 
@@ -90,7 +114,17 @@ export const interpolateClause = ({ body, variables, values }: InterpolateClause
         missing.push(variable.name);
       }
 
-      // Leave the token in place either way.
+      /*
+        Still missing, still refused at the send gate — only the rendering
+        changes. Making it legible must not make the lease look answerable.
+      */
+      if (delegatedNames.has(variable.name)) {
+        text = text.split(`{{${variable.name}}}`).join(DELEGATED_PLACEHOLDER);
+        continue;
+      }
+
+      // Otherwise the token stays: the landlord can answer it, and a raw token
+      // is the signal that they have not.
       continue;
     }
 

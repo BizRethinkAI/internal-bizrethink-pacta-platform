@@ -51,6 +51,8 @@ export type StoredMatter = {
    */
   propertyState?: unknown;
   propertyUtilities?: unknown;
+  /** Variables the landlord handed to the tenant to answer. */
+  delegatedFields?: unknown;
   /**
    * The PROPERTY's uploaded documents, passed in by the caller.
    *
@@ -207,5 +209,11 @@ export const renderInputForMatter = (matter: StoredMatter): RenderLeaseInput => 
       any, which is why the state is threaded now rather than then.
     */
     jurisdiction: normaliseJurisdiction(matter.propertyState as string | null) ?? 'US-FL',
+    /*
+      Carried through so an unanswered delegated variable renders as a named
+      blank rather than a raw token. The tenant is who downloads this PDF, and
+      they are the person being asked.
+    */
+    delegated: (matter.delegatedFields ?? []) as string[],
   };
 };
