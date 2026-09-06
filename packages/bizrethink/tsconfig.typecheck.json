@@ -3,9 +3,7 @@
   "extends": "../tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "jsx": "react-jsx",
     "module": "esnext",
     "moduleResolution": "bundler",
