@@ -1802,6 +1802,117 @@ export const leaseBuilderRouter = router({
       };
     }),
 
+    /**
+     * An attorney records a finding against one clause.
+     *
+     * UNAUTHENTICATED, like the tenant's comment route, because the whole point
+     * of a review link is that counsel needs no account. Attribution comes from
+     * the review row rather than from anything the caller sends: a caller who
+     * could name themselves could name somebody else.
+     *
+     * A finding is not a comment. A tenant's comment is a negotiating position
+     * and does not block. This is a defect report against text we are asserting
+     * is lawful, so it blocks the clause until answered.
+     */
+    recordFinding: procedure
+      .input(
+        z.object({
+          token: z.string(),
+          clauseSlug: z.string(),
+          body: z.string().trim().min(1),
+        }),
+      )
+      .mutation(async ({ input }) => {
+        const share = await prisma.bizrethinkLibraryReview.findUnique({
+          where: { token: input.token },
+          select: { id: true, status: true, expiresAt: true, reviewerName: true, reviewerEmail: true },
+        });
+
+        const usable =
+          share !== null &&
+          share.status === 'open' &&
+          (share.expiresAt === null || share.expiresAt.getTime() > Date.now());
+
+        if (!share || !usable) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+        }
+
+        /*
+          The slug has to be a clause that exists. Without this the table
+          accepts findings against anything, and a typo becomes a blocker
+          nobody can clear because no clause page will ever show it.
+        */
+        const clause = FL_LIBRARY.find((entry) => entry.slug === input.clauseSlug);
+
+        if (!clause) {
+          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'No such clause.' });
+        }
+
+        return await prisma.bizrethinkLibraryFinding.create({
+          data: {
+            id: prefixedId('lease_finding', 16),
+            reviewId: share.id,
+            clauseSlug: clause.slug,
+            body: input.body,
+            // From the review row, never from the caller.
+            authorName: share.reviewerName,
+            authorEmail: share.reviewerEmail,
+            // What they were looking at. An answer to a finding against text
+            // that has since moved is answering a different question.
+            clauseFingerprint: clauseFingerprint(clause),
+          },
+          select: { id: true, clauseSlug: true, body: true, authorName: true, createdAt: true },
+        });
+      }),
+
+    /**
+     * Staff answer a finding. Both halves required — a timestamp with no text
+     * would make this as fast to bypass as to satisfy.
+     */
+    answerFinding: authenticatedProcedure
+      .input(
+        z.object({
+          organisationId: z.string(),
+          findingId: z.string(),
+          answer: z.string().trim().min(1),
+        }),
+      )
+      .mutation(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        return await prisma.bizrethinkLibraryFinding.update({
+          where: { id: input.findingId },
+          data: {
+            answer: input.answer,
+            answeredAt: new Date(),
+            answeredByUserId: ctx.user.id,
+          },
+          select: { id: true, answeredAt: true },
+        });
+      }),
+
+    /** Every finding on the library, newest first, for the staff page. */
+    listFindings: authenticatedProcedure
+      .input(z.object({ organisationId: z.string() }))
+      .query(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
+
+        return await prisma.bizrethinkLibraryFinding.findMany({
+          where: { review: { organisationId: input.organisationId } },
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            clauseSlug: true,
+            body: true,
+            authorName: true,
+            clauseFingerprint: true,
+            answeredAt: true,
+            answer: true,
+            createdAt: true,
+          },
+        });
+      }),
+
     approve: authenticatedProcedure
       .input(
         z.object({
