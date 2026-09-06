@@ -3,20 +3,21 @@
 Primary text, committed so that a check can be run without a network and so
 that the words a spec was transcribed from cannot change underneath it.
 
-## Two extractions of the Virginia form
+## Two extractions each of the Virginia and Connecticut forms
 
-`VA-Disclosure-Form.txt` is a reading-order `pdftotext` dump.
-`VA-Disclosure-Form.layout.txt` is the same PDF with `-layout`.
+`VA-Disclosure-Form.txt` and `CT-DOB-Guidance.txt` are reading-order `pdftotext`
+dumps. The `.layout.txt` files beside them are the same PDFs with `-layout`.
 
 Both are kept because they fail in opposite directions, and the checker reads
 the first for a reason worth writing down.
 
-Virginia's form is a two-column grid. Under `-layout`, a label that wraps inside
-its cell has the *neighbouring column* interleaved between its lines, so
-"Payment Schedule" comes out as `Payment ☐ Amount of each fixed payment: $
-Schedule ☐ Frequency of fixed payments:`. Collapse the whitespace and the label
-is not there as a contiguous string — the checker reported it missing from a
-form that prints it plainly.
+Both forms are two-column grids. Under `-layout`, a label that wraps inside its
+cell has the *neighbouring column* interleaved between its lines, so "Payment
+Schedule" comes out as `Payment ☐ Amount of each fixed payment: $ Schedule ☐
+Frequency of fixed payments:`. Collapse the whitespace and the label is not
+there as a contiguous string — the checker reported it missing from a form that
+prints it plainly. Connecticut's Appendix A failed the same way on four labels,
+including "Total Amount of the Commercial Financing".
 
 The reading-order dump keeps multi-line labels together and loses the column
 structure instead. Since `checkAgainstSource` asks "do these words appear", that

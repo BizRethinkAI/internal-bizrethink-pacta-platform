@@ -6,11 +6,13 @@ import { GA_DISCLOSURE } from '../content/statutes/ga';
 import { KS_DISCLOSURE } from '../content/statutes/ks';
 import { LA_DISCLOSURE } from '../content/statutes/la';
 import { MO_DISCLOSURE } from '../content/statutes/mo';
+import { TX_DISCLOSURE } from '../content/statutes/tx';
 import { UT_DISCLOSURE } from '../content/statutes/ut';
 import ga from './ga-rows.fixture.json';
 import ks from './ks-rows.fixture.json';
 import la from './la-rows.fixture.json';
 import mo from './mo-rows.fixture.json';
+import tx from './tx-rows.fixture.json';
 import ut from './ut-rows.fixture.json';
 
 const CASES = [
@@ -19,6 +21,7 @@ const CASES = [
   { statute: UT_DISCLOSURE, rendered: ut },
   { statute: LA_DISCLOSURE, rendered: la },
   { statute: GA_DISCLOSURE, rendered: ga },
+  { statute: TX_DISCLOSURE, rendered: tx },
 ];
 
 describe.each(CASES)('$statute.citation', ({ statute, rendered }) => {

@@ -98,3 +98,45 @@ in a row, not that a required sentence is present. This checker tests
 authorisation, never completeness — it can tell you that you said something you
 may not say, and cannot tell you that you failed to say something you must.
 Completeness needs the transaction's facts, which this package does not have.
+
+
+## Coverage
+
+All eleven states Lombard sends to are encoded, and every shipped form conforms.
+Three kinds of prescription, which is the reason there are two checkers rather
+than one:
+
+| | states | what the statute fixes | what is checked |
+|---|---|---|---|
+| Prescribed sentences | CA, NY | rows, labels AND exact words, closed with "shall include only" | every word, and that nothing else is present |
+| Prescribed form | CT, VA | labels and their order; the answers are ours | every label, spelled and ordered as prescribed |
+| Content only | FL, GA, KS, LA, MO, TX, UT | the information required; wording is ours | that every required item has a home, and the evidence for it is present |
+
+Kansas and Missouri sit across the line: content-only acts that nevertheless
+dictate every label.
+
+## What this cannot tell you
+
+**Completeness, on the prescribed-sentence states.** The checker knows a
+sentence is authorised in a row; it cannot know that a conditionally required
+sentence is missing, because that turns on facts about the transaction this
+package does not have.
+
+**Anything in a row that prescribes "a short explanation".** Five of New York's
+eleven rows and four of California's ten do. `coverage()` returns the number and
+the tests assert it, so a green suite cannot be read as a clean form.
+
+**Whether the evidence actually says the right thing.** For the content states
+the check is that a required item has a home and that the words pinned as
+evidence are in it. That a row *addresses* the requirement is a human judgement,
+recorded in the spec's `requires` field so a reviewer can see what was claimed.
+
+**Two Connecticut obligations that are not about the form at all.** §36a-868
+bars prejudgment-remedy waivers in the contract; §36a-869 makes a specific offer
+irrevocable until midnight of the third calendar day. The second is a sending
+rule, and nothing here enforces it.
+
+**Two states where we hold the form but not the statute.** Connecticut (guidance
+plus Appendix A, not the General Statutes) and Virginia (the form, not the
+Code). Their forms can be checked; the prohibitions, registration duties and
+penalties around them cannot.

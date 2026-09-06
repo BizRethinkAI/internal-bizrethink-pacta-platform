@@ -1,9 +1,7 @@
-               Department of Banking Issues Guidance Regarding Public Act 23-201
-
-                                                  June 10, 2024
-                                             (updated August 1, 2024)
-
-       The Department of Banking (“Department”) issues this guidance, pursuant to the authority set forth
+Department of Banking Issues Guidance Regarding Public Act 23-201
+June 10, 2024
+(updated August 1, 2024)
+The Department of Banking (“Department”) issues this guidance, pursuant to the authority set forth
 in Section 36a-1-8 of the Regulations of Connecticut State Agencies, concerning P.A. 23-201, An Act
 Requiring Certain Financing Disclosures (“Act”), subsequently codified at Sections 36a-861 to 36a-872,
 inclusive, of the 2024 Supplement to the General Statutes, to set forth expectations concerning disclosures
@@ -13,41 +11,34 @@ registration of commercial financing brokers and providers no later than October
 Section 36a-870 of the 2024 Supplement to the General Statutes. Additional information regarding the
 registration process of such brokers and providers will soon be made available on the Department’s
 website and the NMLS Resource Center available here.
-
-                                          Disclosure Requirements of the Act
-
-      Section 3 of the Act, codified at Section 36a-863 of the 2024 Supplement to the General Statutes
+Disclosure Requirements of the Act
+Section 3 of the Act, codified at Section 36a-863 of the 2024 Supplement to the General Statutes
 requires that effective July 1, 2024, a provider shall provide to a recipient, when the provider extends a
 specific offer for sales-based financing, disclosures in a format prescribed by the Banking
 Commissioner. The required format of such disclosures is attached hereto as Appendix A∗ to this
 Guidance.
-
-      At this time, the Department has not determined that the laws of any other state require
+At this time, the Department has not determined that the laws of any other state require
 commercial financing disclosures that meet or exceed Connecticut’s commercial financing disclosure
 requirements, such that another state’s approved form may be used to comply with Connecticut’s
 disclosure requirements. Considering the limited amount of time available for providers to come into
 compliance with the disclosure requirements of the Act and Appendix A*, the Department is hereby
 issuing the no-action position set forth below.
-
-                                                No-Action Position
-
-      Pursuant to Section 36a-1-8 of the Regulations of Connecticut State Agencies, the Commissioner
+No-Action Position
+Pursuant to Section 36a-1-8 of the Regulations of Connecticut State Agencies, the Commissioner
 will not take enforcement action for a provider’s failure to provide the disclosures required by Sections
 36a-863 and 36a-864 of the 2024 Supplement to the General Statutes, or obtain the recipient’s signature
 on disclosures, as required by Section 36a-865 of the 2024 Supplement to the General Statutes, for
 specific offers of commercial sales-based financing issued from July 1 to September 30, 2024.
 
+∗
 
+Revised August 1, 2024.
+TEL: (860) 240-8299  FAX: (860) 240-8178
+Website: http://www.ct.gov/dob
+An Affirmative Action/Equal Opportunity Employer
 
-      ∗
-          Revised August 1, 2024.
-
-                                      TEL: (860) 240-8299  FAX: (860) 240-8178
-                                             Website: http://www.ct.gov/dob
-                                    An Affirmative Action/Equal Opportunity Employer
-                           Sections 8 and 9 of the Act, effective July 1, 2024
-
-      Please be advised that this no-action position does not apply to Section 8 of the Act (prohibition
+Sections 8 and 9 of the Act, effective July 1, 2024
+Please be advised that this no-action position does not apply to Section 8 of the Act (prohibition
 against prejudgment remedy due process waivers) and Section 9 of the Act (mandating three-day review
 period for specific offers), effective July 1, 2024. Sections 8 and 9 of the Act, codified at Sections
 36a-868 and 36a-869 of the 2024 Supplement to the General Statutes, respectively, provide commercial
@@ -60,115 +51,148 @@ order under chapter 903a of the general statutes in connection with a prejudgmen
 July 1, 2024, from being revoked, withdrawn or modified until midnight of the third calendar day after the
 date of the specific offer and sets forth circumstances upon which the offer may be revoked, withdrawn or
 modified.
-
-     Should you have any questions concerning this guidance or the Act’s requirements, please contact
+Should you have any questions concerning this guidance or the Act’s requirements, please contact
 Anne Cappelli at anne.cappelli@ct.gov.
 
+-2-
 
-
-
-                                                   -2-
 Rev. 8/1/2024
-                                COMMERCIAL (SALES-BASED) FINANCING DISCLOSURE FORM
-                                    (pursuant to Part XVI of Chapter 669 of the 2024 Supplement to the General Statutes)
 
-                Total Amount of the                             $                     Disclosure Date:
-                Commercial Financing
-                                                                                      Recipient’s Name:
-                Finance Charges Deducted or                     $
-                Withheld at Disbursement                                              Recipient’s Address:
-                Disbursement Amount                             $
-                [Amount Paid to Recipient or on the
-                Recipient’s Behalf, Excluding Finance                                 Provider’s Name:
-                Charges Deducted or Withheld at
-                Disbursement]                                                         Provider’s Address:
-                Finance Charge                                  $
-                Total Repayment Amount                 $
-                [Disbursement Amount plus (+) Finance
-                Charge]                                                               Provider’s Phone Number:
-                Estimated Time Period Required for the
-                                                                                      Provider’s E-mail Address:
-                Periodic Payments to Equal the Total
-                Repayment Amount
+COMMERCIAL (SALES-BASED) FINANCING DISCLOSURE FORM
+(pursuant to Part XVI of Chapter 669 of the 2024 Supplement to the General Statutes)
 
+Total Amount of the
+Commercial Financing
 
+$
 
+Finance Charges Deducted or
+Withheld at Disbursement
 
-                Payment Schedule
-                For Fixed Payment Amounts:
-                ☐ Amount of each fixed payment: $
-                ☐ Frequency of fixed payments:
-                For Variable Payment Amounts:
-                ☐ Variable payment schedule or
-                ☐ Description of the method used to calculate the amounts, frequency of payments and the amount of the
-                average projected payments per month:
-                                                                                                           ☐ SEE PAGE 2
-                Description of All Other Potential Fees
-                and Charges NOT Included in the
-                Finance Charge (including draw fees,
-                late payment fees, and returned payment
-                fees)                                                                                      ☐ SEE PAGE 2
-                Description of Collateral Requirements
-                or Security Interests
+$
 
-                                                                                                                     ☐ SEE PAGE 2
-                Broker Compensation                             Is Provider paying               If Yes, amount of
-                (Paid from Financed Amount)                     compensation                     compensation being paid
-                                                                directly to a broker?            directly to broker:
-                                                                     ☐ Yes ☐ No                  $
-                Finance Charges or Fees upon
-                Prepayment or Refinance (including
-                the percentage of any unpaid portion
-                of the finance charge and the                                                                              ☐ SEE PAGE 2
-                maximum dollar amount of finance
-                charge)
+Disbursement Amount
+[Amount Paid to Recipient or on the
+Recipient’s Behalf, Excluding Finance
+Charges Deducted or Withheld at
+Disbursement]
+Finance Charge
 
+$
 
-                                         Initials                                                                   Date
+Disclosure Date:
+Recipient’s Name:
+Recipient’s Address:
+
+Provider’s Name:
+$
+
+Total Repayment Amount
+$
+[Disbursement Amount plus (+) Finance
+Charge]
+Estimated Time Period Required for the
+Periodic Payments to Equal the Total
+Repayment Amount
+
+Provider’s Address:
+
+Provider’s Phone Number:
+Provider’s E-mail Address:
+
+Payment Schedule
+For Fixed Payment Amounts:
+☐ Amount of each fixed payment: $
+☐ Frequency of fixed payments:
+For Variable Payment Amounts:
+☐ Variable payment schedule or
+☐ Description of the method used to calculate the amounts, frequency of payments and the amount of the
+average projected payments per month:
+☐ SEE PAGE 2
+Description of All Other Potential Fees
+and Charges NOT Included in the
+Finance Charge (including draw fees,
+late payment fees, and returned payment
+fees)
+☐ SEE PAGE 2
+Description of Collateral Requirements
+or Security Interests
+Broker Compensation
+(Paid from Financed Amount)
+Finance Charges or Fees upon
+Prepayment or Refinance (including
+the percentage of any unpaid portion
+of the finance charge and the
+maximum dollar amount of finance
+charge)
+Initials
+
+Is Provider paying
+compensation
+directly to a broker?
+☐ Yes ☐ No
+
+☐ SEE PAGE 2
+If Yes, amount of
+compensation being paid
+directly to broker:
+$
+
+☐ SEE PAGE 2
+
+Date
+
 Rev. 8/1/2024
-                        COMMERCIAL (SALES-BASED) FINANCING DISCLOSURE FORM - PAGE 2
-                                  (pursuant to Part XVI of Chapter 669 of the 2024 Supplement to the General Statutes)
 
-           Recipient’s Name:                                                 Disclosure Date:
+COMMERCIAL (SALES-BASED) FINANCING DISCLOSURE FORM - PAGE 2
+(pursuant to Part XVI of Chapter 669 of the 2024 Supplement to the General Statutes)
 
-           Recipient’s Address:                                              Provider’s Name:
+Recipient’s Name:
 
+Disclosure Date:
 
-           The information provided below relates to the following checked item(s):
-                ☐ Variable payment schedule
-                ☐ Description of the method used to calculate the amounts, frequency of payments and the amount of the
-                  average projected payments per month
-                ☐ Description of all other potential fees and charges not included in the finance charge
-                ☐ Description of collateral requirements or security interests
-                ☐ Description of finance charges or fees upon prepayment or refinance
+Recipient’s Address:
 
+Provider’s Name:
 
+The information provided below relates to the following checked item(s):
+☐ Variable payment schedule
+☐ Description of the method used to calculate the amounts, frequency of payments and the amount of the
+average projected payments per month
+☐ Description of all other potential fees and charges not included in the finance charge
+☐ Description of collateral requirements or security interests
+☐ Description of finance charges or fees upon prepayment or refinance
 
+If a renewal financing transaction:
+Reduction in Disbursement Amount to Pay
+Outstanding Balance of Existing Commercial
+Financing
+Total Amount from New Financing Used to
+Payoff Prepayment Charges & Unpaid Interest
+on Existing Commercial Financing
+• Prepayment Charges Payable to
+Provider
+• Unpaid Interest Payable to Provider Not
+Forgiven at the Time of Renewal
 
-          If a renewal financing transaction:
-           Reduction in Disbursement Amount to Pay                $
-           Outstanding Balance of Existing Commercial
-           Financing
-           Total Amount from New Financing Used to                $
-           Payoff Prepayment Charges & Unpaid Interest
-           on Existing Commercial Financing
-               • Prepayment Charges Payable to                    $
-                  Provider
-              • Unpaid Interest Payable to Provider Not           $
-                  Forgiven at the Time of Renewal
-          Connecticut law prohibits commercial financing contracts from having any provision waiving a recipient’s right to
-          notice, judicial hearing, or prior court order under Chapter 903a in connection with the provider obtaining a
-          prejudgment remedy, upon commencing any litigation against the recipient.
-          Provider will not revoke, withdraw, or modify a specific offer for commercial financing until midnight of the third
-          calendar day after the date of this offer. A specific offer may be revoked, withdrawn or modified: (1) based on
-          information obtained in the underwriting process, including, but not limited to, verification of any information
-          provided by the recipient, or (2) at the request of the recipient.
-          This specific offer for commercial financing is (1) based on the provider’s preliminary review of application
-          information only and (2) not a final approval or commitment to provide commercial financing.
+$
 
-          Acknowledgement: I/We acknowledge that I/we have received this Commercial Financing Disclosure Form.
+$
 
-          Signature of Recipient: _________________________________
+$
+$
 
-          Date: _________________________
+Connecticut law prohibits commercial financing contracts from having any provision waiving a recipient’s right to
+notice, judicial hearing, or prior court order under Chapter 903a in connection with the provider obtaining a
+prejudgment remedy, upon commencing any litigation against the recipient.
+Provider will not revoke, withdraw, or modify a specific offer for commercial financing until midnight of the third
+calendar day after the date of this offer. A specific offer may be revoked, withdrawn or modified: (1) based on
+information obtained in the underwriting process, including, but not limited to, verification of any information
+provided by the recipient, or (2) at the request of the recipient.
+This specific offer for commercial financing is (1) based on the provider’s preliminary review of application
+information only and (2) not a final approval or commitment to provide commercial financing.
+Acknowledgement: I/We acknowledge that I/we have received this Commercial Financing Disclosure Form.
+Signature of Recipient: _________________________________
+Date: _________________________
+
 
