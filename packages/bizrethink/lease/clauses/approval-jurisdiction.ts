@@ -36,7 +36,15 @@ const ADMISSIONS: Record<string, ClauseJurisdiction> = {
   'north carolina': 'US-NC',
 };
 
-export const normaliseBarJurisdiction = (input: string | null): ClauseJurisdiction | null => {
+/**
+ * Turn what a human wrote into a jurisdiction the library recognises.
+ *
+ * Serves two callers with the same problem. A landlord types an attorney's
+ * admission on their behalf — "FL", "Florida", "us-fl". A property row stores a
+ * two-letter state. Both have to equal a clause's own `jurisdiction` exactly or
+ * the comparison silently never fires.
+ */
+export const normaliseJurisdiction = (input: string | null): ClauseJurisdiction | null => {
   if (input === null) {
     return null;
   }

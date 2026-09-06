@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { lookupAddress } from '../../lease/address/census';
 import { clauseFingerprint, isApprovalCurrent, libraryFingerprint } from '../../lease/clauses/approval';
-import { admissionBlocks, normaliseBarJurisdiction } from '../../lease/clauses/approval-jurisdiction';
+import { admissionBlocks, normaliseJurisdiction } from '../../lease/clauses/approval-jurisdiction';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { whyThisClause } from '../../lease/clauses/why-this-clause';
@@ -1844,7 +1844,7 @@ export const leaseBuilderRouter = router({
           than about the moment: reloading the page will not fix it, so saying
           so first is the more useful order.
         */
-        const admission = normaliseBarJurisdiction(input.barJurisdiction);
+        const admission = normaliseJurisdiction(input.barJurisdiction);
         const blocked = admissionBlocks(clause.jurisdiction, admission);
 
         if (blocked !== null) {

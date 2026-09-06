@@ -1,7 +1,8 @@
+import type { ClauseJurisdiction } from '../clauses/approval-jurisdiction';
 import type { CustomClauseInput } from '../clauses/custom';
 import { toCustomClause } from '../clauses/custom';
+import { libraryFor } from '../clauses/library';
 import type { ClauseFacts } from '../clauses/types';
-import { FL_LIBRARY } from '../clauses/us-fl';
 import { selectClauses } from '../engine/select-clauses';
 import { deriveMoney } from '../money/derive';
 import type { MoneyAnswers } from '../money/types';
@@ -32,6 +33,14 @@ export type RenderLeaseInput = {
    * by exactly the same code as everything else.
    */
   customClauses?: CustomClauseInput[];
+  /**
+   * Whose law this lease is drafted to.
+   *
+   * Derived from the property's state. Optional only so existing callers keep
+   * working while the second state is built; every caller should pass it once
+   * there is a second state to get wrong.
+   */
+  jurisdiction?: ClauseJurisdiction;
   /**
    * Variables the landlord delegated to the tenant.
    *
@@ -123,7 +132,16 @@ const shortAddress = (propertyAddress: string): string => propertyAddress.split(
 export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: LeaseDocumentSpec[]; missing: string[] } => {
   const { facts, money, values, propertyAddress, customClauses = [] } = input;
 
-  const library = [...FL_LIBRARY, ...customClauses.map((clause, index) => toCustomClause(clause, index))];
+  /*
+    The clauses that apply where the property IS, not every clause that exists.
+    Defaults to Florida because that is the only state with clauses of its own
+    today; the moment a second one has any, a lease must not be able to reach
+    them by accident.
+  */
+  const library = [
+    ...libraryFor(input.jurisdiction ?? 'US-FL'),
+    ...customClauses.map((clause, index) => toCustomClause(clause, index)),
+  ];
 
   const selection = selectClauses({ facts, library });
   const derived = deriveMoney(money);
