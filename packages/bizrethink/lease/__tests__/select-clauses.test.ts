@@ -22,6 +22,7 @@ const NEW_TENANCY: ClauseFacts = {
   petsPermitted: true,
   hasNamedOccupants: false,
   hasHoa: true,
+  hasCdd: false,
   // Derived in hydrateMatter; stated here because these fixtures drive clause
   // selection directly rather than going through it.
   hasPetFees: false,

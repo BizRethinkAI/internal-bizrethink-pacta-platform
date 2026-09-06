@@ -40,6 +40,9 @@ const PINNED: Record<string, string> = {
   'deposit.advance-rent-carried': 'US-FL',
   'deposit.return': 'US-FL',
   'hoa.compliance': 'generic',
+  // Ch. 190 Fla. Stat. — a Florida creature. A second state gets its own
+  // clause rather than a widened version of this one.
+  'cdd.assessments': 'US-FL',
   'hoa.lease-requirements': 'generic',
   'hoa.amenity-access': 'generic',
   'hoa.governing-documents-receipt': 'generic',
@@ -135,7 +138,7 @@ describe('the library knows whose law each clause is', () => {
     expect({ generic: by('generic'), US: by('US'), 'US-FL': by('US-FL') }).toEqual({
       generic: 35,
       US: 1,
-      'US-FL': 27,
+      'US-FL': 28,
     });
   });
 });

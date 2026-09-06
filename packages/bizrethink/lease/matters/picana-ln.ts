@@ -63,6 +63,14 @@ export const PICANA_FACTS: ClauseFacts = {
   // the `use.occupancy-limit-with-others` variant.
   hasNamedOccupants: true,
   hasHoa: true,
+  /*
+    Estancia at Wiregrass has a community development district — its
+    "Suspension and Termination of Access Rule" is issued by the Estancia at
+    Wiregrass Community Development District and sits in the governing-document
+    set the tenant signs a receipt for. The tenant asked whether there were CDD
+    fees; there are, and the lease now says who pays them.
+  */
+  hasCdd: true,
   // Derived in hydrateMatter; stated here because these fixtures drive clause
   // selection directly rather than going through it.
   hasPetFees: false,
@@ -170,6 +178,12 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   // The association charges to register a tenant and issue access cards.
   // Silence here is an argument during move-in week.
   amenityFeesPaidBy: 'Landlord',
+  // An owner's obligation under the declaration. The clause used to imply
+  // otherwise by binding the tenant to "all of the obligations of the Owner".
+  assessmentsPaidBy: 'Landlord',
+  cddName: 'the Estancia at Wiregrass Community Development District',
+  // Collected on the annual property tax bill, so the owner's.
+  cddAssessmentsPaidBy: 'Landlord',
   // Read off THIS association's declaration. Another community requires
   // something else, which is exactly why it is an answer and not a clause.
   hoaLeaseRequirements:
