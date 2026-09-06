@@ -132,15 +132,11 @@ export const assertPublishable = (clause: HasProvenance): string[] => {
 
   if (clause.source.kind === 'regulator-prescribed-form') {
     if (clause.source.verbatimVerifiedAt === null) {
-      problems.push(
-        `${clause.slug}: regulator-prescribed text published without a verification date`,
-      );
+      problems.push(`${clause.slug}: regulator-prescribed text published without a verification date`);
     }
 
     if (clause.source.structureVerifiedAt === null) {
-      problems.push(
-        `${clause.slug}: regulator-prescribed form published without a structure verification date`,
-      );
+      problems.push(`${clause.slug}: regulator-prescribed form published without a structure verification date`);
     }
   }
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { assertPublishable } from './types';
 import type { ClauseSource, HasProvenance } from './types';
+import { assertPublishable } from './types';
 
 const thing = (source: ClauseSource, status: HasProvenance['status'] = 'published'): HasProvenance => ({
   slug: 'ca-offer-summary',
@@ -42,9 +42,7 @@ describe('regulator-prescribed forms need TWO verification dates', () => {
   });
 
   it('reports both when neither is set', () => {
-    const problems = assertPublishable(
-      thing(PRESCRIBED({ verbatimVerifiedAt: null, structureVerifiedAt: null })),
-    );
+    const problems = assertPublishable(thing(PRESCRIBED({ verbatimVerifiedAt: null, structureVerifiedAt: null })));
 
     expect(problems).toHaveLength(2);
   });
@@ -63,7 +61,12 @@ describe('regulator-prescribed forms need TWO verification dates', () => {
 */
 describe('the variants that existed before the move behave as they did', () => {
   it('refuses statutory text with no verification date', () => {
-    const s: ClauseSource = { kind: 'statute', citation: 'Fla. Stat. §83.51', verbatimRequired: true, verbatimVerifiedAt: null };
+    const s: ClauseSource = {
+      kind: 'statute',
+      citation: 'Fla. Stat. §83.51',
+      verbatimRequired: true,
+      verbatimVerifiedAt: null,
+    };
 
     expect(assertPublishable(thing(s))).toEqual([
       'ca-offer-summary: statutory text published without a verification date',
