@@ -149,8 +149,6 @@ jobs:
     # Run-scoped, so concurrent branches cannot see each other's schema.
     # github.run_id is unique per run and run_attempt distinguishes re-runs;
     # both are digits, so the identifier needs no quoting.
-    env:
-      RUN_DB: documenso_run_${{ github.run_id }}_${{ github.run_attempt }}
 
     steps:
       # fetch-depth: 0 so the docs-only detection below can diff against the
@@ -377,6 +375,18 @@ jobs:
           echo "The check reports success so the required-check gate is satisfied."
           echo "Any non-documentation file in the diff runs the full suite."
     env:
+      # MODIFIED for BizRethink (2026-09-07): one database per run.
+      #
+      # Must live in THIS block, not a second `env:` on the job. YAML permits
+      # duplicate keys and most parsers silently keep the last, so a second
+      # block validates locally and is rejected by Actions as an invalid
+      # workflow file — the run then reports under the raw filename with no
+      # checks at all, which reads as "E2E did not run" rather than as an
+      # error.
+      #
+      # github.run_id is unique per run, run_attempt separates re-runs; both
+      # are digits, so the identifier needs no quoting.
+      RUN_DB: documenso_run_${{ github.run_id }}_${{ github.run_attempt }}
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
       # Stream task output instead of buffering it. Turbo's buffered mode

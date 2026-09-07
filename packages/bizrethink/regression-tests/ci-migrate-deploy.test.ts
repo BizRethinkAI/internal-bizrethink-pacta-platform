@@ -1,8 +1,9 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
+import { parseDocument } from 'yaml';
 
 /**
  * Regression guard for the shared-database incident (2026-09-06).
@@ -85,5 +86,42 @@ describe('e2e-tests.yml — migrations must be applied unattended', () => {
     // a new problem in place of the one being fixed.
     expect(executable).toContain('Drop the run database');
     expect(executable).toMatch(/Drop the run database[\s\S]{0,120}if:\s*always\(\)/);
+  });
+});
+
+/**
+ * Found while writing the fix above, and the more dangerous half of it.
+ *
+ * The job already had an `env:` block. The first attempt added a SECOND one
+ * for RUN_DB. YAML permits duplicate keys and most parsers silently keep the
+ * last, so the file validated locally — `yaml.safe_load` returned a dict and
+ * reported no problem — while GitHub rejected it outright.
+ *
+ * What that looks like is the point. An invalid workflow does not fail a
+ * check: it produces NO CHECKS AT ALL, and the run is listed under the raw
+ * filename instead of the workflow name. The PR showed nine green checks
+ * where it should have shown eleven, and the E2E gate was simply absent.
+ * Absent reads as "did not need to run", which is the same silent-gate shape
+ * as a cancelled run.
+ *
+ * Applies to every workflow, not just this one.
+ */
+describe('.github/workflows — no duplicate keys', () => {
+  const dir = resolve(dirname(fileURLToPath(import.meta.url)), '../../../.github/workflows');
+  const files = readdirSync(dir).filter((f) => f.endsWith('.yml') || f.endsWith('.yaml'));
+
+  it('has workflows to check', () => {
+    expect(files.length).toBeGreaterThan(0);
+  });
+
+  it.each(files)('%s parses with no duplicated key', (file) => {
+    // parseDocument collects errors rather than throwing on the first, and
+    // unlike a plain load it reports duplicates instead of silently resolving
+    // them. That difference is the whole reason this test exists.
+    const doc = parseDocument(readFileSync(resolve(dir, file), 'utf8'), {
+      uniqueKeys: true,
+    });
+
+    expect(doc.errors.map((e) => e.message)).toEqual([]);
   });
 });
