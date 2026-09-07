@@ -1,7 +1,11 @@
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { Trans } from '@lingui/react/macro';
-import { Outlet, isRouteErrorResponse, useRouteError } from 'react-router';
+import { useEffect } from 'react';
+import { isRouteErrorResponse, Outlet, useRouteError } from 'react-router';
 
 // MODIFIED for BizRethink (overlay 014): async getters for SSO flags + OIDC label.
+// Upstream reads IS_*_SSO_ENABLED / OIDC_PROVIDER_LABEL as module constants;
+// ours are DB-backed and therefore async (ADR 0004).
 import {
   getOidcProviderLabel,
   isGoogleSsoEnabled,
@@ -53,9 +57,29 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
   const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } =
     loaderData || {};
 
+  const analytics = useAnalytics();
   const error = useRouteError();
 
   console.log({ routeError: error });
+
+  useEffect(() => {
+    const isExpectedEmbedResponse =
+      isRouteErrorResponse(error) &&
+      [
+        'embed-authentication-required',
+        'embed-paywall',
+        'embed-waiting-for-turn',
+        'embed-recipient-expired',
+        'embed-document-rejected',
+        'embed-document-completed',
+      ].includes(error.data?.type);
+
+    if (isExpectedEmbedResponse) {
+      return;
+    }
+
+    analytics.captureException(error, { source: 'embed', location: 'embed_layout_boundary' });
+  }, [error]);
 
   if (isRouteErrorResponse(error)) {
     if (error.status === 401 && error.data.type === 'embed-authentication-required') {

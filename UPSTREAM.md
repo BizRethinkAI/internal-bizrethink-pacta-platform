@@ -86,12 +86,18 @@ Document each exception in `overlays/EXCEPTIONS.md` so they don't get lost.
 ## `patches/` — the other thing a sync can silently break
 
 `overlays/` covers upstream FILES. It does not cover upstream DEPENDENCIES, and
-this fork patches two of those through `patch-package`, applied by `postinstall`:
+those are patched through `patch-package`, applied by `postinstall`:
 
-| Patch | What breaks without it |
-|---|---|
-| `@react-pdf+layout+5.2.0.patch` | Every lease PDF over ~13 pages dies with `unsupported number: -2.2127632876551446e+22` |
-| `@ai-sdk+google-vertex+3.0.81.patch` | (pre-existing; see its own header) |
+| Patch | Owner | What breaks without it |
+|---|---|---|
+| `@react-pdf+layout+5.2.0.patch` | **ours** | Every lease PDF over ~13 pages dies with `unsupported number: -2.2127632876551446e+22` |
+| `@radix-ui+react-menu+2.1.24.patch` | upstream | Arrived with the 2026-09-07 sync; upstream's, not ours |
+
+**Only the first row is fork work.** `@ai-sdk+google-vertex+3.0.81.patch` used to
+sit in this table and was never ours either: upstream added it in #2271 and
+deleted it in #3225 when they bumped the package to 5.0.48, so the 2026-09-07
+sync removed it. Read a `patches/` entry's provenance before defending it —
+`git log --diff-filter=A -- patches/<name>` says who introduced it.
 
 **The filename pins an exact version.** If a sync bumps `@react-pdf/layout` past
 5.2.0, `patch-package` will not apply a 5.2.0 patch to 5.3.0 — and the failure

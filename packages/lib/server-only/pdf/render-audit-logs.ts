@@ -1,17 +1,18 @@
+// sort-imports-ignore
+import '../konva/skia-backend';
+
+import fs from 'node:fs';
+import path from 'node:path';
+import type { Canvas } from '@documenso/skia-canvas';
+import { Image as SkiaImage } from '@documenso/skia-canvas';
 import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { DocumentMeta } from '@prisma/client';
 import type { Envelope, RecipientRole } from '@prisma/client';
 import Konva from 'konva';
-import 'konva/skia-backend';
 import type { DateTimeFormatOptions } from 'luxon';
 import { DateTime } from 'luxon';
-import fs from 'node:fs';
-import path from 'node:path';
-import type { Canvas } from 'skia-canvas';
-import { Image as SkiaImage } from 'skia-canvas';
-import { match } from 'ts-pattern';
-import { P } from 'ts-pattern';
+import { match, P } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
 import { DOCUMENT_STATUS } from '../../constants/document';
