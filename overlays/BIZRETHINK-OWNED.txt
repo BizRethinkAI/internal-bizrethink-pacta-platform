@@ -55,6 +55,15 @@ apps/remix/app/routes/_authenticated+/admin+/lease-library.tsx
 # page is a function of files committed to this repository.
 apps/remix/app/routes/_authenticated+/admin+/mca.tsx
 
+# The server-only half of that route. `conformitySurface()` reads the vendored
+# statutes off disk, so its module graph reaches node:fs — and importing it
+# into the route and using it only in the `loader` is NOT enough to keep it out
+# of the browser bundle. `.server.ts` is the mechanism that guarantees it.
+#
+# `app/utils/` is upstream's directory, so this is one line and not a glob. The
+# `bizrethink-` filename prefix is the ownership marker.
+apps/remix/app/utils/bizrethink-mca-conformity.server.ts
+
 # Components imported by those routes. Namespaced under lease/ so a collision
 # with an upstream component is impossible short of upstream shipping a lease
 # builder of their own.

@@ -37,6 +37,15 @@ export {
 } from './mca/jurisdictions';
 export { OPEN_READINGS, type OpenReading } from './mca/readings';
 export { disclosuresFor } from './mca/registry';
+// READS THE FILESYSTEM. `conformitySurface` and `envelopeShapes` reach
+// `mca/provenance/source-text.ts`, which imports `node:fs`, `node:path` and
+// `node:crypto` to re-earn every verification date against the vendored
+// statutes. Import them ONLY from server code — a Remix route must go through
+// a `.server.ts` module (see
+// `apps/remix/app/utils/bizrethink-mca-conformity.server.ts`), because
+// importing them into a route directly and using them only in the `loader`
+// puts `node:fs` in the CLIENT bundle and fails the build. That is not
+// hypothetical: it is how PR #118 first went red.
 export {
   type Assurance,
   assertSingleLibrary,

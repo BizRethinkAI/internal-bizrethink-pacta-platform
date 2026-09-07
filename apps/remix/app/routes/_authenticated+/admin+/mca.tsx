@@ -1,10 +1,5 @@
-import {
-  type ConformityEntry,
-  conformitySurface,
-  envelopeShapes,
-  JURISDICTION_NAMES,
-  OPEN_READINGS,
-} from '@bizrethink/customizations';
+import type { ConformityEntry } from '@bizrethink/customizations';
+import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -13,6 +8,7 @@ import { msg } from '@lingui/core/macro';
 import { AlertTriangle, Eye, FileWarning, HelpCircle, ScrollText } from 'lucide-react';
 import { useLoaderData } from 'react-router';
 
+import { buildMcaConformityView } from '~/utils/bizrethink-mca-conformity.server';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/mca';
@@ -73,15 +69,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const surface = conformitySurface();
-
-  return {
-    library: surface.library as string,
-    jurisdictions: [...surface.jurisdictions],
-    entries: surface.entries,
-    envelopes: envelopeShapes(),
-    readings: [...OPEN_READINGS],
-  };
+  return buildMcaConformityView();
 }
 
 const ASSURANCE_LABEL = {

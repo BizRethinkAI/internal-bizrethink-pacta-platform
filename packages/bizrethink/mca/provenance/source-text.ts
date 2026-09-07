@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 /**
  * Reading, digesting and slicing the vendored primary text.
@@ -10,7 +10,66 @@ import { join } from 'node:path';
  * intention; this file is the enforcement.
  */
 
-const SOURCES = join(__dirname, '..', 'sources');
+/**
+ * Find the vendored statutes, and RETURN NULL RATHER THAN THROW when they are
+ * not there.
+ *
+ * This used to be `join(__dirname, '..', 'sources')` evaluated at module load,
+ * which was correct while the only caller was a test runner and became a
+ * liability the moment `/admin/mca` made this module reachable from the Remix
+ * server bundle. Two things break there and they break differently:
+ *
+ *   - The bundle is ESM, where `__dirname` is not merely absent but
+ *     UNDECLARED. A bare reference throws `ReferenceError` at module
+ *     evaluation, and a route module that throws on import takes the server
+ *     with it. `typeof` is the only safe way to ask.
+ *   - The production image (`docker/Dockerfile`, runner stage) copies
+ *     `apps/remix/build`, `apps/remix/public`, `packages/tailwind-config` and
+ *     the Prisma schema. **`packages/bizrethink/mca/sources/` is not among
+ *     them**, so in the container these files do not exist at any path.
+ *
+ * The second is a real deployment gap that this function does not close — see
+ * the in-flight note. What it does is make the gap DEGRADE HONESTLY rather
+ * than crash: with no sources directory, `sourceExists` is false for every
+ * file, `verifyProvenance` reports `kind: 'source'`, and the conformity
+ * surface renders every state as unverified with "SOURCE MISSING" beside it.
+ *
+ * That is the correct thing for it to say. A verification date whose evidence
+ * is not present cannot be re-earned, and this package's entire position is
+ * that a date nothing re-executes is worth nothing.
+ */
+export const resolveSourcesDir = (candidates: readonly string[]): string | null =>
+  candidates.find((dir) => existsSync(join(dir, 'README.md'))) ?? null;
+
+const defaultCandidates = (): string[] => {
+  const out: string[] = [];
+
+  // Present under vitest and any CommonJS build; undeclared in an ESM bundle.
+  if (typeof __dirname !== 'undefined') {
+    out.push(join(__dirname, '..', 'sources'));
+  }
+
+  // Walk up from the working directory, for a bundled server started from the
+  // repository root.
+  let dir = process.cwd();
+
+  for (let i = 0; i < 8 && dir !== dirname(dir); i += 1) {
+    out.push(join(dir, 'packages', 'bizrethink', 'mca', 'sources'));
+    dir = dirname(dir);
+  }
+
+  return out;
+};
+
+let resolved: string | null | undefined;
+
+const sourcesDir = (): string | null => {
+  if (resolved === undefined) {
+    resolved = resolveSourcesDir(defaultCandidates());
+  }
+
+  return resolved;
+};
 
 /**
  * Collapse whitespace and fold the punctuation that differs between
@@ -23,10 +82,23 @@ export const norm = (s: string): string =>
 
 export class MissingSourceError extends Error {}
 
-export const sourceExists = (file: string): boolean => existsSync(join(SOURCES, file));
+export const sourceExists = (file: string): boolean => {
+  const dir = sourcesDir();
+
+  return dir !== null && existsSync(join(dir, file));
+};
 
 export const readSourceText = (file: string): string => {
-  const path = join(SOURCES, file);
+  const dir = sourcesDir();
+
+  if (dir === null) {
+    throw new MissingSourceError(
+      `mca/sources/ could not be found from ${process.cwd()}, so ${file} cannot be read and no verification date on ` +
+        'any spec can be re-earned in this environment',
+    );
+  }
+
+  const path = join(dir, file);
 
   if (!existsSync(path)) {
     throw new MissingSourceError(`${file} is not in mca/sources/`);

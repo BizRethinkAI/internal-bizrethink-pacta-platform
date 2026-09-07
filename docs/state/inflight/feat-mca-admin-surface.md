@@ -121,22 +121,91 @@ Granted for this phase: `packages/bizrethink/index.ts`, the new route, and the
 admin nav. Two further files were touched that the brief did not name, both
 because CI requires them:
 
-- `overlays/BIZRETHINK-OWNED.txt` — declares `admin+/mca.tsx` as ours.
-  Governance guard 1 fails on any `apps/` file not declared or patched, and this
-  is the established mechanism (`lease-library.tsx` is listed the same way).
+- `overlays/BIZRETHINK-OWNED.txt` — declares `admin+/mca.tsx` and
+  `app/utils/bizrethink-mca-conformity.server.ts` as ours. Governance guard 1
+  fails on any `apps/` file not declared or patched, and this is the established
+  mechanism (`lease-library.tsx` is listed the same way).
 - `overlays/README.md` — records the nav edit under overlay 047, which is the
   inline overlay that owns `admin+/_layout.tsx`'s `NAV_GROUPS`.
 
+A third arrived with the build fix: `apps/remix/app/utils/bizrethink-mca-conformity.server.ts`,
+which is the only way to keep `node:fs` out of the browser bundle (see below).
+
 `packages/bizrethink/lease/` was not touched. No component was moved out of it.
+
+**A concurrent session is in `packages/bizrethink/mca/` on phase 3** (the four
+remaining prescribed forms, plus the CT and VA statutes). This branch changes
+`registry.ts`, `instance/check.ts` and `provenance/source-text.ts`, so expect a
+conflict in `registry.ts` where their new specs meet this branch's
+`deepFreeze`. Nothing here is incompatible with that work — the surface derives
+its entries from `MCA_DISCLOSURES`, so their four forms will appear on the page
+without any change to this code.
+
+## The build broke, and why it is worth recording
+
+The first push went red on `Build App`, in the **client** bundle:
+
+```
+"join" is not exported by "__vite-browser-external",
+imported by packages/bizrethink/mca/provenance/source-text.ts
+```
+
+`conformitySurface()` reads the vendored statutes off disk, so its module graph
+reaches `node:fs`, `node:path` and `node:crypto`. The route imported it and used
+it only in the `loader`, on the assumption that the React Router plugin's
+dead-code elimination would keep it out of the browser build. **It did not** —
+and relying on an optimisation for correctness was the mistake, not the missing
+optimisation.
+
+Fixed with `apps/remix/app/utils/bizrethink-mca-conformity.server.ts`. The
+`.server.ts` convention is the mechanism that actually guarantees it: the plugin
+replaces such a module with a stub in the client build. The route now takes its
+TYPES from `@bizrethink/customizations` (erased) and `JURISDICTION_NAMES` from
+`@bizrethink/customizations/mca/jurisdictions`, a pure data module with no
+imports at all.
+
+Verified locally, not just in CI: `node_modules/@bizrethink` and
+`node_modules/@documenso` were symlinked into this worktree so the build would
+resolve against it, and `react-router build` then completed both bundles —
+client 4827 modules, SSR 1323. The failing CI run died at 4845. The client chunk
+for the route contains **zero** occurrences of `node:fs`, `readFileSync` or
+`existsSync`; the string `mca/sources/` in it is UI copy.
+
+## THE PAGE WILL BE EMPTY IN PRODUCTION — this is the one thing to act on
+
+`docker/Dockerfile`'s runner stage copies `out/json/`, `patches`,
+`apps/remix/build`, `apps/remix/public`, `packages/tailwind-config`,
+`packages/prisma/schema.prisma` and `migrations`. **`packages/bizrethink/mca/sources/`
+is not among them.** In the container those regulations do not exist at any
+path, so every digest check will fail to find its file.
+
+`provenance/source-text.ts` was changed so this **degrades honestly instead of
+crashing**: the sources directory is resolved lazily, `__dirname` is reached
+only behind `typeof` (it is *undeclared*, not merely absent, in an ESM bundle —
+a bare reference would have thrown at module load and taken the server with it),
+and an unresolvable directory yields `MissingSourceError` rather than an
+exception at import. The page then renders all eleven states as **SOURCE
+MISSING / Not verified**, which is the truth in that environment and exactly
+what this package says a verification date without evidence is worth.
+
+But it means the page does not do its job in production until the vendored
+statutes reach the runtime. Two ways, neither of them mine to take:
+
+1. **An overlay on `docker/Dockerfile`** adding the sources to the runner stage.
+   That is an upstream file (already patched by overlay 003), so it needs a
+   patch, a fragility rating and the adversarial review the standard mandates
+   for `overlays/*.patch`.
+2. **Embed the sources as modules** so they are bundled — roughly 700 KB of
+   string literals in the server bundle, including a 339,000-character Missouri
+   omnibus bill.
+
+Option 1 is smaller and keeps the sources as files, which is what
+`sources/README.md` says they are for. **Owner's call; nothing done here.**
 
 ## What could not be verified here
 
-**The page has never been rendered.** This worktree has no `node_modules` —
-module resolution walks up to the parent checkout, where
-`@bizrethink/customizations` still resolves to the pre-export `index.ts`. The
-route was typechecked by a throwaway `tsconfig` with the path remapped
-(clean, and deleted afterwards), but nothing has run `react-router build`, and
-no browser has loaded `/admin/mca`. **CI is the first real test of the route.**
+**No browser has loaded `/admin/mca`.** The bundles build and the route
+typechecks, but nothing has rendered it, and the E2E suite does not visit it.
 
 **The three prescribed readings were not previously structured.** Only the five
 `UNRESOLVED_READINGS` existed in code. The three from #108 were prose in

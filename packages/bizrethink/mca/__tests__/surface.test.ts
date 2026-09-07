@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { UNRESOLVED_READINGS } from '../instance/identities';
 import { MCA_JURISDICTIONS } from '../jurisdictions';
-import { normalisedDigest, readSourceText } from '../provenance/source-text';
+import { normalisedDigest, readSourceText, resolveSourcesDir } from '../provenance/source-text';
 import { publishableProblems } from '../provenance/verify';
 import { OPEN_READINGS, PRESCRIBED_READINGS } from '../readings';
 import { MCA_DISCLOSURES, PRESCRIBED_FORMS } from '../registry';
@@ -316,6 +316,56 @@ describe('what the checker can only read the label of', () => {
   */
   it('every recorded digest still matches the vendored source', () => {
     expect(surface.entries.filter((e) => e.digest !== 'matches').map((e) => e.slug)).toEqual([]);
+  });
+});
+
+/*
+  THE VENDORED SOURCES ARE NOT IN THE PRODUCTION IMAGE.
+
+  `docker/Dockerfile`'s runner stage copies `apps/remix/build`,
+  `apps/remix/public`, `packages/tailwind-config` and the Prisma schema.
+  `packages/bizrethink/mca/sources/` is not among them, so in the container
+  these regulations do not exist at any path — and this module is now reachable
+  from the Remix server bundle, where `__dirname` is undeclared rather than
+  merely absent.
+
+  Neither may crash. What they must do is make the surface say, for every
+  state, that nothing here can be re-earned — which is the truth in that
+  environment and is exactly what this package says a date without evidence is
+  worth.
+*/
+describe('with no vendored sources, the surface degrades to unverified rather than throwing', () => {
+  it('finds the real directory when it is there', () => {
+    expect(resolveSourcesDir([join(__dirname, '..', 'sources')])).not.toBeNull();
+  });
+
+  it('returns null rather than throwing when every candidate is absent', () => {
+    expect(resolveSourcesDir([join(__dirname, 'no-such-directory')])).toBeNull();
+    expect(resolveSourcesDir([])).toBeNull();
+  });
+
+  it('reports a spec whose source cannot be read as source-missing and unverified', () => {
+    const built = entryFor(
+      syntheticForm({
+        slug: 'synthetic-source-absent',
+        citation: '10 CCR §914',
+        sourceFile: 'a-file-no-production-image-contains.txt',
+        status: 'published',
+        source: {
+          kind: 'regulator-prescribed-form',
+          citation: '10 CCR §914',
+          sourceFile: 'a-file-no-production-image-contains.txt',
+          verbatimVerifiedAt: '2026-09-06',
+          structureVerifiedAt: '2026-09-06',
+        },
+        rows: [{ label: 'Funding Provided', verbatim: null, onlyPrescribedContent: true }],
+      }),
+    );
+
+    expect(built.digest).toBe('source-missing');
+    expect(built.observedDigest).toBeNull();
+    expect(built.assurance).toBe('unverified');
+    expect(built.problems.map((p) => p.kind)).toContain('source');
   });
 });
 
