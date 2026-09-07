@@ -289,6 +289,20 @@ clause states what the **parties agree** and asserts nothing about the law.
 8. Still open from #110: **does an approval of a portable clause travel between
    states?** `PORTABLE_APPROVAL_TRAVELS` is the one line that changes.
 
+## Verified by rendering, not only by unit test
+
+`buildLeaseDocuments({ ..., jurisdiction: 'US-NC' })` over the Picana answer set:
+
+    DOCS 3        Residential Lease | Pet Addendum | House Rules
+    CLAUSES 40    numbered 1 … 12.x, sections in document order
+    FLORIDA CLAUSES IN AN NC LEASE: 0
+    MISSING       exactly the 7 new North Carolina variables the Florida
+                  fixture cannot answer — nothing renders as a raw {{token}}
+
+"Green tests do not mean complete code" is this repo's own lesson; the document
+assembling, numbering and containing no Florida clause is the part a unit test
+would not have caught.
+
 ## Verification
 
     cd packages/bizrethink && npx vitest run                # 1259 passed
