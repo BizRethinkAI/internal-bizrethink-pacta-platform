@@ -34,7 +34,10 @@ const changed = args.changed && existsSync(args.changed)
 
 const failures = [];
 const fail = (title, msg) => failures.push({ title, msg });
-const stripComments = (s) => s.replace(/<!--[\s\S]*?-->/g, '');
+// Strip HTML comments until none remain (a single pass can leave a marker behind when
+// comments nest or split — CodeQL "incomplete multi-character sanitization"). The result
+// is only ever tested for emptiness, never rendered.
+const stripComments = (s) => { let prev; do { prev = s; s = s.replace(/<!--[\s\S]*?-->/g, ''); } while (s !== prev); return s; };
 const headings = (s) => s.split('\n').filter((l) => /^## /.test(l)).map((l) => l.trim());
 
 // 1. Every template heading is present.
