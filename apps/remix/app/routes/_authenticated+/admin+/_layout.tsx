@@ -121,7 +121,11 @@ const NAV_GROUPS: NavGroupDef[] = [
         // attorney approvals — identical for every customer, and it was
         // readable by any member of any organisation holding the lease-builder
         // flag.
-        label: <Trans>Clause Library</Trans>,
+        // "Lease Clauses", not "Clause Library". With an MCA vertical arriving
+        // with a library of its own, the generic name is ambiguous at exactly
+        // the place a person chooses between them. The noun that distinguishes
+        // them goes first.
+        label: <Trans>Lease Clauses</Trans>,
         href: '/admin/lease-library',
         icon: ScrollTextIcon,
         bizrethink: true,
