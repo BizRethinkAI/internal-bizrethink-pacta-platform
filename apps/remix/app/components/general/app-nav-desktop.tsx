@@ -10,6 +10,8 @@ import type { HTMLAttributes } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
+// MODIFIED for BizRethink (overlay 069): the Leases entry, gated per organisation.
+import { useLeaseBuilderTeamUrls } from '~/components/general/lease/use-lease-builder-team-urls';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type AppNavDesktopProps = HTMLAttributes<HTMLDivElement> & {
@@ -25,6 +27,9 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
   const [modifierKey, setModifierKey] = useState(() => 'Ctrl');
 
   const currentTeam = useOptionalCurrentTeam();
+
+  // MODIFIED for BizRethink (overlay 069).
+  const leaseBuilderTeamUrls = useLeaseBuilderTeamUrls();
 
   useEffect(() => {
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
@@ -53,8 +58,10 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
         href: `/t/${teamUrl}/templates`,
         label: msg`Templates`,
       },
+      // MODIFIED for BizRethink (overlay 069).
+      ...(leaseBuilderTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/leases`, label: msg`Leases` }] : []),
     ];
-  }, [currentTeam, organisations]);
+  }, [currentTeam, organisations, leaseBuilderTeamUrls]);
 
   return (
     <div className={cn('ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between', className)} {...props}>

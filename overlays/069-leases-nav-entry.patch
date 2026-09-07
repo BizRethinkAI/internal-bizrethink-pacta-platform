@@ -1,0 +1,117 @@
+# What this patches: apps/remix/app/components/general/app-nav-desktop.tsx and
+#   app-nav-mobile.tsx — the two definitions of the team-level main nav. Adds a
+#   "Leases" entry beside Documents and Templates, rendered only for teams whose
+#   organisation holds the `lease-builder` feature.
+#
+# Why not a new file: the nav items are array literals inside these two
+#   components. There is no shared, importable definition to extend — upstream
+#   extracted the SETTINGS nav to packages/lib/utils/settings-nav.ts in the
+#   2026-08-13 sync (see overlays/README.md "Relocations") but did not do the
+#   same for the app nav, and each component still builds its own array with its
+#   own item shape (`label` + `msg` on desktop, `text` + `t` on mobile). A new
+#   file cannot add an entry to a literal it cannot see.
+#
+# Upstream-merge-fragility: LOW.
+#
+# Both insertions are a single spread expression appended to an array that
+# upstream already maintains as data, plus an import and a hook call. That is
+# the shape overlay 047 had to CREATE for the admin sidebar; here upstream has
+# already done it, so this overlay only adds a row. A merge conflict is possible
+# if upstream reorders or restyles the array, and the fix in that case is to
+# re-append the same one line — there is no logic to re-derive.
+#
+# The gate is the interesting part. `canAccessLeaseBuilder` is server-only and
+# these components render in the browser, so the flag reaches them through a
+# READ of the gate rather than a copy of it: `bizrethink.leaseBuilder.access`
+# (additive, packages/bizrethink) calls the same function every lease route's
+# loader calls, and apps/remix/app/components/general/lease/
+# use-lease-builder-team-urls.tsx maps its answer onto the session's team tree.
+# Nothing about the rule lives in an upstream file, so a future upstream sync
+# cannot silently change who sees the entry. Guarded by
+# packages/bizrethink/regression-tests/leases-nav-entry.test.ts, which fails if
+# the entry is dropped from either file or stops being gated on that hook.
+#
+# Alternatives considered and rejected: putting the flag on the organisation
+# session (would patch upstream's session query AND its zod schema, and add two
+# grant lookups per organisation to a query that re-runs on every navigation and
+# window focus), and threading a boolean through a route loader (the nav is
+# rendered by _authenticated+/_layout.tsx, which sets
+# `shouldRevalidate = () => false` — its loader does not re-run on a team
+# switch, so the boolean would describe whichever team was landed on first).
+
+diff --git a/apps/remix/app/components/general/app-nav-desktop.tsx b/apps/remix/app/components/general/app-nav-desktop.tsx
+index 744af2ce8..201edefd3 100644
+--- a/apps/remix/app/components/general/app-nav-desktop.tsx
++++ b/apps/remix/app/components/general/app-nav-desktop.tsx
+@@ -10,6 +10,8 @@ import type { HTMLAttributes } from 'react';
+ import { useEffect, useMemo, useState } from 'react';
+ import { Link, useLocation } from 'react-router';
+ 
++// MODIFIED for BizRethink (overlay 069): the Leases entry, gated per organisation.
++import { useLeaseBuilderTeamUrls } from '~/components/general/lease/use-lease-builder-team-urls';
+ import { useOptionalCurrentTeam } from '~/providers/team';
+ 
+ export type AppNavDesktopProps = HTMLAttributes<HTMLDivElement> & {
+@@ -26,6 +28,9 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
+ 
+   const currentTeam = useOptionalCurrentTeam();
+ 
++  // MODIFIED for BizRethink (overlay 069).
++  const leaseBuilderTeamUrls = useLeaseBuilderTeamUrls();
++
+   useEffect(() => {
+     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
+     const isMacOS = /Macintosh|Mac\s+OS\s+X/i.test(userAgent);
+@@ -53,8 +58,10 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
+         href: `/t/${teamUrl}/templates`,
+         label: msg`Templates`,
+       },
++      // MODIFIED for BizRethink (overlay 069).
++      ...(leaseBuilderTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/leases`, label: msg`Leases` }] : []),
+     ];
+-  }, [currentTeam, organisations]);
++  }, [currentTeam, organisations, leaseBuilderTeamUrls]);
+ 
+   return (
+     <div className={cn('ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between', className)} {...props}>
+diff --git a/apps/remix/app/components/general/app-nav-mobile.tsx b/apps/remix/app/components/general/app-nav-mobile.tsx
+index 2a3c263d6..9fbccdf36 100644
+--- a/apps/remix/app/components/general/app-nav-mobile.tsx
++++ b/apps/remix/app/components/general/app-nav-mobile.tsx
+@@ -9,6 +9,8 @@ import { ReadStatus } from '@prisma/client';
+ import { useMemo } from 'react';
+ import { Link } from 'react-router';
+ 
++// MODIFIED for BizRethink (overlay 069): the Leases entry, gated per organisation.
++import { useLeaseBuilderTeamUrls } from '~/components/general/lease/use-lease-builder-team-urls';
+ import { useOptionalCurrentTeam } from '~/providers/team';
+ 
+ export type AppNavMobileProps = {
+@@ -23,6 +25,9 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
+ 
+   const currentTeam = useOptionalCurrentTeam();
+ 
++  // MODIFIED for BizRethink (overlay 069).
++  const leaseBuilderTeamUrls = useLeaseBuilderTeamUrls();
++
+   const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
+     {
+       readStatus: ReadStatus.NOT_OPENED,
+@@ -65,6 +70,8 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
+         href: `/t/${teamUrl}/templates`,
+         text: t`Templates`,
+       },
++      // MODIFIED for BizRethink (overlay 069).
++      ...(leaseBuilderTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/leases`, text: t`Leases` }] : []),
+       {
+         href: '/inbox',
+         text: t`Inbox`,
+@@ -74,7 +81,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
+         text: t`Settings`,
+       },
+     ];
+-  }, [currentTeam, organisations]);
++  }, [currentTeam, organisations, leaseBuilderTeamUrls]);
+ 
+   return (
+     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>

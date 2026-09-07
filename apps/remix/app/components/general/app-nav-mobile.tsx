@@ -9,6 +9,8 @@ import { ReadStatus } from '@prisma/client';
 import { useMemo } from 'react';
 import { Link } from 'react-router';
 
+// MODIFIED for BizRethink (overlay 069): the Leases entry, gated per organisation.
+import { useLeaseBuilderTeamUrls } from '~/components/general/lease/use-lease-builder-team-urls';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type AppNavMobileProps = {
@@ -22,6 +24,9 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
   const { organisations } = useSession();
 
   const currentTeam = useOptionalCurrentTeam();
+
+  // MODIFIED for BizRethink (overlay 069).
+  const leaseBuilderTeamUrls = useLeaseBuilderTeamUrls();
 
   const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
     {
@@ -65,6 +70,8 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         href: `/t/${teamUrl}/templates`,
         text: t`Templates`,
       },
+      // MODIFIED for BizRethink (overlay 069).
+      ...(leaseBuilderTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/leases`, text: t`Leases` }] : []),
       {
         href: '/inbox',
         text: t`Inbox`,
@@ -74,7 +81,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         text: t`Settings`,
       },
     ];
-  }, [currentTeam, organisations]);
+  }, [currentTeam, organisations, leaseBuilderTeamUrls]);
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
