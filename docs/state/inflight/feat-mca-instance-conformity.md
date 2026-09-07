@@ -98,6 +98,47 @@ Report these; do not act on them from here.
 - `packages/bizrethink/index.ts` — export is phase 2.
 - Nothing published to Pacta.
 
+## CI: E2E is blocked by another branch's migration, on the shared runner
+
+**Not caused by this PR, and not fixable from it.** Every other check is green
+(Governance, Lint, Build App, Build Docker Image, CodeQL, Analyze ×2, npm audit,
+Validate PR title). E2E fails before a single test runs:
+
+```
+- Drift detected: Your database schema is not in sync with your migration history.
+  [*] Changed the `BizrethinkLibraryReview` table
+    [+] Added column `jurisdiction`
+- The following migration(s) are applied to the database but missing from the
+  local migrations directory: 20260906230000_library_review_jurisdiction
+  We need to reset the "public" schema at "127.0.0.1:54320"
+npm error code 130
+```
+
+`20260906230000_library_review_jurisdiction` belongs to
+`feat/library-jurisdiction-visible`, the concurrent lease session's branch. Its
+CI ran on the same self-hosted runner at 00:33–00:35 and left the migration
+applied in the runner's **shared** development database. `prisma migrate dev`
+then refuses on any branch that does not contain that migration, blocks for
+confirmation, and is killed — exit 130, which is SIGINT, not a test result.
+
+Same cause as the pre-existing typecheck error below: `additions.prisma` and
+`lease-builder-router.ts` are mid-flight on that branch.
+
+**This blocks every branch that lacks the migration, not just this one.** Two
+ways out, neither of them mine to take: merge `feat/library-jurisdiction-visible`
+to `main` and rebase this branch onto it, or reset the runner's dev database.
+Owner's call.
+
+The run before the drift appeared (00:37) did execute the suite: 8 flaky and one
+real failure, `[BULK_ACTIONS]: can cancel multiple pending documents`, a
+`[role="status"]` toast not appearing within 5s. Three of the four bulk-action
+tests failed or flaked in that same run while the other session's CI was
+occupying the runner. Nothing in this PR is imported by the application —
+`packages/bizrethink/index.ts` is unchanged and no overlay is touched, so no
+application code path can reach `mca/instance/`. Recorded rather than dismissed:
+it wants one clean E2E run to confirm, which is not available until the drift is
+cleared.
+
 ## Pre-existing red, not mine
 
 `npx tsc --noEmit -p packages/bizrethink/tsconfig.typecheck.json` reports one
