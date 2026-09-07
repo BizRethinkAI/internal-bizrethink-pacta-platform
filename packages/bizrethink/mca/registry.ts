@@ -34,14 +34,39 @@ import type { McaTransactionType } from './transactions';
  *                         wording ours; KS and MO straddle it, dictating every
  *                         label while prescribing no sentence
  */
-export const PRESCRIBED_FORMS: readonly PrescribedForm[] = [
+/**
+ * Freeze a spec, all the way down.
+ *
+ * `readonly` is a compile-time claim and this package's specs are handed to
+ * things that read them at runtime — a checker, and now an admin page. The
+ * property that matters is that **displaying a spec cannot change it**: no
+ * caller may set `status` to `'published'`, stamp a verification date, or edit
+ * a prescribed sentence as a side effect of rendering a report about it.
+ *
+ * Modules are strict-mode, so a write to a frozen object throws rather than
+ * failing silently. That is the point — a silent no-op would leave a caller
+ * believing it had recorded something.
+ */
+const deepFreeze = <T>(value: T): T => {
+  if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
+    Object.freeze(value);
+
+    for (const key of Object.getOwnPropertyNames(value)) {
+      deepFreeze((value as Record<string, unknown>)[key]);
+    }
+  }
+
+  return value;
+};
+
+export const PRESCRIBED_FORMS: readonly PrescribedForm[] = deepFreeze([
   CA_LEASE_FINANCING,
   CA_OFFER_SUMMARY,
   CT_DISCLOSURE,
   NY_LEASE_FINANCING,
   NY_OFFER_SUMMARY,
   VA_DISCLOSURE,
-];
+]);
 
 /**
  * The Itemization of Amount Financed, per state.
@@ -52,9 +77,9 @@ export const PRESCRIBED_FORMS: readonly PrescribedForm[] = [
  * no prescribed row count and no closed rows, which is how a checker starts
  * reporting defects in correct documents.
  */
-export const ITEMIZATIONS: readonly ItemizationForm[] = [CA_ITEMIZATION, NY_ITEMIZATION];
+export const ITEMIZATIONS: readonly ItemizationForm[] = deepFreeze([CA_ITEMIZATION, NY_ITEMIZATION]);
 
-export const CONTENT_STATUTES: readonly ContentStatute[] = [
+export const CONTENT_STATUTES: readonly ContentStatute[] = deepFreeze([
   FL_DISCLOSURE,
   GA_DISCLOSURE,
   KS_DISCLOSURE,
@@ -62,9 +87,13 @@ export const CONTENT_STATUTES: readonly ContentStatute[] = [
   MO_DISCLOSURE,
   TX_DISCLOSURE,
   UT_DISCLOSURE,
-];
+]);
 
-export const MCA_DISCLOSURES: readonly McaDisclosure[] = [...PRESCRIBED_FORMS, ...ITEMIZATIONS, ...CONTENT_STATUTES];
+export const MCA_DISCLOSURES: readonly McaDisclosure[] = Object.freeze([
+  ...PRESCRIBED_FORMS,
+  ...ITEMIZATIONS,
+  ...CONTENT_STATUTES,
+]);
 
 /**
  * The disclosures that apply in one jurisdiction.
