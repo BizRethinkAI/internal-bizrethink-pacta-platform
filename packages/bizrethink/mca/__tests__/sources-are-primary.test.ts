@@ -67,10 +67,9 @@ describe('every vendored source is primary text', () => {
     const header = readFileSync(resolve(sourcesDir, file), 'utf8').split('\n').slice(0, 40).join('\n');
 
     const retrieved = /Retrieved|Vendored|Source:|published by|https?:\/\//i.test(header);
-    const letterhead =
-      /STATE OF |DEPARTMENT OF |GENERAL ASSEMBLY|LEGISLATURE|COMMISSIONER|OFFICE OF |CODE OF /i.test(
-        header,
-      );
+    const letterhead = /STATE OF |DEPARTMENT OF |GENERAL ASSEMBLY|LEGISLATURE|COMMISSIONER|OFFICE OF |CODE OF /i.test(
+      header,
+    );
 
     expect(retrieved || letterhead).toBe(true);
   });
