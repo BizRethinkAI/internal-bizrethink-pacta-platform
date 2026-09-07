@@ -83,6 +83,37 @@ You may modify an upstream file directly (no overlay) ONLY if:
 
 Document each exception in `overlays/EXCEPTIONS.md` so they don't get lost.
 
+## `patches/` — the other thing a sync can silently break
+
+`overlays/` covers upstream FILES. It does not cover upstream DEPENDENCIES, and
+this fork patches two of those through `patch-package`, applied by `postinstall`:
+
+| Patch | What breaks without it |
+|---|---|
+| `@react-pdf+layout+5.2.0.patch` | Every lease PDF over ~13 pages dies with `unsupported number: -2.2127632876551446e+22` |
+| `@ai-sdk+google-vertex+3.0.81.patch` | (pre-existing; see its own header) |
+
+**The filename pins an exact version.** If a sync bumps `@react-pdf/layout` past
+5.2.0, `patch-package` will not apply a 5.2.0 patch to 5.3.0 — and the failure
+is not a red build. It is a lease that renders fine at 12 pages and throws at
+14, in whichever document happens to be longest.
+
+**So: after any sync that touches `package-lock.json`, check `npx patch-package`
+output for a patch that did not apply.** Then run
+`packages/bizrethink/regression-tests/react-pdf-lineheight-compounding.test.ts`,
+which renders a document three times the length of the real lease and fails with
+the exact crash when the patch is missing.
+
+**If that test goes red, do not "fix" it by shortening a document.** The bug is
+that `lineHeight` is re-resolved once per page and grows as
+`fontSize ^ pageCount` until it passes pdfkit's 1e21 ceiling — the variable is
+PAGE COUNT, not content. Hours went into clause length and an orphan-control
+character threshold before that was noticed. Upstream bug, current in 4.9.0:
+https://github.com/diegomura/react-pdf/issues/3277
+
+Re-generate a patch with `npx patch-package <pkg>` after applying the same edit
+to the new version in `node_modules`, and rename the file to the new version.
+
 ## Pre-merge gates (REQUIRED before merging any upstream-sync PR)
 
 These run on every PR via `.github/workflows/ci.yml` (`Build App` + `Build Docker Image` jobs). **Do not merge until both are green.** Branch protection on `main` *should* enforce this — verify with `gh api repos/BizRethinkAI/internal-bizrethink-pacta-platform/branches/main/protection` (returns `Branch not protected` if disabled).
