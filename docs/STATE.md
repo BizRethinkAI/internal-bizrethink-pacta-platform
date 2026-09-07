@@ -38,6 +38,34 @@ Live features include per-org SMTP, DB-backed instance config for
 signing/storage/AI/SSO/Stripe, SaaS billing tiers with trials, and per-org
 branding.
 
+**There are two verticals, and this file is mostly about one of them.**
+Everything below describes the **lease builder**, which is the finished product.
+The **MCA vertical** (merchant cash advance) is the second, is mid-build, and its
+architecture is recorded in ADRs rather than here:
+
+- [ADR 0008](adr/0008-mca-is-two-surfaces-not-one.md) — it is *two* surfaces with
+  two release paths: **conformity** (does a disclosure meet a state's statute)
+  and **the agreement** (our clauses, our contract). They share one provenance
+  gate and nothing else.
+- [ADR 0009](adr/0009-counsel-is-parallel-not-a-gate.md) — counsel is a parallel
+  track, not a prerequisite. `assertPublishable` gates text reaching a *third
+  party*, not text being written. Building the clause library is unblocked.
+
+Where it stands, 2026-09-07:
+
+| | |
+|---|---|
+| Conformity surface | **built** — `/admin/mca`, instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, CT/VA primary text sourced |
+| The 47 never-examined clauses | **read** — REVIEW-02, in `lombard-contracts`; 23 fixes applied there |
+| `packages/bizrethink/mca/clauses/` | **does not exist** — the clause library, sibling of `/admin/lease-library`, is the next build |
+| Agreement builder | **not started — and it is the deliverable** |
+
+The MCA package today holds `content/`, `prescribed/` and `__tests__/`. Those are
+the *rule packs* — what a state demands of a disclosure. They are not clauses and
+were never going to become clauses, so "I only see MCA conformity" is an accurate
+reading of the package, not a misunderstanding of it. The lease equivalent has
+sixteen directories; the mapping from one to the other is the build plan.
+
 ## In flight
 
 **Live work now lives in [`docs/state/inflight/`](state/inflight/), one file per
@@ -50,7 +78,7 @@ that folder. The table below is history and stays until compaction.
 | #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. You are reading its STATE update. |
 | #3 | `default-deny GITHUB_TOKEN` scope in CI workflows | Rebased 2026-08-29 |
 | #4 | AATL signing setup plan (DigiCert + GCP Cloud HSM) | Rebased 2026-08-29. AATL confirmed still live. |
-| — | MCA clause library — prescribed disclosure forms | Landed. See the 2026-09-06/07 section below. |
+| — | MCA — conformity surface | Landed. Architecture in [ADR 0008](adr/0008-mca-is-two-surfaces-not-one.md) / [0009](adr/0009-counsel-is-parallel-not-a-gate.md), not in the 09-01→09-07 section below, which is lease-only. The clause library is **not** built. |
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
 **#21** (route), **#22** (preview link), **#23** (custom clauses + interview
