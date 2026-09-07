@@ -50,7 +50,7 @@ that folder. The table below is history and stays until compaction.
 | #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. You are reading its STATE update. |
 | #3 | `default-deny GITHUB_TOKEN` scope in CI workflows | Rebased 2026-08-29 |
 | #4 | AATL signing setup plan (DigiCert + GCP Cloud HSM) | Rebased 2026-08-29. AATL confirmed still live. |
-| — | MCA clause library — prescribed disclosure forms (CA, NY) | Branch `feat/mca-clause-library`, no PR yet. See [inflight note](state/inflight/feat-mca-clause-library.md). |
+| — | MCA clause library — prescribed disclosure forms | Landed. See the 2026-09-06/07 section below. |
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
 **#21** (route), **#22** (preview link), **#23** (custom clauses + interview
@@ -96,6 +96,95 @@ of what ran; when it goes out of date, the correction belongs here, not there.
 The move was safe only because nothing had been signed — `envelopeId` was NULL
 and the organisation had zero envelopes. **There is no code path to move an
 envelope between teams.** Anything similar must happen before the first send.
+
+## The week of 2026-09-01 → 09-07: the lease product's build finished
+
+**28 in-flight notes folded here and deleted**, per the convention in CLAUDE.md.
+This is the settled narrative; the notes were the working record.
+
+### What now exists
+
+A landlord picks a property, answers an interview that asks only what that
+state's law supports, and gets a lease assembled from a jurisdiction-split
+clause library. A tenant reviews it by token and comments per clause. An
+attorney reviews the library by token and records findings that hold a clause
+until answered. None of it can reach a third party, by design.
+
+**The jurisdiction architecture, in four PRs.** Approvals carry
+`clauseJurisdiction` + `barJurisdiction` and `admissionBlocks` refuses a
+mismatch (#89). The library splits `generic` / `US` / `US-FL` / `US-NC` and
+`libraryFor()` selects portable ∪ one state (#93). The interview marks fields
+per jurisdiction — DERIVED from which clauses consume them, so it
+self-maintains (#94) — and the builder reads the property's state (#100).
+Made visible in both UIs, with review links scoped per jurisdiction (#111).
+
+**North Carolina proved the architecture, and only half of it** (#114). 17 own
+clauses, **zero of the 36 portable ones duplicated** — under flat labelling that
+would have been 53 clauses with 36 second copies each needing a second attorney.
+But the interview did NOT generalise: the derived marking sees only clause
+variables, so facts, money fields and teaching prose are invisible to it and
+four questions are dead in NC. And `RulePack`'s *type* is Florida-shaped, so an
+NC lease is still numerically validated against Florida's limits. Pinned in
+`interview-florida-leak.test.ts`; the rule packs are unfixed and block sending an
+NC lease.
+
+**Counsel review became possible** (#103, #107). The counsel page was 145 lines,
+one query, zero mutations — an attorney could read 64 clauses and say nothing.
+Findings now record through the token and **block approval** until answered.
+
+**The clause library moved to `/admin/lease-library`** (#99) and is labelled
+"Lease Clauses" (#116) — it is instance content, not a customer's, and
+`clauseLibrary.list` proved it by ignoring `organisationId` for data entirely.
+Leases reached the main nav (#117, overlay 069), gated by a READ of
+`canAccessLeaseBuilder` rather than a copy of the rule, so the nav cannot
+disagree with the route's 404.
+
+### Two production defects found and fixed
+
+**A cross-tenant write.** `answerFinding` keyed its update on a caller-supplied
+`findingId`; `assertAccess` proved only that the caller belonged to the
+organisation they NAMED. Any authenticated user could answer another tenant's
+finding — 39 organisations, 35 distinct owners in production. Now `updateMany`
+scoped by `review.organisationId`.
+
+**An invisible footer on every lease PDF ever produced.** See the react-pdf entry
+under Watch out for.
+
+### The pilot lease was in the wrong organisation
+
+29090 Picana Ln is personal; the lease names four natural persons and the
+company appears nowhere in it. Moved to `org_nkzrmhochvhmbwnt` / team `prabhat`
+by `scripts/one-off/2026-09-06-move-picana-to-personal.sql`. **Four things had to
+move, not two:** `BizrethinkDocument` carries its OWN `organisationId` and the
+document procedures authorize on that column alone, so 15 HOA files would have
+stayed the company's — invisibly, since a member of both organisations sees no
+difference. And `BizrethinkLeaseMatter.teamId` goes straight into
+`createEnvelope`, so moving only the organisation would have filed the signed
+envelope back inside the company. Safe **only** because nothing was signed:
+there is no code path to move an envelope between teams.
+
+### The pattern that cost the most time
+
+**Shipping a mechanism with no caller, and describing it as working.** It
+happened three times in one week, by three different sessions:
+
+- `interviewFor` (#94) — the jurisdiction-aware interview, called from nowhere
+  until #100.
+- `findingsBlock` (#103) — "a finding holds the clause until answered", written
+  in four places, true in none until #107.
+- `clauseJurisdiction` / `barJurisdiction` (#89) — written by a migration and
+  read by nothing until #111.
+
+Each passed CI. Each read as finished. **A test that the mechanism exists is not
+a test that anything calls it** — the guards that now exist assert the wiring,
+not the function.
+
+The sibling failure is **a fix that is right for a reason that is wrong**: a
+comment citing Tex. Fin. Code §398.051(a)(9)–(a)(10) where the duplication is at
+(a)(8)–(a)(9). Nothing fails; the next reader inherits a false statement about a
+statute. Same class as `STATE.md` carrying "52 clauses" for weeks — a Picana
+render count used as the library size.
+
 
 ## Blocked
 
@@ -297,6 +386,38 @@ precede it, are in flight as #26 and #27.
 6. Close the remaining documentation lie (`scripts/apply-overlays.sh`).
 
 ## Watch out for
+
+### react-pdf compounds `lineHeight` once per page — and `patches/` is how that is held shut
+
+Every lease PDF over ~13 pages died with `unsupported number:
+-2.2127632876551446e+22`. That value is exactly `Math.fround(1.5 * 11 * 7 ** 25)`:
+`lineHeight` is the only non-idempotent style handler, a unitless ratio resolves
+by multiplying by `fontSize`, and `@react-pdf/layout` re-runs the resolver on the
+already-resolved tree ONCE PER PAGE, so it grows as `fontSize ^ pageCount` until
+it passes pdfkit's 1e21 ceiling.
+
+**The variable is PAGES, not content.** 13 rendered, 14 crashed. Hours went into
+clause length and an orphan-control character threshold — both dead ends, because
+both left the document at 14 pages. It also explains the file's folklore about
+six of eight typefaces "crashing react-pdf": wider metrics, more pages, over the
+ceiling.
+
+It also fixed a live bug nobody knew about: **every lease PDF shipped before
+2026-09-06 had an invisible footer on every page**, its translate degrading to
+-4.5e20 by page 13.
+
+Held by `patches/@react-pdf+layout+5.2.0.patch`, applied by `postinstall`.
+**The filename pins an exact version**, so a dependency bump silently drops it.
+`UPSTREAM.md` now has a `patches/` section; the guard is
+`packages/bizrethink/regression-tests/react-pdf-lineheight-compounding.test.ts`.
+Upstream, current in 4.9.0: https://github.com/diegomura/react-pdf/issues/3277
+
+### Overlay numbers are a shared namespace
+
+Two sessions independently claimed 069 on 2026-09-07. Different files, no
+functional conflict — but overlay numbers are how `UPSTREAM.md` says what to
+re-apply after a merge. Renumbered to 070. **Check `ls overlays/` before
+claiming a number**, especially when more than one session is working.
 
 **This repo's characteristic failure is silence, not breakage.** Everything below
 passed, or appeared to:
