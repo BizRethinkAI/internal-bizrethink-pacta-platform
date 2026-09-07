@@ -141,4 +141,4 @@ That's it. See `overlays/README.md` for status.
 
 ## Pull requests
 
-The PR body is the review surface. Read `.github/pull_request_template.md` before opening or editing any PR, write the body to a file, and open it with `/open-pr` (or `gh pr create --body-file`). A Claude Code hook blocks any other shape; the "PR description" CI job fails a body that skips a section.
+The PR body is the review surface. Read `.github/pull_request_template.md` before opening or editing any PR, write the body to a file, and open it with `/open-pr` (or `gh pr create --body-file`). The "PR description" CI job fails a body that skips a section. This repo does not version `.claude/`, so the Claude Code hook that blocks any other shape is present only once `scripts/ci/install-pr-discipline.sh` has been run in your checkout.
