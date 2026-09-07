@@ -62,7 +62,7 @@ describe('the same overstatement, two states', () => {
     const evaluation = evaluateApr(envelope('NY', OVERSTATED_BY_A_HAIR));
 
     expect(evaluation.outcome).toBe('accurate');
-    expect(evaluation.band.min).toBeCloseTo(OVERSTATED_BY_A_HAIR - 0.0025, 12);
+    expect(evaluation.band.min).toBeCloseTo(OVERSTATED_BY_A_HAIR * 0.975, 12);
   });
 
   it('records the §955(c) inadvertence provision on the California finding rather than treating it as exposure', () => {

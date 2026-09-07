@@ -136,7 +136,14 @@ export const permittedCalculatedBand = (
   const band = Math.max(point, rule.relative * Math.abs(disclosed));
 
   return {
-    min: rule.forgivesOverstatement ? disclosed - point : disclosed,
+    // The relative test extends the band in whichever direction(s) that state's
+    // POINT tests allow, per RELATIVE_TEST_FOLLOWS_POINT_TEST_DIRECTION above.
+    // California's point tests say "below", so nothing extends downward at all
+    // and the floor is the disclosed rate itself. New York's say "above or
+    // below", so the same widened band applies on both sides — using the bare
+    // point band for New York's floor would be stricter than §600.4 requires
+    // and would contradict the reading this file states.
+    min: rule.forgivesOverstatement ? disclosed - band : disclosed,
     max: disclosed + band,
   };
 };

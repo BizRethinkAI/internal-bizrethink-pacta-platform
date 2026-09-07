@@ -14,8 +14,16 @@ import {
   RECIPIENT_FUNDS,
   TOTAL_PAYMENT_ROW,
 } from './authorities';
-import { buildEstimatedStream } from './stream';
-import type { Authority, Cents, DisclosureEnvelope, InstanceFinding, InstanceFindingKind, Jurisdiction } from './types';
+import { buildEstimatedStream, PAYMENT_WEEKDAY_PHASES } from './stream';
+import type {
+  Authority,
+  Cents,
+  DisclosureEnvelope,
+  InstanceFinding,
+  InstanceFindingKind,
+  Jurisdiction,
+  OfferSummaryInstance,
+} from './types';
 
 /**
  * The identities.
@@ -128,6 +136,27 @@ const finding = (
   detail: string,
   assumptions: string[] = [],
 ): Omit<InstanceFinding, 'identity' | 'authorities'> => ({ kind, severity, detail, assumptions });
+
+/**
+ * Every payment count and calendar span the document leaves open.
+ *
+ * The weekday the first payment lands on is not disclosed and there is no
+ * funding date to derive it from, so where the term is stated in CALENDAR days
+ * on a weekday product the number of payments inside it depends on the phase —
+ * 106 to 108 on a 150-day term. `apr.ts` already refuses to pick one; any
+ * identity that quietly picked Monday would report a correct form as a defect,
+ * which is worse than reporting nothing.
+ */
+const paymentCountReadings = (o: OfferSummaryInstance): { count: number; spanDays: number; phase: number }[] => {
+  const convention = o.paymentDayConvention ?? 'every-calendar-day';
+  const phases = convention === 'business-days' && o.termUnit === 'calendar-days' ? [...PAYMENT_WEEKDAY_PHASES] : [0];
+
+  return phases.map((phase) => {
+    const stream = buildEstimatedStream(o, { convention, firstPaymentWeekday: phase });
+
+    return { count: stream.length, spanDays: stream[stream.length - 1].calendarDayOffset, phase };
+  });
+};
 
 const both = (byState: Record<Jurisdiction, Authority>[]): Record<Jurisdiction, Authority[]> => ({
   CA: byState.map((a) => a.CA),
@@ -453,14 +482,22 @@ export const IDENTITIES: Identity[] = [
     requires: [],
     evaluate: (env) => {
       const { offerSummary: o } = env;
-      const stream = buildEstimatedStream(o, {
-        convention: o.paymentDayConvention ?? 'every-calendar-day',
-        firstPaymentWeekday: 0,
-      });
-      const implied = o.estimatedPayment * stream.length;
-      const gap = Math.abs(implied - o.estimatedTotalPaymentAmount);
+      // Every payment count the document leaves open, not one of them. On a
+      // 150-calendar-day weekday term the count runs 106-108 across the five
+      // phases, which is a wider spread than this identity's own one-payment
+      // tolerance — pinning the phase at Monday reported a correctly disclosed
+      // Friday-phase stream as a violation.
+      const candidates = paymentCountReadings(o);
+      const scored = candidates.map((c) => ({
+        ...c,
+        implied: o.estimatedPayment * c.count,
+        gap: Math.abs(o.estimatedPayment * c.count - o.estimatedTotalPaymentAmount),
+      }));
+      // The reading most favourable to the document governs: if ANY reading the
+      // form leaves open closes the stream, the form is not contradicting itself.
+      const kindest = scored.reduce((a, b) => (a.gap <= b.gap ? a : b));
 
-      if (gap <= o.estimatedPayment) {
+      if (kindest.gap <= o.estimatedPayment) {
         return [];
       }
 
@@ -468,9 +505,9 @@ export const IDENTITIES: Identity[] = [
         finding(
           'stream-does-not-close',
           'violation',
-          `${usd(o.estimatedPayment)} across ${stream.length} payments is ${usd(implied)}, against a disclosed total of ${usd(
+          `${usd(o.estimatedPayment)} across ${kindest.count} payments is ${usd(kindest.implied)}, against a disclosed total of ${usd(
             o.estimatedTotalPaymentAmount,
-          )} — a gap of ${usd(gap)}`,
+          )} — a gap of ${usd(kindest.gap)}`,
           [
             o.paymentDayConvention === null
               ? 'the payment-day convention was not captured, so every calendar day was assumed'
@@ -478,6 +515,9 @@ export const IDENTITIES: Identity[] = [
             o.termUnit === 'payment-days'
               ? 'the Estimated Term figure was read as a count of payments'
               : 'the Estimated Term figure was read as elapsed calendar days',
+            scored.length > 1
+              ? `every weekday phase was evaluated (${scored.map((s) => s.count).join('/')} payments) and the closest was taken`
+              : 'the payment count is not phase-dependent on this reading',
           ],
         ),
       ];
@@ -560,14 +600,20 @@ export const IDENTITIES: Identity[] = [
         return [];
       }
 
-      const stream = buildEstimatedStream(o, {
-        convention: o.paymentDayConvention ?? 'every-calendar-day',
-        firstPaymentWeekday: 0,
-      });
-      const termDays = o.termUnit === 'calendar-days' ? o.estimatedTerm : stream[stream.length - 1].calendarDayOffset;
-      const expected = Math.round(o.estimatedTotalPaymentAmount / (termDays / DAYS_PER_MONTH));
+      // Where the term is a payment count the calendar span is phase-dependent,
+      // so every reading is evaluated and the closest governs — same reason as
+      // `stream-closure`. The 2% band would have hidden this today; it would
+      // not on a shorter term.
+      const scored = paymentCountReadings(o).map((r) => {
+        const termDays = o.termUnit === 'calendar-days' ? o.estimatedTerm : r.spanDays;
+        const expected = Math.round(o.estimatedTotalPaymentAmount / (termDays / DAYS_PER_MONTH));
 
-      if (Math.abs(expected - o.estimatedMonthlyCost) <= 0.02 * expected) {
+        // biome-ignore lint/style/noNonNullAssertion: guarded by `applicable`
+        return { termDays, expected, gap: Math.abs(expected - o.estimatedMonthlyCost!) };
+      });
+      const kindest = scored.reduce((a, b) => (a.gap <= b.gap ? a : b));
+
+      if (kindest.gap <= 0.02 * kindest.expected) {
         return [];
       }
 
@@ -577,10 +623,16 @@ export const IDENTITIES: Identity[] = [
           'violation',
           `the inserted row states ${usd(o.estimatedMonthlyCost)}; ${usd(
             o.estimatedTotalPaymentAmount,
-          )} over ${termDays} days is ${usd(expected)} a month`,
-          o.termUnit === 'payment-days'
-            ? ['the Estimated Term figure was read as a count of payments, so the calendar span of the stream was used']
-            : [],
+          )} over ${kindest.termDays} days is ${usd(kindest.expected)} a month`,
+          [
+            ...(o.termUnit === 'payment-days'
+              ? [
+                  'the Estimated Term figure was read as a count of payments, so the calendar span of the stream was used',
+                ]
+              : []),
+            ...(scored.length > 1 ? ['every weekday phase was evaluated and the closest was taken'] : []),
+            '§900(a)(12) says a provider MAY count months as term days ÷ 30.4, so a 2% band is allowed for any other reasonable month count',
+          ],
         ),
       ];
     },
@@ -688,17 +740,25 @@ export const IDENTITIES: Identity[] = [
           : 'under every weekday phase and payment-day convention evaluated';
 
       if (evaluation.outcome === 'undetermined') {
-        const worst = evaluation.readings.filter((r) => r.outcome !== 'accurate');
+        const accurate = evaluation.readings.filter((r) => r.outcome === 'accurate').length;
+        const below = evaluation.readings.filter((r) => r.outcome === 'below').length;
+        const above = evaluation.readings.filter((r) => r.outcome === 'above').length;
+        // Both directions are reachable at once: the phase spread can exceed
+        // the band on a regular transaction at a low disclosed rate, putting
+        // some readings above the calculated rate and others below it. Naming
+        // one direction for all of them would be a false statement in the
+        // sentence a human reads, even though the verdict is right.
+        const rest = [below > 0 ? `understated under ${below}` : null, above > 0 ? `overstated under ${above}` : null]
+          .filter(Boolean)
+          .join(' and ');
 
         return [
           finding(
             'apr-undetermined',
             'undetermined',
-            `the disclosed ${pct(evaluation.disclosed)} is accurate under ${
-              evaluation.readings.length - worst.length
-            } of ${evaluation.readings.length} readings the document leaves open, and ${
-              worst[0].outcome === 'below' ? 'understated' : 'overstated'
-            } under the rest`,
+            `the disclosed ${pct(evaluation.disclosed)} is accurate under ${accurate} of ${
+              evaluation.readings.length
+            } readings the document leaves open, and ${rest}`,
             evaluation.assumptions,
           ),
         ];

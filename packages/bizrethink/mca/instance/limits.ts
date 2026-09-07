@@ -74,8 +74,8 @@ export const NOT_CHECKED: Limit[] = [
   {
     id: 'relative-tolerance-direction',
     kind: 'ambiguous',
-    what: 'Whether a California APR overstated by up to 2.5% relative is inside §955(a)(3).',
-    why: 'The subsection’s arithmetic is worded one-directionally and is literally satisfied by any overstatement, which would leave "below" in (a)(1)-(2) doing nothing. We read it as extending the band only upward. A contrary reading turns some `apr-above-calculated` findings into passes.',
+    what: 'Which direction the 2.5% relative test extends the band in — in EITHER state.',
+    why: 'Both subsections are worded one-directionally and are literally satisfied by any overstatement, which would leave "below" in §955(a)(1)-(2) doing nothing. We read the relative test as extending the band only in the direction(s) that state’s POINT tests allow: upward only in California, both ways in New York. A contrary reading turns some California `apr-above-calculated` findings into passes, and would narrow New York’s floor from 2.5% relative back to a quarter point — which would report lawful New York disclosures as defects.',
     wouldNeed:
       'A reading from counsel. Until then the stricter reading is applied, so the failure mode is a false positive on a California overstatement rather than a missed one.',
   },
@@ -122,6 +122,21 @@ export const NOT_CHECKED: Limit[] = [
     why: 'This package takes an instance as a set of named quantities. It never sees the rendered page, so a form with the right numbers in the wrong rows, or with New York’s phrasing on a California form, passes everything here.',
     wouldNeed:
       '`checkFormConformity`, which already exists and runs on the blank template. The two halves are not yet run together on one document.',
+  },
+  {
+    id: 'the-platform-models-a-different-stream',
+    kind: 'outside-the-documents',
+    what: 'That this checker and `lombard-platform` model the same deal’s payment stream differently.',
+    why: '`computeDisclosureFigures` builds its stream on "every CALENDAR day of the estimated term", while the Lombard California form’s Payment Terms row reads "each business day (Monday–Friday)" and this package follows the row. On the sample deal the contradiction surfaces correctly as `stream-does-not-close` — it is real and it is in the documents — but nothing here says the two systems disagree by construction rather than by defect, and a reader of the finding cannot tell which.',
+    wouldNeed:
+      'The two to agree on one convention, which is a decision for whoever owns the disclosure computation. Phase 2 meets this immediately.',
+  },
+  {
+    id: 'equipment-outside-the-finance-charge',
+    kind: 'ambiguous',
+    what: 'Whether equipment cost deferred into the purchased amount is outside the finance charge under 10 CCR §943.',
+    why: 'The `finance-charge` identity subtracts it, on the computation spec’s reasoning that it is the price of goods rather than a cost of the financing. Nothing in §943(a) says so in terms, and REVIEW-01 carries `equipment-money-never-tested-as-finance-charge` as an open coverage gap. Every fixture in this package has a zero equipment amount except the one that exists to exercise the branch.',
+    wouldNeed: 'Counsel, and a real deal with deferred equipment to check against.',
   },
   {
     id: 'citation-subdivision-letters',

@@ -66,10 +66,13 @@ describe('permittedCalculatedBand — the range of TRUE rates a disclosed rate m
     expect(band.max).toBeCloseTo(disclosed + 0.025 * disclosed, 12);
   });
 
-  it('New York permits it on either side', () => {
+  it('New York permits it on either side, by the same widened band', () => {
     const band = permittedCalculatedBand(TOLERANCE_RULES.NY, disclosed, 'irregular');
 
-    expect(band.min).toBeCloseTo(disclosed - 0.0025, 12);
+    // Not `disclosed - 0.0025`. §600.4(a)(1)-(2) say "above or below", so the
+    // relative test in (a)(3) extends the band on both sides; using the bare
+    // quarter point as the floor would be stricter than New York requires.
+    expect(band.min).toBeCloseTo(disclosed - 0.025 * disclosed, 12);
     expect(band.max).toBeCloseTo(disclosed + 0.025 * disclosed, 12);
   });
 
@@ -79,5 +82,15 @@ describe('permittedCalculatedBand — the range of TRUE rates a disclosed rate m
 
     expect(permittedCalculatedBand(TOLERANCE_RULES.CA, small, 'regular').max).toBeCloseTo(small + 0.00125, 12);
     expect(permittedCalculatedBand(TOLERANCE_RULES.CA, small, 'irregular').max).toBeCloseTo(small + 0.0025, 12);
+    // And New York's floor moves with it.
+    expect(permittedCalculatedBand(TOLERANCE_RULES.NY, small, 'regular').min).toBeCloseTo(small - 0.00125, 12);
+    expect(permittedCalculatedBand(TOLERANCE_RULES.NY, small, 'irregular').min).toBeCloseTo(small - 0.0025, 12);
+  });
+
+  it('never lets California’s floor fall below the disclosed rate, at any size', () => {
+    for (const d of [0.001, 0.05, 0.674, 1.715, 9]) {
+      expect(permittedCalculatedBand(TOLERANCE_RULES.CA, d, 'irregular').min).toBe(d);
+      expect(permittedCalculatedBand(TOLERANCE_RULES.CA, d, 'regular').min).toBe(d);
+    }
   });
 });

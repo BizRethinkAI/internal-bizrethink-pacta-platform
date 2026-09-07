@@ -163,6 +163,47 @@ const CORPUS: { kind: InstanceFindingKind; label: string; env: DisclosureEnvelop
     }),
   },
   {
+    kind: 'missing-required-figure',
+    label: 'the APR row’s prescribed sentence has no assumed-income figure in it',
+    env: mutate((e) => {
+      e.offerSummary.estimatedAvgMonthlyIncome = null;
+    }),
+  },
+  {
+    kind: 'missing-required-figure',
+    label: 'the prepayment cap cell is blank, which is undecidable rather than a defect',
+    env: mutate((e) => {
+      e.offerSummary.maximumNonInterestFinanceCharge = null;
+    }),
+  },
+  {
+    kind: 'amount-financed-mismatch',
+    label: 'a renewal carries a prior balance and the amount financed ignores it',
+    env: mutate((e) => {
+      // biome-ignore lint/style/noNonNullAssertion: the clean fixture always carries one
+      e.contract!.priorBalanceCarried = 1_000_000;
+      // biome-ignore lint/style/noNonNullAssertion: the clean fixture always carries one
+      e.contract!.purchasedAmount = 8_450_000;
+      e.offerSummary.estimatedTotalPaymentAmount = 8_450_000;
+      e.offerSummary.financeCharge = 2_739_500;
+      // Correct would be 4_710_500 + 1_000_000.
+    }),
+  },
+  {
+    kind: 'finance-charge-mismatch',
+    label: 'deferred equipment is treated as a cost of the financing',
+    env: mutate((e) => {
+      // biome-ignore lint/style/noNonNullAssertion: the clean fixture always carries one
+      e.contract!.equipmentCostDeferred = 500_000;
+      // biome-ignore lint/style/noNonNullAssertion: the clean fixture always carries one
+      e.contract!.purchasedAmount = 7_950_000;
+      e.offerSummary.estimatedTotalPaymentAmount = 7_950_000;
+      // The charge still reads as if the whole spread were a finance charge:
+      // correct is 2_739_500, since §943 excludes the price of goods.
+      e.offerSummary.financeCharge = 3_239_500;
+    }),
+  },
+  {
     kind: 'apr-below-calculated',
     label: '67.4% against a true rate near 175%',
     env: mutate((e) => {
@@ -185,24 +226,35 @@ const CORPUS: { kind: InstanceFindingKind; label: string; env: DisclosureEnvelop
   },
 ];
 
-const ALL_KINDS: InstanceFindingKind[] = [
-  'closure-mismatch',
-  'itemization-disagrees',
-  'itemization-internally-inconsistent',
-  'recipient-funds-unexplained',
-  'itemization-required',
-  'finance-charge-mismatch',
-  'finance-charge-below-prepaid',
-  'amount-financed-mismatch',
-  'stream-does-not-close',
-  'payment-contradicts-projection',
-  'monthly-cost-mismatch',
-  'prepayment-cap-exceeds-finance-charge',
-  'apr-below-calculated',
-  'apr-above-calculated',
-  'apr-undetermined',
-  'missing-required-figure',
-];
+/*
+  EXHAUSTIVE BY THE TYPE, not by hand.
+
+  A plain `InstanceFindingKind[]` literal is a SUBSET: add a member to the union
+  in `types.ts`, forget it here, and both the typecheck and the suite stay green
+  — which is exactly the vacuous pass this file exists to prevent, reintroduced
+  by the file itself. `Record<InstanceFindingKind, true>` is not a subset. Omit
+  a key and `tsc -p tsconfig.typecheck.json` fails.
+*/
+const KIND_MUST_BE_REACHABLE: Record<InstanceFindingKind, true> = {
+  'closure-mismatch': true,
+  'itemization-disagrees': true,
+  'itemization-internally-inconsistent': true,
+  'recipient-funds-unexplained': true,
+  'itemization-required': true,
+  'finance-charge-mismatch': true,
+  'finance-charge-below-prepaid': true,
+  'amount-financed-mismatch': true,
+  'stream-does-not-close': true,
+  'payment-contradicts-projection': true,
+  'monthly-cost-mismatch': true,
+  'prepayment-cap-exceeds-finance-charge': true,
+  'apr-below-calculated': true,
+  'apr-above-calculated': true,
+  'apr-undetermined': true,
+  'missing-required-figure': true,
+};
+
+const ALL_KINDS = Object.keys(KIND_MUST_BE_REACHABLE) as InstanceFindingKind[];
 
 describe('the clean instance', () => {
   it('produces nothing, so every finding below is caused by its own mutation', () => {
@@ -219,6 +271,47 @@ describe('the clean instance', () => {
     // §956(a) is not triggered on a deal with no payments on the merchant's
     // behalf, and that is the only identity the clean instance cannot exercise.
     expect(report.notApplicable.map((n) => n.identity)).toEqual(['itemization-required']);
+  });
+});
+
+describe('no identity resolves an undisclosed reading against the document', () => {
+  /*
+    The weekday the first payment lands on is not disclosed. On a term stated in
+    CALENDAR days it changes the payment count — 108, 108, 108, 107, 106 across
+    Monday through Friday on a 150-day term — which is a wider spread than
+    `stream-closure`'s one-payment tolerance.
+
+    `apr.ts` already refused to pick a phase. `stream-closure` and `monthly-cost`
+    used to pin it at Monday, so a correctly disclosed Friday-phase stream was
+    reported as a violation of an identity it satisfies.
+  */
+  const fridayPhase = (): DisclosureEnvelope => {
+    const env = clean();
+    env.offerSummary.estimatedTerm = 150;
+    env.offerSummary.termUnit = 'calendar-days';
+    // 106 payments is the Friday-phase count inside 150 calendar days.
+    env.offerSummary.estimatedPayment = 70_283; // $74,500.00 ÷ 106
+    env.offerSummary.estimatedMonthlyCost = 1_509_867; // $74,500 ÷ (150 ÷ 30.4)
+    env.offerSummary.estimatedAvgMonthlyIncome = 10_170_000;
+    env.offerSummary.estimatedApr = 1.7; // inside the band under every phase
+
+    return env;
+  };
+
+  it('does not report a correctly disclosed Friday-phase stream as a violation', () => {
+    const kinds = checkDisclosureInstance(fridayPhase()).findings.map((f) => f.kind);
+
+    expect(kinds).not.toContain('stream-does-not-close');
+    expect(kinds).not.toContain('monthly-cost-mismatch');
+  });
+
+  it('says which phases it evaluated when it does report one', () => {
+    const env = fridayPhase();
+    env.offerSummary.estimatedPayment = 40_000; // closes under no phase
+
+    const found = checkDisclosureInstance(env).findings.find((f) => f.kind === 'stream-does-not-close');
+
+    expect(found?.assumptions.join(' ')).toContain('every weekday phase was evaluated');
   });
 });
 
