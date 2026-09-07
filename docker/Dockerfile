@@ -145,6 +145,22 @@ COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 
+# BIZRETHINK overlay 069: ship the vendored statutes.
+#
+# packages/bizrethink/mca/sources/ holds the primary text every MCA disclosure
+# spec was transcribed from. `verifyProvenance` re-reads those files on every
+# run and re-hashes them: a verification date means "these bytes have not moved
+# since we checked", and without the bytes it means nothing.
+#
+# The runner stage copies only the built app, so the sources were absent from
+# the image. /admin/mca would report SOURCE MISSING for all eleven states in
+# production while being green locally -- the page telling the truth about a
+# gap it had itself created.
+#
+# 764K of text. Kept out of the build stages deliberately: nothing compiles
+# them, they are read at request time.
+COPY --from=installer --chown=nodejs:nodejs /app/packages/bizrethink/mca/sources ./packages/bizrethink/mca/sources
+
 # Generate the prisma client again
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 

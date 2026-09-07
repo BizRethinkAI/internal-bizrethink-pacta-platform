@@ -53,6 +53,7 @@ some of these, so check here first when re-deriving a patch.**
 | 012 / 015 / 017 / 032 (admin sections) | inline in `admin+/site-settings.tsx` (route is now a thin shell) | `apps/remix/app/components/general/admin-{signup-gating,captcha,webhook,security-headers}-section.tsx` |
 | 037 (`created` on signature type) | duplicate `FieldToRender` in `render-field.ts` | single definition in `universal/field-renderer/field-renderer.ts` |
 | 041 (PRO claim + trial) | `claim: internalClaims[INTERNAL_CLAIM_ID.PRO]` | `getSubscriptionClaim(INTERNAL_CLAIM_ID.PRO)` — upstream slimmed `internalClaims` to `Pick<'id'\|'name'>`, so flags/quotas now come from the DB row |
+| 069 | `069-ship-mca-sources.patch` | **APPLIED 2026-09-07** | LOW | Adds one `COPY` to `docker/Dockerfile`'s runner stage for `packages/bizrethink/mca/sources/` (764K of vendored statutes). `verifyProvenance` re-reads and re-hashes those files at request time, so a verification date without the bytes means nothing. Without this, `/admin/mca` reports SOURCE MISSING for all eleven states in production while being green locally. Same file as overlays 003 and 031. |
 
 Overlay 047's `NAV_GROUPS` also gained upstream's two new admin routes (Email Transports,
 Organisation Stats) — re-check that array whenever upstream adds an admin page.
