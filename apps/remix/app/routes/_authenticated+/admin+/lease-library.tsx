@@ -52,7 +52,7 @@ import type { Route } from './+types/lease-library';
  */
 
 export function meta() {
-  return appMetaTags(msg`Clause library`);
+  return appMetaTags(msg`Lease clause library`);
 }
 
 /**
@@ -279,7 +279,7 @@ export default function ClauseLibraryPage() {
   return (
     <div className="mx-auto w-full max-w-screen-lg px-4 pb-16 md:px-8">
       <div className="mt-8">
-        <h1 className="font-semibold text-3xl">Clause library</h1>
+        <h1 className="font-semibold text-3xl">Lease clause library</h1>
         {/*
           THE OLD HEADING WAS FALSE FOR 36 OF 64. It read "Every clause a
           Florida lease can be assembled from", which is true as a set and reads
