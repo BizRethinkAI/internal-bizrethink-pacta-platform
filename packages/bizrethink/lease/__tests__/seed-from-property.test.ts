@@ -88,6 +88,29 @@ describe('the landlord comes from the property', () => {
     expect(values.noticeAddress).toBe('537 Lochaven Rd, Wesley Chapel, FL 33543');
   });
 
+  /*
+    THE SAME TWO COLUMNS, SEEDED INTO NORTH CAROLINA'S FIELDS TOO.
+
+    North Carolina asks for the landlord's notice name and address under its own
+    field names, because the teaching differs — Fla. Stat. §83.50 COMPELS the
+    disclosure, while in North Carolina it is §42-42(a)(4) making the landlord's
+    own repair duty turn on the tenant's written notice. Different law, so a
+    separate question.
+
+    But it is the same FACT, and the property row already holds it. Seeding only
+    the Florida pair would have made a North Carolina landlord retype something
+    the product already knew — which is the exact shape of the redundancy that
+    hid the §83.505 defect: the interview asked for notice addresses it already
+    had, and the duplicate turned out not to be able to represent the real
+    answer. Cheaper to seed both than to find out.
+  */
+  it('seeds the same two facts into the North Carolina fields', () => {
+    const { values } = seedMatterFromProperty(property);
+
+    expect(values.ncNoticeName).toBe('Shwet Prabhat');
+    expect(values.ncNoticeAddress).toBe('537 Lochaven Rd, Wesley Chapel, FL 33543');
+  });
+
   it('copies rather than references, so later edits cannot reach a live lease', () => {
     const seeded = seedMatterFromProperty(property);
 
@@ -158,5 +181,7 @@ describe('a property set up before landlords existed', () => {
     const { values } = seedMatterFromProperty(legacy);
 
     expect(values.noticeName ?? null).toBeNull();
+    expect(values.ncNoticeName ?? null).toBeNull();
+    expect(values.ncNoticeAddress ?? null).toBeNull();
   });
 });

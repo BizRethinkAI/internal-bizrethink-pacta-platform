@@ -24,7 +24,7 @@ inherits**. Two commits, and the first is a bug fix that had to go first.
 | Interview questions | 70 | **54** |
 | Interview steps | 15 | **13** |
 
-Tests **1199 → 1259**. Typecheck clean in both `packages/bizrethink` and
+Tests **1199 → 1260**. Typecheck clean in both `packages/bizrethink` and
 `apps/remix`.
 
 ## The verdict: was a second state cheap?
@@ -246,7 +246,13 @@ marking mechanism that can read `includeWhen` safely. Not in this PR.
    *(An earlier draft of this note asserted 76 and 69. Both were invented and
    neither was measured. Recorded because a number nobody checked is precisely
    what the STATE.md clause-count correction on `main` was about.)*
-7. **`deposit.permitted-uses-nc` was written and then dropped.** §42-51(a) is a
+7. **`seedMatterFromProperty` now seeds the North Carolina notice fields from
+   the same two property columns as the Florida ones.** They are separate
+   questions because the teaching differs, but they are the same fact and the
+   property already holds it. Seeding only the Florida pair would have made a
+   North Carolina landlord retype what the product knows — the exact redundancy
+   that hid the §83.505 defect.
+8. **`deposit.permitted-uses-nc` was written and then dropped.** §42-51(a) is a
    closed list and enumerating it is protective, but North Carolina neither
    requires it nor has a Florida clause it replaces, so it failed the scope rule.
    Recorded here rather than silently omitted.
