@@ -211,8 +211,16 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
           {/*
             Indexed key, not label-keyed. Texas maps fifteen statutory
             requirements onto rows and two of its labels appear twice —
-            "Estimated Periodic Payment" for §398.051(a)(5) and (a)(6),
-            "Prepayment" for (a)(9) and (a)(10). A label key collides there.
+            "Estimated Periodic Payment" for §398.051(a)(5) and
+            (a)(6)(B)(i), "Prepayment" for (a)(8) and (a)(9). A label key
+            collides there.
+
+            The citations were wrong when first written: they read (a)(9) and
+            (a)(10), but (a)(10) is "Collateral Requirements or Security
+            Interests" and duplicates nothing. The FIX was right and the reason
+            given for it was not — the harder error to notice, because the code
+            works, so nothing fails, and the next reader inherits a false
+            statement about the statute.
           */}
           {entry.unreadable.map((u, i) => (
             <li key={`${entry.slug}-${i}-${u.label}`}>
