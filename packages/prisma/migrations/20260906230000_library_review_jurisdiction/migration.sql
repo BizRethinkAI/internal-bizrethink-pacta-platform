@@ -1,0 +1,22 @@
+-- Which jurisdiction's library a counsel review link covers.
+--
+-- The clause library was split by jurisdiction on 2026-09-06 — 35 clauses that
+-- turn on no state's law, 1 federal, 28 Florida — and `libraryFor()` has served
+-- one state's slice ever since. The REVIEW LINK was never told. Every link sent
+-- all 64 clauses under a heading calling them Florida's, and pinned
+-- `libraryFingerprint` to all 64, so a link for one state would have gone stale
+-- on an edit to a clause it never showed.
+--
+-- NOT NULL, no default, no backfill. Re-verified read-only against production
+-- immediately before writing this: `SELECT count(*) FROM
+-- "BizrethinkLibraryReview"` returns 0, as does the finding table that hangs
+-- off it. A default would be a guess about what earlier links covered, and
+-- there are no earlier links to guess about — the same reason
+-- `20260905200000_approval_jurisdiction` could add its two columns as a field
+-- addition rather than a migration with rows to fix.
+--
+-- If this ever needs replaying against a database that DID accumulate rows, the
+-- correct move is not a default: it is to read what each link actually sent
+-- from its `libraryFingerprint`, and a link whose fingerprint matches no
+-- jurisdiction's library should be revoked rather than relabelled.
+ALTER TABLE "BizrethinkLibraryReview" ADD COLUMN "jurisdiction" TEXT NOT NULL;

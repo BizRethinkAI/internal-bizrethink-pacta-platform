@@ -1,3 +1,9 @@
+import {
+  JURISDICTION_TIERS,
+  jurisdictionLabel,
+  jurisdictionName,
+  PORTABLE_TIERS,
+} from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
 import { trpc } from '@documenso/trpc/react';
 
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -59,8 +65,8 @@ export default function ClauseReviewPage() {
 
   /*
     A SEPARATE QUERY FROM `openLibrary`, deliberately. Recording a finding has
-    to refetch whatever shows it, and `openLibrary` carries all 52 clause
-    bodies — re-downloading the entire library to render one new line. This one
+    to refetch whatever shows it, and `openLibrary` carries every clause body
+    on the link — re-downloading the entire library to render one new line. This one
     is small and refetched often; that one is large and does not change.
 
     Scoped by the review row on the server, so this is the findings that came in
@@ -88,15 +94,32 @@ export default function ClauseReviewPage() {
     );
   }
 
-  const { reviewerName, libraryMoved, clauses } = query.data;
+  const { reviewerName, libraryMoved, clauses, jurisdiction } = query.data;
 
   const compelled = clauses.filter((c) => c.why.kind === 'compelled');
   const implementing = clauses.filter((c) => c.why.kind === 'implements');
   const discretionary = clauses.filter((c) => c.why.kind === 'discretionary');
 
+  /*
+    THE SPLIT THIS PAGE WAS HIDING. The link carries the clauses that reach a
+    lease in one state — the ones that turn on its law, plus the ones that turn
+    on no state's law at all. Rendered flat, an attorney read all of them under
+    a heading naming one state, with nothing saying which was which and nothing
+    telling her that most of them are not that state's.
+
+    Clauses arrive in `inReviewOrder`, so this only splits them.
+  */
+  const tiers = JURISDICTION_TIERS.map((tier) => ({
+    tier,
+    rows: clauses.filter((clause) => clause.jurisdiction === tier),
+  })).filter((group) => group.rows.length > 0);
+
+  const stateName = jurisdictionName(jurisdiction);
+  const portable = clauses.filter((clause) => PORTABLE_TIERS.has(clause.jurisdiction)).length;
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <h1 className={`${DOC_SERIF} font-bold text-3xl tracking-tight`}>Florida lease clause library</h1>
+      <h1 className={`${DOC_SERIF} font-bold text-3xl tracking-tight`}>{stateName} lease clause library</h1>
       <p className="mt-1 text-muted-foreground text-sm">For review by {reviewerName}</p>
 
       {/*
@@ -112,6 +135,15 @@ export default function ClauseReviewPage() {
           <span className={ACCENT}>implements a statute</span>, or our own drafting. Only {compelled.length} of{' '}
           {clauses.length} are compelled by statute — the rest are editorial judgement, which is where your reading is
           worth most.
+          <br />
+          <br />
+          {/*
+            SAID PLAINLY, because the page used to imply the opposite by
+            omission. It is headed with one state's name and {portable} of these
+            clauses turn on no state's law — they are in every state's library.
+          */}
+          They are grouped below by the law each one depends on. {portable} of the {clauses.length} turn on no
+          state&rsquo;s law and appear in every state&rsquo;s library; the rest are {stateName}&rsquo;s.
         </AlertDescription>
       </Alert>
 
@@ -138,59 +170,71 @@ export default function ClauseReviewPage() {
         ))}
       </dl>
 
-      <div className="mt-10 space-y-6">
-        {clauses.map((clause) => (
-          <section key={clause.slug} className="border-b pb-6 last:border-b-0">
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className={`${DOC_SERIF} font-semibold text-lg`}>{clause.heading}</h2>
-              {clause.approved ? (
-                <Badge variant="neutral">Approved</Badge>
-              ) : (
-                <Badge variant="secondary">Unapproved</Badge>
-              )}
-            </div>
+      {tiers.map((group) => (
+        <div key={group.tier} className="mt-10">
+          <h2 className={`${DOC_SERIF} border-b pb-2 font-bold text-xl`}>{jurisdictionLabel(group.tier)}</h2>
+          <p className="mt-1 text-muted-foreground text-sm">
+            {group.rows.length} {group.rows.length === 1 ? 'clause' : 'clauses'} ·{' '}
+            {PORTABLE_TIERS.has(group.tier)
+              ? 'In every state\u2019s library.'
+              : `Only in a ${jurisdictionName(group.tier)} lease.`}
+          </p>
 
-            <p className="mt-1 font-mono text-muted-foreground text-xs">
-              {clause.slug} · v{clause.version}
-            </p>
+          <div className="mt-6 space-y-6">
+            {group.rows.map((clause) => (
+              <section key={clause.slug} className="border-b pb-6 last:border-b-0">
+                <div className="flex items-baseline justify-between gap-3">
+                  <h2 className={`${DOC_SERIF} font-semibold text-lg`}>{clause.heading}</h2>
+                  {clause.approved ? (
+                    <Badge variant="neutral">Approved</Badge>
+                  ) : (
+                    <Badge variant="secondary">Unapproved</Badge>
+                  )}
+                </div>
 
-            <p className="mt-1 text-xs">
-              {clause.why.kind === 'compelled' && (
-                <span className={ACTION}>
-                  Required by law — {clause.why.citation}. {clause.why.appliesWhen}
-                </span>
-              )}
-              {clause.why.kind === 'implements' && (
-                <span className={ACCENT}>
-                  Implements {clause.why.citation}. The statute does not dictate this wording.
-                </span>
-              )}
-              {clause.why.kind === 'discretionary' && (
-                <span className="text-muted-foreground">Our drafting. No statute requires this clause.</span>
-              )}
-            </p>
+                <p className="mt-1 font-mono text-muted-foreground text-xs">
+                  {clause.slug} · v{clause.version}
+                </p>
 
-            <p className="mt-0.5 text-muted-foreground text-xs">
-              {clause.sourceKind === 'statute'
-                ? clause.verbatimRequired
-                  ? clause.verbatimVerifiedAt
-                    ? `Prescribed text — read off the statute on ${clause.verbatimVerifiedAt}.`
-                    : 'Prescribed text — NOT yet checked against the statute book.'
-                  : 'Safe-harbour form — the statute asks for "substantially" this.'
-                : 'Drafted in-house.'}
-            </p>
+                <p className="mt-1 text-xs">
+                  {clause.why.kind === 'compelled' && (
+                    <span className={ACTION}>
+                      Required by law — {clause.why.citation}. {clause.why.appliesWhen}
+                    </span>
+                  )}
+                  {clause.why.kind === 'implements' && (
+                    <span className={ACCENT}>
+                      Implements {clause.why.citation}. The statute does not dictate this wording.
+                    </span>
+                  )}
+                  {clause.why.kind === 'discretionary' && (
+                    <span className="text-muted-foreground">Our drafting. No statute requires this clause.</span>
+                  )}
+                </p>
 
-            <p className={`${DOC_SERIF} mt-3 whitespace-pre-wrap text-[0.95rem] leading-relaxed`}>{clause.body}</p>
+                <p className="mt-0.5 text-muted-foreground text-xs">
+                  {clause.sourceKind === 'statute'
+                    ? clause.verbatimRequired
+                      ? clause.verbatimVerifiedAt
+                        ? `Prescribed text — read off the statute on ${clause.verbatimVerifiedAt}.`
+                        : 'Prescribed text — NOT yet checked against the statute book.'
+                      : 'Safe-harbour form — the statute asks for "substantially" this.'
+                    : 'Drafted in-house.'}
+                </p>
 
-            <FindingBox
-              token={token}
-              clauseSlug={clause.slug}
-              recorded={findingsFor(clause.slug)}
-              onRecorded={() => void findings.refetch()}
-            />
-          </section>
-        ))}
-      </div>
+                <p className={`${DOC_SERIF} mt-3 whitespace-pre-wrap text-[0.95rem] leading-relaxed`}>{clause.body}</p>
+
+                <FindingBox
+                  token={token}
+                  clauseSlug={clause.slug}
+                  recorded={findingsFor(clause.slug)}
+                  onRecorded={() => void findings.refetch()}
+                />
+              </section>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

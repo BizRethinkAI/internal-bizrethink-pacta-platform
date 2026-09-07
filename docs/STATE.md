@@ -58,7 +58,7 @@ definition), **#24** (multi-step interview UI), **#25** (four Florida statutory
 gaps found by adversarial review).
 
 **The lease builder is now reachable and usable.** `/t/:teamUrl/leases` renders a
-13-step, 68-field interview over **52 clauses**, with a live findings panel, a PDF
+15-step, 70-field interview over **64 clauses**, with a live findings panel, a PDF
 preview, a custom-clause editor and — as of #26 — a working Send. Both gates
 remain shut: `BizrethinkFeatureAccess` grants access only to user 3, and every
 clause sits at `status: 'draft'`, which renders only for an organisation holding
@@ -151,8 +151,16 @@ envelope between teams.** Anything similar must happen before the first send.
 
 - **Lease builder cannot reach a third party** until a Florida attorney reviews
   the clause library. That is deliberate and enforced in code, not by memory.
-  **52 clauses**, all `attorney-drafted, author: null` — meaning drafted by a
-  language model and reviewed by nobody. `reviewedBy`, `verbatimVerifiedAt` and
+  **64 clauses** — 58 `attorney-drafted, author: null`, meaning drafted by a
+  language model and reviewed by nobody, and 6 transcribed statutory text. Zero
+  approvals exist in production, so nothing in the library is reviewed.
+
+  *(Corrected 2026-09-07, verified against `FL_LIBRARY` and a read-only prod
+  query. The file had said 52 for weeks. **52 is the number of clauses that
+  RENDER for the Picana matter** — one property, one set of answers — and it had
+  been copied into three places as though it were the size of the library. A
+  count that depends on a matter is not a fact about the library, and the two
+  drifted apart the moment a clause was added that Picana does not select.)* `reviewedBy`, `verbatimVerifiedAt` and
   the `assertPublishable` guard all exist and are all currently set by nobody;
   the planned review loop writes into them.
 
@@ -459,7 +467,7 @@ passed, or appeared to:
 
 Every clause said `jurisdiction: 'US-FL'` except the lead-paint disclosure.
 Measured against the only question that matters — *would this text still be true
-in another state?* — the split is **35 generic, 1 federal, 27 Florida**.
+in another state?* — the split is **35 generic, 1 federal, 28 Florida**.
 
 Adding North Carolina under the old labelling would have duplicated those 35 per
 state: a second `general.severability`, a second set of house rules, a second

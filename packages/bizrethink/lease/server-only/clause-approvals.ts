@@ -40,6 +40,12 @@ export const loadClauseApprovals = async (): Promise<Map<string, ClauseApproval>
       fingerprint: row.fingerprint,
       approvedByName: row.approvedByName,
       approvedByBarNumber: row.approvedByBarNumber,
+      /*
+        Added by `20260905200000_approval_jurisdiction` and, until now, written
+        and never read back. `coversJurisdiction` is the reader.
+      */
+      clauseJurisdiction: row.clauseJurisdiction,
+      barJurisdiction: row.barJurisdiction,
       approvedAt: row.approvedAt,
       notes: row.notes,
     });
