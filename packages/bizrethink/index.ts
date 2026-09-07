@@ -50,6 +50,7 @@ export {
   type Assurance,
   assertSingleLibrary,
   type ConformityEntry,
+  type ConformityKind,
   type ConformitySurface,
   conformitySurface,
   type DigestState,

@@ -3,6 +3,7 @@ import type { ContentStatute } from '../content/types';
 import { coverageForContents, type EnvelopeContents } from '../instance/check';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS, type McaJurisdiction } from '../jurisdictions';
 import { coverage } from '../prescribed/conformity';
+import { type ItemizationForm, itemizationCoverage } from '../prescribed/itemization';
 import type { PrescribedForm } from '../prescribed/types';
 import { normalisedDigest, readSourceText, type SourceSection, sourceExists } from '../provenance/source-text';
 import {
@@ -124,6 +125,16 @@ export type DigestState = 'matches' | 'stale' | 'source-missing';
  */
 export type Assurance = 'unverified' | 'partly-verified' | 'verified';
 
+/**
+ * Which of the three documents a card describes.
+ *
+ * Three, not two, since #119. They are kept apart because they are checked by
+ * different code against different obligations — `coverage()` counts rows,
+ * `itemizationCoverage()` counts lines, and a content-only statute has a
+ * requirement list and no document structure at all.
+ */
+export type ConformityKind = 'prescribed-form' | 'itemization' | 'content-statute';
+
 /** A row, or a statutory requirement, whose contents no check reads. */
 export type Unreadable = {
   /** Row index on a prescribed form; null for a content statute's requirement. */
@@ -139,7 +150,7 @@ export type ConformityEntry = {
   slug: string;
   /** The statute or regulation the spec was transcribed from. */
   citation: string;
-  kind: 'prescribed-form' | 'content-statute';
+  kind: ConformityKind;
   /** The vendored primary text in `mca/sources/`. Never a summary. */
   sourceFile: string;
   /** Which part of that file, where the file holds more than this instrument. */
@@ -181,7 +192,64 @@ export type ConformitySurface = {
   entries: ConformityEntry[];
 };
 
+/**
+ * Which of the three documents this is.
+ *
+ * THIS FUNCTION IS THE FIX FOR THE BUG #119 EXPOSED, and the bug was not that
+ * the itemization was mishandled. It was that a binary `prescribed ? … : …`
+ * had no way to express "I do not know what this is": an `ItemizationForm` went
+ * down the content-statute branch and read `.requirements`, which it does not
+ * have.
+ *
+ * Note how it presented, because it is the whole argument for CI running the
+ * typecheck: **the suite passed and only `tsc` failed.** vitest strips types, so
+ * a green run said nothing about whether the code compiled, and neither PR was
+ * red on its own — only the combination was.
+ *
+ * So the dispatch is exhaustive in two ways, which catch different things:
+ *
+ *   - the throw fails at RUNTIME on an object that satisfies none of the three,
+ *     which the type system cannot see (a spec crossing a boundary, a cast).
+ *     This one is asserted — replacing it with a default branch fails the
+ *     suite;
+ *   - the `never` assignment fails the TYPECHECK the moment a fourth member
+ *     joins the `McaDisclosure` union, before anyone runs anything.
+ *
+ * BE PRECISE ABOUT WHICH OF THOSE IS ENFORCED. Deleting the `never` assignment
+ * on its own is caught by NOTHING — verified by mutation. What actually holds
+ * the union closed is the compile-time pin in `__tests__/surface.test.ts`,
+ * which stops compiling if `McaDisclosure` and the three handled shapes stop
+ * being the same set in either direction. The `never` here is local defence
+ * beside it, not the guarantee.
+ *
+ * Neither may be replaced by a default branch producing an empty card. A card
+ * with no rows and nothing unread reads as a clean document, and rendering an
+ * unknown shape as clean is this page's own failure mode, one level up.
+ */
+const shapeOf = (spec: McaDisclosure): ConformityKind => {
+  if ('rows' in spec) {
+    return 'prescribed-form';
+  }
+
+  if ('lines' in spec) {
+    return 'itemization';
+  }
+
+  if ('requirements' in spec) {
+    return 'content-statute';
+  }
+
+  const unhandled: never = spec;
+  const slug = (unhandled as { slug?: string }).slug ?? JSON.stringify(unhandled);
+
+  throw new Error(
+    `the conformity surface has no card for ${slug}: it is neither a prescribed form (rows), an itemization ` +
+      '(lines) nor a content-only statute (requirements). Add a shape rather than letting it render empty.',
+  );
+};
+
 const isPrescribedForm = (spec: McaDisclosure): spec is PrescribedForm => 'rows' in spec;
+const isItemization = (spec: McaDisclosure): spec is ItemizationForm => 'lines' in spec;
 
 const digestStateOf = (spec: McaDisclosure): { digest: DigestState; observed: string | null } => {
   if (!sourceExists(spec.sourceFile)) {
@@ -210,6 +278,31 @@ const unreadableRowsOf = (form: PrescribedForm): Unreadable[] =>
             row: i,
             label: row.label,
             why: `${form.citation} prescribes this label and supplies no wording for the row, so the label is checked and the contents are not`,
+          },
+        ]
+      : [],
+  );
+
+/*
+  The one line the Itemization's own regulation requires and does not word.
+
+  §956(a)(3) and §600.17(a)(3) put each third-party payee on a separate line and
+  say to identify them; they supply no wording, so the text on that line is
+  OURS on a document that is otherwise the regulator's. One line of six, on
+  each of the two.
+
+  It is the same class of gap as an unworded row on §914 and it is reported the
+  same way — which is the point of putting itemizations on this page at all.
+  `itemizationCoverage()` counts it; this names it.
+*/
+const unreadableLinesOf = (form: ItemizationForm): Unreadable[] =>
+  form.lines.flatMap((line, i) =>
+    line.description === null
+      ? [
+          {
+            row: i,
+            label: `Line ${i + 1}`,
+            why: `${line.citation} requires this line and supplies no description for it, so the words on it are ours`,
           },
         ]
       : [],
@@ -252,11 +345,31 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
   const { digest, observed } = digestStateOf(spec);
   const problems = verifyProvenance(spec);
   const publishGate = assertPublishable(spec);
-  const prescribed = isPrescribedForm(spec);
 
-  const unreadable = prescribed ? unreadableRowsOf(spec) : unreadableRequirementsOf(spec);
+  /*
+    Every shape-dependent value is derived from ONE dispatch, not from a
+    scattering of `'rows' in spec` tests. Three of those had drifted apart
+    before, which is how an itemization reached `.requirements`.
+  */
+  const kind = shapeOf(spec);
+  const prescribed = isPrescribedForm(spec);
+  const itemization = isItemization(spec);
+
+  const unreadable = prescribed
+    ? unreadableRowsOf(spec)
+    : itemization
+      ? unreadableLinesOf(spec)
+      : unreadableRequirementsOf(spec);
+
+  // Only a prescribed TABLE has a row the regulator closes with "shall include
+  // only" and then compels us to write into. §956 closes nothing.
   const providerDrafted = prescribed ? unverifiableSentences(spec) : [];
-  const rows = prescribed ? coverage(spec) : { total: spec.requirements.length };
+
+  const rows = prescribed
+    ? coverage(spec)
+    : itemization
+      ? { total: itemizationCoverage(spec).total }
+      : { total: spec.requirements.length };
 
   const structureVerifiedAt = spec.source.kind === 'regulator-prescribed-form' ? spec.source.structureVerifiedAt : null;
   const verbatimVerifiedAt =
@@ -284,8 +397,20 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
     blocking.push('the words have never been checked against the source');
   }
 
-  if (prescribed && structureVerifiedAt === null) {
-    blocking.push('the rows, their labels and their order have never been checked');
+  /*
+    A content-only statute prescribes no structure, so it has nothing to verify
+    and a null date there is not a gap. Both the other two do — an itemization's
+    line ORDER is re-executed against §956(a)(1)-(6), and more strictly than
+    §914's, whose prose order is not its table's.
+  */
+  const structureApplicable = kind !== 'content-statute';
+
+  if (structureApplicable && structureVerifiedAt === null) {
+    blocking.push(
+      prescribed
+        ? 'the rows, their labels and their order have never been checked'
+        : 'the lines, their descriptions and their order have never been checked',
+    );
   }
 
   for (const p of problems) {
@@ -311,7 +436,14 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
     );
   }
 
-  if (!prescribed && unreadable.length > 0) {
+  if (itemization && unreadable.length > 0) {
+    partial.push(
+      `${unreadable.length} of ${rows.total} lines: the regulation requires the line and words none of it, so the ` +
+        'text on it is ours',
+    );
+  }
+
+  if (!prescribed && !itemization && unreadable.length > 0) {
     const labelled = spec.requirements.filter((r) => r.labelPrescribed === true).length;
 
     partial.push(
@@ -326,7 +458,7 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
     );
   }
 
-  if (prescribed && spec.structureEvidence === 'prose-described') {
+  if ((prescribed || itemization) && spec.structureEvidence === 'prose-described') {
     partial.push(
       "the source describes the rows in prose whose order is not the table's, so row order was verified by a human and is not re-executed",
     );
@@ -340,13 +472,16 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
     jurisdictionName: JURISDICTION_NAMES[spec.jurisdiction],
     slug: spec.slug,
     citation: spec.citation,
-    kind: prescribed ? 'prescribed-form' : 'content-statute',
+    kind,
     sourceFile: spec.sourceFile,
     section: spec.section,
     verbatimVerifiedAt,
     structureVerifiedAt,
-    structureApplicable: prescribed,
-    structureEvidence: prescribed ? spec.structureEvidence : null,
+    structureApplicable,
+    // `prescribed || itemization` rather than `structureApplicable`: a boolean
+    // does not narrow the union, and a content statute has no such field. That
+    // distinction is invisible to the tests and caught by `tsc` alone.
+    structureEvidence: prescribed || itemization ? spec.structureEvidence : null,
     digest,
     recordedDigest: spec.sourceDigest,
     observedDigest: observed,

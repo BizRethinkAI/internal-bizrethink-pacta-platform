@@ -1,9 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import type { ContentStatute } from '../content/types';
 import { UNRESOLVED_READINGS } from '../instance/identities';
 import { MCA_JURISDICTIONS } from '../jurisdictions';
+import type { ItemizationForm } from '../prescribed/itemization';
+import type { PrescribedForm } from '../prescribed/types';
 import { normalisedDigest, readSourceText, resolveSourcesDir } from '../provenance/source-text';
+import type { McaDisclosure } from '../provenance/verify';
 import { publishableProblems } from '../provenance/verify';
 import { OPEN_READINGS, PRESCRIBED_READINGS } from '../readings';
 import { MCA_DISCLOSURES, PRESCRIBED_FORMS } from '../registry';
@@ -366,6 +370,152 @@ describe('with no vendored sources, the surface degrades to unverified rather th
     expect(built.observedDigest).toBeNull();
     expect(built.assurance).toBe('unverified');
     expect(built.problems.map((p) => p.kind)).toContain('source');
+  });
+});
+
+/*
+  THE THIRD SHAPE.
+
+  #119 added `ItemizationForm` — made of `lines`, counted by
+  `itemizationCoverage()` — beside `PrescribedForm` (`rows`) and
+  `ContentStatute` (`requirements`). This surface assumed exactly two, and sent
+  an itemization down the content-statute branch where `.requirements` does not
+  exist.
+
+  NOTE HOW THAT PRESENTED, because it is the argument for the typecheck gate:
+  the suite went green on code that does not compile. vitest strips types, so
+  only `tsc` saw it, and neither PR failed alone — only the combination did.
+
+  The itemization is its own CARD, not a section of California's. It is a
+  separate document, sent to the merchant separately, compelled by its own
+  regulation (§956, not §914) and checked by its own checker. Folding it into
+  its parent state's card buries all of that; leaving it off the page recreates
+  exactly the blind spot this surface exists to close — two documents merchants
+  receive, unverified and unmentioned.
+*/
+describe('the Itemization of Amount Financed gets a card of its own', () => {
+  it('is on the surface as a first-class entry, not folded into its state', () => {
+    expect(surface.entries.filter((e) => e.kind === 'itemization').map((e) => e.slug)).toEqual([
+      'ca-itemization',
+      'ny-itemization',
+    ]);
+  });
+
+  it('carries the regulation that compels it, which is not its state\u2019s offer-summary rule', () => {
+    expect(entry('ca-itemization').citation).toBe('10 CCR \u00a7956');
+    expect(entry('ny-itemization').citation).toBe('23 NYCRR \u00a7600.17');
+
+    // The card next to it on the same state is a DIFFERENT regulation. If these
+    // ever agree, the two documents have been conflated.
+    expect(entry('ca-offer-summary').citation).not.toBe(entry('ca-itemization').citation);
+  });
+
+  /*
+    \u00a7956(a)(3) and \u00a7600.17(a)(3) require a line per third-party payee and word
+    none of it, so that line's text is ours on a document that is otherwise the
+    regulator's. One line of six, on each. It belongs on the card exactly the
+    way an unread row does.
+  */
+  it('shows the payee line the regulation requires and does not word', () => {
+    for (const slug of ['ca-itemization', 'ny-itemization']) {
+      const e = entry(slug);
+
+      expect(e.rowsTotal).toBe(6);
+      expect(e.unreadable).toHaveLength(1);
+      expect(e.unreadable[0]?.why).toMatch(/\(a\)\(3\)/);
+    }
+  });
+
+  it('is partly verified \u2014 never verified \u2014 while that line is unread', () => {
+    for (const slug of ['ca-itemization', 'ny-itemization']) {
+      const e = entry(slug);
+
+      expect(e.problems).toEqual([]);
+      expect(e.digest).toBe('matches');
+      expect(e.verbatimVerifiedAt).not.toBeNull();
+      expect(e.structureVerifiedAt).not.toBeNull();
+      expect(e.structureApplicable).toBe(true);
+      expect(e.assurance).toBe('partly-verified');
+    }
+  });
+
+  /*
+    Unlike CA/NY offer summaries, an itemization's line ORDER is machine-checked:
+    \u00a7956(a)(1)-(6) enumerate the lines in the order they appear and \u00a7956(b)
+    prints worked examples in the same order. If this ever reads
+    'prose-described' the structure date has quietly stopped being re-earned.
+  */
+  it('has its line order re-executed rather than resting on a human reading', () => {
+    expect(entry('ca-itemization').structureEvidence).toBe('source-order');
+    expect(entry('ny-itemization').structureEvidence).toBe('source-order');
+  });
+});
+
+/*
+  A FOURTH SHAPE MUST NOT RENDER AS AN EMPTY CARD.
+
+  The bug #119 exposed was not that the itemization was mishandled; it was that
+  a binary `prescribed ? \u2026 : \u2026` had no way to say "I do not know what this is".
+  A card with zero rows and zero unread lines reads as a clean document, which
+  is the failure mode this whole page is built against — one level up.
+
+  Two guards, because they catch different things. The `never` assignment fails
+  the TYPECHECK when a fourth member joins the `McaDisclosure` union, and CI now
+  runs that as a blocking step. The throw catches an object that satisfies none
+  of the three at runtime.
+*/
+/*
+  A COMPILE-TIME PIN ON THE UNION ITSELF.
+
+  The runtime throw below covers an object that is none of the three shapes.
+  It cannot cover the other direction: a fourth member joining `McaDisclosure`,
+  which is a type-level event no test can observe — vitest strips types, which
+  is precisely how the itemization reached `.requirements` with 519 tests green.
+
+  `shapeOf`'s `never` assignment catches that, but nothing proved the `never`
+  assignment was still there; deleting it left every test passing. This is that
+  proof. It stops compiling if `McaDisclosure` and the three handled shapes ever
+  stop being the same set, in EITHER direction, and CI runs
+  `tsc -p tsconfig.typecheck.json` as a blocking step.
+*/
+type HandledShapes = PrescribedForm | ItemizationForm | ContentStatute;
+
+type SameSet<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never;
+
+const everyShapeHasACard: SameSet<McaDisclosure, HandledShapes> = true;
+
+describe('the surface handles every shape the library can hold', () => {
+  it('is pinned at the type level, and this asserts the pin was evaluated', () => {
+    expect(everyShapeHasACard).toBe(true);
+  });
+});
+
+describe('a shape the page cannot render fails loudly', () => {
+  it('refuses a spec that is none of the three shapes', () => {
+    const alien = {
+      slug: 'alien-shape',
+      citation: 'nowhere',
+      jurisdiction: 'US-CA',
+      sourceFile: 'CA-10CCR-900-956.txt',
+      sourceDigest: 'x',
+      section: null,
+      status: 'draft',
+      source: { kind: 'attorney-drafted', author: null },
+    } as unknown as Parameters<typeof entryFor>[0];
+
+    expect(() => entryFor(alien)).toThrow(/alien-shape/);
+    expect(() => entryFor(alien)).toThrow(/no card/i);
+  });
+
+  it('gives every entry on the real surface one of the three known shapes', () => {
+    const kinds = new Set(surface.entries.map((e) => e.kind));
+
+    expect([...kinds].sort()).toEqual(['content-statute', 'itemization', 'prescribed-form']);
+
+    for (const e of surface.entries) {
+      expect(e.rowsTotal).toBeGreaterThan(0);
+      expect(e.assuranceReasons.length).toBeGreaterThan(0);
+    }
   });
 });
 

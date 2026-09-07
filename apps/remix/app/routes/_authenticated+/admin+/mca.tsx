@@ -1,4 +1,4 @@
-import type { ConformityEntry } from '@bizrethink/customizations';
+import type { ConformityEntry, ConformityKind } from '@bizrethink/customizations';
 import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
@@ -92,6 +92,28 @@ const ASSURANCE_VARIANT = {
   verified: 'default',
 } as const;
 
+/*
+  THREE SHAPES, NAMED IN ONE PLACE.
+
+  These were ternaries — `kind === 'prescribed-form' ? 'rows' : 'requirements'`
+  — which is exactly the binary that sent an itemization down the wrong branch
+  in the view model. A record keyed on `ConformityKind` cannot silently absorb
+  a fourth shape: adding one to the union makes these fail the typecheck, which
+  CI now runs as a blocking step.
+*/
+const KIND_LABEL: Record<ConformityKind, string> = {
+  'prescribed-form': 'prescribed form',
+  itemization: 'itemization of amount financed',
+  'content-statute': 'content-only statute',
+};
+
+/** What the document is made of, so a count is never called the wrong thing. */
+const KIND_UNIT: Record<ConformityKind, string> = {
+  'prescribed-form': 'rows',
+  itemization: 'lines',
+  'content-statute': 'requirements',
+};
+
 const DIGEST_LABEL = {
   matches: 'digest matches',
   stale: 'DIGEST STALE — the source has changed since it was verified',
@@ -107,7 +129,7 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
           <span className="font-normal text-muted-foreground text-sm">{entry.jurisdiction}</span>
         </h3>
         <p className="text-muted-foreground text-sm">
-          {entry.citation} · {entry.kind === 'prescribed-form' ? 'prescribed form' : 'content-only statute'}
+          {entry.citation} · {KIND_LABEL[entry.kind]}
         </p>
       </div>
 
@@ -146,7 +168,7 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
             (entry.structureVerifiedAt ?? <span className="font-semibold text-destructive">never</span>)
           ) : (
             <span className="text-muted-foreground">
-              not applicable — this statute prescribes information, not a form
+              not applicable — this statute prescribes information, not a document structure
             </span>
           )}
         </dd>
@@ -183,8 +205,7 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
       <div className="mt-4 rounded border border-amber-500/40 bg-amber-500/5 p-3">
         <p className="flex items-center gap-2 font-medium text-sm">
           <Eye className="h-4 w-4" aria-hidden="true" />
-          {entry.unreadable.length} of {entry.rowsTotal} {entry.kind === 'prescribed-form' ? 'rows' : 'requirements'}:
-          label read, contents not
+          {entry.unreadable.length} of {entry.rowsTotal} {KIND_UNIT[entry.kind]}: label read, contents not
         </p>
         <ul className="mt-2 space-y-1 text-sm">
           {/*
@@ -282,8 +303,8 @@ export default function AdminMcaConformityPage() {
       <Alert className="mt-6" variant="warning">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>
-          {notFullyVerified} of {entries.length} disclosures are not fully verified, and {unreadableRows} rows and
-          requirements across them have contents no check reads
+          {notFullyVerified} of {entries.length} disclosures are not fully verified, and {unreadableRows} of their rows,
+          lines and requirements have contents no check reads
         </AlertTitle>
         <AlertDescription>
           A verification date means every prescribed label and every prescribed sentence was still found in the vendored

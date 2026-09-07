@@ -24,6 +24,87 @@ real rather than theoretical: `US-FL` is a jurisdiction in BOTH libraries, so a
 list keyed on jurisdiction would merge Florida's lease clauses into Florida's
 disclosure statute with no type error at all.
 
+## Rebased onto #119, which added a THIRD shape
+
+The branch was written against a library with two document shapes and rebased
+onto one with three:
+
+| | made of | counted by |
+|---|---|---|
+| `PrescribedForm` | `rows` | `coverage()` |
+| `ContentStatute` | `requirements` | its requirement list |
+| **`ItemizationForm`** | **`lines`** | **`itemizationCoverage()`** |
+
+`surface/view.ts` assumed exactly two, so an itemization went down the
+content-statute branch and read `.requirements`, which it does not have.
+
+**How that presented is the point, and it is the argument for the typecheck
+gate #120 added.** The suite reported **519 tests passing while `tsc` failed** —
+vitest strips types, so a green run said nothing about whether the code
+compiled. Neither PR was red alone; only the combination was, so no per-PR check
+could have caught it before #120.
+
+The same trap fired again while fixing it: my first version used a boolean
+`structureApplicable` to guard `spec.structureEvidence`. A boolean does not
+narrow a union, so a content statute — which has no such field — was still
+reachable. Tests green, `tsc` red. Fixed by narrowing on the type guards.
+
+### Itemizations get first-class cards
+
+Two of them, CA §956 and NY §600.17, both published to Pacta as templates 95
+and 96. Each carries everything the other cards carry — statute and citation,
+section anchors, both verification dates, digest match, live `verifyProvenance`
+and `assertPublishable` verdicts, assurance with reasons.
+
+Their own gap is **one line of six that the regulation requires and does not
+word**: §956(a)(3) / §600.17(a)(3) put each third-party payee on a separate line
+and supply no description, so the text on that line is ours on a document that
+is otherwise the regulator's. It is reported exactly the way an unread row is.
+
+Both are `partly-verified`. Note one way they are *stronger* than the CA and NY
+offer summaries beside them: their line ORDER is machine re-checked
+(`source-order`), because §956(a)(1)-(6) enumerate the lines in the order they
+appear and §956(b) prints worked examples in the same order — unlike §914,
+whose prose introduces the Estimated Monthly Cost row last though the row is
+fifth.
+
+Rejected, and not re-litigated: folding the itemization into its parent state's
+card (buries a separate document with its own regulation), and leaving
+itemizations off the page (recreates the blind spot this surface exists to
+close).
+
+### A fourth shape cannot render as an empty card
+
+The bug was not that the itemization was mishandled; it was that a binary
+`prescribed ? … : …` had no way to say *I do not know what this is*. A card with
+zero rows and nothing unread reads as a clean document, which is this page's own
+failure mode one level up.
+
+`shapeOf()` is now a single exhaustive dispatch that every shape-dependent value
+derives from, and it **throws** rather than defaulting. Two guards, and the note
+is honest about which is enforced:
+
+- the throw is **asserted** — replacing it with a default branch fails the suite;
+- a **compile-time pin** in `__tests__/surface.test.ts` stops compiling if
+  `McaDisclosure` and the three handled shapes stop being the same set, in
+  either direction. Proven both ways by mutation, and visible to `tsc` only;
+- `shapeOf`'s own `never` assignment is local defence beside the pin. **Deleting
+  it on its own is caught by nothing** — verified by mutation, and said so in
+  the code rather than left to look like a guarantee.
+
+The route's two `kind === 'prescribed-form' ? … : …` ternaries — the same binary
+one layer up — became `Record<ConformityKind, string>` lookups, which cannot
+silently absorb a fourth shape either.
+
+### Conflicts resolved
+
+- `registry.ts` — as predicted. `deepFreeze` now also wraps `ITEMIZATIONS`, and
+  `MCA_DISCLOSURES` carries all three lists.
+- `overlays/README.md` — main's overlay 047 row (which carries #116's **Lease
+  Clauses** rename) plus this branch's MCA Conformity sentence. The coordinator
+  resolved this once in a throwaway worktree and asked that a row not describe
+  an entry that does not yet exist, so the sentence ships here, with the entry.
+
 ## What the page shows
 
 Per state, from `mca/surface/view.ts`:
@@ -133,13 +214,11 @@ which is the only way to keep `node:fs` out of the browser bundle (see below).
 
 `packages/bizrethink/lease/` was not touched. No component was moved out of it.
 
-**A concurrent session is in `packages/bizrethink/mca/` on phase 3** (the four
-remaining prescribed forms, plus the CT and VA statutes). This branch changes
-`registry.ts`, `instance/check.ts` and `provenance/source-text.ts`, so expect a
-conflict in `registry.ts` where their new specs meet this branch's
-`deepFreeze`. Nothing here is incompatible with that work — the surface derives
-its entries from `MCA_DISCLOSURES`, so their four forms will appear on the page
-without any change to this code.
+That prediction was right about the conflict and wrong about its size: #119 did
+not merely add specs, it added a document SHAPE. See the rebase section above.
+The surface does derive its entries from `MCA_DISCLOSURES`, so the four new
+prescribed forms appeared with no change — but the two itemizations needed a
+shape of their own.
 
 ## The build broke, and why it is worth recording
 
@@ -171,36 +250,29 @@ client 4827 modules, SSR 1323. The failing CI run died at 4845. The client chunk
 for the route contains **zero** occurrences of `node:fs`, `readFileSync` or
 `existsSync`; the string `mca/sources/` in it is UI copy.
 
-## THE PAGE WILL BE EMPTY IN PRODUCTION — this is the one thing to act on
+## The page would have been empty in production — closed on main by #121
 
-`docker/Dockerfile`'s runner stage copies `out/json/`, `patches`,
-`apps/remix/build`, `apps/remix/public`, `packages/tailwind-config`,
-`packages/prisma/schema.prisma` and `migrations`. **`packages/bizrethink/mca/sources/`
-is not among them.** In the container those regulations do not exist at any
-path, so every digest check will fail to find its file.
+When this branch opened, `docker/Dockerfile`'s runner stage did not copy
+`packages/bizrethink/mca/sources/`, so in the container the vendored regulations
+existed at no path and every digest check would have failed to find its file.
+It was reported here as a decision for the owner rather than taken unilaterally,
+because the fix touches an upstream file already patched by overlay 003.
 
-`provenance/source-text.ts` was changed so this **degrades honestly instead of
-crashing**: the sources directory is resolved lazily, `__dirname` is reached
-only behind `typeof` (it is *undeclared*, not merely absent, in an ESM bundle —
-a bare reference would have thrown at module load and taken the server with it),
-and an unresolvable directory yields `MissingSourceError` rather than an
-exception at import. The page then renders all eleven states as **SOURCE
-MISSING / Not verified**, which is the truth in that environment and exactly
-what this package says a verification date without evidence is worth.
+**#121 took it**, and the runner stage now carries the sources:
 
-But it means the page does not do its job in production until the vendored
-statutes reach the runtime. Two ways, neither of them mine to take:
+```
+COPY --from=installer /app/packages/bizrethink/mca/sources ./packages/bizrethink/mca/sources
+```
 
-1. **An overlay on `docker/Dockerfile`** adding the sources to the runner stage.
-   That is an upstream file (already patched by overlay 003), so it needs a
-   patch, a fragility rating and the adversarial review the standard mandates
-   for `overlays/*.patch`.
-2. **Embed the sources as modules** so they are bundled — roughly 700 KB of
-   string literals in the server bundle, including a 339,000-character Missouri
-   omnibus bill.
-
-Option 1 is smaller and keeps the sources as files, which is what
-`sources/README.md` says they are for. **Owner's call; nothing done here.**
+The defensive half stays and is still worth having, because it is what makes
+the failure legible if that COPY is ever dropped in an upstream merge.
+`provenance/source-text.ts` resolves the sources directory lazily and reaches
+`__dirname` only behind `typeof` — it is *undeclared*, not merely absent, in an
+ESM bundle, so a bare reference would have thrown at module evaluation and taken
+the server with it. An unresolvable directory now yields `MissingSourceError`
+rather than an exception at import, and the page renders every state as **SOURCE
+MISSING / Not verified**: the truth in that environment, and exactly what this
+package says a verification date without evidence is worth.
 
 ## What could not be verified here
 
@@ -228,8 +300,20 @@ corrected — it is my reconstruction, not a record.**
   still be wrong about — is **still not on this page.** It belongs beside a
   findings list, and there is no findings list here because there is no
   envelope. It remains reachable only from a test.
-- The four unencoded forms (CA/NY Itemization, CA/NY Lease Financing) and the
-  CT/VA statutes are phase 3 and are not represented here at all — the page
-  shows what is encoded, and says nothing about what is missing from the
-  library. A reader cannot tell from this page that four published Pacta
-  templates have no spec.
+- **The page shows what is encoded and says nothing about what is not.** That
+  bullet used to name four unencoded forms; #119 encoded all four, so today the
+  fifteen cards happen to be the whole library. The property that made the
+  bullet worth writing has not changed: nothing on this page would reveal a
+  sixteenth document that exists in Pacta and has no spec, because the page is
+  built from the spec list.
+
+- **A card can be `partly-verified` while the document it describes is being
+  held unsent, and the page does not say so.** #119 left REVIEW-01
+  `lease-disclosure-assumes-a-purchase-option-the-subscription-does-not-grant`
+  open — a blocker, owner to decide — against both lease-financing templates,
+  which are published and not being sent. The CA §915 and NY §600.14 cards
+  render like any other partly-verified card. Everything they claim is true:
+  the spec does match §915. What they cannot say is whether §915 is the right
+  regulation for this transaction at all, which is the actual question. This is
+  the sharpest remaining way the page can read as more reassuring than it is,
+  and closing it means a blocker axis this PR does not add.
