@@ -1,6 +1,6 @@
 # feat/mca-clauses-spine — the MCA clause library exists, and one agreement is in it
 
-**Branch:** `feat/mca-clauses-spine`. **PR:** #TBD.
+**Branch:** `feat/mca-clauses-spine`. **PR:** #126.
 
 `packages/bizrethink/mca/clauses/` did not exist. It does now, with the ISO
 Partner Referral Agreement's twenty-four clauses in it and four guards holding
