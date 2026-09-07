@@ -28,28 +28,44 @@ import type { PrescribedForm } from '../types';
  *   - Page one closes with INITIALS and a date. Virginia's closes with a
  *     signature. Our form is correct on this — it carries {{INITIALS, r1}}.
  *
- * TWO OBLIGATIONS IN THE GUIDANCE THAT ARE NOT ABOUT THE FORM, and that this
- * package cannot check because they live in the contract and the sending
- * process rather than the disclosure:
+ * TWO OBLIGATIONS THAT ARE NOT ABOUT THE FORM, and that this package cannot
+ * check because they live in the contract and the sending process rather than
+ * the disclosure:
  *
  *   - §36a-868 bars a commercial financing contract entered into on or after
  *     1 July 2024 from waiving the recipient's right to notice, judicial
  *     hearing or prior court order on a prejudgment remedy. FRPA §7.24 already
- *     relies on this.
- *   - §36a-869 makes a specific offer irrevocable until midnight of the third
- *     calendar day after its date. That is a SENDING RULE: a Connecticut offer
- *     cannot be withdrawn or modified for three days. Nothing in the form
- *     expresses it, and nothing in this package enforces it.
+ *     relies on this. It is NOT a confession-of-judgment ban — the Act contains
+ *     none, and the two are routinely conflated.
+ *   - §36a-869 bars revoking, withdrawing or modifying a specific offer until
+ *     midnight of the third calendar day after its date — SUBJECT TO two
+ *     express carve-outs in the same sentence (information obtained in
+ *     underwriting; the recipient's own request), and §36a-869(b) lets the offer
+ *     state that it is a preliminary review only. This is weaker than the flat
+ *     irrevocability the package assumed while it held only the guidance.
  *
- * KNOWN GAP: we hold the guidance and Appendix A, not the General Statutes.
- * Everything above about §§36a-863, 36a-868 and 36a-869 is the Department's
- * characterisation of the Act, not the Act. See MCA-CLAUSE-LIBRARY-PHASE0.md §3.
+ * THE GAP IS CLOSED. Conn. Gen. Stat. §§36a-861 to 36a-872 are vendored at
+ * `sources/CT-CGS-36a-861-872.txt` from the Connecticut General Assembly, and
+ * every claim above is a verbatim quotation re-matched against them on every
+ * run — see `statutes/ct-va-obligations.ts` and `__tests__/ct-va-statutes.test.ts`.
+ * Two of the corrections it forced are recorded there: the Act is in chapter
+ * 669 rather than 668, and §36a-869 is not what the guidance reads like.
+ *
+ * WHAT STILL RESTS ON THE GUIDANCE. Exactly one thing, and it is the load-
+ * bearing one: that the Commissioner has made no §36a-867 determination
+ * recognising another state's form. §36a-867 opens the reciprocity door only on
+ * such a determination; whether one exists is a fact about the Department's
+ * practice, and the Act cannot state it.
  */
 export const CT_DISCLOSURE: PrescribedForm = {
   slug: 'ct-disclosure',
   citation: 'Conn. DOB Appendix A (rev. 8/1/2024)',
   sourceFile: 'CT-DOB-Guidance.txt',
   jurisdiction: 'US-CT',
+  // Read out of the Act, not assumed: §36a-861(1) defines commercial financing
+  // as "any extension of SALES-BASED FINANCING … not exceeding two hundred
+  // fifty thousand dollars". The ceiling is a per-deal fact nothing here checks.
+  transaction: 'sales-based-financing',
   status: 'published',
   source: {
     kind: 'regulator-prescribed-form',

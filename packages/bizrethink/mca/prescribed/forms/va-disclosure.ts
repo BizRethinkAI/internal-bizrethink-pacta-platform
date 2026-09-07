@@ -16,15 +16,31 @@ import type { PrescribedForm } from '../types';
  * Writing a `verbatim` for these rows would be inventing an obligation Virginia
  * does not impose, which is the same error as ignoring one.
  *
- * KNOWN GAP: we hold the form, not the Code. Prohibitions, registration duties,
- * broker rules and penalties around the form are unverified — see
- * MCA-CLAUSE-LIBRARY-PHASE0.md §3.
+ * THE GAP IS CLOSED. Va. Code Ann. §§6.2-2228 to 6.2-2238 are vendored at
+ * `sources/VA-Code-6.2-2228-2238.txt` from the Virginia Law Portal, and the
+ * prohibitions, registration duties, broker rule and penalties are now verbatim
+ * quotations re-matched on every run — see `statutes/ct-va-obligations.ts`.
+ * §6.2-2231's nine numbered items each have a row on the form and a test says
+ * which. Note the citation range: the chapter STOPS at §6.2-2238, and
+ * §6.2-2239/§6.2-2240 belong to an unrelated chapter on virtual currency kiosk
+ * operators.
+ *
+ * TWO THINGS THE CODE STILL DOES NOT GIVE US. It never defines "finance
+ * charge", where Conn. Gen. Stat. §36a-861(3) does by reference to 12 CFR
+ * 1026.4 — so the figure in that row rests on a reading nobody has written
+ * down. And §6.2-2231(7)(a) requires items 1-6 to be RE-disclosed as of the day
+ * of any prepayment or refinance, which is an event-triggered obligation no
+ * blank form can carry.
  */
 export const VA_DISCLOSURE: PrescribedForm = {
   slug: 'va-disclosure',
   citation: 'Va. sales-based financing disclosure form',
   sourceFile: 'VA-Disclosure-Form.txt',
   jurisdiction: 'US-VA',
+  // Read out of the Code: chapter 22.1 is "Sales-Based Financing Providers" and
+  // §6.2-2228 defines the term. Note that it is keyed to the RECIPIENT's
+  // principal place of business, not the provider's.
+  transaction: 'sales-based-financing',
   status: 'published',
   source: {
     kind: 'regulator-prescribed-form',

@@ -23,6 +23,7 @@ export const CA_OFFER_SUMMARY: PrescribedForm = {
   citation: '10 CCR §914',
   sourceFile: 'CA-10CCR-900-956.txt',
   jurisdiction: 'US-CA',
+  transaction: 'sales-based-financing',
   status: 'published',
   source: {
     kind: 'regulator-prescribed-form',

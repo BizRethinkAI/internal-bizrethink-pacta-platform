@@ -202,21 +202,68 @@ authorisation, never completeness — it can tell you that you said something yo
 may not say, and cannot tell you that you failed to say something you must.
 Completeness needs the transaction's facts, which this package does not have.
 
+**2026-09-07, the four remaining prescribed forms.** Writing the §915 and
+§600.14 specs turned up two defects in documents that had already shipped, and
+neither is visible by reading the form:
+
+- `Lombard_NY_Lease_Disclosure_v1` **drops a word from a prescribed sentence.**
+  §600.14(c)(3) reads "… finance charges you pay, **and** the periodic payments
+  you make, and the anticipated cost …"; the document omits that conjunction,
+  which is California §915(a)(3)(C)'s structure with New York's noun swapped in.
+  The row is closed by §600.14(c) with "shall include only". This is the same
+  failure as templates 104/105 and in the same direction — one state's phrasing
+  surviving inside the other state's document.
+- **Neither lease disclosure combines the Prepayment cell.** §915(a)(8) and
+  §600.14(h) both say the first column of the seventh and eighth rows "shall be
+  combined". Both DOCX files contain no `vMerge` element at all, while the
+  sibling `Lombard_CA_Disclosure_v1` merges correctly under §914(a)(9). Weigh
+  this one honestly: the lease tables carry no borders, so the eighth row's
+  first column prints as blank space under "Prepayment" — which is what a
+  combined cell looks like. The divergence is in the file rather than on the
+  page.
+
+And a third, in our own tooling rather than in a document:
+`lombard-contracts/pipeline/extract_disclosure_rows.py` drops any row whose
+first cell is empty or reads "term". Both are prescribed rows under §915, so the
+script returns six rows from an eight-row lease table — an extractor that
+silently loses the rows a checker exists to check.
+
+The two document defects are reported and handed back. Nothing was published
+and no template was edited from here.
+
 
 ## Coverage
 
-All eleven states Lombard sends to are encoded, and every shipped form conforms.
-Three kinds of prescription, which is the reason there are two checkers rather
-than one:
+Fifteen specs across eleven states. Four kinds of prescription, which is the
+reason there are three checkers rather than one:
 
-| | states | what the statute fixes | what is checked |
+| | specs | what the statute fixes | what is checked |
 |---|---|---|---|
-| Prescribed sentences | CA, NY | rows, labels AND exact words, closed with "shall include only" | every word, and that nothing else is present |
+| Prescribed sentences | CA §914, CA §915, NY §600.6, NY §600.14 | rows, labels AND exact words, closed with "shall include only" | every word, that nothing else is present, and that a row the regulation empties stays empty |
 | Prescribed form | CT, VA | labels and their order; the answers are ours | every label, spelled and ordered as prescribed |
+| At a minimum | CA §956, NY §600.17 | six described items, in order; extra lines lawful | the descriptions as an ordered subsequence, and that each computed line's cross-reference names the lines it is actually computed from |
 | Content only | FL, GA, KS, LA, MO, TX, UT | the information required; wording is ours | that every required item has a home, and the evidence for it is present |
 
 Kansas and Missouri sit across the line: content-only acts that nevertheless
 dictate every label.
+
+**California and New York prescribe three documents each,** which is why
+`disclosuresFor` returns three specs for those states and why there is a second
+axis. `mca/transactions.ts` records which KIND of financing a spec is prescribed
+for, and `prescribedFormsForTransaction` filters on it — §915's lease table
+asserts a purchase option and an anticipated cost of acquiring property, and
+sending it with a merchant cash advance would be the right shape for the wrong
+instrument. It is not a tenant axis and not a product axis; "Lombard-specific"
+belongs on neither axis.
+
+**The Itemization is not a table and does not use the table checker.** §956(a)
+requires a document "substantially similar in form … including at a minimum" six
+items: no row count, no "shall include only", each third-party payee on its own
+line, and §956(c)(4) expressly permitting assumptions below. Positional row
+alignment is wrong there the moment a deal has two payees. See
+`prescribed/itemization.ts`, which also holds the one check no table needs — the
+"(Sum of Items 1-3)" cross-references name line POSITIONS, and go stale silently
+when a line is added.
 
 ## What this cannot tell you
 
@@ -234,12 +281,38 @@ the check is that a required item has a home and that the words pinned as
 evidence are in it. That a row *addresses* the requirement is a human judgement,
 recorded in the spec's `requires` field so a reviewer can see what was claimed.
 
-**Two Connecticut obligations that are not about the form at all.** §36a-868
-bars prejudgment-remedy waivers in the contract; §36a-869 makes a specific offer
-irrevocable until midnight of the third calendar day. The second is a sending
-rule, and nothing here enforces it.
+**Twelve obligations across the two Acts that are not about the form at all** —
+contract terms, sending rules, registration and enforcement. They are now
+verbatim and verified, and *verified* here means "these are the Act's words",
+not "we comply". §36a-868 bars prejudgment-remedy waivers in the contract;
+§6.2-2234(C) bars confessions of judgment, which Connecticut does not; §36a-869
+bars withdrawing a specific offer for three calendar days *subject to two
+carve-outs*; both states expire a registration by operation of law on a missed
+annual fee. Nothing in this package reads a contract, sends an offer or pays a
+fee. `bearsOn` on each obligation names the surface it lives on, and everything
+that is not `'the form'` is outside what any check here can reach.
 
-**Two states where we hold the form but not the statute.** Connecticut (guidance
-plus Appendix A, not the General Statutes) and Virginia (the form, not the
-Code). Their forms can be checked; the prohibitions, registration duties and
-penalties around them cannot.
+**And three obligations that ARE about the form and that no row can discharge.**
+§36a-866 and §6.2-2233 both allow additional information and require it to sit
+outside the prescribed disclosure — a constraint on the page, not on a cell, and
+the checker sees only the table. §36a-867 governs which form may be used at all.
+
+**One fact about the Department's practice, in Connecticut.** Everything else
+that used to sit here — the prohibitions, the three-day window, the registration
+duties, the penalties, the scope of both Acts — was closed on 2026-09-07, when
+Conn. Gen. Stat. §§36a-861 to 36a-872 and Va. Code §§6.2-2228 to 6.2-2238 were
+vendored from their official publishers and every claim became a verbatim
+quotation re-matched on every run (`statutes/ct-va-obligations.ts`).
+
+What survives is narrow and cannot be closed by reading a statute: §36a-867
+opens the door to another state's form only if *"the Banking Commissioner
+determines"* that its law meets or exceeds Connecticut's, and whether such a
+determination exists is a fact about the Department's practice. The guidance
+says none has been made. The Act cannot say.
+
+**Three things the fetch corrected**, all of which had been asserted from
+secondary text and were wrong: the Act is in chapter 669 and not 668; Virginia's
+chapter ends at §6.2-2238 (the next two sections govern virtual currency kiosk
+operators); and §36a-869 is not flat three-day irrevocability — the same
+sentence carries two carve-outs and §36a-869(b) lets the offer state that it is
+preliminary.

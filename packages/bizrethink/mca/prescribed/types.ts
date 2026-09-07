@@ -2,6 +2,7 @@ import type { ClauseSource } from '../../provenance/types';
 import type { ClauseStatus } from '../../server-only/feature-access';
 import type { McaJurisdiction } from '../jurisdictions';
 import type { SourceSection } from '../provenance/source-text';
+import type { McaTransactionType } from '../transactions';
 
 /**
  * A regulator-prescribed form.
@@ -71,6 +72,25 @@ export type PrescribedRow = {
    * unverifiable surface is allowed to exist, but not to grow unnoticed.
    */
   providerDrafted?: { citation: string; text: string }[];
+  /**
+   * True where the regulation says the row shall include NO information in the
+   * third column.
+   *
+   * A third kind of row, and neither of the other two can express it. A row is
+   * otherwise either worded by the regulation (`verbatim`) or left to the
+   * provider (`verbatim: null`), and `checkFormConformity` returns early on the
+   * second — it checks the label and never looks at the cell. A row that must
+   * be EMPTY is neither: the regulation says exactly what belongs there, and
+   * what belongs there is nothing.
+   *
+   * 10 CCR §915(a)(7) and 23 NYCRR §600.14(g), both on the Term row: "The sixth
+   * row of the table shall include no information in the third column, and the
+   * remaining columns shall include only the following information". This is
+   * the only content rule in either lease table a machine can decide —
+   * everything else those sections leave to the provider they describe rather
+   * than word.
+   */
+  thirdColumnEmpty?: boolean;
 };
 
 export type PrescribedForm = {
@@ -84,6 +104,17 @@ export type PrescribedForm = {
    * York document — which they once did, in production.
    */
   jurisdiction: McaJurisdiction;
+  /**
+   * Which KIND of financing this table is prescribed for.
+   *
+   * A second axis, added when the lease-financing forms landed. Until then
+   * every spec in the library was a sales-based financing disclosure and
+   * `disclosuresFor('US-CA')` returned exactly one thing; it returns three now,
+   * and §915's lease table describes a transaction §914's does not. See
+   * `mca/transactions.ts` — and note that this is emphatically NOT a tenant or
+   * product axis, which belong on the document rather than on the spec.
+   */
+  transaction: McaTransactionType;
   /**
    * Where these words came from, and whether they may be published.
    *

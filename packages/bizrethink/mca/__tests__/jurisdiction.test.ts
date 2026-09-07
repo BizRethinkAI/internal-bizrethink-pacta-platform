@@ -35,8 +35,17 @@ describe('the jurisdiction axis filters', () => {
     }
   });
 
-  it('the eleven jurisdictions and the eleven specs are the same eleven', () => {
-    expect([...MCA_DISCLOSURES].map((d) => d.jurisdiction).sort()).toEqual([...MCA_JURISDICTIONS].sort());
+  /*
+    Was "the eleven jurisdictions and the eleven specs are the same eleven"
+    until 2026-09-07, when California and New York each went from one spec to
+    three — the sales-based offer summary, the lease financing disclosure and
+    the Itemization of Amount Financed. The count is no longer one-to-one and
+    the property being asserted never was: it is that the listed jurisdictions
+    and the jurisdictions actually reachable are the same SET, which is what
+    stops a spec being added for a state nobody declared.
+  */
+  it('the declared jurisdictions and the reachable ones are the same set', () => {
+    expect([...new Set(MCA_DISCLOSURES.map((d) => d.jurisdiction))].sort()).toEqual([...MCA_JURISDICTIONS].sort());
   });
 
   it.each(pairs)('nothing from %s is reachable from %s', (a, b) => {
@@ -89,8 +98,11 @@ describe('California and New York cannot borrow each other’s words', () => {
     sweep that was correct for nine states and unlawful in two.
   */
   it('are different tables, not one table twice', () => {
-    const ca = disclosuresFor('US-CA')[0];
-    const ny = disclosuresFor('US-NY')[0];
+    // By slug, not by position. `disclosuresFor` returns three specs per state
+    // now, and an index would silently start asserting about a different
+    // document the next time the registry's order changes.
+    const ca = disclosuresFor('US-CA').find((d) => d.slug === 'ca-offer-summary');
+    const ny = disclosuresFor('US-NY').find((d) => d.slug === 'ny-offer-summary');
 
     if (!ca || !ny || !('rows' in ca) || !('rows' in ny)) {
       throw new Error('CA and NY are prescribed forms and should have rows');

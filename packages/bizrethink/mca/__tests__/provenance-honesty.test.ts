@@ -60,17 +60,32 @@ describe('a spec is checked against its own section, not the whole file', () => 
   });
 
   /*
-    The three that need it, and why. Missouri is the extreme case: SB 1359 is
+    The seven that need it, and why. Missouri is the extreme case: SB 1359 is
     an omnibus bill of eighty-odd sections, of which the Commercial Financing
     Disclosure Law is one, so a prescribed label found "somewhere in the bill"
     would be worth nothing at all.
+
+    The four added on 2026-09-07 are the sharpest test of the mechanism so far,
+    because they live in the SAME two files as the offer summaries they must not
+    be confused with. §915 sits immediately after §914 and shares four of its
+    row labels; §956 uses "Amount Financed" and "Prepaid Finance Charge", both
+    §900 defined terms that appear throughout the file. Unscoped, each of the
+    four would verify against the other's words.
   */
   it('scopes exactly the files that hold more than one instrument', () => {
     expect(
       MCA_DISCLOSURES.filter((d) => d.section !== null)
         .map((d) => d.slug)
         .sort(),
-    ).toEqual(['ca-offer-summary', 'mo-disclosure', 'ny-offer-summary']);
+    ).toEqual([
+      'ca-itemization',
+      'ca-lease-financing',
+      'ca-offer-summary',
+      'mo-disclosure',
+      'ny-itemization',
+      'ny-lease-financing',
+      'ny-offer-summary',
+    ]);
   });
 });
 

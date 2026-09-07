@@ -1,0 +1,42 @@
+[
+  {
+    "label": "Funding Provided",
+    "value": "$ ______«3»______",
+    "content": "This is how much funding ___________«2»____________ will provide."
+  },
+  {
+    "label": "Annual Percentage Rate (APR)",
+    "value": "__«4»___%",
+    "content": "APR is the cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, fees you pay, the periodic payments you make, and the anticipated cost for you to acquire the property at the end of the lease term. Your APR is not an interest rate."
+  },
+  {
+    "label": "Finance Charge",
+    "value": "$ ______«5»______",
+    "content": "The finance charge is the Total Payment Amount above, less the Funding Provided. It is made up of the lease payments for the Equipment over the term, plus the purchase option price, less the cash price of the Equipment. No other expense is included in the finance charge."
+  },
+  {
+    "label": "Total Payment Amount",
+    "value": "$ ______«6»______",
+    "content": "This is the total dollar amount of payments you will make during the term of the contract (including the cost of the purchase option)."
+  },
+  {
+    "label": "Payment",
+    "value": "$ _____«7»_____/month. Purchase Price: $ _____«8»_____",
+    "content": "This is how much you will pay each month, and the purchase price you may pay at the end of the term to acquire the Equipment. Your monthly payments are due on the same day of each month, beginning on the Commencement Date."
+  },
+  {
+    "label": "Term",
+    "value": "__«9»___ months",
+    "content": ""
+  },
+  {
+    "label": "Prepayment",
+    "value": null,
+    "content": "If you pay off the financing before the end of the term, you will be required to pay all or a portion of the finance charge other than accrued and unpaid interest, up to $_____«10»______."
+  },
+  {
+    "label": "",
+    "value": null,
+    "content": "If you pay off the financing before the end of the term, you will not be required to pay additional fees or charges."
+  }
+]
