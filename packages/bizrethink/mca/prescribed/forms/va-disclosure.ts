@@ -49,7 +49,12 @@ export const VA_DISCLOSURE: PrescribedForm = {
     verbatimVerifiedAt: '2026-09-06',
     structureVerifiedAt: '2026-09-06',
   },
-  sourceDigest: 'e065205380591724620b8f224807ba13c51d6b2bc748f0bad79e168799765af6',
+  // Digest re-computed 2026-09-07 after a vendoring header was added to the
+  // source file recording where it came from. The STATUTORY TEXT is byte-identical;
+  // only the header above it changed, so `verbatimVerifiedAt` stands rather than
+  // being re-stamped. Saying that out loud because "the digest broke, I updated
+  // it" is exactly the move this mechanism exists to make someone justify.
+  sourceDigest: 'f8efa84abd2db5bbe82e50bae3695e29d2db608c359df09adb264b48a35e3a93',
   // The file is the form itself.
   section: null,
   structureEvidence: 'source-order',

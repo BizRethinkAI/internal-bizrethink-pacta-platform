@@ -1,3 +1,20 @@
+VIRGINIA — SALES-BASED FINANCING DISCLOSURE FORM
+
+Vendored 2026-09-06 from lombard-contracts
+state-disclosures/regulatory-source/VA-Sales-Based-Financing-Disclosure-Form.pdf
+(reading-order pdftotext; the -layout companion is beside this file).
+
+ORIGINAL RETRIEVAL SOURCE UNRECORDED. Whoever first obtained this PDF did not
+write down where from, and this header does not invent one. The form itself
+carries no issuing letterhead, so provenance here rests on the document set it
+arrived with rather than on anything in the file.
+
+Weaker than every other source in this directory. Va. Code §§6.2-2228-2238 IS
+vendored from law.lis.virginia.gov and is primary; this form is the artefact
+the Code requires, not the Code.
+
+------------------------------------------------------------------------------
+
 SALES-BASED FINANCING DISCLOSURE FORM
 Recipient’s Name:
 
