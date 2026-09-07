@@ -1,0 +1,6 @@
+{
+  "adrDir": "docs/adr",
+  "migrationPaths": [],
+  "redRunPaths": [],
+  "redRunWaiver": "not a money, auth or tenant-scope change"
+}

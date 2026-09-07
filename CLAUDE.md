@@ -138,3 +138,7 @@ That's it. See `overlays/README.md` for status.
 - No secrets in code or logs
 - **Instance config is DB-backed with an admin UI, never a Coolify env var** — see [ADR 0004](docs/adr/0004-db-backed-instance-config.md). Coolify env vars hold only bootstrap secrets (encryption key, database URL); everything an admin should be able to see and change lives in `/admin/*`.
 - Full rules, including the ones learned the hard way: [`docs/engineering-standard.md`](docs/engineering-standard.md)
+
+## Pull requests
+
+The PR body is the review surface. Read `.github/pull_request_template.md` before opening or editing any PR, write the body to a file, and open it with `/open-pr` (or `gh pr create --body-file`). A Claude Code hook blocks any other shape; the "PR description" CI job fails a body that skips a section.
