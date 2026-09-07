@@ -63,6 +63,56 @@ strongest identities need a second document in the envelope — see the
 `skipped` array and `instanceCoverage()`, which names the blockers a given
 envelope could not have detected.
 
+## The third check: provenance
+
+`verifyProvenance(spec)` — is the verification date on this spec worth
+anything? Added 2026-09-06, when the package was wired to
+`packages/bizrethink/provenance/`.
+
+`assertPublishable` asks whether a date is PRESENT. That is all it can ask, and
+a present date is indistinguishable from one somebody typed. So every date here
+is bound to something re-executed on every run:
+
+| the claim | what re-executes it |
+|---|---|
+| `verbatimVerifiedAt` | every label, prescribed sentence and *permitted* sentence is still found in the named file, **in the section the form was transcribed from** |
+| `structureVerifiedAt` | the source's digest is unchanged, and for `source-order` forms the labels still appear in the spec's order |
+
+**The scoping is the load-bearing part.** California's regulation prescribes at
+least six different tables in one 132,000-character file — closed-end, open-end,
+factoring, sales-based, lease, asset-based — and only the sales-based one is
+ours. Checked against the whole file, `"Repurchase Costs"` (a real California
+label, for factoring) passes as one of our rows. Sharper still: **New York's
+file contains California's phrasing of the funding-provided sentence**, in a
+later section governing a different transaction type (§600.11, §600.12), so a
+whole-file check accepts New York's form carrying California's words. `section`
+on each spec is what closes that.
+
+**That is the mirror of the defect that shipped, not the defect itself** — a
+distinction worth keeping, because the temptation is to claim the mechanism
+caught the thing that hurt. Templates 104/105 had the *California* form
+carrying *New York's* wording, and New York's phrasing appears nowhere in the
+California file, so a whole-file check would have rejected it;
+`__tests__/near-identical-states.test.ts` asserts precisely that. **The shipped
+defect survived because until PR #101 there was no checker at all**, which is
+the account given at the top of that file and the one to trust. Scoping earns
+its place on the direction nobody has got wrong yet.
+
+Two things it deliberately does not claim:
+
+- It does not prove a human read the regulation. It proves the bytes have not
+  moved since we said they had. When a regulator amends a rule the digest
+  breaks and a human has to look again — that is the event this is built for.
+- **Row order is not machine-checked for California or New York.** Their
+  regulations *describe* rows in a prose order that is not the table's order:
+  §914 introduces the Estimated Monthly Cost row last, as an instruction to
+  "insert one additional row below the fourth row", and numbers Payment Terms
+  "the sixth row" on a count taken before that insertion. Checking source order
+  there reports a defect in a table that is correct. `structureEvidence` records
+  which reading each form gets, and it is required with no default so the weaker
+  one has to be chosen rather than fallen into.
+
+
 ## Rules for adding content
 
 1. **Primary text only.** `sources/` holds regulations, never summaries. Two
@@ -84,6 +134,24 @@ envelope could not have detected.
    `lombard-contracts/MCA-CLAUSE-LIBRARY-PHASE0.md`). None looks dangerous,
    which is what the inherited documents looked like before REVIEW-01 found 207
    defects in them.
+5. **Reach a spec through `disclosuresFor`, never by importing it.** The
+   individual specs stay exported because the conformity tests need them, but a
+   caller that imports `CA_OFFER_SUMMARY` directly is back in the position that
+   shipped California's form carrying New York's sentence.
+6. **Scope a source that holds more than one instrument.** If the vendored file
+   contains other prescribed tables, other transaction types or — like
+   Missouri's SB 1359 — eighty other sections of an omnibus bill, set `section`.
+   A label found "somewhere in the file" is not evidence.
+7. **Our own wording goes in `providerDrafted`, never in `alsoPermitted`.**
+   `alsoPermitted` means the regulator supplied these words and they can be
+   matched against the source. Where a regulation requires *"a short
+   explanation"* and supplies no wording, the sentence is ours: it must carry
+   the citation that compels it, and it is counted as unverifiable rather than
+   sitting among text that has been verified.
+8. **A new date needs a new digest.** Re-vendoring a source breaks
+   `sourceDigest` on purpose. Re-stamping the date without re-reading the
+   regulation is the one move this whole mechanism exists to make impossible to
+   do by accident.
 
 ## If an assembler ever arrives
 

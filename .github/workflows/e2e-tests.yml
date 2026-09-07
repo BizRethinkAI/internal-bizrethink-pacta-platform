@@ -128,6 +128,28 @@ jobs:
     # GitHub-hosted ubuntu-latest has Docker (for dx:up) + is always available.
     # Guarded by packages/bizrethink/regression-tests/workflow-runners.test.ts.
     runs-on: [self-hosted, linux, x64]
+
+    # MODIFIED for BizRethink (2026-09-07): one database per run.
+    #
+    # The runner is self-hosted and `dx:up` brings postgres up on a NAMED
+    # VOLUME (docker/development/compose.yml: documenso_database), so the
+    # database survives between jobs and between BRANCHES. `concurrency` is
+    # keyed on github.ref, so two branches run here at the same time.
+    #
+    # That combination cost three runs on 2026-09-06. #111 carried
+    # 20260906230000_library_review_jurisdiction and applied it to the shared
+    # database; every branch that ran afterwards without that migration was
+    # killed before a single test executed:
+    #
+    #   The following migration(s) are applied to the database but missing
+    #   from the local migrations directory: 20260906230000_...
+    #   We need to reset the "public" schema at "127.0.0.1:54320"
+    #   npm error code 130
+    #
+    # Run-scoped, so concurrent branches cannot see each other's schema.
+    # github.run_id is unique per run and run_attempt distinguishes re-runs;
+    # both are digits, so the identifier needs no quoting.
+
     steps:
       # fetch-depth: 0 so the docs-only detection below can diff against the
       # PR base. A shallow clone does not contain base.sha.
@@ -192,7 +214,14 @@ jobs:
 
       - name: Copy env
         if: steps.scope.outputs.code == 'true'
-        run: cp .env.example .env
+        run: |
+          cp .env.example .env
+          # Every later step reads the URL from .env — migrate, seed, and the
+          # app the browser drives. Rewriting it here is what makes them all
+          # agree on the run-scoped database without touching .env.example,
+          # which is upstream.
+          sed -i "s|/documenso\"|/${RUN_DB}\"|g" .env
+          grep -E '^NEXT_PRIVATE_(DIRECT_)?DATABASE_URL' .env
 
       - uses: ./.github/actions/node-install
         if: steps.scope.outputs.code == 'true'
@@ -204,9 +233,34 @@ jobs:
       - uses: ./.github/actions/playwright-install
         if: steps.scope.outputs.code == 'true'
 
+      - name: Create the run database
+        if: steps.scope.outputs.code == 'true'
+        run: |
+          set -euo pipefail
+          # `dx:up` returns as soon as the containers are created, not when
+          # postgres is accepting connections. The old first database step
+          # tolerated that because prisma retries; CREATE DATABASE does not.
+          for i in $(seq 1 30); do
+            docker exec database pg_isready -U documenso -q && break
+            [ "$i" -eq 30 ] && { echo "postgres never became ready"; exit 1; }
+            sleep 2
+          done
+          docker exec database psql -U documenso -d documenso \
+            -c "CREATE DATABASE \"${RUN_DB}\";"
+          echo "created ${RUN_DB}"
+
       - name: Create the database
         if: steps.scope.outputs.code == 'true'
-        run: npm run prisma:migrate-dev
+        # `migrate deploy`, NOT `migrate dev`. `dev` is an interactive
+        # authoring command: it compares the database against the migrations
+        # folder, and on any difference it asks to reset. In CI there is
+        # nobody to ask, so it exits 130 and the job dies before a test runs.
+        # `deploy` applies pending migrations in order and never resets, which
+        # is the only behaviour that makes sense unattended.
+        #
+        # Both scripts run bizrethink:merge-additions first, so the schema
+        # still includes packages/bizrethink/prisma-extensions/additions.prisma.
+        run: npm run prisma:migrate-deploy
 
       - name: Seed the database
         if: steps.scope.outputs.code == 'true'
@@ -270,7 +324,7 @@ jobs:
           # Set here rather than in .env.example or the compose file, both of
           # which are upstream.
           # ---------------------------------------------------------------
-          NEXT_PRIVATE_DATABASE_URL: 'postgres://documenso:password@127.0.0.1:54320/documenso?connection_limit=5'
+          NEXT_PRIVATE_DATABASE_URL: 'postgres://documenso:password@127.0.0.1:54320/${{ env.RUN_DB }}?connection_limit=5'
 
       - uses: actions/upload-artifact@v4
         if: always() && steps.scope.outputs.code == 'true'
@@ -279,6 +333,45 @@ jobs:
           name: test-results-shard-${{ matrix.shard }}
           path: 'packages/app-tests/**/test-results/*'
           retention-days: 7
+
+      # always(), so a failing suite still cleans up after itself. Without
+      # this a per-run database is a disk leak on a self-hosted runner, which
+      # would be a new problem in place of the one above.
+      - name: Drop the run database
+        if: always() && steps.scope.outputs.code == 'true'
+        # The step's own comment claimed cleanup must never fail the job, and
+        # the first version did not achieve it: GitHub runs steps under
+        # `bash -e`, so ANY unguarded non-zero here turns a passing suite red.
+        # It did exactly that once — 1029 tests passed and the job reported
+        # failure. `|| true` on each command is not enough, because it does
+        # not cover a mistake in the script itself.
+        continue-on-error: true
+        run: |
+          # Never fail the job on cleanup. A red suite must report the suite's
+          # failure, not a teardown error on top of it.
+          docker exec database psql -U documenso -d documenso \
+            -c "DROP DATABASE IF EXISTS \"${RUN_DB}\" WITH (FORCE);" || true
+
+          # Runs that are cancelled hard never reach the step above, so sweep
+          # anything left behind. Safe against a CONCURRENTLY RUNNING branch:
+          # a live job writes to its database continuously, so its directory
+          # mtime stays fresh, and the job timeout is 120 minutes — three
+          # hours of no writes means nothing is using it.
+          docker exec database psql -U documenso -d documenso -tAc "
+            SELECT datname FROM pg_database
+            WHERE datname LIKE 'documenso\_run\_%'
+              AND datname <> '${RUN_DB}'
+              AND NOT EXISTS (
+                SELECT 1 FROM pg_stat_activity WHERE datname = pg_database.datname
+              )
+              AND (pg_stat_file('base/' || oid::text)).modification
+                    < now() - interval '3 hours';
+          " 2>/dev/null | while read -r db; do
+            [ -n "$db" ] || continue
+            echo "dropping orphan ${db}"
+            docker exec database psql -U documenso -d documenso \
+              -c "DROP DATABASE IF EXISTS \"${db}\" WITH (FORCE);" || true
+          done
 
       # Make the skip visible in the check output. A green E2E check that ran
       # nothing should say so, not look identical to one that ran everything.
@@ -289,6 +382,18 @@ jobs:
           echo "The check reports success so the required-check gate is satisfied."
           echo "Any non-documentation file in the diff runs the full suite."
     env:
+      # MODIFIED for BizRethink (2026-09-07): one database per run.
+      #
+      # Must live in THIS block, not a second `env:` on the job. YAML permits
+      # duplicate keys and most parsers silently keep the last, so a second
+      # block validates locally and is rejected by Actions as an invalid
+      # workflow file — the run then reports under the raw filename with no
+      # checks at all, which reads as "E2E did not run" rather than as an
+      # error.
+      #
+      # github.run_id is unique per run, run_attempt separates re-runs; both
+      # are digits, so the identifier needs no quoting.
+      RUN_DB: documenso_run_${{ github.run_id }}_${{ github.run_attempt }}
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
       # Stream task output instead of buffering it. Turbo's buffered mode

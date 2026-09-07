@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { checkAgainstSource } from '../prescribed/conformity';
 import type { PrescribedForm } from '../prescribed/types';
 import rendered from './ca-rows.fixture.json';
+import { syntheticForm } from './synthetic-form';
 
 /*
   The real thing, on real text: a spec seeded from OUR California form, checked
@@ -18,12 +19,12 @@ import rendered from './ca-rows.fixture.json';
 const source = readFileSync(join(__dirname, '../sources/CA-10CCR-900-956.txt'), 'utf8');
 
 /** Seeded from Lombard_CA_Disclosure_v1, exactly as a naive import would. */
-const seeded: PrescribedForm = {
+const seeded: PrescribedForm = syntheticForm({
   slug: 'ca-offer-summary',
   citation: '10 CCR §914',
   sourceFile: 'CA-10CCR-900-956.txt',
   rows: rendered.map((r) => ({ label: r.label, verbatim: null, onlyPrescribedContent: false })),
-};
+});
 
 describe('a spec seeded from our own form, checked against the statute', () => {
   it('reports every label the regulation does not contain', () => {

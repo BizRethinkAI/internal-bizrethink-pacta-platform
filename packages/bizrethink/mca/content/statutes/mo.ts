@@ -17,6 +17,26 @@ export const MO_DISCLOSURE: ContentStatute = {
   slug: 'mo-disclosure',
   citation: 'Mo. SB 1359 §(2)',
   sourceFile: 'MO-SB-1359.txt',
+  jurisdiction: 'US-MO',
+  status: 'published',
+  source: {
+    kind: 'statute',
+    citation: 'Mo. SB 1359 §(2)',
+    // As Kansas: Missouri prescribes every label, and capitalises them where
+    // Kansas writes them lower case.
+    verbatimRequired: true,
+    verbatimVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: 'ac0d2b63b47f37336f4155401ad9dd3c707daaee039b233a2e30c98582a4374f',
+  /*
+    SB 1359 is a 339,000-character omnibus bill — acknowledgment certificates,
+    trusts, licensing, and eighty-odd other sections. The Commercial Financing
+    Disclosure Law is §427.300 alone. A prescribed label found "somewhere in
+    the bill" would be no evidence at all, so the search is bounded to the one
+    section. The short title appears exactly once in the file, which is what
+    makes it a safe anchor.
+  */
+  section: { from: 'Commercial Financing Disclosure Law', to: '442.210.' },
   requirements: [
     {
       citation: 'Mo. SB 1359 §(2)(a)',

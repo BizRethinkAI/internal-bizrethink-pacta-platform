@@ -16,6 +16,16 @@ export const UT_DISCLOSURE: ContentStatute = {
   slug: 'ut-disclosure',
   citation: 'Utah Code §7-27-201(2)',
   sourceFile: 'UT-Title-7-Ch-27.txt',
+  jurisdiction: 'US-UT',
+  status: 'published',
+  source: {
+    kind: 'statute',
+    citation: 'Utah Code §7-27-201(2)',
+    verbatimRequired: false,
+    verbatimVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '060c5bea09bd05a2a76ed42c8dbc2ff8abfb3fd86f2b31a7376d47a53ffb99a5',
+  section: null,
   requirements: [
     {
       citation: 'Utah Code §7-27-201(2)(a)',
