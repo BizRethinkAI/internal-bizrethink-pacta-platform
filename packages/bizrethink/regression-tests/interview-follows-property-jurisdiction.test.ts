@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { jurisdictionForProperty } from '../lease/clauses/approval-jurisdiction';
+
 /**
  * The builder asks the questions the property's state supports.
  *
@@ -57,11 +59,19 @@ describe('the builder interview follows the property, not Florida', () => {
 
   /*
     An unrecognised or missing state must not silently become "no questions".
-    Florida is the only state with clauses of its own today, so it is the
-    fallback — and the fallback stops being harmless the moment a second state
-    has any, which is why this is pinned rather than left to read naturally.
+
+    THE FALLBACK MOVED, AND THIS GUARD MOVED WITH IT. It asserted the literal
+    `US-FL` in this page, because the page wrote the rule out itself. Three files
+    did, and the third — the validate path — never did at all, so the rule now
+    lives once in `jurisdictionForProperty` and the page asks for it. Asserting
+    the literal here would now pass only by putting a fourth copy back.
+
+    The substance is unchanged: the page derives its jurisdiction from the
+    property, and the fallback is Florida.
   */
   it('falls back to Florida rather than to nothing', () => {
-    expect(code(BUILDER)).toMatch(/US-FL/);
+    expect(code(BUILDER)).toMatch(/jurisdictionForProperty\(/);
+    expect(jurisdictionForProperty(null)).toBe('US-FL');
+    expect(jurisdictionForProperty('ZZ')).toBe('US-FL');
   });
 });

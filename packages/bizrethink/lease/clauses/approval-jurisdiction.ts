@@ -60,6 +60,30 @@ export const normaliseJurisdiction = (input: string | null): ClauseJurisdiction 
 };
 
 /**
+ * The jurisdiction a lease is drafted to when its property does not say.
+ *
+ * FAIL-OPEN, AND NAMED SO THAT IS VISIBLE. A property in a state the library
+ * holds no clauses for gets Florida's — the radon disclosure, the §83.49
+ * deposit sections, the lot. Failing closed would leave that landlord with a
+ * builder that assembles nothing and no way forward, so the default stays; what
+ * changes is that it is one named constant rather than three hand-written
+ * `?? 'US-FL'` fallbacks, and a test pins what it is.
+ */
+export const DEFAULT_LEASE_JURISDICTION: ClauseJurisdiction = 'US-FL';
+
+/**
+ * Whose law a lease over this property is drafted to.
+ *
+ * The rule is "the state the property is in", and it was written out by hand in
+ * three files — `renderInputForMatter`, the lease page's `interviewFor` call,
+ * and, missing entirely, the validate path. Three copies of a fallback is how
+ * one of them ends up defaulting differently, and the symptom is a lease whose
+ * QUESTIONS come from one state and whose CLAUSES come from another.
+ */
+export const jurisdictionForProperty = (state: string | null | undefined): ClauseJurisdiction =>
+  normaliseJurisdiction(state ?? null) ?? DEFAULT_LEASE_JURISDICTION;
+
+/**
  * What each tier is called, in the adjectival form both readers need.
  *
  * ONE MAP, and it is the reason this lives here rather than in either page. The
