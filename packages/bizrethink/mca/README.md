@@ -1,7 +1,19 @@
-# MCA clause library
+# The MCA vertical
 
-Second vertical beside `lease/`. Phase 1 is here: the conformity checker, with
-no clause content behind it yet.
+Second vertical beside `lease/`, and **two surfaces rather than one** — see
+[ADR 0008](../../../docs/adr/0008-mca-is-two-surfaces-not-one.md).
+
+| | where | what it is |
+|---|---|---|
+| **Conformity** | this directory: `content/`, `prescribed/`, `statutes/`, `sources/` | does a disclosure meet a state's statute. The words are the regulator's, so there is nothing here for counsel to approve |
+| **The clause library** | [`clauses/`](clauses/) | our own contract text, the negotiated agreements. Every clause needs an attorney before it can reach a merchant |
+
+The rest of this file is about the first. **This file is not about `clauses/`,
+and reading it as the whole package is the mistake ADR 0008 exists to prevent:
+`content/` and `prescribed/` are rule packs — what a state demands of a
+disclosure — and they were never going to become clauses.** The deliverable the
+whole vertical is for is the agreement builder, which selects from `clauses/`
+and must not violate what is checked here.
 
 ## What this checker does and does not do
 
