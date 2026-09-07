@@ -1,8 +1,12 @@
 # feat/north-carolina-clauses — the second jurisdiction
 
-**PR:** #TBD. **Stacked on [#111](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/111)**
-(`feat/library-jurisdiction-visible`, green, unmerged) — both touch
-`lease/clauses/library.ts`, and they merge together.
+**PR:** [#114](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/114).
+
+Branched from `038eef66c`, the head of `feat/library-jurisdiction-visible`
+(#111), because both touch `lease/clauses/library.ts` and the two were meant to
+merge together. **#111 merged into `main` while this was being written**
+(`7c9e7a62e`), so the stack resolved itself — `main` has been merged in and this
+is now an ordinary PR against it.
 
 ---
 
@@ -17,7 +21,8 @@ inherits**. Two commits, and the first is a bug fix that had to go first.
 | Portable (shared, not copied) | 36 | 36 |
 | Total in a lease's library | 64 | **53** |
 | Compelled by statute | 6 | **1** (federal lead paint) |
-| Interview questions | 76 | **69** |
+| Interview questions | 70 | **54** |
+| Interview steps | 15 | **13** |
 
 Tests **1199 → 1259**. Typecheck clean in both `packages/bizrethink` and
 `apps/remix`.
@@ -230,10 +235,17 @@ marking mechanism that can read `includeWhen` safely. Not in this PR.
 5. **`venueCounty` lost the word "Florida" from its label** and is asked in both
    states. Not decided here — the derived test computed it and failed until the
    marking came off.
-6. **North Carolina asks two fewer deposit questions than Florida**, because
-   §42-52 fixes both deadlines and Florida's §83.49(3)(a) sets maxima the
-   landlord chooses under. The only place a second state made the interview
-   *shorter*.
+6. **North Carolina's interview is 54 questions over 13 steps against Florida's
+   70 over 15** — measured, not estimated. Two steps disappear entirely
+   (`maintenance`, whose only questions are the Florida repair threshold, and
+   `disclosures`, whose three are the §83.512 flood answers). Two deposit
+   questions vanish because §42-52 fixes both deadlines where Florida's
+   §83.49(3)(a) sets maxima the landlord chooses under. The only place a second
+   state made the product *shorter*.
+
+   *(An earlier draft of this note asserted 76 and 69. Both were invented and
+   neither was measured. Recorded because a number nobody checked is precisely
+   what the STATE.md clause-count correction on `main` was about.)*
 7. **`deposit.permitted-uses-nc` was written and then dropped.** §42-51(a) is a
    closed list and enumerating it is protective, but North Carolina neither
    requires it nor has a Florida clause it replaces, so it failed the scope rule.
