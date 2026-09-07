@@ -1,6 +1,7 @@
 import { assertPublishable } from '../../provenance/types';
 import type { ContentStatute } from '../content/types';
 import { checkAgainstSource } from '../prescribed/conformity';
+import { checkItemizationAgainstSource, type ItemizationForm } from '../prescribed/itemization';
 import type { PrescribedForm } from '../prescribed/types';
 import {
   containsLabel,
@@ -41,9 +42,10 @@ export type ProvenanceProblem = {
   detail: string;
 };
 
-export type McaDisclosure = PrescribedForm | ContentStatute;
+export type McaDisclosure = PrescribedForm | ItemizationForm | ContentStatute;
 
 const isPrescribedForm = (spec: McaDisclosure): spec is PrescribedForm => 'rows' in spec;
+const isItemization = (spec: McaDisclosure): spec is ItemizationForm => 'lines' in spec;
 
 /**
  * Do the labels appear in the source in the order the spec puts them in?
@@ -52,21 +54,32 @@ const isPrescribedForm = (spec: McaDisclosure): spec is PrescribedForm => 'rows'
  * rows are both labelled "Prepayment" and a position lookup would find the same
  * one twice. Scanning forward from the last match is also what "in order"
  * actually means.
+ *
+ * Takes the labels rather than the form: the itemization prescribes DESCRIPTIONS
+ * rather than row labels, and "in order" means the same thing for both. A null
+ * label is one the regulation requires and does not word — §956(a)(3)'s payee
+ * lines — and is skipped rather than searched for, because there is nothing to
+ * search for and pretending otherwise would report a missing label on a
+ * conforming form.
  */
-const labelsInOrder = (form: PrescribedForm, section: string): string[] => {
+const labelsInOrder = (labels: readonly (string | null)[], sourceFile: string, section: string): string[] => {
   const hay = section.toLowerCase().replace(/\s+/g, ' ');
   const problems: string[] = [];
   let cursor = 0;
 
-  for (const [i, row] of form.rows.entries()) {
-    const label = row.label.toLowerCase().replace(/\s+/g, ' ').trim();
+  for (const [i, raw] of labels.entries()) {
+    if (raw === null) {
+      continue;
+    }
+
+    const label = raw.toLowerCase().replace(/\s+/g, ' ').trim();
     const at = hay.indexOf(label, cursor);
 
     if (at === -1) {
       problems.push(
         hay.includes(label)
-          ? `row ${i}: ${JSON.stringify(row.label)} appears in ${form.sourceFile} but out of the prescribed order`
-          : `row ${i}: ${JSON.stringify(row.label)} does not appear in ${form.sourceFile}`,
+          ? `row ${i}: ${JSON.stringify(raw)} appears in ${sourceFile} but out of the prescribed order`
+          : `row ${i}: ${JSON.stringify(raw)} does not appear in ${sourceFile}`,
       );
       continue;
     }
@@ -167,7 +180,11 @@ export const verifyProvenance = (spec: McaDisclosure): ProvenanceProblem[] => {
     }
 
     if (spec.source.structureVerifiedAt !== null && spec.structureEvidence === 'source-order') {
-      for (const d of labelsInOrder(spec, section)) {
+      for (const d of labelsInOrder(
+        spec.rows.map((r) => r.label),
+        spec.sourceFile,
+        section,
+      )) {
         say('structure', d);
       }
     }
@@ -180,6 +197,47 @@ export const verifyProvenance = (spec: McaDisclosure): ProvenanceProblem[] => {
     */
     if (spec.structureEvidence === 'prose-described' && spec.section === null) {
       say('structure', 'a prose-described form must name the section it was transcribed from');
+    }
+
+    return problems;
+  }
+
+  /*
+    The Itemization of Amount Financed — §956, §600.17.
+
+    Its own branch because it is its own instrument: no prescribed row count, no
+    "shall include only", and DESCRIPTIONS rather than sentences. What it shares
+    with a table is exactly the part below — the source must exist, its digest
+    must still match, the section anchors must still resolve, and every
+    description the spec claims must be found in that section, in order. Those
+    are properties of a verification date, not of a table, which is why they are
+    reused rather than reimplemented.
+  */
+  if (isItemization(spec)) {
+    if (spec.source.kind !== 'regulator-prescribed-form') {
+      say('kind', `an itemization must carry regulator-prescribed-form provenance, not ${spec.source.kind}`);
+
+      return problems;
+    }
+
+    if (spec.source.verbatimVerifiedAt !== null) {
+      for (const d of checkItemizationAgainstSource(spec, section)) {
+        say('verbatim', d.detail);
+      }
+    }
+
+    if (spec.source.structureVerifiedAt !== null && spec.structureEvidence === 'source-order') {
+      for (const d of labelsInOrder(
+        spec.lines.map((l) => l.description),
+        spec.sourceFile,
+        section,
+      )) {
+        say('structure', d);
+      }
+    }
+
+    if (spec.structureEvidence === 'prose-described' && spec.section === null) {
+      say('structure', 'a prose-described itemization must name the section it was transcribed from');
     }
 
     return problems;

@@ -16,8 +16,16 @@ import { CONTENT_STATUTES, MCA_DISCLOSURES, PRESCRIBED_FORMS } from '../registry
 */
 
 describe('every MCA spec carries provenance', () => {
-  it('has all eleven states', () => {
-    expect(MCA_DISCLOSURES).toHaveLength(11);
+  /*
+    Fifteen specs across eleven states, not eleven specs. California and New
+    York each prescribe three separate documents — the sales-based offer
+    summary, the lease financing disclosure and the Itemization of Amount
+    Financed — and the count moved from 11 to 15 when the last four were
+    encoded. Kept as a bare number rather than derived from the registry,
+    because a count derived from the thing it counts asserts nothing.
+  */
+  it('holds every spec the eleven states prescribe', () => {
+    expect(MCA_DISCLOSURES).toHaveLength(15);
   });
 
   it.each(MCA_DISCLOSURES.map((d) => [d.slug, d] as const))('%s carries a source and a status', (_slug, spec) => {

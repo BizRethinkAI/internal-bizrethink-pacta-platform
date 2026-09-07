@@ -28,6 +28,7 @@ export const NY_OFFER_SUMMARY: PrescribedForm = {
   citation: '23 NYCRR §600.6',
   sourceFile: 'NY-23NYCRR-600.txt',
   jurisdiction: 'US-NY',
+  transaction: 'sales-based-financing',
   status: 'published',
   source: {
     kind: 'regulator-prescribed-form',

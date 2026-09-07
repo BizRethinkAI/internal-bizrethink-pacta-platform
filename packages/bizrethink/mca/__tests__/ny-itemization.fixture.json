@@ -1,0 +1,32 @@
+[
+  {
+    "number": "1.",
+    "description": "Amount Given Directly to You",
+    "amount": "$ ______«2»______"
+  },
+  {
+    "number": "2.",
+    "description": "Amount Paid on your Account with Us",
+    "amount": "$ ______«3»______"
+  },
+  {
+    "number": "3.",
+    "description": "Paid on your behalf to _________«4»__________",
+    "amount": "$ ______«5»______"
+  },
+  {
+    "number": "4.",
+    "description": "Amount Provided to You or on Your Behalf (Sum of Items 1-3)",
+    "amount": "$ ______«6»______"
+  },
+  {
+    "number": "5.",
+    "description": "Prepaid Finance Charges: Origination Fee",
+    "amount": "$ ______«7»______"
+  },
+  {
+    "number": "6.",
+    "description": "Amount Financed (Item 4 minus Item 5)",
+    "amount": "$ ______«8»______"
+  }
+]

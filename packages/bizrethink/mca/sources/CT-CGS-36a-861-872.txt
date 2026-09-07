@@ -1,0 +1,127 @@
+Sec. 36a-861. Definitions. As used in this section and sections 36a-862 to 36a-872, inclusive:
+
+(1) “Commercial financing” means any extension of sales-based financing by a provider in an amount not exceeding two hundred fifty thousand dollars, the proceeds of which the recipient does not intend to use primarily for personal, family or household purposes;
+
+(2) “Commercial financing broker” means a person, other than a financer, who, for compensation or the expectation of compensation, offers, or offers to obtain, commercial financing for a recipient from a provider that is not exempt;
+
+(3) “Finance charge” means the cost of financing expressed as a dollar amount, including (A) any charge payable directly or indirectly by the recipient and imposed directly or indirectly by the provider as an incident to, or a condition of, the extension of financing, and (B) all charges that would be included under the definition of “finance charge” in 12 CFR 1026.4, as amended from time to time, as if the transaction were subject to said section;
+
+(4) “Financer” means a person who provides, or will provide, commercial financing to a recipient;
+
+(5) “Person” means an individual, corporation, partnership, limited liability company, joint venture, association, joint stock company, trust or unincorporated organization, including, but not limited to, a sole proprietorship;
+
+(6) “Provider” means a person who extends a specific offer of commercial financing to a recipient and includes, unless otherwise exempt under this section, a commercial financing broker, but does not include any (A) bank, out-of-state bank, bank holding company, Connecticut credit union, federal credit union, out-of-state credit union or any subsidiary or affiliate of the foregoing, as those terms are defined in section 36a-2, (B) person acting in such person's capacity as a technology services provider to an entity exempt under this section for use as part of the exempt entity's commercial financing program, provided such person has no interest, arrangement or agreement to purchase any interest in the commercial financing extended by the exempt entity in connection with such program, (C) lender regulated under the federal Farm Credit Act, 12 USC 2001 et seq., as amended from time to time, (D) person or provider who extends or brokers a commercial financing transaction secured by real property, (E) person or provider who extends or brokers a lease, as defined in section 42a-2A-102, (F) person or provider who extends or brokers a purchase-money obligation, as defined in section 42a-9-103a, (G) person or provider who extends not more than five commercial financing transactions in this state in a twelve-month period, (H) person or provider who extends or brokers a commercial financing transaction entered into pursuant to a commercial financing agreement or commercial open-end credit plan of at least fifty thousand dollars, in which the recipient is (i) a dealer, as defined in section 14-1, or an affiliate of such a dealer, or (ii) a motor vehicle rental company, or an affiliate of such a company, or (I) person or provider who extends or brokers a commercial financing transaction in connection with the sale of products or services that such person or provider manufactures, licenses or distributes, or whose parent company, subsidiary or affiliate manufactures, licenses or distributes;
+
+(7) “Recipient” means a person, or the authorized representative of a person, who applies for commercial financing and is made a specific offer of commercial financing by a provider, but does not include a person acting as a commercial financing broker;
+
+(8) “Sales-based financing” means a transaction that is repaid by the recipient to the provider over time (A) as a percentage of sales or revenue, in which the payment amount may increase or decrease according to the volume of sales made or revenue received by the recipient, or (B) according to a fixed payment mechanism that provides for a reconciliation process that adjusts the payment to an amount that is a percentage of sales or revenue; and
+
+(9) “Specific offer” means the specific terms of commercial financing, including, but not limited to, a price or amount, that is quoted to a recipient based on information obtained from or about the recipient, which, if accepted by the recipient, would be binding on the provider, subject to any specific requirements stated in such terms.
+
+(P.A. 23-201, S. 1.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-862. Reliance on statement of intended purpose made by recipient. For purposes of determining whether financing is commercial financing, a provider may rely on any statement of intended purpose made by the recipient. The statement may be (1) a separate statement signed by the recipient, (2) contained in the financing application, financing agreement or other document signed or consented to by the recipient, or (3) provided orally by the recipient if such oral statement is documented in the recipient's application file by the provider. Electronic signatures and consents are valid for purposes of this section. A provider shall not be required to ascertain that the proceeds of commercial financing are used in accordance with the recipient's statement of intended purpose.
+
+(P.A. 23-201, S. 2.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-863. Disclosures required when specific offer extended. A provider shall provide to a recipient, when the provider extends a specific offer for sales-based financing, the following disclosures in a format prescribed by the Banking Commissioner:
+
+(1) The total amount of the commercial financing.
+
+(2) The disbursement amount, which is the amount paid to the recipient or on the recipient's behalf, excluding any finance charges that are deducted or withheld at disbursement.
+
+(3) The finance charge.
+
+(4) The total repayment amount, which is the disbursement amount plus the finance charge.
+
+(5) The estimated time period required for the periodic payments to equal the total repayment amount.
+
+(6) The payment amounts as follows:
+
+(A) For payment amounts that are fixed, the payment amounts and frequency; or
+
+(B) For payment amounts that are variable, a payment schedule or a description of the method used to calculate the amounts and frequency of payments, and the amount of the average projected payments per month.
+
+(7) A description of all other potential fees and charges not included in the finance charge, including, but not limited to, draw fees, late payment fees and returned payment fees.
+
+(8) (A) Any finance charge the recipient will be required to pay if the recipient elects to pay off or refinance the commercial financing prior to full repayment, other than interest accrued since the recipient's last payment, and the percentage of any unpaid portion of such finance charge and the maximum dollar amount of such finance charge the recipient will be required to pay; and
+
+(B) Any additional fees, not already included in the finance charge, the recipient will be required to pay if the recipient elects to pay off or refinance the commercial financing prior to full repayment.
+
+(9) A description of collateral requirements or security interests, if any.
+
+(10) Whether, in connection with the specific offer of sales-based financing, the provider will pay compensation directly to a commercial financing broker out of the financed amount and, if so, the amount of such compensation.
+
+(P.A. 23-201, S. 3.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-864. Disclosures required if recipient required to pay off existing commercial financing as condition. If as a condition of obtaining commercial financing the provider requires the recipient to pay off the balance of existing commercial financing from the same provider, the provider shall disclose to the recipient:
+
+(1) The amount of the new commercial financing used to pay off the portion of the existing commercial financing that consists of prepayment charges required to be paid and any unpaid interest expense that was not forgiven at the time of renewal. For financing for which the total repayment amount is calculated as a fixed amount, the prepayment charge is equal to the original finance charge multiplied by the amount of the renewal used to pay off existing financing as a percentage of the total repayment amount, minus any portion of the total repayment amount forgiven by the provider at the time of prepayment.
+
+(2) If the disbursement amount will be reduced to pay down any unpaid portion of the outstanding balance, the actual dollar amount by which such disbursement amount will be reduced.
+
+(P.A. 23-201, S. 4.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-865. Signature of recipient required on disclosures. The provider shall obtain the recipient's signature, which may be fulfilled by an electronic signature, on all disclosures required to be presented to the recipient pursuant to sections 36a-861 to 36a-866, inclusive, before authorizing the recipient to proceed further with the commercial financing transaction application.
+
+(P.A. 23-201, S. 5.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-866. Disclosure of additional information. Nothing in this section or sections 36a-861 to 36a-865, inclusive, shall prevent a provider from providing or disclosing additional information concerning commercial financing offered to a recipient, provided such additional information shall not be disclosed as part of any disclosure required pursuant to this section or sections 36a-861 to 36a-865, inclusive.
+
+(P.A. 23-201, S. 6.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-867. Use of commercial financing disclosure form approved by another state. If the Banking Commissioner determines that the laws of another state require commercial financing disclosures that meet or exceed the commercial financing disclosure requirements established under sections 36a-861 to 36a-866, inclusive, any commercial financing disclosure form that such other state approves for the purposes of complying with such other state's commercial financing disclosure laws may be used for the purposes of complying with the commercial financing disclosure requirements established under sections 36a-861 to 36a-866, inclusive.
+
+(P.A. 23-201, S. 7.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-868. Waiver provisions re provider obtaining prejudgment remedy. Unenforceable provisions. No commercial financing contract entered into on or after July 1, 2024, shall contain any provision waiving a recipient's right to notice, judicial hearing or prior court order under chapter 903a in connection with the provider obtaining any prejudgment remedy, including, but not limited to, attachment, execution, garnishment or replevin, upon commencing any litigation against the recipient. Any such provision in a commercial financing contract entered into on or after July 1, 2024, shall be unenforceable.
+
+(P.A. 23-201, S. 8.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-869. Revocation, withdrawal or modification of specific offer based on preliminary review. (a) A provider shall not revoke, withdraw or modify a specific offer made on or after July 1, 2024, until midnight of the third calendar day after the date of the specific offer. A specific offer may be revoked, withdrawn or modified (1) based on information obtained in the underwriting process, including, but not limited to, verification of any information provided by the recipient, or (2) at the request of the recipient.
+
+(b) A specific offer may state that it is based on the provider's preliminary review of application information only and is not a final approval or commitment to provide sales-based financing.
+
+(P.A. 23-201, S. 9.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-870. Registration. Authority to transact business. Application. Fees. (a) Not later than October 1, 2024, each provider and commercial financing broker shall: (1) Register with the Banking Commissioner in a manner prescribed by the commissioner; and (2) unless such provider or broker is organized under the laws of this state or is otherwise not required to obtain authority to transact business in this state as a foreign entity, shall obtain authority to transact business in this state.
+
+(b) An application for registration by a provider or commercial financing broker shall disclose any judgment, memorandum of understanding, cease and desist order or conviction that involves a crime or an act of fraud, breach of trust or money laundering with respect to such provider or broker or any officer, director, manager, operator or individual who otherwise controls the operations of such provider or broker.
+
+(c) Each provider and commercial financing broker shall pay an initial registration fee of one thousand dollars and an annual registration fee of five hundred dollars by the fifteenth of September each year thereafter. If a provider or commercial financing broker fails to timely pay any such annual registration fee, its registration shall automatically expire by operation of law.
+
+(P.A. 23-201, S. 10.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-871. Regulations. The Banking Commissioner may adopt regulations, in accordance with the provisions of chapter 54, to carry out the provisions of sections 36a-861 to 36a-872, inclusive.
+
+(P.A. 23-201, S. 11.)
+
+History: P.A. 23-201 effective July 1, 2024.
+
+Sec. 36a-872. Penalties. (a) Any provider who violates any provision of sections 36a-861 to 36a-870, inclusive, or any regulation adopted pursuant to section 36a-871 shall be liable for a civil penalty pursuant to section 36a-50.
+
+(b) In addition to any civil penalty imposed under subsection (a) of this section, if the Banking Commissioner finds that a provider has knowingly violated any provision of sections 36a-861 to 36a-870, inclusive, or any regulation adopted pursuant to section 36a-871, the commissioner may seek an injunction in a court of competent jurisdiction, and may exercise the powers granted to the commissioner under section 36a-50, on behalf of any recipient affected by the violation.
+
+(P.A. 23-201, S. 12.)
+
+History: P.A. 23-201 effective July 1, 2024.

@@ -7,12 +7,18 @@ import { TX_DISCLOSURE } from './content/statutes/tx';
 import { UT_DISCLOSURE } from './content/statutes/ut';
 import type { ContentStatute } from './content/types';
 import type { McaJurisdiction } from './jurisdictions';
+import { CA_ITEMIZATION } from './prescribed/forms/ca-itemization';
+import { CA_LEASE_FINANCING } from './prescribed/forms/ca-lease-financing';
 import { CA_OFFER_SUMMARY } from './prescribed/forms/ca-offer-summary';
 import { CT_DISCLOSURE } from './prescribed/forms/ct-disclosure';
+import { NY_ITEMIZATION } from './prescribed/forms/ny-itemization';
+import { NY_LEASE_FINANCING } from './prescribed/forms/ny-lease-financing';
 import { NY_OFFER_SUMMARY } from './prescribed/forms/ny-offer-summary';
 import { VA_DISCLOSURE } from './prescribed/forms/va-disclosure';
+import type { ItemizationForm } from './prescribed/itemization';
 import type { PrescribedForm } from './prescribed/types';
 import type { McaDisclosure } from './provenance/verify';
+import type { McaTransactionType } from './transactions';
 
 /**
  * Every commercial-financing disclosure the library holds, and the only way to
@@ -29,11 +35,24 @@ import type { McaDisclosure } from './provenance/verify';
  *                         label while prescribing no sentence
  */
 export const PRESCRIBED_FORMS: readonly PrescribedForm[] = [
+  CA_LEASE_FINANCING,
   CA_OFFER_SUMMARY,
   CT_DISCLOSURE,
+  NY_LEASE_FINANCING,
   NY_OFFER_SUMMARY,
   VA_DISCLOSURE,
 ];
+
+/**
+ * The Itemization of Amount Financed, per state.
+ *
+ * A third list rather than a fourth entry in `PRESCRIBED_FORMS`, because it is
+ * a different shape with a different checker — see `prescribed/itemization.ts`.
+ * Folding it in would mean `checkFormConformity` being handed a document with
+ * no prescribed row count and no closed rows, which is how a checker starts
+ * reporting defects in correct documents.
+ */
+export const ITEMIZATIONS: readonly ItemizationForm[] = [CA_ITEMIZATION, NY_ITEMIZATION];
 
 export const CONTENT_STATUTES: readonly ContentStatute[] = [
   FL_DISCLOSURE,
@@ -45,7 +64,7 @@ export const CONTENT_STATUTES: readonly ContentStatute[] = [
   UT_DISCLOSURE,
 ];
 
-export const MCA_DISCLOSURES: readonly McaDisclosure[] = [...PRESCRIBED_FORMS, ...CONTENT_STATUTES];
+export const MCA_DISCLOSURES: readonly McaDisclosure[] = [...PRESCRIBED_FORMS, ...ITEMIZATIONS, ...CONTENT_STATUTES];
 
 /**
  * The disclosures that apply in one jurisdiction.
@@ -63,3 +82,36 @@ export const MCA_DISCLOSURES: readonly McaDisclosure[] = [...PRESCRIBED_FORMS, .
  */
 export const disclosuresFor = (jurisdiction: McaJurisdiction): McaDisclosure[] =>
   MCA_DISCLOSURES.filter((disclosure) => disclosure.jurisdiction === jurisdiction);
+
+/**
+ * The prescribed forms one state requires for one KIND of financing.
+ *
+ * A SECOND FILTER, NOT A REPLACEMENT. `disclosuresFor` answers "what does this
+ * state prescribe", which is what the read-only conformity surface wants. This
+ * answers "which of those describe the transaction in front of me", which is a
+ * different question and became a real one the moment California went from one
+ * spec to three: §915's table asserts a purchase option, an anticipated cost of
+ * acquiring property and a lease term, none of which a sales-based advance has.
+ * Handing it to a sales-based deal is the same class of defect as handing New
+ * York's sentence to a California form.
+ *
+ * §956 and §600.17 come back for every transaction type: §956(a) applies
+ * "when a provider provides a disclosure … under sections 910 through 917",
+ * which is all six tables.
+ *
+ * READ THE NAME LITERALLY. It returns PRESCRIBED FORMS, and it is not a list of
+ * everything a provider must send. The seven content-only statutes are excluded
+ * because `ContentStatute` carries no transaction type, and it carries none
+ * because settling the scope of seven acts means reading seven acts — which has
+ * not been done, and guessing at it here would be exactly the laundering of
+ * judgement into authority that REVIEW-01 found in the inherited documents.
+ */
+export const prescribedFormsForTransaction = (
+  jurisdiction: McaJurisdiction,
+  transaction: McaTransactionType,
+): (PrescribedForm | ItemizationForm)[] =>
+  [...PRESCRIBED_FORMS, ...ITEMIZATIONS].filter(
+    (form) =>
+      form.jurisdiction === jurisdiction &&
+      (form.transaction === transaction || form.transaction === 'any-commercial-financing'),
+  );

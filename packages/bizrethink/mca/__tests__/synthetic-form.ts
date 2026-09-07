@@ -17,6 +17,7 @@ export const syntheticForm = (
   over: Pick<PrescribedForm, 'slug' | 'citation' | 'sourceFile' | 'rows'> & Partial<PrescribedForm>,
 ): PrescribedForm => ({
   jurisdiction: 'US-CA',
+  transaction: 'sales-based-financing',
   status: 'draft',
   source: {
     kind: 'regulator-prescribed-form',

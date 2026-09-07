@@ -58,6 +58,22 @@ export const checkFormConformity = (form: PrescribedForm, rendered: RenderedRow[
       });
     }
 
+    /*
+      §915(a)(7) / §600.14(g): "shall include no information in the third
+      column". Checked BEFORE the `verbatim === null` return below, because a
+      row that must be empty has no prescribed wording and would otherwise fall
+      straight through the early exit — label checked, cell never looked at.
+    */
+    if (row.thirdColumnEmpty && norm(actual.content) !== '') {
+      out.push({
+        kind: 'unauthorised-addition',
+        row: i,
+        detail: `row ${i}: ${form.citation} says this row shall include no information in the third column, but it carries ${JSON.stringify(
+          norm(actual.content),
+        )}`,
+      });
+    }
+
     if (row.verbatim === null) {
       return;
     }
