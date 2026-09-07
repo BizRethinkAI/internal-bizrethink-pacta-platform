@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { FL_LIBRARY } from '../clauses/us-fl';
+import { ALL_CLAUSES } from '../clauses/library';
 
-const body = (slug: string) => FL_LIBRARY.find((c) => c.slug === slug)?.body ?? '';
+const body = (slug: string) => ALL_CLAUSES.find((c) => c.slug === slug)?.body ?? '';
 
 /*
   A CROSS-REFERENCE THAT OUTLIVED WHAT IT POINTED AT.
@@ -35,7 +35,7 @@ describe('nothing points at a charge that does not exist', () => {
   it('no clause refers to a section by a name the document does not use', () => {
     // "the administrative charges section" was never a section heading either;
     // the charges live under Maintenance and Repair.
-    for (const clause of FL_LIBRARY) {
+    for (const clause of ALL_CLAUSES) {
       expect(clause.body).not.toMatch(/administrative charges section/i);
     }
   });

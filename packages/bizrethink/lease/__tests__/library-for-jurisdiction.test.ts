@@ -30,6 +30,18 @@ describe('libraryFor', () => {
     ).toEqual(FL_LIBRARY.map((c) => c.slug).sort());
   });
 
+  /*
+    THE SAFETY PROPERTY, RESTATED FOR THE DAY A SECOND STATE LANDED. Adding
+    North Carolina's seventeen clauses to `ALL_CLAUSES` must not change a single
+    clause a Florida lease is built from, or every existing Florida matter would
+    render differently and every recorded approval would be measured against a
+    different document.
+  */
+  it('was unchanged for Florida by North Carolina arriving', () => {
+    expect(libraryFor('US-FL').length).toBe(64);
+    expect(libraryFor('US-FL').filter((c) => c.slug.endsWith('-nc'))).toEqual([]);
+  });
+
   it('always carries the clauses that belong to no state', () => {
     const fl = libraryFor('US-FL');
     const generic = ALL_CLAUSES.filter((c) => c.jurisdiction === 'generic');
@@ -63,12 +75,32 @@ describe('libraryFor', () => {
   });
 
   /*
-    North Carolina has no clauses of its own yet, so today it is the portable
-    library and nothing else. Asserting the number is how the next person sees
-    that adding NC clauses is additive rather than a rewrite.
+    North Carolina, once it had clauses: the 36 portable ones plus its own 17.
+    The number this replaced asserted 36 — "the portable library and nothing
+    else, for now" — and watching it fail was the first sign the second state
+    had actually landed.
   */
-  it('gives North Carolina the portable library and nothing else, for now', () => {
-    expect(libraryFor('US-NC').length).toBe(36);
+  it('gives North Carolina the portable library plus its own', () => {
+    const nc = libraryFor('US-NC');
+
+    expect(nc.length).toBe(53);
+    expect(nc.filter((c) => c.jurisdiction === 'US-NC').length).toBe(17);
+    expect(nc.filter((c) => c.jurisdiction === 'US-FL')).toEqual([]);
+  });
+
+  /*
+    AND EVERY PORTABLE CLAUSE IS THE SAME OBJECT IN BOTH. Not an equal one — the
+    same one. Two states sharing a reference is what makes an approval of a
+    portable clause a single fact rather than one per state, and it is the thing
+    a well-meaning refactor into per-jurisdiction folders would break first by
+    copying.
+  */
+  it('shares the portable clauses rather than copying them', () => {
+    const fl = libraryFor('US-FL');
+
+    for (const clause of libraryFor('US-NC').filter((c) => c.jurisdiction !== 'US-NC')) {
+      expect(fl.includes(clause), clause.slug).toBe(true);
+    }
   });
 
   it('never returns a clause twice', () => {

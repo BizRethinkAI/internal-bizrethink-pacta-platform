@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { FL_LIBRARY } from '../clauses/us-fl';
+import { ALL_CLAUSES } from '../clauses/library';
 
 /**
  * Which jurisdiction's law each clause depends on.
@@ -14,6 +14,7 @@ import { FL_LIBRARY } from '../clauses/us-fl';
  *              state. A generic clause may not cite one state's statute.
  *   `US`       federal law. Applies everywhere.
  *   `US-FL`    depends on Florida law and does not travel.
+ *   `US-NC`    depends on North Carolina law and does not travel.
  *
  * Sixty-three clauses were labelled `US-FL` when only twenty-seven of them
  * actually depend on Florida. Adding North Carolina under that labelling would
@@ -89,11 +90,38 @@ const PINNED: Record<string, string> = {
   'deposit.escrow-notice': 'US-FL',
   'disclosure.landlord-identity': 'US-FL',
   'disclosure.lead-paint': 'US',
+
+  /*
+    NORTH CAROLINA, added 2026-09-06. Seventeen clauses against Florida's
+    twenty-eight, and not one of the thirty-five generic clauses duplicated —
+    which is the whole argument for having done the reclassification first.
+
+    Every slug ends in `-nc` because approvals are keyed by slug alone (see
+    `loadClauseApprovals`), so a shared name would let one state's sign-off hide
+    the other's. Florida's are unsuffixed for historical reasons only.
+  */
+  'deposit.held-nc': 'US-NC',
+  'deposit.held-carried-nc': 'US-NC',
+  'deposit.escrow-notice-nc': 'US-NC',
+  'deposit.advance-rent-nc': 'US-NC',
+  'deposit.advance-rent-carried-nc': 'US-NC',
+  'deposit.accounting-nc': 'US-NC',
+  'rent.late-fee-nc': 'US-NC',
+  'fees.litigation-nc': 'US-NC',
+  'maintenance.landlord-statutory-nc': 'US-NC',
+  'maintenance.detectors-nc': 'US-NC',
+  'access.entry-nc': 'US-NC',
+  'default.notices-nc': 'US-NC',
+  'moveout.personal-property-nc': 'US-NC',
+  'notices.method-nc': 'US-NC',
+  'notices.landlord-address-nc': 'US-NC',
+  'general.waiver-nc': 'US-NC',
+  'general.governing-law-nc': 'US-NC',
 };
 
 describe('the library knows whose law each clause is', () => {
   it('classifies every clause, and only the clauses that exist', () => {
-    const actual = Object.fromEntries(FL_LIBRARY.map((c) => [c.slug, c.jurisdiction]));
+    const actual = Object.fromEntries(ALL_CLAUSES.map((c) => [c.slug, c.jurisdiction]));
 
     expect(actual).toEqual(PINNED);
   });
@@ -103,7 +131,7 @@ describe('the library knows whose law each clause is', () => {
     single state's statute it is that state's clause, whatever the label says.
   */
   it('has no generic clause citing one state law', () => {
-    const offenders = FL_LIBRARY.filter(
+    const offenders = ALL_CLAUSES.filter(
       (c) =>
         c.jurisdiction === 'generic' &&
         (/Fla\. Stat\.|Florida Statutes|N\.C\. Gen\. Stat\.|NCGS/.test(c.body) ||
@@ -114,15 +142,43 @@ describe('the library knows whose law each clause is', () => {
   });
 
   it('has every Florida clause that claims a statute claiming a Florida one', () => {
-    const offenders = FL_LIBRARY.filter(
+    const offenders = ALL_CLAUSES.filter(
       (c) => c.jurisdiction === 'US-FL' && c.requiredBy !== undefined && !/Fla\.|Ch\. \d+, Fla/.test(c.requiredBy),
     ).map((c) => `${c.slug} → ${c.requiredBy}`);
 
     expect(offenders).toEqual([]);
   });
 
+  /*
+    The same tooth, pointed at the second state. A North Carolina clause citing
+    a Florida statute is the failure mode a port produces, and the one a
+    reviewer would be least likely to notice — the citation looks like a
+    citation.
+  */
+  it('has every North Carolina clause that claims a statute claiming a North Carolina one', () => {
+    const offenders = ALL_CLAUSES.filter(
+      (c) => c.jurisdiction === 'US-NC' && c.requiredBy !== undefined && !/N\.C\. Gen\. Stat\./.test(c.requiredBy),
+    ).map((c) => `${c.slug} → ${c.requiredBy}`);
+
+    expect(offenders).toEqual([]);
+  });
+
+  /*
+    And in the body, where a citation does not have to be declared to be read by
+    a signer. Neither state may name the other's statute book at all.
+  */
+  it('never names one state law inside another state clause', () => {
+    const offenders = ALL_CLAUSES.filter(
+      (c) =>
+        (c.jurisdiction === 'US-NC' && /Fla\. Stat\.|Florida/.test(c.body)) ||
+        (c.jurisdiction === 'US-FL' && /N\.C\. Gen\. Stat\.|North Carolina/.test(c.body)),
+    ).map((c) => c.slug);
+
+    expect(offenders).toEqual([]);
+  });
+
   it('has every federal clause citing federal law', () => {
-    for (const clause of FL_LIBRARY.filter((c) => c.jurisdiction === 'US')) {
+    for (const clause of ALL_CLAUSES.filter((c) => c.jurisdiction === 'US')) {
       expect(`${clause.body} ${clause.requiredBy ?? ''}`, clause.slug).toMatch(/U\.S\.C\.|C\.F\.R\./);
     }
   });
@@ -133,12 +189,40 @@ describe('the library knows whose law each clause is', () => {
     North Carolina.
   */
   it('leaves most of the library portable', () => {
-    const by = (j: string) => FL_LIBRARY.filter((c) => c.jurisdiction === j).length;
+    const by = (j: string) => ALL_CLAUSES.filter((c) => c.jurisdiction === j).length;
 
-    expect({ generic: by('generic'), US: by('US'), 'US-FL': by('US-FL') }).toEqual({
+    expect({
+      generic: by('generic'),
+      US: by('US'),
+      'US-FL': by('US-FL'),
+      'US-NC': by('US-NC'),
+    }).toEqual({
       generic: 35,
       US: 1,
       'US-FL': 28,
+      'US-NC': 17,
     });
+  });
+
+  /*
+    THE NUMBER THAT ANSWERS "WAS A SECOND STATE CHEAP".
+
+    Adding North Carolina cost 17 new clauses and duplicated 0 of the 36
+    portable ones. Under the old labelling — every clause marked `US-FL` — it
+    would have cost 53, because all 36 would have needed a second copy, a second
+    approval, and a second attorney in a second state to read text that turns on
+    no state's law.
+  */
+  it('cost a second state seventeen clauses rather than fifty-three', () => {
+    const nc = ALL_CLAUSES.filter((c) => c.jurisdiction === 'US-NC');
+    const portable = ALL_CLAUSES.filter((c) => c.jurisdiction === 'generic' || c.jurisdiction === 'US');
+
+    expect(nc.length).toBe(17);
+    expect(portable.length).toBe(36);
+
+    // Nothing portable was forked to serve North Carolina.
+    const forked = portable.filter((c) => c.slug.endsWith('-nc'));
+
+    expect(forked).toEqual([]);
   });
 });

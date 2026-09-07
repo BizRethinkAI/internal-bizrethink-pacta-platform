@@ -1,5 +1,6 @@
+import { ALL_CLAUSES } from './library';
 import type { Clause } from './types';
-import { FL_LIBRARY, FL_SECTION_ORDER } from './us-fl';
+import { FL_SECTION_ORDER } from './us-fl';
 
 /**
  * Clauses a landlord writes themselves.
@@ -31,7 +32,7 @@ import { FL_LIBRARY, FL_SECTION_ORDER } from './us-fl';
  * similar wording. In the Keane lease, joint-and-several liability appeared in
  * §2.5.8 and again in custom clause F because nothing could see across the two.
  */
-export const ASSERTION_TAGS: readonly string[] = [...new Set(FL_LIBRARY.flatMap((clause) => clause.asserts))].sort();
+export const ASSERTION_TAGS: readonly string[] = [...new Set(ALL_CLAUSES.flatMap((clause) => clause.asserts))].sort();
 
 export type CustomClauseInput = {
   heading: string;

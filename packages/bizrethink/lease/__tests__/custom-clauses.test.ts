@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CustomClauseInput } from '../clauses/custom';
 import { ASSERTION_TAGS, toCustomClause } from '../clauses/custom';
+import { ALL_CLAUSES } from '../clauses/library';
 import type { ClauseFacts } from '../clauses/types';
 import { FL_LIBRARY, FL_SECTION_ORDER } from '../clauses/us-fl';
 import { selectClauses } from '../engine/select-clauses';
@@ -129,9 +130,16 @@ describe('duplicate detection', () => {
   });
 });
 
+/*
+  EVERY clause, not one state's. The custom-clause editor is served from
+  `ASSERTION_TAGS`, which is a single module-level constant with no jurisdiction
+  in scope, so the tags it offers are the union across the library. A North
+  Carolina author picking `litigation-fees` is how the duplicate detector
+  notices that their own clause and `fees.litigation-nc` say the same thing.
+*/
 describe('the tag list offered to an author', () => {
   it('is drawn from what the library actually asserts', () => {
-    const libraryTags = new Set(FL_LIBRARY.flatMap((c) => c.asserts));
+    const libraryTags = new Set(ALL_CLAUSES.flatMap((c) => c.asserts));
 
     for (const tag of ASSERTION_TAGS) {
       expect(libraryTags.has(tag), `${tag} is offered but no clause asserts it`).toBe(true);
@@ -139,7 +147,7 @@ describe('the tag list offered to an author', () => {
   });
 
   it('covers every assertion the library makes, so nothing is undetectable', () => {
-    const libraryTags = [...new Set(FL_LIBRARY.flatMap((c) => c.asserts))].sort();
+    const libraryTags = [...new Set(ALL_CLAUSES.flatMap((c) => c.asserts))].sort();
 
     expect([...ASSERTION_TAGS].sort()).toEqual(libraryTags);
   });

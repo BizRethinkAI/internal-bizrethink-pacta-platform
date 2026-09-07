@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { FL_LIBRARY } from '../clauses/us-fl';
+import { ALL_CLAUSES } from '../clauses/library';
 
-const clause = (slug: string) => FL_LIBRARY.find((c) => c.slug === slug);
+const clause = (slug: string) => ALL_CLAUSES.find((c) => c.slug === slug);
 
 /*
   WHAT COUNTS AS RENT.
@@ -61,7 +61,7 @@ describe('rent is rent, and a charge is a charge', () => {
   is not ours to tidy.
 */
 describe('every clause agrees about what rent is', () => {
-  const bodies = FL_LIBRARY.filter((c) => c.slug !== 'termination.early-election').map((c) => ({
+  const bodies = ALL_CLAUSES.filter((c) => c.slug !== 'termination.early-election').map((c) => ({
     slug: c.slug,
     body: c.body,
   }));
@@ -74,13 +74,13 @@ describe('every clause agrees about what rent is', () => {
 
   it('leaves the statutory election text alone', () => {
     // Prescribed wording. Tidying it would break "substantially the form".
-    const election = FL_LIBRARY.find((c) => c.slug === 'termination.early-election');
+    const election = ALL_CLAUSES.find((c) => c.slug === 'termination.early-election');
 
     expect(election?.body).toMatch(/additional rent beyond the month/i);
   });
 
   it('names the charges as Other Charges where it used to say rent', () => {
-    const lateFee = FL_LIBRARY.find((c) => c.slug === 'rent.late-fee-flat');
+    const lateFee = ALL_CLAUSES.find((c) => c.slug === 'rent.late-fee-flat');
 
     expect(lateFee?.body).toMatch(/Other Charge/);
   });

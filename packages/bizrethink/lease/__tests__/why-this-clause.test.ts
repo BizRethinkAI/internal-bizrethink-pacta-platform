@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { FL_LIBRARY } from '../clauses/us-fl';
+import { ALL_CLAUSES } from '../clauses/library';
 import { FL_COMPELLED, whyThisClause } from '../clauses/why-this-clause';
 
 /*
@@ -27,13 +27,13 @@ import { FL_COMPELLED, whyThisClause } from '../clauses/why-this-clause';
 */
 describe('every clause can say why it exists', () => {
   it('classifies all of them', () => {
-    for (const clause of FL_LIBRARY) {
+    for (const clause of ALL_CLAUSES) {
       expect(whyThisClause(clause).kind).toMatch(/^(compelled|implements|discretionary)$/);
     }
   });
 
   it('names the statute for anything compelled', () => {
-    for (const clause of FL_LIBRARY) {
+    for (const clause of ALL_CLAUSES) {
       const why = whyThisClause(clause);
 
       if (why.kind === 'compelled') {
@@ -43,7 +43,7 @@ describe('every clause can say why it exists', () => {
   });
 
   it('is honest that most of the library is our drafting', () => {
-    const discretionary = FL_LIBRARY.filter((c) => whyThisClause(c).kind === 'discretionary');
+    const discretionary = ALL_CLAUSES.filter((c) => whyThisClause(c).kind === 'discretionary');
 
     // If this ever drops to a handful, someone has quietly reclassified
     // drafting as law. That is the failure this number guards.

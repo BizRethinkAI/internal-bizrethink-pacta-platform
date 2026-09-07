@@ -52,6 +52,22 @@ type Compelled = {
  * "tenant" and "rent" appear nowhere in it. Both were previously reported as
  * compliance obligations. They are not, and a test asserts they never creep
  * back in.
+ *
+ * NORTH CAROLINA ADDS NOTHING TO THIS LIST, and that is a finding rather than
+ * an omission. A second statutory walk on 2026-09-06 read Chapter 42 end to end
+ * and searched the whole of the General Statutes: nothing in North Carolina law
+ * requires text in a residential lease. §42-50's notice is a separate written
+ * notice given after the term begins, and the §42-46 fees are permissive —
+ * available only "pursuant to a written lease", which makes them a remedy a
+ * lease may reserve rather than words it must carry. "Radon" appears once in
+ * the entire code and is sale-side (§47E-4(b)(6)); the all-caps legend and the
+ * escrow-identity disclosure people expect are in Chapter 42A, which governs
+ * VACATION RENTALS and is excluded from Article 5 by §42-39(a1).
+ *
+ * So the only clause compelled in a North Carolina lease is the federal lead
+ * disclosure already on this list, and `north-carolina.test.ts` asserts exactly
+ * that. The name `FL_COMPELLED` is still right: everything here is Florida's or
+ * the federal government's, because there is nothing else to add.
  */
 export const FL_COMPELLED: Compelled[] = [
   {

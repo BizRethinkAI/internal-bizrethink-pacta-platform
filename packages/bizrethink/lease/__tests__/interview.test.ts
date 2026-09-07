@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { FL_LIBRARY, FL_SECTION_ORDER } from '../clauses/us-fl';
+import { ALL_CLAUSES } from '../clauses/library';
+import { FL_SECTION_ORDER } from '../clauses/us-fl';
 import type { InterviewAnswers } from '../interview/steps';
 import { allFields, DERIVED_FACTS, DERIVED_VALUES, FL_INTERVIEW, visibleSteps } from '../interview/steps';
 import { PICANA_FACTS, PICANA_MONEY, PICANA_PARTIES, PICANA_VALUES, PICANA_YARD } from '../matters/picana-ln';
@@ -43,7 +44,7 @@ describe('coverage — the interview must be able to fill the document', () => {
     by something that actually derives it.
   */
   it('asks for, or derives, every variable the library interpolates', () => {
-    const needed = new Set(FL_LIBRARY.flatMap((c) => c.variables.map((v) => v.name)));
+    const needed = new Set(ALL_CLAUSES.flatMap((c) => c.variables.map((v) => v.name)));
     const askedAsValue = new Set(
       allFields(FL_INTERVIEW)
         .filter((f) => f.target === 'value')
@@ -111,7 +112,7 @@ describe('coverage — the interview must be able to fill the document', () => {
 
   it('asks nothing the engine has no use for', () => {
     const known = new Set([
-      ...FL_LIBRARY.flatMap((c) => c.variables.map((v) => v.name)),
+      ...ALL_CLAUSES.flatMap((c) => c.variables.map((v) => v.name)),
       ...Object.keys(PICANA_FACTS),
       'monthlyUsd',
       'dueDayOfMonth',

@@ -424,6 +424,64 @@ export const FL_INTERVIEW: InterviewStep[] = [
         ],
         required: true,
       },
+      /*
+        NORTH CAROLINA'S OWN, and the duplication is deliberate rather than
+        careless — it is the cost this PR reports.
+
+        `depositInstitution` above asks the same thing, and could have been
+        shared. It carries a `statute` block citing Fla. Stat. §83.49(2), and an
+        `InterviewField` has room for exactly one, so a shared field would show
+        a Florida citation to a North Carolina landlord. Splitting the question
+        is the only way to give each state its own teaching until the field type
+        can hold teaching per jurisdiction.
+
+        Note what North Carolina does NOT ask: whether the account bears
+        interest. Fla. Stat. §83.49(1)(a) requires that in the lease; N.C. Gen.
+        Stat. §42-50 does not mention interest at all, so the question does not
+        exist there.
+      */
+      {
+        name: 'ncDepositSecurity',
+        jurisdictions: ['US-NC'],
+        target: 'value',
+        kind: 'select',
+        label: 'How is the deposit secured?',
+        statute: {
+          cite: 'N.C. Gen. Stat. §42-50',
+          note: 'A residential security deposit must be held in a trust account with a licensed and federally insured depository or trust institution authorized to do business in North Carolina, or secured by a bond from an insurer licensed there. A trust account outside the State requires an adequate bond in the amount of the deposit.',
+        },
+        options: [
+          {
+            value:
+              'holds the deposit in a trust account with a licensed and federally insured depository institution or trust institution authorized to do business in North Carolina',
+            label: 'In a trust account at a bank or trust institution',
+          },
+          {
+            value:
+              'has furnished a bond for the deposit from an insurance company licensed to do business in North Carolina',
+            label: 'Secured by a bond from a licensed insurer',
+          },
+        ],
+        required: true,
+      },
+      {
+        name: 'ncDepositInstitution',
+        jurisdictions: ['US-NC'],
+        target: 'value',
+        kind: 'text',
+        label: 'Which institution or insurance company?',
+        help: 'Named in the lease, and separately notified to the tenant within 30 days after the term begins. §42-55 voids the right to retain any part of the deposit where that notice is wilfully not given.',
+        required: true,
+      },
+      {
+        name: 'ncDepositInstitutionAddress',
+        jurisdictions: ['US-NC'],
+        target: 'value',
+        kind: 'textarea',
+        label: 'At what address?',
+        address: true,
+        required: true,
+      },
       {
         name: 'depositReturnDays',
         jurisdictions: ['US-FL'],
@@ -449,8 +507,16 @@ export const FL_INTERVIEW: InterviewStep[] = [
         required: true,
       },
       {
+        /*
+          ALSO NO LONGER FLORIDA-ONLY, and this one closed a hole rather than
+          opening one. `advanceRentHeldUsd` below — "How much of that was
+          already collected previously?" — is a `money` field rather than a
+          clause variable, so the derived marking never covered it and it was
+          asked in North Carolina with nothing above it to refer to. Giving
+          North Carolina its own advance-rent clauses makes this question mean
+          something there, and the follow-up stops dangling.
+        */
         name: 'advanceRentUsd',
-        jurisdictions: ['US-FL'],
         target: 'money',
         kind: 'usd',
         label: 'How much advance rent is held for the final month?',
@@ -685,12 +751,23 @@ export const FL_INTERVIEW: InterviewStep[] = [
         required: true,
       },
       {
+        /*
+          NO LONGER FLORIDA-ONLY, and it stopped being so without anyone
+          deciding it here. `general.governing-law-nc` needs a county too, so
+          the derived marking in `interview-jurisdiction.test.ts` computed that
+          this field is now shared and failed until the marking came off. That
+          is the mechanism working: the library is the source of truth about
+          which questions belong to which state, and this file follows it.
+
+          The label lost the word "Florida" in the same change. A shared field
+          cannot carry one state's teaching — which is the limitation this PR
+          reports rather than solves.
+        */
         name: 'venueCounty',
-        jurisdictions: ['US-FL'],
         target: 'value',
         kind: 'text',
-        label: 'Which Florida county is the property in?',
-        help: 'Sets the venue for any proceeding — which is where a Florida eviction is actually filed.',
+        label: 'Which county is the property in?',
+        help: 'Sets the venue for any proceeding — which is where an eviction is actually filed.',
         required: true,
       },
       {
@@ -704,6 +781,42 @@ export const FL_INTERVIEW: InterviewStep[] = [
           cite: 'Fla. Stat. §83.50',
           note: 'The name and address of the landlord, or of a person authorised to receive notices and demands, must be disclosed in writing.',
         },
+        required: true,
+      },
+      /*
+        THE SAME TWO FACTS AS THE FLORIDA PAIR BELOW, FOR A DIFFERENT REASON.
+
+        Florida is COMPELLED to disclose them: §83.50 requires the landlord's
+        name and address in writing, and the field says so. North Carolina
+        compels nothing of the kind — §42-44(c1) rather contemplates a lease
+        that does not identify the landlord at all. What makes the answer matter
+        there is the reverse dependency: §42-42(a)(4) makes the landlord's
+        repair duty arise on the tenant's WRITTEN notice, and a tenant who
+        cannot tell where to send it cannot start the clock.
+
+        Different law, different teaching, so a separate question — the same
+        one-statute-note-per-field limitation as the deposit institution above.
+      */
+      {
+        name: 'ncNoticeName',
+        jurisdictions: ['US-NC'],
+        target: 'value',
+        kind: 'text',
+        label: 'Who receives written notice for the landlord?',
+        statute: {
+          cite: 'N.C. Gen. Stat. §42-42(a)(4)',
+          note: "The landlord's duty to repair supplied facilities and appliances arises when the tenant gives notice of the needed repair in writing, except in an emergency. §42-43(a)(7) requires written notice about a smoke or carbon monoxide alarm.",
+        },
+        required: true,
+      },
+      {
+        name: 'ncNoticeAddress',
+        jurisdictions: ['US-NC'],
+        target: 'value',
+        kind: 'text',
+        address: true,
+        label: 'At what address?',
+        help: 'A postal address. This is where the tenant sends the written notice that starts your repair obligations, so it has to be somewhere post reaches.',
         required: true,
       },
       {
@@ -886,6 +999,33 @@ export const FL_INTERVIEW: InterviewStep[] = [
         label: 'What is the handling charge for a returned payment?',
         required: true,
       },
+      /*
+        THE QUESTION THAT MAKES A NORTH CAROLINA LEASE ENFORCEABLE FOR A
+        NON-MONETARY BREACH.
+
+        N.C. Gen. Stat. §42-26(a)(2) lets a landlord remove a tenant who "has
+        done or omitted any act by which, according to the STIPULATIONS OF THE
+        LEASE, his estate has ceased". A lease with no forfeiture or reentry
+        stipulation gives the landlord no summary-ejectment ground for anything
+        but unpaid rent and holding over. Florida needs no equivalent because
+        §83.56(2) supplies the seven-day cure by statute.
+
+        So the cure period is genuinely the landlord's to set, which is why it
+        carries a suggestion rather than a citation.
+      */
+      {
+        name: 'ncCureDays',
+        jurisdictions: ['US-NC'],
+        target: 'value',
+        kind: 'number',
+        label: 'How long does the tenant have to cure a breach that is not about rent?',
+        help: 'The lease has to reserve a right of reentry for a breach other than unpaid rent, and say when the estate ends. Without one, the only grounds are unpaid rent and holding over.',
+        suggestion: {
+          value: 10,
+          note: 'Leases commonly allow between 10 and 30 days for a non-monetary breach, and often longer where the cure needs a contractor.',
+        },
+        required: true,
+      },
     ],
   },
 
@@ -931,6 +1071,32 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'number',
         label: 'How many inspections per year?',
+        required: true,
+      },
+      /*
+        A SUGGESTION RATHER THAN A STATUTE, and the difference is the finding.
+
+        Every Florida field on this step carries a §83.53(2) citation because
+        Florida fixes the notice floor and the reasonable hours. North Carolina
+        has no landlord-entry statute at all — verified across the whole General
+        Statutes on 2026-09-06, not just Chapter 42 — so there is no limit to
+        state, the hours are not asked, and the field is eligible for the
+        suggestion that a field carrying a `statute` may never have.
+
+        The note observes what leases do; it does not recommend. Common-law
+        quiet enjoyment still governs and is not something this library states.
+      */
+      {
+        name: 'ncEntryNoticeHours',
+        jurisdictions: ['US-NC'],
+        target: 'value',
+        kind: 'number',
+        label: 'How much notice will you give before entering?',
+        help: 'The lease sets this. It is not a floor above a statutory minimum — this is the whole of the tenant\u2019s notice.',
+        suggestion: {
+          value: 24,
+          note: 'Residential leases commonly set this at 24 hours, and 48 is not unusual where the landlord lives out of state.',
+        },
         required: true,
       },
     ],
