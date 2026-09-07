@@ -1,0 +1,17 @@
+{
+  "_source": "lombard-contracts/sample-data/ca-disclosure.json, formValues unaltered",
+  "formValues": {
+    "disclosure_date": "{{TODAY}}",
+    "merchant_legal_name": "Acme Coffee Roasters LLC",
+    "funding_provided": "$50,000.00",
+    "recipient_funds": "$47,105.00",
+    "estimated_apr": "67.4",
+    "finance_charge": "$24,500.00",
+    "estimated_total_payment_amount": "$71,605.00",
+    "estimated_payment": "$496.66",
+    "specified_percentage": "15",
+    "estimated_term_days": "150",
+    "estimated_avg_monthly_income": "$15,000.00",
+    "merchant_signer_name": "Shwet Prabhat"
+  }
+}
