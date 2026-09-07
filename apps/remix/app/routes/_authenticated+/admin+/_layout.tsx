@@ -20,6 +20,7 @@ import {
   LineChartIcon,
   LogInIcon,
   MailIcon,
+  ScaleIcon,
   ScrollTextIcon,
   Settings,
   SparklesIcon,
@@ -128,6 +129,19 @@ const NAV_GROUPS: NavGroupDef[] = [
         label: <Trans>Lease Clauses</Trans>,
         href: '/admin/lease-library',
         icon: ScrollTextIcon,
+        bizrethink: true,
+      },
+      {
+        // The MCA vertical's conformity surface (2026-09-07, ADR 0008). A
+        // SEPARATE entry from Clause Library on purpose: the two are different
+        // products with different release paths, and the only thing that kept
+        // them apart before this page existed was that nothing could import
+        // packages/bizrethink/mca/. Read-only — there is no approval workflow
+        // here, because approving a regulator's prescribed words would record
+        // an attorney's name against California's text.
+        label: <Trans>MCA Conformity</Trans>,
+        href: '/admin/mca',
+        icon: ScaleIcon,
         bizrethink: true,
       },
       {

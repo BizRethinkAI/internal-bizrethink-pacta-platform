@@ -44,6 +44,17 @@ apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases*.tsx
 # Lives under admin+/ now, behind the isAdmin gate that was already there.
 apps/remix/app/routes/_authenticated+/admin+/lease-library.tsx
 
+# The MCA vertical's conformity surface (2026-09-07, ADR 0008). Deliberately a
+# SECOND page rather than a tab on the one above: the two are different
+# products with different release paths, and a single page with a `kind`
+# discriminator would put an Approve button on text no one may approve. The
+# first person to press it records an attorney's name against California's
+# words.
+#
+# Read-only. It resolves no organisation and touches no database — the whole
+# page is a function of files committed to this repository.
+apps/remix/app/routes/_authenticated+/admin+/mca.tsx
+
 # Components imported by those routes. Namespaced under lease/ so a collision
 # with an upstream component is impossible short of upstream shipping a lease
 # builder of their own.

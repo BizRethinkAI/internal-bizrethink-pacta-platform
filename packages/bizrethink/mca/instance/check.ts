@@ -54,18 +54,77 @@ const prepaidTotalOf = (env: DisclosureEnvelope): Cents | null => {
   return env.itemization ? env.itemization.prepaidFinanceCharge : null;
 };
 
-const unmet = (identity: Identity, env: DisclosureEnvelope, prepaidTotal: Cents | null): IdentityRequirement[] =>
+/**
+ * Which documents travelled in the envelope, and nothing else about them.
+ *
+ * Every entry in `skipped` turns on this and on no figure — an identity is
+ * skipped because a document is absent, never because a number is wrong. That
+ * makes the skip set answerable for an envelope SHAPE, before any instance
+ * exists, which is what the conformity surface needs: the page has no filled
+ * envelope to report on and would otherwise have to invent one.
+ */
+export type EnvelopeContents = {
+  contract: boolean;
+  itemization: boolean;
+};
+
+const contentsOf = (env: DisclosureEnvelope): EnvelopeContents => ({
+  contract: env.contract !== undefined,
+  itemization: env.itemization !== undefined,
+});
+
+const unmet = (identity: Identity, contents: EnvelopeContents): IdentityRequirement[] =>
   identity.requires.filter((r) => {
     if (r === 'contract') {
-      return !env.contract;
+      return !contents.contract;
     }
 
     if (r === 'itemization') {
-      return !env.itemization;
+      return !contents.itemization;
     }
 
-    return prepaidTotal === null;
+    // The prepaid total comes from the agreement's fee schedule OR the
+    // Itemization's prepaid line, so either document satisfies it.
+    return !contents.contract && !contents.itemization;
   });
+
+const skippedFor = (contents: EnvelopeContents): SkippedIdentity[] =>
+  IDENTITIES.flatMap((identity) => {
+    const missing = unmet(identity, contents);
+
+    return missing.length === 0
+      ? []
+      : [
+          {
+            identity: identity.id,
+            statement: identity.statement,
+            reason: missing.map((m) => REQUIREMENT_REASON[m]).join('; '),
+            wouldCatch: identity.catches,
+          },
+        ];
+  });
+
+/**
+ * The REVIEW-01 findings that nothing in a run could have detected.
+ *
+ * A finding is undetected only if EVERY identity that catches it was skipped —
+ * one identity that ran is enough. Shared between the per-instance and the
+ * per-shape report so the two cannot drift into disagreeing about the same
+ * envelope.
+ */
+const undetectableGiven = (skipped: readonly { identity: string; wouldCatch: string[] }[]): string[] => {
+  const undetected = new Set(skipped.flatMap((s) => s.wouldCatch));
+
+  for (const identity of IDENTITIES) {
+    if (!skipped.some((s) => s.identity === identity.id)) {
+      for (const c of identity.catches) {
+        undetected.delete(c);
+      }
+    }
+  }
+
+  return [...undetected].sort();
+};
 
 export const checkDisclosureInstance = (env: DisclosureEnvelope): InstanceReport => {
   const prepaidTotal = prepaidTotalOf(env);
@@ -74,8 +133,10 @@ export const checkDisclosureInstance = (env: DisclosureEnvelope): InstanceReport
   const skipped: SkippedIdentity[] = [];
   const notApplicable: { identity: string; reason: string }[] = [];
 
+  const contents = contentsOf(env);
+
   for (const identity of IDENTITIES) {
-    const missing = unmet(identity, env, prepaidTotal);
+    const missing = unmet(identity, contents);
 
     if (missing.length > 0) {
       skipped.push({
@@ -128,15 +189,6 @@ export const checkDisclosureInstance = (env: DisclosureEnvelope): InstanceReport
  */
 export const instanceCoverage = (env: DisclosureEnvelope) => {
   const report = checkDisclosureInstance(env);
-  const undetected = new Set(report.skipped.flatMap((s) => s.wouldCatch));
-
-  for (const identity of IDENTITIES) {
-    if (!report.skipped.some((s) => s.identity === identity.id)) {
-      for (const c of identity.catches) {
-        undetected.delete(c);
-      }
-    }
-  }
 
   return {
     evaluated: report.passed.length + new Set(report.findings.map((f) => f.identity)).size,
@@ -144,6 +196,33 @@ export const instanceCoverage = (env: DisclosureEnvelope) => {
     skipped: report.skipped.length,
     notApplicable: report.notApplicable.length,
     /** REVIEW-01 findings that nothing in this run could have detected. */
-    undetectableInThisEnvelope: [...undetected].sort(),
+    undetectableInThisEnvelope: undetectableGiven(report.skipped),
+  };
+};
+
+/**
+ * The same question, asked of an envelope SHAPE rather than of an instance.
+ *
+ * `instanceCoverage` needs a filled disclosure. The read-only conformity
+ * surface has none, and fabricating one so a page could show a number would be
+ * the sort of reassurance this package exists to refuse. What CAN be stated
+ * without any instance is which identities a given combination of documents
+ * lets the checker decide at all — because that turns on document presence and
+ * on nothing else.
+ *
+ * It is strictly the weaker claim, and the difference matters when reading the
+ * page: `evaluable` counts identities the checker could reach, not identities
+ * that would pass. An identity can be evaluable and still return nothing
+ * because the figure it compares is blank — `notApplicable` in
+ * `InstanceReport`, which needs the figures and is therefore absent here.
+ */
+export const coverageForContents = (contents: EnvelopeContents) => {
+  const skipped = skippedFor(contents);
+
+  return {
+    evaluable: IDENTITIES.length - skipped.length,
+    total: IDENTITIES.length,
+    skipped,
+    undetectableInThisEnvelope: undetectableGiven(skipped),
   };
 };
