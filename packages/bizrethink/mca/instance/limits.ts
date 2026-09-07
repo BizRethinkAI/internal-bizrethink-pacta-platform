@@ -124,6 +124,13 @@ export const NOT_CHECKED: Limit[] = [
       '`checkFormConformity`, which already exists and runs on the blank template. The two halves are not yet run together on one document.',
   },
   {
+    id: 'citation-subdivision-letters',
+    kind: 'unconstrained',
+    what: 'Whether a quoted sentence really sits at the subdivision its `citation` names.',
+    why: '`instance-authorities.test.ts` proves every quotation exists in its own vendored file, which is the part that carries legal weight. It cannot prove the sentence is §600.1(p) rather than §600.1(r): the vendored sources are pdftotext output with no structure to walk. Two subdivision letters were wrong when `authorities.ts` was written and were found by reading, not by the suite.',
+    wouldNeed: 'A structured source, or a second reader. A citation here is a pointer to re-read, not a checked fact.',
+  },
+  {
     id: 'which-document-is-wrong',
     kind: 'unconstrained',
     what: 'When two documents disagree, which of them is right.',

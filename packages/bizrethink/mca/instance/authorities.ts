@@ -15,6 +15,12 @@ import type { Authority, Jurisdiction } from './types';
  *    `instance-authorities.test.ts`. A quotation that has drifted from the
  *    statute — or was never in it — fails the suite rather than sitting there
  *    lending false weight to a check.
+ *
+ * WHAT THAT TEST DOES NOT CHECK: the subdivision letters in `citation`. The
+ * vendored files are `pdftotext` output with no structure to walk, so "this
+ * sentence is §600.1(p) rather than §600.1(r)" is verified by reading and not
+ * by assertion. Two were wrong when this file was written and were caught that
+ * way. Treat a citation as a pointer to be re-read, not as a checked fact.
  */
 
 const ca = (citation: string, text: string): Authority => ({
@@ -122,7 +128,7 @@ export const PERIODIC_PAYMENT_ROW: Record<Jurisdiction, Authority> = {
     'The average amount of estimated periodic payments calculated in accordance with section 942, followed by a forward slash (/) and the frequency of periodic payments.',
   ),
   NY: ny(
-    '23 NYCRR §600.6(f)(1)',
+    '23 NYCRR §600.6(f)(2)(i)',
     'average amount of estimated periodic payments calculated in accordance with section 600.7, followed by a forward slash (/) and the frequency of periodic payments;',
   ),
 };
@@ -134,7 +140,7 @@ export const ESTIMATED_MONTHLY_COST: Record<Jurisdiction, Authority> = {
     'means the estimated average total amount paid by the recipient (periodic and irregular payments) over the estimated term of the contract, divided by the number of months in the estimated term of the contract.',
   ),
   NY: ny(
-    '23 NYCRR §600.1(r)',
+    '23 NYCRR §600.1(p)',
     'Estimated monthly cost means the estimated average total amount paid by the recipient (periodic and irregular payments) over the estimated term of the contract, divided by the number of months in the estimated term of the contract.',
   ),
 };

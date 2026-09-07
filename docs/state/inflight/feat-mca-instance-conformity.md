@@ -111,6 +111,6 @@ branch stashed** and belongs to the lease vertical. Not fixed here.
   actioned: the term unit, the direction of the (a)(3) relative test, the
   weekday phase, the carry-renewal term, and which Itemization line carries a
   fee the financer keeps.
-- `NOT_CHECKED` in `instance/limits.ts` enumerates thirteen things a filled form
+- `NOT_CHECKED` in `instance/limits.ts` enumerates fourteen things a filled form
   can still be wrong about. Phase 2 surfaces it beside the findings; nothing
   forces a human to read it today.
