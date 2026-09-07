@@ -132,3 +132,37 @@ export const canAccessLeaseBuilder = async (options: Omit<GetFeatureAccessOption
 /** Convenience wrapper for lock 2 — may unreviewed clause text be rendered? */
 export const canRenderDraftClauses = async (options: Omit<GetFeatureAccessOptions, 'feature'>): Promise<boolean> =>
   await getFeatureAccess({ ...options, feature: LEASE_CLAUSE_DRAFT_FEATURE });
+
+/**
+ * Every organisation of this user's that holds the lease builder.
+ *
+ * Exists for the navigation, which has to decide whether to show a Leases
+ * entry before the user has picked a lease route to be 404'd from. It answers
+ * by calling `canAccessLeaseBuilder` — the same function every lease route's
+ * loader calls — once per organisation, rather than by reading the grant table
+ * a second way. A nav entry that can disagree with the route it points at is
+ * worse than no nav entry, and the only way to guarantee it cannot is for both
+ * to be the same call.
+ *
+ * Membership-scoped in the query. `canAccessLeaseBuilder` is a FEATURE GATE
+ * and not authorization — a user-scoped grant makes it return true for any
+ * organisationId, by design — so the set of organisations it is asked about
+ * has to be the set the user actually belongs to. Same doctrine as
+ * `assertAccess` in the lease builder router.
+ *
+ * A loop of small lookups rather than one clever query: a person belongs to a
+ * handful of organisations, and the alternative is a second implementation of
+ * the resolution rules, which is the thing this function exists to avoid.
+ */
+export const listLeaseBuilderOrganisationIds = async ({ userId }: { userId: number }): Promise<string[]> => {
+  const memberships = await prisma.organisation.findMany({
+    where: { members: { some: { userId } } },
+    select: { id: true },
+  });
+
+  const granted = await Promise.all(
+    memberships.map(async ({ id }) => ((await canAccessLeaseBuilder({ organisationId: id, userId })) ? id : null)),
+  );
+
+  return granted.filter((id): id is string => id !== null);
+};

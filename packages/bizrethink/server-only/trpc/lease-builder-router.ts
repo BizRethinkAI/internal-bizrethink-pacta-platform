@@ -52,7 +52,12 @@ import { seedMatterFromProperty } from '../../lease/server-only/seed-from-proper
 import type { UtilityRow } from '../../lease/utilities/derive-utilities';
 import type { YardTask } from '../../lease/yard/derive-yard';
 import { unassignedYardTasks } from '../../lease/yard/derive-yard';
-import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../feature-access';
+import {
+  canAccessLeaseBuilder,
+  canRenderClause,
+  canRenderDraftClauses,
+  listLeaseBuilderOrganisationIds,
+} from '../feature-access';
 
 /**
  * The lease builder's server surface.
@@ -427,6 +432,22 @@ const documentScope = async (userId: number): Promise<string[]> => {
 };
 
 export const leaseBuilderRouter = router({
+  /**
+   * Which of the caller's organisations hold the lease builder.
+   *
+   * The navigation's read of the gate. Takes no input on purpose: every other
+   * procedure here receives an organisationId from the client and has to prove
+   * membership before answering, and the honest way to avoid that dance for a
+   * yes/no the nav needs on every page is to never let the client name the
+   * organisation at all. The answer is derived entirely from the session.
+   *
+   * Returns ids and not a bare boolean because the nav renders links for a
+   * team the user may not currently be inside — see `leaseBuilderTeamUrls`.
+   */
+  access: authenticatedProcedure.query(async ({ ctx }) => ({
+    organisationIds: await listLeaseBuilderOrganisationIds({ userId: ctx.user.id }),
+  })),
+
   property: router({
     list: authenticatedProcedure.input(z.object({ organisationId: z.string() })).query(async ({ ctx, input }) => {
       await assertAccess(input.organisationId, ctx.user.id);
