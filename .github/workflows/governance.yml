@@ -235,6 +235,30 @@ jobs:
       - name: Format check
         run: npx biome format packages/bizrethink
 
+      # BLOCKING, unlike the lint below it.
+      #
+      # packages/bizrethink/tsconfig.typecheck.json existed since the lease
+      # builder and was invoked by NOTHING — no workflow, no turbo task. The
+      # only npm script naming it, `typecheck:lease`, is called by nobody.
+      # So the gate ran when someone remembered to run it by hand.
+      #
+      # That is not hypothetical. On 2026-09-06 two assertions in the MCA
+      # package filtered on `Divergence` kinds that do not exist, so both
+      # returned [] whatever the form said and both passed vacuously. `tsc`
+      # found them the first time the package was actually typechecked — by
+      # hand, days after they were written. This step is why that no longer
+      # depends on anyone remembering.
+      #
+      # vitest strips types without checking them, so nothing else in CI would
+      # catch it either: the unit suite goes green on code that does not
+      # compile.
+      #
+      # The config covers lease/ AND mca/ (extended 2026-09-06). The script
+      # name still says lease and is now wrong; renaming it is a separate
+      # change, and calling tsc directly here avoids depending on the name.
+      - name: Typecheck (bizrethink)
+        run: npx tsc --noEmit -p packages/bizrethink/tsconfig.typecheck.json
+
       # Lint rules are ADVISORY for now. 16 findings remain at 2026-08-29:
       # 4 useBlockStatements, 4 noUndeclaredEnvVars (a nursery rule, still
       # unstable), 4 useLiteralKeys, 3 useTemplate, 1 noImplicitAnyLet.
