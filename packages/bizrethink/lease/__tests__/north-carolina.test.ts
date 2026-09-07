@@ -372,6 +372,28 @@ describe('every figure in the North Carolina set is the statute’s own', () => 
     expect(body).toMatch(/fifteen percent \(15%\)/);
   });
 
+  /*
+    §42-52's LAST TWO SENTENCES, and the one this clause first left out.
+
+    "If the tenant's address is unknown the landlord shall apply the deposit as
+    permitted in G.S. 42-51 after a period of 30 days and the landlord shall
+    hold the balance of the deposit for collection by the tenant for at least
+    six months."
+
+    An absence that costs the tenant something, which is the shape the Florida
+    statutory walk found twice. The clause already required a forwarding
+    address, which is the trigger for this branch, and then said nothing about
+    what happens when there is not one — leaving a tenant who moved without
+    leaving an address to assume the money was simply gone.
+  */
+  it('§42-52 — six months to collect where the address is unknown', () => {
+    const body = clause('deposit.accounting-nc').body;
+
+    expect(body).toMatch(/at least six months/i);
+    expect(body).toMatch(/normal wear and tear/i);
+    expect(body).toMatch(/exceeds Landlord’s actual damages/i);
+  });
+
   it('§42-50 — a trust account in this State, or a bond', () => {
     const body = clause('deposit.held-nc').body;
 

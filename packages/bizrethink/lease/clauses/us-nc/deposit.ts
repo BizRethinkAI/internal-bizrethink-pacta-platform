@@ -236,13 +236,22 @@ export const NC_DEPOSIT: Clause[] = [
       the Article cost the landlord the whole deposit, so a lease that leaves
       them out is not a shorter lease, it is a worse one.
 
+      AND THE UNKNOWN-ADDRESS BRANCH, which this clause first left out. §42-52
+      ends: where the tenant's address is unknown the landlord applies the
+      deposit after thirty days and holds the balance "for collection by the
+      tenant for at least six months". The clause already required a forwarding
+      address — the trigger for that branch — and then said nothing about what
+      happens when there is not one, leaving a tenant who moved without leaving
+      one to assume the money was simply gone. An absence that costs the tenant
+      something, which is the shape the Florida statutory walk found twice.
+
       NO VARIABLES. Florida asks the landlord how many days they will take,
       because §83.49(3)(a) sets a maximum and anything under it is a choice.
       Every figure here is fixed by the statute, so North Carolina asks two
       fewer questions than Florida does — which is the only place in this
       library where a second state made the interview shorter.
     */
-    body: 'Within 30 days after the tenancy terminates and Tenant delivers possession of the Premises to Landlord, Landlord shall apply the deposit as N.C. Gen. Stat. §42-51 permits or refund it, and shall in either case itemise any damage in writing and mail or deliver that itemisation to Tenant together with the balance of the deposit. Where the extent of Landlord’s claim against the deposit cannot be determined within that period, Landlord shall provide Tenant with an interim accounting within 30 days and a final accounting within 60 days, each running from the date the tenancy terminated and possession was delivered. Landlord shall not withhold any part of the deposit for conditions that are due to normal wear and tear, and shall not retain an amount that exceeds Landlord’s actual damages. Tenant shall give Landlord a forwarding address on vacating.',
+    body: 'Within 30 days after the tenancy terminates and Tenant delivers possession of the Premises to Landlord, Landlord shall apply the deposit as N.C. Gen. Stat. §42-51 permits or refund it, and shall in either case itemise any damage in writing and mail or deliver that itemisation to Tenant together with the balance of the deposit. Where the extent of Landlord’s claim against the deposit cannot be determined within that period, Landlord shall provide Tenant with an interim accounting within 30 days and a final accounting within 60 days, each running from the date the tenancy terminated and possession was delivered. Landlord shall not withhold any part of the deposit for conditions that are due to normal wear and tear, and shall not retain an amount that exceeds Landlord’s actual damages. Tenant shall give Landlord a forwarding address on vacating. If Tenant’s address is unknown, Landlord shall apply the deposit as N.C. Gen. Stat. §42-51 permits after a period of 30 days and shall hold the balance for collection by Tenant for at least six months.',
     source: drafted(),
     status: 'draft',
     requiredBy: 'N.C. Gen. Stat. §42-52',

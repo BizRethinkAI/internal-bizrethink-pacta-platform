@@ -24,7 +24,7 @@ inherits**. Two commits, and the first is a bug fix that had to go first.
 | Interview questions | 70 | **54** |
 | Interview steps | 15 | **13** |
 
-Tests **1199 → 1260**. Typecheck clean in both `packages/bizrethink` and
+Tests **1199 → 1261**. Typecheck clean in both `packages/bizrethink` and
 `apps/remix`.
 
 ## The verdict: was a second state cheap?
