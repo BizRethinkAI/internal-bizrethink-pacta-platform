@@ -16,6 +16,23 @@ export const KS_DISCLOSURE: ContentStatute = {
   slug: 'ks-disclosure',
   citation: 'Kan. SB 345 §2(b)',
   sourceFile: 'KS-SB-345.txt',
+  jurisdiction: 'US-KS',
+  status: 'published',
+  source: {
+    kind: 'statute',
+    citation: 'Kan. SB 345 §2(b)',
+    /*
+      TRUE HERE AND FALSE IN FLORIDA, THOUGH THE TWO ACTS OTHERWISE READ THE
+      SAME. Kansas dictates the label of every one of the six items — "such
+      disclosure shall be labeled 'total amount of funds provided'" — and a
+      prescribed label is exact words that must be reproduced. Each one is
+      re-checked against the bill by `verifyProvenance`.
+    */
+    verbatimRequired: true,
+    verbatimVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: '2e9d48751efe52ae6a29e74bb8f629fae4ba93bcd6c23148620c8ec43b339461',
+  section: null,
   requirements: [
     {
       citation: 'Kan. SB 345 §2(b)(1)',

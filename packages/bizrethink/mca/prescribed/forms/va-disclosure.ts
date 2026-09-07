@@ -24,6 +24,19 @@ export const VA_DISCLOSURE: PrescribedForm = {
   slug: 'va-disclosure',
   citation: 'Va. sales-based financing disclosure form',
   sourceFile: 'VA-Disclosure-Form.txt',
+  jurisdiction: 'US-VA',
+  status: 'published',
+  source: {
+    kind: 'regulator-prescribed-form',
+    citation: 'Va. sales-based financing disclosure form',
+    sourceFile: 'VA-Disclosure-Form.txt',
+    verbatimVerifiedAt: '2026-09-06',
+    structureVerifiedAt: '2026-09-06',
+  },
+  sourceDigest: 'e065205380591724620b8f224807ba13c51d6b2bc748f0bad79e168799765af6',
+  // The file is the form itself.
+  section: null,
+  structureEvidence: 'source-order',
   // Virginia's first column carries the label plus tick-boxes and, under
   // several labels, the printed formula. See `labelMatch` in types.ts.
   labelMatch: 'contains',
