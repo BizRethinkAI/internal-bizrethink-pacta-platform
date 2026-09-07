@@ -1,0 +1,459 @@
+O.C.G.A. § 10-1-393.18 — REQUIRED DISCLOSURES FOR COMMERCIAL FINANCING
+TRANSACTIONS; EXCEPTIONS; LIMITATIONS ON BROKERS; ENFORCEMENT; CIVIL PENALTIES
+
+PRIMARY TEXT. Senate Bill 90, 2023-2024 regular session, AS PASSED (enrolled),
+published by the Georgia General Assembly at
+https://www.legis.ga.gov/api/legislation/document/20232024/219440
+Retrieved 2026-09-07. Enacted Ga. L. 2023, p. 255, § 2/SB 90, effective
+January 1, 2024.
+
+This REPLACES a browser capture of law.justia.com, which was a secondary
+publisher and was incomplete: subsection (a)'s definitions and the full text of
+(b)-(k) were not in it, so "advance fee" -- a term the broker prohibition in
+(f)(1) turns on -- was defined nowhere in what we held, while the Georgia
+content spec nonetheless carried a verification date against it.
+
+The earlier note that "the Georgia legislature's document API returns an
+unrelated resolution" was a wrong document id, not a broken API.
+
+The enrolled bill is the act as passed. Where a later amendment changes the
+Code, this file is superseded and the digest will say so.
+
+------------------------------------------------------------------------------
+
+     23                                                                                     SB 90/AP
+
+     Senate Bill 90
+     By: Senators Dixon of the 45th, Gooch of the 51st, Albers of the 56th, Still of the 48th and
+     Kennedy of the 18th
+
+
+                                                                                        AS PASSED
+
+
+                                      A BILL TO BE ENTITLED
+                                                AN ACT
+
+
+ 1   To amend Title 10 of the Official Code of Georgia Annotated, relating to commerce and
+ 2   trade, so as to add an example of an unfair or deceptive practice regarding brokerage
+ 3   engagements and options to enter into brokerage engagements to the "Fair Business Practices
+ 4   Act"; to provide for commercial financing disclosures; to require certain persons who provide
+ 5   commercial financing transactions to make certain disclosures; to provide for penalties; to
+ 6   provide for applicability; to provide for requirements and restrictions on certain unsolicited
+ 7   written inquiries or mailings expressing an interest in buying real property; to revise
+ 8   provisions regarding the duration of relationships between brokers and clients; to provide for
+ 9   limitations on brokerage engagements and options to enter into brokerage engagements; to
+10   provide for construction; to provide for definitions; to amend Code Section 46-5-27 of the
+11   Official Code of Georgia Annotated, relating to telephone solicitations to residential, mobile,
+12   or wireless subscribers, Public Service Commission to establish and maintain list of certain
+13   subscribers, authorization for imposition of administrative fees, confidential nature of data
+14   base, and required identification, so as to revise a definition; to provide for an effective date;
+15   to provide for related matters; to repeal conflicting laws; and for other purposes.
+
+
+16             BE IT ENACTED BY THE GENERAL ASSEMBLY OF GEORGIA:
+
+
+
+
+                                                 S. B. 90
+                                                   -1-
+     23                                                                                SB 90/AP
+
+17                                           SECTION 1.
+18   Title 10 of the Official Code of Georgia Annotated, relating to commerce and trade, is
+19   amended in Part 2 of Article 15 of Chapter 1, relating to the "Fair Business Practices Act of
+20   1975," by striking "and" at the end of paragraph (33), striking the period at the end of
+21   paragraph (34) and inserting "; and" in lieu thereof, and by adding a new paragraph to
+22   subsection (b) of Code Section 10-1-393, relating to unfair or deceptive practices in
+23   consumer transactions unlawful and examples, to read as follows:
+24        "(35) Failure to comply with the provisions of Code Section 10-6A-9 or 10-6A-10
+25        regarding brokerage engagements and options to enter into brokerage engagements."
+
+
+26                                           SECTION 2.
+27   Said title is further amended by adding new Code sections to read as follows:
+28    "10-1-393.18.
+29    (a) As used in this Code section, the term:
+30        (1) 'Accounts receivable purchase transaction' means a transaction in which a business
+31        forwards or otherwise sells to a person all or a portion of the business's accounts, as
+32        defined in Code Section 11-9-102, or payment intangibles, as defined in Code Section
+33        11-9-102, at a discount to the accounts' or payment intangibles' expected value.
+34        (2) 'Advance fee' means any consideration which is assessed or collected prior to the
+35        closing of a commercial financing transaction by a broker.
+36        (3) 'Broker' means a person who, for compensation or the expectation of compensation,
+37        arranges a commercial financing transaction between a third party and a business in the
+38        state that would, if executed, be binding upon that third party and communicates that
+39        offer to a business located in this state. Such term excludes a 'provider,' and any
+40        individual or entity whose compensation is not based or dependent upon on the terms of
+41        the specific commercial financing transaction obtained or offered.
+
+
+
+
+                                                S. B. 90
+                                                  -2-
+     23                                                                                 SB 90/AP
+
+42        (4) 'Business' means a private enterprise carried on for the purpose of gain or economic
+43        profit.
+44          (5)(A) 'Business purpose transaction' means a transaction from which the resulting
+45          proceeds that a business receives are:
+46           (i) Provided to the business; or
+47           (ii) Intended to be used to carry on the business.
+48          (B) Such term shall not include a transaction from which the resulting proceeds are
+49          intended to be used for personal, family, or household purposes.
+50          (C)     For purposes of determining whether a transaction is a business purpose
+51          transaction, a provider may rely on a written statement of intended purpose, signed by
+52          an individual authorized to sign on behalf of the business. Such written statement may
+53          be contained in an application, agreement, or other document signed by an individual
+54          authorized to sign on behalf of the business.
+55        (6) 'Commercial financing transaction' means a business purpose transaction:
+56          (A) Under which a person extends a business a commercial loan or a commercial
+57          open-end credit plan; or
+58          (B) That is an accounts receivable purchase transaction.
+59        (7) 'Commercial loan' means a loan to a business, regardless of whether the loan is
+60        secured.
+61        (8) 'Commercial open-end credit plan' means commercial financing extended to a
+62        business on terms under which:
+63          (A) The creditor reasonably contemplates repeat transactions; and
+64          (B) Subject to any limit set by the creditor, the amount of financing that the creditor
+65          may extend to the business during the term of the plan is made available to the extent
+66          that any outstanding balance is repaid.
+67        (9) 'Motor vehicle dealer' means a dealer as defined in Code Section 40-2-39 or a used
+68        motor vehicle dealer as defined in Code Section 43-47-2.
+
+
+                                                S. B. 90
+                                                  -3-
+     23                                                                                  SB 90/AP
+
+69        (10) 'Provider' means a person who consummates more than five commercial financing
+70        transactions in this state during any calendar year and includes, but is not limited to, a
+71        person who, under a written agreement with a depository institution, offers one or more
+72        commercial financing products provided by the depository institution via an online
+73        platform that the person administers.
+74    (b) The provisions of this Code section shall not apply to:
+75        (1) A provider that is a federally insured depository financial institution;
+76        (2) A provider that is:
+77         (A) A subsidiary, an affiliate, or a holding company of a federally insured depository
+78         financial institution; or
+79         (B) A service corporation for a federally insured depository financial institution;
+80        (3) A provider that is regulated under the federal Farm Credit Act, 12 U.S.C. Section
+81        2001, et seq.;
+82        (4) A provider that is licensed as a money transmitter in accordance with Article 4 of
+83        Chapter 1 of Title 7;
+84        (5) A provider that consummates five or fewer commercial financing transactions in the
+85        state during any 12 month period;
+86        (6) A commercial financing transaction secured by real property;
+87        (7) A commercial financing transaction that is a lease as defined in Code Section
+88        11-2A-103;
+89        (8) A commercial financing transaction that is a purchase money obligation as defined
+90        in Code Section 11-9-103;
+91        (9) A commercial financing transaction that:
+92         (A) Involves a commercial loan or a commercial open-end credit plan;
+93         (B) Is $50,000.00 or more; and
+94         (C) Extends the commercial loan or the commercial open-end credit plan to:
+95           (i) A motor vehicle dealer or the motor vehicle dealer's affiliate; or
+
+
+                                                  S. B. 90
+                                                    -4-
+      23                                                                                 SB 90/AP
+
+ 96           (ii) A motor vehicle rental company as defined in Code Section 40-2-167 or the
+ 97           motor vehicle rental company's affiliate;
+ 98        (10) A commercial financing transaction offered by a person in connection with the sale
+ 99        or lease of a product or service that:
+100         (A) The person manufactures, licenses, or distributes; or
+101         (B) The person's parent company or any of such parent company's directly or indirectly
+102         owned and controlled subsidiaries manufactures, licenses, or distributes;
+103        (11) A commercial financing transaction of more than $500,000.00; or
+104        (12) A commercial financing product that is a factoring transaction, purchase, sale,
+105        advance, or similar of accounts receivables owed to a healthcare provider because of a
+106        patient's personal injury treated by the healthcare provider.
+107    (c) For purposes of Chapter 1 of Title 7, a provider's characterization of an accounts
+108    receivable purchase transaction as a purchase shall be conclusive that the accounts
+109    receivable purchase transaction is not a loan or a transaction for the use, forbearance, or
+110    detention of money.
+111    (d) For purposes of Chapter 1 of Title 7, a provider extending a specific offer for a
+112    commercial financing transaction on behalf of a depository institution shall not be
+113    construed to mean that the provider engaged in lending or financing or originated that loan
+114    or financing.
+115        (e)(1) Before consummating a commercial financing transaction, a provider shall
+116        disclose the terms of the commercial financing transaction in accordance with this Code
+117        section.
+118        (2) Only one disclosure must be provided for each commercial financing transaction, and
+119        a disclosure is not required as a result of the modification, forbearance, or change to a
+120        consummated commercial financing transaction.
+121        (3) A provider shall disclose the following information in connection with each
+122        commercial financing transaction:
+
+
+                                                    S. B. 90
+                                                      -5-
+      23                                                                                 SB 90/AP
+
+123         (A) The total amount of funds provided to the business under the terms of the
+124         commercial financing transaction;
+125         (B) The total amount of funds disbursed to the business under the terms of the
+126         commercial financing transaction, if less than the amount described in
+127         subparagraph (A) of this paragraph, as a result of any fees deducted or withheld at
+128         disbursement, any amount paid to the provider to satisfy a prior balance, and any
+129         amount paid to a third party on behalf of the business;
+130         (C) The total amount to be paid to the provider under the terms of the commercial
+131         financing transaction;
+132         (D) The total dollar cost of the commercial financing transaction, calculated by finding
+133         the difference between:
+134           (i) The amount described in subparagraph (A) of this paragraph; and
+135           (ii) The amount described in subparagraph (C) of this paragraph;
+136           (E)(i) The manner, frequency, and amount of each payment; or
+137           (ii) If the amount of each payment may vary, the manner, frequency, and estimated
+138           amount of the initial payment; and
+139         (F) A statement of whether there are any costs or discounts associated with prepayment
+140         under the commercial financing transaction, including a reference to the paragraph in
+141         the commercial financing transaction agreement that creates each cost or discount.
+142        (4) The commercial financing transaction agreement shall include a description of the
+143        methodology for calculating any variable payment amount and the circumstances that
+144        may cause a payment amount to vary.
+145        (5) The provisions of this subsection shall apply to any commercial financing transaction
+146        consummated on or after January 1, 2024.
+147    (f) No broker shall:
+148        (1) Assess, collect, or solicit an advance fee from a business to provide services as a
+149        broker; provided, however, that nothing contained in this paragraph shall preclude a
+
+
+                                                 S. B. 90
+                                                   -6-
+      23                                                                                     SB 90/AP
+
+150        broker from soliciting a potential business to pay for, or preclude a potential business
+151        from paying for, actual services necessary to apply for a commercial financing
+152        transaction, including, but not limited to, a credit check or an appraisal of security, where
+153        such payment is made by check or money order payable to a party independent of the
+154        broker;
+155        (2) Make or use any false or misleading representations or omit any material fact in the
+156        offer or sale of the services of a broker or engage, directly or indirectly, in any act that
+157        operates or would operate as fraud or deception upon any person in connection with the
+158        offer or sale of the services of a broker, notwithstanding the absence of reliance by the
+159        buyer; or
+160        (3) Make or use any false or deceptive representation in its business dealings.
+161    (g) The Attorney General may:
+162        (1) Receive and act on complaints;
+163        (2) Take action designed to obtain voluntary compliance with this Code section; and
+164        (3) Commence administrative or judicial proceedings on the Attorney General's own
+165        initiative to enforce compliance with this Code section.
+166    (h) A person who violates a provision of this Code section is subject to a civil penalty of
+167    $500.00 per violation, not to exceed $20,000.00 for all violations arising from the use of
+168    the same transaction documentation or materials.
+169    (i) A person who violates a provision of this Code section after receiving written notice
+170    of a prior violation is subject to a civil penalty of $1,000.00 per violation, not to exceed
+171    $50,000.00 for all violations arising from the use of the same transaction documentation
+172    or materials.
+173    (j) Nothing in this Code section creates a private right of action against any person based
+174    on failure to comply with the provisions of this Code section.
+175    (k) A violation of this Code section shall not affect the enforceability of any underlying
+176    agreement.
+
+
+                                                   S. B. 90
+                                                     -7-
+      23                                                                                    SB 90/AP
+
+177    10-1-393.19.
+178    (a) Any unsolicited written inquiry or mailing by any person or entity that is not licensed
+179    or regulated pursuant to the provisions of Chapter 40 or Chapter 41 of Title 43 or
+180    Chapter 19 of Title 15 that expresses an interest in buying real property, or an option to buy
+181    real property, from the addressee or in buying the real property to which such written
+182    inquiry or mailing is addressed or that offers services relating to the sale of real estate shall
+183    include:
+184          (1)(A) At the top of and at least two inches apart from any other text on such written
+185          inquiry or mailing, the following notice in capital letters:
+186            'THIS IS A SOLICITATION.            THE SENDER IS CONTACTING YOU TO
+187            INQUIRE AS TO YOUR INTEREST IN SELLING YOUR HOME OR OTHER
+188            REAL ESTATE. YOU ARE UNDER NO OBLIGATION TO RESPOND.'
+189          (B) No text contained in such solicitation shall be larger than the text required in
+190          subparagraph (A) of this paragraph.
+191        (2) On front of the envelope or, if there is no envelope, on the part of the written inquiry
+192        or mailing that bears the postage stamp or postage amount, the following notice in capital
+193        letters:
+194          'SOLICITATION. YOU ARE UNDER NO OBLIGATION TO OPEN OR TO
+195          RESPOND.'
+196        (3) The notices required in paragraphs (1) and (2) of this subsection shall be:
+197          (A) Of a font that is the same as the majority of the text of the written inquiry or
+198          mailing;
+199          (B) Of a size which is no smaller than the text of the written inquiry or mailing, and in
+200          no event no smaller than 16 point font; and
+201          (C) Displayed in a distinctly contrasting color.
+202    (b) Failure to comply with the provisions of this Code section shall be considered an unfair
+203    or deceptive act or practice which is unlawful and shall therefore be punishable by the
+
+
+                                                   S. B. 90
+                                                     -8-
+      23                                                                                     SB 90/AP
+
+204    provisions of this part; provided, however, that notwithstanding Code Section 10-1-399,
+205    a claim of a violation of this Code section may be brought in a representative capacity and
+206    may be the subject of a class action under Code Section 9-11-23; and provided, further, that
+207    damages for such violation shall be the actual damages or $200.00 per violation, whichever
+208    is greater."
+
+
+209                                            SECTION 3.
+210   Said title is further amended by adding a new paragraph to Code Section 10-6A-3, relating
+211   to definitions relative to brokerage relationships in real estate transactions, to read as follows:
+212        "(12.1) 'Option to enter into a brokerage engagement' means a written contract wherein
+213        a broker pays valuable consideration or agrees that a seller, buyer, landlord, or tenant may
+214        receive a valuable consideration from another in consideration of such seller, buyer,
+215        landlord, or tenant granting such broker an exclusive right to enter into a brokerage
+216        engagement with such seller, buyer, landlord, or tenant during the term of the written
+217        contract."
+
+
+218                                            SECTION 4.
+219   Said title is further amended by revising subsection (a) of Code Section 10-6A-9, relating to
+220   duration of relationships between brokers and clients, as follows:
+221    "(a) The relationships set forth in Code Sections 10-6A-4 through 10-6A-8 and, Code
+222    Sections Section 10-6A-12 and, Code Section 10-6A-13, and an option to enter into a
+223    brokerage engagement shall commence at the time that the client engages the broker or
+224    executes an option to enter into a brokerage engagement, and shall continue until:
+225        (1) Completion of performance of the engagement; or
+226        (2) If paragraph (1) of this subsection is not applicable, then the earlier of:
+227         (A) Any date of expiration agreed upon by the parties in the brokerage engagement,
+228         the option to enter into a brokerage engagement, or in any amendments thereto;
+
+
+                                                   S. B. 90
+                                                     -9-
+      23                                                                                 SB 90/AP
+
+229         (B) Any authorized termination of the relationship; or
+230         (C) If no expiration is provided and no authorized termination has occurred, then one
+231         year after initiation of the brokerage engagement or one year after the date the option
+232         to enter into a brokerage engagement was executed."
+
+
+233                                           SECTION 5.
+234   Said title is further amended by revising Code Section 10-6A-10, relating to duties of brokers
+235   prior to entering into brokerage engagement relationships, as follows:
+236    "10-6A-10.
+237    (a) All brokerage engagements must:
+238        (1) Advise the prospective client of the types of agency relationships available through
+239        the broker;
+240        (2) Advise such prospective client of any brokerage relationships held by such broker
+241        with other parties which would conflict with any interests of the prospective client
+242        actually known to the broker but excluding the fact that the broker may be representing
+243        other sellers and landlords in selling or leasing property or that the broker may be
+244        representing other buyers and tenants in buying or leasing other property;
+245        (3) Advise such prospective client as to the broker's compensation and whether the
+246        broker will share such compensation with other brokers who may represent other parties
+247        to the transaction in an agency capacity; and
+248        (4) Advise the prospective client of the broker's obligations to keep information
+249        confidential under this chapter.
+250    (b) A brokerage engagement or an option to enter into a brokerage engagement shall not:
+251        (1) Purport to be a covenant running with the land or to be binding on future owners of
+252        interests in the subject property, except for rights solely applicable to commercial real
+253        estate as set forth in Code Section 44-14-602;
+
+
+
+
+                                                 S. B. 90
+                                                  - 10 -
+      23                                                                                     SB 90/AP
+
+254        (2) Allow for assignment of the right to provide service without notice and agreement
+255        of the owner of the subject property, except for such rights of assignment for commercial
+256        real estate as set forth in Code Section 44-14-602 or as part of the sale or merger of a
+257        brokerage firm; or
+258        (3) Purport to create a recordable lien, encumbrance, or other real property security
+259        interest. Any such lien, encumbrance, or other real property security interest, if recorded,
+260        shall be void and unenforceable and no release or voiding of such lien, encumbrance, or
+261        other real property security interest shall be required; provided, however, that this
+262        subsection shall not be applicable to lien rights solely applicable to commercial real estate
+263        as set forth in Code Section 44-14-602.
+264    (c) This Code section shall not apply to:
+265        (1) A home warranty, building warranty, or other similar product that covers the cost of
+266        maintenance of a home's or other building's system or systems for a prescribed period of
+267        time from the date such home or building is sold;
+268        (2) An insurance contract;
+269        (3) An option to purchase, a put requirement to purchase, a right of first offer, or a right
+270        of refusal;
+271        (4) A declaration created in the formation of a common interest community or an
+272        amendment thereto;
+273        (5) A maintenance or repair agreement entered into by a homeowners' or property
+274        owners' association in a common interest community;
+275        (6) A loan or a commitment to make or receive a loan secured by real estate;
+276        (7) A security agreement under the Uniform Commercial Code relating to the sale or
+277        rental of personal property or fixtures;
+278        (8) Water, sewer, electrical, telephone, cable, or other regulated utility service providers;
+279        or
+
+
+
+
+                                                   S. B. 90
+                                                    - 11 -
+      23                                                                                      SB 90/AP
+
+280        (9) A property management agreement by which the owner of the real property shall
+281        contract with a party to provide management services for the maintenance, ownership,
+282        operation, or lease of real property, provided that the real estate that is the subject of the
+283        property management agreement is either for commercial real estate as defined by Code
+284        Section 44-14-601 or is for residential one- to four-family real estate that is otherwise not
+285        occupied by the owner or owner's family members as their principal place of residence
+286        and place of abode as of the date of inception of such property management agreement.
+287    (d) This Code section shall not be construed to impair the rights granted by Code
+288    Sections 44-14-361, 44-14-361.1, 44-14-602, and 9-12-80.
+289    (e) This Code section shall not be construed to create any statutory lien right or statutory
+290    right to create a cloud on title that is not otherwise created elsewhere in the Official Code
+291    of Georgia Annotated."
+
+
+292                                             SECTION 6.
+293   Code Section 46-5-27 of the Official Code of Georgia Annotated, relating to telephone
+294   solicitations to residential, mobile, or wireless subscribers, Public Service Commission to
+295   establish and maintain list of certain subscribers, authorization for imposition of
+296   administrative fees, confidential nature of data base, and required identification, is amended
+297   by revising paragraph (3) of subsection (b) as follows:
+298        "(3) 'Telephone solicitation' means any voice communication over a telephone line for
+299        the purpose of encouraging the purchase or rental of, or investment in, personal property,
+300        real property, goods, or services, but does not include communications:
+301         (A) To any residential, mobile, or wireless subscriber with that subscriber's prior
+302         express invitation or permission;
+303         (B) By or on behalf of any person or entity with whom a residential, mobile, or
+304         wireless subscriber has a prior or current business or personal relationship; or
+
+
+
+
+                                                   S. B. 90
+                                                    - 12 -
+      23                                                                                  SB 90/AP
+
+305         (C) By or on behalf of a charitable organization which has filed a registration statement
+306         pursuant to Code Section 43-17-5, is exempt from such registration under
+307         paragraphs (1) through (6) of subsection (a) of Code Section 43-17-9, or is exempt from
+308         such registration as a religious organization or agency referred to in paragraph (2) of
+309         Code Section 43-17-2; or
+310         (D) By any person who is licensed or regulated pursuant to Chapter 40 or Chapter 41
+311         of Title 43 or Chapter 19 of Title 15.
+312        Such communication may be from a live operator, through the use of ADAD equipment
+313        as defined in Code Section 46-5-23, or by other means."
+
+
+314                                           SECTION 7.
+315   This Act shall become effective on January 1, 2024.
+
+
+316                                           SECTION 8.
+317   All laws and parts of laws in conflict with this Act are repealed.
+
+
+
+
+                                                 S. B. 90
+                                                  - 13 -
+

@@ -24,7 +24,12 @@ export const UT_DISCLOSURE: ContentStatute = {
     verbatimRequired: false,
     verbatimVerifiedAt: '2026-09-06',
   },
-  sourceDigest: '060c5bea09bd05a2a76ed42c8dbc2ff8abfb3fd86f2b31a7376d47a53ffb99a5',
+  // Digest re-computed 2026-09-07 after a vendoring header was added to the
+  // source file recording where it came from. The STATUTORY TEXT is byte-identical;
+  // only the header above it changed, so `verbatimVerifiedAt` stands rather than
+  // being re-stamped. Saying that out loud because "the digest broke, I updated
+  // it" is exactly the move this mechanism exists to make someone justify.
+  sourceDigest: 'f5535bf4ab354050b4bec4ec6450008efd5edf8cdb78f72f442521a5ff6d1924',
   section: null,
   requirements: [
     {

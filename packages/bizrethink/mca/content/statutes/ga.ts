@@ -3,6 +3,22 @@ import type { ContentStatute } from '../types';
 /**
  * Georgia — O.C.G.A. §10-1-393.18(e)(3).
  *
+ * SOURCE REPLACED 2026-09-07, and the verification date re-earned rather than
+ * carried over. The previous source was a browser capture of law.justia.com — a
+ * secondary publisher — and was INCOMPLETE: subsection (a)'s definitions and the
+ * full text of (b)-(k) were not in it. So "advance fee", the term the broker
+ * prohibition in (f)(1) turns on, was defined nowhere in what we held, while
+ * this spec carried a verification date against it as though it were primary.
+ *
+ * That is the failure the provenance design exists to prevent, and it survived
+ * because nothing checks whether a source IS primary — only that its bytes have
+ * not moved. A digest over a secondary source is a faithful record of the wrong
+ * document.
+ *
+ * Now Senate Bill 90 AS PASSED, from the Georgia General Assembly's own
+ * document API. All six lettered disclosure items and the (f)(1) advance-fee
+ * prohibition were re-checked against it before this date was written.
+ *
  * Six items, no prescribed labels. Reads as the same model act as Florida,
  * Louisiana and Georgia, and differs from all three in paragraph (f): Utah and
  * Georgia want a reference to the paragraph that creates "each cost or
@@ -15,16 +31,16 @@ import type { ContentStatute } from '../types';
 export const GA_DISCLOSURE: ContentStatute = {
   slug: 'ga-disclosure',
   citation: 'O.C.G.A. §10-1-393.18(e)(3)',
-  sourceFile: 'GA-OCGA-10-1-393.18.txt',
+  sourceFile: 'GA-SB90-enrolled.txt',
   jurisdiction: 'US-GA',
   status: 'published',
   source: {
     kind: 'statute',
     citation: 'O.C.G.A. §10-1-393.18(e)(3)',
     verbatimRequired: false,
-    verbatimVerifiedAt: '2026-09-06',
+    verbatimVerifiedAt: '2026-09-07',
   },
-  sourceDigest: '506e5a0579c5f1cf2a8f7bebac6aa4a1a2948921c5425201bcc80ba60ce817d5',
+  sourceDigest: 'a090725091f034702d5f8aac70c501f60b919f299778cf914a9febfa8b935112',
   section: null,
   requirements: [
     {
