@@ -332,12 +332,20 @@ jobs:
           # Per shard, or the four uploads collide.
           name: test-results-shard-${{ matrix.shard }}
           path: 'packages/app-tests/**/test-results/*'
+          retention-days: 7
 
       # always(), so a failing suite still cleans up after itself. Without
       # this a per-run database is a disk leak on a self-hosted runner, which
       # would be a new problem in place of the one above.
       - name: Drop the run database
         if: always() && steps.scope.outputs.code == 'true'
+        # The step's own comment claimed cleanup must never fail the job, and
+        # the first version did not achieve it: GitHub runs steps under
+        # `bash -e`, so ANY unguarded non-zero here turns a passing suite red.
+        # It did exactly that once — 1029 tests passed and the job reported
+        # failure. `|| true` on each command is not enough, because it does
+        # not cover a mistake in the script itself.
+        continue-on-error: true
         run: |
           # Never fail the job on cleanup. A red suite must report the suite's
           # failure, not a teardown error on top of it.
@@ -364,7 +372,6 @@ jobs:
             docker exec database psql -U documenso -d documenso \
               -c "DROP DATABASE IF EXISTS \"${db}\" WITH (FORCE);" || true
           done
-          retention-days: 7
 
       # Make the skip visible in the check output. A green E2E check that ran
       # nothing should say so, not look identical to one that ran everything.

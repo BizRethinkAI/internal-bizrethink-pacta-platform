@@ -81,6 +81,19 @@ describe('e2e-tests.yml — migrations must be applied unattended', () => {
     }
   });
 
+  it('cannot fail the job from cleanup', () => {
+    // Steps run under `bash -e`. The first version of the teardown was killed
+    // by a stray line and turned a run with 1029 passing tests red — a
+    // teardown error reported as a suite failure, which is the opposite of
+    // what a gate should say.
+    const doc = parseDocument(workflow, { uniqueKeys: true });
+    const steps = (doc.toJS() as WorkflowShape).jobs.e2e_tests.steps;
+    const teardown = steps.find((s) => s.name === 'Drop the run database');
+
+    expect(teardown).toBeDefined();
+    expect(teardown?.['continue-on-error']).toBe(true);
+  });
+
   it('drops the run database even when the suite fails', () => {
     // Without this a per-run database is a disk leak on a self-hosted runner:
     // a new problem in place of the one being fixed.
@@ -88,6 +101,10 @@ describe('e2e-tests.yml — migrations must be applied unattended', () => {
     expect(executable).toMatch(/Drop the run database[\s\S]{0,120}if:\s*always\(\)/);
   });
 });
+
+type WorkflowShape = {
+  jobs: Record<string, { steps: { name?: string; run?: string; 'continue-on-error'?: boolean }[] }>;
+};
 
 /**
  * Found while writing the fix above, and the more dangerous half of it.
@@ -123,5 +140,48 @@ describe('.github/workflows — no duplicate keys', () => {
     });
 
     expect(doc.errors.map((e) => e.message)).toEqual([]);
+  });
+});
+
+/**
+ * A `run:` block that swallowed the key below it.
+ *
+ * Inserting a step by string replacement anchored on the end of the previous
+ * step's `with:` block captured the `retention-days: 7` line that followed —
+ * so it became a line of shell, and bash exited 127 with
+ * `retention-days:: command not found`. The YAML still parsed, the step still
+ * existed, and every test passed; only the job went red.
+ *
+ * A shell script has no reason to contain a bare `key: value` line at its own
+ * top level. When it does, a YAML key has fallen into it.
+ */
+describe('.github/workflows — no step has swallowed a YAML key', () => {
+  const dir = resolve(dirname(fileURLToPath(import.meta.url)), '../../../.github/workflows');
+  const files = readdirSync(dir).filter((f) => f.endsWith('.yml') || f.endsWith('.yaml'));
+
+  it.each(files)('%s keeps its keys out of run blocks', (file) => {
+    const doc = parseDocument(readFileSync(resolve(dir, file), 'utf8'), { uniqueKeys: true });
+    const jobs = (doc.toJS() as WorkflowShape).jobs ?? {};
+    const strays: string[] = [];
+
+    for (const [jobName, job] of Object.entries(jobs)) {
+      for (const step of job.steps ?? []) {
+        if (typeof step.run !== 'string') {
+          continue;
+        }
+
+        for (const line of step.run.split('\n')) {
+          // A key at the script's own top level: no leading space, a bare
+          // identifier, a colon, then a value. Shell would read it as a
+          // command name. `foo: bar` in an indented heredoc or a quoted SQL
+          // string is indented and so does not match.
+          if (/^[a-z][a-z0-9-]*:\s+\S/.test(line)) {
+            strays.push(`${jobName} / ${step.name ?? '(unnamed)'}: ${line.trim()}`);
+          }
+        }
+      }
+    }
+
+    expect(strays).toEqual([]);
   });
 });
