@@ -22,7 +22,9 @@ it.
 So the count of passing tests is a measure of coverage, never of conformity. The
 statutes still have to be read.
 
-## The two checks
+## Two surfaces: the blank form, and the filled one
+
+### `prescribed/` — the blank template
 
 `checkFormConformity(spec, rendered)` — does a form we built match the spec we
 wrote? Row count, prescribed labels, verbatim text, and additions to a row the
@@ -34,6 +36,33 @@ implemented specs derived from secondary summaries that were broadly right and
 wrong in the particulars. A library that only checks form-against-spec is a tidy
 way of being confidently incorrect.
 
+### `instance/` — the numbers written into it
+
+Both checks above live entirely in fixed prose, and every defect either has
+found lived there. Three REVIEW-01 blockers did not:
+`ca-funding-provided-is-gross-purchase-price`,
+`ca-finance-charge-omits-withheld-fees` and `ca-apr-understated` all have the
+right widget in the right row with the right sentence beside it. What was wrong
+was the number.
+
+`checkDisclosureInstance(envelope)` checks **identities** — relationships that
+must hold between the numbers PRINTED on the documents in one envelope, whoever
+computed them and however. It contains no calculator and reimplements nothing;
+`lombard-platform/src/lib/disclosure-math.ts` computes the disclosure and keeps
+doing so. Two calculators drift, and when they disagree there is no principled
+way to say which is right.
+
+The one place arithmetic is unavoidable is the APR, and even there no rate is
+solved for: present value is strictly decreasing in the rate, so the §955 /
+§600.4 band on the calculated rate inverts into a band on the present value at
+two rates already known.
+
+**Read `instance/limits.ts` before trusting an empty findings list.** An empty
+list means the instance is CONSISTENT, not that it is lawful, and the two
+strongest identities need a second document in the envelope — see the
+`skipped` array and `instanceCoverage()`, which names the blockers a given
+envelope could not have detected.
+
 ## Rules for adding content
 
 1. **Primary text only.** `sources/` holds regulations, never summaries. Two
@@ -44,7 +73,13 @@ way of being confidently incorrect.
    pin the divergence with an assertion rather than a comment. See
    `__tests__/near-identical-states.test.ts` — the deduplication guard there is
    deliberate and must not be tidied away.
-4. **Unexamined text enters as draft.** 47 of 140 clauses in the Lombard
+4. **Jurisdiction is one axis; tenant is another.** Federal, state, regulatory
+   and generic are jurisdictional. Product- or tenant-specific is not, and
+   folding them together breaks the property that makes adding a state safe.
+   Nothing in `instance/` outside `instance/adapters/` knows a field is called
+   `funding_provided`, and nothing in `instance/adapters/` is imported by the
+   checker.
+5. **Unexamined text enters as draft.** 47 of 140 clauses in the Lombard
    agreements have never been reviewed by anyone (see
    `lombard-contracts/MCA-CLAUSE-LIBRARY-PHASE0.md`). None looks dangerous,
    which is what the inherited documents looked like before REVIEW-01 found 207
