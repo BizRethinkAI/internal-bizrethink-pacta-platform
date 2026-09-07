@@ -8,7 +8,8 @@ import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.s
 import { EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../../server-only/feature-access';
-import { FL_LIBRARY } from '../clauses/us-fl';
+import { DEFAULT_LEASE_JURISDICTION } from '../clauses/approval-jurisdiction';
+import { libraryFor } from '../clauses/library';
 import { selectClauses } from '../engine/select-clauses';
 import type { RenderedDocument, RenderLeaseInput } from '../render/render-lease';
 import { renderLease } from '../render/render-lease';
@@ -161,7 +162,18 @@ export const createEnvelopeFromMatter = async ({
     });
   }
 
-  const selection = selectClauses({ facts: input.facts, library: FL_LIBRARY });
+  /*
+    THE SAME LIBRARY THE RENDERER IS ABOUT TO USE. This selected from the Florida
+    module's whole export while `buildLeaseDocuments`, inside the `renderLease`
+    below, selected from `libraryFor(input.jurisdiction)`. Identical outputs
+    while Florida was the only state with clauses of its own; the moment a second
+    one has any, the attorney-review gate below is checking a different set of
+    clauses from the ones that reach the signer.
+  */
+  const selection = selectClauses({
+    facts: input.facts,
+    library: libraryFor(input.jurisdiction ?? DEFAULT_LEASE_JURISDICTION),
+  });
 
   /*
     Lock 2: no unreviewed clause text may reach a third party. Checked against

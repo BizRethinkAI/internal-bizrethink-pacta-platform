@@ -1,6 +1,30 @@
 import { describe, expect, it } from 'vitest';
+import { ALL_CLAUSES } from '../clauses/library';
 import { assertPublishable } from '../clauses/types';
-import { FL_CLAUSE_MODULES, FL_LIBRARY, FL_SECTION_ORDER } from '../clauses/us-fl';
+import { FL_CLAUSE_MODULES, FL_SECTION_ORDER } from '../clauses/us-fl';
+import { NC_CLAUSE_MODULES } from '../clauses/us-nc';
+
+/*
+  EVERY clause, of every jurisdiction. These invariants read the Florida
+  module's export until North Carolina existed, at which point seventeen clauses would have been
+  exempt from every one of them — unique slugs, section order, dangling
+  supersedes, the pinned citations, the publish guard — with nothing red. That
+  is this repo's characteristic failure, and it would have arrived in the same
+  commit as the feature it was meant to guard.
+*/
+/*
+  PREFIXED, because both states name a module `maintenance` and a plain spread
+  silently drops one of them. Caught on the first run of this change: the merged
+  map lost Florida's maintenance, boilerplate and use-and-remedies modules, and
+  the "contains nothing that is not in a module" invariant then reported
+  thirty-five perfectly good Florida clauses as orphans. A collision that
+  removed clauses from the CHECK rather than from the library — quieter, and the
+  same shape.
+*/
+const MODULES = Object.fromEntries([
+  ...Object.entries(FL_CLAUSE_MODULES).map(([name, clauses]) => [`us-fl/${name}`, clauses] as const),
+  ...Object.entries(NC_CLAUSE_MODULES).map(([name, clauses]) => [`us-nc/${name}`, clauses] as const),
+]);
 
 /**
  * Invariants across the whole library, rather than any one clause.
@@ -14,17 +38,17 @@ import { FL_CLAUSE_MODULES, FL_LIBRARY, FL_SECTION_ORDER } from '../clauses/us-f
 
 describe('every clause module reaches the library', () => {
   it('contains every clause from every module', () => {
-    const missing = Object.entries(FL_CLAUSE_MODULES).flatMap(([moduleName, clauses]) =>
-      clauses.filter((c) => !FL_LIBRARY.includes(c)).map((c) => `${moduleName}: ${c.slug}`),
+    const missing = Object.entries(MODULES).flatMap(([moduleName, clauses]) =>
+      clauses.filter((c) => !ALL_CLAUSES.includes(c)).map((c) => `${moduleName}: ${c.slug}`),
     );
 
     expect(missing).toEqual([]);
   });
 
   it('contains nothing that is not in a module', () => {
-    const known = new Set(Object.values(FL_CLAUSE_MODULES).flat());
+    const known = new Set(Object.values(MODULES).flat());
 
-    expect(FL_LIBRARY.filter((c) => !known.has(c))).toEqual([]);
+    expect(ALL_CLAUSES.filter((c) => !known.has(c))).toEqual([]);
   });
 });
 
@@ -32,7 +56,7 @@ describe('structural invariants', () => {
   it('gives every clause a unique slug', () => {
     const seen = new Map<string, number>();
 
-    for (const clause of FL_LIBRARY) {
+    for (const clause of ALL_CLAUSES) {
       seen.set(clause.slug, (seen.get(clause.slug) ?? 0) + 1);
     }
 
@@ -45,15 +69,15 @@ describe('structural invariants', () => {
       actually gets selected — one behind a false includeWhen would sit in the
       library undetected until the day someone's answers selected it.
     */
-    const orphans = FL_LIBRARY.filter((c) => !FL_SECTION_ORDER.includes(c.section as never)).map((c) => c.slug);
+    const orphans = ALL_CLAUSES.filter((c) => !FL_SECTION_ORDER.includes(c.section as never)).map((c) => c.slug);
 
     expect(orphans).toEqual([]);
   });
 
   it('only supersedes clauses that exist', () => {
-    const slugs = new Set(FL_LIBRARY.map((c) => c.slug));
+    const slugs = new Set(ALL_CLAUSES.map((c) => c.slug));
 
-    const dangling = FL_LIBRARY.flatMap((c) =>
+    const dangling = ALL_CLAUSES.flatMap((c) =>
       c.supersedes.filter((target) => !slugs.has(target)).map((target) => `${c.slug} -> ${target}`),
     );
 
@@ -61,7 +85,7 @@ describe('structural invariants', () => {
   });
 
   it('never supersedes itself', () => {
-    expect(FL_LIBRARY.filter((c) => c.supersedes.includes(c.slug)).map((c) => c.slug)).toEqual([]);
+    expect(ALL_CLAUSES.filter((c) => c.supersedes.includes(c.slug)).map((c) => c.slug)).toEqual([]);
   });
 
   it('declares every variable its body interpolates', () => {
@@ -69,7 +93,7 @@ describe('structural invariants', () => {
     // token into a signed lease.
     const problems: string[] = [];
 
-    for (const clause of FL_LIBRARY) {
+    for (const clause of ALL_CLAUSES) {
       const declared = new Set(clause.variables.map((v) => v.name));
 
       for (const match of clause.body.matchAll(/\{\{(\w+)\}\}/g)) {
@@ -83,7 +107,7 @@ describe('structural invariants', () => {
   });
 
   it('interpolates every variable it declares', () => {
-    const problems = FL_LIBRARY.flatMap((clause) =>
+    const problems = ALL_CLAUSES.flatMap((clause) =>
       clause.variables
         .filter((v) => !clause.body.includes(`{{${v.name}}}`))
         .map((v) => `${clause.slug}: ${v.name} is declared but never used`),
@@ -97,12 +121,12 @@ describe('provenance invariants', () => {
   it('holds the entire library below published', () => {
     // Nothing has been through attorney review, so nothing may render for an
     // organisation that is not BizRethink-internal.
-    expect(FL_LIBRARY.filter((c) => c.status === 'published')).toEqual([]);
-    expect(FL_LIBRARY.flatMap(assertPublishable)).toEqual([]);
+    expect(ALL_CLAUSES.filter((c) => c.status === 'published')).toEqual([]);
+    expect(ALL_CLAUSES.flatMap(assertPublishable)).toEqual([]);
   });
 
   /*
-    THE CLAUSE LIBRARY IS FLORIDA LAW, NOT ONE PROPERTY.
+    THE CLAUSE LIBRARY IS A STATE'S LAW, NOT ONE PROPERTY.
 
     Text may be fixed here only by a statute, a regulation, or a court-approved
     form. Anything fixed by a PRIVATE instrument — an HOA declaration, an
@@ -121,11 +145,12 @@ describe('provenance invariants', () => {
     any requiredBy forces an edit here, which forces the conversation.
 
     Every hard-coded figure elsewhere in this library traces to a statute:
-    30/60 days from §83.575, 15 from §83.49(3)(a), 3/7 from §83.56. That is not
-    a rule imposed on the library; it is the rule the library already followed.
+    30/60 days from §83.575, 15 from §83.49(3)(a), 3/7 from §83.56, 10 from
+    §42-3, 15 from §42-42(a)(5), 5%/10%/12%/15% from §42-46. That is not a rule
+    imposed on the library; it is the rule the library already followed.
   */
   it('cites only law, and cites exactly what is pinned here', () => {
-    const cited = Object.fromEntries(FL_LIBRARY.filter((c) => c.requiredBy).map((c) => [c.slug, c.requiredBy]));
+    const cited = Object.fromEntries(ALL_CLAUSES.filter((c) => c.requiredBy).map((c) => [c.slug, c.requiredBy]));
 
     expect(cited).toEqual({
       'deposit.escrow-notice': 'Fla. Stat. §83.49(2)',
@@ -147,6 +172,25 @@ describe('provenance invariants', () => {
       'notices.electronic-delivery': 'Fla. Stat. §83.505',
       'term.non-renewal-notice': 'Fla. Stat. §83.575',
       'termination.early-election': 'Fla. Stat. §83.595(4)',
+
+      /*
+        North Carolina, read off ncleg.gov on 2026-09-06. Every one of these is
+        `implements`, never `compelled` — Chapter 42 does not say a residential
+        lease shall contain anything, and `north-carolina.test.ts` asserts that
+        the only compelled clause in a North Carolina lease is the federal lead
+        disclosure travelling in on the portable tier.
+      */
+      'deposit.held-nc': 'N.C. Gen. Stat. §42-50',
+      'deposit.held-carried-nc': 'N.C. Gen. Stat. §42-50',
+      'deposit.escrow-notice-nc': 'N.C. Gen. Stat. §42-50',
+      'deposit.accounting-nc': 'N.C. Gen. Stat. §42-52',
+      'maintenance.landlord-statutory-nc': 'N.C. Gen. Stat. §42-42(a)',
+      'maintenance.detectors-nc': 'N.C. Gen. Stat. §42-42(a)(5)',
+      'default.notices-nc': 'N.C. Gen. Stat. §42-3',
+      'moveout.personal-property-nc': 'N.C. Gen. Stat. §42-25.7',
+      'rent.late-fee-nc': 'N.C. Gen. Stat. §42-46(a)',
+      'fees.litigation-nc': 'N.C. Gen. Stat. §42-46',
+      'notices.landlord-address-nc': 'N.C. Gen. Stat. §42-42(a)(4)',
     });
   });
 
@@ -159,7 +203,7 @@ describe('provenance invariants', () => {
     imposed on every other. Numbers in these clauses must arrive as variables.
   */
   it('states no bare quantity in a clause selected only by there being an association', () => {
-    const hoaClauses = FL_LIBRARY.filter((c) => c.slug.startsWith('hoa.'));
+    const hoaClauses = ALL_CLAUSES.filter((c) => c.slug.startsWith('hoa.'));
 
     expect(hoaClauses.length).toBeGreaterThan(0);
 
@@ -176,6 +220,6 @@ describe('provenance invariants', () => {
   });
 
   it('never carries customer-authored text in the shared library', () => {
-    expect(FL_LIBRARY.filter((c) => c.source.kind === 'customer-authored').map((c) => c.slug)).toEqual([]);
+    expect(ALL_CLAUSES.filter((c) => c.source.kind === 'customer-authored').map((c) => c.slug)).toEqual([]);
   });
 });

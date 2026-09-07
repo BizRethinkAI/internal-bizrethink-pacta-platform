@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { FL_LIBRARY } from '../clauses/us-fl';
+import { ALL_CLAUSES, libraryFor } from '../clauses/library';
 
-const clause = (slug: string) => FL_LIBRARY.find((c) => c.slug === slug);
+const clause = (slug: string) => ALL_CLAUSES.find((c) => c.slug === slug);
 const body = (slug: string) => clause(slug)?.body ?? '';
 
 /*
@@ -95,10 +95,23 @@ describe('one obligation, stated once', () => {
     the repetition. In a document with an integration clause, saying the same
     thing three times invites an argument about which one governs.
   */
-  it('states the forwarding address once, where the deposit is returned', () => {
-    const saying = FL_LIBRARY.filter((c) => /forwarding address/i.test(c.body)).map((c) => c.slug);
+  /*
+    ONCE PER LEASE, WHICH IS NOT THE SAME AS ONCE PER LIBRARY. Florida and North
+    Carolina each have a deposit-return clause and each asks for a forwarding
+    address, and they can never appear in the same document — `libraryFor`
+    guarantees it. Scoping this to a jurisdiction is what keeps the guard
+    asserting the thing it was written to assert, rather than being relaxed to a
+    count that grows with every state.
+  */
+  it.each([
+    ['US-FL', ['deposit.return']],
+    ['US-NC', ['deposit.accounting-nc']],
+  ] as const)('states the forwarding address once in a %s lease', (jurisdiction, expected) => {
+    const saying = libraryFor(jurisdiction)
+      .filter((c) => /forwarding address/i.test(c.body))
+      .map((c) => c.slug);
 
-    expect(saying).toEqual(['deposit.return']);
+    expect(saying).toEqual(expected);
   });
 });
 

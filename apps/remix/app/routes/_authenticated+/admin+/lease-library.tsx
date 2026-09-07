@@ -175,9 +175,10 @@ export default function ClauseLibraryPage() {
     may or may not count for a lease in another, and a bare count that does not
     say which state is a number nobody can act on.
 
-    One option today. The library holds Florida clauses and nothing else, so
-    offering more would be a lie about what can be reviewed. Adding the second
-    is one entry in `ZLeaseJurisdiction` and one <option> below.
+    TWO OPTIONS SINCE 2026-09-06. North Carolina has seventeen clauses of its
+    own, so a link that could only carry Florida's would leave the second state
+    unreviewable — and attorney review is the critical path for the whole
+    product, not a background task.
   */
   const [jurisdiction, setJurisdiction] = useState<'US-FL' | 'US-NC'>('US-FL');
 
@@ -287,9 +288,9 @@ export default function ClauseLibraryPage() {
           state is a filter rather than a second copy of the library.
         */}
         <p className="mt-1 max-w-2xl text-muted-foreground">
-          Every clause the library holds, grouped by the law it depends on. A Florida lease is assembled from the
-          Florida clauses plus the ones that turn on no state&rsquo;s law. A clause reaches a third party only once an
-          attorney has approved the exact words below.
+          Every clause the library holds, grouped by the law it depends on. A lease is assembled from its own
+          state&rsquo;s clauses plus the ones that turn on no state&rsquo;s law. A clause reaches a third party only
+          once an attorney has approved the exact words below.
         </p>
       </div>
 
@@ -413,6 +414,7 @@ export default function ClauseLibraryPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="US-FL">A Florida lease</SelectItem>
+                  <SelectItem value="US-NC">A North Carolina lease</SelectItem>
                 </SelectContent>
               </Select>
               <p className="mt-1 text-muted-foreground text-xs">
@@ -851,7 +853,7 @@ const ClauseRowItem = ({
                 <Input
                   id={`admitted-${clause.slug}`}
                   value={admitted}
-                  placeholder="Florida"
+                  placeholder="Florida or North Carolina"
                   onChange={(e) => setAdmitted(e.target.value)}
                 />
                 {/*

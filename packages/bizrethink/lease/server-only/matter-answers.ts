@@ -1,4 +1,4 @@
-import { normaliseJurisdiction } from '../clauses/approval-jurisdiction';
+import { jurisdictionForProperty } from '../clauses/approval-jurisdiction';
 import type { CustomClauseInput } from '../clauses/custom';
 import type { LeaseDocument } from '../documents/derive-documents';
 import { describeDocuments, hasGoverningDocuments } from '../documents/derive-documents';
@@ -204,11 +204,10 @@ export const renderInputForMatter = (matter: StoredMatter): RenderLeaseInput => 
     customClauses: hydrated.customClauses,
     /*
       Whose law this lease is drafted to, taken from the property rather than
-      guessed. Falls back to Florida because that is the only state with clauses
-      of its own; the fallback stops being harmless the moment a second one has
-      any, which is why the state is threaded now rather than then.
+      guessed — and taken through the shared helper, so the renderer, the
+      validator and the interview cannot disagree about which state this is.
     */
-    jurisdiction: normaliseJurisdiction(matter.propertyState as string | null) ?? 'US-FL',
+    jurisdiction: jurisdictionForProperty(matter.propertyState as string | null),
     /*
       Carried through so an unanswered delegated variable renders as a named
       blank rather than a raw token. The tenant is who downloads this PDF, and

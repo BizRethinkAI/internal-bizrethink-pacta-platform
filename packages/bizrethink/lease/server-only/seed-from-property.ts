@@ -112,10 +112,25 @@ export const seedMatterFromProperty = (property: SeedProperty): SeededMatter => 
     venueCounty: property.county,
     hoaName: property.hoaName,
     includedAppliances: property.includedAppliances,
-    // Fla. Stat. §83.50. Left unset on a property recorded before these
-    // existed, so the interview still asks rather than printing a blank.
-    ...(property.noticeName ? { noticeName: property.noticeName } : {}),
-    ...(property.noticeAddress ? { noticeAddress: property.noticeAddress } : {}),
+    /*
+      The landlord's notice name and address, seeded into BOTH states' fields
+      from the same two property columns.
+
+      They are separate questions because the teaching differs — Fla. Stat.
+      §83.50 COMPELS the disclosure, while in North Carolina it is
+      §42-42(a)(4) making the landlord's own repair duty turn on the tenant's
+      written notice — but they are the same FACT, and the property already
+      holds it. Seeding only the Florida pair would make a North Carolina
+      landlord retype what the product knows, which is the exact redundancy
+      that hid the §83.505 defect.
+
+      Left unset on a property recorded before these columns existed, so the
+      interview still asks rather than printing a blank.
+    */
+    ...(property.noticeName ? { noticeName: property.noticeName, ncNoticeName: property.noticeName } : {}),
+    ...(property.noticeAddress
+      ? { noticeAddress: property.noticeAddress, ncNoticeAddress: property.noticeAddress }
+      : {}),
     /*
       The utility prose is NOT seeded. It is derived from the property's rows
       on every read — see hydrateMatter. Seeding it here is what left a matter

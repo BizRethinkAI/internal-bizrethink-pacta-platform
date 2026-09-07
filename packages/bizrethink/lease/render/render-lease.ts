@@ -1,4 +1,5 @@
 import type { ClauseJurisdiction } from '../clauses/approval-jurisdiction';
+import { DEFAULT_LEASE_JURISDICTION } from '../clauses/approval-jurisdiction';
 import type { CustomClauseInput } from '../clauses/custom';
 import { toCustomClause } from '../clauses/custom';
 import { libraryFor } from '../clauses/library';
@@ -134,12 +135,11 @@ export const buildLeaseDocuments = (input: RenderLeaseInput): { documents: Lease
 
   /*
     The clauses that apply where the property IS, not every clause that exists.
-    Defaults to Florida because that is the only state with clauses of its own
-    today; the moment a second one has any, a lease must not be able to reach
-    them by accident.
+    The default is named rather than written inline — `DEFAULT_LEASE_JURISDICTION`
+    is where it records that it is fail-open.
   */
   const library = [
-    ...libraryFor(input.jurisdiction ?? 'US-FL'),
+    ...libraryFor(input.jurisdiction ?? DEFAULT_LEASE_JURISDICTION),
     ...customClauses.map((clause, index) => toCustomClause(clause, index)),
   ];
 

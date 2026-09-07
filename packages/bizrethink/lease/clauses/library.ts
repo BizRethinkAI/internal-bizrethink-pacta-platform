@@ -2,6 +2,7 @@ import type { ClauseJurisdiction } from './approval-jurisdiction';
 import { JURISDICTION_TIERS, PORTABLE_TIERS } from './approval-jurisdiction';
 import type { Clause } from './types';
 import { FL_LIBRARY, FL_SECTION_ORDER } from './us-fl';
+import { NC_LIBRARY } from './us-nc';
 
 /**
  * The clauses that apply in one jurisdiction.
@@ -17,12 +18,15 @@ import { FL_LIBRARY, FL_SECTION_ORDER } from './us-fl';
  * thing North Carolina genuinely cannot be built without is this filter. The
  * folders buy readability and can follow at any time; this buys capability.
  *
- * `ALL_CLAUSES` still comes out of the `us-fl` module because that is where
- * every clause currently lives, including the 35 that depend on no state's law
- * at all. That naming is now wrong and is exactly what the folder move would
- * fix — a comment rather than a rewrite, until it is worth the churn.
+ * `ALL_CLAUSES` is now genuinely all of them: Florida's 64 — which still
+ * includes the 36 that depend on no state's law at all, because that is simply
+ * where they were written — plus North Carolina's 17. The `us-fl` module's name
+ * remains wrong about the portable clauses inside it, and that is what the
+ * folder move would fix. It is still a comment rather than a rewrite, and it is
+ * now the ONLY thing the folder move would buy, because the split it was meant
+ * to enable has been delivered by the filter below.
  */
-export const ALL_CLAUSES: Clause[] = FL_LIBRARY;
+export const ALL_CLAUSES: Clause[] = [...FL_LIBRARY, ...NC_LIBRARY];
 
 /*
   Which tiers travel is defined in `approval-jurisdiction.ts`, beside the rule

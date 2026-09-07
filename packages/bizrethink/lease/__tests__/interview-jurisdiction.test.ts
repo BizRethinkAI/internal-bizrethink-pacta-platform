@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 /*
-  Every clause, whatever its jurisdiction. `FL_LIBRARY` is that set today — the
-  name is a leftover from when the library was assumed to be Florida's, and #93
-  renames the concept to ALL_CLAUSES. Swap the import when that lands.
+  Every clause, whatever its jurisdiction — and now genuinely so. This read the
+  Florida module's export under an alias while Florida was the only state with
+  clauses; with North Carolina's seventeen in the library that alias would have
+  computed the whole marking from one state and quietly agreed with itself.
 */
-import { FL_LIBRARY as ALL_CLAUSES } from '../clauses/us-fl';
+import { ALL_CLAUSES } from '../clauses/library';
 import { allFields, FL_INTERVIEW, interviewFor } from '../interview/steps';
 
 /**
@@ -76,20 +77,90 @@ describe('the interview knows whose law each question serves', () => {
 
   it('counts out the same way it was measured', () => {
     const marked = allFields(FL_INTERVIEW).filter((f) => f.jurisdictions !== undefined);
+    const by = (jurisdiction: string) => marked.filter((f) => f.jurisdictions?.includes(jurisdiction as never)).length;
 
     /*
-      25 since the CDD pair (cddName, cddAssessmentsPaidBy) landed. NOT
-      assessmentsPaidBy — that feeds hoa.compliance, which is `generic`, so the
-      question travels to any state. The derived test above is what proves that
-      distinction rather than this count.
+      Was 25 when Florida was the only state with clauses. Two things moved it,
+      and both are worth reading rather than just recounting:
+
+        -2  `venueCounty` and `advanceRentUsd` stopped being Florida-only,
+            because North Carolina clauses now consume them. Neither was
+            decided here — the derived test above computed it from the library
+            and failed until the markings came off.
+
+        +7  North Carolina's own questions. Four of the seven duplicate a
+            Florida question that could have been shared, and are separate only
+            because an `InterviewField` holds one `statute` note and the two
+            states cite different law. That is the measurable cost of a second
+            state in this file, and it is reported in the PR rather than hidden
+            in a count.
     */
-    expect(marked.length).toBe(25);
+    expect({ total: marked.length, florida: by('US-FL'), northCarolina: by('US-NC') }).toEqual({
+      total: 30,
+      florida: 23,
+      northCarolina: 7,
+    });
   });
 });
 
 describe('interviewFor', () => {
-  it('asks Florida everything it asks today', () => {
-    expect(allFields(interviewFor('US-FL')).map((f) => f.name)).toEqual(allFields(FL_INTERVIEW).map((f) => f.name));
+  /*
+    `FL_INTERVIEW` IS THE MASTER LIST, NOT FLORIDA'S — a name that was accurate
+    until North Carolina had questions of its own and is now the same kind of
+    leftover as `us-fl` holding the generic clauses.
+
+    So this can no longer assert that Florida is asked everything in the master
+    list. What it asserts instead is the property that actually matters: Florida
+    is asked the master list MINUS the questions belonging to another state, and
+    nothing has gone missing from it.
+  */
+  it('asks Florida every question that is not another state’s', () => {
+    const expected = allFields(FL_INTERVIEW)
+      .filter((f) => f.jurisdictions === undefined || f.jurisdictions.includes('US-FL'))
+      .map((f) => f.name);
+
+    expect(allFields(interviewFor('US-FL')).map((f) => f.name)).toEqual(expected);
+  });
+
+  it('asks North Carolina its own questions', () => {
+    const asked = allFields(interviewFor('US-NC')).map((f) => f.name);
+
+    for (const field of [
+      'ncDepositSecurity',
+      'ncDepositInstitution',
+      'ncDepositInstitutionAddress',
+      'ncEntryNoticeHours',
+      'ncCureDays',
+      'ncNoticeName',
+      'ncNoticeAddress',
+    ]) {
+      expect(asked, field).toContain(field);
+    }
+  });
+
+  /*
+    And Florida is asked none of them. The filter runs both ways or it is not a
+    filter.
+  */
+  it('asks Florida none of North Carolina’s', () => {
+    const asked = allFields(interviewFor('US-FL')).map((f) => f.name);
+
+    expect(asked.filter((name) => name.startsWith('nc'))).toEqual([]);
+  });
+
+  /*
+    The two fields that stopped being Florida-only when North Carolina clauses
+    began consuming them. Pinned by name because the derived test above reports
+    a mismatch, not a direction, and it took reading the failure to see which
+    way it had moved.
+  */
+  it('asks both states the questions their clauses now share', () => {
+    for (const jurisdiction of ['US-FL', 'US-NC'] as const) {
+      const asked = allFields(interviewFor(jurisdiction)).map((f) => f.name);
+
+      expect(asked, `${jurisdiction} venueCounty`).toContain('venueCounty');
+      expect(asked, `${jurisdiction} advanceRentUsd`).toContain('advanceRentUsd');
+    }
   });
 
   /*

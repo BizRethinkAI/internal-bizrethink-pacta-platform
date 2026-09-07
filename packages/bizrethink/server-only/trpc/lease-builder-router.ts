@@ -9,11 +9,15 @@ import { z } from 'zod';
 import { lookupAddress } from '../../lease/address/census';
 import { clauseFingerprint, isApprovalCurrent, libraryFingerprint } from '../../lease/clauses/approval';
 import type { ClauseJurisdiction } from '../../lease/clauses/approval-jurisdiction';
-import { admissionBlocks, coversJurisdiction, normaliseJurisdiction } from '../../lease/clauses/approval-jurisdiction';
+import {
+  admissionBlocks,
+  coversJurisdiction,
+  jurisdictionForProperty,
+  normaliseJurisdiction,
+} from '../../lease/clauses/approval-jurisdiction';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { findingsBlock } from '../../lease/clauses/findings';
 import { ALL_CLAUSES, inReviewOrder, libraryFor } from '../../lease/clauses/library';
-import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { whyThisClause } from '../../lease/clauses/why-this-clause';
 import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
@@ -815,7 +819,20 @@ export const leaseBuilderRouter = router({
         userId: ctx.user.id,
       });
 
-      const library = [...FL_LIBRARY, ...answers.customClauses.map((clause, index) => toCustomClause(clause, index))];
+      /*
+        The clauses that apply where the property IS, not every clause that
+        exists. This reached for the Florida module's whole export — which was
+        indistinguishable from correct while Florida was the only state with
+        clauses of its own, and silently validates a North Carolina lease
+        against Florida's set the moment one is not.
+
+        Same helper as `renderInputForMatter`, so the clauses this procedure
+        reports on are the clauses the PDF will contain.
+      */
+      const library = [
+        ...libraryFor(jurisdictionForProperty(matter.propertyState)),
+        ...answers.customClauses.map((clause, index) => toCustomClause(clause, index)),
+      ];
 
       const selection = selectClauses({ facts: answers.facts, library });
 
@@ -2117,7 +2134,14 @@ export const leaseBuilderRouter = router({
       .mutation(async ({ ctx, input }) => {
         await assertAccess(input.organisationId, ctx.user.id);
 
-        const clause = FL_LIBRARY.find((candidate) => candidate.slug === input.clauseSlug);
+        /*
+          EVERY clause, deliberately — the opposite scoping to the counsel link.
+          Staff record an approval against a clause of any jurisdiction, and
+          `admissionBlocks` below is what decides whether this attorney may
+          approve this one. Scoping the lookup would make a clause unapprovable
+          rather than unapproved.
+        */
+        const clause = ALL_CLAUSES.find((candidate) => candidate.slug === input.clauseSlug);
 
         if (!clause) {
           throw new AppError(AppErrorCode.NOT_FOUND, { message: 'No such clause in the library.' });

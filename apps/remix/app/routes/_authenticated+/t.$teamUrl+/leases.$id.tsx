@@ -1,5 +1,5 @@
-import { normaliseJurisdiction } from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
-import { FL_LIBRARY } from '@bizrethink/customizations/lease/clauses/us-fl';
+import { jurisdictionForProperty } from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
+import { libraryFor } from '@bizrethink/customizations/lease/clauses/library';
 import { selectClauses } from '@bizrethink/customizations/lease/engine/select-clauses';
 import { clauseIndexForFields } from '@bizrethink/customizations/lease/interview/clause-for-field';
 import {
@@ -193,10 +193,7 @@ export default function LeaseInterviewPage() {
     today. That fallback stops being harmless the moment a second state has
     any, which is exactly why the state is threaded now rather than then.
   */
-  const interview = useMemo(
-    () => interviewFor(normaliseJurisdiction(matter.propertyState ?? null) ?? 'US-FL'),
-    [matter.propertyState],
-  );
+  const interview = useMemo(() => interviewFor(jurisdictionForProperty(matter.propertyState)), [matter.propertyState]);
 
   // Which fields may be put to the tenant at all. Server-side this is
   // recomputed from the same definitions, so the UI cannot widen it.
@@ -283,7 +280,8 @@ export default function LeaseInterviewPage() {
     from what survives selection, so it is recomputed as the answers change
     rather than read off the library once.
   */
-  const clauseFor = clauseIndexForFields(selectClauses({ facts: facts as never, library: FL_LIBRARY }).selected);
+  const library = libraryFor(jurisdictionForProperty(matter.propertyState));
+  const clauseFor = clauseIndexForFields(selectClauses({ facts: facts as never, library }).selected);
 
   /*
     How much of a step is still outstanding, so the rail can say so. Counts
