@@ -187,8 +187,14 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
           label read, contents not
         </p>
         <ul className="mt-2 space-y-1 text-sm">
-          {entry.unreadable.map((u) => (
-            <li key={`${u.row ?? 'req'}-${u.label}`}>
+          {/*
+            Indexed key, not label-keyed. Texas maps fifteen statutory
+            requirements onto rows and two of its labels appear twice —
+            "Estimated Periodic Payment" for §398.051(a)(5) and (a)(6),
+            "Prepayment" for (a)(9) and (a)(10). A label key collides there.
+          */}
+          {entry.unreadable.map((u, i) => (
+            <li key={`${entry.slug}-${i}-${u.label}`}>
               <span className="font-medium">{u.label}</span> <span className="text-muted-foreground">— {u.why}</span>
             </li>
           ))}
@@ -276,8 +282,8 @@ export default function AdminMcaConformityPage() {
       <Alert className="mt-6" variant="warning">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>
-          {notFullyVerified} of {entries.length} disclosures are not fully verified, and {unreadableRows} rows across
-          them have contents no check reads
+          {notFullyVerified} of {entries.length} disclosures are not fully verified, and {unreadableRows} rows and
+          requirements across them have contents no check reads
         </AlertTitle>
         <AlertDescription>
           A verification date means every prescribed label and every prescribed sentence was still found in the vendored
