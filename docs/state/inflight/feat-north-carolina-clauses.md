@@ -13,7 +13,7 @@ is now an ordinary PR against it.
 ## What landed
 
 North Carolina, as **17 clauses of its own plus the 36 portable ones it
-inherits**. Two commits, and the first is a bug fix that had to go first.
+inherits**. The first commit is a bug fix that had to go first.
 
 | | Florida | North Carolina |
 |---|---|---|
@@ -41,7 +41,7 @@ measured against it.
 clause **variables** and nothing else, by construction, and the cost is
 measurable: four questions duplicated purely because an `InterviewField` holds
 one `statute` note and the two states cite different law; four more questions
-that are dead in North Carolina and one of them shows a Florida citation.
+that are dead in North Carolina, three of them showing a Florida citation.
 
 **The rule packs, not at all** — and this is the one to plan for. See
 *Not in this PR* below.
