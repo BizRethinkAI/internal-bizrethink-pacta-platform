@@ -1998,9 +1998,27 @@ model BizrethinkLibraryReview {
   reviewerName  String
   reviewerEmail String
 
+  /// Which jurisdiction's library was sent. 'US-FL' | 'US-NC' — a
+  /// ClauseJurisdiction, and never the portable tiers, because a link is for a
+  /// lease in a state.
+  ///
+  /// The library has been split by jurisdiction since 2026-09-06 and the link
+  /// was not: every review sent all 64 clauses, 36 of which turn on no state's
+  /// law. An attorney admitted in one state was being shown another state's
+  /// clauses with nothing saying so.
+  ///
+  /// NOT NULL with no default, because the table held zero rows when the column
+  /// was added. A default would have been a guess about what earlier links
+  /// covered, written into rows that do not exist.
+  jurisdiction String
+
   /// Which clauses existed, and in what words, when the link was issued.
   /// An approval recorded against text that has since moved is worthless, and
   /// this is what lets the page say so rather than silently disagree.
+  ///
+  /// Of the SCOPED library, not the whole of it. A North Carolina link pinned
+  /// to all 64 clauses would report "the library has changed" the moment a
+  /// Florida clause moved, on a page that never showed one.
   libraryFingerprint String
 
   createdByUserId Int

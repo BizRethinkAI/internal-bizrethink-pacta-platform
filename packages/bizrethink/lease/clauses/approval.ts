@@ -33,6 +33,21 @@ export type ClauseApproval = {
   approvedByName: string;
   /** Bar number, for a record that means something later. */
   approvedByBarNumber: string | null;
+  /**
+   * WHICH BAR, and which tier the clause belonged to at the time.
+   *
+   * Both stored on the row rather than derived: a clause's jurisdiction can
+   * move in a later library version, and this records what was true when the
+   * attorney signed off. `coversJurisdiction` is the only thing that reads
+   * them, and it is what answers "does this approval count for a lease here".
+   *
+   * Nullable because the columns were added to an existing table
+   * (`20260905200000_approval_jurisdiction`). There were zero rows, so nothing
+   * carries null in practice — and an approval that did would cover nothing,
+   * which is the safe direction.
+   */
+  clauseJurisdiction: string | null;
+  barJurisdiction: string | null;
   approvedAt: Date;
   notes: string | null;
 };

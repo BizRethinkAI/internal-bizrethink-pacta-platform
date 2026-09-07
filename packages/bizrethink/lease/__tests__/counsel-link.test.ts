@@ -3,10 +3,25 @@ import { describe, expect, it } from 'vitest';
 
 const router = readFileSync(new URL('../../server-only/trpc/lease-builder-router.ts', import.meta.url), 'utf8');
 
-const proc = (name: string) => {
-  const i = router.indexOf(`${name}: `);
+/*
+  To the next procedure definition, not a fixed byte count.
 
-  return i === -1 ? '' : router.slice(i, i + 2200);
+  This read `slice(i, i + 2200)`, and adding a comment to `openLibrary` pushed
+  `whyThisClause` past 2200 bytes — the test went red for a change that moved
+  nothing it was testing. `findings-wiring.test.ts` already had the boundary
+  version; this is the same one.
+*/
+const proc = (name: string) => {
+  const start = router.indexOf(`${name}: `);
+
+  if (start === -1) {
+    return '';
+  }
+
+  const rest = router.slice(start + name.length);
+  const next = rest.search(/\n {4}\w+: (?:authenticatedProcedure|procedure)/);
+
+  return name + (next === -1 ? rest : rest.slice(0, next));
 };
 
 /*
