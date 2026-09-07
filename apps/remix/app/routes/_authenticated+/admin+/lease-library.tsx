@@ -1,3 +1,9 @@
+import {
+  JURISDICTION_TIERS,
+  jurisdictionLabel,
+  jurisdictionName,
+  PORTABLE_TIERS,
+} from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
 import { outstandingFindings } from '@bizrethink/customizations/lease/clauses/findings';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
@@ -8,6 +14,7 @@ import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { msg } from '@lingui/core/macro';
 import {
@@ -75,7 +82,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   /*
     THE LIBRARY IS INSTANCE CONTENT; ITS SHARE LINKS ARE NOT — YET.
 
-    `clauseLibrary.list` reads FL_LIBRARY and the approval table and ignores the
+    `clauseLibrary.list` reads the clause library and the approval table and
+    ignores the
     organisationId entirely for data; it uses it only for `assertAccess`. But
     `BizrethinkLibraryReview` — the counsel-review share links — carries an
     organisationId column, so listing and creating one still needs an
@@ -123,6 +131,13 @@ type FindingRow = {
 type ClauseRow = {
   slug: string;
   version: number;
+  /*
+    THE FIELD THIS PAGE NEVER RECEIVED. `clauseLibrary.list` did not send it, so
+    the page rendered 64 clauses flat under a heading calling them Florida's —
+    while `libraryFor()` had been splitting them into 36 portable and 28 Florida
+    since 2026-09-06.
+  */
+  jurisdiction: string;
   section: string;
   heading: string;
   body: string;
@@ -136,6 +151,8 @@ type ClauseRow = {
     | { kind: 'implements'; citation: string }
     | { kind: 'discretionary' };
   effectiveStatus: string;
+  /** Does the recorded approval cover a lease in the jurisdiction being counted? */
+  approvedForJurisdiction: boolean;
   fingerprint: string;
   approval: {
     approvedByName: string;
@@ -149,7 +166,22 @@ type ClauseRow = {
 export default function ClauseLibraryPage() {
   const { organisationId } = useLoaderData<typeof loader>();
 
-  const library = trpc.bizrethink.leaseBuilder.clauseLibrary.list.useQuery({ organisationId });
+  /*
+    WHICH STATE'S LEASE THE PAGE IS TALKING ABOUT.
+
+    One control, two jobs, and they are the same job. It decides which library a
+    counsel link is minted against, and it decides what "36 of 64 approved"
+    means — because an approval recorded by an attorney admitted in one state
+    may or may not count for a lease in another, and a bare count that does not
+    say which state is a number nobody can act on.
+
+    One option today. The library holds Florida clauses and nothing else, so
+    offering more would be a lie about what can be reviewed. Adding the second
+    is one entry in `ZLeaseJurisdiction` and one <option> below.
+  */
+  const [jurisdiction, setJurisdiction] = useState<'US-FL' | 'US-NC'>('US-FL');
+
+  const library = trpc.bizrethink.leaseBuilder.clauseLibrary.list.useQuery({ organisationId, jurisdiction });
 
   /*
     Sending the library to counsel. The approval form has always asked for an
@@ -224,15 +256,40 @@ export default function ClauseLibraryPage() {
   };
 
   const clauses = (library.data?.clauses ?? []) as unknown as ClauseRow[];
-  const published = clauses.filter((clause) => clause.effectiveStatus === 'published').length;
+
+  /*
+    COUNTED THROUGH `coversJurisdiction`, on the server. It used to count
+    `effectiveStatus === 'published'`, which answers "was this approved" and not
+    "does that approval cover the lease I am about to assemble" — the same
+    question the counsel badge asks, so both now come from the one helper.
+  */
+  const published = clauses.filter((clause) => clause.approvedForJurisdiction).length;
+
+  /*
+    Grouped by the law each clause depends on. The rows arrive in
+    `inReviewOrder`, so a group's members are already in document order and this
+    only has to split them.
+  */
+  const tiers = JURISDICTION_TIERS.map((tier) => ({
+    tier,
+    rows: clauses.filter((clause) => clause.jurisdiction === tier),
+  })).filter((group) => group.rows.length > 0);
 
   return (
     <div className="mx-auto w-full max-w-screen-lg px-4 pb-16 md:px-8">
       <div className="mt-8">
         <h1 className="font-semibold text-3xl">Clause library</h1>
+        {/*
+          THE OLD HEADING WAS FALSE FOR 36 OF 64. It read "Every clause a
+          Florida lease can be assembled from", which is true as a set and reads
+          as a claim that all of them are Florida law. Most of them are not:
+          they turn on no state's law at all, which is the whole reason a second
+          state is a filter rather than a second copy of the library.
+        */}
         <p className="mt-1 max-w-2xl text-muted-foreground">
-          Every clause a Florida lease can be assembled from. A clause reaches a third party only once an attorney has
-          approved the exact words below.
+          Every clause the library holds, grouped by the law it depends on. A Florida lease is assembled from the
+          Florida clauses plus the ones that turn on no state&rsquo;s law. A clause reaches a third party only once an
+          attorney has approved the exact words below.
         </p>
       </div>
 
@@ -240,7 +297,8 @@ export default function ClauseLibraryPage() {
         <Alert className="mt-6" variant={published === clauses.length ? 'default' : 'warning'}>
           <ShieldCheck className="h-4 w-4" />
           <AlertTitle>
-            {published} of {clauses.length} clauses approved
+            {published} of {clauses.length} clauses carry an approval that covers a {jurisdictionName(jurisdiction)}{' '}
+            lease
           </AlertTitle>
           <AlertDescription>
             {published === clauses.length
@@ -282,7 +340,9 @@ export default function ClauseLibraryPage() {
               <li key={row.id} className="flex items-start justify-between gap-4 rounded border p-3">
                 <div>
                   <p className="font-medium text-sm">{row.reviewerName}</p>
-                  <p className="text-muted-foreground text-xs">{row.reviewerEmail}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {row.reviewerEmail} · {jurisdictionLabel(row.jurisdiction)}
+                  </p>
                   {/*
                     Two live links for the same person rendered as identical
                     cards on the tenant reviewer page, and the wrong one got
@@ -338,6 +398,29 @@ export default function ClauseLibraryPage() {
               />
             </div>
 
+            {/*
+              WHICH LIBRARY GOES ON THE LINK. Every link used to carry all 64
+              clauses whatever it was for. One option, because the library holds
+              one state — the control exists so that adding the second is a line
+              here rather than a redesign, and so the page says out loud that a
+              link covers a jurisdiction.
+            */}
+            <div>
+              <Label htmlFor="counsel-jurisdiction">Which library</Label>
+              <Select value={jurisdiction} onValueChange={(value) => setJurisdiction(value as 'US-FL' | 'US-NC')}>
+                <SelectTrigger id="counsel-jurisdiction" className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="US-FL">A Florida lease</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-muted-foreground text-xs">
+                The link carries the clauses that reach a lease in this state — the ones that turn on its law, plus the
+                ones that turn on no state&rsquo;s law.
+              </p>
+            </div>
+
             {share.error && (
               <Alert variant="destructive">
                 <AlertDescription>{share.error.message}</AlertDescription>
@@ -352,6 +435,7 @@ export default function ClauseLibraryPage() {
                     organisationId,
                     reviewerName: counselName.trim(),
                     reviewerEmail: counselEmail.trim(),
+                    jurisdiction,
                   })
                 }
               >
@@ -437,22 +521,41 @@ export default function ClauseLibraryPage() {
         </p>
       )}
 
-      <ul className="mt-8 space-y-2">
-        {clauses.map((clause) => (
-          <ClauseRowItem
-            key={clause.slug}
-            clause={clause}
-            /*
-              Shown on the row rather than only discovered on submit. The guard
-              in `approve` refuses, but a refusal after somebody has typed a
-              name, a bar number and a jurisdiction is a worse way to learn it.
-            */
-            outstanding={stillOpen.filter((row) => row.clauseSlug === clause.slug).length}
-            organisationId={organisationId}
-            onApproved={() => void library.refetch()}
-          />
-        ))}
-      </ul>
+      {/*
+        GROUPED BY THE LAW EACH CLAUSE DEPENDS ON, which this page never showed.
+        Sixty-four rows in module-concatenation order told a reviewer nothing
+        about which of them their admission covers, and the split has been real
+        in `libraryFor()` since 2026-09-06.
+      */}
+      {tiers.map((group) => (
+        <section key={group.tier} className="mt-8">
+          <h2 className="font-semibold text-lg">{jurisdictionLabel(group.tier)}</h2>
+          <p className="mt-0.5 text-muted-foreground text-sm">
+            {group.rows.length} {group.rows.length === 1 ? 'clause' : 'clauses'} ·{' '}
+            {PORTABLE_TIERS.has(group.tier)
+              ? 'In every state\u2019s library.'
+              : `Only in a ${jurisdictionName(group.tier)} lease.`}
+          </p>
+
+          <ul className="mt-3 space-y-2">
+            {group.rows.map((clause) => (
+              <ClauseRowItem
+                key={clause.slug}
+                clause={clause}
+                /*
+                  Shown on the row rather than only discovered on submit. The
+                  guard in `approve` refuses, but a refusal after somebody has
+                  typed a name, a bar number and a jurisdiction is a worse way
+                  to learn it.
+                */
+                outstanding={stillOpen.filter((row) => row.clauseSlug === clause.slug).length}
+                organisationId={organisationId}
+                onApproved={() => void library.refetch()}
+              />
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   );
 }
@@ -585,7 +688,14 @@ const ClauseRowItem = ({
     },
   });
 
-  const approved = clause.effectiveStatus === 'published';
+  /*
+    Approved FOR THE JURISDICTION THE PAGE IS COUNTING, so the badge and the
+    header count cannot disagree. `effectiveStatus` still arrives on the row and
+    answers the narrower "is there a current approval at all"; nothing on this
+    page reads it, and that is deliberate — two badges disagreeing about the
+    word "approved" is worse than one badge answering the narrower question.
+  */
+  const approved = clause.approvedForJurisdiction;
   const lapsed = clause.approval?.lapsed === true;
 
   return (
@@ -606,6 +716,12 @@ const ClauseRowItem = ({
             <p className="mt-0.5 font-mono text-muted-foreground text-xs">
               {clause.slug} · v{clause.version} · {clause.section}
             </p>
+            {/*
+              Repeated on the row, not only in the group heading. A row is read
+              expanded, scrolled to, and screenshotted into an email, and in all
+              three the heading is off-screen.
+            */}
+            <p className="mt-0.5 text-muted-foreground text-xs">{jurisdictionLabel(clause.jurisdiction)}</p>
             {/*
               WHY THIS CLAUSE EXISTS. The page used to show the slug and the
               section — true, and useless to a reviewer, who cannot tell a
@@ -738,9 +854,22 @@ const ClauseRowItem = ({
                   placeholder="Florida"
                   onChange={(e) => setAdmitted(e.target.value)}
                 />
+                {/*
+                  THIS SENTENCE USED TO ANSWER THE QUESTION COUNSEL WAS ASKED.
+                  It said clauses depending on no state's law "may be approved
+                  by any US admission" — the permissive reading, which
+                  `approval-jurisdiction.ts` records as provisional and pending
+                  counsel, stated to a user as settled law. Advice-shaped
+                  strings are banned by docs/engineering-standard.md, and this
+                  was worse than advice: it was a legal conclusion about the
+                  very thing the review is meant to establish.
+
+                  What replaces it says only what the software does with the
+                  value, which is all this field needs to explain.
+                */}
                 <p className="mt-1 text-muted-foreground text-xs">
-                  The bar this attorney is admitted in. A clause may be approved only by someone admitted where it
-                  applies; clauses that depend on no state&rsquo;s law may be approved by any US admission.
+                  The bar this attorney is admitted in. It is checked against this clause&rsquo;s jurisdiction (
+                  {jurisdictionLabel(clause.jurisdiction)}) before the approval is recorded.
                 </p>
               </div>
 
