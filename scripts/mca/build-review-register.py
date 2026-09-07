@@ -1,5 +1,17 @@
 """Derive the review register vendored into pacta from the two full finding files.
 
+Two steps, and both are part of regenerating it:
+
+    python3 scripts/mca/build-review-register.py \\
+        packages/bizrethink/mca/clauses/source-documents/review-register.json
+    npx biome format --write packages/bizrethink/mca/clauses/source-documents
+
+The second is not optional and not cosmetic: `biome format` is a BLOCKING CI
+gate on packages/bizrethink, and biome and json.dumps disagree about when a
+short array stays on one line. Skipping it produces a file that is correct and
+red. Run both and the output is byte-stable, so a regeneration against an
+unchanged lombard-contracts is an empty diff.
+
 Deterministic and re-runnable: anyone holding lombard-contracts can run this and
 diff the result. What it drops is `evidence`, `consequence` and `fix` -- the
 long-form fields -- because what a clause in pacta needs from a review is that
@@ -9,7 +21,11 @@ import hashlib, json, subprocess, sys
 from pathlib import Path
 
 REPO = Path.home() / 'github/lombard/lombard-contracts'
-KEEP = ('id', 'severity', 'category', 'document', 'locus', 'finding', 'decides')
+# A survived finding and a refuted one have different shapes in the source
+# files: refuted entries carry `id`, `finding` and `why` and nothing else.
+# Both are kept as they are rather than padded into one schema, because a
+# refuted finding genuinely has no severity or route -- it was withdrawn.
+KEEP = ('id', 'severity', 'category', 'document', 'locus', 'finding', 'decides', 'why')
 
 commit = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'],
                         capture_output=True, text=True).stdout.strip()
@@ -22,7 +38,7 @@ for review, fname in (('REVIEW-01', 'REVIEW-01-findings.json'),
     entries = []
     for status in ('survived', 'refuted'):
         for f in doc.get(status, []):
-            e = {k: f.get(k) for k in KEEP}
+            e = {k: f[k] for k in KEEP if k in f}
             e['status'] = status
             e['review'] = review
             entries.append(e)
@@ -51,6 +67,11 @@ out = {
                         'it says -- the argument lives in the source repository '
                         'and is not reproduced here.'),
     '_dropped': ['evidence', 'consequence', 'fix'],
+    '_knownDefect': ('REVIEW-01 uses the id `frpa-cross-reference-titles-wrong` '
+                     'for TWO different findings -- one against FL/GA/KS, one against '
+                     'LA/MO/TX/UT. Finding ids are therefore not unique and this file '
+                     'does not pretend otherwise; `examination.ts` resolves an id to a '
+                     'LIST and names the ambiguity rather than silently keeping one.'),
     'reviews': reviews,
 }
 

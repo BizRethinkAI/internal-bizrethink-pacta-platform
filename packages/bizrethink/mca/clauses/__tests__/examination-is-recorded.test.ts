@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { FINDINGS_BY_ID, findingsFor, REVIEWS } from '../examination';
+import { AMBIGUOUS_FINDING_IDS, FINDINGS_BY_ID, findingsFor, REVIEWS } from '../examination';
 import { ALL_MCA_CLAUSES } from '../library';
 
 /**
@@ -36,10 +36,10 @@ describe('no clause enters the library unexamined', () => {
   )('%s only names findings that exist', (_slug, clause) => {
     for (const examination of clause.examinedBy) {
       for (const id of examination.findings) {
-        const finding = FINDINGS_BY_ID.get(id);
+        const found = FINDINGS_BY_ID.get(id) ?? [];
 
-        expect(finding, `${clause.slug} names a finding that is not in the register: ${id}`).toBeDefined();
-        expect(finding?.review).toBe(examination.review);
+        expect(found.length, `${clause.slug} names a finding that is not in the register: ${id}`).toBeGreaterThan(0);
+        expect(found.some((finding) => finding.review === examination.review)).toBe(true);
       }
     }
   });
@@ -51,10 +51,19 @@ describe('no clause enters the library unexamined', () => {
    * this asserts a clause cannot claim a refuted finding without the register
    * agreeing.
    */
-  it('the register knows which findings were refuted', () => {
-    const refuted = [...FINDINGS_BY_ID.values()].filter((finding) => finding.status === 'refuted');
+  it('the register knows which findings were refuted, and why', () => {
+    const refuted = [...FINDINGS_BY_ID.values()].flat().filter((finding) => finding.status === 'refuted');
 
-    expect(refuted.length).toBeGreaterThan(0);
+    expect(refuted.length).toBe(5);
+
+    // A refuted finding carries `why` and carries no severity or route, because
+    // it was withdrawn and genuinely has neither. Padding the shape would print
+    // an empty severity beside it and read as missing data.
+    for (const finding of refuted) {
+      expect(finding.why).toBeDefined();
+      expect(finding.severity).toBeUndefined();
+      expect(finding.decides).toBeUndefined();
+    }
   });
 
   it('the register holds both reviews and every finding is reachable by id', () => {
@@ -62,7 +71,24 @@ describe('no clause enters the library unexamined', () => {
 
     const total = REVIEWS.reduce((sum, review) => sum + review.findings.length, 0);
 
-    expect(FINDINGS_BY_ID.size).toBe(total);
+    expect([...FINDINGS_BY_ID.values()].flat().length).toBe(total);
+  });
+
+  /**
+   * A finding id is not unique, and the test that assumed it was is how that
+   * was found.
+   *
+   * REVIEW-01 gives `frpa-cross-reference-titles-wrong` to two findings — one
+   * against the Florida, Georgia and Kansas disclosures, one against Louisiana,
+   * Missouri, Texas and Utah. Same defect, different documents, same name.
+   *
+   * Pinned rather than tolerated. A map keyed by id would have kept one and
+   * dropped the other in silence; this asserts the exact set, so a
+   * regeneration that introduces a second collision fails here instead of
+   * quietly hiding a finding from whoever is reading the clause that cites it.
+   */
+  it('names the one id the reviews use twice, and no other', () => {
+    expect(AMBIGUOUS_FINDING_IDS).toEqual(['frpa-cross-reference-titles-wrong']);
   });
 
   /**
@@ -81,6 +107,75 @@ describe('no clause enters the library unexamined', () => {
 
     for (const clause of withFindings) {
       expect(findingsFor(clause).length).toBeGreaterThan(0);
+    }
+  });
+});
+
+/**
+ * The shape of what the first instrument actually brought in.
+ *
+ * Asserted rather than described, because the numbers are the whole claim this
+ * import makes and prose about them rots. If a later change quietly stops a
+ * clause citing a finding, or cites one that was refuted, this is what says so.
+ */
+describe('the ISO Partner Referral Agreement, as imported', () => {
+  const clauses = ALL_MCA_CLAUSES.filter((clause) => clause.instruments.includes('iso-pra'));
+
+  it('is all twenty-four of its clauses', () => {
+    expect(clauses).toHaveLength(24);
+  });
+
+  /**
+   * REVIEW-01 read twenty-one of them. The three it did not — A.2 *When
+   * Commission Is Earned*, A.6 *Sole Compensation* and 1.6 *Representatives* —
+   * are the ones Phase 0's appendix listed as unexamined for this document, and
+   * REVIEW-02 is where they were finally read.
+   *
+   * §2.6 is the fourth and it is not in either census: it did not exist when
+   * REVIEW-01 ran (that review's `iso-no-952-transmission-or-evidence-clause`
+   * reports its absence), and Phase 0's appendix was built before it was
+   * counted. REVIEW-02 read it in passing, against 1.6.
+   */
+  it('names REVIEW-02 for exactly the four clauses REVIEW-01 did not read', () => {
+    const reviewedByTwoOnly = clauses
+      .filter((clause) => clause.examinedBy.every((examination) => examination.review === 'REVIEW-02'))
+      .map((clause) => clause.number)
+      .sort();
+
+    expect(reviewedByTwoOnly).toEqual(['1.6', '2.6', 'A.2', 'A.6']);
+  });
+
+  it('cites seventeen distinct findings, none of them refuted', () => {
+    const cited = new Set(clauses.flatMap((clause) => clause.examinedBy).flatMap((e) => e.findings));
+
+    expect(cited.size).toBe(17);
+
+    for (const finding of clauses.flatMap((clause) => findingsFor(clause))) {
+      expect(finding.status, `${finding.id} was refuted but is cited as a finding`).toBe('survived');
+    }
+  });
+
+  /**
+   * Four REVIEW-01 findings mentioning this agreement are attached to no clause
+   * of it, and that is deliberate: two are against the signature block and the
+   * section headings, one is against the FRPA's §7.21, and one against a row of
+   * the California disclosure. None is about a clause here.
+   *
+   * Pinned so that "every finding has a home" never gets adopted as a tidiness
+   * goal — it would put a finding in front of a reviewer reading a clause it is
+   * not about, which is how findings start being ignored.
+   */
+  it('leaves the four document-level findings unattached', () => {
+    const cited = new Set(clauses.flatMap((clause) => clause.examinedBy).flatMap((e) => e.findings));
+
+    for (const id of [
+      'iso-signature-dates-share-effective-date-field',
+      'iso-inconsistent-section-numbering',
+      'iso-channel-vs-never-cold-call',
+      'ca-broker-row-contradicts-frpa-and-iso',
+    ]) {
+      expect(FINDINGS_BY_ID.has(id), `${id} is missing from the register`).toBe(true);
+      expect(cited.has(id)).toBe(false);
     }
   });
 });

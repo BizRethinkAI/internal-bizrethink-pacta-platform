@@ -4,6 +4,7 @@
   "_commit": "b48b5e4cadbc8bae51eef5560283513e74739f28",
   "_whatThisProves": "That a finding id a clause names is a finding that was actually raised, what it was about and where it routed. It does NOT prove the finding says what a clause claims it says -- the argument lives in the source repository and is not reproduced here.",
   "_dropped": ["evidence", "consequence", "fix"],
+  "_knownDefect": "REVIEW-01 uses the id `frpa-cross-reference-titles-wrong` for TWO different findings -- one against FL/GA/KS, one against LA/MO/TX/UT. Finding ids are therefore not unique and this file does not pretend otherwise; `examination.ts` resolves an id to a LIST and names the ambiguity rather than silently keeping one.",
   "reviews": [
     {
       "review": "REVIEW-01",
@@ -87,12 +88,8 @@
         },
         {
           "id": "bank-instruction-and-damages-waiver-residue",
-          "severity": null,
-          "category": null,
-          "document": null,
-          "locus": null,
           "finding": "§4.1 leaves standing an authorisation for Buyer to instruct the merchant's own depository bank without independent verification, plus a waiver of the merchant's damages claims against that bank — language whose only function is a deposit-account debit rail.",
-          "decides": null,
+          "why": "Misreads §4.1. The quoted sentences are real, but \"The foregoing authorizations\" refers back to the two preceding paragraphs, which grant information and verification authorizations only (\"the information and authorizations necessary to verify Merchant's Receipts into the Account\"; processor/third-party disclosure). Nothing in the quoted text authorizes any debit, and the finding's load-bearing consequence — \"this is the written debit authority the site promises does not exist\" — is contradicted by §4.16 (\"this authorization does not, by itself, authorize any debit, transfer, or withdrawal — collection mechanisms are governed exclusively by Section 2.3\") and §2.2/§2.3. The repo's own PASS1 A4, written after reading the whole FRPA, concludes \"No ACH-debit path exists.\" Invariant B4 forbids a pre-signed debit authorisation; this is not one. Telling counsel there is a live debit rail in §4.1 is a dead end.",
           "status": "refuted",
           "review": "REVIEW-01"
         },
@@ -131,12 +128,8 @@
         },
         {
           "id": "ca-ach-program-fee-disclosed-nowhere",
-          "severity": null,
-          "category": null,
-          "document": null,
-          "locus": null,
           "finding": "A $395 ACH program fee is deducted from the merchant's proceeds but appears in no document: not in the finance charge, not in FRPA §1.4, not in FRPA Appendix A, and not as any AcroForm field in the FRPA.",
-          "decides": null,
+          "why": "REFUTED — treats a stale FRPA v3 leftover in a smoke-test fixture as a live charge. `ach_program_fee` appears ONLY in sample-data/frpa.json. It is absent from templates/frpa.fields.json (59 fields, verified), from FRPA §1.4 and Appendix A, and — decisively — from the entire lombard-platform codebase (grep for ach_program_fee across src/ returns nothing). Production computes `disbursementAmount = advanceAmount - feesDeducted`, so the real gap is the origination fee alone; the $2,895 / $395 gap does not exist in any deal the product can produce. The only true residual is a stale field in a test fixture, which is not a blocker-adjacent statutory finding. (The v3 provenance is confirmed by CA-SB-362-2025-2026-Amendment.md, which lists ach_program_fee among FRPA v3's §1 grid fields.)",
           "status": "refuted",
           "review": "REVIEW-01"
         },
@@ -175,12 +168,8 @@
         },
         {
           "id": "ca-estimated-payment-not-derived-from-split-rate",
-          "severity": null,
-          "category": null,
-          "document": null,
-          "locus": null,
           "finding": "The estimated payment and estimated term are back-solved from an assumed 150-day term rather than calculated from the disclosed Specified Percentage and monthly income estimate, and are inconsistent with them by an order of magnitude.",
-          "decides": null,
+          "why": "REFUTED — the production pipeline does precisely what the finding demands. lombard-platform/src/lib/offer-estimates.ts: `dailyHoldback = Math.round(dailyAvg * holdbackPct)` where dailyAvg = avg_monthly_processing / days_per_month, then `estimated_payback_days = Math.round(payback / dailyHoldback)`. Payment is derived FROM the split rate times the income projection, and the term is derived from that payment — not back-solved from an assumed 150 days. The $496.66/150-day inconsistency exists only in the hand-written smoke-test fixture. The finding's own fix ('add a pipeline assertion that estimated_payment is within tolerance of specified_percentage x income / days') is already the implementation.",
           "status": "refuted",
           "review": "REVIEW-01"
         },
@@ -296,12 +285,8 @@
         },
         {
           "id": "ca-total-payment-amount-understated",
-          "severity": null,
-          "category": null,
-          "document": null,
-          "locus": null,
           "finding": "Estimated Total Payment Amount is computed as recipient funds plus finance charge, not as the total the merchant will actually deliver, and so is $2,895 below the Purchased Amount the FRPA obliges the merchant to pay.",
-          "decides": null,
+          "why": "REFUTED — misreads a smoke-test fixture as the product. sample-data/ca-disclosure.json is self-labelled 'Sample data for B.6 ... smoke test' and its $71,605 is a hand-written value. The real populator, lombard-platform/src/lib/contract-builders.ts:981, emits `estimated_total_payment_amount: formatCurrency(paybackAmount)` — i.e. exactly the $74,500 Purchased Amount the finding's own fix demands. The claimed computation 'recipient funds plus finance charge' exists nowhere in code. No defect.",
           "status": "refuted",
           "review": "REVIEW-01"
         },
@@ -2369,12 +2354,8 @@
         },
         {
           "id": "el-3-18-entire-agreement-vs-the-cross-document-never-pay-twice-promise",
-          "severity": null,
-          "category": null,
-          "document": null,
-          "locus": null,
           "finding": "The single most important merchant protection in the pair - that equipment is never charged twice - is stated as two reciprocal promises in two agreements with different counterparties, and one of those agreements contains an entire-agreement clause.",
-          "decides": null,
+          "why": "REFUTED - the quoted clauses are real but the mechanism is misread, and the misreading is what makes it a blocker. An entire-agreement clause integrates the writing it sits in: it excludes prior and extrinsic agreements and understandings, not the clauses of its own document. Equipment Lease 3.6 and 3.18 are both clauses of the Equipment Lease, so 3.18 cannot exclude 3.6, and 3.6 is not a promise the lessee has to reach outside the four corners to reach: it ends \"You will never pay for the same equipment twice\" - an unconditional promise by Lombard Pay LLC, in Lombard Pay LLC's own integrated document, to the person who signed it. The different-obligor half fails for the same reason. FRPA 1.5 carries the reciprocal operative sentence - \"In no event does Merchant pay for the same equipment under both this Agreement and an Equipment Lease Agreement\" - inside the FRPA, binding Lombard Capital LLC. The merchant is a party to both instruments and holds each promise directly against the entity that gave it; neither promise depends on enforcing the other entity's document. 3.18's \"supersedes any previous agreements\" cannot reach the FRPA in any event: it is limited to agreements \"between the parties\", the FRPA's counterparty is a different entity, and the two are executed as a contemporaneous package, each cross-referencing the other as live (EL 3.6 \"any future receivables purchase agreement between you and any of our affiliates\"; FRPA 1.5 \"a separate Equipment Lease Agreement with Lombard Pay LLC\"). The finding's own fix confirms the misdiagnosis - option (b) proposes carving 3.6 out of 3.18, a carve-out for a problem that cannot arise. REVIEW-01's `equipment-charged-in-both-documents` fix is as strong as it reads. Verified by reading both documents end to end from the extracted word/document.xml of sources/Lombard_Equipment_Lease_Agreement_v1.docx and sources/Lombard_FRPA_v4.docx.",
           "status": "refuted",
           "review": "REVIEW-02"
         },
