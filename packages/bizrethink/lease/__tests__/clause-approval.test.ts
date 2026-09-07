@@ -46,6 +46,8 @@ const approvalFor = (c: Clause, over: Partial<ClauseApproval> = {}): ClauseAppro
   fingerprint: clauseFingerprint(c),
   approvedByName: 'J. Reviewer',
   approvedByBarNumber: 'FL123456',
+  clauseJurisdiction: c.jurisdiction,
+  barJurisdiction: 'US-FL',
   approvedAt: new Date('2026-09-01T00:00:00Z'),
   notes: null,
   ...over,

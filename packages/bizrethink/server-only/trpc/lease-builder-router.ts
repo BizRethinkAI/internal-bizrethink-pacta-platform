@@ -8,9 +8,11 @@ import { z } from 'zod';
 
 import { lookupAddress } from '../../lease/address/census';
 import { clauseFingerprint, isApprovalCurrent, libraryFingerprint } from '../../lease/clauses/approval';
-import { admissionBlocks, normaliseJurisdiction } from '../../lease/clauses/approval-jurisdiction';
+import type { ClauseJurisdiction } from '../../lease/clauses/approval-jurisdiction';
+import { admissionBlocks, coversJurisdiction, normaliseJurisdiction } from '../../lease/clauses/approval-jurisdiction';
 import { toCustomClause } from '../../lease/clauses/custom';
 import { findingsBlock } from '../../lease/clauses/findings';
+import { ALL_CLAUSES, inReviewOrder, libraryFor } from '../../lease/clauses/library';
 import { FL_LIBRARY } from '../../lease/clauses/us-fl';
 import { whyThisClause } from '../../lease/clauses/why-this-clause';
 import { scanCustomClauses } from '../../lease/engine/guardrails';
@@ -59,6 +61,17 @@ import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '.
  * in: a half-finished interview must be saveable, so `saveStep` accepts an
  * incomplete answer set and `validate` is what refuses to let it be sent.
  */
+
+/**
+ * The jurisdictions a lease — and so a review link — can be FOR.
+ *
+ * Deliberately narrower than `ClauseJurisdiction`. `generic` and `US` are tiers
+ * a clause can belong to, not places a lease is signed, and `libraryFor` reads
+ * its argument as a state. One value is live today because the library holds
+ * one state's clauses; adding the second is one entry here and one option on
+ * the form.
+ */
+const ZLeaseJurisdiction = z.enum(['US-FL', 'US-NC']);
 
 const ZCustomClause = z.object({
   heading: z.string().min(1),
@@ -1559,7 +1572,7 @@ export const leaseBuilderRouter = router({
   /**
    * The clause library, and attorney sign-off on it.
    *
-   * This is the gate the whole product waits behind: 52 clauses drafted by a
+   * This is the gate the whole product waits behind: 64 clauses drafted by a
    * language model and reviewed by nobody. Until a clause has a current
    * approval it renders only where draft rendering is explicitly granted, and
    * never reaches a third party.
@@ -1596,59 +1609,99 @@ export const leaseBuilderRouter = router({
   }),
 
   clauseLibrary: router({
-    list: authenticatedProcedure.input(z.object({ organisationId: z.string() })).query(async ({ ctx, input }) => {
-      await assertAccess(input.organisationId, ctx.user.id);
+    /**
+     * The whole library, for staff.
+     *
+     * EVERY clause, not `libraryFor(...)` — staff have to be able to reach a
+     * clause of any jurisdiction to record an approval against it, which is the
+     * opposite of the counsel link's job. The `jurisdiction` input is a LENS,
+     * not a filter: it says which state's lease the approval counts are being
+     * asked about, because "36 of 64 approved" is meaningless without one.
+     */
+    list: authenticatedProcedure
+      .input(
+        z.object({
+          organisationId: z.string(),
+          jurisdiction: ZLeaseJurisdiction.default('US-FL'),
+        }),
+      )
+      .query(async ({ ctx, input }) => {
+        await assertAccess(input.organisationId, ctx.user.id);
 
-      const approvals = await loadClauseApprovals();
+        const approvals = await loadClauseApprovals();
 
-      return {
-        clauses: FL_LIBRARY.map((clause) => {
-          const approval = approvals.get(clause.slug) ?? null;
-          const current = isApprovalCurrent(clause, approval);
+        return {
+          jurisdiction: input.jurisdiction,
+          /*
+            Grouped by tier and then in document order. The page rendered in
+            module-concatenation order, which is the order the clause files
+            happen to be spread in — invisible while the list was flat, and
+            plainly wrong the moment it is grouped.
+          */
+          clauses: inReviewOrder(ALL_CLAUSES).map((clause) => {
+            const approval = approvals.get(clause.slug) ?? null;
+            const current = isApprovalCurrent(clause, approval);
 
-          return {
-            slug: clause.slug,
-            version: clause.version,
-            section: clause.section,
-            heading: clause.heading,
-            body: clause.body,
-            placement: clause.placement,
-            requiredBy: clause.requiredBy ?? null,
-            sourceKind: clause.source.kind,
-            /*
+            return {
+              slug: clause.slug,
+              version: clause.version,
+              /*
+                THE FIELD NEITHER PAGE RECEIVED. The library has been split by
+                jurisdiction since 2026-09-06 and both review surfaces dropped
+                this on the way out, so 36 clauses that turn on no state's law
+                were shown as Florida's.
+              */
+              jurisdiction: clause.jurisdiction,
+              section: clause.section,
+              heading: clause.heading,
+              body: clause.body,
+              placement: clause.placement,
+              requiredBy: clause.requiredBy ?? null,
+              sourceKind: clause.source.kind,
+              /*
                 For a statute clause the approval IS the verbatim
                 verification — `verbatimVerifiedAt` has been null on every one
                 of these since they were transcribed, and it is what an
                 attorney confirming the wording actually settles.
               */
-            verbatimRequired: clause.source.kind === 'statute' && clause.source.verbatimRequired,
-            citation: clause.source.kind === 'statute' ? clause.source.citation : null,
-            verbatimVerifiedAt: clause.source.kind === 'statute' ? clause.source.verbatimVerifiedAt : null,
-            /*
-              Why the clause is in the library at all — the question the page
-              could not answer. Sent rather than derived in the UI so the
-              statutory walk stays the single source of the claim.
-            */
-            why: whyThisClause(clause),
-            codeStatus: clause.status,
-            effectiveStatus: statusWithApproval(clause, approvals),
-            fingerprint: clauseFingerprint(clause),
-            approval: approval
-              ? {
-                  approvedByName: approval.approvedByName,
-                  approvedByBarNumber: approval.approvedByBarNumber,
-                  approvedAt: approval.approvedAt,
-                  notes: approval.notes,
-                  // An approval that exists but no longer matches is shown
-                  // as lapsed rather than hidden — "it was approved, then
-                  // the text changed" is the useful thing to know.
-                  lapsed: !current,
-                }
-              : null,
-          };
-        }),
-      };
-    }),
+              verbatimRequired: clause.source.kind === 'statute' && clause.source.verbatimRequired,
+              citation: clause.source.kind === 'statute' ? clause.source.citation : null,
+              verbatimVerifiedAt: clause.source.kind === 'statute' ? clause.source.verbatimVerifiedAt : null,
+              /*
+                Why the clause is in the library at all — the question the page
+                could not answer. Sent rather than derived in the UI so the
+                statutory walk stays the single source of the claim.
+              */
+              why: whyThisClause(clause),
+              codeStatus: clause.status,
+              effectiveStatus: statusWithApproval(clause, approvals),
+              /*
+                WHETHER THE APPROVAL COUNTS HERE, which is a different question
+                from whether it is current. A current approval recorded by an
+                attorney admitted in one state may or may not carry to a lease in
+                another; `coversJurisdiction` holds that reading in one place and
+                this is one of its two callers.
+              */
+              approvedForJurisdiction:
+                statusWithApproval(clause, approvals) === 'published' &&
+                (approval === null || coversJurisdiction(approval, input.jurisdiction)),
+              fingerprint: clauseFingerprint(clause),
+              approval: approval
+                ? {
+                    approvedByName: approval.approvedByName,
+                    approvedByBarNumber: approval.approvedByBarNumber,
+                    approvedAt: approval.approvedAt,
+                    notes: approval.notes,
+                    // An approval that exists but no longer matches is shown
+                    // as lapsed rather than hidden — "it was approved, then
+                    // the text changed" is the useful thing to know.
+                    lapsed: !current,
+                  }
+                : null,
+            };
+          }),
+        };
+      }),
 
     /**
      * Send the library to a lawyer.
@@ -1669,6 +1722,17 @@ export const leaseBuilderRouter = router({
           organisationId: z.string(),
           reviewerName: z.string().min(1),
           reviewerEmail: z.string().email(),
+          /**
+           * WHICH LIBRARY THE ATTORNEY IS BEING SENT.
+           *
+           * A link used to carry all 64 clauses under a page headed "Florida
+           * lease clause library", 36 of which turn on no state's law. An
+           * attorney admitted in one state was being shown another state's
+           * clauses with nothing saying so, and the fingerprint pinned to all
+           * of them would have reported the library as moved on an edit to a
+           * clause the link never showed.
+           */
+          jurisdiction: ZLeaseJurisdiction,
         }),
       )
       .mutation(async ({ ctx, input }) => {
@@ -1681,7 +1745,10 @@ export const leaseBuilderRouter = router({
             token: prefixedId('clr', 32),
             reviewerName: input.reviewerName,
             reviewerEmail: input.reviewerEmail,
-            libraryFingerprint: libraryFingerprint(FL_LIBRARY),
+            jurisdiction: input.jurisdiction,
+            // Of the SCOPED library. `libraryFingerprint` already took a clause
+            // list, so this needed no signature change — only the right list.
+            libraryFingerprint: libraryFingerprint(libraryFor(input.jurisdiction)),
             createdByUserId: ctx.user.id,
             expiresAt: new Date(Date.now() + REVIEW_LINK_TTL_DAYS * 24 * 60 * 60 * 1000),
           },
@@ -1715,6 +1782,10 @@ export const leaseBuilderRouter = router({
           status: true,
           reviewerName: true,
           reviewerEmail: true,
+          // Which library went out on it. Two links to the same attorney for
+          // two states are otherwise identical cards, which is exactly the
+          // failure the "Current link" marker already exists for.
+          jurisdiction: true,
           expiresAt: true,
           createdAt: true,
         },
@@ -1764,6 +1835,7 @@ export const leaseBuilderRouter = router({
           status: true,
           expiresAt: true,
           reviewerName: true,
+          jurisdiction: true,
           libraryFingerprint: true,
         },
       });
@@ -1779,27 +1851,56 @@ export const leaseBuilderRouter = router({
 
       const approvals = await loadClauseApprovals();
 
+      /*
+        THE CLAUSES THIS LINK ACTUALLY COVERS. Every review link used to serve
+        all 64 clauses whatever it was for. `libraryFor` has existed since
+        2026-09-06 and this was the caller it never got.
+      */
+      const jurisdiction = share.jurisdiction as ClauseJurisdiction;
+      const library = libraryFor(jurisdiction);
+
       return {
         reviewerName: share.reviewerName,
+        jurisdiction,
         /*
           True when a clause has changed since the link was sent. The reviewer
           is told rather than left to discover that the words they are reading
           are not the words the landlord meant to send.
+
+          Compared against the SCOPED library, matching what `share` pinned.
+          Against the whole of it, a link for one state would go stale on an
+          edit to a clause it never showed — a warning the reader could not act
+          on, which is the fastest way to teach them to ignore the warning.
         */
-        libraryMoved: share.libraryFingerprint !== libraryFingerprint(FL_LIBRARY),
-        clauses: FL_LIBRARY.map((clause) => ({
-          slug: clause.slug,
-          version: clause.version,
-          section: clause.section,
-          heading: clause.heading,
-          body: clause.body,
-          placement: clause.placement,
-          why: whyThisClause(clause),
-          sourceKind: clause.source.kind,
-          verbatimRequired: clause.source.kind === 'statute' && clause.source.verbatimRequired,
-          verbatimVerifiedAt: clause.source.kind === 'statute' ? clause.source.verbatimVerifiedAt : null,
-          approved: statusWithApproval(clause, approvals) === 'published',
-        })),
+        libraryMoved: share.libraryFingerprint !== libraryFingerprint(library),
+        clauses: inReviewOrder(library).map((clause) => {
+          const approval = approvals.get(clause.slug) ?? null;
+
+          return {
+            slug: clause.slug,
+            version: clause.version,
+            // The tier this clause turns on. Dropped here until now, which is
+            // why the page could head 36 portable clauses as Florida law.
+            jurisdiction: clause.jurisdiction,
+            section: clause.section,
+            heading: clause.heading,
+            body: clause.body,
+            placement: clause.placement,
+            why: whyThisClause(clause),
+            sourceKind: clause.source.kind,
+            verbatimRequired: clause.source.kind === 'statute' && clause.source.verbatimRequired,
+            verbatimVerifiedAt: clause.source.kind === 'statute' ? clause.source.verbatimVerifiedAt : null,
+            /*
+              Approved FOR THIS LINK'S JURISDICTION. The badge is read by an
+              attorney deciding whether the clause still needs her, so it has to
+              mean "somebody's approval covers the lease you are reviewing this
+              for", not "somebody approved this once, somewhere".
+            */
+            approved:
+              statusWithApproval(clause, approvals) === 'published' &&
+              (approval === null || coversJurisdiction(approval, jurisdiction)),
+          };
+        }),
       };
     }),
 
@@ -1876,7 +1977,14 @@ export const leaseBuilderRouter = router({
       .mutation(async ({ input }) => {
         const share = await prisma.bizrethinkLibraryReview.findUnique({
           where: { token: input.token },
-          select: { id: true, status: true, expiresAt: true, reviewerName: true, reviewerEmail: true },
+          select: {
+            id: true,
+            status: true,
+            expiresAt: true,
+            reviewerName: true,
+            reviewerEmail: true,
+            jurisdiction: true,
+          },
         });
 
         const usable =
@@ -1893,7 +2001,16 @@ export const leaseBuilderRouter = router({
           accepts findings against anything, and a typo becomes a blocker
           nobody can clear because no clause page will ever show it.
         */
-        const clause = FL_LIBRARY.find((entry) => entry.slug === input.clauseSlug);
+        /*
+          Scoped to the link's own library, not the whole of it. A finding
+          against a clause the reviewer was never shown is a finding nobody can
+          answer in context — and after this change "the library" is not one
+          list any more, so validating against all of it would accept exactly
+          that.
+        */
+        const clause = libraryFor(share.jurisdiction as ClauseJurisdiction).find(
+          (entry) => entry.slug === input.clauseSlug,
+        );
 
         if (!clause) {
           throw new AppError(AppErrorCode.NOT_FOUND, { message: 'No such clause.' });
