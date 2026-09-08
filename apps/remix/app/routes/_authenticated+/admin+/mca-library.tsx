@@ -117,8 +117,9 @@ export default function AdminMcaLibraryPage() {
 
       <p className="mt-2 text-muted-foreground text-sm">
         <Trans>
-          The negotiated agreements — our contract text, not a regulator's. Conformity for the prescribed disclosure
-          forms is a separate page.
+          The negotiated agreements — our contract text, not a regulator's. Clauses name their parties by role ({'{{'}
+          funder{'}}'}, {'{{'}processor{'}}'}), and the documents below are one client's copy of them. Conformity for
+          the prescribed disclosure forms is a separate page.
         </Trans>
       </p>
 
@@ -376,7 +377,6 @@ const InstrumentCard = ({
         <ScrollText className="h-4 w-4 shrink-0 text-muted-foreground" />
         <h2 className="font-medium text-foreground">{instrument.title}</h2>
         <Badge variant="secondary">{COUNTERPARTY_LABEL[instrument.counterparty] ?? instrument.counterparty}</Badge>
-        <span className="text-muted-foreground text-sm">{instrument.entity}</span>
         <span className="ml-auto flex items-center gap-2">
           <Badge variant={SOURCE_VARIANT[instrument.sourceState]}>{SOURCE_LABEL[instrument.sourceState]}</Badge>
           <span className="text-muted-foreground text-sm">

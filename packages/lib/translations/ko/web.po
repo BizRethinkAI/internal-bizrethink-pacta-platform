@@ -12531,7 +12531,7 @@ msgid "The license key has been copied to your clipboard"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "The negotiated agreements — our contract text, not a regulator's. Conformity for the prescribed disclosure forms is a separate page."
+msgid "The negotiated agreements — our contract text, not a regulator's. Clauses name their parties by role ({{funder}}, {{processor}}), and the documents below are one client's copy of them. Conformity for the prescribed disclosure forms is a separate page."
 msgstr ""
 
 #. placeholder {0}: form.watch('name')

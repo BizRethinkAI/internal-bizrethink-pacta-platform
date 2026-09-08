@@ -3,6 +3,7 @@ import { agreementDigest, agreementExists, MissingAgreementError } from '../docu
 import { findingsFor, outstandingFindingsFor, REGISTER_AVAILABLE } from '../examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
 import { ALL_MCA_CLAUSES, inReviewOrder } from '../library';
+import { LOMBARD, type McaTenant } from '../parties';
 
 /**
  * The view model behind `/admin/mca-library`.
@@ -75,7 +76,6 @@ export type McaLibraryInstrumentView = {
   id: McaInstrument;
   title: string;
   counterparty: string;
-  entity: string;
   clauseCount: number;
   outstanding: number;
   sourceDocument: string;
@@ -90,15 +90,21 @@ const describeSource = (source: { kind: string; author?: string | null }): strin
       : 'Attorney-drafted — no named reviewer'
     : source.kind;
 
-const sourceState = (id: McaInstrument): SourceState => {
-  const instrument = INSTRUMENTS[id];
+/*
+  THE DOCUMENT IS THE TENANT'S, NOT THE INSTRUMENT'S. "The Future Receivables
+  Purchase Agreement" is a kind of document; the file, its digest and the date
+  its bodies were read are facts about ONE client's paper. Reading them off the
+  instrument is what made this library single-tenant while every test passed.
+*/
+const sourceState = (id: McaInstrument, tenant: McaTenant): SourceState => {
+  const doc = tenant.documents[id];
 
-  if (instrument.bodiesVerifiedAt === null || !agreementExists(instrument.sourceDocument)) {
+  if (doc === undefined || doc.bodiesVerifiedAt === null || !agreementExists(doc.file)) {
     return 'source-missing';
   }
 
   try {
-    return agreementDigest(instrument.sourceDocument) === instrument.sourceDigest ? 'verified' : 'digest-moved';
+    return agreementDigest(doc.file) === doc.digest ? 'verified' : 'digest-moved';
   } catch (error) {
     if (error instanceof MissingAgreementError) {
       return 'source-missing';
@@ -108,7 +114,7 @@ const sourceState = (id: McaInstrument): SourceState => {
   }
 };
 
-export const mcaLibrarySurface = () => {
+export const mcaLibrarySurface = (tenant: McaTenant = LOMBARD) => {
   const clauses: McaLibraryClauseView[] = inReviewOrder(ALL_MCA_CLAUSES).map((clause) => {
     const outstanding = new Set(outstandingFindingsFor(clause).map((finding) => finding.id));
 
@@ -151,12 +157,11 @@ export const mcaLibrarySurface = () => {
       id,
       title: INSTRUMENTS[id].title,
       counterparty: INSTRUMENTS[id].counterparty,
-      entity: INSTRUMENTS[id].entity,
       clauseCount: mine.length,
       outstanding: new Set(mine.flatMap((c) => c.findings.filter((f) => f.outstanding).map((f) => f.id))).size,
-      sourceDocument: INSTRUMENTS[id].sourceDocument,
-      bodiesVerifiedAt: INSTRUMENTS[id].bodiesVerifiedAt,
-      sourceState: sourceState(id),
+      sourceDocument: tenant.documents[id]?.file ?? '',
+      bodiesVerifiedAt: tenant.documents[id]?.bodiesVerifiedAt ?? null,
+      sourceState: sourceState(id, tenant),
     };
   });
 

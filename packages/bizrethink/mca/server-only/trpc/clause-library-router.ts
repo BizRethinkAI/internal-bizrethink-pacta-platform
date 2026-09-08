@@ -13,6 +13,7 @@ import {
 } from '../../clauses/approval';
 import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../../clauses/examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
+import { LOMBARD, resolveClauses } from '../../clauses/parties';
 import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview, reviewIsStale } from '../../review/link';
 import { toReadableAgreement } from '../../review/readable-agreement';
@@ -279,9 +280,22 @@ export const mcaClauseLibraryRouter = router({
       instrument: {
         id: instrument.id,
         title: instrument.title,
-        entity: instrument.entity,
         counterparty: instrument.counterparty,
       },
+      /*
+        WHOSE PAPER THE REVIEWER IS READING.
+
+        This was `instrument.entity` until the clause library was parameterised:
+        "Lombard Capital LLC" was a field on the Future Receivables Purchase
+        Agreement itself, which made the library one client's. It is a tenant
+        fact now, so it comes from the tenant.
+
+        THE SEAM: `BizrethinkMcaLibraryReview` has no tenant column, because it
+        was designed before there was a tenant to name. There is exactly one
+        today, so defaulting is honest rather than convenient — and this is the
+        line that changes when a second client's review link is minted.
+      */
+      parties: LOMBARD.parties,
       /*
         True when a clause has changed since the link was sent. The reviewer is
         told rather than left to discover that the words they are reading are
@@ -304,7 +318,17 @@ export const mcaClauseLibraryRouter = router({
         flat list in module-concatenation order, which is neither document order
         nor any other order a reader could name.
       */
-      sections: toReadableAgreement(clauses).map((section) => ({
+      /*
+        RESOLVED FOR THE TENANT BEFORE IT REACHES COUNSEL.
+
+        Clause bodies carry `{{funder}}`, `{{equipmentAffiliate}}` and
+        `{{processor}}` so the library is not one client's paperwork. An
+        attorney must not be shown those: she is reading to decide whether these
+        words may go to a merchant, and the words that go to a merchant name the
+        parties. Sending the general form would be asking her to approve text no
+        document contains.
+      */
+      sections: toReadableAgreement(resolveClauses(clauses, LOMBARD)).map((section) => ({
         ...section,
         clauses: section.clauses.map((readable) => {
           const clause = clauses.find((candidate) => candidate.slug === readable.slug);
