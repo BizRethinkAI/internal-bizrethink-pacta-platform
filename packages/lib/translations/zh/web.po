@@ -319,10 +319,20 @@ msgstr "{0, plural, other {你即将删除 # 个模板。}}"
 msgid "{0}"
 msgstr "{0}"
 
+#. placeholder {0}: result.provider ?? ''
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "{0} answered."
+msgstr ""
+
 #. placeholder {0}: team.name
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "{0} direct signing templates"
 msgstr "{0} 个直接签署模板"
+
+#. placeholder {0}: evidence.sourcesMoved.length
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "{0} document(s) changed since these clauses were transcribed from them"
+msgstr ""
 
 #. placeholder {0}: t(FRIENDLY_FIELD_TYPE[field.type])
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
@@ -1825,6 +1835,10 @@ msgstr "管理员已删除您的文档“{documentName}”。"
 msgid "An administrator has created a Documenso account for you."
 msgstr "管理员已为你创建了一个 Documenso 账户。"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "An API key for Gemini or Claude, used by the lease clause drafter. Stored encrypted at rest."
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
 msgstr "你在我们平台上提供的电子签名——无论是通过点击文档并输入姓名，还是通过我们提供的其他任何电子签署方式——都具有法律效力，其效力和可执行性与纸质手写签名完全相同。"
@@ -2161,6 +2175,7 @@ msgstr "API"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/email-transport-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 msgid "API key"
 msgstr "API 密钥"
 
@@ -2558,6 +2573,10 @@ msgstr "边框圆角"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Border radius size in REM units (e.g. 0.5rem)."
 msgstr "边框圆角大小，以 REM 为单位（例如 0.5rem）。"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Both authenticate with an API key alone — no cloud project or region is needed."
+msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
@@ -3029,6 +3048,10 @@ msgstr "认领账号"
 msgid "Claims"
 msgstr "声明"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Clause"
+msgstr ""
+
 #: apps/remix/app/components/general/filter-pill.tsx
 msgid "Clear"
 msgstr ""
@@ -3359,12 +3382,19 @@ msgstr "确认邮件已发送"
 msgid "Connected to Stripe"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
 msgid "Connection failed"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 msgid "Connection succeeded."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Connection works"
 msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
@@ -3569,6 +3599,11 @@ msgstr "复制值"
 
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "Copy your token now. For security reasons you will not be able to see it again."
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Could not test the connection"
 msgstr ""
 
 #: apps/remix/app/components/general/organisation-usage-reset-button.tsx
@@ -5645,6 +5680,10 @@ msgstr "随附文档"
 msgid "Enclosed Documents"
 msgstr "随附文件"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Encrypted at rest. It is never sent back to this page once saved."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
 msgid "Endpoint (optional, for non-AWS providers)"
 msgstr ""
@@ -5936,6 +5975,11 @@ msgstr "事件"
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Event Type"
 msgstr "事件类型"
+
+#. placeholder {0}: totals.findingsCited
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Every clause is attorney-drafted with no named reviewer, so the publishing gate refuses all of them — that is the design, not a defect. Outstanding counts only findings nobody has acted on: {0} were cited across the library and the rest are recorded as implemented, rejected or withdrawn in the review manifests."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: packages/lib/constants/document-visibility.ts
@@ -6571,10 +6615,6 @@ msgstr ""
 msgid "Google Cloud HSM"
 msgstr ""
 
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Google Vertex AI credentials for AI-assisted contract review. Stored encrypted at rest."
-msgstr ""
-
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Green"
 msgstr "绿色"
@@ -6732,6 +6772,10 @@ msgstr ""
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Hide license key"
 msgstr "隐藏许可证密钥"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Hide the key"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
@@ -7305,6 +7349,24 @@ msgstr "去年"
 msgid "Learn more"
 msgstr "了解详情"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.tsx
+msgid "Lease Builder"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/lease-library.tsx
+msgid "Lease clause library"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Lease Clauses"
+msgstr ""
+
+#: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases._index.tsx
+msgid "Leases"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Leave"
@@ -7729,6 +7791,20 @@ msgstr "每个文档允许的最大发送收件人数。0 = 不限"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Maximum number of uploaded files per envelope allowed"
 msgstr "每个信封允许上传的最大文件数量"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "MCA Clauses"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca.tsx
+msgid "MCA conformity"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "MCA Conformity"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
@@ -8255,6 +8331,12 @@ msgstr "无"
 msgid "None (Overrides global settings)"
 msgstr "无（覆盖全局设置）"
 
+#. placeholder {0}: totals.clauses
+#. placeholder {1}: totals.outstanding
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "None of these {0} clauses may be sent to a merchant, and {1} findings are outstanding"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
@@ -8282,6 +8364,10 @@ msgstr "未取消任何内容"
 msgid "Nothing to do"
 msgstr "暂无待处理事项"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Nothing typed. A saved key is encrypted at rest and never sent back to this page, so it cannot be revealed."
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Notifications"
 msgstr "通知"
@@ -8289,6 +8375,7 @@ msgstr "通知"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
@@ -8633,6 +8720,10 @@ msgstr "原始"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "否则将把文档创建为草稿。"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Outstanding"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
@@ -9316,6 +9407,7 @@ msgstr "进度"
 msgid "Prompt (none / login / consent / select_account)"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Provider"
 msgstr "提供方"
@@ -9392,6 +9484,10 @@ msgstr "重新注册"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Re-register Email Domain"
 msgstr "重新注册电子邮件域名"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Read by"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
@@ -10156,6 +10252,14 @@ msgstr "返回登录"
 msgid "Return to templates"
 msgstr "返回模板列表"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Reveal the key"
+msgstr ""
+
+#: apps/remix/app/routes/_recipient+/lease-review.$token.tsx
+msgid "Review a lease · Pacta"
+msgstr ""
+
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Review request"
 msgstr "审查请求"
@@ -10255,6 +10359,10 @@ msgstr "保存"
 msgid "Save AI config"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Save and test connection"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -10287,6 +10395,11 @@ msgstr ""
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Save Template"
 msgstr "保存模板"
+
+#. placeholder {0}: result.provider ?? ''
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Saved, and {0} answered."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Seal job triggered"
@@ -11286,6 +11399,10 @@ msgstr ""
 msgid "SMTP settings saved"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Some evidence is not present in this environment"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
@@ -12145,6 +12262,10 @@ msgstr ""
 msgid "Test sandbox connection"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Test saved connection"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Test Webhook"
 msgstr "测试 Webhook"
@@ -12237,6 +12358,10 @@ msgstr "收件人签署签名字段所需的认证方式。"
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "The authentication methods required for recipients to view the document."
 msgstr "收件人查看文档所需的认证方式。"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "The clause text below may be quoting superseded sentences. Re-vendor the affected documents from lombard-contracts and re-earn their verification dates."
+msgstr ""
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "The content to show in the banner, HTML is allowed"
@@ -12427,6 +12552,10 @@ msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "The license key has been copied to your clipboard"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "The negotiated agreements — our contract text, not a regulator's. Conformity for the prescribed disclosure forms is a separate page."
 msgstr ""
 
 #. placeholder {0}: form.watch('name')
@@ -13529,6 +13658,8 @@ msgstr "未知"
 
 #: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
@@ -14049,18 +14180,6 @@ msgstr "验证邮箱后即可上传文档。"
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Verify your team email address"
 msgstr "验证您的团队邮箱地址"
-
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Vertex API key"
-msgstr ""
-
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Vertex location"
-msgstr ""
-
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Vertex project ID"
-msgstr ""
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
@@ -14818,6 +14937,10 @@ msgstr "必须填写 Well-known URL"
 msgid "Were you trying to edit this document instead?"
 msgstr "你是想编辑这份文档吗？"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "What is missing cannot be checked here, so an empty result below is not a clean one. This is a deployment fact rather than a defect in the text."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"
 msgstr "通过团队您可以完成以下工作："
@@ -15461,6 +15584,10 @@ msgstr "你已成功撤销访问权限。"
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 msgstr "在完成签署流程之前，你有权随时撤回对使用电子签名的同意。要撤回同意，请联系文档的发送方。如果无法联系发送方，你可以通过 <0>{SUPPORT_EMAIL}</0> 与我们联系以获得协助。请注意，撤回同意可能会延迟或中止相关交易或服务的完成。"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "You have typed a new key. Use \"Save and test connection\" — this button tests the saved one."
+msgstr ""
 
 #: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 msgid "You have unsaved changes"
