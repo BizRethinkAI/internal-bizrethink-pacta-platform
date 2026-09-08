@@ -17,7 +17,26 @@ no primary text behind it.
 | `CT-CGS-36a-861-872.txt` | Connecticut General Assembly | `https://www.cga.ct.gov/current/pub/chap_669.htm` | 2026-09-07 |
 | `VA-Code-6.2-2228-2238.txt` | Virginia Law Portal (DLAS) | `https://law.lis.virginia.gov/vacode/title6.2/chapter22.1/` (eleven per-section pages) | 2026-09-07 |
 
-Both are official publishers, fetched over HTTPS with the certificate chain
+### The other nine, headed 2026-09-08
+
+Every remaining source now carries a `Publisher:` and `Site:` line. They are a
+weaker claim than the two above and the header says so: a publisher identified
+from the document itself, not a fetch recorded at the moment of fetching.
+
+The distinction is worth keeping because it is the only honest one available.
+The deep links these were originally fetched through were never written down and
+are not recoverable — Kansas's and California's paths both 301 into 404s today,
+because legislatures reorganise their sites. What the documents themselves make
+plain is who published them: an enrolled act, a chamber's letterhead and a
+Superintendent's signed adoption are not artefacts a reproducer manufactures.
+
+**Adding those headers moved seven digests and no verification date.** The
+statutory text is byte-identical in all seven, asserted before the digests were
+touched. Same treatment and same reason as the two headers in
+`fix/ga-primary-text`: "the digest broke, so I updated it" is the move this
+mechanism exists to make somebody justify, so the justification is in each file.
+
+Both CT and VA are official publishers, fetched over HTTPS with the certificate chain
 verified, tag-stripped and otherwise untouched: no word is rewritten, reordered
 or normalised. The only removals are the CGA page's own "(Return to …)"
 navigation lines.

@@ -1,7 +1,7 @@
 {
   "_what": "The two adversarial reviews of the Lombard negotiated agreements, indexed. Derived from lombard-contracts by scripts/mca/build-review-register.py; regenerate and diff rather than editing this file.",
   "_repository": "https://github.com/lombardpay/lombard-contracts",
-  "_commit": "6a7248b1b42bc12276f62f45bde849d3647c2b1f",
+  "_commit": "7b8e61c3c1c9fa02ff4a98f3e4d477132066008d",
   "_dispositions": "Each finding carries the status from its review manifest (implemented / open / handoff / rejected / wont-fix). A finding absent from its manifest is `unrecorded` -- unknown, which is not the same as open and not the same as done, and which counts as outstanding. REVIEW-02 had no manifest at all until lombard-contracts PR #9.",
   "_whatThisProves": "That a finding id a clause names is a finding that was actually raised, what it was about and where it routed. It does NOT prove the finding says what a clause claims it says -- the argument lives in the source repository and is not reproduced here.",
   "_dropped": ["evidence", "consequence", "fix"],
@@ -2485,7 +2485,7 @@
       "file": "REVIEW-02-findings.json",
       "sha256": "bf334c284d27aeebed00263d3e3813d234e1068e3fc55fb0a01badc1372cf9a1",
       "manifest": "REVIEW-02-manifest.json",
-      "manifestSha256": "caa18a3f250d9aad7c63387c89a0eb82df64f024456e6f130bb0f76637713601",
+      "manifestSha256": "fc622043cc795c8c5cbd0b40f70b97a86014b19bbbaaaad6b8d8d7b3553a6ee3",
       "survived": 48,
       "refuted": 1,
       "coverageGaps": [
@@ -2586,7 +2586,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "open"
+          "disposition": "implemented"
         },
         {
           "id": "el-3-8-grants-no-licence-to-manufacturer-owned-software",
@@ -2658,7 +2658,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "open"
+          "disposition": "implemented"
         },
         {
           "id": "el-4-5-fcra-authorisation-runs-to-a-different-entity-than-the-frpas",
@@ -2730,7 +2730,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "open"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-4-8-may-impede-a-merchant-complaint-to-a-regulator",
@@ -2934,7 +2934,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "open"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-9-4-creates-guarantor-liability-on-merchant-bankruptcy",
@@ -3006,7 +3006,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "open"
+          "disposition": "implemented"
         },
         {
           "id": "iso-a6-and-frpa-7-21-give-different-answers-about-a-merchant-paid-fee",

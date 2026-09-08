@@ -27,7 +27,7 @@ export const MO_DISCLOSURE: ContentStatute = {
     verbatimRequired: true,
     verbatimVerifiedAt: '2026-09-06',
   },
-  sourceDigest: 'ac0d2b63b47f37336f4155401ad9dd3c707daaee039b233a2e30c98582a4374f',
+  sourceDigest: '21b5f3df17f10fb451fabfb2c32952c8308b95f9bf6ae4098327ba13467df2c9',
   /*
     SB 1359 is a 339,000-character omnibus bill — acknowledgment certificates,
     trusts, licensing, and eighty-odd other sections. The Commercial Financing

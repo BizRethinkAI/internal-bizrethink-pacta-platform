@@ -81,6 +81,7 @@ export {
   assertSingleLibrary,
   type ConformityEntry,
   type ConformityKind,
+  type ConformitySummary,
   type ConformitySurface,
   conformitySurface,
   type DigestState,

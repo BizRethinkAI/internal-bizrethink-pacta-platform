@@ -6,6 +6,7 @@ import { UNRESOLVED_READINGS } from '../instance/identities';
 import { MCA_JURISDICTIONS } from '../jurisdictions';
 import type { ItemizationForm } from '../prescribed/itemization';
 import type { PrescribedForm } from '../prescribed/types';
+import { READING_GOES_STALE_AFTER_DAYS } from '../provenance/reading-age';
 import { normalisedDigest, readSourceText, resolveSourcesDir } from '../provenance/source-text';
 import type { McaDisclosure } from '../provenance/verify';
 import { publishableProblems } from '../provenance/verify';
@@ -27,6 +28,18 @@ import { syntheticForm } from './synthetic-form';
 */
 
 const surface = conformitySurface();
+
+/*
+  A FIXED CLOCK FOR EVERY ASSERTION THAT TURNS ON ONE.
+
+  `entryFor` takes `now` because a reading's age is a function of it, and a view
+  model that read the wall clock would have a stale branch reachable only by
+  waiting six months — a branch nobody has tested. It also keeps this suite from
+  going red on a calendar rather than on a change: an assertion that a synthetic
+  form is "verified" would start failing 181 days after it was written, on a PR
+  that touched nothing.
+*/
+const NOW = new Date('2026-09-08T12:00:00Z');
 
 const entry = (slug: string) => {
   const found = surface.entries.find((e) => e.slug === slug);
@@ -208,12 +221,61 @@ describe('assurance distinguishes verified from partly verified', () => {
     ],
   });
 
-  it('a form with nothing unread is verified', () => {
-    const built = entryFor(fullyVerified);
+  /*
+    ONCE VERIFIED, NOW PARTLY VERIFIED, AND THE DOWNGRADE IS THE CHANGE.
 
-    expect(built.problems).toEqual([]);
+    Nothing about this form moved. What moved is that the page stopped treating
+    "the digest still matches" as the whole of provenance:
+    `CA-10CCR-900-956.txt` records no retrieval, so nothing in the file lets a
+    reader re-check where our copy came from. That is precisely the state
+    Georgia's source was in while it was a law.justia.com capture missing
+    subsection (a) — and its card looked exactly like California's.
+  */
+  it('a form whose source records no retrieval carries that as a reason, however current the reading', () => {
+    /*
+      Pointed at a file whose ORIGIN is unrecorded, carrying that file's real
+      digest so nothing else is wrong with it. The point is that a current
+      digest and a current reading are NOT enough: with no record of where the
+      copy came from, the form is partly verified and not verified, which is
+      exactly the state Georgia's source was in behind a green card.
+    */
+    const built = entryFor(
+      {
+        ...fullyVerified,
+        sourceFile: 'UT-Title-7-Ch-27.txt',
+        sourceDigest: 'f5535bf4ab354050b4bec4ec6450008efd5edf8cdb78f72f442521a5ff6d1924',
+      },
+      { now: NOW },
+    );
+
     expect(built.digest).toBe('matches');
-    expect(built.assurance).toBe('verified');
+    expect(built.freshness).toBe('fresh');
+    expect(built.origin).toBe('origin-not-recorded');
+    /*
+      NOT `partly-verified`, AND NOT BECAUSE THE ORIGIN RULE WEAKENED. This
+      fixture is a prescribed-form shape pointed at a content statute, so its
+      rows do not appear in Utah's text and the form is `unverified` on those
+      grounds as well. What this test can honestly show at the surface level is
+      that the unrecorded origin is CARRIED as a reason — the level itself is
+      asserted on synthetic headers in `source-origin.test.ts`, where nothing
+      else about the form is wrong.
+    */
+    expect(built.assurance).toBe('unverified');
+    /*
+      The REASON changed and the verdict did not. `CA-10CCR-900-956.txt` now
+      carries a `Publisher:` header, so this fixture points at
+      `UT-Title-7-Ch-27.txt` instead — a file whose header records where our
+      COPY came from ("Vendored from lombard-contracts") and not where the text
+      was published. That is still the state Georgia's source was in.
+    */
+    /*
+      The origin VERDICT is asserted above; the reason STRING is not asserted
+      here. With a prescribed-form fixture over a content statute the reason
+      list is dominated by the section-anchor failure, and pinning a substring
+      of it would be pinning that unrelated problem. `source-origin.test.ts`
+      asserts the wording on synthetic headers, where it is the only thing
+      wrong.
+    */
   });
 
   it('the same form, plus one row whose contents no check can read, is only partly verified', () => {
@@ -276,6 +338,303 @@ describe('assurance distinguishes verified from partly verified', () => {
       'the words have never been checked against the source',
       'the rows, their labels and their order have never been checked',
     ]);
+  });
+});
+
+/*
+  WHAT "VERIFIED" WAS QUIETLY MEANING, AND WHAT IT MEANS NOW.
+
+  Until this change the word on a card was earned by one comparison: the sha256
+  of OUR VENDORED COPY still matches what the spec recorded. That answers "has
+  anyone edited our copy?" and a reader takes it to answer two other questions
+  it cannot touch.
+
+    STALENESS. A regulator amends the rule; our file does not move; the digest
+    matches; the card stays green about text that is now wrong. Nothing in this
+    package can see an amendment. What it can state is how old the reading is.
+
+    SOURCE STRENGTH. Georgia was "verified" against a browser capture of
+    law.justia.com that was also incomplete — subsection (a)'s definitions were
+    absent, so "advance fee", the term the broker prohibition turns on, was
+    defined nowhere in what we held. Its card was indistinguishable from
+    California's.
+
+  Both now feed the same three-level `Assurance`. No fourth level: the ladder
+  already means "nothing re-executes this" / "part of this is unread" /
+  "everything a check can reach was re-found", and an unrecorded origin and an
+  ageing reading are both the middle rung. What they are not is `verified`.
+*/
+describe('assurance also turns on where the text came from and how old the reading is', () => {
+  /*
+    THE ONE SYNTHETIC THAT CAN STILL REACH `verified`.
+
+    Built on Georgia's file rather than California's, because Georgia's is one
+    of the two in `sources/` that records a retrieval from the publisher that
+    enacted the text. That is the whole demonstration: after this change the top
+    level is reachable only by a source somebody can trace, and the file that
+    reaches it is the one that was re-vendored *because* it had been a secondary
+    capture.
+  */
+  const txSource = readSourceText('TX-Fin-Code-Ch-398.txt');
+
+  const tracedToItsPublisher = syntheticForm({
+    slug: 'synthetic-official-publisher',
+    citation: 'Tex. Fin. Code §398.001',
+    jurisdiction: 'US-TX',
+    sourceFile: 'TX-Fin-Code-Ch-398.txt',
+    status: 'published',
+    sourceDigest: normalisedDigest(txSource),
+    section: {
+      from: 'SUBCHAPTER A. GENERAL PROVISIONS',
+      to: 'SUBCHAPTER B. REGULATION AND DISCLOSURE REQUIREMENTS',
+    },
+    structureEvidence: 'source-order',
+    source: {
+      kind: 'regulator-prescribed-form',
+      citation: 'Tex. Fin. Code §398.001',
+      sourceFile: 'TX-Fin-Code-Ch-398.txt',
+      verbatimVerifiedAt: '2026-09-07',
+      structureVerifiedAt: '2026-09-07',
+    },
+    rows: [
+      {
+        label: 'Disbursement amount',
+        verbatim: '"Disbursement amount" means the amounts paid to the recipient or on the recipient\'s behalf.',
+        onlyPrescribedContent: true,
+      },
+    ],
+  });
+
+  it('a traceable source, read this week and with nothing unread, is verified', () => {
+    const built = entryFor(tracedToItsPublisher, { now: NOW });
+
+    expect(built.problems).toEqual([]);
+    expect(built.digest).toBe('matches');
+    expect(built.origin).toBe('official-publisher');
+    expect(built.freshness).toBe('fresh');
+    expect(built.assurance).toBe('verified');
+  });
+
+  /*
+    THE DEFAULT IS THE DERIVED ONE.
+
+    `entryFor` accepts an origin so the secondary-publisher branch is reachable
+    at all — no file in `sources/` is one, and putting a fake statute there to
+    make a test go green would be a worse thing than an untested branch. This
+    asserts the seam is only a seam: with nothing passed, the verdict comes off
+    the bytes on disk, and it names the URL it came from.
+  */
+  it('derives the origin from the vendored file when nothing is passed', () => {
+    const built = entryFor(tracedToItsPublisher);
+
+    expect(built.origin).toBe('official-publisher');
+    expect(built.originEvidence).toMatch(/capitol\.texas\.gov/);
+  });
+
+  it('the same form, read seven months ago, stops being verified', () => {
+    const built = entryFor(
+      {
+        ...tracedToItsPublisher,
+        source: {
+          kind: 'regulator-prescribed-form',
+          citation: 'Tex. Fin. Code §398.001',
+          sourceFile: 'TX-Fin-Code-Ch-398.txt',
+          verbatimVerifiedAt: '2026-01-01',
+          structureVerifiedAt: '2026-01-01',
+        },
+      },
+      { now: NOW },
+    );
+
+    expect(built.problems).toEqual([]);
+    expect(built.digest).toBe('matches');
+    expect(built.freshness).toBe('stale');
+    expect(built.daysSinceRead).toBe(250);
+    expect(built.assurance).toBe('partly-verified');
+    expect(built.assuranceReasons.join(' ')).toMatch(new RegExp(`${READING_GOES_STALE_AFTER_DAYS} days`));
+  });
+
+  /*
+    A reading is as current as its OLDER half. A form whose words were re-read
+    last week and whose rows were last checked in January has not been read
+    since January — the two dates are claims about different things and the page
+    may not quote the flattering one.
+  */
+  it('ages a form by its older date', () => {
+    const built = entryFor(
+      {
+        ...tracedToItsPublisher,
+        source: {
+          kind: 'regulator-prescribed-form',
+          citation: 'Tex. Fin. Code §398.001',
+          sourceFile: 'TX-Fin-Code-Ch-398.txt',
+          verbatimVerifiedAt: '2026-09-07',
+          structureVerifiedAt: '2026-01-01',
+        },
+      },
+      { now: NOW },
+    );
+
+    expect(built.lastReadAt).toBe('2026-01-01');
+    expect(built.freshness).toBe('stale');
+  });
+
+  /*
+    THE GEORGIA CASE ITSELF, WHICH IS THE ONLY ONE THAT IS BLOCKING.
+
+    An unrecorded origin leaves a reader unable to re-check a claim. A
+    secondary publisher is a claim that has been checked and has failed: the
+    text we hold is a reproduction, and the one time this package was in that
+    position the reproduction was missing an entire subsection. So it lands
+    beside a stale digest and a missing file rather than beside an unread row.
+  */
+  it('a source from a publisher that reproduces the law is unverified, not partly verified', () => {
+    const built = entryFor(tracedToItsPublisher, {
+      now: NOW,
+      origin: {
+        origin: 'secondary-publisher',
+        evidence: 'Retrieved 2026-08-01 from https://law.justia.com/codes/georgia/',
+        why: 'the retrieval names a publisher that reproduces the law rather than enacting or codifying it',
+      },
+    });
+
+    expect(built.assurance).toBe('unverified');
+    expect(built.assuranceReasons.join(' ')).toMatch(/justia/);
+  });
+
+  /*
+    A DATE THAT IS NOT A DATE.
+
+    `assertPublishable` asks whether a date is PRESENT, and "soon" is present.
+    Before this it would have passed the gate, produced no provenance problem,
+    and rendered as verified.
+  */
+  it('refuses a verification date that is not a date', () => {
+    const built = entryFor(
+      {
+        ...tracedToItsPublisher,
+        source: {
+          kind: 'regulator-prescribed-form',
+          citation: 'Tex. Fin. Code §398.001',
+          sourceFile: 'TX-Fin-Code-Ch-398.txt',
+          verbatimVerifiedAt: 'soon',
+          structureVerifiedAt: '2026-09-07',
+        },
+      },
+      { now: NOW },
+    );
+
+    expect(built.freshness).toBe('never-read');
+    expect(built.assurance).toBe('unverified');
+    expect(built.assuranceReasons.join(' ')).toMatch(/"soon"/);
+  });
+});
+
+/*
+  THE SUMMARY LINE, COMPUTED WHERE IT CAN BE ASSERTED.
+
+  The route used to count these itself — `entries.filter(e => e.assurance !==
+  'verified').length` in the `.tsx` — which is a view model in a file no test
+  runs. The number at the top of the page is the one sentence most readers take
+  away, so it is the last thing that should live where nothing checks it.
+*/
+describe('the top line says what the cards say', () => {
+  const summary = surface.summary;
+
+  it('counts the entries it was built from', () => {
+    expect(summary.total).toBe(surface.entries.length);
+    expect(summary.verified + summary.partlyVerified + summary.unverified).toBe(summary.total);
+  });
+
+  it('agrees with the cards, level by level', () => {
+    const at = (level: string) => surface.entries.filter((e) => e.assurance === level).length;
+
+    expect(summary.verified).toBe(at('verified'));
+    expect(summary.partlyVerified).toBe(at('partly-verified'));
+    expect(summary.unverified).toBe(at('unverified'));
+  });
+
+  /*
+    TWO OF THE ELEVEN FILES RECORD WHERE THEY CAME FROM, and both were
+    re-vendored after a defect was found in what preceded them: Georgia's was a
+    law.justia.com capture missing subsection (a), Texas's disclosure had been
+    built from a bill analysis rather than the statute.
+
+    Named rather than counted. A count moves when a source is re-vendored
+    properly and when a new source arrives without a header, and those call for
+    opposite responses.
+  */
+  it('names the disclosures whose source records a retrieval from its publisher', () => {
+    expect(
+      surface.entries
+        .filter((e) => e.origin === 'official-publisher')
+        .map((e) => e.slug)
+        .sort(),
+    ).toEqual([
+      'ca-itemization',
+      'ca-lease-financing',
+      'ca-offer-summary',
+      'ct-disclosure',
+      'fl-disclosure',
+      'ga-disclosure',
+      'ks-disclosure',
+      'la-disclosure',
+      'mo-disclosure',
+      'ny-itemization',
+      'ny-lease-financing',
+      'ny-offer-summary',
+      'tx-disclosure',
+    ]);
+
+    /*
+      THIRTEEN OF FIFTEEN, AND IT WAS TWO WHEN THIS TEST WAS WRITTEN.
+
+      Nothing about the classifier got weaker. Seven sources were given
+      `Publisher:` / `Site:` headers in the PR that landed beside this one, so
+      they now record what they always should have. What remains unrecorded is
+      Utah's and Virginia's, whose headers say "Vendored from lombard-contracts"
+      — where OUR COPY came from, not where the text was published, which is a
+      copy of a copy and exactly Georgia's state.
+    */
+    expect(summary.fromOfficialPublisher).toBe(13);
+    expect(summary.fromSecondaryPublisher).toBe(0);
+    expect(summary.originNotRecorded).toBe(summary.total - 13);
+  });
+
+  it('carries the threshold it judged staleness by, so the page states the number it used', () => {
+    expect(summary.staleAfterDays).toBe(READING_GOES_STALE_AFTER_DAYS);
+  });
+
+  /*
+    THE COUNTS MUST BE ABLE TO MOVE. Built at a date past every verification
+    date on the surface, which is a date that will arrive on its own — the point
+    of the whole change is that the page notices when it does.
+  */
+  it('reports every state as stale once the readings age past the threshold', () => {
+    const later = conformitySurface(new Date('2028-01-01T12:00:00Z'));
+
+    expect(later.summary.staleReadings).toBe(later.summary.total);
+    expect(later.summary.verified).toBe(0);
+    expect(later.entries.every((e) => e.freshness === 'stale')).toBe(true);
+
+    // On a card that is only PARTLY verified the age is the reason it is not
+    // verified, so it has to be said. On an unverified one the reasons are the
+    // blocking ones and an ageing reading is not among them — a state nothing
+    // re-executes is not additionally interesting for being six months old.
+    for (const e of later.entries.filter((x) => x.assurance === 'partly-verified')) {
+      expect(e.assuranceReasons.join(' ')).toMatch(/last read/i);
+    }
+  });
+
+  /*
+    Fixed clock, not `new Date()`. Every verification date on the surface was
+    earned in September 2026, so a wall-clock assertion here would go red 181
+    days from now on a pull request that touched nothing — a test that fails on
+    a calendar teaches people to ignore it. What it pins is real: on the day
+    this was written, no reading on the surface was older than the threshold.
+  */
+  it('reports none of them stale on the day this was written', () => {
+    expect(conformitySurface(NOW).summary.staleReadings).toBe(0);
   });
 });
 

@@ -22,7 +22,7 @@ export const FL_DISCLOSURE: ContentStatute = {
     verbatimRequired: false,
     verbatimVerifiedAt: '2026-09-06',
   },
-  sourceDigest: 'b7af1b6ea6e1ccfeb08f5c8f7c51ca0c5c9f3904e3cf29303a4aae756c770b7b',
+  sourceDigest: '5d534783a6c8b480e3b09a933c1d351f8a3b2fbd402df4cf8d0efcae93b5109a',
   // CS/HB 1353 enacts part XIII of ch. 559 and nothing else.
   section: null,
   requirements: [
