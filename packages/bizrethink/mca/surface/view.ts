@@ -5,6 +5,8 @@ import { JURISDICTION_NAMES, MCA_JURISDICTIONS, type McaJurisdiction } from '../
 import { coverage } from '../prescribed/conformity';
 import { type ItemizationForm, itemizationCoverage } from '../prescribed/itemization';
 import type { PrescribedForm } from '../prescribed/types';
+import { type Freshness, READING_GOES_STALE_AFTER_DAYS, readingAge } from '../provenance/reading-age';
+import { type OriginFinding, originOfSource, type SourceOrigin } from '../provenance/source-origin';
 import { normalisedDigest, readSourceText, type SourceSection, sourceExists } from '../provenance/source-text';
 import {
   type McaDisclosure,
@@ -122,6 +124,31 @@ export type DigestState = 'matches' | 'stale' | 'source-missing';
  * content-only statute prescribes no words at all, so almost everything in its
  * disclosure is ours. Calling either of those "verified" is the specific
  * dishonesty this page exists to avoid.
+ *
+ * STILL THREE, AFTER SOURCE STRENGTH AND AGE JOINED THE LADDER (2026-09-08),
+ * and the restraint is deliberate. Both new facts are the SAME KIND of thing
+ * the middle rung already means — part of what this card claims is not
+ * re-executable — so both land on `partly-verified`, and neither earns a level
+ * of its own:
+ *
+ *   AGE. A digest answers "has anyone edited our copy?". When a regulator
+ *   amends a rule our file does not move, so the digest matches and the card
+ *   went on saying "verified" about text that is now wrong. The words are still
+ *   found where the spec says; how long ago a human looked is now said beside
+ *   them.
+ *
+ *   SOURCE STRENGTH. Georgia was "verified" against a browser capture of
+ *   law.justia.com that was also incomplete — subsection (a)'s definitions were
+ *   absent, so "advance fee", the term the broker prohibition turns on, was
+ *   defined nowhere in what we held — and its card looked exactly like
+ *   California's.
+ *
+ * A FOURTH LEVEL WOULD MAKE THE PAGE WORSE. The ladder is read as a colour, and
+ * a colour with four steps is a colour nobody can hold in their head; what a
+ * reader needs is the reason, which is why `assuranceReasons` is never empty.
+ * The one exception is a source from a publisher that REPRODUCES the law, which
+ * is not a partial claim but a failed one — it sits with a stale digest and a
+ * missing file at `unverified`.
  */
 export type Assurance = 'unverified' | 'partly-verified' | 'verified';
 
@@ -169,6 +196,24 @@ export type ConformityEntry = {
   recordedDigest: string;
   /** Null when the source is not in `mca/sources/` at all. */
   observedDigest: string | null;
+  /**
+   * Where the vendored text came from, DERIVED from the file's own header on
+   * every load — never a field on the spec. A spec claiming "official
+   * publisher" with nothing re-executing it is the same defect as a
+   * verification date nothing re-earns.
+   */
+  origin: SourceOrigin;
+  /** The retrieval statement that verdict was taken from. Null when there is none. */
+  originEvidence: string | null;
+  /** Why it got that verdict, in the file's own terms. */
+  originWhy: string;
+  /**
+   * The OLDER of the applicable verification dates — a claim is only as current
+   * as its stalest half. Null when any of them is missing or unusable.
+   */
+  lastReadAt: string | null;
+  daysSinceRead: number | null;
+  freshness: Freshness;
   rowsTotal: number;
   unreadable: Unreadable[];
   /**
@@ -186,10 +231,39 @@ export type ConformityEntry = {
   assuranceReasons: string[];
 };
 
+/**
+ * The line at the top of the page.
+ *
+ * COMPUTED HERE BECAUSE IT WAS COMPUTED IN THE `.tsx`, which is a view model no
+ * test runs — `entries.filter((e) => e.assurance !== 'verified').length`, sat in
+ * the route, counting the one sentence most readers take away. Everything on
+ * this page that could be wrong is computed in this file and asserted in
+ * `__tests__/surface.test.ts`; a summary is the last thing that should be an
+ * exception to that.
+ */
+export type ConformitySummary = {
+  total: number;
+  verified: number;
+  partlyVerified: number;
+  unverified: number;
+  /** Sources whose header records a retrieval from the publisher that enacted or codified the text. */
+  fromOfficialPublisher: number;
+  originNotRecorded: number;
+  fromSecondaryPublisher: number;
+  freshReadings: number;
+  staleReadings: number;
+  neverRead: number;
+  /** Rows, lines and requirements whose contents no check reads. */
+  unreadable: number;
+  /** The threshold the staleness count was judged by, so the page states the number it used. */
+  staleAfterDays: number;
+};
+
 export type ConformitySurface = {
   library: CheckedLibrary;
   jurisdictions: readonly McaJurisdiction[];
   entries: ConformityEntry[];
+  summary: ConformitySummary;
 };
 
 /**
@@ -334,6 +408,28 @@ const unreadableRequirementsOf = (statute: ContentStatute): Unreadable[] =>
   }));
 
 /**
+ * What a caller may inject, and why there is anything to inject.
+ *
+ * `now` is here because a reading's AGE is a function of it, and a view model
+ * that called `new Date()` internally would have a stale branch reachable only
+ * by waiting six months. A branch nobody can reach in a test is a branch nobody
+ * has tested — this package has already shipped two assertions that filtered on
+ * `Divergence` kinds that do not exist and passed vacuously for a day.
+ *
+ * `origin` IS A NARROWER SEAM AND WORTH BEING SUSPICIOUS OF, because a caller
+ * passing a flattering origin is exactly the defect the derivation exists to
+ * prevent. It is here for one branch: no file in `mca/sources/` comes from a
+ * secondary publisher, and the honest ways to test that branch are to inject it
+ * or to commit a fake statute to `sources/` — where a fake statute would be a
+ * far worse thing than an untested branch (README rule 1). `conformitySurface`
+ * never passes it, and a test asserts that the default is the derived verdict.
+ */
+export type EntryOptions = {
+  now?: Date;
+  origin?: OriginFinding;
+};
+
+/**
  * Build one row of the surface.
  *
  * Exported so a synthetic spec can be pushed through the same code path the
@@ -341,7 +437,8 @@ const unreadableRequirementsOf = (statute: ContentStatute): Unreadable[] =>
  * waiting for a regulator to amend something is a view model whose failure
  * states are never tested.
  */
-export const entryFor = (spec: McaDisclosure): ConformityEntry => {
+export const entryFor = (spec: McaDisclosure, options: EntryOptions = {}): ConformityEntry => {
+  const now = options.now ?? new Date();
   const { digest, observed } = digestStateOf(spec);
   const problems = verifyProvenance(spec);
   const publishGate = assertPublishable(spec);
@@ -393,6 +490,16 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
   */
   const blocking: string[] = [];
 
+  /*
+    WHERE THE TEXT CAME FROM, AND HOW OLD THE READING IS.
+
+    Neither is answerable by any check that compares our text to our copy, which
+    is every other check in this package. Both are answered from evidence
+    re-read on every load: the vendored file's own vendoring header, and the
+    dates on the spec against a clock.
+  */
+  const origin = options.origin ?? originOfSource(spec.sourceFile);
+
   if (verbatimVerifiedAt === null) {
     blocking.push('the words have never been checked against the source');
   }
@@ -413,6 +520,47 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
     );
   }
 
+  /*
+    THE APPLICABLE DATES, AND ONLY THOSE.
+
+    A content-only statute prescribes no structure, so its null structure date
+    is an absent obligation rather than an unread one. Feeding it in would age
+    every content statute as never-read and make seven cards say something
+    false.
+  */
+  const age = readingAge(structureApplicable ? [verbatimVerifiedAt, structureVerifiedAt] : [verbatimVerifiedAt], now);
+
+  /*
+    A DATE THAT IS NOT A DATE, OR HAS NOT HAPPENED YET.
+
+    `assertPublishable` asks whether a date is PRESENT; "soon" and next March
+    are both present, and neither is a reading. Blocking rather than partial,
+    because there is no claim here to be partly behind.
+  */
+  for (const date of age.unusableDates) {
+    blocking.push(
+      `${JSON.stringify(date)} is recorded as a verification date and is not a usable one — it does not parse, or it ` +
+        'has not happened yet',
+    );
+  }
+
+  /*
+    A SOURCE THAT REPRODUCES THE LAW IS NOT A PARTIAL CLAIM, IT IS A FAILED ONE.
+
+    Georgia's spec carried a verification date against a law.justia.com capture
+    that was missing subsection (a) entirely, so "advance fee" — the term the
+    broker prohibition turns on — was defined nowhere in what we held. The
+    digest matched on every run. That is not "part of this is unread"; it is
+    "what we checked against was the wrong document", which belongs beside a
+    stale digest.
+  */
+  if (origin.origin === 'secondary-publisher') {
+    blocking.push(
+      `${spec.sourceFile} is not primary text: ${origin.why}` +
+        (origin.evidence === null ? '' : ` (${origin.evidence})`),
+    );
+  }
+
   for (const p of problems) {
     blocking.push(`${p.kind}: ${p.detail}`);
   }
@@ -429,6 +577,37 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
   */
 
   const partial: string[] = [];
+
+  /*
+    NOBODY RECORDED WHERE THIS TEXT CAME FROM.
+
+    Not a defect in the text — California's and New York's files are almost
+    certainly the promulgating department's own — but "almost certainly" is a
+    belief, and the file gives a reader nothing to re-check it against. Georgia
+    sat in exactly this state while what we held was a truncated capture from a
+    secondary publisher, and its card was indistinguishable from California's.
+    Utah's header says it in as many words: ORIGINAL RETRIEVAL SOURCE UNRECORDED.
+  */
+  if (origin.origin === 'origin-not-recorded') {
+    partial.push(`where ${spec.sourceFile} came from is not established — ${origin.why}`);
+  }
+
+  /*
+    THE READING HAS AGED.
+
+    The one thing on this page that gets worse while nobody touches anything.
+    When a regulator amends a rule our vendored file does not move, the digest
+    still matches, and every other check goes on passing about text that is no
+    longer the law — so the age of the last human reading is the only signal
+    there is, and a stale one must not render like a fresh one.
+  */
+  if (age.freshness === 'stale') {
+    partial.push(
+      `last read ${age.lastReadAt} (${age.daysSinceRead} days ago), and a reading goes stale after ` +
+        `${READING_GOES_STALE_AFTER_DAYS} days — an amendment to the regulation does not move the digest, so nothing ` +
+        'else on this card would notice one',
+    );
+  }
 
   if (prescribed && unreadable.length > 0) {
     partial.push(
@@ -485,6 +664,12 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
     digest,
     recordedDigest: spec.sourceDigest,
     observedDigest: observed,
+    origin: origin.origin,
+    originEvidence: origin.evidence,
+    originWhy: origin.why,
+    lastReadAt: age.lastReadAt,
+    daysSinceRead: age.daysSinceRead,
+    freshness: age.freshness,
     rowsTotal: rows.total,
     unreadable,
     providerDrafted,
@@ -497,8 +682,40 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
         : partial.length > 0
           ? partial
           : [
-              'every label and every prescribed sentence is re-found in the vendored source, and no row is left unworded',
+              'every label and every prescribed sentence is re-found in the vendored source, no row is left unworded, ' +
+                `the file records where it was retrieved from, and it was last read ${age.lastReadAt}`,
             ],
+  };
+};
+
+/**
+ * Count what the cards say, without softening any of it.
+ *
+ * THE FAILURE MODE IS THE HEADLINE. A page whose cards are honest and whose top
+ * line says "11 states verified" is a page that says "verified" to everyone who
+ * does not scroll — and most readers do not scroll. So every number here is
+ * derived from the same `assurance`, `origin` and `freshness` the cards carry,
+ * and there is no number that could be higher than what a card would support.
+ *
+ * `verified` is counted rather than "not verified" so the count that most
+ * flatters us is the one a reader sees first, and it is currently zero.
+ */
+const summarise = (entries: readonly ConformityEntry[]): ConformitySummary => {
+  const count = <T>(pick: (e: ConformityEntry) => T, value: T) => entries.filter((e) => pick(e) === value).length;
+
+  return {
+    total: entries.length,
+    verified: count((e) => e.assurance, 'verified'),
+    partlyVerified: count((e) => e.assurance, 'partly-verified'),
+    unverified: count((e) => e.assurance, 'unverified'),
+    fromOfficialPublisher: count((e) => e.origin, 'official-publisher'),
+    originNotRecorded: count((e) => e.origin, 'origin-not-recorded'),
+    fromSecondaryPublisher: count((e) => e.origin, 'secondary-publisher'),
+    freshReadings: count((e) => e.freshness, 'fresh'),
+    staleReadings: count((e) => e.freshness, 'stale'),
+    neverRead: count((e) => e.freshness, 'never-read'),
+    unreadable: entries.reduce((n, e) => n + e.unreadable.length, 0),
+    staleAfterDays: READING_GOES_STALE_AFTER_DAYS,
   };
 };
 
@@ -512,10 +729,17 @@ export const entryFor = (spec: McaDisclosure): ConformityEntry => {
  * caller in the package to do so, and README rule 5 exists because that is how
  * templates 104 and 105 shipped.
  */
-export const conformitySurface = (): ConformitySurface => {
-  const entries = MCA_JURISDICTIONS.flatMap((jurisdiction) => disclosuresFor(jurisdiction).map(entryFor));
+export const conformitySurface = (now: Date = new Date()): ConformitySurface => {
+  const entries = MCA_JURISDICTIONS.flatMap((jurisdiction) =>
+    disclosuresFor(jurisdiction).map((spec) => entryFor(spec, { now })),
+  );
 
-  return { library: assertSingleLibrary(entries, MCA_LIBRARY), jurisdictions: MCA_JURISDICTIONS, entries };
+  return {
+    library: assertSingleLibrary(entries, MCA_LIBRARY),
+    jurisdictions: MCA_JURISDICTIONS,
+    entries,
+    summary: summarise(entries),
+  };
 };
 
 /**
