@@ -394,6 +394,37 @@ export const findingsHold = (outstanding: ReviewFinding[], evidenceAvailable: bo
 };
 
 /**
+ * A finding counsel recorded through a review link, which nobody has answered.
+ *
+ * NOT THE SAME REGISTER AS `findingsHold` ABOVE, and the difference is the
+ * whole reason both exist. That one reads the vendored record of the two
+ * adversarial document reviews, whose dispositions live in `lombard-contracts`
+ * manifests; clearing one means editing a manifest in another repository and
+ * re-vendoring. This one is a first-party objection from a named attorney, it
+ * arrived through a link we minted, and it is answered on `/admin/mca` in a
+ * form. One register per origin — the objection to a second register was that
+ * two copies of the SAME findings drift, and no manifest has ever held one of
+ * these.
+ *
+ * WHAT IT IS FOR. Without it the textarea on the review page is decorative:
+ * counsel writes "this indemnity is unenforceable in New York", it lands in a
+ * table, and the clause is approved that afternoon by somebody who never saw
+ * it. The lease shipped exactly that — `approve` never consulted a finding —
+ * and CI was green throughout, because every unit was tested in isolation and
+ * nothing asked whether anything called them.
+ */
+export const counselFindingsHold = (unanswered: number): string | null => {
+  if (unanswered <= 0) {
+    return null;
+  }
+
+  const noun = unanswered === 1 ? 'a finding' : `${unanswered} findings`;
+  const them = unanswered === 1 ? 'it' : 'them';
+
+  return `Counsel recorded ${noun} against this clause through a review link, and nobody has answered ${them}. Answer ${them} on /admin/mca before recording an approval of this wording — an approval written over an unanswered objection records that an attorney signed off on text another attorney had just objected to.`;
+};
+
+/**
  * The one door every caller goes through before an approval is written.
  *
  * ORDER MATTERS AND IS THE SAME ORDER THE LEASE ROUTER ARGUES FOR. The
@@ -411,6 +442,29 @@ export const approvalBlocks = (
     outstanding: ReviewFinding[];
     /** Whether the review register was readable. See `findingsHold`. */
     evidenceAvailable: boolean;
+    /**
+     * Findings counsel recorded through a review link that staff have not
+     * answered.
+     *
+     * OPTIONAL, AND THAT IS A KNOWN RISK RATHER THAN AN OVERSIGHT. Making it
+     * required would have forced every existing caller and test to count rows
+     * they have no database for. The cost is that a caller which stops passing
+     * it goes quietly back to the old behaviour, which is the exact shape of
+     * the failure this whole rule was written to prevent — so the caller that
+     * matters is asserted in `mca/review/__tests__/findings-wiring.test.ts`
+     * rather than trusted.
+     */
+    unansweredCounselFindings?: number;
   },
 ): string | null =>
-  admissionBlocks(clause, context.admission) ?? findingsHold(context.outstanding, context.evidenceAvailable);
+  admissionBlocks(clause, context.admission) ??
+  /*
+    COUNSEL'S FINDING BEFORE THE VENDORED ONE. Both are fixable, so neither has
+    the admission's claim to come first, and the tie is broken on how long the
+    fix takes: answering counsel is a form on `/admin/mca`, while clearing a
+    vendored finding means editing a manifest in lombard-contracts and
+    re-vendoring the register. Surfacing the slower errand first would send
+    somebody on it while the short one was still open.
+  */
+  counselFindingsHold(context.unansweredCounselFindings ?? 0) ??
+  findingsHold(context.outstanding, context.evidenceAvailable);

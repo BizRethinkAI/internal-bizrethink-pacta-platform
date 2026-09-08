@@ -2,7 +2,121 @@ import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
+import { Textarea } from '@documenso/ui/primitives/textarea';
+import { useState } from 'react';
 import { useParams } from 'react-router';
+
+type RecordedFinding = {
+  id: string;
+  clauseSlug: string;
+  body: string;
+  answeredAt: Date | string | null;
+  answer: string | null;
+  createdAt: Date | string;
+};
+
+/**
+ * What counsel says back, against one clause.
+ *
+ * THE PAGE SHIPPED READ-ONLY AND THAT WAS THE WRONG CALL. The reason given was
+ * real but narrower than the conclusion drawn from it: findings from the two
+ * adversarial DOCUMENT reviews live in `lombard-contracts` manifests, and a
+ * second Pacta-side register of those same findings would drift. Nothing
+ * counsel writes here is a second copy of one — it arrives on a link we minted,
+ * it is attributable to the reviewer named on that link, and no manifest has
+ * ever held one. One register per origin, and each is labelled.
+ *
+ * NOT AN APPROVAL. Recording an approval carries a bar number and an admitting
+ * jurisdiction and is checked against the states whose law puts the clause in
+ * the agreement; that stays with staff, who have an account. This is the other
+ * direction — saying what is wrong — and it needs no such ceremony.
+ *
+ * IT BLOCKS. An unanswered finding holds the clause against approval. That is
+ * what separates it from a comment box, and it is the part the lease shipped
+ * without.
+ */
+function FindingBox({
+  token,
+  clauseSlug,
+  recorded,
+  onRecorded,
+}: {
+  token: string;
+  clauseSlug: string;
+  recorded: RecordedFinding[];
+  onRecorded: () => void;
+}) {
+  const [body, setBody] = useState('');
+
+  const record = trpc.bizrethink.mcaClauseLibrary.recordFinding.useMutation({
+    onSuccess: () => {
+      setBody('');
+      onRecorded();
+    },
+  });
+
+  return (
+    <div className="mt-3">
+      {/*
+        WHAT SHE ALREADY SAID, AND WHETHER ANYBODY REPLIED.
+
+        The lease's version of this box was write-only: it cleared, the page
+        said "Recorded", and a reload showed nothing at all — no record it had
+        saved, no answer, no way to tell a saved finding from a lost one. An
+        attorney billing by the hour responds to that by writing it twice, and
+        then by going back to email.
+      */}
+      {recorded.length > 0 && (
+        <ul className="mb-3 space-y-2">
+          {recorded.map((finding) => (
+            <li key={finding.id} className="rounded border-l-2 border-l-muted-foreground/40 bg-muted/30 p-2">
+              <p className="whitespace-pre-wrap text-sm">{finding.body}</p>
+              <p className="mt-1 text-muted-foreground text-xs">
+                You recorded this on {new Date(finding.createdAt).toLocaleDateString()}
+                {finding.answeredAt === null && ' · holding this clause against approval until it is answered'}
+              </p>
+              {finding.answeredAt !== null && (
+                <div className="mt-2 border-t pt-2">
+                  <p className="text-muted-foreground text-xs">
+                    Answered {new Date(finding.answeredAt).toLocaleDateString()}
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm">{finding.answer}</p>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Textarea
+        aria-label={`Finding on ${clauseSlug}`}
+        className="text-sm"
+        onChange={(event) => setBody(event.target.value)}
+        placeholder="What is wrong with this clause?"
+        rows={2}
+        value={body}
+      />
+
+      <div className="mt-2 flex items-center gap-3">
+        <Button
+          disabled={body.trim() === '' || record.isPending}
+          onClick={() => record.mutate({ token, clauseSlug, body })}
+          size="sm"
+          variant="outline"
+        >
+          Record a finding
+        </Button>
+
+        {/*
+          A failed save was invisible on the lease page once and cost a reviewer
+          their work. Not repeating that here.
+        */}
+        {record.error && <span className="text-destructive text-xs">{record.error.message}</span>}
+      </div>
+    </div>
+  );
+}
 
 /**
  * One MCA agreement, read by a lawyer who has no account.
@@ -58,6 +172,13 @@ export default function McaClauseReviewPage() {
   const { token = '' } = useParams();
 
   const query = trpc.bizrethink.mcaClauseLibrary.openLibrary.useQuery({ token });
+
+  /*
+    Separate from `openLibrary` so that recording a finding refetches the
+    findings alone. Re-reading the whole agreement to show one new sentence
+    would scroll a reader who is halfway down a hundred clauses back to the top.
+  */
+  const findings = trpc.bizrethink.mcaClauseLibrary.openFindings.useQuery({ token });
 
   if (query.isPending) {
     return <div className="mx-auto max-w-3xl px-6 py-16 text-muted-foreground">Loading…</div>;
@@ -205,14 +326,32 @@ export default function McaClauseReviewPage() {
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>
 
                 {clause.outstandingFindings.length > 0 && (
-                  <ul className="mt-3 space-y-1 border-[#a2560c]/40 border-l-2 pl-3 dark:border-[#d99a4e]/40">
-                    {clause.outstandingFindings.map((finding) => (
-                      <li key={finding} className="text-muted-foreground text-xs">
-                        {finding}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="mt-3 border-[#a2560c]/40 border-l-2 pl-3 dark:border-[#d99a4e]/40">
+                    {/*
+                      LABELLED BY ORIGIN, now that this page holds two kinds of
+                      finding. These came from the two earlier document reviews
+                      and are read out of the vendored register; the box below
+                      holds what THIS reader writes. Unlabelled, a reviewer
+                      would read her own findings and someone else's as one
+                      list and could not tell which she was expected to answer.
+                    */}
+                    <p className="font-medium text-muted-foreground text-xs">From the earlier document reviews</p>
+                    <ul className="mt-1 space-y-1">
+                      {clause.outstandingFindings.map((finding) => (
+                        <li key={finding} className="text-muted-foreground text-xs">
+                          {finding}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
+
+                <FindingBox
+                  clauseSlug={clause.slug}
+                  onRecorded={() => void findings.refetch()}
+                  recorded={(findings.data?.findings ?? []).filter((finding) => finding.clauseSlug === clause.slug)}
+                  token={token}
+                />
               </li>
             ))}
           </ul>

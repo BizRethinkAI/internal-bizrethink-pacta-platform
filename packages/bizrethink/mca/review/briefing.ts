@@ -31,11 +31,18 @@ import { JURISDICTION_NAMES, MCA_JURISDICTIONS } from '../jurisdictions';
  * no approval of theirs can change. Both are cheap to say and expensive to
  * leave unsaid.
  *
- * IT COLLECTS NOTHING. The page takes no findings, for the reason `link.ts` and
- * the router both give: MCA findings live in the `lombard-contracts` manifests
- * and a second register would drift from the first. That is only a defensible
- * design if the page says where comments go instead — otherwise a read-only
- * page reads as an oversight, and the reader has nowhere to put a sentence.
+ * WHERE COMMENTS GO. There is a box under every clause, and the briefing says
+ * so and says what a finding does — an unanswered one blocks approval of its
+ * clause, which is what separates it from a comment box.
+ *
+ * THIS SECTION SAID THE OPPOSITE ONE REVISION AGO, because the page did.
+ * Findings were refused on the grounds that the two adversarial DOCUMENT
+ * reviews keep their dispositions in `lombard-contracts` manifests and a second
+ * register would drift from the first. That reason was real; the conclusion
+ * drawn from it was too wide. Nothing counsel writes here is a second copy of a
+ * manifest finding — it arrives only on a link we minted, it is attributable to
+ * the reviewer named on that link, and no manifest has ever held one. One
+ * register per origin, and both pages label which origin a finding came from.
  */
 
 export type BriefingSection = {
@@ -217,9 +224,10 @@ export const counselBriefing = (input: BriefingInput): BriefingSection[] => {
       id: 'respond',
       title: 'How to send comments back',
       body: [
-        `**This page deliberately does not collect them.** Findings on these documents are kept in one register, alongside the two earlier reviews, so that there is a single answer to "what was raised and what was done about it". A comment box here would start a second register, and when two registers disagree there is no principled way to say which is right.`,
-        `${replyTo} Cite the clause by the reference shown beside it and we will record what you say in the same register the earlier reviews went into, along with what we did about it. If you would rather mark up a document, ask and we will send this agreement as a file.`,
-        `Recording a formal approval is done by us, from your written sign-off, so that the bar number and admitting jurisdiction attached to it are ones you gave us rather than ones typed into a web form by whoever held the link.`,
+        `**Write them under the clause.** There is a box beneath every clause below. What you write is recorded against that clause, attributed to you from this link, and visible to you here afterwards — including our answer when we make one, so you never have to wonder whether something saved.`,
+        `**A finding blocks the clause.** This is not a comment box: while a finding of yours is unanswered, the clause it names cannot be approved by anybody, including a different attorney. We clear it by answering in writing, and you see the answer in the same place you wrote the finding.`,
+        `${replyTo} If you would rather mark up a document, ask and we will send this agreement as a file.`,
+        `Recording a formal **approval** is still done by us, from your written sign-off, so that the bar number and admitting jurisdiction attached to it are ones you gave us rather than ones typed into a web form by whoever held the link. Findings go the other way and need no such ceremony, which is why one is a box on this page and the other is not.`,
         `${expiry} This text is confidential and unexecuted: no merchant or partner has been sent any of it.`,
       ],
     },

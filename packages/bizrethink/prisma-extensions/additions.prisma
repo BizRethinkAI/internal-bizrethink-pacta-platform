@@ -953,8 +953,65 @@ model BizrethinkMcaLibraryReview {
   createdByUserId Int
   expiresAt       DateTime?
 
+  findings BizrethinkMcaLibraryFinding[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([instrument])
+}
+
+/// A defect counsel reported against one clause, through a review link.
+///
+/// WHY THIS TABLE EXISTS WHEN THE PAGE ONCE REFUSED TO COLLECT FINDINGS. The
+/// refusal had a stated reason: findings from the two adversarial document
+/// reviews live in `lombard-contracts` manifests, and a second Pacta-side
+/// register of the same findings would drift from the first. That argument is
+/// about the reviews it names and does not reach this case. Nothing counsel
+/// records here is a second copy of anything — it arrives only through a link
+/// we minted, it is attributable to the reviewer named on that link, and no
+/// manifest has ever held one. There is one register per origin, and the review
+/// page labels which origin each finding came from.
+///
+/// SEPARATE FROM `BizrethinkLibraryFinding`, for the reason `mca/review/link.ts`
+/// gives about the review rows themselves: the lease table's token is resolved
+/// by a lease query that takes no discriminator, so sharing it would mean
+/// editing every lease finding query in the same change. What a merge would
+/// need is a `library` discriminator on both tables and on each of those
+/// queries, and this model is shaped so that merge is a data migration.
+model BizrethinkMcaLibraryFinding {
+  id String @id
+
+  /// The link it came in on. A finding is only ever created through a review
+  /// token, so there is no path that records one without a named reviewer.
+  reviewId String
+  review   BizrethinkMcaLibraryReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  /// Which clause. Not a foreign key: the library is code, not rows.
+  clauseSlug String
+
+  body String
+
+  /// Copied from the review rather than joined. The row is the record of who
+  /// said what, and it has to survive the review being closed.
+  authorName  String
+  authorEmail String
+
+  /// The words of the clause when the finding was made — as counsel READ them,
+  /// with the tenant's party names resolved, because that is the text she was
+  /// shown and an answer to a finding against different words is an answer to a
+  /// different question.
+  clauseFingerprint String
+
+  /// Null while outstanding. Both are required to clear it: a timestamp with no
+  /// text would make this as fast to bypass as to satisfy.
+  answeredAt       DateTime?
+  answer           String?
+  answeredByUserId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reviewId])
+  @@index([clauseSlug])
 }

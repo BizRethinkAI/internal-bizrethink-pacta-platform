@@ -12,6 +12,7 @@ import {
 import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../clauses/examination';
 import type { McaInstrument } from '../clauses/instruments';
 import { ALL_MCA_CLAUSES, libraryFor } from '../clauses/library';
+import { LOMBARD, resolveClauses } from '../clauses/parties';
 import { type McaLibraryClauseView, mcaLibrarySurface } from '../clauses/surface/view';
 import type { McaJurisdiction } from '../jurisdictions';
 import { isMcaReviewUsable, type McaLibraryReview, reviewIsStale } from '../review/link';
@@ -126,6 +127,40 @@ const approvalView = (
   lapsed: !isMcaApprovalCurrent(clause, approval),
   statesNotCovered: statesNotCovered(clause, approval.barJurisdiction),
 });
+
+/**
+ * A finding counsel recorded through a review link, as staff see it.
+ *
+ * SEPARATE FROM THE VENDORED REGISTER `outstandingFindingsFor` READS, and shown
+ * separately on both pages. That one holds the two adversarial document
+ * reviews, whose dispositions live in `lombard-contracts` manifests and are
+ * cleared by editing a manifest and re-vendoring. These arrive on a link, are
+ * attributable to the reviewer named on it, and are cleared with a sentence
+ * typed here. One register per origin, each labelled — the objection to a
+ * second register was that two copies of the SAME findings drift, and no
+ * manifest has ever held one of these.
+ */
+export type McaCounselFindingView = {
+  id: string;
+  clauseSlug: string;
+  /** Resolved to the heading counsel actually read, or the slug when unheaded. */
+  clauseLabel: string;
+  instrument: McaInstrument | null;
+  body: string;
+  authorName: string;
+  reviewerName: string;
+  answeredAt: string | null;
+  answer: string | null;
+  createdAt: string;
+  /**
+   * Whether the clause has moved since she read it.
+   *
+   * An answer to a finding against text that has since changed is an answer to
+   * a different question, and the person typing it is the one who needs to know
+   * that before they type it.
+   */
+  clauseMoved: boolean;
+};
 
 export const mcaLibraryPage = async () => {
   const surface = mcaLibrarySurface();
@@ -243,10 +278,59 @@ export const mcaLibraryPage = async () => {
     };
   });
 
+  /*
+    WHAT COUNSEL SAID, FOR THE PEOPLE WHO HAVE TO ANSWER IT.
+
+    Read here rather than over tRPC for the reason at the top of this file: one
+    place the page's data comes from, so the answer form and the approval badges
+    cannot disagree about whether a clause is blocked.
+  */
+  const findingRows = await prisma.bizrethinkMcaLibraryFinding.findMany({
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      clauseSlug: true,
+      body: true,
+      authorName: true,
+      clauseFingerprint: true,
+      answeredAt: true,
+      answer: true,
+      createdAt: true,
+      review: { select: { instrument: true, reviewerName: true } },
+    },
+  });
+
+  const counselFindings: McaCounselFindingView[] = findingRows.map((row) => {
+    const clause = ALL_MCA_CLAUSES.find((candidate) => candidate.slug === row.clauseSlug);
+    const asRead = clause === undefined ? null : resolveClauses([clause], LOMBARD)[0];
+
+    return {
+      id: row.id,
+      clauseSlug: row.clauseSlug,
+      // The heading counsel read, and the slug when the document heads nothing
+      // — forty clauses carry no heading at all.
+      clauseLabel: asRead === null || asRead.heading === '' ? row.clauseSlug : asRead.heading,
+      instrument: clause?.instrument ?? null,
+      body: row.body,
+      authorName: row.authorName,
+      reviewerName: row.review.reviewerName,
+      answeredAt: row.answeredAt === null ? null : row.answeredAt.toISOString(),
+      answer: row.answer,
+      createdAt: row.createdAt.toISOString(),
+      /*
+        A clause that has since been deleted counts as moved. It has certainly
+        not stayed the same, and "unknown" is not one of the two states the
+        person answering can act on.
+      */
+      clauseMoved: asRead === null || mcaClauseFingerprint(asRead) !== row.clauseFingerprint,
+    };
+  });
+
   return {
     ...surface,
     clauses,
     reviews,
+    counselFindings,
     totals: {
       ...surface.totals,
       /*
