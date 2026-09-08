@@ -31,7 +31,7 @@ export const KS_DISCLOSURE: ContentStatute = {
     verbatimRequired: true,
     verbatimVerifiedAt: '2026-09-06',
   },
-  sourceDigest: '2e9d48751efe52ae6a29e74bb8f629fae4ba93bcd6c23148620c8ec43b339461',
+  sourceDigest: '2c40445c16d7863010accc1b2157e9a5356c357190504ccce7f8b1b69e41ac4d',
   section: null,
   requirements: [
     {

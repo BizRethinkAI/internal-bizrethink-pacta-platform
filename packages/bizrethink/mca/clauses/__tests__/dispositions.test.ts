@@ -75,8 +75,13 @@ describe('a finding that was acted on is not outstanding', () => {
 
     const reviewTwo = [...FINDINGS_BY_ID.values()].flat().filter((finding) => finding.review === 'REVIEW-02');
 
-    expect(reviewTwo.filter((finding) => finding.disposition === 'implemented').length).toBe(21);
-    expect(reviewTwo.filter((finding) => finding.disposition === 'open').length).toBe(24);
+    // 21 → 26 and 24 → 19 when lombard-contracts #10 landed: the four owner
+    // answers plus decisions 5 and 6 were applied to the documents, and the
+    // manifest recorded them. The numbers move whenever that repository acts on
+    // a finding, which is the point of reading them from its manifest rather
+    // than restating them here.
+    expect(reviewTwo.filter((finding) => finding.disposition === 'implemented').length).toBe(26);
+    expect(reviewTwo.filter((finding) => finding.disposition === 'open').length).toBe(19);
     expect(reviewTwo.filter((finding) => finding.disposition === 'handoff').length).toBe(3);
   });
 
@@ -146,6 +151,12 @@ describe('a finding that was acted on is not outstanding', () => {
    * `implemented` and 1 `rejected` by the owner. Reporting all 124 as live work
    * is what the library did before #129.
    *
+   * IT FELL AGAIN — TO 38 — WHEN lombard-contracts #10 APPLIED THE OWNER
+   * ANSWERS. Five findings that were `open` are now `implemented`, and Pacta
+   * held them as live work for as long as its copy of the register was stale.
+   * That is the drift `scripts/mca/revendor.py` exists to make visible in one
+   * command.
+   *
    * IT FELL FROM 58 TO 39 WHEN REVIEW-02 GOT ITS MANIFEST. Before
    * lombard-contracts PR #9, 45 of the 58 were `unrecorded` — counted as
    * outstanding because unknown is not done. Nineteen of those turned out to be
@@ -158,7 +169,7 @@ describe('a finding that was acted on is not outstanding', () => {
     const stillOpen = new Set(ALL_MCA_CLAUSES.flatMap((clause) => outstandingFindingsFor(clause)).map((f) => f.id));
 
     expect(distinct.size).toBe(136);
-    expect(stillOpen.size).toBe(43);
-    expect(distinct.size - stillOpen.size).toBe(93);
+    expect(stillOpen.size).toBe(38);
+    expect(distinct.size - stillOpen.size).toBe(98);
   });
 });

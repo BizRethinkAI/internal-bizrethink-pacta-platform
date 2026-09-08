@@ -66,7 +66,7 @@ describe('the MCA clause library surface', () => {
    */
   it('counts outstanding findings, not all findings', () => {
     expect(surface.totals.findingsCited).toBe(136);
-    expect(surface.totals.outstanding).toBe(43);
+    expect(surface.totals.outstanding).toBe(38);
     expect(surface.totals.outstanding).toBeLessThan(surface.totals.findingsCited);
   });
 
