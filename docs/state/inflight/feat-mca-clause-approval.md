@@ -112,7 +112,7 @@ migration; it belongs to whoever owns both verticals at once.
 - **Nothing was published to Pacta and no template was uploaded.** The counsel
   link is a page in this application; sending it is a person copying a URL.
 
-## One defect found reviewing my own change
+## Two defects found reviewing my own change
 
 `outstandingFindingsFor` reads the review register off disk and returns `[]`
 when the file is absent, so **an unreadable register and a clause with nothing
@@ -124,6 +124,12 @@ availability flag and refuses outright, ahead of naming any finding, because an
 empty findings list is exactly the answer a missing register cannot be trusted
 about. `docker/Dockerfile` copies the register today (#132), so this refuses
 nothing now and is the whole guard the day somebody edits that COPY line.
+
+The **same defect on the counsel page**, which is worse because a third party
+reads it: an absent register renders as "no findings" to the attorney who is
+acting on it. `openLibrary` now sends `findingsReadable` and the page says so
+instead of counting — before the count, because the count is what cannot be
+trusted.
 
 ## Rebased onto #133
 
