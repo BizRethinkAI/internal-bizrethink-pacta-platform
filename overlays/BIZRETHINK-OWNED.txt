@@ -54,6 +54,8 @@ apps/remix/app/routes/_authenticated+/admin+/lease-library.tsx
 # Read-only. It resolves no organisation and touches no database — the whole
 # page is a function of files committed to this repository.
 apps/remix/app/routes/_authenticated+/admin+/mca.tsx
+# The clause library's own page (ADR 0008: two surfaces, two release paths).
+apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
 
 # The server-only half of that route. `conformitySurface()` reads the vendored
 # statutes off disk, so its module graph reaches node:fs — and importing it
@@ -63,6 +65,7 @@ apps/remix/app/routes/_authenticated+/admin+/mca.tsx
 # `app/utils/` is upstream's directory, so this is one line and not a glob. The
 # `bizrethink-` filename prefix is the ownership marker.
 apps/remix/app/utils/bizrethink-mca-conformity.server.ts
+apps/remix/app/utils/bizrethink-mca-library.server.ts
 
 # Components imported by those routes. Namespaced under lease/ so a collision
 # with an upstream component is impossible short of upstream shipping a lease
