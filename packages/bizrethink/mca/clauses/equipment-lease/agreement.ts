@@ -12,7 +12,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.equipment',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.1',
     section: 'agreement',
     sortKey: 10,
@@ -26,7 +26,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.effective-date-term-and-interim-rent',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.2',
     section: 'agreement',
     sortKey: 20,
@@ -40,7 +40,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.site-preparation',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.3',
     section: 'agreement',
     sortKey: 30,
@@ -54,7 +54,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.payment-of-amounts-due',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.4',
     section: 'agreement',
     sortKey: 40,
@@ -68,7 +68,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.use-return-of-equipment-and-insurance',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.5',
     section: 'agreement',
     sortKey: 50,
@@ -82,7 +82,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.title-to-equipment',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.6',
     section: 'agreement',
     sortKey: 60,
@@ -96,7 +96,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.7',
     section: 'agreement',
     sortKey: 70,
@@ -110,7 +110,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.software-license',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.8',
     section: 'agreement',
     sortKey: 80,
@@ -132,7 +132,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.limitation-on-liability',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.9',
     section: 'agreement',
     sortKey: 90,
@@ -154,7 +154,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.warranties',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.10',
     section: 'agreement',
     sortKey: 100,
@@ -168,7 +168,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.indemnification',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.11',
     section: 'agreement',
     sortKey: 110,
@@ -190,7 +190,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.default-remedies',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.12',
     section: 'agreement',
     sortKey: 120,
@@ -204,7 +204,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.assignment',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.13',
     section: 'agreement',
     sortKey: 130,
@@ -218,7 +218,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.lease-guaranty',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.14',
     section: 'agreement',
     sortKey: 140,
@@ -241,7 +241,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.governing-law-and-venue',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.15',
     section: 'agreement',
     sortKey: 150,
@@ -263,7 +263,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.notices',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.16',
     section: 'agreement',
     sortKey: 160,
@@ -277,7 +277,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.electronic-signatures',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.17',
     section: 'agreement',
     sortKey: 170,
@@ -291,7 +291,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.entire-agreement',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.18',
     section: 'agreement',
     sortKey: 180,
@@ -305,7 +305,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
   {
     slug: 'equipment-lease.survival',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '3.19',
     section: 'agreement',
     sortKey: 190,

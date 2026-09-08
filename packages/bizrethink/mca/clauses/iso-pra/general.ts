@@ -13,7 +13,7 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   {
     slug: 'iso-pra.representations-and-warranties',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '3.1',
     section: 'general',
     sortKey: 10,
@@ -27,7 +27,7 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   {
     slug: 'iso-pra.term-and-termination',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '3.2',
     section: 'general',
     sortKey: 20,
@@ -41,7 +41,7 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   {
     slug: 'iso-pra.indemnification',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '3.3',
     section: 'general',
     sortKey: 30,
@@ -55,7 +55,7 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   {
     slug: 'iso-pra.independent-contractor',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '3.4',
     section: 'general',
     sortKey: 40,
@@ -69,7 +69,7 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   {
     slug: 'iso-pra.governing-law',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '3.5',
     section: 'general',
     sortKey: 50,
@@ -83,7 +83,7 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   {
     slug: 'iso-pra.entire-agreement',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '3.6',
     section: 'general',
     sortKey: 60,

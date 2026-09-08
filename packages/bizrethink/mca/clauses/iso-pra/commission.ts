@@ -13,7 +13,7 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   {
     slug: 'iso-pra.commission-rate',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: 'A.1',
     section: 'commission',
     sortKey: 10,
@@ -33,7 +33,7 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   {
     slug: 'iso-pra.when-commission-is-earned',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: 'A.2',
     section: 'commission',
     sortKey: 20,
@@ -55,7 +55,7 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   {
     slug: 'iso-pra.payment-timing',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: 'A.3',
     section: 'commission',
     sortKey: 30,
@@ -84,7 +84,7 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   {
     slug: 'iso-pra.clawback-provision',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: 'A.4',
     section: 'commission',
     sortKey: 40,
@@ -119,7 +119,7 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   {
     slug: 'iso-pra.commission-transparency',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: 'A.5',
     section: 'commission',
     sortKey: 50,
@@ -145,7 +145,7 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   {
     slug: 'iso-pra.sole-compensation',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: 'A.6',
     section: 'commission',
     sortKey: 60,

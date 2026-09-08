@@ -21,10 +21,10 @@ text being written down.
 
 | | |
 |---|---|
+| FRPA | **101 clauses, imported** — 87 numbered, 14 the document leaves unnumbered |
 | ISO Partner Referral Agreement | **24 clauses, imported** |
 | Equipment Lease | **26 clauses, imported** |
 | Subscription | **26 clauses, imported** — the Equipment Lease's twin |
-| FRPA | not imported — 90 clauses |
 | Payzli Split Funding Authorization | no numbered clauses; it is a letter |
 | Permission to Release | no numbered clauses |
 | Approvals, review links, an admin surface | not built |
@@ -82,11 +82,17 @@ recipient. Putting the relation in the field name is what keeps
    Subscription share no vocabulary-bearing sentence, so there is nothing to
    store once; what there is instead is `__tests__/twins.test.ts`, which
    answers REVIEW-02's *"a fix applied to one and not the other is a divergence
-   nothing checks for"* by checking for it.
-6. **Slugs are globally unique**, across instruments as well as within them.
+   nothing checks for"* by checking for it. `instrument` is consequently
+   singular: across 177 clauses not one names a second.
+6. **A clause the document does not number still gets imported.** Fourteen FRPA
+   clauses carry no number, including the granting clause — the sentence that
+   makes the instrument a sale rather than a loan.
+   `__tests__/frpa-coverage.test.ts` asserts that nothing in the document is
+   missing from the library, which is the direction that fails silently.
+7. **Slugs are globally unique**, across instruments as well as within them.
    The lease library learned this when one attorney approval hid another's,
    because approvals are keyed by slug alone.
-7. **Reach a clause through `libraryFor`, never by importing an instrument's
+8. **Reach a clause through `libraryFor`, never by importing an instrument's
    module.** The California disclosure shipped carrying New York's phrasing and
    survived a human reading both regulations side by side; the failure was that
    a caller could reach the wrong text at all. The instruments here are more
@@ -105,9 +111,11 @@ applied, and that every declared divergence still diverges — so the register
 cannot go write-only. Five clauses differ in substance (§§3.4–3.8) and ten more
 places differ only in wording; both lists are pinned.
 
-They do not prove a clause is any good. The clauses here cite **44 distinct
-findings that survived refutation**, of which **21 are still outstanding** —
-the other 23 were fixed, and `REVIEW-01-manifest.json` is what says so.
+They do not prove a clause is any good. The clauses here cite **124 distinct
+findings that survived refutation**, of which **58 are still outstanding** —
+the other 66 were fixed or rejected, and `REVIEW-01-manifest.json` is what says
+so. Forty-five of the 58 are `unrecorded` and will fall sharply once
+lombard-contracts PR #9 lands REVIEW-02's manifest.
 
 **`findingsFor` and `outstandingFindingsFor` mean different things and the
 difference is the point.** A finding surviving refutation says it was RIGHT.
