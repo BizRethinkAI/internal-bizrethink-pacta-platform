@@ -77,8 +77,8 @@ describe('the MCA clause library', () => {
    * because the moment a genuinely shared clause appears this is the test that
    * should be reconsidered, and a count in prose would not be.
    */
-  it('gives every clause exactly one instrument, across all 192', () => {
-    expect(ALL_MCA_CLAUSES).toHaveLength(192);
+  it('gives every clause exactly one instrument, across all 204', () => {
+    expect(ALL_MCA_CLAUSES).toHaveLength(204);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 
