@@ -49,7 +49,7 @@ export const NY_ITEMIZATION: ItemizationForm = {
     verbatimVerifiedAt: '2026-09-07',
     structureVerifiedAt: '2026-09-07',
   },
-  sourceDigest: '958bec0fdf305f2eba624b330ef2197abc28e0737514512de8bfc0b9251bf0f2',
+  sourceDigest: 'f255a3f65ef0a79fc3583844a314a4ff9ffa97c8cc42839e641cd7d93b9df07a',
   section: {
     from: 'Section 600.17 Funding recipient will receive.',
     to: 'Section 600.18 Signatures.',
