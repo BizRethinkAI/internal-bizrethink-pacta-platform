@@ -112,6 +112,19 @@ migration; it belongs to whoever owns both verticals at once.
 - **Nothing was published to Pacta and no template was uploaded.** The counsel
   link is a page in this application; sending it is a person copying a URL.
 
+## One defect found reviewing my own change
+
+`outstandingFindingsFor` reads the review register off disk and returns `[]`
+when the file is absent, so **an unreadable register and a clause with nothing
+outstanding against it were indistinguishable** to the approval gate — the same
+observation `surface/view.ts` already makes about `source-missing`. On a page
+that is cosmetic; on the gate that decides whether counsel's sign-off may be
+recorded it is a gate that silently stops gating. `findingsHold` now takes the
+availability flag and refuses outright, ahead of naming any finding, because an
+empty findings list is exactly the answer a missing register cannot be trusted
+about. `docker/Dockerfile` copies the register today (#132), so this refuses
+nothing now and is the whole guard the day somebody edits that COPY line.
+
 ## Rebased onto #133
 
 `origin/main` moved while this was open: PR #133 re-vendored after owner edits
