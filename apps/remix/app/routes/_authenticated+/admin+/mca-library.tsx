@@ -3,6 +3,7 @@ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { AlertTriangle, FileWarning, Lock, ScrollText } from 'lucide-react';
 import { useLoaderData } from 'react-router';
@@ -13,7 +14,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/mca-library';
 
 export function meta() {
-  return appMetaTags('MCA Clauses');
+  return appMetaTags(msg`MCA Clauses`);
 }
 
 /**

@@ -314,10 +314,20 @@ msgstr "{0, plural, one {You are about to delete the selected template.} other {
 msgid "{0}"
 msgstr "{0}"
 
+#. placeholder {0}: result.provider ?? ''
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "{0} answered."
+msgstr "{0} answered."
+
 #. placeholder {0}: team.name
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "{0} direct signing templates"
 msgstr "{0} direct signing templates"
+
+#. placeholder {0}: evidence.sourcesMoved.length
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "{0} document(s) changed since these clauses were transcribed from them"
+msgstr "{0} document(s) changed since these clauses were transcribed from them"
 
 #. placeholder {0}: t(FRIENDLY_FIELD_TYPE[field.type])
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
@@ -1820,6 +1830,10 @@ msgstr "An admin has deleted your document \"{documentName}\"."
 msgid "An administrator has created a Documenso account for you."
 msgstr "An administrator has created a Documenso account for you."
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "An API key for Gemini or Claude, used by the lease clause drafter. Stored encrypted at rest."
+msgstr "An API key for Gemini or Claude, used by the lease clause drafter. Stored encrypted at rest."
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
 msgstr "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
@@ -2156,6 +2170,7 @@ msgstr "API"
 
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/components/forms/email-transport-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 msgid "API key"
 msgstr "API key"
 
@@ -2553,6 +2568,10 @@ msgstr "Border Radius"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Border radius size in REM units (e.g. 0.5rem)."
 msgstr "Border radius size in REM units (e.g. 0.5rem)."
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Both authenticate with an API key alone — no cloud project or region is needed."
+msgstr "Both authenticate with an API key alone — no cloud project or region is needed."
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
@@ -3024,6 +3043,10 @@ msgstr "Claim account"
 msgid "Claims"
 msgstr "Claims"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Clause"
+msgstr "Clause"
+
 #: apps/remix/app/components/general/filter-pill.tsx
 msgid "Clear"
 msgstr "Clear"
@@ -3354,6 +3377,8 @@ msgstr "Confirmation email sent"
 msgid "Connected to Stripe"
 msgstr "Connected to Stripe"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/stripe.tsx
 msgid "Connection failed"
 msgstr "Connection failed"
@@ -3361,6 +3386,11 @@ msgstr "Connection failed"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 msgid "Connection succeeded."
 msgstr "Connection succeeded."
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Connection works"
+msgstr "Connection works"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Consent to Electronic Transactions"
@@ -3565,6 +3595,11 @@ msgstr "Copy Value"
 #: apps/remix/app/components/dialogs/token-create-dialog.tsx
 msgid "Copy your token now. For security reasons you will not be able to see it again."
 msgstr "Copy your token now. For security reasons you will not be able to see it again."
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Could not test the connection"
+msgstr "Could not test the connection"
 
 #: apps/remix/app/components/general/organisation-usage-reset-button.tsx
 msgid "Counter reset."
@@ -5640,6 +5675,10 @@ msgstr "Enclosed Document"
 msgid "Enclosed Documents"
 msgstr "Enclosed Documents"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Encrypted at rest. It is never sent back to this page once saved."
+msgstr "Encrypted at rest. It is never sent back to this page once saved."
+
 #: apps/remix/app/routes/_authenticated+/admin+/storage.tsx
 msgid "Endpoint (optional, for non-AWS providers)"
 msgstr "Endpoint (optional, for non-AWS providers)"
@@ -5931,6 +5970,11 @@ msgstr "Event"
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Event Type"
 msgstr "Event Type"
+
+#. placeholder {0}: totals.findingsCited
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Every clause is attorney-drafted with no named reviewer, so the publishing gate refuses all of them — that is the design, not a defect. Outstanding counts only findings nobody has acted on: {0} were cited across the library and the rest are recorded as implemented, rejected or withdrawn in the review manifests."
+msgstr "Every clause is attorney-drafted with no named reviewer, so the publishing gate refuses all of them — that is the design, not a defect. Outstanding counts only findings nobody has acted on: {0} were cited across the library and the rest are recorded as implemented, rejected or withdrawn in the review manifests."
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: packages/lib/constants/document-visibility.ts
@@ -6566,10 +6610,6 @@ msgstr "Go to your settings"
 msgid "Google Cloud HSM"
 msgstr "Google Cloud HSM"
 
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Google Vertex AI credentials for AI-assisted contract review. Stored encrypted at rest."
-msgstr "Google Vertex AI credentials for AI-assisted contract review. Stored encrypted at rest."
-
 #: packages/ui/primitives/signature-pad/signature-pad-color-picker.tsx
 msgid "Green"
 msgstr "Green"
@@ -6727,6 +6767,10 @@ msgstr "Hide \"Powered by Pacta\" attribution"
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "Hide license key"
 msgstr "Hide license key"
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Hide the key"
+msgstr "Hide the key"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
@@ -7300,6 +7344,24 @@ msgstr "Last Year"
 msgid "Learn more"
 msgstr "Learn more"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases.$id.tsx
+msgid "Lease Builder"
+msgstr "Lease Builder"
+
+#: apps/remix/app/routes/_authenticated+/admin+/lease-library.tsx
+msgid "Lease clause library"
+msgstr "Lease clause library"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "Lease Clauses"
+msgstr "Lease Clauses"
+
+#: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/general/app-nav-mobile.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/leases._index.tsx
+msgid "Leases"
+msgstr "Leases"
+
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Leave"
@@ -7724,6 +7786,20 @@ msgstr "Maximum number of recipients per document allowed. 0 = Unlimited"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Maximum number of uploaded files per envelope allowed"
 msgstr "Maximum number of uploaded files per envelope allowed"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "MCA Clauses"
+msgstr "MCA Clauses"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca.tsx
+msgid "MCA conformity"
+msgstr "MCA conformity"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+msgid "MCA Conformity"
+msgstr "MCA Conformity"
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
@@ -8250,6 +8326,12 @@ msgstr "None"
 msgid "None (Overrides global settings)"
 msgstr "None (Overrides global settings)"
 
+#. placeholder {0}: totals.clauses
+#. placeholder {1}: totals.outstanding
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "None of these {0} clauses may be sent to a merchant, and {1} findings are outstanding"
+msgstr "None of these {0} clauses may be sent to a merchant, and {1} findings are outstanding"
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
@@ -8277,6 +8359,10 @@ msgstr "Nothing cancelled"
 msgid "Nothing to do"
 msgstr "Nothing to do"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Nothing typed. A saved key is encrypted at rest and never sent back to this page, so it cannot be revealed."
+msgstr "Nothing typed. A saved key is encrypted at rest and never sent back to this page, so it cannot be revealed."
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 msgid "Notifications"
 msgstr "Notifications"
@@ -8284,6 +8370,7 @@ msgstr "Notifications"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
@@ -8628,6 +8715,10 @@ msgstr "Original"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Otherwise, the document will be created as a draft."
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Outstanding"
+msgstr "Outstanding"
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
@@ -9311,6 +9402,7 @@ msgstr "Progress"
 msgid "Prompt (none / login / consent / select_account)"
 msgstr "Prompt (none / login / consent / select_account)"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Provider"
 msgstr "Provider"
@@ -9387,6 +9479,10 @@ msgstr "Re-register"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Re-register Email Domain"
 msgstr "Re-register Email Domain"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Read by"
+msgstr "Read by"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
@@ -10151,6 +10247,14 @@ msgstr "Return to sign in"
 msgid "Return to templates"
 msgstr "Return to templates"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Reveal the key"
+msgstr "Reveal the key"
+
+#: apps/remix/app/routes/_recipient+/lease-review.$token.tsx
+msgid "Review a lease · Pacta"
+msgstr "Review a lease · Pacta"
+
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Review request"
 msgstr "Review request"
@@ -10250,6 +10354,10 @@ msgstr "Save"
 msgid "Save AI config"
 msgstr "Save AI config"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Save and test connection"
+msgstr "Save and test connection"
+
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-save-as-template-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -10282,6 +10390,11 @@ msgstr "Save storage config"
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Save Template"
 msgstr "Save Template"
+
+#. placeholder {0}: result.provider ?? ''
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Saved, and {0} answered."
+msgstr "Saved, and {0} answered."
 
 #: apps/remix/app/routes/_authenticated+/admin+/unsealed-documents._index.tsx
 msgid "Seal job triggered"
@@ -11281,6 +11394,10 @@ msgstr "SMTP Settings"
 msgid "SMTP settings saved"
 msgstr "SMTP settings saved"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Some evidence is not present in this environment"
+msgstr "Some evidence is not present in this environment"
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
@@ -12140,6 +12257,10 @@ msgstr "Test live connection"
 msgid "Test sandbox connection"
 msgstr "Test sandbox connection"
 
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "Test saved connection"
+msgstr "Test saved connection"
+
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Test Webhook"
 msgstr "Test Webhook"
@@ -12232,6 +12353,10 @@ msgstr "The authentication methods required for recipients to sign the signature
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "The authentication methods required for recipients to view the document."
 msgstr "The authentication methods required for recipients to view the document."
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "The clause text below may be quoting superseded sentences. Re-vendor the affected documents from lombard-contracts and re-earn their verification dates."
+msgstr "The clause text below may be quoting superseded sentences. Re-vendor the affected documents from lombard-contracts and re-earn their verification dates."
 
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "The content to show in the banner, HTML is allowed"
@@ -12423,6 +12548,10 @@ msgstr "The instance now signs using environment-variable configuration."
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "The license key has been copied to your clipboard"
 msgstr "The license key has been copied to your clipboard"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "The negotiated agreements — our contract text, not a regulator's. Conformity for the prescribed disclosure forms is a separate page."
+msgstr "The negotiated agreements — our contract text, not a regulator's. Conformity for the prescribed disclosure forms is a separate page."
 
 #. placeholder {0}: form.watch('name')
 #. placeholder {1}: form.watch('email')
@@ -13524,6 +13653,8 @@ msgstr "Unknown"
 
 #: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/signing.tsx
@@ -14044,18 +14175,6 @@ msgstr "Verify your email to upload documents."
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Verify your team email address"
 msgstr "Verify your team email address"
-
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Vertex API key"
-msgstr "Vertex API key"
-
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Vertex location"
-msgstr "Vertex location"
-
-#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
-msgid "Vertex project ID"
-msgstr "Vertex project ID"
 
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: apps/remix/app/components/forms/editor/editor-field-radio-form.tsx
@@ -14813,6 +14932,10 @@ msgstr "Well-known URL is required"
 msgid "Were you trying to edit this document instead?"
 msgstr "Were you trying to edit this document instead?"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "What is missing cannot be checked here, so an empty result below is not a clean one. This is a deployment fact rather than a defect in the text."
+msgstr "What is missing cannot be checked here, so an empty result below is not a clean one. This is a deployment fact rather than a defect in the text."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"
 msgstr "What you can do with teams:"
@@ -15456,6 +15579,10 @@ msgstr "You have successfully revoked access."
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
 msgstr "You have the right to withdraw your consent to use electronic signatures at any time before completing the signing process. To withdraw your consent, please contact the sender of the document. In failing to contact the sender you may reach out to <0>{SUPPORT_EMAIL}</0> for assistance. Be aware that withdrawing consent may delay or halt the completion of the related transaction or service."
+
+#: apps/remix/app/routes/_authenticated+/admin+/ai.tsx
+msgid "You have typed a new key. Use \"Save and test connection\" — this button tests the saved one."
+msgstr "You have typed a new key. Use \"Save and test connection\" — this button tests the saved one."
 
 #: apps/remix/app/components/forms/form-sticky-save-bar.tsx
 msgid "You have unsaved changes"
