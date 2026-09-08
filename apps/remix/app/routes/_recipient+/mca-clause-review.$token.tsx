@@ -63,7 +63,7 @@ export default function McaClauseReviewPage() {
     );
   }
 
-  const { reviewerName, instrument, agreementMoved, sections } = query.data;
+  const { reviewerName, instrument, agreementMoved, findingsReadable, sections } = query.data;
 
   const clauses = sections.flatMap((section) => section.clauses);
   const approved = clauses.filter((clause) => clause.approved).length;
@@ -96,7 +96,23 @@ export default function McaClauseReviewPage() {
         </AlertDescription>
       </Alert>
 
-      {outstanding > 0 && (
+      {/*
+        AN EMPTY FINDING LIST AND AN UNREADABLE REGISTER LOOK IDENTICAL, and on
+        this page the person acting on the difference is the attorney. Said
+        before the count, because the count is exactly what cannot be trusted.
+      */}
+      {!findingsReadable && (
+        <Alert className="mt-4" variant="warning">
+          <AlertTitle>What the earlier reviews found cannot be read here</AlertTitle>
+          <AlertDescription>
+            Two adversarial reviews read these documents before you, and their register is not present in this
+            environment. No finding is shown below, and that is an absence of evidence rather than an absence of
+            findings.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {findingsReadable && outstanding > 0 && (
         <Alert className="mt-4" variant="warning">
           <AlertTitle>
             {outstanding} of these clauses carry a finding from an earlier review that nothing has disposed of

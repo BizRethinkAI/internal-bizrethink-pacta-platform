@@ -289,6 +289,17 @@ export const mcaClauseLibraryRouter = router({
       */
       agreementMoved: reviewIsStale(review, clauses),
       /*
+        WHETHER THE FINDINGS BELOW CAN BE TRUSTED TO BE COMPLETE.
+
+        `outstandingFindingsFor` reads the review register off disk and returns
+        `[]` when the file is absent, so an empty list means either "nothing
+        outstanding" or "we cannot tell". Telling an attorney nothing was found
+        when we cannot tell is worse on this page than on any other, because
+        she is the one person acting on it. `findingsHold` refuses an approval
+        for the same reason; this is the read-only half of the same honesty.
+      */
+      findingsReadable: REGISTER_AVAILABLE,
+      /*
         Grouped and in reading order. `openLibrary` on the lease side returned a
         flat list in module-concatenation order, which is neither document order
         nor any other order a reader could name.

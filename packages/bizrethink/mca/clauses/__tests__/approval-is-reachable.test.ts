@@ -143,6 +143,17 @@ describe('the two pages', () => {
     expect(counselPage).not.toContain('useMutation');
   });
 
+  /*
+    THE SAME "EMPTY OR UNREADABLE" PROBLEM, ON THE PAGE A THIRD PARTY READS.
+    The findings shown under each clause come from a register read off disk,
+    and an absent file yields an empty list. Telling an attorney that nothing
+    was found when we cannot tell is worse than saying nothing at all.
+  */
+  it('tells the reviewer when the earlier reviews could not be read', () => {
+    expect(router).toContain('REGISTER_AVAILABLE');
+    expect(counselPage).toContain('findingsReadable');
+  });
+
   it('declares the counsel route as ours', () => {
     expect(owned).toContain('apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx');
   });
