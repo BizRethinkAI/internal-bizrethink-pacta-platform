@@ -63,7 +63,7 @@ export default function McaClauseReviewPage() {
     );
   }
 
-  const { reviewerName, instrument, agreementMoved, findingsReadable, sections } = query.data;
+  const { reviewerName, instrument, parties, agreementMoved, findingsReadable, sections } = query.data;
 
   const clauses = sections.flatMap((section) => section.clauses);
   const approved = clauses.filter((clause) => clause.approved).length;
@@ -74,7 +74,7 @@ export default function McaClauseReviewPage() {
       <p className="text-muted-foreground text-sm">For {reviewerName}</p>
       <h1 className="mt-1 font-semibold text-3xl">{instrument.title}</h1>
       <p className="mt-1 text-muted-foreground text-sm">
-        {instrument.entity} · {clauses.length} clauses · {approved} carry a current approval
+        {parties.funder} · {clauses.length} clauses · {approved} carry a current approval
       </p>
 
       {agreementMoved && (
