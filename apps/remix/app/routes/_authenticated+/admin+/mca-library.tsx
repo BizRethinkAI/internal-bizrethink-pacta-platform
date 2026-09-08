@@ -89,7 +89,6 @@ const InstrumentCard = ({
       <ScrollText className="h-4 w-4 shrink-0 text-muted-foreground" />
       <h2 className="font-medium text-foreground">{instrument.title}</h2>
       <Badge variant="secondary">{COUNTERPARTY_LABEL[instrument.counterparty] ?? instrument.counterparty}</Badge>
-      <span className="text-muted-foreground text-sm">{instrument.entity}</span>
       <span className="ml-auto flex items-center gap-2">
         <Badge variant={SOURCE_VARIANT[instrument.sourceState]}>{SOURCE_LABEL[instrument.sourceState]}</Badge>
         <span className="text-muted-foreground text-sm">

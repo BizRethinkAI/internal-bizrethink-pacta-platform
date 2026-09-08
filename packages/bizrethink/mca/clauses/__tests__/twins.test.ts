@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { readAgreementBody } from '../documents';
-import { INSTRUMENTS } from '../instruments';
 import { libraryFor } from '../library';
+import { LOMBARD } from '../parties';
 import {
   applyTwinVocabulary,
   EQUIPMENT_TWIN,
@@ -187,7 +187,7 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
    * removed from both.
    */
   it('has no vocabulary entry that never applies', () => {
-    const leaseText = readAgreementBody(INSTRUMENTS['equipment-lease'].sourceDocument);
+    const leaseText = readAgreementBody(LOMBARD.documents['equipment-lease'].file);
 
     for (const [from] of TWIN_VOCABULARY) {
       expect(leaseText.includes(from), `vocabulary entry never appears in the document: ${from}`).toBe(true);

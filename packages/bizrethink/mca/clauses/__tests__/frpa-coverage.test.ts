@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { documentLines, linesNotAccountedFor } from '../documents';
 import { FRPA_LOCUS_EXCLUSIONS, FRPA_NON_CLAUSE } from '../frpa';
-import { INSTRUMENTS } from '../instruments';
+
 import { libraryFor } from '../library';
+import { LOMBARD, resolveClauses } from '../parties';
 
 /**
  * EVERY LINE OF THE DOCUMENT IS ACCOUNTED FOR, OR THIS FAILS.
@@ -32,10 +33,10 @@ import { libraryFor } from '../library';
  */
 describe('the FRPA library accounts for the whole document', () => {
   const clauses = libraryFor('frpa');
-  const file = INSTRUMENTS.frpa.sourceDocument;
+  const file = LOMBARD.documents.frpa.file;
 
   it('leaves no line unaccounted for', () => {
-    expect(linesNotAccountedFor(file, clauses, FRPA_NON_CLAUSE)).toEqual([]);
+    expect(linesNotAccountedFor(file, resolveClauses(clauses, LOMBARD), FRPA_NON_CLAUSE)).toEqual([]);
   });
 
   it('reads the whole document, not a prefix of it', () => {

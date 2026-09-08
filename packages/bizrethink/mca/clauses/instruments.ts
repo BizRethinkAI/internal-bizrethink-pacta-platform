@@ -37,7 +37,7 @@ export type McaInstrument =
   | 'equipment-lease'
   | 'subscription'
   | 'iso-pra'
-  | 'payzli-split-funding'
+  | 'split-funding'
   | 'permission-to-release';
 
 export const MCA_INSTRUMENTS: readonly McaInstrument[] = [
@@ -45,7 +45,7 @@ export const MCA_INSTRUMENTS: readonly McaInstrument[] = [
   'equipment-lease',
   'subscription',
   'iso-pra',
-  'payzli-split-funding',
+  'split-funding',
   'permission-to-release',
 ];
 
@@ -64,48 +64,7 @@ export type McaInstrumentRecord = {
   id: McaInstrument;
   title: string;
   counterparty: McaCounterparty;
-  /**
-   * The Lombard entity that is party to it.
-   *
-   * RECORDED BECAUSE IT IS NOT ONE ENTITY, AND ONE OF THEM IS BARELY
-   * DOCUMENTED. Three published documents are with Lombard Pay LLC, and
-   * `CONTRACT_INDEX.md` names only Lombard Capital LLC (REVIEW-02,
-   * `two-lombard-entities-one-of-which-appears-nowhere-authoritative`). The
-   * FRPA carries the phrase "an Equipment Lease Agreement between Merchant and
-   * Lombard Pay LLC" verbatim four times, three of them in clauses no review
-   * had examined until REVIEW-02.
-   */
-  entity: string;
   /** The vendored body text in `source-documents/`. */
-  sourceDocument: string;
-  /**
-   * The normalised digest of that file's body, as it stood when the clause
-   * bodies below were transcribed from it.
-   *
-   * Empty string until an instrument's clauses are imported — see
-   * `bodiesVerifiedAt`, which is the field that says whether this one means
-   * anything yet.
-   */
-  sourceDigest: string;
-  /**
-   * ISO date the clause bodies were last checked against that document, or
-   * null when no clause has been imported for this instrument.
-   *
-   * A DATE AND A DIGEST, FOR THE REASON THE REST OF THIS PACKAGE GIVES. The
-   * date is the claim; the digest is what re-executes it. A date without a
-   * digest is a date somebody typed, and re-stamping the date after a digest
-   * breaks — instead of re-reading the document — is the one move the whole
-   * mechanism exists to make impossible by accident.
-   *
-   * THE MECHANISM HAS NOW FIRED ONCE, ON 2026-09-08. `lombard-contracts` PR #10
-   * applied five owner-decision edits to four of these six documents, and every
-   * one of those digests broke. Nothing in this repository knew the `.docx`
-   * files had changed — Pacta hashes its own vendored copy, not the source — so
-   * the break came from re-vendoring, and the red named the seven clauses whose
-   * words had moved. Each body below was re-read from the re-vendored text
-   * rather than retyped, and only then were these dates re-stamped.
-   */
-  bodiesVerifiedAt: string | null;
 };
 
 export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
@@ -113,55 +72,31 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     id: 'frpa',
     title: 'Future Receivables Purchase Agreement',
     counterparty: 'merchant',
-    entity: 'Lombard Capital LLC',
-    sourceDocument: 'Lombard_FRPA_v4.txt',
-    sourceDigest: 'e236a2cb42fcaec9cd2d53ed41f159726e518449561fb7a4d74c56bc1625eb2c',
-    bodiesVerifiedAt: '2026-09-08',
   },
   'equipment-lease': {
     id: 'equipment-lease',
     title: 'Equipment Lease Agreement',
     counterparty: 'merchant',
-    entity: 'Lombard Pay LLC',
-    sourceDocument: 'Lombard_Equipment_Lease_Agreement_v1.txt',
-    sourceDigest: '95d57e4d6e524430bc8891d7ee9262d68882d89f9d0ca046edc55a9da286dd9f',
-    bodiesVerifiedAt: '2026-09-08',
   },
   subscription: {
     id: 'subscription',
     title: 'Subscription Agreement',
     counterparty: 'merchant',
-    entity: 'Lombard Pay LLC',
-    sourceDocument: 'Lombard_Subscription_Agreement_v2.txt',
-    sourceDigest: 'dc82632ba82667125ec689f6c7f52178f39a2250872e59a5239096a1fc56f61a',
-    bodiesVerifiedAt: '2026-09-08',
   },
   'iso-pra': {
     id: 'iso-pra',
     title: 'ISO Partner Referral Agreement',
     counterparty: 'iso-partner',
-    entity: 'Lombard Pay LLC',
-    sourceDocument: 'Lombard_ISO_Partner_Referral_Agreement_v2.txt',
-    sourceDigest: '46c91b72955223fdb9786082df65671a5219675cac28fb846288a275f18a5922',
-    bodiesVerifiedAt: '2026-09-08',
   },
-  'payzli-split-funding': {
-    id: 'payzli-split-funding',
-    title: 'Payzli Split Funding Authorization',
+  'split-funding': {
+    id: 'split-funding',
+    title: 'Split Funding Authorization',
     counterparty: 'processor',
-    entity: 'Lombard Capital LLC',
-    sourceDocument: 'Lombard_Payzli_Split_Funding_Authorization_v2.txt',
-    sourceDigest: '2c077ddff1656c3f6c94fa9ae1563779947fcb6900abd785cd47c672083d2d21',
-    bodiesVerifiedAt: '2026-09-08',
   },
   'permission-to-release': {
     id: 'permission-to-release',
     title: 'Permission to Release',
     counterparty: 'merchant',
-    entity: 'Lombard Capital LLC',
-    sourceDocument: 'Lombard_Permission_to_Release_v1.txt',
-    sourceDigest: 'b18c51387a2c0ebc01b96034b88041a5676d02b32c2df2ae5d80960e25b5ec64',
-    bodiesVerifiedAt: '2026-09-08',
   },
 };
 

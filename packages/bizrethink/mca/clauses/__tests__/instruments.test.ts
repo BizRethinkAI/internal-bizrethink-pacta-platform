@@ -27,7 +27,7 @@ describe('the instruments', () => {
       'equipment-lease',
       'subscription',
       'iso-pra',
-      'payzli-split-funding',
+      'split-funding',
       'permission-to-release',
     ]);
   });
@@ -38,8 +38,6 @@ describe('the instruments', () => {
 
       expect(instrument.id).toBe(id);
       expect(instrument.title.length).toBeGreaterThan(0);
-      expect(instrument.entity.length).toBeGreaterThan(0);
-      expect(instrument.sourceDocument).toMatch(/\.txt$/);
     }
   });
 

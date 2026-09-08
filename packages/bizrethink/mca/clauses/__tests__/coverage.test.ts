@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import { documentLines, linesNotAccountedFor } from '../documents';
 import { EQUIPMENT_NON_CLAUSE } from '../equipment-lease';
-import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
+import { MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
 import { ISO_PRA_NON_CLAUSE } from '../iso-pra';
 import { libraryFor } from '../library';
+import { LOMBARD, resolveClauses } from '../parties';
 import { SUBSCRIPTION_NON_CLAUSE } from '../subscription';
 
 /**
@@ -41,10 +42,10 @@ const COVERED: [McaInstrument, { anchor: string; reason: string }[]][] = [
 ];
 
 describe.each(COVERED)('%s accounts for its whole document', (instrument, nonClause) => {
-  const file = INSTRUMENTS[instrument].sourceDocument;
+  const file = LOMBARD.documents[instrument].file;
 
   it('leaves no line unaccounted for', () => {
-    expect(linesNotAccountedFor(file, libraryFor(instrument), nonClause)).toEqual([]);
+    expect(linesNotAccountedFor(file, resolveClauses(libraryFor(instrument), LOMBARD), nonClause)).toEqual([]);
   });
 
   it('has no non-clause declaration that never matches, and gives each a reason', () => {
@@ -69,7 +70,7 @@ describe.each(COVERED)('%s accounts for its whole document', (instrument, nonCla
  */
 describe('coverage is not optional', () => {
   it('covers all six instruments', () => {
-    const covered = new Set([...COVERED.map(([id]) => id), 'frpa', 'payzli-split-funding', 'permission-to-release']);
+    const covered = new Set([...COVERED.map(([id]) => id), 'frpa', 'split-funding', 'permission-to-release']);
 
     expect([...covered].sort()).toEqual([...MCA_INSTRUMENTS].sort());
   });
