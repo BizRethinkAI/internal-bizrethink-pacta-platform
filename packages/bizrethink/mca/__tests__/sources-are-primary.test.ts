@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
+import { HEADER_LINES, SECONDARY_PUBLISHERS } from '../provenance/source-origin';
 import { MCA_DISCLOSURES } from '../registry';
 
 /**
@@ -26,8 +27,21 @@ import { MCA_DISCLOSURES } from '../registry';
  */
 const sourcesDir = resolve(dirname(fileURLToPath(import.meta.url)), '../sources');
 
-/** Publishers that reproduce a statute rather than enact or codify it. */
-const SECONDARY = [/justia/i, /casetext/i, /findlaw/i, /lawserver/i, /codes\.findlaw/i];
+/*
+  THIS FILE IS THE FLOOR; `source-origin.ts` IS THE GRADE.
+
+  What is asserted here is that no vendored source NAMES a secondary publisher
+  as its origin, and that every one shows something. That is a pass/fail on the
+  worst case. It says nothing about the difference between a file recording a
+  retrieval from `legis.ga.gov` and a file carrying only its own letterhead —
+  and on 2026-09-08 that difference reached `/admin/mca`, because a card that
+  cannot say where its text came from should not read like one that can.
+
+  The publisher list moved to `provenance/source-origin.ts` and is imported.
+  Two copies of it would drift, and the copy that drifted silently would be the
+  one in the test.
+*/
+const SECONDARY = SECONDARY_PUBLISHERS;
 
 describe('every vendored source is primary text', () => {
   const files = [...new Set(MCA_DISCLOSURES.map((d) => d.sourceFile))];
@@ -37,10 +51,11 @@ describe('every vendored source is primary text', () => {
   });
 
   it.each(files)('%s does not name a secondary publisher as its origin', (file) => {
-    // The first 40 lines are the vendoring header, where provenance is
-    // recorded. Matching the whole file would flag a statute that happens to
-    // mention a publisher in its own text.
-    const header = readFileSync(resolve(sourcesDir, file), 'utf8').split('\n').slice(0, 40).join('\n');
+    // The vendoring header, where provenance is recorded. Matching the whole
+    // file would flag a statute that happens to mention a publisher in its own
+    // text. The same window `source-origin.ts` reads, imported rather than
+    // repeated as a literal.
+    const header = readFileSync(resolve(sourcesDir, file), 'utf8').split('\n').slice(0, HEADER_LINES).join('\n');
 
     // A header may DISCUSS a secondary source it replaced — that is the
     // Georgia file's own history and worth keeping. What it may not do is
@@ -64,7 +79,7 @@ describe('every vendored source is primary text', () => {
    * What must not happen is neither.
    */
   it.each(files)('%s shows where it came from', (file) => {
-    const header = readFileSync(resolve(sourcesDir, file), 'utf8').split('\n').slice(0, 40).join('\n');
+    const header = readFileSync(resolve(sourcesDir, file), 'utf8').split('\n').slice(0, HEADER_LINES).join('\n');
 
     const retrieved = /Retrieved|Vendored|Source:|published by|https?:\/\//i.test(header);
     const letterhead = /STATE OF |DEPARTMENT OF |GENERAL ASSEMBLY|LEGISLATURE|COMMISSIONER|OFFICE OF |CODE OF /i.test(

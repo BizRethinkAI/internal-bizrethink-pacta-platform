@@ -33,6 +33,11 @@ export const buildMcaConformityView = () => {
     library: surface.library as string,
     jurisdictions: [...surface.jurisdictions],
     entries: surface.entries,
+    // The counts at the top of the page. Computed in the package beside the
+    // cards they summarise and asserted in `mca/__tests__/surface.test.ts` —
+    // the route used to derive them itself, which put the page's single most
+    // quoted sentence in a `.tsx` no test runs.
+    summary: surface.summary,
     envelopes: envelopeShapes(),
     readings: [...OPEN_READINGS],
   };

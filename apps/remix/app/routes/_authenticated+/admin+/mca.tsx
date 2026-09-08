@@ -5,7 +5,7 @@ import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { msg } from '@lingui/core/macro';
-import { AlertTriangle, Eye, FileWarning, HelpCircle, ScrollText } from 'lucide-react';
+import { AlertTriangle, BookMarked, Eye, FileWarning, HelpCircle, ScrollText } from 'lucide-react';
 import { useLoaderData } from 'react-router';
 
 import { buildMcaConformityView } from '~/utils/bizrethink-mca-conformity.server';
@@ -114,6 +114,39 @@ const KIND_UNIT: Record<ConformityKind, string> = {
   'content-statute': 'requirements',
 };
 
+/*
+  WHERE THE TEXT CAME FROM, IN A WORD AND THEN IN A SENTENCE.
+
+  Keyed on `ConformityEntry['origin']` rather than a bare string map, so a new
+  member of the union fails the typecheck here instead of rendering as
+  `undefined` — the same discipline as KIND_LABEL above, and for the same reason
+  it was introduced.
+
+  The verdict is derived from the vendored file's own header on every load
+  (`mca/provenance/source-origin.ts`). It is never a field on a spec: a spec
+  asserting "official publisher" with nothing re-executing it is the defect this
+  package exists to prevent, one level up from a verification date nobody
+  re-earns.
+*/
+const ORIGIN_LABEL: Record<ConformityEntry['origin'], string> = {
+  'official-publisher': 'retrieval recorded, from the publisher that enacted or codified it',
+  'origin-not-recorded': 'ORIGIN NOT RECORDED — the file does not say where this text came from',
+  'secondary-publisher': 'FROM A SECONDARY PUBLISHER — this is a reproduction, not the enacted text',
+};
+
+/*
+  HOW OLD THE READING IS.
+
+  The question the digest cannot answer. When a regulator amends a rule our
+  vendored file does not move, so the digest still matches and every other check
+  goes on passing about text that is no longer the law.
+*/
+const FRESHNESS_LABEL: Record<ConformityEntry['freshness'], string> = {
+  fresh: 'read within the last',
+  stale: 'NOT READ IN',
+  'never-read': 'never read',
+};
+
 const DIGEST_LABEL = {
   matches: 'digest matches',
   stale: 'DIGEST STALE — the source has changed since it was verified',
@@ -178,6 +211,46 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
             table&rsquo;s
           </dd>
         )}
+        {/*
+          HOW LONG AGO A HUMAN LOOKED.
+
+          The dates above say a reading happened; this says how old it is. It is
+          the only thing on this card that gets worse while nobody touches
+          anything, and the only signal there is for the failure a digest cannot
+          see: a regulator amends the rule, our vendored file does not move, and
+          every other line here goes on passing.
+        */}
+        <dd
+          className={
+            entry.freshness === 'fresh' ? 'text-muted-foreground text-xs' : 'font-semibold text-destructive text-xs'
+          }
+        >
+          {FRESHNESS_LABEL[entry.freshness]}
+          {entry.lastReadAt === null
+            ? ' — no usable date to age this reading from'
+            : ` — ${entry.lastReadAt}, ${entry.daysSinceRead} days ago`}
+        </dd>
+      </div>
+
+      {/*
+        WHERE THE TEXT CAME FROM.
+
+        Georgia's card looked exactly like California's while what we held was a
+        browser capture of law.justia.com missing subsection (a) — "advance
+        fee", the term the broker prohibition turns on, was defined nowhere in
+        it, and the digest over it matched on every run. The file said where it
+        came from in its own header, and nothing read the header. This is that
+        header, read on every load.
+      */}
+      <div className="sm:col-span-2">
+        <dt className="text-muted-foreground text-xs uppercase">Where the text came from</dt>
+        <dd
+          className={entry.origin === 'official-publisher' ? 'text-muted-foreground' : 'font-semibold text-destructive'}
+        >
+          {ORIGIN_LABEL[entry.origin]}
+        </dd>
+        <dd className="mt-1 text-muted-foreground text-xs">{entry.originWhy}</dd>
+        {entry.originEvidence !== null && <dd className="mt-1 font-mono text-xs">{entry.originEvidence}</dd>}
       </div>
 
       <div className="sm:col-span-2">
@@ -286,10 +359,7 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
 );
 
 export default function AdminMcaConformityPage() {
-  const { library, jurisdictions, entries, envelopes, readings } = useLoaderData<typeof loader>();
-
-  const notFullyVerified = entries.filter((e) => e.assurance !== 'verified').length;
-  const unreadableRows = entries.reduce((n, e) => n + e.unreadable.length, 0);
+  const { library, jurisdictions, entries, envelopes, readings, summary } = useLoaderData<typeof loader>();
 
   return (
     <div className="mx-auto w-full max-w-screen-lg px-4 pb-16 md:px-8">
@@ -308,17 +378,50 @@ export default function AdminMcaConformityPage() {
         looking reassuring. Someone opening it a year from now needs to know
         what "verified" claims and what it does not.
       */}
+      {/*
+        THE SUMMARY IS COMPUTED IN THE PACKAGE, NOT HERE.
+
+        These numbers were `entries.filter(...)` calls in this file, which is a
+        view model no test runs — and the top line is the one sentence most
+        readers take away. They now come off `surface.summary`, beside the cards
+        they summarise and asserted in `mca/__tests__/surface.test.ts`.
+      */}
       <Alert className="mt-6" variant="warning">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>
-          {notFullyVerified} of {entries.length} disclosures are not fully verified, and {unreadableRows} of their rows,
-          lines and requirements have contents no check reads
+          {summary.verified} of {summary.total} disclosures are fully verified, and {summary.unreadable} rows, lines and
+          requirements across them have contents no check reads
         </AlertTitle>
         <AlertDescription>
           A verification date means every prescribed label and every prescribed sentence was still found in the vendored
           source, in the section the spec was transcribed from, on the last run. It does not mean a human has read the
           current regulation, and it says nothing about a row the regulation leaves unworded. Those rows are listed
           under each state.
+        </AlertDescription>
+      </Alert>
+
+      {/*
+        THE TWO QUESTIONS "VERIFIED" USED TO BE READ AS ANSWERING.
+
+        A digest compares our text to OUR VENDORED COPY. It cannot see a
+        regulator amending the rule — our file does not move, so the digest
+        matches and the card stays green about text that is now wrong — and it
+        cannot see that the copy was weak to begin with. Georgia was verified
+        against a browser capture of law.justia.com that was also incomplete,
+        and its card was indistinguishable from California's.
+      */}
+      <Alert className="mt-4" variant="warning">
+        <BookMarked className="h-4 w-4" />
+        <AlertTitle>
+          {summary.fromOfficialPublisher} of {summary.total} are vendored from the publisher that enacted or codified
+          them, and {summary.staleReadings} were last read more than {summary.staleAfterDays} days ago
+        </AlertTitle>
+        <AlertDescription>
+          Where a source came from is read off that file&rsquo;s own vendoring header on every load &mdash; it is never
+          a field on a spec. {summary.originNotRecorded} of these disclosures rest on a file that records no retrieval
+          at all: the text is probably the official publisher&rsquo;s, and nothing in the file lets a reader check that.
+          Age is counted from the OLDER of a spec&rsquo;s applicable verification dates, because a claim is only as
+          current as its stalest half. A disclosure counts as verified only when both hold.
         </AlertDescription>
       </Alert>
 
