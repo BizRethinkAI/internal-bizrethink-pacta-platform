@@ -110,6 +110,54 @@ defect survived because until PR #101 there was no checker at all**, which is
 the account given at the top of that file and the one to trust. Scoping earns
 its place on the direction nobody has got wrong yet.
 
+### What the digest was being read as answering, and now is not
+
+A digest compares our text to **our vendored copy** of the rule. On
+`/admin/mca` that comparison was carrying the word *verified*, which a reader
+takes to answer two further questions it cannot touch. Both now have their own
+evidence, and both feed the same three-level `Assurance` — no fourth level, and
+`surface/view.ts` carries the argument for that.
+
+**Staleness — `provenance/reading-age.ts`.** When a regulator amends a rule our
+file does not move. The digest still matches, every prescribed sentence is still
+found where the spec says, and the card goes on saying *verified* about text
+that is now wrong. Nothing in this package can see an amendment; what it can
+state is how old the reading is. A reading goes stale after
+`READING_GOES_STALE_AFTER_DAYS` — 180 days, chosen as the largest window that
+guarantees one human reading between the two conventional effective dates (1
+January, 1 July) these acts arrive on. A stale card drops to
+`partly-verified`. The honest reading of *fresh* is "recently looked at", never
+"current": a rule can be amended the day after a reading.
+
+**Source strength — `provenance/source-origin.ts`.** Georgia was *verified*
+against a browser capture of law.justia.com that was also incomplete — see the
+record below — and its card was indistinguishable from California's. The
+verdict is derived from the vendored file's own header on every load and is
+never a field on a spec: a spec asserting "official publisher" with nothing
+re-executing it is the defect this package exists to prevent, one level up from
+a verification date nobody re-earns. Three verdicts:
+
+| | what it means | where it lands |
+|---|---|---|
+| `official-publisher` | the header records a retrieval from the publisher that enacted or codified the text — a URL on a government host | can reach `verified` |
+| `origin-not-recorded` | the file records no retrieval, or records only a path of ours | `partly-verified` |
+| `secondary-publisher` | the retrieval names a publisher that reproduces the law | `unverified`, beside a stale digest |
+
+**Two of the eleven sources are `official-publisher`**: Georgia's and Texas's,
+both re-vendored after a defect was found in what preceded them. The other nine
+include California's and New York's, which are almost certainly the promulgating
+department's own documents — "almost certainly" is a belief, and the file gives
+a reader nothing to re-check it against.
+
+**Letterhead is not credited, and that is the judgement most worth arguing
+with.** `sources-are-primary.test.ts` accepts an issuing authority's letterhead
+as evidence that a file shows where it came from, which is a sensible floor. It
+is not evidence of a publisher: letterhead travels with the text, so a
+reproduction of 10 CCR carries "STATE OF CALIFORNIA / DEPARTMENT OF FINANCIAL
+PROTECTION AND INNOVATION" exactly as the Department's own PDF does, and "Be it
+enacted by the Legislature of the State of Kansas" is in every copy of the bill.
+The Georgia capture almost certainly carried the Code's own headings too.
+
 Two things it deliberately does not claim:
 
 - It does not prove a human read the regulation. It proves the bytes have not
@@ -287,6 +335,16 @@ package does not have.
 **Anything in a row that prescribes "a short explanation".** Five of New York's
 eleven rows and four of California's ten do. `coverage()` returns the number and
 the tests assert it, so a green suite cannot be read as a clean form.
+
+**That a source is complete.** `source-origin.ts` reads what a file SAYS about
+its own origin: a header naming an official publisher and lying is
+indistinguishable from one telling the truth, and nothing here would catch a
+complete capture from a secondary publisher or a truncated one from an official
+publisher. The Georgia capture was both secondary and truncated, and truncation
+is the half that made it dangerous.
+
+**Whether a regulation has been amended.** Only how long ago someone looked. A
+`fresh` card is a card read inside 180 days, not a card that is current.
 
 **Whether the evidence actually says the right thing.** For the content states
 the check is that a required item has a home and that the words pinned as
