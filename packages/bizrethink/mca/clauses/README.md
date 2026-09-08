@@ -22,9 +22,9 @@ text being written down.
 | | |
 |---|---|
 | ISO Partner Referral Agreement | **24 clauses, imported** |
+| Equipment Lease | **26 clauses, imported** |
+| Subscription | **26 clauses, imported** — the Equipment Lease's twin |
 | FRPA | not imported — 90 clauses |
-| Equipment Lease | not imported — 25 clauses |
-| Subscription | not imported — the Equipment Lease's twin |
 | Payzli Split Funding Authorization | no numbered clauses; it is a letter |
 | Permission to Release | no numbered clauses |
 | Approvals, review links, an admin surface | not built |
@@ -76,12 +76,13 @@ recipient. Putting the relation in the field name is what keeps
    fixes that review produced removed a section above it. There is deliberately
    no string match from locus to clause; a match would break exactly when a
    review had been acted on.
-5. **A clause published in two agreements is one clause with two instruments.**
-   Not two clauses that agree. The Equipment Lease and the Subscription are the
-   same document with its vocabulary swapped and its numbering identical, and
-   REVIEW-02's finding is the reason this matters: *every Equipment Lease
-   finding lands twice, in two live templates, and a fix applied to one and not
-   the other is a divergence nothing checks for.*
+5. **A twin is two clauses whose agreement is asserted, not one clause rendered
+   twice.** This was the other way round when the field was designed, and the
+   documents refused it — see `twins.ts`. The Equipment Lease and the
+   Subscription share no vocabulary-bearing sentence, so there is nothing to
+   store once; what there is instead is `__tests__/twins.test.ts`, which
+   answers REVIEW-02's *"a fix applied to one and not the other is a divergence
+   nothing checks for"* by checking for it.
 6. **Slugs are globally unique**, across instruments as well as within them.
    The lease library learned this when one attorney approval hid another's,
    because approvals are keyed by slug alone.
@@ -96,6 +97,13 @@ recipient. Putting the relation in the field name is what keeps
 They prove the words in this directory are the words the documents ship, that
 the documents have not moved under them, and that every clause names a review
 that read it.
+
+**The twins are checked against each other as well as against their documents.**
+`twins.test.ts` asserts that the two number their clauses identically, that
+every clause not declared divergent agrees word for word once the vocabulary is
+applied, and that every declared divergence still diverges — so the register
+cannot go write-only. Five clauses differ in substance (§§3.4–3.8) and ten more
+places differ only in wording; both lists are pinned.
 
 They do not prove a clause is any good. The twenty-four ISO PRA clauses cite
 **seventeen distinct findings, every one of which survived refutation** — a

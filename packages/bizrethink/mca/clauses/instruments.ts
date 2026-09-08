@@ -116,8 +116,8 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'merchant',
     entity: 'Lombard Pay LLC',
     sourceDocument: 'Lombard_Equipment_Lease_Agreement_v1.txt',
-    sourceDigest: '',
-    bodiesVerifiedAt: null,
+    sourceDigest: '3aa412d121d10c7664db29ffd6c2a8bbac288777372406c985b02c18df450126',
+    bodiesVerifiedAt: '2026-09-08',
   },
   subscription: {
     id: 'subscription',
@@ -125,8 +125,8 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'merchant',
     entity: 'Lombard Pay LLC',
     sourceDocument: 'Lombard_Subscription_Agreement_v2.txt',
-    sourceDigest: '',
-    bodiesVerifiedAt: null,
+    sourceDigest: '11c732a5de69c73d4492c7d5f5f2e239aeb9833aee680988487d3cd6b200adad',
+    bodiesVerifiedAt: '2026-09-08',
   },
   'iso-pra': {
     id: 'iso-pra',

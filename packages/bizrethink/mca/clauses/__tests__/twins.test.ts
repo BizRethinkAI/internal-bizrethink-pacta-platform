@@ -3,7 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { readAgreementBody } from '../documents';
 import { INSTRUMENTS } from '../instruments';
 import { libraryFor } from '../library';
-import { applyTwinVocabulary, EQUIPMENT_TWIN, TWIN_VOCABULARY, twinDivergence } from '../twins';
+import {
+  applyTwinVocabulary,
+  EQUIPMENT_TWIN,
+  TWIN_VOCABULARY,
+  TWIN_VOCABULARY_EXCEPTIONS,
+  twinDivergence,
+} from '../twins';
 
 /**
  * The Equipment Lease and the Subscription Agreement are the same document with
@@ -59,17 +65,13 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
    * vocabulary is applied. This is the assertion that goes red when somebody
    * fixes one document and forgets the other.
    */
-  it('agrees word for word on every clause not declared divergent', () => {
-    for (const clause of lease) {
-      if (twinDivergence(clause.number) !== null) {
-        continue;
-      }
+  it.each(
+    lease.filter((clause) => twinDivergence(clause.number) === null).map((clause) => [clause.number, clause] as const),
+  )('%s agrees word for word with its twin', (number, clause) => {
+    const twin = subscription.find((other) => other.number === number);
 
-      const twin = subscription.find((other) => other.number === clause.number);
-
-      expect(applyTwinVocabulary(clause.heading), `heading ${clause.number}`).toBe(twin?.heading);
-      expect(applyTwinVocabulary(clause.body), `body ${clause.number}`).toBe(twin?.body);
-    }
+    expect(applyTwinVocabulary(clause.heading, number)).toBe(twin?.heading);
+    expect(applyTwinVocabulary(clause.body, number)).toBe(twin?.body);
   });
 
   /**
@@ -90,7 +92,8 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
       const twin = subscription.find((other) => other.number === clause.number);
 
       expect(
-        applyTwinVocabulary(clause.heading) !== twin?.heading || applyTwinVocabulary(clause.body) !== twin?.body,
+        applyTwinVocabulary(clause.heading, clause.number) !== twin?.heading ||
+          applyTwinVocabulary(clause.body, clause.number) !== twin?.body,
         `${clause.number} is declared divergent but the two documents now agree`,
       ).toBe(true);
     }
@@ -131,6 +134,37 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
    * the two documents use a word they do not, and would survive the word being
    * removed from both.
    */
+  /**
+   * The vocabulary was applied inconsistently in ten places, and that list is a
+   * finding rather than a workaround. Pinned so it cannot quietly grow: a new
+   * entry means somebody edited one document and reworded rather than copied,
+   * which is the near-miss version of the divergence this file exists to catch.
+   */
+  it('records the ten places the swap was applied inconsistently', () => {
+    expect(TWIN_VOCABULARY_EXCEPTIONS).toHaveLength(10);
+
+    expect([...new Set(TWIN_VOCABULARY_EXCEPTIONS.map((entry) => entry.number))].sort()).toEqual([
+      '3.1',
+      '3.12',
+      '3.2',
+      '4.2',
+      '4.3',
+      '4.7',
+    ]);
+
+    // Every exception must actually fire. One that does not is a claim about
+    // the documents that is no longer true.
+    for (const entry of TWIN_VOCABULARY_EXCEPTIONS) {
+      const clause = lease.find((other) => other.number === entry.number);
+
+      expect(clause, `no clause ${entry.number}`).toBeDefined();
+      expect(
+        applyTwinVocabulary(clause?.body ?? '', entry.number).includes(entry.to),
+        `exception never applies: ${entry.from}`,
+      ).toBe(true);
+    }
+  });
+
   it('has no vocabulary entry that never applies', () => {
     const leaseText = readAgreementBody(INSTRUMENTS['equipment-lease'].sourceDocument);
 
