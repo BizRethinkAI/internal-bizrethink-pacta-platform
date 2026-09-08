@@ -92,9 +92,16 @@ want a fourth level will find it.
   is a source change with a digest consequence, deliberately out of scope here.
   Utah's header already names `le.utah.gov` as the publisher that would make it
   as strong as Georgia's.
-- **The production image still does not carry `mca/sources/`** (`docker/Dockerfile`
-  runner stage). In the container every card reads SOURCE MISSING and now also
-  `origin-not-recorded`, which is the truthful answer in that environment and
-  still not a deployed page worth reading. Unchanged by this PR, recorded again
-  because it keeps being the thing a reader of `/admin/mca` in production hits
-  first.
+- **CORRECTED 2026-09-08: the production image DOES carry `mca/sources/`.**
+  This note first said it did not, and that the container would therefore read
+  SOURCE MISSING on every card. That was true when
+  `mca/provenance/source-text.ts` wrote its long comment about the deployment
+  gap, and it stopped being true when the Dockerfile line was added —
+  `docker/Dockerfile:162` copies `mca/sources`, and line 173 now copies
+  `mca/clauses/source-documents` for the clause library.
+
+  Recorded as a correction rather than deleted, because the mistake is worth
+  keeping: the claim was carried forward from a source comment that describes
+  the problem it was written to fix, and read as a statement of current fact.
+  A file people trust for "where things stand" is exactly where that goes
+  wrong, and re-reading the Dockerfile takes ten seconds.
