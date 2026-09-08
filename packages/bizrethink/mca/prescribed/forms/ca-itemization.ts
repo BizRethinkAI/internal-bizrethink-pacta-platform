@@ -53,7 +53,7 @@ export const CA_ITEMIZATION: ItemizationForm = {
     verbatimVerifiedAt: '2026-09-07',
     structureVerifiedAt: '2026-09-07',
   },
-  sourceDigest: '302f878f33afa3a72f7c7b0bff6fe66afbd921658aa7a5abf4a7e01942d4199c',
+  sourceDigest: 'e43c919418e4aeaa2a55cd421fe12a5d8e3c9a316d08345d25b4ba50abe54930',
   /*
     Scoped like every other spec in the library, and it earns it: "Amount
     Financed" is a §900 defined term used throughout the file, and "Prepaid

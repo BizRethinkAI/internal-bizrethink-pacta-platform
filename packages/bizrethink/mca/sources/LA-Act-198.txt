@@ -1,3 +1,31 @@
+Publisher: Louisiana State Legislature
+Site:      https://legis.la.gov
+Recorded:  2026-09-08
+
+Act 198, 2025 Regular Session. The file is the ENROLLED text and says so on
+its first line.
+
+WHY THIS HEADER SAYS "PUBLISHER" AND NOT "RETRIEVED FROM". The deep link this
+file was fetched through was not written down at the time and is not
+recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into
+404s, because legislatures reorganise their sites. What IS determinable, from
+the document itself, is who published it: an enrolled act, a chamber's
+letterhead and a Superintendent's signed adoption are not things a reproducer
+manufactures.
+
+So this records the publisher and the publisher's site, dated today, as a
+statement about what the document IS. It is deliberately not a claim that these
+bytes were served from that host on that date — only a fetch recorded at the
+moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and
+`VA-Code-6.2-2228-2238.txt` have and these do not.
+
+THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes
+the file, so its digest was recomputed. Not one byte of the statutory text
+changed — the same treatment, and the same reason, as the two headers added in
+`fix/ga-primary-text`: "the digest broke, I updated it" is the move this
+mechanism exists to make somebody justify, so the justification is written here.
+
+--- STATUTORY TEXT BEGINS ---
                                                                                     ENROLLED
 
      2025 Regular Session

@@ -74,7 +74,7 @@ export const CT_DISCLOSURE: PrescribedForm = {
     verbatimVerifiedAt: '2026-09-06',
     structureVerifiedAt: '2026-09-06',
   },
-  sourceDigest: '7a347bdb5046d948592edea0f968efccf80c1bcec7ef06894b08558c882d4f2b',
+  sourceDigest: '20166b62142875c374cc1cff941f244580a55877e28d832d764ab8c96798a731',
   // The file is Appendix A and nothing else, so there is no neighbouring form
   // for a label to be borrowed from.
   section: null,

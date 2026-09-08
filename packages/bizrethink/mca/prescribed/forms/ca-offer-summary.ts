@@ -35,7 +35,7 @@ export const CA_OFFER_SUMMARY: PrescribedForm = {
     verbatimVerifiedAt: '2026-09-06',
     structureVerifiedAt: '2026-09-06',
   },
-  sourceDigest: '302f878f33afa3a72f7c7b0bff6fe66afbd921658aa7a5abf4a7e01942d4199c',
+  sourceDigest: 'e43c919418e4aeaa2a55cd421fe12a5d8e3c9a316d08345d25b4ba50abe54930',
   /*
     §914 is one of at least six prescribed tables in this file — closed-end
     (§910), open-end (§911), factoring (§912/913), sales-based (§914), lease
