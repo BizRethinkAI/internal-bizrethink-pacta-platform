@@ -13,8 +13,9 @@ import {
 } from '../../clauses/approval';
 import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../../clauses/examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
-import { LOMBARD, resolveClauses } from '../../clauses/parties';
 import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
+import { LOMBARD, resolveClauses } from '../../clauses/parties';
+import { counselBriefing } from '../../review/briefing';
 import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview, reviewIsStale } from '../../review/link';
 import { toReadableAgreement } from '../../review/readable-agreement';
 import { loadMcaClauseApprovals } from '../clause-approvals';
@@ -249,6 +250,7 @@ export const mcaClauseLibraryRouter = router({
         reviewerName: true,
         instrument: true,
         libraryFingerprint: true,
+        createdByUserId: true,
       },
     });
 
@@ -274,6 +276,24 @@ export const mcaClauseLibraryRouter = router({
     const clauses = libraryFor(review.instrument);
     const approvals = await loadMcaClauseApprovals();
     const instrument = INSTRUMENTS[review.instrument];
+
+    /*
+      WHO TO REPLY TO, resolved rather than assumed.
+
+      The briefing has to end with a name and an address, because this page
+      collects nothing and a read-only page that does not say where comments go
+      reads as an oversight rather than as the deliberate single-register design
+      it is. `createdByUserId` is an `Int` with no relation on the model, so
+      this is a second query rather than an include.
+
+      NULL IS A SUPPORTED ANSWER. A staff account can be deleted while the link
+      it minted is still live, and `counselBriefing` falls back to "reply to
+      whoever sent you this link" rather than printing a hole where a name goes.
+    */
+    const sender = await prisma.user.findUnique({
+      where: { id: row.createdByUserId },
+      select: { name: true, email: true },
+    });
 
     return {
       reviewerName: review.reviewerName,
@@ -313,6 +333,28 @@ export const mcaClauseLibraryRouter = router({
         for the same reason; this is the read-only half of the same honesty.
       */
       findingsReadable: REGISTER_AVAILABLE,
+      /*
+        WHAT THE READER IS TOLD BEFORE THE FIRST CLAUSE.
+
+        Derived per agreement rather than written into the page: the six are not
+        interchangeable, and prose typed into a route renders the same sentences
+        for all of them. `briefing.ts` carries the argument in full.
+
+        The counts are computed here from the same lists the page renders, so
+        the briefing cannot claim a number the clauses below contradict.
+      */
+      briefing: counselBriefing({
+        instrument: review.instrument,
+        tenant: LOMBARD,
+        clauseCount: clauses.length,
+        approvedCount: clauses.filter((clause) => isMcaApprovalCurrent(clause, approvals.get(clause.slug) ?? null))
+          .length,
+        outstandingCount: clauses.filter((clause) => outstandingFindingsFor(clause).length > 0).length,
+        findingsReadable: REGISTER_AVAILABLE,
+        sender: sender === null ? null : { name: sender.name ?? sender.email, email: sender.email },
+        expiresAt: row.expiresAt,
+        now: new Date(),
+      }),
       /*
         Grouped and in reading order. `openLibrary` on the lease side returned a
         flat list in module-concatenation order, which is neither document order

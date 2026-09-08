@@ -41,6 +41,19 @@ import { useParams } from 'react-router';
  * earlier reviews found and nobody has disposed of, because an attorney reading
  * a clause is the person best placed to use that.
  */
+/**
+ * `**like this**` becomes bold, and nothing else is interpreted.
+ *
+ * A markdown dependency for one construct would be a dependency shipped to an
+ * unauthenticated page, and the briefing is our own text rather than anything a
+ * reader supplies — but it is still text going through a splitter, so the parts
+ * are rendered as React children and never as HTML.
+ */
+const withEmphasis = (paragraph: string) =>
+  paragraph
+    .split(/\*\*(.+?)\*\*/g)
+    .map((part, index) => (index % 2 === 1 ? <strong key={index}>{part}</strong> : part));
+
 export default function McaClauseReviewPage() {
   const { token = '' } = useParams();
 
@@ -63,11 +76,10 @@ export default function McaClauseReviewPage() {
     );
   }
 
-  const { reviewerName, instrument, parties, agreementMoved, findingsReadable, sections } = query.data;
+  const { reviewerName, instrument, parties, agreementMoved, findingsReadable, briefing, sections } = query.data;
 
   const clauses = sections.flatMap((section) => section.clauses);
   const approved = clauses.filter((clause) => clause.approved).length;
-  const outstanding = clauses.filter((clause) => clause.outstandingFindings.length > 0).length;
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
@@ -87,14 +99,36 @@ export default function McaClauseReviewPage() {
         </Alert>
       )}
 
-      <Alert className="mt-4">
-        <AlertTitle>What you are reading</AlertTitle>
-        <AlertDescription>
-          Our own contract text, quoted as the document publishes it. The «angle-bracketed numbers» are the fill-in
-          fields the document carries; they are part of what a merchant signs. None of these clauses may be sent to a
-          merchant until an approval names the attorney who read them.
-        </AlertDescription>
-      </Alert>
+      {/*
+        THE BRIEFING, AND WHY IT REPLACED A FOUR-LINE ALERT.
+
+        The link was opened as counsel would open it, and the page gave a
+        funder's name, a clause count and a hundred paragraphs of contract text.
+        A lawyer cannot review a document whose purpose has not been stated: not
+        what the business is, not who is asking, not what an approval would
+        cause, not which of six documents this is, not what is deliberately
+        absent, and — worst, because the page collects nothing — not where a
+        comment goes. Every one of those was answerable from what this package
+        already knew.
+
+        RENDERED, NOT SUMMARISED, AND NOT COLLAPSED BEHIND A DISCLOSURE. The
+        reader has been engaged to read carefully; hiding the terms of the
+        engagement behind "show more" optimises the page for someone who is not
+        the audience.
+      */}
+      <section className="mt-8 rounded-lg border border-border bg-muted/30 px-6 py-5">
+        {briefing.map((part) => (
+          <div key={part.id} className="mt-6 first:mt-0">
+            <h2 className="font-semibold text-base">{part.title}</h2>
+
+            {part.body.map((paragraph, index) => (
+              <p key={index} className="mt-2 text-sm leading-relaxed">
+                {withEmphasis(paragraph)}
+              </p>
+            ))}
+          </div>
+        ))}
+      </section>
 
       {/*
         AN EMPTY FINDING LIST AND AN UNREADABLE REGISTER LOOK IDENTICAL, and on
@@ -112,17 +146,13 @@ export default function McaClauseReviewPage() {
         </Alert>
       )}
 
-      {findingsReadable && outstanding > 0 && (
-        <Alert className="mt-4" variant="warning">
-          <AlertTitle>
-            {outstanding} of these clauses carry a finding from an earlier review that nothing has disposed of
-          </AlertTitle>
-          <AlertDescription>
-            Two adversarial reviews read these documents before you. Their findings are quoted under each clause where
-            no manifest records what was done about them.
-          </AlertDescription>
-        </Alert>
-      )}
+      {/*
+        The outstanding-COUNT alert that used to sit here is now the briefing's
+        `history` section, which says the same number with the context that
+        makes it mean something. The two warnings above are kept as alerts
+        because each is an exceptional condition the reader must act on, not a
+        description of what they are about to read.
+      */}
 
       {sections.map((section) => (
         <section key={section.id} className="mt-10">
@@ -140,7 +170,25 @@ export default function McaClauseReviewPage() {
                   {clause.number !== '' && (
                     <span className="font-mono text-muted-foreground text-xs">{clause.number}</span>
                   )}
-                  <h3 className="font-medium">{clause.heading || clause.slug}</h3>
+                  {/*
+                    THE SLUG IS A REFERENCE, NOT A HEADING.
+
+                    Forty of the 204 clauses carry no heading in the document —
+                    the FRPA's holdback explainer, its §§10.3–10.6, every
+                    recital in the set — and `clause.heading || clause.slug`
+                    put `frpa.holdback-explainer` where a heading goes. An
+                    attorney was being shown an internal identifier formatted as
+                    if the contract printed it.
+
+                    The slug still has to be visible: it is how counsel cites a
+                    clause back to us, and it is the only stable handle an
+                    unnumbered clause has. So it is shown on every clause, in
+                    the margin, looking like the reference it is — and a clause
+                    the document does not head simply has no heading, which is
+                    the honest render.
+                  */}
+                  {clause.heading !== '' && <h3 className="font-medium">{clause.heading}</h3>}
+                  <span className="font-mono text-muted-foreground/70 text-xs">{clause.slug}</span>
                   {clause.approved ? <Badge>Approved</Badge> : <Badge variant="neutral">No current approval</Badge>}
                 </div>
 
