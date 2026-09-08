@@ -1,6 +1,6 @@
 # feat/mca-clause-approval — per-clause approval and the counsel review link
 
-**PR:** _(filled on push)_ · **Branch:** `feat/mca-clause-approval` · Opened 2026-09-08
+**PR:** [#135](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/135) · **Branch:** `feat/mca-clause-approval` · Opened 2026-09-08
 
 The MCA clause library gets the two things `/admin/mca-library` shipped without:
 an attorney's approval recorded per clause, and a tokenised read-only link that
