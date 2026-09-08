@@ -96,6 +96,14 @@ export type McaInstrumentRecord = {
    * digest is a date somebody typed, and re-stamping the date after a digest
    * breaks — instead of re-reading the document — is the one move the whole
    * mechanism exists to make impossible by accident.
+   *
+   * THE MECHANISM HAS NOW FIRED ONCE, ON 2026-09-08. `lombard-contracts` PR #10
+   * applied five owner-decision edits to four of these six documents, and every
+   * one of those digests broke. Nothing in this repository knew the `.docx`
+   * files had changed — Pacta hashes its own vendored copy, not the source — so
+   * the break came from re-vendoring, and the red named the seven clauses whose
+   * words had moved. Each body below was re-read from the re-vendored text
+   * rather than retyped, and only then were these dates re-stamped.
    */
   bodiesVerifiedAt: string | null;
 };
@@ -107,7 +115,7 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'merchant',
     entity: 'Lombard Capital LLC',
     sourceDocument: 'Lombard_FRPA_v4.txt',
-    sourceDigest: '322e70399945de2199e34d1c7ca2915cb4bbe654dd9857beda04ed590d33075e',
+    sourceDigest: 'e236a2cb42fcaec9cd2d53ed41f159726e518449561fb7a4d74c56bc1625eb2c',
     bodiesVerifiedAt: '2026-09-08',
   },
   'equipment-lease': {
@@ -116,7 +124,7 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'merchant',
     entity: 'Lombard Pay LLC',
     sourceDocument: 'Lombard_Equipment_Lease_Agreement_v1.txt',
-    sourceDigest: '3aa412d121d10c7664db29ffd6c2a8bbac288777372406c985b02c18df450126',
+    sourceDigest: '95d57e4d6e524430bc8891d7ee9262d68882d89f9d0ca046edc55a9da286dd9f',
     bodiesVerifiedAt: '2026-09-08',
   },
   subscription: {
@@ -125,7 +133,7 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'merchant',
     entity: 'Lombard Pay LLC',
     sourceDocument: 'Lombard_Subscription_Agreement_v2.txt',
-    sourceDigest: '11c732a5de69c73d4492c7d5f5f2e239aeb9833aee680988487d3cd6b200adad',
+    sourceDigest: 'dc82632ba82667125ec689f6c7f52178f39a2250872e59a5239096a1fc56f61a',
     bodiesVerifiedAt: '2026-09-08',
   },
   'iso-pra': {
@@ -134,8 +142,8 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'iso-partner',
     entity: 'Lombard Pay LLC',
     sourceDocument: 'Lombard_ISO_Partner_Referral_Agreement_v2.txt',
-    sourceDigest: 'e63dd6f3622465d6fa6b403335c9b57f56dc4fc0495e9e326271f638bbc76e8e',
-    bodiesVerifiedAt: '2026-09-07',
+    sourceDigest: '46c91b72955223fdb9786082df65671a5219675cac28fb846288a275f18a5922',
+    bodiesVerifiedAt: '2026-09-08',
   },
   'payzli-split-funding': {
     id: 'payzli-split-funding',

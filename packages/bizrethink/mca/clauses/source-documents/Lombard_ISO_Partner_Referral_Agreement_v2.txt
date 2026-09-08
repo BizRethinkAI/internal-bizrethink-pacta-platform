@@ -1,8 +1,8 @@
 Lombard_ISO_Partner_Referral_Agreement_v2.docx -- body text, extracted
 
 Source:    lombard-contracts/sources/Lombard_ISO_Partner_Referral_Agreement_v2.docx
-Repository: https://github.com/lombardpay/lombard-contracts at b48b5e4cadbc8bae51eef5560283513e74739f28
-docx sha256: 524a63be652d58463c9702f103450335860ad2f7c12575a5be3246b7f8af7c88
+Repository: https://github.com/lombardpay/lombard-contracts at 7b8e61c3c1c9fa02ff4a98f3e4d477132066008d
+docx sha256: 46f618230ba4ac3490117b7e73e1c2d357eed2fd16db65c19b39f02aef61f7f5
 Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
            that repository at the commit above.
 
@@ -37,7 +37,7 @@ WHEREAS, ISO Partner desires to introduce prospective merchants to Company for p
 NOW THEREFORE, in consideration of the mutual promises and commitments contained herein, the parties agree as follows:
 SECTION A — COMMISSION STRUCTURE
 A.1 Commission Rate
-Company shall pay ISO Partner a commission equal to _«2»_% of the amount advanced for each merchant cash advance successfully funded as a result of ISO Partner’s introduction. The commission is payable solely out of the Origination Fee actually collected by Company on that transaction and shall not exceed that Origination Fee. If no Origination Fee is collected on a transaction, no commission is payable on it. This default rate is subject to adjustment by mutual written agreement based on volume performance or special arrangements.
+Company shall pay ISO Partner a commission equal to _«2»_% of the amount advanced for each merchant cash advance successfully funded as a result of ISO Partner’s introduction. The commission is payable solely out of the Origination Fee actually collected by Company on that transaction and shall not exceed that Origination Fee. If no Origination Fee is collected on a transaction, no commission is payable on it. An Origination Fee is not actually collected on a transaction that Merchant cancels under Section 4.14 of the Future Receivables Purchase Agreement; no commission is payable on such a transaction, and any commission already paid on it is repayable to Company and is recovered in the manner set out in Section A.4. This default rate is subject to adjustment by mutual written agreement based on volume performance or special arrangements.
 A.2 When Commission Is Earned
 Commission is earned at the time of successful funding disbursement to the referred merchant. No commission is payable on declined, withdrawn, or unfunded applications.
 A.3 Payment Timing

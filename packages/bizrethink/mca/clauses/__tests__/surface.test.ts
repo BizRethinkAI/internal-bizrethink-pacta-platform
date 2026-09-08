@@ -26,7 +26,7 @@ describe('the MCA clause library surface', () => {
 
   it('shows every clause in the library, and no others', () => {
     expect(surface.clauses).toHaveLength(ALL_MCA_CLAUSES.length);
-    expect(surface.clauses).toHaveLength(192);
+    expect(surface.clauses).toHaveLength(204);
   });
 
   it('groups by instrument, in the declared order', () => {
@@ -37,20 +37,20 @@ describe('the MCA clause library surface', () => {
       expect(entry.clauseCount).toBe(ALL_MCA_CLAUSES.filter((c) => c.instrument === entry.id).length);
     }
 
-    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(192);
+    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(204);
   });
 
   /**
    * THE SENTENCE THE PAGE EXISTS TO MAKE TRUE.
    *
-   * Not one of these 192 clauses may reach a merchant, and the reason is the
+   * Not one of these 204 clauses may reach a merchant, and the reason is the
    * same for every one: `attorney-drafted` with no named author. The page states
    * it as a count with the reason attached, rather than leaving a reader to
-   * infer it from 192 identical badges.
+   * infer it from 204 identical badges.
    */
   it('reports that nothing is publishable, and why', () => {
     expect(surface.totals.publishable).toBe(0);
-    expect(surface.totals.clauses).toBe(192);
+    expect(surface.totals.clauses).toBe(204);
 
     for (const clause of surface.clauses) {
       expect(clause.publishProblems).toEqual([

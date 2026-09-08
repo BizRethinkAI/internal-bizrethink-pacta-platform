@@ -61,6 +61,9 @@ export const TWIN_VOCABULARY: readonly (readonly [string, string])[] = [
   ['Lease Guaranty', 'Subscription Guaranty'],
   ['Lease Term', 'Subscription Term'],
   ['LEASE', 'SUBSCRIPTION'],
+  // The all-caps read-before-signing legend, which the numbered-heading import
+  // never reached and the coverage check found.
+  ['LESSEE', 'SUBSCRIBER'],
   ['Lease', 'Subscription'],
   ['Lessee', 'Subscriber'],
   ['lease', 'subscription'],
@@ -97,6 +100,11 @@ export const TWIN_VOCABULARY: readonly (readonly [string, string])[] = [
  * difference of substance belongs in `divergent` below, with a cause.
  */
 export type TwinVocabularyException = {
+  /**
+   * The clause this exception applies to: its NUMBER where the document gives
+   * one, and its SLUG where it does not. Four clauses in each twin are
+   * unnumbered, so a number-only key could not reach them.
+   */
   number: string;
   /** The Equipment Lease's words, after `TWIN_VOCABULARY` has been applied. */
   from: string;
@@ -131,6 +139,16 @@ export const TWIN_VOCABULARY_EXCEPTIONS: readonly TwinVocabularyException[] = [
   { number: '4.2', from: 'a defense to this Subscription and/or', to: 'a defense to the Subscription and/or' },
   { number: '4.3', from: 'reflected in this Subscription at Section', to: 'reflected in the Subscription at Section' },
   { number: '4.7', from: 'executed this Equipment Subscription Agreement', to: 'executed this Subscription Agreement' },
+  {
+    // The parties paragraph carries no number, so it is keyed by slug — the
+    // same key `twins.test.ts` pairs unnumbered clauses on. Same asymmetry as
+    // §4.7: the Equipment Lease calls itself "Equipment Lease Agreement" and
+    // the Subscription calls itself "Subscription Agreement", not "Equipment
+    // Subscription Agreement".
+    number: 'equipment-lease.parties',
+    from: 'This Equipment Subscription Agreement',
+    to: 'This Subscription Agreement',
+  },
 ];
 
 /**
