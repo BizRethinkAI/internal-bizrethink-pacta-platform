@@ -1,7 +1,7 @@
 # feat/mca-admin-library — the clause library becomes reachable
 
-**Branch:** `feat/mca-admin-library`, on top of `feat/mca-last-instruments` (#131).
-**PR:** #TBD — held until #131 merges, so it gets all 13 checks rather than 5.
+**Branch:** `feat/mca-admin-library`. Held until #131 merged, then opened against `main` so it gets all 13 checks rather than 5.
+**PR:** #132.
 
 `/admin/mca-library`. Read-only, 192 clauses, six instruments.
 
