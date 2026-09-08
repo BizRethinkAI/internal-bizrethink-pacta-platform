@@ -11,7 +11,7 @@ import {
   mcaLibraryFingerprint,
   normaliseMcaAdmission,
 } from '../../clauses/approval';
-import { outstandingFindingsFor } from '../../clauses/examination';
+import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../../clauses/examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
 import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview, reviewIsStale } from '../../review/link';
@@ -108,7 +108,17 @@ export const mcaClauseLibraryRouter = router({
         last, here, because it is the only one whose remedy is "reload and read
         it again".
       */
-      const blocked = approvalBlocks(clause, { admission, outstanding: outstandingFindingsFor(clause) });
+      const blocked = approvalBlocks(clause, {
+        admission,
+        outstanding: outstandingFindingsFor(clause),
+        /*
+          An unreadable register returns an empty findings list, which is
+          indistinguishable from a clean clause. Passed in rather than read
+          inside `approvalBlocks` so the rule stays pure and the environment
+          fact stays at the edge.
+        */
+        evidenceAvailable: REGISTER_AVAILABLE,
+      });
 
       if (blocked !== null) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, { message: blocked });

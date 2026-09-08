@@ -349,7 +349,29 @@ export const admissionBlocks = (clause: McaClause, admission: McaJurisdiction | 
  * because a filter here and a filter at the caller is two places to get the
  * scope wrong.
  */
-export const findingsHold = (outstanding: ReviewFinding[]): string | null => {
+export const findingsHold = (outstanding: ReviewFinding[], evidenceAvailable: boolean): string | null => {
+  /*
+    FAIL CLOSED WHEN THE REGISTER IS NOT READABLE, AND SAY SO BEFORE ANYTHING
+    ELSE.
+
+    `outstandingFindingsFor` reads a JSON file off disk and returns `[]` when it
+    is absent, so an unreadable register and a clause with nothing against it
+    are INDISTINGUISHABLE — the same observation `surface/view.ts` makes about
+    `source-missing`: "an empty finding list and an unreadable one look
+    identical on a page". On a page that is cosmetic. On the gate that decides
+    whether counsel's sign-off may be recorded it is a gate that silently stops
+    gating, which is this repo's characteristic failure rather than a
+    hypothetical one.
+
+    `docker/Dockerfile` copies the register today, so this refuses nothing now
+    and is the whole guard the day somebody edits that COPY line. The flag is
+    passed in rather than read here so the rule stays pure and the environment
+    fact stays at the edge.
+  */
+  if (!evidenceAvailable) {
+    return 'The review register is not readable in this environment, so what the two document reviews found against this clause cannot be checked. An approval recorded now would be recorded against unknown evidence.';
+  }
+
   if (outstanding.length === 0) {
     return null;
   }
@@ -384,5 +406,11 @@ export const findingsHold = (outstanding: ReviewFinding[]): string | null => {
  */
 export const approvalBlocks = (
   clause: McaClause,
-  context: { admission: McaJurisdiction | null; outstanding: ReviewFinding[] },
-): string | null => admissionBlocks(clause, context.admission) ?? findingsHold(context.outstanding);
+  context: {
+    admission: McaJurisdiction | null;
+    outstanding: ReviewFinding[];
+    /** Whether the review register was readable. See `findingsHold`. */
+    evidenceAvailable: boolean;
+  },
+): string | null =>
+  admissionBlocks(clause, context.admission) ?? findingsHold(context.outstanding, context.evidenceAvailable);

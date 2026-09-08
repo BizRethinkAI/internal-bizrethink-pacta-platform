@@ -9,7 +9,7 @@ import {
   mcaClauseFingerprint,
   statesNotCovered,
 } from '../clauses/approval';
-import { outstandingFindingsFor } from '../clauses/examination';
+import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../clauses/examination';
 import type { McaInstrument } from '../clauses/instruments';
 import { ALL_MCA_CLAUSES, libraryFor } from '../clauses/library';
 import { type McaLibraryClauseView, mcaLibrarySurface } from '../clauses/surface/view';
@@ -186,7 +186,17 @@ export const mcaLibraryPage = async () => {
       appliesInStates: clause.appliesInStates,
       approval: approval === null ? null : approvalView(approval, clause, recorderName(approval.recordedByUserId)),
       approved: isMcaApprovalCurrent(clause, approval),
-      heldByFindings: findingsHold(outstandingFindingsFor(clause)),
+      /*
+        WHAT THE ROUTER WILL SAY, ASKED THROUGH THE SAME FUNCTION. Shown on the
+        row rather than discovered on submit: the gate refuses either way, but a
+        refusal after somebody has typed a name, a bar number and a jurisdiction
+        is a worse way to learn it.
+
+        The ADMISSION half is deliberately not asked here. Nobody has typed one
+        yet, and inventing a plausible value to get an answer would be asking a
+        different question and printing it as this one's.
+      */
+      heldByFindings: findingsHold(outstandingFindingsFor(clause), REGISTER_AVAILABLE),
     };
   });
 

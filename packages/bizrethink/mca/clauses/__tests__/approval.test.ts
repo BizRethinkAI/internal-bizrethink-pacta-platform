@@ -247,41 +247,98 @@ describe('which bar an approval was recorded under', () => {
 
 describe('an outstanding finding holds the clause', () => {
   it('refuses while a survived finding nobody has disposed of names it', () => {
-    const held = findingsHold([finding()]);
+    const held = findingsHold([finding()], true);
 
     expect(held).not.toBeNull();
     expect(held).toContain('frpa-some-defect');
   });
 
   it('names every one of them rather than counting', () => {
-    const held = findingsHold([finding(), finding({ id: 'frpa-other-defect' })]);
+    const held = findingsHold([finding(), finding({ id: 'frpa-other-defect' })], true);
 
     expect(held).toContain('frpa-some-defect');
     expect(held).toContain('frpa-other-defect');
   });
 
   it('allows when nothing is outstanding', () => {
-    expect(findingsHold([])).toBeNull();
+    expect(findingsHold([], true)).toBeNull();
   });
 
   it('says where the disposition is recorded, because it is not recorded here', () => {
-    expect(findingsHold([finding()])).toContain('lombard-contracts');
+    expect(findingsHold([finding()], true)).toContain('lombard-contracts');
+  });
+
+  /*
+    FAIL CLOSED WHEN THE EVIDENCE IS NOT THERE. An unreadable register returns
+    an empty findings list, which is indistinguishable from a clean clause. The
+    register is copied into the container today, so this guard costs nothing now
+    and is the whole guard the day somebody edits that COPY line.
+  */
+  it('refuses entirely when the register cannot be read, even with nothing outstanding', () => {
+    const blocked = findingsHold([], false);
+
+    expect(blocked).not.toBeNull();
+    expect(blocked).toContain('register');
+  });
+
+  it('says that before naming findings, since an empty list is what it cannot be trusted about', () => {
+    const blocked = findingsHold([finding()], false);
+
+    expect(blocked).toContain('register');
+    expect(blocked).not.toContain('frpa-some-defect');
   });
 });
 
 describe('approvalBlocks — the one door every caller goes through', () => {
+  const evidenceAvailable = true;
+
   it('reports the admission before the finding, because reading a finding cannot fix an admission', () => {
     const scoped = clause({ appliesInStates: ['US-CA'] });
 
-    expect(approvalBlocks(scoped, { admission: 'US-FL', outstanding: [finding()] })).toContain('California');
+    expect(approvalBlocks(scoped, { admission: 'US-FL', outstanding: [finding()], evidenceAvailable })).toContain(
+      'California',
+    );
   });
 
   it('reports the finding once the admission is right', () => {
-    expect(approvalBlocks(clause(), { admission: 'US-CA', outstanding: [finding()] })).toContain('frpa-some-defect');
+    expect(approvalBlocks(clause(), { admission: 'US-CA', outstanding: [finding()], evidenceAvailable })).toContain(
+      'frpa-some-defect',
+    );
   });
 
   it('lets a clean clause through', () => {
-    expect(approvalBlocks(clause(), { admission: 'US-CA', outstanding: [] })).toBeNull();
+    expect(approvalBlocks(clause(), { admission: 'US-CA', outstanding: [], evidenceAvailable })).toBeNull();
+  });
+
+  /*
+    FAIL CLOSED WHEN THE EVIDENCE IS NOT THERE.
+
+    `outstandingFindingsFor` reads a register off disk, and when the file is
+    absent it returns [] — so an unreadable register and a clean clause are
+    INDISTINGUISHABLE to every caller. The register is copied into the
+    container today (docker/Dockerfile), which means this guard costs nothing
+    now and is the whole guard the day somebody edits that COPY line.
+
+    A findings gate that silently stops gating is this repo's characteristic
+    failure, not a hypothetical one: the E2E suite went dark twice without a
+    red test.
+  */
+  it('refuses entirely when the review register cannot be read', () => {
+    const blocked = approvalBlocks(clause(), { admission: 'US-CA', outstanding: [], evidenceAvailable: false });
+
+    expect(blocked).not.toBeNull();
+    expect(blocked).toContain('register');
+  });
+
+  it('says so before the findings, since an empty list is exactly what it cannot be trusted about', () => {
+    const blocked = approvalBlocks(clause(), {
+      admission: 'US-CA',
+      outstanding: [finding()],
+      evidenceAvailable: false,
+    });
+
+    expect(blocked).toContain('register');
+    expect(blocked).not.toContain('frpa-some-defect');
   });
 });
 
