@@ -62,7 +62,7 @@ manifests — is refused for the reason `mca/README.md` refuses a second
 calculator: two registers drift, and when they disagree there is no principled
 way to say which is right.
 
-**Today this holds 73 of 192 clauses.** That is the mechanism working, and it is
+**Today this holds 73 of 204 clauses.** That is the mechanism working, and it is
 mostly REVIEW-02's `unrecorded` findings — that review kept its dispositions in
 prose, so "unknown is not done" counts them.
 
@@ -97,7 +97,7 @@ migration; it belongs to whoever owns both verticals at once.
   about the files that wire them together.
 - **The admission guard fires on exactly one clause today.** Only ISO PRA §2.6
   carries a non-empty `appliesInStates` (California and New York). On the other
-  191 the permissive reading applies and any admission is accepted. That reading
+  203 the permissive reading applies and any admission is accepted. That reading
   is provisional and changes in one function if counsel says otherwise.
 - **A finding attached AFTER an approval does not lapse it.** `examinedBy` is
   deliberately outside the fingerprint — it is evidence about a clause, not
@@ -111,6 +111,15 @@ migration; it belongs to whoever owns both verticals at once.
   the fix is a register here, and it should be argued for rather than added.
 - **Nothing was published to Pacta and no template was uploaded.** The counsel
   link is a page in this application; sending it is a person copying a URL.
+
+## Rebased onto #133
+
+`origin/main` moved while this was open: PR #133 re-vendored after owner edits
+and took the library from 192 clauses to 204. Merged in rather than rebased, and
+re-verified against it — 156 files, 2809 tests, typecheck clean, `apps/remix`
+build green. The counts above are post-merge. No test in this PR asserts an
+absolute clause count, which is why the merge changed nothing but the numbers in
+this note.
 
 ## Still open
 
