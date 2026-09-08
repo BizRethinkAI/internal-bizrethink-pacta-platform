@@ -31,19 +31,30 @@ export type McaClause = {
   version: number;
 
   /**
-   * Every agreement this clause is published in.
+   * The agreement this clause is published in. Exactly one.
    *
-   * PLURAL, AND THAT IS THE POINT. The Equipment Lease and the Subscription
-   * Agreement are the same document with its vocabulary swapped and its clause
-   * numbering identical (REVIEW-02,
-   * `phase0-corpus-omits-the-subscription-agreement-entirely`). REVIEW-02's
-   * consequence is the design constraint: *every Equipment Lease finding lands
-   * twice, in two live templates, and a fix applied to one and not the other is
-   * a divergence nothing checks for.* One clause in two instruments cannot
-   * diverge; two clauses that happen to agree today can, quietly, on the next
-   * edit.
+   * IT WAS AN ARRAY, AND THE CORPUS DISPROVED THE REASON FOR IT. The plural
+   * existed so that a clause published in two agreements could be stored once
+   * and be unable to diverge — aimed squarely at the Equipment Lease and the
+   * Subscription, which REVIEW-02 found are the same document with its
+   * vocabulary swapped and its numbering identical.
+   *
+   * They are. But the swap was made by hand and is not a function: inside §3.2
+   * alone, `leased` becomes `you subscribe for` in one sentence and `subscribed
+   * for` in the next. The two documents share no vocabulary-bearing sentence,
+   * so there was never anything to store once, and across all 177 clauses of
+   * four instruments not one names a second. A field with no user reads as
+   * evidence that sharing happens here. It does not.
+   *
+   * What replaced it is `twins.ts`, which ASSERTS the two documents' agreement
+   * instead of generating it — REVIEW-02's *"a fix applied to one and not the
+   * other is a divergence nothing checks for"* answered by checking for it.
+   *
+   * If a genuinely shared clause ever appears, widening this back is a small
+   * change and a deliberate one. That is the intended cost, and it is the same
+   * argument `jurisdictions.ts` makes about adding a federal disclosure.
    */
-  instruments: McaInstrument[];
+  instrument: McaInstrument;
 
   /**
    * The number the document itself prints — `A.4`, `2.6`, `3.12`.

@@ -29,12 +29,10 @@ describe('every clause body is still in the document it was taken from', () => {
   });
 
   it.each(ALL_MCA_CLAUSES.map((clause) => [clause.slug, clause] as const))('%s', (_slug, clause) => {
-    for (const id of clause.instruments) {
-      const body = readAgreementBody(INSTRUMENTS[id].sourceDocument);
+    const body = readAgreementBody(INSTRUMENTS[clause.instrument].sourceDocument);
 
-      expect(containsClauseText(body, clause.heading)).toBe(true);
-      expect(containsClauseText(body, clause.body)).toBe(true);
-    }
+    expect(containsClauseText(body, clause.heading)).toBe(true);
+    expect(containsClauseText(body, clause.body)).toBe(true);
   });
 
   /**
@@ -50,11 +48,9 @@ describe('every clause body is still in the document it was taken from', () => {
   it.each(
     ALL_MCA_CLAUSES.map((clause) => [clause.slug, clause] as const),
   )('%s prints its number beside its heading', (_slug, clause) => {
-    for (const id of clause.instruments) {
-      const body = readAgreementBody(INSTRUMENTS[id].sourceDocument);
+    const body = readAgreementBody(INSTRUMENTS[clause.instrument].sourceDocument);
 
-      expect(containsClauseText(body, `${clause.number} ${clause.heading}`)).toBe(true);
-    }
+    expect(containsClauseText(body, `${clause.number} ${clause.heading}`)).toBe(true);
   });
 
   it('every instrument that has clauses has a vendored document', () => {

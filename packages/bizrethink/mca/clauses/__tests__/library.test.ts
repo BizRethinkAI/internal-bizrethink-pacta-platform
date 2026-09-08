@@ -56,19 +56,33 @@ describe('the MCA clause library', () => {
   it('returns only the named instrument’s clauses', () => {
     for (const id of MCA_INSTRUMENTS) {
       for (const clause of libraryFor(id)) {
-        expect(clause.instruments).toContain(id);
+        expect(clause.instrument).toBe(id);
       }
     }
-
-    expect(ALL_MCA_CLAUSES.every((clause) => clause.instruments.length > 0)).toBe(true);
   });
 
   it('names only instruments that exist', () => {
     for (const clause of ALL_MCA_CLAUSES) {
-      for (const id of clause.instruments) {
-        expect(INSTRUMENTS[id]).toBeDefined();
-      }
+      expect(INSTRUMENTS[clause.instrument]).toBeDefined();
     }
+  });
+
+  /**
+   * The evidence that `instrument` is singular rather than a list.
+   *
+   * The plural existed for the Equipment Lease and the Subscription, on the
+   * theory that one clause could be published in both and so could not diverge.
+   * The documents refused it — see `twins.ts` — and across the whole library not
+   * one clause names a second instrument. Asserted rather than described,
+   * because the moment a genuinely shared clause appears this is the test that
+   * should be reconsidered, and a count in prose would not be.
+   */
+  it('gives every clause exactly one instrument, across all 177', () => {
+    expect(ALL_MCA_CLAUSES).toHaveLength(177);
+
+    const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
+
+    expect(perInstrument.reduce((a, b) => a + b, 0)).toBe(ALL_MCA_CLAUSES.length);
   });
 
   it('scopes a clause only to states the disclosure library knows', () => {

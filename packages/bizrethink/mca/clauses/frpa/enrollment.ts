@@ -11,7 +11,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.merchant-deposit-agreement-4-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.1',
     section: 'enrollment',
     sortKey: 10,
@@ -37,7 +37,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.term-of-agreement-4-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.2',
     section: 'enrollment',
     sortKey: 20,
@@ -57,7 +57,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.financial-condition-4-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.3',
     section: 'enrollment',
     sortKey: 30,
@@ -73,7 +73,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.transaction-history-4-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.4',
     section: 'enrollment',
     sortKey: 40,
@@ -87,7 +87,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.no-liability-4-5',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.5',
     section: 'enrollment',
     sortKey: 50,
@@ -109,7 +109,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.power-of-attorney-4-6',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.6',
     section: 'enrollment',
     sortKey: 60,
@@ -123,7 +123,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.protection-of-information-4-7',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.7',
     section: 'enrollment',
     sortKey: 70,
@@ -137,7 +137,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.confidentiality-4-8',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.8',
     section: 'enrollment',
     sortKey: 80,
@@ -159,7 +159,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.d-b-a-names-4-9',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.9',
     section: 'enrollment',
     sortKey: 90,
@@ -175,7 +175,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.security-interest-4-10',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.10',
     section: 'enrollment',
     sortKey: 100,
@@ -201,7 +201,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.negative-pledge-4-11',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.11',
     section: 'enrollment',
     sortKey: 110,
@@ -217,7 +217,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.remedies-4-12',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.12',
     section: 'enrollment',
     sortKey: 120,
@@ -231,7 +231,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.timing-and-method-of-funding-4-13',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.13',
     section: 'enrollment',
     sortKey: 130,
@@ -253,7 +253,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.right-to-cancel-4-14',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.14',
     section: 'enrollment',
     sortKey: 140,
@@ -270,7 +270,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.position-and-cascade-of-collections-4-15',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.15',
     section: 'enrollment',
     sortKey: 150,
@@ -284,7 +284,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   {
     slug: 'frpa.electronic-account-monitoring-authorization-plaid-4-16',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '4.16',
     section: 'enrollment',
     sortKey: 160,

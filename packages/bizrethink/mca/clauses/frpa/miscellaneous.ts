@@ -11,7 +11,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.modifications-amendments-7-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.1',
     section: 'miscellaneous',
     sortKey: 10,
@@ -25,7 +25,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.assignment-7-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.2',
     section: 'miscellaneous',
     sortKey: 20,
@@ -39,7 +39,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.notices-7-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.3',
     section: 'miscellaneous',
     sortKey: 30,
@@ -56,7 +56,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.waiver-of-remedies-7-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.4',
     section: 'miscellaneous',
     sortKey: 40,
@@ -70,7 +70,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.5',
     section: 'miscellaneous',
     sortKey: 50,
@@ -94,7 +94,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.survival-of-representations-7-6',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.6',
     section: 'miscellaneous',
     sortKey: 60,
@@ -108,7 +108,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.severability-7-7',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.7',
     section: 'miscellaneous',
     sortKey: 70,
@@ -122,7 +122,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.entire-agreement-7-8',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.8',
     section: 'miscellaneous',
     sortKey: 80,
@@ -136,7 +136,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.indemnification-7-9',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.9',
     section: 'miscellaneous',
     sortKey: 90,
@@ -164,7 +164,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.jury-trial-waiver-7-10',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.10',
     section: 'miscellaneous',
     sortKey: 100,
@@ -178,7 +178,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.class-action-waiver-7-11',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.11',
     section: 'miscellaneous',
     sortKey: 110,
@@ -192,7 +192,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.service-of-process-7-12',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.12',
     section: 'miscellaneous',
     sortKey: 120,
@@ -208,7 +208,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.sale-of-additional-pool-of-receipts-right-of-first-refusal-7-13',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.13',
     section: 'miscellaneous',
     sortKey: 130,
@@ -224,7 +224,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.reserved-7-14',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.14',
     section: 'miscellaneous',
     sortKey: 140,
@@ -238,7 +238,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.reporting-7-15',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.15',
     section: 'miscellaneous',
     sortKey: 150,
@@ -252,7 +252,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.return-of-buyer-proceeds-7-16',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.16',
     section: 'miscellaneous',
     sortKey: 160,
@@ -266,7 +266,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.electronic-signatures-7-17',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.17',
     section: 'miscellaneous',
     sortKey: 170,
@@ -280,7 +280,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.communications-recording-and-premises-access-7-18',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.18',
     section: 'miscellaneous',
     sortKey: 180,
@@ -294,7 +294,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.contractual-statutes-of-limitations-7-19',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.19',
     section: 'miscellaneous',
     sortKey: 190,
@@ -318,7 +318,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.counterclaim-waiver-7-20',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.20',
     section: 'miscellaneous',
     sortKey: 200,
@@ -342,7 +342,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.independent-sales-organizations-and-brokers-7-21',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.21',
     section: 'miscellaneous',
     sortKey: 210,
@@ -359,7 +359,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.attorney-review-7-22',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.22',
     section: 'miscellaneous',
     sortKey: 220,
@@ -381,7 +381,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.tmf-match-reporting-consent-and-release-7-23',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.23',
     section: 'miscellaneous',
     sortKey: 230,
@@ -395,7 +395,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.state-law-riders-7-24',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '7.24',
     section: 'miscellaneous',
     sortKey: 240,
@@ -418,7 +418,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.renewal-eligibility-8-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '8.1',
     section: 'renewal',
     sortKey: 10,
@@ -432,7 +432,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.rollover-methods-8-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '8.2',
     section: 'renewal',
     sortKey: 20,
@@ -456,7 +456,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.voluntary-prepayment-8-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '8.3',
     section: 'renewal',
     sortKey: 30,

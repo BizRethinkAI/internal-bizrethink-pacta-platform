@@ -11,7 +11,7 @@ export const FRPA_APPENDIX: McaClause[] = [
   {
     slug: 'frpa.appendix-a-fees-collectible',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: 'Appendix A',
     section: 'appendix',
     sortKey: 10,
@@ -25,7 +25,7 @@ export const FRPA_APPENDIX: McaClause[] = [
   {
     slug: 'frpa.appendix-a-origination-fee-to-iso',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: 'Appendix A',
     section: 'appendix',
     sortKey: 20,
@@ -39,7 +39,7 @@ export const FRPA_APPENDIX: McaClause[] = [
   {
     slug: 'frpa.appendix-a-attorneys-fees',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: 'Appendix A',
     section: 'appendix',
     sortKey: 30,
@@ -53,7 +53,7 @@ export const FRPA_APPENDIX: McaClause[] = [
   {
     slug: 'frpa.execution',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'appendix',
     sortKey: 40,
@@ -67,7 +67,7 @@ export const FRPA_APPENDIX: McaClause[] = [
   {
     slug: 'frpa.exhibit-a-split-funding',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: 'Exhibit A',
     section: 'appendix',
     sortKey: 50,
@@ -81,7 +81,7 @@ export const FRPA_APPENDIX: McaClause[] = [
   {
     slug: 'frpa.exhibit-c-permission-to-release',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: 'Exhibit C',
     section: 'appendix',
     sortKey: 60,

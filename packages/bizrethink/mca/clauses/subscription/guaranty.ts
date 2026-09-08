@@ -12,7 +12,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.guarantor-information',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '4.1',
     section: 'guaranty',
     sortKey: 10,
@@ -26,7 +26,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.guaranty-of-payment',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '4.2',
     section: 'guaranty',
     sortKey: 20,
@@ -50,7 +50,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.independent-decision-governing-law',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '4.3',
     section: 'guaranty',
     sortKey: 30,
@@ -67,7 +67,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.jury-trial-and-class-action-waiver',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '4.4',
     section: 'guaranty',
     sortKey: 40,
@@ -90,7 +90,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.credit-reporting-authorization',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '4.5',
     section: 'guaranty',
     sortKey: 50,
@@ -104,7 +104,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.communications-consent',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '4.6',
     section: 'guaranty',
     sortKey: 60,
@@ -118,7 +118,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.acknowledgment',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '4.7',
     section: 'guaranty',
     sortKey: 70,

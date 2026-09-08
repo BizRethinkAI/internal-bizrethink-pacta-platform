@@ -11,7 +11,7 @@ export const FRPA_DEFAULT: McaClause[] = [
   {
     slug: 'frpa.events-of-default-6-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '6.1',
     section: 'default',
     sortKey: 10,
@@ -49,7 +49,7 @@ export const FRPA_DEFAULT: McaClause[] = [
   {
     slug: 'frpa.remedies-6-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '6.2',
     section: 'default',
     sortKey: 20,
@@ -85,7 +85,7 @@ export const FRPA_DEFAULT: McaClause[] = [
   {
     slug: 'frpa.costs-of-collection-6-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '6.3',
     section: 'default',
     sortKey: 30,
@@ -116,7 +116,7 @@ export const FRPA_DEFAULT: McaClause[] = [
   {
     slug: 'frpa.required-notifications-6-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '6.4',
     section: 'default',
     sortKey: 40,

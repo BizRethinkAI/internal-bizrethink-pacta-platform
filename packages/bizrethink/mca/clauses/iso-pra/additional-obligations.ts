@@ -13,7 +13,7 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   {
     slug: 'iso-pra.compliance',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '2.1',
     section: 'additional-obligations',
     sortKey: 10,
@@ -27,7 +27,7 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   {
     slug: 'iso-pra.know-your-partner-compliance',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '2.2',
     section: 'additional-obligations',
     sortKey: 20,
@@ -41,7 +41,7 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   {
     slug: 'iso-pra.merchant-funds',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '2.3',
     section: 'additional-obligations',
     sortKey: 30,
@@ -55,7 +55,7 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   {
     slug: 'iso-pra.confidentiality',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '2.4',
     section: 'additional-obligations',
     sortKey: 40,
@@ -69,7 +69,7 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   {
     slug: 'iso-pra.audits',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '2.5',
     section: 'additional-obligations',
     sortKey: 50,
@@ -102,7 +102,7 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   {
     slug: 'iso-pra.commercial-financing-disclosures-california-and-new-york',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '2.6',
     section: 'additional-obligations',
     sortKey: 60,

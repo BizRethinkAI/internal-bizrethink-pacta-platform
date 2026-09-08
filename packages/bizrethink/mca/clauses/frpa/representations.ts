@@ -11,7 +11,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.representations-lead-in',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'representations',
     sortKey: 5,
@@ -25,7 +25,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.advances-are-not-loans-5-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.1',
     section: 'representations',
     sortKey: 10,
@@ -49,7 +49,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.financial-condition-and-financial-information-5-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.2',
     section: 'representations',
     sortKey: 20,
@@ -63,7 +63,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.governmental-approvals-5-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.3',
     section: 'representations',
     sortKey: 30,
@@ -79,7 +79,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.authorization-5-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.4',
     section: 'representations',
     sortKey: 40,
@@ -93,7 +93,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.insurance-5-5',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.5',
     section: 'representations',
     sortKey: 50,
@@ -116,7 +116,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.the-account-5-6',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.6',
     section: 'representations',
     sortKey: 60,
@@ -135,7 +135,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.reserved-5-7',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.7',
     section: 'representations',
     sortKey: 70,
@@ -149,7 +149,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.estoppel-certificate-5-8',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.8',
     section: 'representations',
     sortKey: 80,
@@ -163,7 +163,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.no-bankruptcy-5-9',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.9',
     section: 'representations',
     sortKey: 90,
@@ -179,7 +179,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.no-encumbrance-of-receipts-5-10',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.10',
     section: 'representations',
     sortKey: 100,
@@ -193,7 +193,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.unencumbered-receipts-5-11',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.11',
     section: 'representations',
     sortKey: 110,
@@ -209,7 +209,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.business-purpose-5-12',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.12',
     section: 'representations',
     sortKey: 120,
@@ -225,7 +225,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.defaults-under-other-contracts-improper-transfers-5-13',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.13',
     section: 'representations',
     sortKey: 130,
@@ -241,7 +241,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.civil-criminal-regulatory-matters-5-14',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.14',
     section: 'representations',
     sortKey: 140,
@@ -257,7 +257,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.business-closure-5-15',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.15',
     section: 'representations',
     sortKey: 150,
@@ -271,7 +271,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.stacking-prohibited-5-16',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.16',
     section: 'representations',
     sortKey: 160,
@@ -285,7 +285,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.no-diversion-of-receipts-5-17',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.17',
     section: 'representations',
     sortKey: 170,
@@ -302,7 +302,7 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   {
     slug: 'frpa.change-of-name-or-location-or-sale-or-closing-of-business-5-18',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '5.18',
     section: 'representations',
     sortKey: 180,

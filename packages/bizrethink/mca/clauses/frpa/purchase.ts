@@ -11,7 +11,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.definitions',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'purchase',
     sortKey: 5,
@@ -25,7 +25,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.sales-of-receipts-not-a-loan-2-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '2.1',
     section: 'purchase',
     sortKey: 10,
@@ -49,7 +49,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.collection-mechanism-and-term-2-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '2.2',
     section: 'purchase',
     sortKey: 20,
@@ -73,7 +73,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.primary-collection-split-funding-via-approved-processor-2-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '2.3',
     section: 'purchase',
     sortKey: 30,
@@ -87,7 +87,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.approved-bank-account-2-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '2.4',
     section: 'purchase',
     sortKey: 40,
@@ -101,7 +101,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.reserved-2-5',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '2.5',
     section: 'purchase',
     sortKey: 50,
@@ -115,7 +115,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.completion-threshold-2-6',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '2.6',
     section: 'purchase',
     sortKey: 60,
@@ -146,7 +146,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.merchant-s-right-to-reconciliation-3-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '3.1',
     section: 'reconciliation',
     sortKey: 10,
@@ -160,7 +160,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.request-for-reconciliation-procedure-3-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '3.2',
     section: 'reconciliation',
     sortKey: 20,
@@ -183,7 +183,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.failure-to-provide-reconciliation-information-3-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '3.3',
     section: 'reconciliation',
     sortKey: 30,
@@ -208,7 +208,7 @@ export const FRPA_PURCHASE: McaClause[] = [
   {
     slug: 'frpa.adjustment-of-the-estimated-daily-holdback-3-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '3.4',
     section: 'reconciliation',
     sortKey: 40,

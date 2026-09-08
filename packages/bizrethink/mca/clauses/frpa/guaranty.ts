@@ -11,7 +11,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.guarantor-information-9-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '9.1',
     section: 'guaranty',
     sortKey: 10,
@@ -28,7 +28,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.guaranty-of-performance-9-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '9.2',
     section: 'guaranty',
     sortKey: 20,
@@ -61,7 +61,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.cross-collateral-9-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '9.3',
     section: 'guaranty',
     sortKey: 30,
@@ -75,7 +75,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.guarantor-waivers-9-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '9.4',
     section: 'guaranty',
     sortKey: 40,
@@ -97,7 +97,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.joint-and-several-liability-9-5',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '9.5',
     section: 'guaranty',
     sortKey: 50,
@@ -111,7 +111,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.guarantor-acknowledgement-9-6',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '9.6',
     section: 'guaranty',
     sortKey: 60,
@@ -133,7 +133,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.section-10-1',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '10.1',
     section: 'service',
     sortKey: 10,
@@ -149,7 +149,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.section-10-2',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '10.2',
     section: 'service',
     sortKey: 20,
@@ -163,7 +163,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.section-10-3',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '10.3',
     section: 'service',
     sortKey: 30,
@@ -177,7 +177,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.section-10-4',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '10.4',
     section: 'service',
     sortKey: 40,
@@ -191,7 +191,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.section-10-5',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '10.5',
     section: 'service',
     sortKey: 50,
@@ -205,7 +205,7 @@ export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.section-10-6',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '10.6',
     section: 'service',
     sortKey: 60,

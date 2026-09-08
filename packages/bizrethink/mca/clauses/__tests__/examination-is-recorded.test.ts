@@ -119,7 +119,7 @@ describe('no clause enters the library unexamined', () => {
  * clause citing a finding, or cites one that was refuted, this is what says so.
  */
 describe('the ISO Partner Referral Agreement, as imported', () => {
-  const clauses = ALL_MCA_CLAUSES.filter((clause) => clause.instruments.includes('iso-pra'));
+  const clauses = ALL_MCA_CLAUSES.filter((clause) => clause.instrument === 'iso-pra');
 
   it('is all twenty-four of its clauses', () => {
     expect(clauses).toHaveLength(24);

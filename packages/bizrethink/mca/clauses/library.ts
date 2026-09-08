@@ -33,13 +33,13 @@ export const ALL_MCA_CLAUSES: McaClause[] = [
  * a `US` tier into every jurisdiction, because 36 of its clauses depend on no
  * state's law. There is no equivalent here and inventing one would be a
  * mistake: a clause that reads identically in two agreements is not "portable",
- * it is one clause published in both, which `instruments` says directly. The
- * distinction matters because a portable tier leaks by construction — anything
- * placed in it reaches every document — whereas naming both instruments is a
- * decision somebody made about those two documents.
+ * it would be one clause published in both. No such clause exists: across 177
+ * clauses of four instruments, every one names exactly one. The distinction
+ * still matters, because a portable tier leaks by construction — anything
+ * placed in it reaches every document — and this filter is exact equality.
  */
 export const libraryFor = (instrument: McaInstrument): McaClause[] =>
-  ALL_MCA_CLAUSES.filter((clause) => clause.instruments.includes(instrument));
+  ALL_MCA_CLAUSES.filter((clause) => clause.instrument === instrument);
 
 /**
  * Section order, per instrument.
@@ -76,19 +76,16 @@ const SECTION_ORDER: Partial<Record<McaInstrument, readonly string[]>> = {
  * that renders nothing because one clause is misfiled hides the other
  * twenty-three.
  *
- * A clause in more than one instrument sorts under the FIRST one it names, so
- * that the twin appears once in a whole-library reading rather than twice.
- * `libraryFor` is what shows it in the other document's context.
  */
 export const inReviewOrder = (clauses: McaClause[]): McaClause[] => {
   const instrument = (clause: McaClause) => {
-    const index = MCA_INSTRUMENTS.indexOf(clause.instruments[0]);
+    const index = MCA_INSTRUMENTS.indexOf(clause.instrument);
 
     return index === -1 ? MCA_INSTRUMENTS.length : index;
   };
 
   const section = (clause: McaClause) => {
-    const order = SECTION_ORDER[clause.instruments[0]] ?? [];
+    const order = SECTION_ORDER[clause.instrument] ?? [];
     const index = order.indexOf(clause.section);
 
     return index === -1 ? order.length : index;

@@ -11,7 +11,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
   {
     slug: 'frpa.holdback-explainer',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'funding-terms',
     sortKey: 10,
@@ -25,7 +25,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
   {
     slug: 'frpa.equipment-cost-explainer',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'funding-terms',
     sortKey: 20,
@@ -39,7 +39,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
   {
     slug: 'frpa.equipment-cost-exclusivity',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'funding-terms',
     sortKey: 30,
@@ -53,7 +53,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
   {
     slug: 'frpa.rollover-method-election',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'funding-terms',
     sortKey: 40,
@@ -67,7 +67,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
   {
     slug: 'frpa.parties',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'preamble',
     sortKey: 10,
@@ -81,7 +81,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
   {
     slug: 'frpa.granting-clause',
     version: 1,
-    instruments: ['frpa'],
+    instrument: 'frpa',
     number: '',
     section: 'preamble',
     sortKey: 20,

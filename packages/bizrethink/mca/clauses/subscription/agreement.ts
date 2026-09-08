@@ -12,7 +12,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.equipment',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.1',
     section: 'agreement',
     sortKey: 10,
@@ -29,7 +29,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.effective-date-term-and-interim-rent',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.2',
     section: 'agreement',
     sortKey: 20,
@@ -52,7 +52,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.site-preparation',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.3',
     section: 'agreement',
     sortKey: 30,
@@ -66,7 +66,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.payment-of-amounts-due',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.4',
     section: 'agreement',
     sortKey: 40,
@@ -92,7 +92,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.use-return-of-equipment-and-insurance',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.5',
     section: 'agreement',
     sortKey: 50,
@@ -109,7 +109,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.title-to-equipment',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.6',
     section: 'agreement',
     sortKey: 60,
@@ -132,7 +132,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.return-or-continuation-of-equipment-at-end-of-subscription-term',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.7',
     section: 'agreement',
     sortKey: 70,
@@ -155,7 +155,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.software-license',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.8',
     section: 'agreement',
     sortKey: 80,
@@ -172,7 +172,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.limitation-on-liability',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.9',
     section: 'agreement',
     sortKey: 90,
@@ -195,7 +195,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.warranties',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.10',
     section: 'agreement',
     sortKey: 100,
@@ -212,7 +212,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.indemnification',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.11',
     section: 'agreement',
     sortKey: 110,
@@ -235,7 +235,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.default-remedies',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.12',
     section: 'agreement',
     sortKey: 120,
@@ -260,7 +260,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.assignment',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.13',
     section: 'agreement',
     sortKey: 130,
@@ -274,7 +274,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.subscription-guaranty',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.14',
     section: 'agreement',
     sortKey: 140,
@@ -297,7 +297,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.governing-law-and-venue',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.15',
     section: 'agreement',
     sortKey: 150,
@@ -320,7 +320,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.notices',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.16',
     section: 'agreement',
     sortKey: 160,
@@ -334,7 +334,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.electronic-signatures',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.17',
     section: 'agreement',
     sortKey: 170,
@@ -348,7 +348,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.entire-agreement',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.18',
     section: 'agreement',
     sortKey: 180,
@@ -362,7 +362,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.survival',
     version: 1,
-    instruments: ['subscription'],
+    instrument: 'subscription',
     number: '3.19',
     section: 'agreement',
     sortKey: 190,

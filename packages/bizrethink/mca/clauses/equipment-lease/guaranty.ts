@@ -12,7 +12,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
     slug: 'equipment-lease.guarantor-information',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '4.1',
     section: 'guaranty',
     sortKey: 10,
@@ -26,7 +26,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
     slug: 'equipment-lease.guaranty-of-payment',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '4.2',
     section: 'guaranty',
     sortKey: 20,
@@ -40,7 +40,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
     slug: 'equipment-lease.independent-decision-governing-law',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '4.3',
     section: 'guaranty',
     sortKey: 30,
@@ -56,7 +56,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
     slug: 'equipment-lease.jury-trial-and-class-action-waiver',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '4.4',
     section: 'guaranty',
     sortKey: 40,
@@ -78,7 +78,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
     slug: 'equipment-lease.credit-reporting-authorization',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '4.5',
     section: 'guaranty',
     sortKey: 50,
@@ -94,7 +94,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
     slug: 'equipment-lease.communications-consent',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '4.6',
     section: 'guaranty',
     sortKey: 60,
@@ -108,7 +108,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
     slug: 'equipment-lease.acknowledgment',
     version: 1,
-    instruments: ['equipment-lease'],
+    instrument: 'equipment-lease',
     number: '4.7',
     section: 'guaranty',
     sortKey: 70,
