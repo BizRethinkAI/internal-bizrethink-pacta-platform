@@ -145,6 +145,18 @@ const NAV_GROUPS: NavGroupDef[] = [
         bizrethink: true,
       },
       {
+        // The MCA vertical's OTHER half, and a separate entry for the reason
+        // ADR 0008 gives: two surfaces, two release paths. MCA Conformity is
+        // the regulator's words and has no approval workflow; this is ours and
+        // will need one. Named to pair with Lease Clauses -- the distinguishing
+        // noun first, so the two read as siblings at the one place a person
+        // chooses between them.
+        label: <Trans>MCA Clauses</Trans>,
+        href: '/admin/mca-library',
+        icon: ScrollTextIcon,
+        bizrethink: true,
+      },
+      {
         label: <Trans>Documents</Trans>,
         href: '/admin/documents',
         icon: FileStack,

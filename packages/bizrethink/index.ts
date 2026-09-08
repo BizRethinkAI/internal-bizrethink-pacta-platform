@@ -30,6 +30,22 @@
 // `provenance/` and nothing else, and a root export that offered both under one
 // namespace would be the first step back towards one list.
 
+// READS THE FILESYSTEM, for the same reason and with the same rule as the
+// conformity surface above. `mcaLibrarySurface` reaches `mca/clauses/documents`
+// and `mca/clauses/examination`, both of which import `node:fs` — one to digest
+// the vendored agreements, the other to read the review register. Import it
+// ONLY from server code, through
+// `apps/remix/app/utils/bizrethink-mca-library.server.ts`.
+//
+// The types beside it are erased at compile time and are safe to import
+// anywhere, which is what lets the route render without pulling the module in.
+export {
+  type McaLibraryClauseView,
+  type McaLibraryFindingView,
+  type McaLibraryInstrumentView,
+  mcaLibrarySurface,
+  type SourceState,
+} from './mca/clauses/surface/view';
 export {
   JURISDICTION_NAMES,
   MCA_JURISDICTIONS,
