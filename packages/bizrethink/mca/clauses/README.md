@@ -105,14 +105,20 @@ applied, and that every declared divergence still diverges — so the register
 cannot go write-only. Five clauses differ in substance (§§3.4–3.8) and ten more
 places differ only in wording; both lists are pinned.
 
-They do not prove a clause is any good. The twenty-four ISO PRA clauses cite
-**seventeen distinct findings, every one of which survived refutation** — a
-blocker against the clawback tiers, a broker-status question routed to counsel,
-a remedy that sends a merchant's refund to the wrong party. A green suite means
-the record is intact, not that the record is empty, and
-`bodies-match-the-document.test.ts` asserts those counts so the difference
-cannot be lost by accident. `findingsFor` and `outstandingFindingsFor` are how a
-surface shows it.
+They do not prove a clause is any good. The clauses here cite **44 distinct
+findings that survived refutation**, of which **21 are still outstanding** —
+the other 23 were fixed, and `REVIEW-01-manifest.json` is what says so.
+
+**`findingsFor` and `outstandingFindingsFor` mean different things and the
+difference is the point.** A finding surviving refutation says it was RIGHT.
+Whether anybody acted on it is a separate question with its own authoritative
+answer, and reading only the first is how this library spent two PRs reporting
+more than twice the real backlog. See `__tests__/dispositions.test.ts`.
+
+**REVIEW-01 keeps a manifest; REVIEW-02 does not.** Its dispositions are prose
+in `change-notes/16-review-02-document-defects.md` — 23 of 48 fixed, without
+saying which in a form anything can read. Every REVIEW-02 finding is therefore
+`unrecorded`, counted as outstanding because unknown is not done.
 
 They also do not prove the findings say what a clause claims. The register keeps
 `id`, `severity`, `locus` and the finding's one-line statement, and drops the

@@ -43,12 +43,41 @@ export type ReviewId = 'REVIEW-01' | 'REVIEW-02';
 
 export type FindingStatus = 'survived' | 'refuted';
 
+/**
+ * What was DONE about a finding, which is a different question from whether it
+ * was right.
+ *
+ * `status` answers the second: did it survive refutation. `disposition` answers
+ * the first, and the library shipped without it — reporting every surviving
+ * finding as outstanding, including the 166 REVIEW-01 had already fixed.
+ *
+ * `unrecorded` is load-bearing and is not a default. REVIEW-01 keeps a manifest
+ * and REVIEW-02 does not: that review's dispositions live in the prose of
+ * `change-notes/16-review-02-document-defects.md`, which says 23 of its 48
+ * findings were fixed without saying which in a form anything can read. So
+ * every REVIEW-02 finding is unknown rather than open, and unknown is treated as
+ * still outstanding — the safe reading, and the one that keeps the asymmetry
+ * visible instead of quietly resolving it.
+ */
+export type FindingDisposition = 'implemented' | 'open' | 'handoff' | 'rejected' | 'wont-fix' | 'unrecorded';
+
+export const DISPOSITIONS: readonly FindingDisposition[] = [
+  'implemented',
+  'open',
+  'handoff',
+  'rejected',
+  'wont-fix',
+  'unrecorded',
+];
+
 export type ReviewFinding = {
   id: string;
   review: ReviewId;
   status: FindingStatus;
   /** The finding itself, one statement. Present on both shapes. */
   finding: string;
+  /** What was done about it. See `FindingDisposition`. */
+  disposition: FindingDisposition;
 
   /*
     A SURVIVED FINDING AND A REFUTED ONE ARE DIFFERENT SHAPES, AND PADDING THEM
@@ -81,6 +110,9 @@ export type ReviewRecord = {
   file: string;
   /** That file's sha256 at derivation time. */
   sha256: string;
+  /** The manifest the dispositions came from, or null where there is none. */
+  manifest: string | null;
+  manifestSha256: string | null;
   survived: number;
   refuted: number;
   /**
@@ -194,10 +226,24 @@ export const findingsFor = (clause: { examinedBy: readonly ClauseExamination[] }
 /**
  * The findings on this clause that nobody has disposed of yet.
  *
- * Refuted ones are dropped, and only those. A `survived` finding routed to
- * `counsel` is still outstanding — that is the backlog ADR 0009 says keeps
- * accumulating whether or not counsel is a gate — and hiding it behind a status
- * filter here would make the library look finished.
+ * TWO FILTERS, AND THE SECOND ONE WAS MISSING UNTIL IT WAS MEASURED. A finding
+ * is outstanding only if it survived refutation AND nobody has acted on it.
+ * This function shipped with the first test alone, so it reported the 166
+ * REVIEW-01 findings already marked `implemented` as live work — on the merged
+ * clauses that was 23 of 44, more than half, all in the direction that makes a
+ * corpus look worse than it is. A mechanism that overstates gets ignored.
+ *
+ * FRPA §6.5 is the sharpest case: eight findings name it, including
+ * `liquidated-damages-plus-actual-costs`, and the section was DELETED by option
+ * (a) of the review's own fix. Reporting them live points an attorney at text
+ * that does not exist.
+ *
+ * `rejected` and `wont-fix` are dropped too — both are decisions, and a
+ * decision is a disposition. `unrecorded` is KEPT, because unknown is not done.
+ * A `survived`, `open` finding routed to counsel stays outstanding: that is the
+ * backlog ADR 0009 says accumulates whether or not counsel is a gate.
  */
 export const outstandingFindingsFor = (clause: { examinedBy: readonly ClauseExamination[] }): ReviewFinding[] =>
-  findingsFor(clause).filter((finding) => finding.status === 'survived');
+  findingsFor(clause).filter(
+    (finding) => finding.status === 'survived' && ['open', 'handoff', 'unrecorded'].includes(finding.disposition),
+  );

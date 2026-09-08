@@ -30,6 +30,16 @@ KEEP = ('id', 'severity', 'category', 'document', 'locus', 'finding', 'decides',
 commit = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'],
                         capture_output=True, text=True).stdout.strip()
 
+# REVIEW-01 records what was DONE about each of its findings. REVIEW-02 does
+# not -- its dispositions live in the prose of
+# change-notes/16-review-02-document-defects.md, which says 23 of 48 were fixed
+# without saying which in a form anything can read. So REVIEW-02's findings are
+# `unrecorded`: not open, not implemented, unknown. That asymmetry is a fact
+# about the corpus and is carried rather than smoothed over.
+manifest = json.loads((REPO / 'REVIEW-01-manifest.json').read_bytes())
+DISPOSITION = {e['id']: e['status'] for e in manifest['entries']}
+MANIFEST_SHA = hashlib.sha256((REPO / 'REVIEW-01-manifest.json').read_bytes()).hexdigest()
+
 reviews = []
 for review, fname in (('REVIEW-01', 'REVIEW-01-findings.json'),
                       ('REVIEW-02', 'REVIEW-02-findings.json')):
@@ -41,12 +51,16 @@ for review, fname in (('REVIEW-01', 'REVIEW-01-findings.json'),
             e = {k: f[k] for k in KEEP if k in f}
             e['status'] = status
             e['review'] = review
+            e['disposition'] = (DISPOSITION.get(f['id'], 'unrecorded')
+                                if review == 'REVIEW-01' else 'unrecorded')
             entries.append(e)
     entries.sort(key=lambda e: e['id'])
     reviews.append({
         'review': review,
         'file': fname,
         'sha256': hashlib.sha256(raw).hexdigest(),
+        'manifest': ('REVIEW-01-manifest.json' if review == 'REVIEW-01' else None),
+        'manifestSha256': (MANIFEST_SHA if review == 'REVIEW-01' else None),
         'survived': len(doc.get('survived', [])),
         'refuted': len(doc.get('refuted', [])),
         'coverageGaps': [g if isinstance(g, str) else g.get('id', g.get('gap', str(g)))
@@ -61,6 +75,11 @@ out = {
               'than editing this file.'),
     '_repository': 'https://github.com/lombardpay/lombard-contracts',
     '_commit': commit,
+    '_dispositions': ('REVIEW-01 findings carry the status from '
+                      'REVIEW-01-manifest.json (implemented / open / handoff / '
+                      'rejected / wont-fix). REVIEW-02 has no manifest, so every '
+                      'one of its findings is `unrecorded` -- unknown, which is '
+                      'not the same as open and not the same as done.'),
     '_whatThisProves': ('That a finding id a clause names is a finding that was '
                         'actually raised, what it was about and where it routed. '
                         'It does NOT prove the finding says what a clause claims '
