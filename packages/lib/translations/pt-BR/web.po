@@ -3043,10 +3043,6 @@ msgstr "Reivindicar conta"
 msgid "Claims"
 msgstr "Reivindicações"
 
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Clause"
-msgstr ""
-
 #: apps/remix/app/components/general/filter-pill.tsx
 msgid "Clear"
 msgstr ""
@@ -5971,11 +5967,6 @@ msgstr "Evento"
 msgid "Event Type"
 msgstr "Tipo de Evento"
 
-#. placeholder {0}: totals.findingsCited
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Every clause is attorney-drafted with no named reviewer, so the publishing gate refuses all of them — that is the design, not a defect. Outstanding counts only findings nobody has acted on: {0} were cited across the library and the rest are recorded as implemented, rejected or withdrawn in the review manifests."
-msgstr ""
-
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: packages/lib/constants/document-visibility.ts
 #: packages/ui/components/document/document-visibility-select.tsx
@@ -8326,12 +8317,6 @@ msgstr "Nenhum"
 msgid "None (Overrides global settings)"
 msgstr ""
 
-#. placeholder {0}: totals.clauses
-#. placeholder {1}: totals.outstanding
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "None of these {0} clauses may be sent to a merchant, and {1} findings are outstanding"
-msgstr ""
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
@@ -8370,7 +8355,6 @@ msgstr ""
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
@@ -8715,10 +8699,6 @@ msgstr "Original"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Caso contrário, o documento será criado como um rascunho."
-
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Outstanding"
-msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
@@ -9478,10 +9458,6 @@ msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Re-register Email Domain"
-msgstr ""
-
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Read by"
 msgstr ""
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
@@ -12550,7 +12526,7 @@ msgid "The license key has been copied to your clipboard"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "The negotiated agreements — our contract text, not a regulator's. Conformity for the prescribed disclosure forms is a separate page."
+msgid "The negotiated agreements — our contract text, not a regulator's. Clauses name their parties by role ({{funder}}, {{processor}}), and the documents below are one client's copy of them. Conformity for the prescribed disclosure forms is a separate page."
 msgstr ""
 
 #. placeholder {0}: form.watch('name')

@@ -53,6 +53,20 @@ export {
 } from './mca/jurisdictions';
 export { OPEN_READINGS, type OpenReading } from './mca/readings';
 export { disclosuresFor } from './mca/registry';
+// READS THE FILESYSTEM *AND* THE DATABASE. `mcaLibraryPage` is
+// `mcaLibrarySurface` plus the approval rows and the counsel links — the whole
+// of what `/admin/mca-library` renders, in one read, so the clause list and the
+// approval badges cannot disagree because one refetched and the other did not.
+//
+// Same rule as everything above it: server code only, through
+// `apps/remix/app/utils/bizrethink-mca-library.server.ts`. The types beside it
+// are erased at compile time and are safe to import anywhere.
+export {
+  type McaLibraryApprovalView,
+  type McaLibraryPageClause,
+  type McaLibraryReviewView,
+  mcaLibraryPage,
+} from './mca/server-only/library-page';
 // READS THE FILESYSTEM. `conformitySurface` and `envelopeShapes` reach
 // `mca/provenance/source-text.ts`, which imports `node:fs`, `node:path` and
 // `node:crypto` to re-earn every verification date against the vendored
