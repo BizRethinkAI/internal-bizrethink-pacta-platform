@@ -206,7 +206,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     section: 'enrollment',
     sortKey: 110,
     heading: 'Negative Pledge',
-    body: 'Merchant and Guarantor each agrees not to create, incur, assume, or permit to exist, directly or indirectly, any lien on or with respect to any of the Collateral other than the security interest granted to Buyer and the monthly Equipment payment billed at merchant level by the Approved Processor under an Equipment Lease Agreement between Merchant and Lombard Pay LLC, which is a permitted claim ranking after the Specified Percentage. This Section does not restrict Merchant from granting a lien on any asset that is not Collateral.',
+    body: 'Merchant and Guarantor each agrees not to create, incur, assume, or permit to exist, directly or indirectly, any lien on or with respect to any of the Collateral other than the security interest granted to Buyer and the monthly Equipment payment billed at merchant level by the Approved Processor under an Equipment Lease Agreement between Merchant and {{equipmentAffiliate}}, which is a permitted claim ranking after the Specified Percentage. This Section does not restrict Merchant from granting a lien on any asset that is not Collateral.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

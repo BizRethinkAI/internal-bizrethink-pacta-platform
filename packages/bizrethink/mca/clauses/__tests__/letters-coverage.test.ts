@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { documentLines, linesNotAccountedFor } from '../documents';
-import { INSTRUMENTS } from '../instruments';
+
 import { libraryFor } from '../library';
-import { PAYZLI_NON_CLAUSE } from '../payzli';
+import { LOMBARD, resolveClauses } from '../parties';
 import { PERMISSION_TO_RELEASE_NON_CLAUSE } from '../permission-to-release';
+import { PAYZLI_NON_CLAUSE } from '../split-funding';
 
 /**
  * The two letters, and the third correction to Phase 0's corpus.
@@ -26,13 +27,13 @@ import { PERMISSION_TO_RELEASE_NON_CLAUSE } from '../permission-to-release';
  * that does not care how a document is numbered.
  */
 describe.each([
-  ['payzli-split-funding' as const, PAYZLI_NON_CLAUSE, 7],
+  ['split-funding' as const, PAYZLI_NON_CLAUSE, 7],
   ['permission-to-release' as const, PERMISSION_TO_RELEASE_NON_CLAUSE, 8],
 ])('%s accounts for its whole document', (instrument, nonClause, expected) => {
-  const file = INSTRUMENTS[instrument].sourceDocument;
+  const file = LOMBARD.documents[instrument].file;
 
   it('leaves no line unaccounted for', () => {
-    expect(linesNotAccountedFor(file, libraryFor(instrument), nonClause)).toEqual([]);
+    expect(linesNotAccountedFor(file, resolveClauses(libraryFor(instrument), LOMBARD), nonClause)).toEqual([]);
   });
 
   it('holds every clause the document has', () => {
@@ -60,7 +61,7 @@ describe('what the letters actually contain', () => {
    * land on it.
    */
   it('keeps the six findings on the Payzli split-funding instruction', () => {
-    const clause = libraryFor('payzli-split-funding').find((c) => c.slug === 'payzli.split-funding-instruction');
+    const clause = libraryFor('split-funding').find((c) => c.slug === 'split-funding.split-funding-instruction');
 
     expect(clause?.examinedBy.flatMap((e) => e.findings)).toHaveLength(6);
   });
