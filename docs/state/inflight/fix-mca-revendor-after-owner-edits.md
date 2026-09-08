@@ -81,11 +81,16 @@ the Equipment Lease calls itself "Equipment Lease Agreement" and the Subscriptio
 calls itself "Subscription Agreement" rather than "Equipment Subscription
 Agreement". Same asymmetry as §4.7.
 
-## Merge-order note
+## The merge-order trap, and how it was closed
 
-#132 adds `__tests__/surface.test.ts`, which asserts **192**. This makes it 204.
-Whichever lands second needs that number updated — a one-line conflict, flagged
-so it is not a surprise.
+#132 and #133 touch no file in common, so git merges both without a murmur —
+and `main` goes red. #132's `__tests__/surface.test.ts` asserts **192** clauses;
+this PR makes the library **204**. A clean merge is not a safe one.
+
+#132 landed first, this branch merged `main`, and the four assertions were
+reconciled to 204 here. Worth naming as a shape rather than an incident: two
+PRs that share no file can still share a NUMBER, and nothing in the tooling
+looks for that.
 
 ## Still outstanding
 
