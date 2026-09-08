@@ -1,3 +1,4 @@
+import type { NonClauseLine } from '../documents';
 import type { McaClause } from '../types';
 import { ISO_PRA_ADDITIONAL_OBLIGATIONS } from './additional-obligations';
 import { ISO_PRA_COMMISSION } from './commission';
@@ -50,3 +51,24 @@ export const ISO_PRA_LIBRARY: McaClause[] = Object.values(ISO_PRA_CLAUSE_MODULES
 
 /** Document order, which is also the order a reviewer should read it in. */
 export const ISO_PRA_SECTION_ORDER = ['commission', 'referral-duties', 'additional-obligations', 'general'] as const;
+
+/**
+ * Lines of the ISO Partner Referral Agreement that belong to no clause, each with the reason.
+ *
+ * Required by `__tests__/coverage.test.ts`. The reason is not decoration: "not
+ * a clause" is a claim about the document, and a claim with no stated basis is
+ * how a real clause gets dropped — which is exactly what happened here until
+ * coverage was run over this instrument.
+ */
+export const ISO_PRA_NON_CLAUSE: NonClauseLine[] = [
+  { anchor: 'Referral Agreement', reason: 'cover page title' },
+  { anchor: 'Merchant Cash Advance Partner Program', reason: 'cover page subtitle' },
+  { anchor: '[TABLE]  | PREPARED BY', reason: 'cover page metadata block' },
+  { anchor: 'SECTION A \u2014', reason: 'section header' },
+  { anchor: 'SECTION I \u2014', reason: 'section header' },
+  { anchor: 'SECTION II \u2014', reason: 'section header' },
+  { anchor: 'SECTION III \u2014', reason: 'section header' },
+  { anchor: 'SIGNATURES', reason: 'signature block header' },
+  { anchor: 'IN WITNESS WHEREOF', reason: 'execution line' },
+  { anchor: '[TABLE] COMPANY', reason: 'signature block' },
+];
