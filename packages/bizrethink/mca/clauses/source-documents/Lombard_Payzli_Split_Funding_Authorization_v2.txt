@@ -1,7 +1,7 @@
 Lombard_Payzli_Split_Funding_Authorization_v2.docx -- body text, extracted
 
 Source:    lombard-contracts/sources/Lombard_Payzli_Split_Funding_Authorization_v2.docx
-Repository: https://github.com/lombardpay/lombard-contracts at 6a7248b1b42bc12276f62f45bde849d3647c2b1f
+Repository: https://github.com/lombardpay/lombard-contracts at 7b8e61c3c1c9fa02ff4a98f3e4d477132066008d
 docx sha256: f94d8b5dd6b3f061abda56b2b652e4c705d62666ef779eee956b1343b9617d20
 Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
            that repository at the commit above.
