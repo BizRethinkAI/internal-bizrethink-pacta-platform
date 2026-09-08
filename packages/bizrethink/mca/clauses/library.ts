@@ -1,4 +1,5 @@
 import { EQUIPMENT_LEASE_LIBRARY, EQUIPMENT_SECTION_ORDER } from './equipment-lease';
+import { FRPA_LIBRARY, FRPA_SECTION_ORDER } from './frpa';
 import { MCA_INSTRUMENTS, type McaInstrument } from './instruments';
 import { ISO_PRA_LIBRARY, ISO_PRA_SECTION_ORDER } from './iso-pra';
 import { SUBSCRIPTION_LIBRARY } from './subscription';
@@ -18,7 +19,12 @@ import type { McaClause } from './types';
  * a caller that imports `EQUIPMENT_LEASE_LIBRARY` directly is in exactly the
  * position that shipped the defect.
  */
-export const ALL_MCA_CLAUSES: McaClause[] = [...EQUIPMENT_LEASE_LIBRARY, ...SUBSCRIPTION_LIBRARY, ...ISO_PRA_LIBRARY];
+export const ALL_MCA_CLAUSES: McaClause[] = [
+  ...FRPA_LIBRARY,
+  ...EQUIPMENT_LEASE_LIBRARY,
+  ...SUBSCRIPTION_LIBRARY,
+  ...ISO_PRA_LIBRARY,
+];
 
 /**
  * The clauses published in one agreement.
@@ -45,6 +51,7 @@ export const libraryFor = (instrument: McaInstrument): McaClause[] =>
  * follows.
  */
 const SECTION_ORDER: Partial<Record<McaInstrument, readonly string[]>> = {
+  frpa: FRPA_SECTION_ORDER,
   'equipment-lease': EQUIPMENT_SECTION_ORDER,
   // The Subscription is the Equipment Lease's twin and shares its sections
   // exactly, which is the one place the duplication is deliberate rather than

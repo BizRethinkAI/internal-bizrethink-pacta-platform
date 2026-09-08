@@ -107,8 +107,8 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'merchant',
     entity: 'Lombard Capital LLC',
     sourceDocument: 'Lombard_FRPA_v4.txt',
-    sourceDigest: '',
-    bodiesVerifiedAt: null,
+    sourceDigest: '322e70399945de2199e34d1c7ca2915cb4bbe654dd9857beda04ed590d33075e',
+    bodiesVerifiedAt: '2026-09-08',
   },
   'equipment-lease': {
     id: 'equipment-lease',

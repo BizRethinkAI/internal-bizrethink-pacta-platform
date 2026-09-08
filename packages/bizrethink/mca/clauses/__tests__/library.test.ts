@@ -30,9 +30,24 @@ describe('the MCA clause library', () => {
     }
   });
 
-  it('numbers each clause once within an instrument', () => {
+  /**
+   * Uniqueness applies to the document's own CLAUSE numbering — `N.M` — and to
+   * nothing else, because nothing else is a number.
+   *
+   * The FRPA made the distinction necessary. Fourteen of its clauses carry no
+   * number at all: the granting clause, the definitions, Section 5's lead-in.
+   * Three more carry "Appendix A", which is the document's designation for a
+   * section holding three separate paragraphs, not an identifier for one of
+   * them. Requiring those to be unique would force an invented number onto text
+   * the document deliberately leaves unnumbered, and an invented number is
+   * exactly the kind of thing a later reader would try to "fix" against the
+   * document. `slug` is the identity; this is what a reader sees on the page.
+   */
+  it('numbers each numbered clause once within an instrument', () => {
     for (const id of MCA_INSTRUMENTS) {
-      const numbers = libraryFor(id).map((clause) => clause.number);
+      const numbers = libraryFor(id)
+        .map((clause) => clause.number)
+        .filter((number) => /^\d+\.\d+$/.test(number));
 
       expect(new Set(numbers).size).toBe(numbers.length);
     }

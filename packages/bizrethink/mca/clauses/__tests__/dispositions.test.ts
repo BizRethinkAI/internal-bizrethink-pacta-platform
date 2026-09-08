@@ -102,12 +102,26 @@ describe('a finding that was acted on is not outstanding', () => {
     }
   });
 
-  it('reports the real backlog on the clauses already merged', () => {
+  /**
+   * The size of the correction, on the whole library.
+   *
+   * These two numbers move with every import, and that is fine — what they pin
+   * is the GAP between them, which is the defect this file exists to describe.
+   * Of 124 findings cited across 177 clauses, 66 are disposed of: 65
+   * `implemented` and 1 `rejected` by the owner. Reporting all 124 as live work
+   * is what the library did before #129.
+   *
+   * `unrecorded` is 45 of the remaining 58 and will fall sharply once
+   * lombard-contracts PR #9 lands REVIEW-02's manifest — at which point this
+   * expectation changes, and should, because the number will finally mean
+   * "genuinely outstanding" rather than "nobody wrote it down".
+   */
+  it('reports the real backlog across the whole library', () => {
     const distinct = new Set(ALL_MCA_CLAUSES.flatMap((clause) => findingsFor(clause)).map((f) => f.id));
     const stillOpen = new Set(ALL_MCA_CLAUSES.flatMap((clause) => outstandingFindingsFor(clause)).map((f) => f.id));
 
-    expect(distinct.size).toBe(44);
-    // 3 open + 18 REVIEW-02 unrecorded. The other 23 are implemented.
-    expect(stillOpen.size).toBe(21);
+    expect(distinct.size).toBe(124);
+    expect(stillOpen.size).toBe(58);
+    expect(distinct.size - stillOpen.size).toBe(66);
   });
 });

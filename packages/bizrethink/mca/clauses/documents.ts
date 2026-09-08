@@ -124,3 +124,55 @@ export const agreementDigest = (file: string): string => normalisedDigest(readAg
  */
 export const containsClauseText = (documentBody: string, text: string): boolean =>
   norm(documentBody).includes(norm(text));
+
+/**
+ * A declaration that a line of a document is not part of any clause.
+ *
+ * `anchor` is the line's opening words; `reason` is why it is not a clause. The
+ * reason is required and is not decoration — "not a clause" is a claim about
+ * the document, and a claim with no stated basis is how a real clause gets
+ * quietly dropped.
+ */
+export type NonClauseLine = {
+  anchor: string;
+  reason: string;
+};
+
+/** The document's body, one entry per non-empty line. */
+export const documentLines = (file: string): string[] =>
+  readAgreementBody(file)
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+/**
+ * The lines of a document that are in no clause and were never declared.
+ *
+ * THE CHECK THAT RUNS THE OTHER WAY. `containsClauseText` asks whether a clause
+ * we hold is really in the document — it catches text we invented. This asks
+ * whether the document holds text we do not, which catches text we never
+ * noticed, and that is the failure with no other detector.
+ *
+ * It cost the corpus twice already: ISO PRA §2.6, which postdates one census
+ * and predates the other, and the FRPA's granting clause, which carries no
+ * number at all and is the sentence the whole instrument turns on.
+ *
+ * Matching is by containment against the concatenated clause text rather than
+ * line by line, because a clause body spans many lines and a heading sits on
+ * its own.
+ */
+export const linesNotAccountedFor = (
+  file: string,
+  clauses: readonly { number: string; heading: string; body: string }[],
+  declared: readonly NonClauseLine[],
+): string[] => {
+  // Reconstructed the way the DOCUMENT prints it — "2.1 Sales of Receipts; Not
+  // a Loan" is one line there, while the clause holds the number and the
+  // heading apart. Matching them separately leaves every heading in the
+  // document looking unaccounted for, which is what it did first time.
+  const held = norm(clauses.map((clause) => `${clause.number} ${clause.heading}\n${clause.body}`).join('\n'));
+
+  return documentLines(file).filter(
+    (line) => !held.includes(norm(line)) && !declared.some(({ anchor }) => line.startsWith(anchor)),
+  );
+};
