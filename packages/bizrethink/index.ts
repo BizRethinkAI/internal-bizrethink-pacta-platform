@@ -62,6 +62,7 @@ export { disclosuresFor } from './mca/registry';
 // `apps/remix/app/utils/bizrethink-mca-library.server.ts`. The types beside it
 // are erased at compile time and are safe to import anywhere.
 export {
+  type McaCounselFindingView,
   type McaLibraryApprovalView,
   type McaLibraryPageClause,
   type McaLibraryReviewView,

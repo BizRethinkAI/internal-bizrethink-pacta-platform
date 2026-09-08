@@ -1,4 +1,5 @@
 import type {
+  McaCounselFindingView,
   McaLibraryInstrumentView,
   McaLibraryPageClause,
   McaLibraryReviewView,
@@ -97,7 +98,7 @@ const COUNTERPARTY_LABEL: Record<string, string> = {
 };
 
 export default function AdminMcaLibraryPage() {
-  const { instruments, clauses, reviews, totals, evidence } = useLoaderData<typeof loader>();
+  const { instruments, clauses, reviews, counselFindings, totals, evidence } = useLoaderData<typeof loader>();
 
   /*
     ONE SOURCE OF DATA, REVALIDATED. Every mutation on this page re-runs the
@@ -191,6 +192,8 @@ export default function AdminMcaLibraryPage() {
 
       <CounselLinks reviews={reviews} onChanged={reload} />
 
+      <CounselFindings findings={counselFindings} onAnswered={reload} />
+
       {instruments.map((instrument) => (
         <InstrumentCard
           key={instrument.id}
@@ -202,6 +205,119 @@ export default function AdminMcaLibraryPage() {
     </div>
   );
 }
+
+/**
+ * What counsel sent back, and answering it.
+ *
+ * TWO REGISTERS, LABELLED, NOT MERGED. The alert at the top of this page counts
+ * findings from the two adversarial DOCUMENT reviews, whose dispositions live
+ * in `lombard-contracts` manifests and are cleared by editing a manifest and
+ * re-vendoring. These came in on a review link, are attributable to the
+ * attorney named on it, and are cleared with a sentence typed here. Merging
+ * them would produce one list with two clearing procedures and no way to tell
+ * from a row which one applies.
+ *
+ * ANSWERING IS NOT OPTIONAL HOUSEKEEPING. An unanswered finding holds its
+ * clause against approval — `counselFindingsHold` — so this form is the only
+ * way past it. That is deliberate: an approval written over an unanswered
+ * objection records that one attorney signed off on text another attorney had
+ * just objected to.
+ */
+const CounselFindings = ({ findings, onAnswered }: { findings: McaCounselFindingView[]; onAnswered: () => void }) => {
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+
+  const answer = trpc.bizrethink.mcaClauseLibrary.answerFinding.useMutation({
+    onSuccess: onAnswered,
+  });
+
+  const outstanding = findings.filter((finding) => finding.answeredAt === null);
+
+  /*
+    The section disappears when there is nothing in it, rather than rendering an
+    empty-state card. A permanent panel reading "no findings" on a page that
+    already leads with a count is furniture.
+  */
+  if (findings.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="mt-10">
+      <h2 className="font-semibold text-2xl">
+        <Trans>From counsel</Trans>
+      </h2>
+
+      <p className="mt-1 text-muted-foreground text-sm">
+        <Trans>
+          Recorded by attorneys through a review link. {outstanding.length} of {findings.length} are unanswered, and
+          each unanswered one holds its clause against approval. These are separate from the findings the two document
+          reviews raised, which are cleared in the review manifests.
+        </Trans>
+      </p>
+
+      <ul className="mt-4 space-y-4">
+        {findings.map((finding) => (
+          <li key={finding.id} className="rounded-lg border border-border p-4">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="font-medium text-sm">{finding.clauseLabel}</span>
+              <span className="font-mono text-muted-foreground text-xs">{finding.clauseSlug}</span>
+              {finding.answeredAt === null ? (
+                <Badge variant="secondary">Unanswered</Badge>
+              ) : (
+                <Badge variant="default">Answered</Badge>
+              )}
+              {/*
+                A finding raised against wording that has since changed. Shown
+                because an answer to it is an answer to a different question,
+                and the person about to type one is who needs to know.
+              */}
+              {finding.clauseMoved && <Badge variant="destructive">Clause has changed since it was read</Badge>}
+            </div>
+
+            <p className="mt-1 text-muted-foreground text-xs">
+              {finding.authorName} · {new Date(finding.createdAt).toLocaleDateString()}
+            </p>
+
+            <p className="mt-2 whitespace-pre-wrap text-sm">{finding.body}</p>
+
+            {finding.answeredAt === null ? (
+              <div className="mt-3">
+                <Textarea
+                  aria-label={`Answer to the finding on ${finding.clauseSlug}`}
+                  className="text-sm"
+                  onChange={(event) => setAnswers((current) => ({ ...current, [finding.id]: event.target.value }))}
+                  placeholder="What was done about it? Counsel sees this."
+                  rows={2}
+                  value={answers[finding.id] ?? ''}
+                />
+
+                <div className="mt-2 flex items-center gap-3">
+                  <Button
+                    disabled={(answers[finding.id] ?? '').trim() === '' || answer.isPending}
+                    onClick={() => answer.mutate({ findingId: finding.id, answer: answers[finding.id] ?? '' })}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Trans>Answer</Trans>
+                  </Button>
+
+                  {answer.error && <span className="text-destructive text-xs">{answer.error.message}</span>}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-3 border-t pt-3">
+                <p className="text-muted-foreground text-xs">
+                  Answered {new Date(finding.answeredAt).toLocaleDateString()}
+                </p>
+                <p className="mt-1 whitespace-pre-wrap text-sm">{finding.answer}</p>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+};
 
 /**
  * Sending an agreement out to be read, and taking the link back.

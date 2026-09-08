@@ -2,7 +2,121 @@ import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
+import { Textarea } from '@documenso/ui/primitives/textarea';
+import { useState } from 'react';
 import { useParams } from 'react-router';
+
+type RecordedFinding = {
+  id: string;
+  clauseSlug: string;
+  body: string;
+  answeredAt: Date | string | null;
+  answer: string | null;
+  createdAt: Date | string;
+};
+
+/**
+ * What counsel says back, against one clause.
+ *
+ * THE PAGE SHIPPED READ-ONLY AND THAT WAS THE WRONG CALL. The reason given was
+ * real but narrower than the conclusion drawn from it: findings from the two
+ * adversarial DOCUMENT reviews live in `lombard-contracts` manifests, and a
+ * second Pacta-side register of those same findings would drift. Nothing
+ * counsel writes here is a second copy of one — it arrives on a link we minted,
+ * it is attributable to the reviewer named on that link, and no manifest has
+ * ever held one. One register per origin, and each is labelled.
+ *
+ * NOT AN APPROVAL. Recording an approval carries a bar number and an admitting
+ * jurisdiction and is checked against the states whose law puts the clause in
+ * the agreement; that stays with staff, who have an account. This is the other
+ * direction — saying what is wrong — and it needs no such ceremony.
+ *
+ * IT BLOCKS. An unanswered finding holds the clause against approval. That is
+ * what separates it from a comment box, and it is the part the lease shipped
+ * without.
+ */
+function FindingBox({
+  token,
+  clauseSlug,
+  recorded,
+  onRecorded,
+}: {
+  token: string;
+  clauseSlug: string;
+  recorded: RecordedFinding[];
+  onRecorded: () => void;
+}) {
+  const [body, setBody] = useState('');
+
+  const record = trpc.bizrethink.mcaClauseLibrary.recordFinding.useMutation({
+    onSuccess: () => {
+      setBody('');
+      onRecorded();
+    },
+  });
+
+  return (
+    <div className="mt-3">
+      {/*
+        WHAT SHE ALREADY SAID, AND WHETHER ANYBODY REPLIED.
+
+        The lease's version of this box was write-only: it cleared, the page
+        said "Recorded", and a reload showed nothing at all — no record it had
+        saved, no answer, no way to tell a saved finding from a lost one. An
+        attorney billing by the hour responds to that by writing it twice, and
+        then by going back to email.
+      */}
+      {recorded.length > 0 && (
+        <ul className="mb-3 space-y-2">
+          {recorded.map((finding) => (
+            <li key={finding.id} className="rounded border-l-2 border-l-muted-foreground/40 bg-muted/30 p-2">
+              <p className="whitespace-pre-wrap text-sm">{finding.body}</p>
+              <p className="mt-1 text-muted-foreground text-xs">
+                You recorded this on {new Date(finding.createdAt).toLocaleDateString()}
+                {finding.answeredAt === null && ' · holding this clause against approval until it is answered'}
+              </p>
+              {finding.answeredAt !== null && (
+                <div className="mt-2 border-t pt-2">
+                  <p className="text-muted-foreground text-xs">
+                    Answered {new Date(finding.answeredAt).toLocaleDateString()}
+                  </p>
+                  <p className="mt-1 whitespace-pre-wrap text-sm">{finding.answer}</p>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Textarea
+        aria-label={`Finding on ${clauseSlug}`}
+        className="text-sm"
+        onChange={(event) => setBody(event.target.value)}
+        placeholder="What is wrong with this clause?"
+        rows={2}
+        value={body}
+      />
+
+      <div className="mt-2 flex items-center gap-3">
+        <Button
+          disabled={body.trim() === '' || record.isPending}
+          onClick={() => record.mutate({ token, clauseSlug, body })}
+          size="sm"
+          variant="outline"
+        >
+          Record a finding
+        </Button>
+
+        {/*
+          A failed save was invisible on the lease page once and cost a reviewer
+          their work. Not repeating that here.
+        */}
+        {record.error && <span className="text-destructive text-xs">{record.error.message}</span>}
+      </div>
+    </div>
+  );
+}
 
 /**
  * One MCA agreement, read by a lawyer who has no account.
@@ -41,10 +155,30 @@ import { useParams } from 'react-router';
  * earlier reviews found and nobody has disposed of, because an attorney reading
  * a clause is the person best placed to use that.
  */
+/**
+ * `**like this**` becomes bold, and nothing else is interpreted.
+ *
+ * A markdown dependency for one construct would be a dependency shipped to an
+ * unauthenticated page, and the briefing is our own text rather than anything a
+ * reader supplies — but it is still text going through a splitter, so the parts
+ * are rendered as React children and never as HTML.
+ */
+const withEmphasis = (paragraph: string) =>
+  paragraph
+    .split(/\*\*(.+?)\*\*/g)
+    .map((part, index) => (index % 2 === 1 ? <strong key={index}>{part}</strong> : part));
+
 export default function McaClauseReviewPage() {
   const { token = '' } = useParams();
 
   const query = trpc.bizrethink.mcaClauseLibrary.openLibrary.useQuery({ token });
+
+  /*
+    Separate from `openLibrary` so that recording a finding refetches the
+    findings alone. Re-reading the whole agreement to show one new sentence
+    would scroll a reader who is halfway down a hundred clauses back to the top.
+  */
+  const findings = trpc.bizrethink.mcaClauseLibrary.openFindings.useQuery({ token });
 
   if (query.isPending) {
     return <div className="mx-auto max-w-3xl px-6 py-16 text-muted-foreground">Loading…</div>;
@@ -63,11 +197,10 @@ export default function McaClauseReviewPage() {
     );
   }
 
-  const { reviewerName, instrument, parties, agreementMoved, findingsReadable, sections } = query.data;
+  const { reviewerName, instrument, parties, agreementMoved, findingsReadable, briefing, sections } = query.data;
 
   const clauses = sections.flatMap((section) => section.clauses);
   const approved = clauses.filter((clause) => clause.approved).length;
-  const outstanding = clauses.filter((clause) => clause.outstandingFindings.length > 0).length;
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
@@ -87,14 +220,36 @@ export default function McaClauseReviewPage() {
         </Alert>
       )}
 
-      <Alert className="mt-4">
-        <AlertTitle>What you are reading</AlertTitle>
-        <AlertDescription>
-          Our own contract text, quoted as the document publishes it. The «angle-bracketed numbers» are the fill-in
-          fields the document carries; they are part of what a merchant signs. None of these clauses may be sent to a
-          merchant until an approval names the attorney who read them.
-        </AlertDescription>
-      </Alert>
+      {/*
+        THE BRIEFING, AND WHY IT REPLACED A FOUR-LINE ALERT.
+
+        The link was opened as counsel would open it, and the page gave a
+        funder's name, a clause count and a hundred paragraphs of contract text.
+        A lawyer cannot review a document whose purpose has not been stated: not
+        what the business is, not who is asking, not what an approval would
+        cause, not which of six documents this is, not what is deliberately
+        absent, and — worst, because the page collects nothing — not where a
+        comment goes. Every one of those was answerable from what this package
+        already knew.
+
+        RENDERED, NOT SUMMARISED, AND NOT COLLAPSED BEHIND A DISCLOSURE. The
+        reader has been engaged to read carefully; hiding the terms of the
+        engagement behind "show more" optimises the page for someone who is not
+        the audience.
+      */}
+      <section className="mt-8 rounded-lg border border-border bg-muted/30 px-6 py-5">
+        {briefing.map((part) => (
+          <div key={part.id} className="mt-6 first:mt-0">
+            <h2 className="font-semibold text-base">{part.title}</h2>
+
+            {part.body.map((paragraph, index) => (
+              <p key={index} className="mt-2 text-sm leading-relaxed">
+                {withEmphasis(paragraph)}
+              </p>
+            ))}
+          </div>
+        ))}
+      </section>
 
       {/*
         AN EMPTY FINDING LIST AND AN UNREADABLE REGISTER LOOK IDENTICAL, and on
@@ -112,17 +267,13 @@ export default function McaClauseReviewPage() {
         </Alert>
       )}
 
-      {findingsReadable && outstanding > 0 && (
-        <Alert className="mt-4" variant="warning">
-          <AlertTitle>
-            {outstanding} of these clauses carry a finding from an earlier review that nothing has disposed of
-          </AlertTitle>
-          <AlertDescription>
-            Two adversarial reviews read these documents before you. Their findings are quoted under each clause where
-            no manifest records what was done about them.
-          </AlertDescription>
-        </Alert>
-      )}
+      {/*
+        The outstanding-COUNT alert that used to sit here is now the briefing's
+        `history` section, which says the same number with the context that
+        makes it mean something. The two warnings above are kept as alerts
+        because each is an exceptional condition the reader must act on, not a
+        description of what they are about to read.
+      */}
 
       {sections.map((section) => (
         <section key={section.id} className="mt-10">
@@ -140,7 +291,25 @@ export default function McaClauseReviewPage() {
                   {clause.number !== '' && (
                     <span className="font-mono text-muted-foreground text-xs">{clause.number}</span>
                   )}
-                  <h3 className="font-medium">{clause.heading || clause.slug}</h3>
+                  {/*
+                    THE SLUG IS A REFERENCE, NOT A HEADING.
+
+                    Forty of the 204 clauses carry no heading in the document —
+                    the FRPA's holdback explainer, its §§10.3–10.6, every
+                    recital in the set — and `clause.heading || clause.slug`
+                    put `frpa.holdback-explainer` where a heading goes. An
+                    attorney was being shown an internal identifier formatted as
+                    if the contract printed it.
+
+                    The slug still has to be visible: it is how counsel cites a
+                    clause back to us, and it is the only stable handle an
+                    unnumbered clause has. So it is shown on every clause, in
+                    the margin, looking like the reference it is — and a clause
+                    the document does not head simply has no heading, which is
+                    the honest render.
+                  */}
+                  {clause.heading !== '' && <h3 className="font-medium">{clause.heading}</h3>}
+                  <span className="font-mono text-muted-foreground/70 text-xs">{clause.slug}</span>
                   {clause.approved ? <Badge>Approved</Badge> : <Badge variant="neutral">No current approval</Badge>}
                 </div>
 
@@ -157,14 +326,32 @@ export default function McaClauseReviewPage() {
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>
 
                 {clause.outstandingFindings.length > 0 && (
-                  <ul className="mt-3 space-y-1 border-[#a2560c]/40 border-l-2 pl-3 dark:border-[#d99a4e]/40">
-                    {clause.outstandingFindings.map((finding) => (
-                      <li key={finding} className="text-muted-foreground text-xs">
-                        {finding}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="mt-3 border-[#a2560c]/40 border-l-2 pl-3 dark:border-[#d99a4e]/40">
+                    {/*
+                      LABELLED BY ORIGIN, now that this page holds two kinds of
+                      finding. These came from the two earlier document reviews
+                      and are read out of the vendored register; the box below
+                      holds what THIS reader writes. Unlabelled, a reviewer
+                      would read her own findings and someone else's as one
+                      list and could not tell which she was expected to answer.
+                    */}
+                    <p className="font-medium text-muted-foreground text-xs">From the earlier document reviews</p>
+                    <ul className="mt-1 space-y-1">
+                      {clause.outstandingFindings.map((finding) => (
+                        <li key={finding} className="text-muted-foreground text-xs">
+                          {finding}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
+
+                <FindingBox
+                  clauseSlug={clause.slug}
+                  onRecorded={() => void findings.refetch()}
+                  recorded={(findings.data?.findings ?? []).filter((finding) => finding.clauseSlug === clause.slug)}
+                  token={token}
+                />
               </li>
             ))}
           </ul>

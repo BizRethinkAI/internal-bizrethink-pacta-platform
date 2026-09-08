@@ -134,13 +134,34 @@ describe('the two pages', () => {
   });
 
   /*
-    READ-ONLY, AND ASSERTED RATHER THAN INTENDED. Sending a link should not be
-    the same act as granting write access: an approval carries a bar number and
-    has to be attributable to somebody who signed in.
+    WHAT THE LINK MAY AND MAY NOT DO, ASSERTED RATHER THAN INTENDED.
+
+    This used to assert the page contained no `useMutation` at all, which was a
+    proxy for the real rule and stopped being one when the page started taking
+    findings. The rule was never "counsel writes nothing" — it is that sending a
+    link must not be the same act as granting the power to APPROVE. An approval
+    carries a bar number and an admitting jurisdiction, is checked against the
+    states whose law puts the clause in the agreement, and has to be
+    attributable to somebody who signed in. A finding is the opposite direction:
+    saying what is wrong, which needs no such ceremony and which the person we
+    sent the link to is the only one able to do.
+
+    So the assertion is now the specific one it should always have been.
   */
-  it('gives counsel a read-only link', () => {
+  it('lets counsel record a finding but never an approval', () => {
     expect(counselPage).toContain('openLibrary');
-    expect(counselPage).not.toContain('useMutation');
+    expect(counselPage).toContain('recordFinding');
+    expect(counselPage).not.toMatch(/mcaClauseLibrary\.approve/);
+  });
+
+  /*
+    And the gate that makes the finding worth recording. Without it the textarea
+    is decorative — the failure the lease shipped, green in CI, because every
+    unit was tested in isolation and nothing asked whether anything called them.
+  */
+  it('makes an unanswered finding hold the clause against approval', () => {
+    expect(router).toContain('unansweredCounselFindings');
+    expect(router).toContain('bizrethinkMcaLibraryFinding');
   });
 
   /*
