@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DISPOSITIONS, FINDINGS_BY_ID, findingsFor, outstandingFindingsFor } from '../examination';
+import { DISPOSITIONS, FINDINGS_BY_ID, findingsFor, outstandingFindingsFor, REVIEWS } from '../examination';
 import { ALL_MCA_CLAUSES } from '../library';
 
 /**
@@ -47,23 +47,58 @@ describe('a finding that was acted on is not outstanding', () => {
   });
 
   /**
-   * REVIEW-02 HAS NO MANIFEST, AND THAT IS RECORDED RATHER THAN GUESSED.
+   * BOTH REVIEWS NOW CARRY DISPOSITIONS, AND THIS TEST USED TO ASSERT THE
+   * OPPOSITE.
    *
-   * REVIEW-01's dispositions are machine-readable and authoritative. REVIEW-02's
-   * live in the prose of `change-notes/16-review-02-document-defects.md`, which
-   * says 23 of its 48 findings were fixed but does not say which in a form
-   * anything can read. So every REVIEW-02 finding is `unrecorded`: not open, not
-   * implemented — unknown, which is the honest answer and a worse one than
-   * either.
+   * It read: "marks every REVIEW-02 finding unrecorded, because that review has
+   * no manifest." That was true and was the point — REVIEW-02's dispositions
+   * lived only in the prose of `change-notes/16-review-02-document-defects.md`,
+   * so nothing could tell a fixed finding from a live one and all 48 counted as
+   * outstanding.
+   *
+   * `lombard-contracts` PR #9 gave that review a manifest, derived from the
+   * records that already existed. The assertion is inverted rather than
+   * deleted, because the thing worth pinning now is that the gap is CLOSED.
+   *
+   * `unrecorded` stays in the vocabulary and is not dead: it is what a finding
+   * gets when its manifest does not name it, which is still true of the refuted
+   * ones in both reviews, and it is where the next review to arrive without a
+   * manifest will land — on an honest answer rather than a default that looks
+   * like one.
    */
-  it('marks every REVIEW-02 finding unrecorded, because that review has no manifest', () => {
+  it('reads a disposition for both reviews, from a named manifest each', () => {
+    expect(REVIEWS.map((review) => review.manifest)).toEqual(['REVIEW-01-manifest.json', 'REVIEW-02-manifest.json']);
+
+    for (const review of REVIEWS) {
+      expect(review.manifestSha256).toMatch(/^[0-9a-f]{64}$/);
+    }
+
     const reviewTwo = [...FINDINGS_BY_ID.values()].flat().filter((finding) => finding.review === 'REVIEW-02');
 
-    expect(reviewTwo.length).toBeGreaterThan(0);
+    expect(reviewTwo.filter((finding) => finding.disposition === 'implemented').length).toBe(21);
+    expect(reviewTwo.filter((finding) => finding.disposition === 'open').length).toBe(24);
+    expect(reviewTwo.filter((finding) => finding.disposition === 'handoff').length).toBe(3);
+  });
 
-    for (const finding of reviewTwo) {
-      expect(finding.disposition).toBe('unrecorded');
-    }
+  /**
+   * The three REVIEW-02 findings marked `handoff` are the owner decisions that
+   * became BUILDER FACTS rather than document edits — `usesDbaName`,
+   * `guarantorCount`, and the entity that contracts with ISO partners. They are
+   * outstanding, and they are outstanding HERE: the clause library is what owes
+   * them, not `lombard-contracts`.
+   */
+  it('keeps the three builder-fact handoffs outstanding', () => {
+    const handoffs = [...FINDINGS_BY_ID.values()]
+      .flat()
+      .filter((finding) => finding.disposition === 'handoff' && finding.review === 'REVIEW-02')
+      .map((finding) => finding.id)
+      .sort();
+
+    expect(handoffs).toEqual([
+      'frpa-4-9-authorises-ucc-filings-under-a-dba-the-repository-does-not-record',
+      'frpa-9-5-refers-to-guarantors-the-form-cannot-collect',
+      'iso-a1-commission-out-of-a-fee-the-company-may-not-collect',
+    ]);
   });
 
   it('counts REVIEW-01 the way the manifest does', () => {
@@ -111,17 +146,19 @@ describe('a finding that was acted on is not outstanding', () => {
    * `implemented` and 1 `rejected` by the owner. Reporting all 124 as live work
    * is what the library did before #129.
    *
-   * `unrecorded` is 45 of the remaining 58 and will fall sharply once
-   * lombard-contracts PR #9 lands REVIEW-02's manifest — at which point this
-   * expectation changes, and should, because the number will finally mean
-   * "genuinely outstanding" rather than "nobody wrote it down".
+   * IT FELL FROM 58 TO 39 WHEN REVIEW-02 GOT ITS MANIFEST. Before
+   * lombard-contracts PR #9, 45 of the 58 were `unrecorded` — counted as
+   * outstanding because unknown is not done. Nineteen of those turned out to be
+   * fixed. The number now means "genuinely outstanding" rather than "nobody
+   * wrote it down", which is the whole difference between a backlog and a
+   * guess.
    */
   it('reports the real backlog across the whole library', () => {
     const distinct = new Set(ALL_MCA_CLAUSES.flatMap((clause) => findingsFor(clause)).map((f) => f.id));
     const stillOpen = new Set(ALL_MCA_CLAUSES.flatMap((clause) => outstandingFindingsFor(clause)).map((f) => f.id));
 
-    expect(distinct.size).toBe(124);
-    expect(stillOpen.size).toBe(58);
-    expect(distinct.size - stillOpen.size).toBe(66);
+    expect(distinct.size).toBe(136);
+    expect(stillOpen.size).toBe(43);
+    expect(distinct.size - stillOpen.size).toBe(93);
   });
 });

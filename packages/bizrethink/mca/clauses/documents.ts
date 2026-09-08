@@ -166,11 +166,37 @@ export const linesNotAccountedFor = (
   clauses: readonly { number: string; heading: string; body: string }[],
   declared: readonly NonClauseLine[],
 ): string[] => {
-  // Reconstructed the way the DOCUMENT prints it — "2.1 Sales of Receipts; Not
-  // a Loan" is one line there, while the clause holds the number and the
-  // heading apart. Matching them separately leaves every heading in the
-  // document looking unaccounted for, which is what it did first time.
-  const held = norm(clauses.map((clause) => `${clause.number} ${clause.heading}\n${clause.body}`).join('\n'));
+  /*
+    Reconstructed the way the DOCUMENT prints it, in every way the corpus prints
+    it.
+
+    A clause holds its number and its heading apart; a document prints them as
+    one line, and the six documents do not agree on how. The FRPA and the twins
+    write "2.1 Sales of Receipts; Not a Loan"; the Permission to Release writes
+    "1. Trade, Landlord, and Bank Information." — a dot after the number and a
+    full stop after the heading, neither of which is part of either value. The
+    FRPA's Section 10 writes "10.1 Merchant hereby…", with a number and no
+    heading at all.
+
+    Both renderings are offered rather than a canonical one chosen, because the
+    alternative is writing typography into clause records to satisfy an
+    assertion, and `number` would stop meaning the number.
+
+    The alternate carries the body too, because §7 of the Permission to Release
+    prints its number, heading and first sentence on one line.
+
+    THE ALTERNATES GO AT THE END, and that placement is load-bearing. `norm`
+    collapses newlines, so a headingless clause's number and body are adjacent
+    in the joined text — which is exactly how "10.1 Merchant hereby…" matches.
+    Interleaving a second rendering between them breaks that adjacency and
+    reports six correct clauses as missing.
+  */
+  const held = norm(
+    [
+      ...clauses.map((clause) => `${clause.number} ${clause.heading}\n${clause.body}`),
+      ...clauses.map((clause) => `${clause.number}. ${clause.heading}.\n${clause.body}`),
+    ].join('\n'),
+  );
 
   return documentLines(file).filter(
     (line) => !held.includes(norm(line)) && !declared.some(({ anchor }) => line.startsWith(anchor)),

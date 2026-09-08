@@ -2,6 +2,8 @@ import { EQUIPMENT_LEASE_LIBRARY, EQUIPMENT_SECTION_ORDER } from './equipment-le
 import { FRPA_LIBRARY, FRPA_SECTION_ORDER } from './frpa';
 import { MCA_INSTRUMENTS, type McaInstrument } from './instruments';
 import { ISO_PRA_LIBRARY, ISO_PRA_SECTION_ORDER } from './iso-pra';
+import { PAYZLI_LIBRARY, PAYZLI_SECTION_ORDER } from './payzli';
+import { PERMISSION_TO_RELEASE_LIBRARY, PERMISSION_TO_RELEASE_SECTION_ORDER } from './permission-to-release';
 import { SUBSCRIPTION_LIBRARY } from './subscription';
 import type { McaClause } from './types';
 
@@ -24,6 +26,8 @@ export const ALL_MCA_CLAUSES: McaClause[] = [
   ...EQUIPMENT_LEASE_LIBRARY,
   ...SUBSCRIPTION_LIBRARY,
   ...ISO_PRA_LIBRARY,
+  ...PAYZLI_LIBRARY,
+  ...PERMISSION_TO_RELEASE_LIBRARY,
 ];
 
 /**
@@ -59,6 +63,8 @@ const SECTION_ORDER: Partial<Record<McaInstrument, readonly string[]>> = {
   // orders while their clauses still matched.
   subscription: EQUIPMENT_SECTION_ORDER,
   'iso-pra': ISO_PRA_SECTION_ORDER,
+  'payzli-split-funding': PAYZLI_SECTION_ORDER,
+  'permission-to-release': PERMISSION_TO_RELEASE_SECTION_ORDER,
 };
 
 /**
