@@ -98,6 +98,18 @@ apps/remix/app/routes/_recipient+/lease-review.$token.attachment.$documentId.tsx
 # link should not be the same act as granting write access.
 apps/remix/app/routes/_recipient+/clause-review.$token.tsx
 
+# The MCA vertical's equivalent, and a SECOND route rather than a mode on the
+# one above (ADR 0008: two surfaces, two release paths). A lease review link is
+# scoped by a jurisdiction because a lease is one document a state decides; an
+# MCA deal is a SET of documents, and a link there carries one AGREEMENT. The
+# two tokens live in different tables for the same reason, so one route
+# resolving both would have to know which — see additions.prisma.
+#
+# Read-only, and narrower than the lease's on purpose: it takes no findings,
+# because MCA findings already have a register in lombard-contracts and a
+# second one would drift from it.
+apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx
+
 # ── BizRethink admin pages ───────────────────────────────────────────────────
 # Instance configuration we added, each created by its own overlay-phase commit
 # and none of it present upstream — Documenso administers none of these things.

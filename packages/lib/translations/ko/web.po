@@ -3048,10 +3048,6 @@ msgstr "계정 청구"
 msgid "Claims"
 msgstr "클레임"
 
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Clause"
-msgstr ""
-
 #: apps/remix/app/components/general/filter-pill.tsx
 msgid "Clear"
 msgstr ""
@@ -5976,11 +5972,6 @@ msgstr "이벤트"
 msgid "Event Type"
 msgstr "이벤트 유형"
 
-#. placeholder {0}: totals.findingsCited
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Every clause is attorney-drafted with no named reviewer, so the publishing gate refuses all of them — that is the design, not a defect. Outstanding counts only findings nobody has acted on: {0} were cited across the library and the rest are recorded as implemented, rejected or withdrawn in the review manifests."
-msgstr ""
-
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: packages/lib/constants/document-visibility.ts
 #: packages/ui/components/document/document-visibility-select.tsx
@@ -8331,12 +8322,6 @@ msgstr "없음"
 msgid "None (Overrides global settings)"
 msgstr "없음(전역 설정 무시)"
 
-#. placeholder {0}: totals.clauses
-#. placeholder {1}: totals.outstanding
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "None of these {0} clauses may be sent to a merchant, and {1} findings are outstanding"
-msgstr ""
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
@@ -8375,7 +8360,6 @@ msgstr "알림"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
@@ -8720,10 +8704,6 @@ msgstr "원본"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "그렇지 않으면 문서는 초안으로 생성됩니다."
-
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Outstanding"
-msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
@@ -9484,10 +9464,6 @@ msgstr "재등록"
 #: apps/remix/app/routes/_authenticated+/admin+/email-domains.$id.tsx
 msgid "Re-register Email Domain"
 msgstr "이메일 도메인 재등록"
-
-#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
-msgid "Read by"
-msgstr ""
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
