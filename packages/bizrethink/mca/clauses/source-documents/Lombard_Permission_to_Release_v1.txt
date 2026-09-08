@@ -1,7 +1,7 @@
 Lombard_Permission_to_Release_v1.docx -- body text, extracted
 
 Source:    lombard-contracts/sources/Lombard_Permission_to_Release_v1.docx
-Repository: https://github.com/lombardpay/lombard-contracts at 6a7248b1b42bc12276f62f45bde849d3647c2b1f
+Repository: https://github.com/lombardpay/lombard-contracts at 7b8e61c3c1c9fa02ff4a98f3e4d477132066008d
 docx sha256: 0daa7a28cfd484b2e6208303f2ebd302b4539d8d57f847f1d74a04dfa81d1f27
 Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
            that repository at the commit above.

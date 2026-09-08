@@ -54,6 +54,28 @@ because 10 CCR §952 and 23 NYCRR §600.21 both regulate what a broker may hand 
 recipient. Putting the relation in the field name is what keeps
 `disclosuresFor`'s exact-equality filter meaning what it says.
 
+## Re-vendoring, when the documents change
+
+```
+python3 scripts/mca/revendor.py            # do it
+python3 scripts/mca/revendor.py --check    # report drift, write nothing
+```
+
+`lombard-contracts` is the source of every document and every review manifest
+here; this repository holds copies. When that repository acts on a finding or
+edits a `.docx`, these copies go stale **and nothing here notices** — the
+digests are taken over our own copy, so they still match.
+
+That is not hypothetical. This script's first `--check` run found the review
+register a commit behind: `lombard-contracts` #10 had recorded five findings as
+`implemented` and Pacta was still holding them as live work, over-blocking the
+approval gate by seven clauses.
+
+**What it deliberately does not do.** It updates the vendored TEXT and prints
+the digests that have moved. It does not touch a clause body and does not
+re-stamp `bodiesVerifiedAt`. Those two acts assert that a human re-read the
+document, and a script cannot make that claim — see rule 3 below.
+
 ## Rules for adding a clause
 
 1. **Nothing enters unexamined.** `examinedBy` is required and may not be empty.
