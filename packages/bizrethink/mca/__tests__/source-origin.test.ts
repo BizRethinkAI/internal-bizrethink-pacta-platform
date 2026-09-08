@@ -205,15 +205,22 @@ describe('the vendored sources, classified as they actually stand', () => {
     a file was re-vendored with a proper header, or a new source arrived without
     one — and they call for opposite responses.
   */
+  /**
+   * TWO, AND THEY ARE THE HONEST TWO.
+   *
+   * This list was nine until seven sources were given `Publisher:` / `Site:`
+   * headers. What remains is not an oversight: Utah's and Virginia's headers
+   * say "Vendored 2026-09-06 from lombard-contracts", which records where OUR
+   * COPY came from and not where the text was published. A copy of a copy is
+   * exactly the state Georgia's source was in, and the classifier is right to
+   * keep saying so.
+   *
+   * Closing these two means fetching from `le.utah.gov` and Virginia's
+   * publisher and recording it at the moment of fetching, which breaks their
+   * digests deliberately and needs a human to re-read.
+   */
   it('names the files whose origin is not recorded', () => {
     expect(files.filter((f) => originOfSource(f).origin === 'origin-not-recorded')).toEqual([
-      'CA-10CCR-900-956.txt',
-      'CT-DOB-Guidance.txt',
-      'FL-HB-1353.txt',
-      'KS-SB-345.txt',
-      'LA-Act-198.txt',
-      'MO-SB-1359.txt',
-      'NY-23NYCRR-600.txt',
       'UT-Title-7-Ch-27.txt',
       'VA-Disclosure-Form.txt',
     ]);

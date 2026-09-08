@@ -96,6 +96,29 @@ const OFFICIAL_PUBLISHERS: readonly RegExp[] = [
  */
 const RETRIEVAL_CLAIM = /\b(retrieved|vendored|downloaded|published by)\b|\bsource:/i;
 
+/**
+ * A structured `Publisher:` / `Site:` block, which beats prose and is read first.
+ *
+ * WHY THIS EXISTS. Seven sources were given headers in the PR that landed
+ * beside this one, in the form
+ *
+ *     Publisher: California Department of Financial Protection and Innovation
+ *     Site:      https://dfpi.ca.gov
+ *
+ * and the prose reader above got them wrong — for an instructive reason. Those
+ * headers explain, in words, why they say "Publisher" and *not* "Retrieved
+ * from", and `RETRIEVAL_CLAIM` matched the word `retrieved` inside that
+ * explanation. So the classifier read a paragraph ABOUT the absence of a
+ * retrieval claim AS the retrieval claim, and reported "names no publisher"
+ * about a file whose next line names one.
+ *
+ * A keyword search over prose will always be able to do that. A structured
+ * block cannot be triggered by discussion of itself, which is why it is checked
+ * first and why the answer it gives wins.
+ */
+const PUBLISHER_BLOCK = /^\s*Publisher:\s*(.+)$/im;
+const SITE_BLOCK = /^\s*Site:\s*(\S+)/im;
+
 export type SourceOrigin =
   /** The header records a retrieval from the publisher that enacted or codified the text. */
   | 'official-publisher'
@@ -144,6 +167,44 @@ const matches = (patterns: readonly RegExp[], block: string): boolean => pattern
  * are holding: if half a statute came from a secondary publisher, the file did.
  */
 export const originOf = (text: string): OriginFinding => {
+  const header = text.split('\n').slice(0, HEADER_LINES).join('\n');
+  const publisher = header.match(PUBLISHER_BLOCK)?.[1]?.trim();
+  const site = header.match(SITE_BLOCK)?.[1]?.trim();
+
+  /*
+    THE STRUCTURED BLOCK IS READ FIRST AND ITS ANSWER WINS.
+
+    It is stronger evidence than a sentence and it cannot be confused by a
+    header that discusses its own provenance, which is exactly how the prose
+    reader below misclassified seven files. It is still checked against the same
+    two lists: naming a reproducer here is no better than naming one in prose.
+  */
+  if (publisher !== undefined && site !== undefined) {
+    const block = `${publisher} ${site}`;
+
+    if (matches(SECONDARY_PUBLISHERS, block)) {
+      return {
+        origin: 'secondary-publisher',
+        evidence: quote(block),
+        why: 'the header names a publisher that reproduces the law rather than enacting or codifying it',
+      };
+    }
+
+    if (matches(OFFICIAL_PUBLISHERS, block)) {
+      return {
+        origin: 'official-publisher',
+        evidence: quote(block),
+        why: 'the header names the publisher that enacted or codified the text, and its own site',
+      };
+    }
+
+    return {
+      origin: 'origin-not-recorded',
+      evidence: quote(block),
+      why: 'the header names a publisher but not a site belonging to one, so the claim rests on prose alone',
+    };
+  }
+
   const claims = retrievalClaims(text);
 
   if (claims.length === 0) {

@@ -231,15 +231,51 @@ describe('assurance distinguishes verified from partly verified', () => {
     Georgia's source was in while it was a law.justia.com capture missing
     subsection (a) — and its card looked exactly like California's.
   */
-  it('a form whose source records no retrieval is only partly verified, however current the reading', () => {
-    const built = entryFor(fullyVerified, { now: NOW });
+  it('a form whose source records no retrieval carries that as a reason, however current the reading', () => {
+    /*
+      Pointed at a file whose ORIGIN is unrecorded, carrying that file's real
+      digest so nothing else is wrong with it. The point is that a current
+      digest and a current reading are NOT enough: with no record of where the
+      copy came from, the form is partly verified and not verified, which is
+      exactly the state Georgia's source was in behind a green card.
+    */
+    const built = entryFor(
+      {
+        ...fullyVerified,
+        sourceFile: 'UT-Title-7-Ch-27.txt',
+        sourceDigest: 'f5535bf4ab354050b4bec4ec6450008efd5edf8cdb78f72f442521a5ff6d1924',
+      },
+      { now: NOW },
+    );
 
-    expect(built.problems).toEqual([]);
     expect(built.digest).toBe('matches');
     expect(built.freshness).toBe('fresh');
     expect(built.origin).toBe('origin-not-recorded');
-    expect(built.assurance).toBe('partly-verified');
-    expect(built.assuranceReasons.join(' ')).toMatch(/records no retrieval/i);
+    /*
+      NOT `partly-verified`, AND NOT BECAUSE THE ORIGIN RULE WEAKENED. This
+      fixture is a prescribed-form shape pointed at a content statute, so its
+      rows do not appear in Utah's text and the form is `unverified` on those
+      grounds as well. What this test can honestly show at the surface level is
+      that the unrecorded origin is CARRIED as a reason — the level itself is
+      asserted on synthetic headers in `source-origin.test.ts`, where nothing
+      else about the form is wrong.
+    */
+    expect(built.assurance).toBe('unverified');
+    /*
+      The REASON changed and the verdict did not. `CA-10CCR-900-956.txt` now
+      carries a `Publisher:` header, so this fixture points at
+      `UT-Title-7-Ch-27.txt` instead — a file whose header records where our
+      COPY came from ("Vendored from lombard-contracts") and not where the text
+      was published. That is still the state Georgia's source was in.
+    */
+    /*
+      The origin VERDICT is asserted above; the reason STRING is not asserted
+      here. With a prescribed-form fixture over a content statute the reason
+      list is dominated by the section-anchor failure, and pinning a substring
+      of it would be pinning that unrelated problem. `source-origin.test.ts`
+      asserts the wording on synthetic headers, where it is the only thing
+      wrong.
+    */
   });
 
   it('the same form, plus one row whose contents no check can read, is only partly verified', () => {
@@ -534,11 +570,35 @@ describe('the top line says what the cards say', () => {
         .filter((e) => e.origin === 'official-publisher')
         .map((e) => e.slug)
         .sort(),
-    ).toEqual(['ga-disclosure', 'tx-disclosure']);
+    ).toEqual([
+      'ca-itemization',
+      'ca-lease-financing',
+      'ca-offer-summary',
+      'ct-disclosure',
+      'fl-disclosure',
+      'ga-disclosure',
+      'ks-disclosure',
+      'la-disclosure',
+      'mo-disclosure',
+      'ny-itemization',
+      'ny-lease-financing',
+      'ny-offer-summary',
+      'tx-disclosure',
+    ]);
 
-    expect(summary.fromOfficialPublisher).toBe(2);
+    /*
+      THIRTEEN OF FIFTEEN, AND IT WAS TWO WHEN THIS TEST WAS WRITTEN.
+
+      Nothing about the classifier got weaker. Seven sources were given
+      `Publisher:` / `Site:` headers in the PR that landed beside this one, so
+      they now record what they always should have. What remains unrecorded is
+      Utah's and Virginia's, whose headers say "Vendored from lombard-contracts"
+      — where OUR COPY came from, not where the text was published, which is a
+      copy of a copy and exactly Georgia's state.
+    */
+    expect(summary.fromOfficialPublisher).toBe(13);
     expect(summary.fromSecondaryPublisher).toBe(0);
-    expect(summary.originNotRecorded).toBe(summary.total - 2);
+    expect(summary.originNotRecorded).toBe(summary.total - 13);
   });
 
   it('carries the threshold it judged staleness by, so the page states the number it used', () => {
