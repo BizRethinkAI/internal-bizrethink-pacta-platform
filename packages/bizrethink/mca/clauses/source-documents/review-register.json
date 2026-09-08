@@ -1,8 +1,8 @@
 {
   "_what": "The two adversarial reviews of the Lombard negotiated agreements, indexed. Derived from lombard-contracts by scripts/mca/build-review-register.py; regenerate and diff rather than editing this file.",
   "_repository": "https://github.com/lombardpay/lombard-contracts",
-  "_commit": "b48b5e4cadbc8bae51eef5560283513e74739f28",
-  "_dispositions": "REVIEW-01 findings carry the status from REVIEW-01-manifest.json (implemented / open / handoff / rejected / wont-fix). REVIEW-02 has no manifest, so every one of its findings is `unrecorded` -- unknown, which is not the same as open and not the same as done.",
+  "_commit": "6a7248b1b42bc12276f62f45bde849d3647c2b1f",
+  "_dispositions": "Each finding carries the status from its review manifest (implemented / open / handoff / rejected / wont-fix). A finding absent from its manifest is `unrecorded` -- unknown, which is not the same as open and not the same as done, and which counts as outstanding. REVIEW-02 had no manifest at all until lombard-contracts PR #9.",
   "_whatThisProves": "That a finding id a clause names is a finding that was actually raised, what it was about and where it routed. It does NOT prove the finding says what a clause claims it says -- the argument lives in the source repository and is not reproduced here.",
   "_dropped": ["evidence", "consequence", "fix"],
   "_knownDefect": "REVIEW-01 uses the id `frpa-cross-reference-titles-wrong` for TWO different findings -- one against FL/GA/KS, one against LA/MO/TX/UT. Finding ids are therefore not unique and this file does not pretend otherwise; `examination.ts` resolves an id to a LIST and names the ambiguity rather than silently keeping one.",
@@ -2484,8 +2484,8 @@
       "review": "REVIEW-02",
       "file": "REVIEW-02-findings.json",
       "sha256": "bf334c284d27aeebed00263d3e3813d234e1068e3fc55fb0a01badc1372cf9a1",
-      "manifest": null,
-      "manifestSha256": null,
+      "manifest": "REVIEW-02-manifest.json",
+      "manifestSha256": "caa18a3f250d9aad7c63387c89a0eb82df64f024456e6f130bb0f76637713601",
       "survived": 48,
       "refuted": 1,
       "coverageGaps": [
@@ -2506,7 +2506,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "debt-vocabulary-the-language-guard-would-not-catch",
@@ -2518,7 +2518,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "el-3-14-subordination-runs-in-the-wrong-direction",
@@ -2530,7 +2530,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "el-3-14-was-not-conformed-when-4-2-was-narrowed",
@@ -2542,7 +2542,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "el-3-15-hides-three-waivers-under-a-miscellaneous-caption",
@@ -2554,7 +2554,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "el-3-15-jury-waiver-is-one-sided-where-the-frpas-is-mutual",
@@ -2566,7 +2566,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "el-3-18-entire-agreement-vs-the-cross-document-never-pay-twice-promise",
@@ -2586,7 +2586,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "el-3-8-grants-no-licence-to-manufacturer-owned-software",
@@ -2598,7 +2598,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "el-3-8-software-licence-has-no-survival-and-the-document-has-no-survival-clause",
@@ -2610,7 +2610,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "el-3-9-excludes-personal-injury-and-omits-the-carve-out-3-11-has",
@@ -2622,7 +2622,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set",
@@ -2634,7 +2634,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt",
@@ -2646,7 +2646,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "el-4-4-guarantor-waives-on-the-lessees-behalf-with-no-authority-recital",
@@ -2658,7 +2658,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "el-4-5-fcra-authorisation-runs-to-a-different-entity-than-the-frpas",
@@ -2670,7 +2670,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-4-12-reopens-the-acceleration-6-2-closed",
@@ -2682,7 +2682,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-4-13-unlimited-right-to-refuse-vs-ct-offer-revocation-bar",
@@ -2694,7 +2694,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument",
@@ -2706,7 +2706,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-4-5-exculpation-is-unqualified-where-every-sibling-clause-is-qualified",
@@ -2718,7 +2718,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-4-8-conditions-the-counsel-review-7-22-promises",
@@ -2730,7 +2730,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-4-8-may-impede-a-merchant-complaint-to-a-regulator",
@@ -2742,7 +2742,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-4-9-authorises-ucc-filings-under-a-dba-the-repository-does-not-record",
@@ -2754,7 +2754,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "handoff"
         },
         {
           "id": "frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2",
@@ -2766,7 +2766,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-5-12-does-not-state-the-merchants-principal-place-of-business",
@@ -2778,7 +2778,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-5-3-and-5-14-give-the-same-compliance-representation-twice",
@@ -2790,7 +2790,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-5-7-duplicates-5-18",
@@ -2802,7 +2802,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-6-1-4-defaults-on-a-sale-5-18-expressly-permits",
@@ -2814,7 +2814,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-6-4-24-hour-notice-cannot-be-given-under-7-3",
@@ -2826,7 +2826,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-6-4-compels-the-notice-6-1-5-makes-a-default",
@@ -2838,7 +2838,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-7-1-has-no-except-as-expressly-provided-carve-out",
@@ -2850,7 +2850,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false",
@@ -2862,7 +2862,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-7-2-permits-delegation-of-the-reconciliation-duty",
@@ -2874,7 +2874,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-7-24-answers-only-half-of-conn-gen-stat-36a-868",
@@ -2886,7 +2886,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-7-24-does-not-name-the-statute-that-actually-bites",
@@ -2898,7 +2898,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-7-24-misstates-what-tex-fin-code-398-055-voids",
@@ -2910,7 +2910,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-7-6-and-4-2-contradict-the-2-6-completion-test",
@@ -2922,7 +2922,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "frpa-9-3-additional-collateral-is-unbounded-and-has-no-form",
@@ -2934,7 +2934,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-9-4-creates-guarantor-liability-on-merchant-bankruptcy",
@@ -2946,7 +2946,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "frpa-9-5-refers-to-guarantors-the-form-cannot-collect",
@@ -2958,7 +2958,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "handoff"
         },
         {
           "id": "frpa-undefined-capitalised-terms-in-the-unexamined-clauses",
@@ -2970,7 +2970,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "iso-1-6-representative-removal-is-a-request-with-no-obligation",
@@ -2982,7 +2982,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "iso-a1-commission-out-of-a-fee-the-company-may-not-collect",
@@ -2994,7 +2994,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "handoff"
         },
         {
           "id": "iso-a2-a4-no-clawback-when-the-merchant-cancels-under-frpa-4-14",
@@ -3006,7 +3006,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "iso-a6-and-frpa-7-21-give-different-answers-about-a-merchant-paid-fee",
@@ -3018,7 +3018,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "iso-a6-remedy-sends-the-merchants-money-to-company",
@@ -3030,7 +3030,7 @@
           "decides": "owner",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "manifest-note-for-iso-signature-dates-does-not-match-the-sidecar",
@@ -3042,7 +3042,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "open"
         },
         {
           "id": "payzli-cessation-on-notice-vs-frpa-2-6-automatic-cessation",
@@ -3054,7 +3054,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "payzli-instruction-stops-short-of-the-frpa-completion-threshold",
@@ -3066,7 +3066,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         },
         {
           "id": "payzli-uses-debit-where-the-frpa-promises-no-deposit-account-debiting",
@@ -3078,7 +3078,7 @@
           "decides": "me",
           "status": "survived",
           "review": "REVIEW-02",
-          "disposition": "unrecorded"
+          "disposition": "implemented"
         }
       ]
     }

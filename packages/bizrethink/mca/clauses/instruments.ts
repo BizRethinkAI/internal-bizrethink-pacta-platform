@@ -143,8 +143,8 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'processor',
     entity: 'Lombard Capital LLC',
     sourceDocument: 'Lombard_Payzli_Split_Funding_Authorization_v2.txt',
-    sourceDigest: '',
-    bodiesVerifiedAt: null,
+    sourceDigest: '2c077ddff1656c3f6c94fa9ae1563779947fcb6900abd785cd47c672083d2d21',
+    bodiesVerifiedAt: '2026-09-08',
   },
   'permission-to-release': {
     id: 'permission-to-release',
@@ -152,8 +152,8 @@ export const INSTRUMENTS: Record<McaInstrument, McaInstrumentRecord> = {
     counterparty: 'merchant',
     entity: 'Lombard Capital LLC',
     sourceDocument: 'Lombard_Permission_to_Release_v1.txt',
-    sourceDigest: '',
-    bodiesVerifiedAt: null,
+    sourceDigest: 'b18c51387a2c0ebc01b96034b88041a5676d02b32c2df2ae5d80960e25b5ec64',
+    bodiesVerifiedAt: '2026-09-08',
   },
 };
 

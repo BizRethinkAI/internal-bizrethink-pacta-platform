@@ -50,7 +50,17 @@ describe('every clause body is still in the document it was taken from', () => {
   )('%s prints its number beside its heading', (_slug, clause) => {
     const body = readAgreementBody(INSTRUMENTS[clause.instrument].sourceDocument);
 
-    expect(containsClauseText(body, `${clause.number} ${clause.heading}`)).toBe(true);
+    // THE CORPUS PUNCTUATES ITS NUMBERING TWO WAYS, and neither is wrong. The
+    // FRPA and the twins print "2.1 Sales of Receipts; Not a Loan"; the
+    // Permission to Release prints "1. Trade, Landlord, and Bank Information."
+    // `number` holds the number and not the punctuation around it, because the
+    // punctuation is the document's typography rather than the clause's
+    // identity — so both forms are accepted here rather than a dot being
+    // written into six clause records to satisfy one assertion.
+    expect(
+      containsClauseText(body, `${clause.number} ${clause.heading}`) ||
+        containsClauseText(body, `${clause.number}. ${clause.heading}`),
+    ).toBe(true);
   });
 
   it('every instrument that has clauses has a vendored document', () => {

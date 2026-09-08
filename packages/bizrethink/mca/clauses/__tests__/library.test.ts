@@ -72,13 +72,13 @@ describe('the MCA clause library', () => {
    *
    * The plural existed for the Equipment Lease and the Subscription, on the
    * theory that one clause could be published in both and so could not diverge.
-   * The documents refused it — see `twins.ts` — and across the whole library not
-   * one clause names a second instrument. Asserted rather than described,
+   * The documents refused it — see `twins.ts` — and across all six instruments
+   * not one clause names a second. Asserted rather than described,
    * because the moment a genuinely shared clause appears this is the test that
    * should be reconsidered, and a count in prose would not be.
    */
-  it('gives every clause exactly one instrument, across all 177', () => {
-    expect(ALL_MCA_CLAUSES).toHaveLength(177);
+  it('gives every clause exactly one instrument, across all 192', () => {
+    expect(ALL_MCA_CLAUSES).toHaveLength(192);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 

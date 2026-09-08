@@ -1,0 +1,48 @@
+Lombard_Permission_to_Release_v1.docx -- body text, extracted
+
+Source:    lombard-contracts/sources/Lombard_Permission_to_Release_v1.docx
+Repository: https://github.com/lombardpay/lombard-contracts at 6a7248b1b42bc12276f62f45bde849d3647c2b1f
+docx sha256: 0daa7a28cfd484b2e6208303f2ebd302b4539d8d57f847f1d74a04dfa81d1f27
+Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
+           that repository at the commit above.
+
+WHAT THIS IS. Lombard's own executed-form agreement -- primary text in the only
+sense that matters here, because the words are ours and this file is the
+document they were published in. It is not a statute and no regulator wrote it,
+so the primary/secondary-publisher question `sources-are-primary.test.ts` asks
+of `mca/sources/` does not arise; the question this header answers instead is
+WHICH document, at WHICH revision.
+
+HOW IT WAS EXTRACTED. word/document.xml, in document order: every <w:p> as one
+line with runs joined and whitespace collapsed, every <w:tbl> as one line
+prefixed `[TABLE]` with cells joined by ` | ` and rows by ` // `. Field codes,
+comments and revision marks are not read. The `<<N>>` markers are the AcroForm
+widget anchors the Lombard pipeline injects; they are part of the published
+document and are kept.
+
+WHY IT IS HERE. A clause in `mca/clauses/` carries the body a merchant reads.
+That body is only worth anything if it is still the body the document ships,
+and this file is what re-executes that claim on every test run. If the .docx
+moves, the digest breaks and somebody has to look -- which is the event this
+exists for.
+
+--- BODY TEXT BEGINS ---
+PERMISSION TO RELEASE INFORMATION
+Date: ____«0»____
+I, ___________«1»___________, an authorized officer or owner of _____________«2»______________ (the “Merchant”), doing business as _____________«3»______________, with principal place of business at ______________________________«4»______________________________, hereby grant the following authorizations to ________«9»________ (“Buyer”) and its agents, servicers, successors, and assigns:
+1. Trade, Landlord, and Bank Information.
+Merchant authorizes Buyer to obtain trade, landlord, and bank information from any vendors, suppliers, landlord/mortgagor, banks, creditors, brokers, and payment processors with whom Merchant has or has had a business relationship. This information will be used for the purpose of (a) underwriting Merchant's qualification for funding through Buyer, (b) ongoing program qualification monitoring during the term of any agreement between Merchant and Buyer, and (c) collection upon any breach of an agreement between Merchant and Buyer.
+2. Banking, Brokerage, and Processing History.
+Merchant authorizes any of its banks, brokers, payment processors, and credit reporting agencies (collectively, “Information Sources”) to provide Buyer with Merchant's banking, brokerage, and processing history, including but not limited to (i) account balances and activity records, (ii) processing volume and chargeback history, (iii) information necessary to verify the amount of Future Receipts previously processed and any fees that may have been charged, and (iv) any other information necessary to determine Merchant's qualification or continuation in any funding program offered by Buyer or to support collection upon a breach of any agreement between Merchant and Buyer.
+3. Credit Bureau Authorization.
+Merchant and any Personal Guarantor under the FRPA hereby authorize Buyer to obtain credit reports and credit-bureau information regarding Merchant and the Personal Guarantor, individually, from any of Equifax, Experian, TransUnion, Dun & Bradstreet, and any other consumer reporting agency or commercial credit bureau, for the permissible purposes of (a) underwriting any commercial financing offer extended by Buyer, (b) ongoing creditworthiness review during the term of any agreement between Merchant and Buyer, and (c) collection upon any breach. Merchant and Personal Guarantor acknowledge that Buyer may obtain such credit reports periodically without further consent.
+4. Fair Credit Reporting Act Acknowledgment.
+Merchant and Personal Guarantor acknowledge that Buyer's credit-bureau pulls regarding the Personal Guarantor are subject to the Fair Credit Reporting Act (15 U.S.C. §1681 et seq.). The Personal Guarantor’s signature below constitutes the “written instructions” of the consumer required for permissible-purpose credit-report access under FCRA §604(a)(2). If any commercial financing application is denied based in whole or in part on information obtained from a consumer reporting agency, Buyer shall provide an adverse-action notice in accordance with FCRA §615(a). Personal Guarantor has the right, upon request, to be informed of the name and address of any consumer reporting agency from which Buyer obtained a credit report regarding Personal Guarantor.
+5. Continuing Authorization; Reliance.
+This Permission is a continuing authorization, effective from the date set forth above and continuing throughout the term of any agreement between Merchant and Buyer and for a reasonable period thereafter for purposes of collection. Information Sources may rely on this Permission without further verification or confirmation from Merchant. A photocopy, facsimile, or electronic image of this Permission shall be deemed equivalent to the original for all purposes.
+6. Release of Information Sources.
+Merchant releases each Information Source, and each vendor, supplier, landlord/mortgagor, creditor and other person named in Section 1, from any and all liability arising from disclosures made in good-faith reliance on this Permission, including any claim for breach of confidentiality, invasion of privacy, or defamation. Merchant acknowledges that this release runs to the benefit of each Information Source as a third-party beneficiary.
+7. Personal Guarantor. The Personal Guarantor signs this Permission individually as well as on behalf of Merchant, and the authorizations in Sections 3 and 4 are given in that individual capacity. If no separate Personal Guarantor signs below, the person signing represents that they are the Personal Guarantor referred to in the Future Receivables Purchase Agreement.
+AGREED AND ACKNOWLEDGED:
+Signature:
+[TABLE] {{SIGNATURE, r1, width=200, height=20}} | Date: {{DATE, r1, width=110, height=16}} // Printed Name: ___________«1»___________ | Title: ____________«7»____________ PERSONAL GUARANTOR (individually): {{SIGNATURE, r2, width=200, height=20}} Printed Name: ___________«10»___________ Date: {{DATE, r2, width=110, height=16}} // Phone: _______«5»________ | Email: ___________«6»___________

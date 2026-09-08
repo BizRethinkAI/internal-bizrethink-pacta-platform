@@ -21,14 +21,15 @@ text being written down.
 
 | | |
 |---|---|
-| FRPA | **101 clauses, imported** — 87 numbered, 14 the document leaves unnumbered |
-| ISO Partner Referral Agreement | **24 clauses, imported** |
-| Equipment Lease | **26 clauses, imported** |
-| Subscription | **26 clauses, imported** — the Equipment Lease's twin |
-| Payzli Split Funding Authorization | no numbered clauses; it is a letter |
-| Permission to Release | no numbered clauses |
+| FRPA | **101 clauses** — 87 numbered, 14 the document leaves unnumbered |
+| ISO Partner Referral Agreement | **24 clauses** |
+| Equipment Lease | **26 clauses** |
+| Subscription | **26 clauses** — the Equipment Lease's twin |
+| Payzli Split Funding Authorization | **7 clauses** — a letter, no numbering at all |
+| Permission to Release | **8 clauses** — Phase 0 recorded it as having none |
+| **Total** | **192 clauses, all six instruments imported** |
 | Approvals, review links, an admin surface | not built |
-| Interview, engine, assembly | not built |
+| Interview, engine, assembly | not built — and it lives here, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
 
 Nothing here is publishable and nothing renders to a merchant. Every clause is
 `attorney-drafted` with a null author, and `library.test.ts` asserts the refusal
@@ -111,11 +112,16 @@ applied, and that every declared divergence still diverges — so the register
 cannot go write-only. Five clauses differ in substance (§§3.4–3.8) and ten more
 places differ only in wording; both lists are pinned.
 
-They do not prove a clause is any good. The clauses here cite **124 distinct
-findings that survived refutation**, of which **58 are still outstanding** —
-the other 66 were fixed or rejected, and `REVIEW-01-manifest.json` is what says
-so. Forty-five of the 58 are `unrecorded` and will fall sharply once
-lombard-contracts PR #9 lands REVIEW-02's manifest.
+They do not prove a clause is any good. The clauses here cite **136 distinct
+findings that survived refutation**, of which **43 are still outstanding** — the
+other 93 were fixed or rejected, and the two review manifests are what say so.
+
+Both reviews now carry dispositions. REVIEW-02's manifest landed in
+lombard-contracts PR #9; before it, all 48 of that review's findings were
+`unrecorded` and counted as outstanding, and 19 of them turned out to be fixed.
+`unrecorded` remains in the vocabulary for a finding whose manifest does not
+name it — which is still true of the refuted ones, and is where the next review
+to arrive without a manifest will land.
 
 **`findingsFor` and `outstandingFindingsFor` mean different things and the
 difference is the point.** A finding surviving refutation says it was RIGHT.
