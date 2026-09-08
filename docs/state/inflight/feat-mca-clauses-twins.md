@@ -1,7 +1,7 @@
 # feat/mca-clauses-twins — the Equipment Lease and the Subscription, and the check that they cannot diverge
 
 **Branch:** `feat/mca-clauses-twins`, stacked on `feat/mca-clauses-spine` (#126).
-**PR:** #TBD.
+**PR:** #127.
 
 Fifty-two clauses: the Equipment Lease Agreement's twenty-six and the
 Subscription Agreement's twenty-six. Three of six instruments are now imported.
