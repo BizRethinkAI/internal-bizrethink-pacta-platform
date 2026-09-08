@@ -1,0 +1,97 @@
+import type { McaClause } from '../types';
+
+/**
+ * SECTION III — REPRESENTATIONS, TERM & GENERAL.
+ *
+ * Bodies are the words the shipped document prints, and
+ * `__tests__/bodies-match-the-document.test.ts` re-finds every one of them
+ * in `source-documents/Lombard_ISO_Partner_Referral_Agreement_v2.txt` on every
+ * run. Edit one here and the test goes red, which is correct: the document is
+ * where a clause is amended, and this library follows it.
+ */
+export const ISO_PRA_GENERAL: McaClause[] = [
+  {
+    slug: 'iso-pra.representations-and-warranties',
+    version: 1,
+    instruments: ['iso-pra'],
+    number: '3.1',
+    section: 'general',
+    sortKey: 10,
+    heading: 'Representations and Warranties',
+    body: 'ISO Partner represents and warrants that: (a) ISO Partner has the full power and authority to execute and perform this Agreement, and no provision of this Agreement conflicts with ISO Partner’s obligations under any other agreement; (b) if other than a sole proprietorship, ISO Partner is duly organized, authorized, and in good standing under the laws of its state of organization; and (c) neither ISO Partner nor any principal or representative has been subject to any criminal conviction (excluding traffic misdemeanors), bankruptcy filing, IRS lien, federal or state regulatory enforcement proceeding, or restraining order or judgment in any proceeding alleging fraud or deceptive practices.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-01', findings: [] }],
+  },
+  {
+    slug: 'iso-pra.term-and-termination',
+    version: 1,
+    instruments: ['iso-pra'],
+    number: '3.2',
+    section: 'general',
+    sortKey: 20,
+    heading: 'Term and Termination',
+    body: 'This Agreement is effective upon execution and continues until terminated by either party with thirty (30) days written notice. Company may terminate immediately for cause, including breach of this Agreement, violation of applicable law, or conduct that may harm Company’s reputation. Upon termination, ISO Partner shall be entitled to commissions earned on fundings disbursed prior to the termination date, subject to Section A.4 (Clawback Provision), which survives termination and applies to those commissions.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-01', findings: ['iso-clawback-does-not-survive-termination'] }],
+  },
+  {
+    slug: 'iso-pra.indemnification',
+    version: 1,
+    instruments: ['iso-pra'],
+    number: '3.3',
+    section: 'general',
+    sortKey: 30,
+    heading: 'Indemnification',
+    body: 'ISO Partner shall indemnify and hold harmless Company, its officers, directors, employees, and affiliates from any claims, damages, losses, or liabilities arising from ISO Partner’s, or any of its representatives’, breach of this Agreement, negligence, or wrongful acts in connection with referral activities.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-01', findings: [] }],
+  },
+  {
+    slug: 'iso-pra.independent-contractor',
+    version: 1,
+    instruments: ['iso-pra'],
+    number: '3.4',
+    section: 'general',
+    sortKey: 40,
+    heading: 'Independent Contractor',
+    body: 'ISO Partner is an independent contractor. Nothing in this Agreement shall be construed as creating an employment, partnership, joint venture, or agency relationship between the parties. ISO Partner shall be responsible for all taxes, insurance, and expenses related to its own business operations.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-01', findings: ['iso-no-bar-on-partner-charging-merchant'] }],
+  },
+  {
+    slug: 'iso-pra.governing-law',
+    version: 1,
+    instruments: ['iso-pra'],
+    number: '3.5',
+    section: 'general',
+    sortKey: 50,
+    heading: 'Governing Law',
+    body: 'This Agreement shall be governed by and construed in accordance with the laws of the State of Florida, without regard to conflict of law principles. Any disputes arising under this Agreement shall be resolved through binding arbitration in Pasco County, Florida.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-01', findings: [] }],
+  },
+  {
+    slug: 'iso-pra.entire-agreement',
+    version: 1,
+    instruments: ['iso-pra'],
+    number: '3.6',
+    section: 'general',
+    sortKey: 60,
+    heading: 'Entire Agreement',
+    body: 'This Agreement, including Section A and its appendices, constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, and agreements. This Agreement may only be amended in writing signed by both parties.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-01', findings: [] }],
+  },
+];

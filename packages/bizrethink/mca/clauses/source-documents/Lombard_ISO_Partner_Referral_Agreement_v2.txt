@@ -1,0 +1,92 @@
+Lombard_ISO_Partner_Referral_Agreement_v2.docx -- body text, extracted
+
+Source:    lombard-contracts/sources/Lombard_ISO_Partner_Referral_Agreement_v2.docx
+Repository: https://github.com/lombardpay/lombard-contracts at b48b5e4cadbc8bae51eef5560283513e74739f28
+docx sha256: 524a63be652d58463c9702f103450335860ad2f7c12575a5be3246b7f8af7c88
+Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
+           that repository at the commit above.
+
+WHAT THIS IS. Lombard's own executed-form agreement -- primary text in the only
+sense that matters here, because the words are ours and this file is the
+document they were published in. It is not a statute and no regulator wrote it,
+so the primary/secondary-publisher question `sources-are-primary.test.ts` asks
+of `mca/sources/` does not arise; the question this header answers instead is
+WHICH document, at WHICH revision.
+
+HOW IT WAS EXTRACTED. word/document.xml, in document order: every <w:p> as one
+line with runs joined and whitespace collapsed, every <w:tbl> as one line
+prefixed `[TABLE]` with cells joined by ` | ` and rows by ` // `. Field codes,
+comments and revision marks are not read. The `<<N>>` markers are the AcroForm
+widget anchors the Lombard pipeline injects; they are part of the published
+document and are kept.
+
+WHY IT IS HERE. A clause in `mca/clauses/` carries the body a merchant reads.
+That body is only worth anything if it is still the body the document ships,
+and this file is what re-executes that claim on every test run. If the .docx
+moves, the digest breaks and somebody has to look -- which is the event this
+exists for.
+
+--- BODY TEXT BEGINS ---
+ISO Partner
+Referral Agreement
+Merchant Cash Advance Partner Program
+[TABLE]  | PREPARED BY Lombard Pay LLC DOCUMENT TYPE Partner Agreement CONFIDENTIALITY Private & Confidential
+This ISO Partner Referral Agreement (the “Agreement”) is entered into and effective as of _____«0»_____ (the “Effective Date”) by and between ________«10»________ (“Company”), and _____________«1»______________ (“ISO Partner”).
+WHEREAS, Company is engaged in the business of providing merchant cash advance (“MCA”) funding and related financial products to small and mid-sized businesses throughout the United States; and
+WHEREAS, ISO Partner desires to introduce prospective merchants to Company for payment processing, with merchant cash advance funding available to those merchants through Company’s ordinary underwriting path, in exchange for commission compensation as described herein;
+NOW THEREFORE, in consideration of the mutual promises and commitments contained herein, the parties agree as follows:
+SECTION A — COMMISSION STRUCTURE
+A.1 Commission Rate
+Company shall pay ISO Partner a commission equal to _«2»_% of the amount advanced for each merchant cash advance successfully funded as a result of ISO Partner’s introduction. The commission is payable solely out of the Origination Fee actually collected by Company on that transaction and shall not exceed that Origination Fee. If no Origination Fee is collected on a transaction, no commission is payable on it. This default rate is subject to adjustment by mutual written agreement based on volume performance or special arrangements.
+A.2 When Commission Is Earned
+Commission is earned at the time of successful funding disbursement to the referred merchant. No commission is payable on declined, withdrawn, or unfunded applications.
+A.3 Payment Timing
+Earned commissions shall be paid within thirty (30) days of funding disbursement, and may be paid earlier at Company’s discretion, via ACH transfer or wire to the bank account designated by ISO Partner. There is no minimum payout threshold. Payment at thirty days coincides with the close of the one-hundred-percent clawback window in Section A.4, and precedes the fifty-percent window, so any clawback is recovered as set-off under that Section rather than by withholding payment here.
+A.4 Clawback Provision
+If a funded merchant breaches its purchase agreement within thirty (30) days following funding disbursement, ISO Partner shall repay one hundred percent (100%) of the commission paid on that transaction. If the breach occurs after the thirtieth (30th) day but within forty-five (45) days following funding disbursement, ISO Partner shall repay fifty percent (50%) of that commission. No commission is repayable in respect of a breach occurring after the forty-fifth (45th) day. Repayment is mandatory and is not subject to Company’s election; Company’s failure to demand repayment on any transaction is not a waiver of its right to demand it on any other. Company shall recover a clawback amount first by setting it off against commissions otherwise payable to ISO Partner, on any transaction and in any later payment cycle, and ISO Partner agrees that set-off is the ordinary and expected mechanism. Only to the extent an amount remains unrecovered ninety (90) days after Company gives notice of it does it become a debt payable in cash on demand. Company shall give ISO Partner written notice identifying the transaction and the amount before applying any set-off. Clawback amounts shall not exceed the commission actually paid on that funding. This Section survives termination or expiry of this Agreement.
+A.5 Commission Transparency
+ISO Partner shall have access to a real-time partner portal at app.lombardpay.com displaying all submitted applications, funding statuses, earned commissions, and payout history.
+A.6 Sole Compensation
+The commission payable by Company under this Section A is ISO Partner’s sole and entire compensation in connection with any merchant it introduces. ISO Partner shall not charge, accept or solicit any fee, commission or other consideration from a merchant, directly or indirectly, in connection with any financing. If ISO Partner receives any such payment it shall disclose the payment to Company in writing immediately and refund it to the merchant who paid it, and shall provide Company with evidence of the refund.
+SECTION I — REFERRAL DUTIES
+1.1 Appointment
+Company hereby appoints ISO Partner as a non-exclusive independent referral agent for the purpose of introducing prospective merchants to Company for payment processing. Merchant cash advance funding is available to such merchants through Company’s ordinary underwriting path, and a commission is earned only if and when such a merchant funds. ISO Partner is not an employee, agent, or legal representative of Company and shall not hold itself out as such.
+1.2 Referral Obligations
+ISO Partner agrees to refer merchant applicants in good faith, providing accurate and complete information via the Company’s online portal. ISO Partner shall submit only those merchants that ISO Partner reasonably believes operate a legitimate business and are suitable candidates for merchant cash advance funding. ISO Partner shall not, in any capacity and in any party’s name, communicate to a merchant any specific commercial financing offer, any proposed amount, rate, factor, term or payment, or any assessment of approval likelihood, whether before or after underwriting. All such communication is made by Company directly to the merchant.
+1.3 Approval of Applications
+ISO Partner acknowledges that all merchant applications must be approved by Company at its sole discretion and will become effective only upon such approval. ISO Partner will not at any time make any promise or create any impression that an application will be approved, or communicate any term on which it might be approved. Company reserves the right to accept or deny any and all prospective merchants.
+1.4 Duty to Notify
+ISO Partner shall promptly notify Company in writing of any adverse information relating to a referred merchant, including but not limited to: (i) information regarding the merchant’s financial distress, (ii) changes in the merchant’s business operations or ownership, (iii) suspected fraud or misrepresentation, or (iv) any information that could indicate Company may incur losses on a funded deal.
+1.5 Marketing Materials
+ISO Partner shall only use marketing and promotional materials that have received prior written approval from Company. ISO Partner shall not misrepresent Company’s products, services, rates, or terms in any marketing activity.
+1.6 Representatives
+ISO Partner shall ensure that each of its employees, contractors, and other personnel involved in referral activities complies with the terms of this Agreement. ISO Partner shall be responsible for the actions of its representatives. ISO Partner shall remove any representative from participation in referral activities under this Agreement promptly on request by Company.
+SECTION II — ADDITIONAL OBLIGATIONS
+2.1 Compliance
+ISO Partner agrees to comply with all applicable federal, state, and local laws and regulations, including but not limited to consumer protection laws, data privacy requirements, anti-money-laundering regulations, and sanctions compliance. ISO Partner shall not engage in any deceptive, unfair, or abusive practices in connection with merchant referrals.
+2.2 Know-Your-Partner Compliance
+ISO Partner agrees to provide Company with accurate and complete information about ISO Partner and any representatives involved in performing functions under this Agreement, as necessary for Company’s compliance with due diligence, anti-money-laundering, and other regulatory requirements.
+2.3 Merchant Funds
+Only Company shall disburse funds to merchants. ISO Partner acknowledges that all merchant funding shall be under the sole control of Company. If any merchant funds are sent to ISO Partner in error, ISO Partner shall be deemed to have received such funds in trust for Company and shall immediately remit them to Company.
+2.4 Confidentiality
+ISO Partner agrees to keep confidential all proprietary information, merchant data, underwriting criteria, pricing structures, and business terms disclosed by Company. ISO Partner shall not disclose such information to any third party without prior written consent from Company. This obligation survives termination of this Agreement.
+2.5 Audits
+Company may conduct an audit of ISO Partner’s records and operations to verify compliance with this Agreement. Audit costs shall be borne by Company unless the audit reveals material irregularities or breach, in which case ISO Partner shall bear the cost.
+2.6 Commercial Financing Disclosures (California and New York)
+Company and ISO Partner acknowledge that delivering a merchant’s application documentation to Company is itself a brokering act under 10 CCR §900(a)(8), so ISO Partner may be a broker under California law whatever this Agreement calls it. The following applies to every California recipient and is not affected by that label. (a) Company elects the route permitted by 10 CCR §952(e) and 23 NYCRR §600.21(e): Company provides a copy of the compliant disclosures directly to the recipient. (b) ISO Partner shall not provide, present or communicate any specific commercial financing offer to any recipient, which is also the unqualified bar in Sections 1.2 and 1.3, so §952(b) and §952(c), and 23 NYCRR §600.21(b) and (c), do not engage. Where a New York recipient is involved, Company also gives the recipient the written statement of how and by whom ISO Partner is compensated that 23 NYCRR §600.21(f) requires, on the face of the New York disclosure. (c) If Company nevertheless transmits disclosures to ISO Partner for a recipient, ISO Partner shall transmit those disclosures to the recipient unaltered before communicating anything about the offer, and shall provide Company evidence of transmission including the time of transmission within one business day. (d) ISO Partner shall preserve records of every such transmission for four years and produce them to Company on request. (e) A pattern of noncompliance with §952(b) is cause for immediate termination under Section 3.2; Company will discontinue the relationship, which is the procedure §952(a)(3)(C) contemplates.
+SECTION III — REPRESENTATIONS, TERM & GENERAL
+3.1 Representations and Warranties
+ISO Partner represents and warrants that: (a) ISO Partner has the full power and authority to execute and perform this Agreement, and no provision of this Agreement conflicts with ISO Partner’s obligations under any other agreement; (b) if other than a sole proprietorship, ISO Partner is duly organized, authorized, and in good standing under the laws of its state of organization; and (c) neither ISO Partner nor any principal or representative has been subject to any criminal conviction (excluding traffic misdemeanors), bankruptcy filing, IRS lien, federal or state regulatory enforcement proceeding, or restraining order or judgment in any proceeding alleging fraud or deceptive practices.
+3.2 Term and Termination
+This Agreement is effective upon execution and continues until terminated by either party with thirty (30) days written notice. Company may terminate immediately for cause, including breach of this Agreement, violation of applicable law, or conduct that may harm Company’s reputation. Upon termination, ISO Partner shall be entitled to commissions earned on fundings disbursed prior to the termination date, subject to Section A.4 (Clawback Provision), which survives termination and applies to those commissions.
+3.3 Indemnification
+ISO Partner shall indemnify and hold harmless Company, its officers, directors, employees, and affiliates from any claims, damages, losses, or liabilities arising from ISO Partner’s, or any of its representatives’, breach of this Agreement, negligence, or wrongful acts in connection with referral activities.
+3.4 Independent Contractor
+ISO Partner is an independent contractor. Nothing in this Agreement shall be construed as creating an employment, partnership, joint venture, or agency relationship between the parties. ISO Partner shall be responsible for all taxes, insurance, and expenses related to its own business operations.
+3.5 Governing Law
+This Agreement shall be governed by and construed in accordance with the laws of the State of Florida, without regard to conflict of law principles. Any disputes arising under this Agreement shall be resolved through binding arbitration in Pasco County, Florida.
+3.6 Entire Agreement
+This Agreement, including Section A and its appendices, constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, and agreements. This Agreement may only be amended in writing signed by both parties.
+SIGNATURES
+IN WITNESS WHEREOF, the parties have executed this ISO Partner Referral Agreement as of the date set forth below.
+[TABLE] COMPANY ____________«11»_____________ By: ___________«3»___________ Title: ________«4»_________ Signature: {{SIGNATURE, r2, width=200, height=20}} Date: {{DATE, r2, width=110, height=16}} | ISO PARTNER ____________«5»_____________ dba _______«15»_______ By: ___________«6»___________ Title: ________«7»_________ Signature: {{SIGNATURE, r1, width=200, height=20}} Date: {{DATE, r1, width=110, height=16}}
