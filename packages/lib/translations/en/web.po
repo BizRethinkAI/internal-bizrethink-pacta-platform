@@ -10245,6 +10245,10 @@ msgstr "Reveal the key"
 msgid "Review a lease · Pacta"
 msgstr "Review a lease · Pacta"
 
+#: apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx
+msgid "Review an agreement · Pacta"
+msgstr "Review an agreement · Pacta"
+
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Review request"
 msgstr "Review request"
