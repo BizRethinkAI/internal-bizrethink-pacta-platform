@@ -2151,6 +2151,10 @@ msgstr "Analyzing page layout"
 msgid "Analyzing pages"
 msgstr "Analyzing pages"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Answer"
+msgstr "Answer"
+
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Any documents that you have been invited to will appear here"
 msgstr "Any documents that you have been invited to will appear here"
@@ -6450,6 +6454,10 @@ msgstr "From"
 msgid "From address"
 msgstr "From address"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "From counsel"
+msgstr "From counsel"
+
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 msgid "From name"
@@ -9725,6 +9733,12 @@ msgstr "Record Type"
 msgid "Record Value"
 msgstr "Record Value"
 
+#. placeholder {0}: outstanding.length
+#. placeholder {1}: findings.length
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Recorded by attorneys through a review link. {0} of {1} are unanswered, and each unanswered one holds its clause against approval. These are separate from the findings the two document reviews raised, which are cleared in the review manifests."
+msgstr "Recorded by attorneys through a review link. {0} of {1} are unanswered, and each unanswered one holds its clause against approval. These are separate from the findings the two document reviews raised, which are cleared in the review manifests."
+
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "Recovery code copied"
 msgstr "Recovery code copied"
@@ -10230,6 +10244,10 @@ msgstr "Reveal the key"
 #: apps/remix/app/routes/_recipient+/lease-review.$token.tsx
 msgid "Review a lease · Pacta"
 msgstr "Review a lease · Pacta"
+
+#: apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx
+msgid "Review an agreement · Pacta"
+msgstr "Review an agreement · Pacta"
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Review request"

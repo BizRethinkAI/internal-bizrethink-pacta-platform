@@ -4,8 +4,40 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Textarea } from '@documenso/ui/primitives/textarea';
+import { i18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { useState } from 'react';
 import { useParams } from 'react-router';
+
+export function meta() {
+  return [
+    /*
+      NAMED, BECAUSE THIS IS A LINK WE EMAIL TO A LAWYER WHO HAS NO ACCOUNT.
+
+      The parent `_recipient+` layout titles everything under it "Sign Document
+      - Documenso" and renders its header only when `sessionData?.user` exists.
+      A reviewer is never signed in, so this page inherited a tab, a bookmark
+      and a forwarded screenshot all naming the wrong product and the wrong
+      action: it is not a signing page, and the product is not Documenso.
+
+      The lease counsel route reached this conclusion first and left the reason
+      in a comment. This is the same fix on the agreement side.
+
+      NOT the instrument's own title. Six agreements go out on these links and
+      the title is set before the loader resolves which one; a title that said
+      "Future Receivables Purchase Agreement" for an Equipment Lease link would
+      be worse than a general one.
+    */
+    { title: i18n._(msg`Review an agreement · Pacta`) },
+    /*
+      Repeated rather than inherited: a route that exports `meta` REPLACES what
+      the parent supplies instead of merging into it, so omitting this would
+      strip the crawler directives from the one page in the app holding
+      unexecuted contract text with no login in front of it.
+    */
+    { name: 'robots', content: 'noindex, nofollow, noarchive, nosnippet, noimageindex' },
+  ];
+}
 
 type RecordedFinding = {
   id: string;

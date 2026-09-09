@@ -140,3 +140,52 @@ describe('counsel can record a finding, and it reaches something', () => {
     expect(counselPage).toMatch(/record\.error|\.error\?\.message|error\.message/);
   });
 });
+
+/**
+ * The tab an attorney actually sees.
+ *
+ * The `_recipient+` layout titles everything beneath it "Sign Document —
+ * Documenso" and renders its header only for a signed-in user. A reviewer is
+ * never signed in, so without its own `meta` this route inherits a title naming
+ * the wrong product and the wrong action: it is not a signing page, and the
+ * product is not Documenso. That title is what a lawyer sees in their tab, in a
+ * bookmark, and in any screenshot they forward to a colleague.
+ *
+ * The LEASE counsel route already fixed exactly this and left the reason in a
+ * comment — "this is a link a landlord emails to a stranger". The MCA route
+ * shipped without it. Asserted here rather than trusted, because nothing about
+ * the page looks wrong from inside the app.
+ */
+describe('the counsel page names itself', () => {
+  it('exports its own meta rather than inheriting the layout title', () => {
+    expect(counselPage).toMatch(/export function meta\(\)/);
+  });
+
+  /*
+    THE TITLE VALUE, NOT THE BLOCK AROUND IT. The first version of this test
+    read the whole `meta` body and asserted it never says "Documenso" — which
+    failed against the comment that explains the bug by quoting the wrong title.
+    A test that cannot survive its own subject being explained is testing the
+    prose, so this reads the string that actually reaches the browser tab.
+  */
+  const metaTitle = () => counselPage.match(/title: i18n\._\(msg`([^`]+)`\)/)?.[1] ?? '';
+
+  it('names Pacta and not the upstream product or a signing action', () => {
+    expect(metaTitle()).toMatch(/Pacta/);
+    expect(metaTitle()).not.toMatch(/Documenso/);
+    expect(metaTitle()).not.toMatch(/Sign Document/);
+  });
+
+  /**
+   * An unauthenticated page holding unexecuted contract text. The app already
+   * sets this globally, and this route sets it again — deliberately, because a
+   * route that exports `meta` REPLACES what it inherits rather than merging
+   * into it, so omitting it here would strip the directives from this page
+   * alone.
+   */
+  it('keeps the crawler directives it would otherwise replace', () => {
+    const meta = counselPage.slice(counselPage.indexOf('export function meta()'));
+
+    expect(meta.slice(0, meta.indexOf('\n}'))).toMatch(/'robots'[\s\S]*noindex/);
+  });
+});

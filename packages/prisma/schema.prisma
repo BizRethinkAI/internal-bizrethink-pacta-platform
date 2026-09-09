@@ -1973,9 +1973,9 @@ model BizrethinkLibraryFinding {
 
   /// Null while outstanding. Both of these are required to clear it — a
   /// timestamp with no text is not an answer.
-  answeredAt       DateTime?
-  answer           String?
-  answeredByUserId Int?
+  answeredAt        DateTime?
+  answer            String?
+  answeredByUserId  Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2085,8 +2085,8 @@ model BizrethinkDocument {
   organisationId   String
   uploadedByUserId Int
 
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   archivedAt DateTime?
 
   @@index([propertyId])

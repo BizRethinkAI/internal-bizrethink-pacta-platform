@@ -2156,6 +2156,10 @@ msgstr "Analizowanie układu strony"
 msgid "Analyzing pages"
 msgstr "Analizowanie stron"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Answer"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Any documents that you have been invited to will appear here"
 msgstr "Wszystkie zaproszenia do dokumentów pojawią się tutaj"
@@ -6455,6 +6459,10 @@ msgstr "Od"
 msgid "From address"
 msgstr "Adres nadawcy"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "From counsel"
+msgstr ""
+
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 msgid "From name"
@@ -9730,6 +9738,12 @@ msgstr "Rodzaj rekordu"
 msgid "Record Value"
 msgstr "Wartość rekordu"
 
+#. placeholder {0}: outstanding.length
+#. placeholder {1}: findings.length
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Recorded by attorneys through a review link. {0} of {1} are unanswered, and each unanswered one holds its clause against approval. These are separate from the findings the two document reviews raised, which are cleared in the review manifests."
+msgstr ""
+
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "Recovery code copied"
 msgstr "Kod odzyskiwania został skopiowany"
@@ -10234,6 +10248,10 @@ msgstr ""
 
 #: apps/remix/app/routes/_recipient+/lease-review.$token.tsx
 msgid "Review a lease · Pacta"
+msgstr ""
+
+#: apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx
+msgid "Review an agreement · Pacta"
 msgstr ""
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx

@@ -216,6 +216,26 @@ describe('the counsel briefing', () => {
   });
 
   /**
+   * THE BRIEFING DESCRIBES THE PAGE THE READER IS ACTUALLY ON.
+   *
+   * It told counsel each clause "carries a short reference in the margin".
+   * There is no margin: the slug sits inline on the heading row, beside the
+   * number and the heading. On the forty clauses the document leaves unheaded
+   * it is the only thing on that row, which is exactly the case where a reader
+   * following the instruction would look somewhere the reference is not.
+   *
+   * A briefing that misdescribes its own page is worse than one that says
+   * nothing, because the reader trusts it to navigate — so this pins the claim
+   * to what the route renders rather than to what would have been tidier.
+   */
+  it.each(MCA_INSTRUMENTS)('%s does not promise a margin the page does not have', (instrument) => {
+    const body = text(instrument);
+
+    expect(body).not.toMatch(/in the margin/i);
+    expect(body).toMatch(/beside/i);
+  });
+
+  /**
    * HOW LONG THEY HAVE. A fortnight is the link's life, and an attorney
    * planning when to read it is exactly the person who needs the date.
    */
