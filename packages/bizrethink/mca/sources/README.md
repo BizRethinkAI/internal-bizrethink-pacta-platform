@@ -59,6 +59,41 @@ and §6.2-2231 "according to formatting prescribed by the Commission", so the
 labels on both forms come from the form, and the specs still point at the form.
 The Acts are what the obligations AROUND the form are read from.
 
+## The Texas implementing rules (added 2026-09-09)
+
+`TX-7TAC-86-310-313.txt`. `TX-Fin-Code-Ch-398.txt` does not carry the OCCC
+complaint notice — its own header said the implementing rules were 7 TAC
+Chapter 86 Subchapter C and we never fetched them, so every claim about the
+notice rested on a citation rather than on text.
+
+| file | publisher | fetched from | on |
+|---|---|---|---|
+| `TX-7TAC-86-310-313.txt` | Texas Secretary of State, Texas Register | `https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html` | 2026-09-09 |
+
+Adopted text only. The Texas Register page also carries the preamble and the
+Commission's responses to comments; those are reasoning about the rules rather
+than the rules, and are not vendored. One response is quoted in the file's
+header because it endorses the deployment structure we had already chosen.
+
+**Why this file settles a question about every other state.** §86.310(d) is the
+only requirement in the eleven states we track that puts words INSIDE the
+agreement. Connecticut §36a-868 and Virginia §6.2-2236(A) are prohibitions — a
+contract may not waive a prejudgment remedy, may not mandate a forum outside
+the Commonwealth — and the rest are satisfied by a separate disclosure. So a
+base form that omits the prohibited terms needs no per-state variant at all, and
+Texas needs one added clause. That is the difference between two templates and
+twenty-two.
+
+§86.313 is also here because the FRPA's split-only design turns on it: a
+provider may debit a deposit account only while holding a validly perfected,
+first-priority security interest in ALL of the recipient's accounts receivable.
+
+**Not yet wired to anything.** No `MCA_DISCLOSURES` spec names this file, so
+`sources-are-primary.test.ts` does not currently read it. Giving the OCCC notice
+a home — a clause with `includeWhen`, per
+[ADR 0011](../../../../docs/adr/0011-the-mca-clause-library-is-a-library.md) —
+is the follow-up.
+
 ## Two extractions each of the Virginia and Connecticut forms
 
 `VA-Disclosure-Form.txt` and `CT-DOB-Guidance.txt` are reading-order `pdftotext`

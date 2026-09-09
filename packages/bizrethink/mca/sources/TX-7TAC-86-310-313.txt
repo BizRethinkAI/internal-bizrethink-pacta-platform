@@ -1,0 +1,98 @@
+7 TAC CHAPTER 86, SUBCHAPTER C — COMMERCIAL SALES-BASED FINANCING
+Adopted rules §§86.310-86.313, as published in the Texas Register.
+Adopted 2026-07-03 by the Finance Commission of Texas; effective 2026-07-09.
+
+Retrieved 2026-09-09 from
+https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html
+
+Vendored because TX-Fin-Code-Ch-398.txt does NOT carry the OCCC complaint
+notice. That file's own header already said the implementing rules were 7 TAC
+Chapter 86 Subchapter C and we never fetched them, so every claim about the
+notice rested on a citation rather than on text. The exact words are in
+§86.310(d) below and nowhere in the Finance Code.
+
+§86.310(d) is the only requirement in the eleven states we track that puts
+words INSIDE the agreement. Connecticut §36a-868 and Virginia §6.2-2236(A)
+are prohibitions — a contract may not waive a prejudgment remedy, may not
+mandate a forum outside the Commonwealth — and every other state is satisfied
+by a separate disclosure document. A base form that simply omits the
+prohibited terms needs no per-state variant; Texas needs an added clause.
+
+The Commission endorsed exactly that structure in its response to comments:
+"If providers wish to use the same contract for multiple states, they might
+consider including the OCCC notice in a state-specific provision for Texas
+transactions."
+
+Also here because §86.313 is the automatic-debit rule the FRPA's split-only
+design turns on: a provider may debit a deposit account only while holding a
+validly perfected, FIRST-PRIORITY security interest in all of the recipient's
+accounts receivable.
+
+Adopted text only. The Texas Register page also carries the preamble and the
+Commission's responses to comments, which are reasoning about the rules rather
+than the rules, and are not reproduced.
+
+--------------------------------------------------------------------------
+§86.310. Disclosures.
+(a) Timing. A provider must provide a recipient with any disclosures required by Texas Finance Code, §398.051, in writing at or before the time the provider extends a specific offer to the recipient.
+(b) Accuracy. All terms and dollar amounts disclosed under Texas Finance Code, §398.051, must accurately reflect the terms of the provider's specific offer to the recipient.
+(c) Revised disclosures in case of inaccuracy. At any time after providing required disclosures under Texas Finance Code, §398.051, if the provider learns that any information on the disclosures was inaccurate or did not correctly reflect the terms of the transaction at closing, then the provider must promptly notify the recipient of the inaccuracy and must promptly provide revised, accurate disclosures to the recipient.
+(d) OCCC notice. A contract for services under Texas Finance Code, Chapter 398 must contain the following statement as a separate section or otherwise conspicuously set out from surrounding written material: "The Office of Consumer Credit Commissioner (OCCC) is a state agency that enforces certain laws that apply to this contract. If a complaint cannot be resolved by contacting the provider, a commercial sales-based financing recipient can contact the OCCC to file a complaint. OCCC address: 2601 N. Lamar Blvd., Austin, Texas 78705. Phone: (800) 538-1579. Website: occc.texas.gov."
+§86.311. Recordkeeping.
+(a) Generally. A provider or broker must maintain records for each transaction entered or brokered under Texas Finance Code, Chapter 398, and must make those records available for investigation. Records may be maintained using an electronic system, a paper or manual system, or a combination of these types of systems, unless otherwise specified by statute or rule.
+(b) Provider's transaction file. A provider must maintain a transaction file for each recipient of a transaction under Texas Finance Code, Chapter 398. The transaction file must include the following:
+(1) a complete copy of the written agreement between the provider and the recipient;
+(2) each disclosure made to the recipient, including disclosures under Texas Finance Code, §398.051;
+(3) each additional document, addendum, or authorization signed by the recipient;
+(4) any documentation showing attachment, perfection, or release of a lien;
+(5) an account history showing the application of each payment made by the recipient; and
+(6) any written documentation of collection, repossession, foreclosure, or litigation against the recipient.
+(c) Broker's transaction file. A broker must maintain a transaction file for each recipient of brokering services under Texas Finance Code, Chapter 398. The transaction file must include any disclosures provided by the broker to the recipient and any agreement that the broker entered with the recipient.
+(d) Time to maintain transaction file. A registrant must maintain the transaction file under subsection (b) or (c) of this section until the later of:
+(1) four years from the date of the transaction; or
+(2) two years from the date of the final entry on the account.
+(e) Application and adverse action records. If a prospective recipient applies for commercial sales-based financing and does not enter a commercial sales-based financing transaction, then a registrant must maintain the application and any written adverse action notice for one year from the date of the application, or one year from the date of the adverse action notice, whichever is later.
+(f) Advertising and solicitation. A registrant must maintain each advertisement or solicitation for one year from the date of the advertisement or solicitation.
+(g) Third-party agreements. A registrant must maintain any written agreements with third parties that relate to services under Texas Finance Code, Chapter 398, including any agreement between a provider and a broker, until one year after the date the agreement terminates.
+(h) Data security policies and procedures. A registrant must maintain policies and procedures to maintain the security of customer information and protect information from unauthorized access.
+(i) Data breach notifications. A registrant must maintain the following for data breach notifications:
+(1) the text of any data breach notification provided to recipients, including any notification under Texas Business & Commerce Code, §521.053, for a period of four years from the date of the notification; and
+(2) any data breach notification provided to a government agency, including any notification provided to the Office of the Attorney General under Texas Business & Commerce Code, §521.053, for a period of four years from the date of the notification.
+§86.312. Prohibition of Unfair, Deceptive, and Abusive Acts.
+(a) Generally. A provider or broker may not engage in an unlawful, unfair, deceptive, or abusive act or practice related to a transaction under Texas Finance Code, Chapter 398.
+(b) Acts and practices identified. The following are unlawful, unfair, deceptive, or abusive acts or practices:
+(1) false, misleading, or inaccurate statements in advertisements, solicitations, disclosures, contracts, or communications with the recipient or other parties, including:
+(A) inaccurate descriptions of contracted-for services;
+(B) claiming a legal right to take an action that the person does not have the authority to take; and
+(C) a statement that there is no personal guarantee, if this is inaccurate;
+(2) failure to perform contracted-for services;
+(3) charging fees or other amounts that were not specifically disclosed and contracted for;
+(4) failure to make accurate disclosures under Texas Finance Code, Chapter 398 and this subchapter;
+(5) a confession of judgment in violation of Texas Finance Code, §398.055;
+(6) an automatic debit in violation of Texas Finance Code, §398.056 and this subchapter;
+(7) a waiver of a recipient's statutory rights under Texas Finance Code, Chapter 398;
+(8) filing a lien on a debtor's property without first obtaining a security agreement authenticated by the debtor under Texas Business & Commerce Code, §9.203;
+(9) foreclosure of collateral without complying with applicable requirements (e.g., Texas Business & Commerce Code, Chapter 9);
+(10) debiting amounts from a person's account or deposit account without the person's authorization;
+(11) failure to maintain records required by this subchapter;
+(12) instructing a recipient or a recipient's customer to redirect payment amounts to the provider, where the amounts were previously scheduled to be paid to another person (e.g., a creditor or factor), unless:
+(A) the other person has consented to payment being redirected to the provider; or
+(B) the payment is for debt that has been validly assigned to the provider.
+(13) a provider's material violation of a written intercreditor agreement, if the provider is a party to the agreement;
+(14) improperly characterizing a transaction as a "business" or "commercial" transaction when the advanced funds are extended primarily for individual, family, or household use; and
+(15) a device or subterfuge to evade statutory or regulatory requirements.
+§86.313. Prohibition of Certain Automatic Debits.
+(a) Generally. As provided by Texas Finance Code, §398.056, a provider or broker may not establish a mechanism for automatically debiting a recipient's deposit account unless the provider or broker holds a validly perfected security interest in the recipient's account under Chapter 9, Business & Commerce Code, with a first priority against the claims of all other persons.
+(b) Automatic debit. For purposes of this section, debits are automatic if they are authorized in advance to occur more than one time or on a recurring basis. A mechanism for automatically debiting a deposit account includes a situation in which a recipient provides more than one prewritten check to a provider in advance for payments under a commercial sales-based financing transaction.
+(c) Security interest in accounts receivable. For purposes of this section, in order to automatically debit a deposit account, a provider or broker must hold a validly perfected, first-priority security interest in all accounts receivable of the recipient.
+(d) Perfection and priority of security interest. Texas Business & Commerce Code, Chapter 9 governs perfection and priority of a security interest in accounts receivable. Generally, a UCC-1 financing statement must be filed in order to perfect a security interest, as provided by Texas Business & Commerce Code, §9.310(a). Priority is generally determined by the time of filing or perfection, as provided by Texas Business & Commerce Code, §9.322(a)(1).
+(e) Violation by third party. A provider or broker may not accept payment of a debit in violation of this section and may not direct a third party to complete a debit that violates this section.
+The agency certifies that legal counsel has reviewed the adoption and found it to be a valid exercise of the agency's legal authority.
+Filed with the Office of the Secretary of State on June 19, 2026.
+TRD-202602507
+Matthew Nance
+General Counsel
+Office of Consumer Credit Commissioner
+Effective date: July 9, 2026
+Proposal publication date: March 6, 2026
+For further information, please call: (512) 936-7660
