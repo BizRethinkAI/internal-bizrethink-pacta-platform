@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
