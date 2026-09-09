@@ -2156,6 +2156,10 @@ msgstr "페이지 레이아웃 분석 중"
 msgid "Analyzing pages"
 msgstr "페이지 분석 중"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Answer"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Any documents that you have been invited to will appear here"
 msgstr "귀하를 초대한 문서는 여기에 표시됩니다."
@@ -6455,6 +6459,10 @@ msgstr "보낸 사람"
 msgid "From address"
 msgstr "보낸 사람 주소"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "From counsel"
+msgstr ""
+
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 msgid "From name"
@@ -9729,6 +9737,12 @@ msgstr "레코드 유형"
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 msgid "Record Value"
 msgstr "레코드 값"
+
+#. placeholder {0}: outstanding.length
+#. placeholder {1}: findings.length
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Recorded by attorneys through a review link. {0} of {1} are unanswered, and each unanswered one holds its clause against approval. These are separate from the findings the two document reviews raised, which are cleared in the review manifests."
+msgstr ""
 
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "Recovery code copied"
