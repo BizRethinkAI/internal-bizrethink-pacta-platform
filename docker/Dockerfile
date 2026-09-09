@@ -2,7 +2,7 @@
 ###########################
 #     BASE CONTAINER      #
 ###########################
-FROM node:22-alpine3.22 AS base
+FROM node:24-alpine3.23 AS base
 
 RUN apk add --no-cache openssl
 RUN apk add --no-cache font-freefont
@@ -27,7 +27,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install -g "turbo@^2.10.0"
+# Install the exact turbo version resolved in the lockfile, without installing
+# the rest of the dependency tree (prune must run before any npm ci).
+RUN TURBO_VERSION="$(jq -r '.packages["node_modules/turbo"].version' package-lock.json)" \
+    && npm install -g "turbo@${TURBO_VERSION}"
 
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
@@ -47,9 +50,9 @@ RUN apk add --no-cache make cmake g++ openssl bash
 WORKDIR /app
 
 # Disable husky from installing hooks
-ENV HUSKY 0
-ENV DOCKER_OUTPUT 1
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV HUSKY=0
+ENV DOCKER_OUTPUT=1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Encryption keys
 ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
@@ -97,21 +100,28 @@ COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
 COPY turbo.json turbo.json
 
-RUN npm install -g "turbo@^2.10.0"
-
 # MODIFIED for BizRethink: raise Node heap during build (default 1GB is too small
-# for monorepo tsc + react-router build). See overlays/003.
+# for monorepo tsc + react-router build), but CAP IT BELOW UPSTREAM'S 8192.
+#
+# Upstream raised this to 8192 in #3332. We deliberately do not follow: the
+# Coolify host that builds this image has 8GB of RAM TOTAL, so permitting V8 to
+# grow its heap to 8GB leaves nothing for the OS and reintroduces the silent
+# build OOM that a 4GB VPS used to produce (buildx terminations do not reliably
+# reach dmesg, so it presents as a generic build failure). Build peaks at ~4GB.
+#
+# If the Docker build ever dies on heap exhaustion, raise this incrementally --
+# do not jump to 8192 on an 8GB box. See overlays/003.
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-RUN turbo run build --filter=@documenso/remix...
+RUN npx turbo run build --filter=@documenso/remix...
 
 ###########################
 #     RUNNER CONTAINER    #
 ###########################
 FROM base AS runner
 
-ENV HUSKY 0
-ENV DOCKER_OUTPUT 1
+ENV HUSKY=0
+ENV DOCKER_OUTPUT=1
 
 # Telemetry credentials (baked into image at build time, can be disabled at runtime)
 ARG NEXT_PRIVATE_TELEMETRY_KEY=""
@@ -134,7 +144,16 @@ COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config
 # Copy the patches across
 COPY --from=builder --chown=nodejs:nodejs /app/patches ./patches
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
+
+# Strip build-time residue that ships as production dependencies but is never
+# executed at runtime.
+RUN rm -rf \
+    node_modules/react-email/dist/cli \
+    node_modules/esbuild \
+    node_modules/@esbuild \
+    node_modules/.bin/esbuild \
+    node_modules/.bin/email
 
 # Automatically leverage output traces to reduce image size
 # https://nodejs.org/docs/advanced-features/output-file-tracing
@@ -145,7 +164,7 @@ COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 
-# BIZRETHINK overlay 069: ship the vendored statutes.
+# BIZRETHINK overlay 070: ship the vendored statutes.
 #
 # packages/bizrethink/mca/sources/ holds the primary text every MCA disclosure
 # spec was transcribed from. `verifyProvenance` re-reads those files on every
@@ -172,8 +191,9 @@ COPY --from=installer --chown=nodejs:nodejs /app/packages/bizrethink/mca/sources
 # SOURCE MISSING for all eleven states until the line above was added.
 COPY --from=installer --chown=nodejs:nodejs /app/packages/bizrethink/mca/clauses/source-documents ./packages/bizrethink/mca/clauses/source-documents
 
-# Generate the prisma client again
-RUN npx prisma generate --schema ./packages/prisma/schema.prisma
+# Generate the prisma client again, this time only targeting the client generator
+RUN npx prisma generate --schema ./packages/prisma/schema.prisma --generator client \
+    && npm cache clean --force
 
 
 # Get the start script from docker/

@@ -28,8 +28,26 @@ const loadP12FromEnvOrFile = (): Uint8Array => {
   throw new Error('No certificate found for local signing');
 };
 
-export const createLocalSigner = async () => {
-  const { getInstanceSigningConfig } = await import('@bizrethink/customizations/server-only/instance-signing-config');
+export type CreateLocalSignerOptions = {
+  /**
+   * Fetch missing intermediates via AIA. Leave on for sealing.
+   * Turn off for health checks so they do not hit the network.
+   *
+   * @default true
+   */
+  buildChain?: boolean;
+};
+
+// MODIFIED for BizRethink (overlay 011): keeps upstream's `buildChain` option
+// -- `getCertificateStatus` passes `{ buildChain: false }` as of #3309 so the
+// health check stays offline -- while resolving the cert and passphrase from
+// the DB row before falling back to env. Because cert-status now inspects the
+// signer this function returns, /api/health reports on the cert we actually
+// sign with, DB-sourced one included.
+export const createLocalSigner = async ({ buildChain = true }: CreateLocalSignerOptions = {}) => {
+  const { getInstanceSigningConfig } = await import(
+    '@bizrethink/customizations/server-only/instance-signing-config'
+  );
   const dbConfig = await getInstanceSigningConfig();
 
   const p12 =
@@ -40,6 +58,6 @@ export const createLocalSigner = async () => {
   const passphrase = dbConfig?.localPassphrase ?? env('NEXT_PRIVATE_SIGNING_PASSPHRASE') ?? '';
 
   return await P12Signer.create(p12, passphrase, {
-    buildChain: true,
+    buildChain,
   });
 };

@@ -8724,4 +8724,3 @@ msgstr "Token-i juaj është krijuar me sukses! Sigurohuni që ta kopjoni pasi n
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Token-ët tuaj do të shfaqen këtu sapo t'i krijoni."
-

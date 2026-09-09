@@ -28,7 +28,7 @@ index bdf91570e..2164c6d49 100644
  COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
  COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
  
-+# BIZRETHINK overlay 069: ship the vendored statutes.
++# BIZRETHINK overlay 070: ship the vendored statutes.
 +#
 +# packages/bizrethink/mca/sources/ holds the primary text every MCA disclosure
 +# spec was transcribed from. `verifyProvenance` re-reads those files on every
@@ -44,6 +44,7 @@ index bdf91570e..2164c6d49 100644
 +# them, they are read at request time.
 +COPY --from=installer --chown=nodejs:nodejs /app/packages/bizrethink/mca/sources ./packages/bizrethink/mca/sources
 +
- # Generate the prisma client again
- RUN npx prisma generate --schema ./packages/prisma/schema.prisma
+ # Generate the prisma client again, this time only targeting the client generator
+ RUN npx prisma generate --schema ./packages/prisma/schema.prisma --generator client \
+     && npm cache clean --force
  
