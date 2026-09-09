@@ -2095,4 +2095,206 @@ model BizrethinkDocument {
   @@index([organisationId])
 }
 
+// ─── MCA clause library — approval and counsel review ─────────────────────
+//
+// The second vertical's negotiated agreements. ADR 0008 splits the MCA vertical
+// into two surfaces: conformity, where the words are a regulator's and there is
+// nothing for counsel to approve, and THIS one, our own contract text, where
+// approval is exactly what counsel is for.
+//
+// WHY THESE ARE NOT BizrethinkClauseApproval AND BizrethinkLibraryReview.
+// ADR 0009 asks for the review link to be generalised, and it is — in shape, in
+// `mca/review/link.ts`, and by keeping this row's columns a superset-compatible
+// mirror of the lease's so a later merge is a data migration. What stopped the
+// merge happening in this change is mechanical, not architectural:
+// `BizrethinkLibraryReview.token` is globally unique and the lease's
+// `openLibrary` resolves a token and NOTHING else — no discriminator, no scope
+// check — so an MCA link stored in that table would open the lease library.
+// Merging means editing every lease query in the same change. The approval
+// table has the same problem one level down: it is keyed by clauseSlug alone,
+// and the MCA library's README rule 7 records what that cost the lease library
+// when one attorney approval hid another's.
+//
+// A `library` discriminator on both tables plus a filter on each existing lease
+// query is what a merge needs. It is a separate change, and belongs to whoever
+// owns both verticals at once.
+
+/// An attorney's approval of one MCA clause's exact wording.
+///
+/// IT RECORDS, IT DOES NOT SIGN. `recordedByUserId` is the member of staff at
+/// the keyboard; `approvedByName` and `approvedByBarNumber` are the attorney
+/// whose authority the approval claims. They are different people, they are
+/// stored as different columns, and both pages say so. Presenting the record as
+/// a signature by the attorney would be worse than not having the feature.
+///
+/// The approval's only effect is to supply the named author that
+/// `assertPublishable` already demands of `attorney-drafted` text. It is not a
+/// second gate beside that one — see `mca/clauses/approval.ts`.
+model BizrethinkMcaClauseApproval {
+  id String @id
+
+  clauseSlug    String
+  clauseVersion Int
+
+  /// The agreement the clause was in when it was approved.
+  ///
+  /// An `McaInstrument`. Stored rather than derived because a clause can move
+  /// in a later library version, and because the Equipment Lease and the
+  /// Subscription number their clauses IDENTICALLY — an approval that named
+  /// neither would be an approval of "clause 3.2".
+  instrument String
+
+  /// Hash of the clause as approved. Mismatch = lapsed = unapproved.
+  ///
+  /// Covers the words, the heading, the document's own number, the version, the
+  /// agreement, the section, the statute that compels it and the states whose
+  /// law scopes it. It deliberately EXCLUDES sortKey: lapsing an approval over
+  /// a reordering trains a reviewer to re-approve without reading, and a gate
+  /// everyone clicks through is not a gate.
+  fingerprint String
+
+  /// Whose authority this approval claims.
+  approvedByName      String
+  approvedByBarNumber String?
+
+  /// Which bar that attorney is admitted in — an `McaJurisdiction`, a state.
+  ///
+  /// REQUIRED, unlike the bar number, and NOT NULL because this table is new.
+  /// `BizrethinkClauseApproval` recorded a number and never which bar, so
+  /// nothing could object to a Florida attorney approving a North Carolina
+  /// clause; that column had to be added nullable to an existing table. There
+  /// is no reason to inherit the nullability along with the lesson.
+  ///
+  /// An instrument must never arrive in this column. Which document a clause is
+  /// in is a different axis and has its own column above — folding the two
+  /// together is the defect `mca/jurisdictions.ts` argues against at length.
+  barJurisdiction String
+
+  /// Who typed it. Not the approver.
+  recordedByUserId Int
+
+  notes String?
+
+  approvedAt DateTime @default(now())
+
+  /// Set when a later approval replaced this one, so the history of who
+  /// approved which words survives rather than being overwritten.
+  supersededAt DateTime?
+
+  @@index([clauseSlug])
+}
+
+/// A link that lets counsel read one MCA agreement without an account.
+///
+/// READ-ONLY ON THE OTHER END, and that is a decision rather than an omission.
+/// Recording an approval carries a bar number and must be attributable to
+/// somebody who signed in; sending a link should not be the same act as
+/// granting that.
+///
+/// NO organisationId, DELIBERATELY. The lease's equivalent carries one, and
+/// `lease-builder-router.ts` names dropping it as "the durable fix" it could
+/// not make — the library is instance content, identical for every customer,
+/// and `/admin/mca-library` resolves no organisation and touches no tenancy.
+/// A column that has to be stamped from somewhere is a column that gets
+/// stamped from the wrong somewhere; the lease page picks the admin's oldest
+/// organisation and says in a comment that it is assuming staff operate from
+/// one. This model is new, so the fix is made at birth instead.
+model BizrethinkMcaLibraryReview {
+  id String @id
+
+  /// Unauthenticated link, same shape as the lease-review token.
+  token String @unique
+
+  /// 'open' | 'closed'. Closing is the revocation — there is no delete,
+  /// because the row is the record of who was sent what and when.
+  status String @default("open")
+
+  reviewerName  String
+  reviewerEmail String
+
+  /// WHICH AGREEMENT went out on this link — an `McaInstrument`.
+  ///
+  /// This is the column ADR 0009 identified as lease-bound. It is not widened
+  /// to hold both axes: a lease link is scoped by a `ClauseJurisdiction`
+  /// because a lease is one document a state decides, while an MCA deal is a
+  /// SET of documents and the axis that decides what goes on a link is which
+  /// agreement it covers. A column named `jurisdiction` holding an instrument
+  /// would be a statement about which document is being assembled, dressed as
+  /// a statement about which law applies.
+  instrument String
+
+  /// Which clauses existed, and in what words, when the link was issued.
+  ///
+  /// Of the SCOPED agreement, not the whole library. A link pinned to all of it
+  /// would report "the agreement has changed" the moment a clause in a document
+  /// the reviewer never saw moved — a warning they cannot act on, which is the
+  /// fastest way to teach somebody to ignore warnings.
+  libraryFingerprint String
+
+  createdByUserId Int
+  expiresAt       DateTime?
+
+  findings BizrethinkMcaLibraryFinding[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([instrument])
+}
+
+/// A defect counsel reported against one clause, through a review link.
+///
+/// WHY THIS TABLE EXISTS WHEN THE PAGE ONCE REFUSED TO COLLECT FINDINGS. The
+/// refusal had a stated reason: findings from the two adversarial document
+/// reviews live in `lombard-contracts` manifests, and a second Pacta-side
+/// register of the same findings would drift from the first. That argument is
+/// about the reviews it names and does not reach this case. Nothing counsel
+/// records here is a second copy of anything — it arrives only through a link
+/// we minted, it is attributable to the reviewer named on that link, and no
+/// manifest has ever held one. There is one register per origin, and the review
+/// page labels which origin each finding came from.
+///
+/// SEPARATE FROM `BizrethinkLibraryFinding`, for the reason `mca/review/link.ts`
+/// gives about the review rows themselves: the lease table's token is resolved
+/// by a lease query that takes no discriminator, so sharing it would mean
+/// editing every lease finding query in the same change. What a merge would
+/// need is a `library` discriminator on both tables and on each of those
+/// queries, and this model is shaped so that merge is a data migration.
+model BizrethinkMcaLibraryFinding {
+  id String @id
+
+  /// The link it came in on. A finding is only ever created through a review
+  /// token, so there is no path that records one without a named reviewer.
+  reviewId String
+  review   BizrethinkMcaLibraryReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  /// Which clause. Not a foreign key: the library is code, not rows.
+  clauseSlug String
+
+  body String
+
+  /// Copied from the review rather than joined. The row is the record of who
+  /// said what, and it has to survive the review being closed.
+  authorName  String
+  authorEmail String
+
+  /// The words of the clause when the finding was made — as counsel READ them,
+  /// with the tenant's party names resolved, because that is the text she was
+  /// shown and an answer to a finding against different words is an answer to a
+  /// different question.
+  clauseFingerprint String
+
+  /// Null while outstanding. Both are required to clear it: a timestamp with no
+  /// text would make this as fast to bypass as to satisfy.
+  answeredAt       DateTime?
+  answer           String?
+  answeredByUserId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reviewId])
+  @@index([clauseSlug])
+}
+
 // BIZRETHINK_ADDITIONS_END

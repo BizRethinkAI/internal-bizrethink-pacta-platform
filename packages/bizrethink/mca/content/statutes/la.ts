@@ -25,7 +25,7 @@ export const LA_DISCLOSURE: ContentStatute = {
     verbatimRequired: false,
     verbatimVerifiedAt: '2026-09-06',
   },
-  sourceDigest: '089e31b3518f0960ab4317b29d88e1853c1ff1f42cfeb5ddb8bf9c6bc479a6ac',
+  sourceDigest: 'b7bb224f4ae17a287fb567fa7bfa4f148a8afd2a6211c698548d5aaf835b3e03',
   section: null,
   requirements: [
     {

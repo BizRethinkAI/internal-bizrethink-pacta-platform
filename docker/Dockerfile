@@ -180,6 +180,17 @@ COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./pa
 # them, they are read at request time.
 COPY --from=installer --chown=nodejs:nodejs /app/packages/bizrethink/mca/sources ./packages/bizrethink/mca/sources
 
+# packages/bizrethink/mca/clauses/source-documents/ holds the vendored review
+# register and the body text of the six negotiated agreements. /admin/mca-library
+# digests those to say whether a document has changed under the clause library,
+# and resolves every finding id through the register.
+#
+# Without them the page degrades honestly -- it reports "source not readable
+# here" and an empty finding list -- but honest degradation on every row is not
+# a page worth having, and this is the same omission that made /admin/mca report
+# SOURCE MISSING for all eleven states until the line above was added.
+COPY --from=installer --chown=nodejs:nodejs /app/packages/bizrethink/mca/clauses/source-documents ./packages/bizrethink/mca/clauses/source-documents
+
 # Generate the prisma client again, this time only targeting the client generator
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma --generator client \
     && npm cache clean --force

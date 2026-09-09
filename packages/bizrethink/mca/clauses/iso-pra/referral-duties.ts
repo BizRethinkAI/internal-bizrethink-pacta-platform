@@ -13,7 +13,7 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   {
     slug: 'iso-pra.appointment',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '1.1',
     section: 'referral-duties',
     sortKey: 10,
@@ -39,7 +39,7 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   {
     slug: 'iso-pra.referral-obligations',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '1.2',
     section: 'referral-duties',
     sortKey: 20,
@@ -61,7 +61,7 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   {
     slug: 'iso-pra.approval-of-applications',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '1.3',
     section: 'referral-duties',
     sortKey: 30,
@@ -75,7 +75,7 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   {
     slug: 'iso-pra.duty-to-notify',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '1.4',
     section: 'referral-duties',
     sortKey: 40,
@@ -89,7 +89,7 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   {
     slug: 'iso-pra.marketing-materials',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '1.5',
     section: 'referral-duties',
     sortKey: 50,
@@ -103,7 +103,7 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   {
     slug: 'iso-pra.representatives',
     version: 1,
-    instruments: ['iso-pra'],
+    instrument: 'iso-pra',
     number: '1.6',
     section: 'referral-duties',
     sortKey: 60,

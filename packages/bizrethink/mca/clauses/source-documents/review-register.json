@@ -1,7 +1,8 @@
 {
   "_what": "The two adversarial reviews of the Lombard negotiated agreements, indexed. Derived from lombard-contracts by scripts/mca/build-review-register.py; regenerate and diff rather than editing this file.",
   "_repository": "https://github.com/lombardpay/lombard-contracts",
-  "_commit": "b48b5e4cadbc8bae51eef5560283513e74739f28",
+  "_commit": "7b8e61c3c1c9fa02ff4a98f3e4d477132066008d",
+  "_dispositions": "Each finding carries the status from its review manifest (implemented / open / handoff / rejected / wont-fix). A finding absent from its manifest is `unrecorded` -- unknown, which is not the same as open and not the same as done, and which counts as outstanding. REVIEW-02 had no manifest at all until lombard-contracts PR #9.",
   "_whatThisProves": "That a finding id a clause names is a finding that was actually raised, what it was about and where it routed. It does NOT prove the finding says what a clause claims it says -- the argument lives in the source repository and is not reproduced here.",
   "_dropped": ["evidence", "consequence", "fix"],
   "_knownDefect": "REVIEW-01 uses the id `frpa-cross-reference-titles-wrong` for TWO different findings -- one against FL/GA/KS, one against LA/MO/TX/UT. Finding ids are therefore not unique and this file does not pretend otherwise; `examination.ts` resolves an id to a LIST and names the ambiguity rather than silently keeping one.",
@@ -10,6 +11,8 @@
       "review": "REVIEW-01",
       "file": "REVIEW-01-findings.json",
       "sha256": "8b64d7b8330570481d6e4117d39dd0df05de83d4929ec05fa835756658442f29",
+      "manifest": "REVIEW-01-manifest.json",
+      "manifestSha256": "1ab1133dc4006c2b89beb14d6b8018645e49a3dcb3ca56ad01bd53b2aa8a371b",
       "survived": 201,
       "refuted": 4,
       "coverageGaps": [
@@ -40,7 +43,8 @@
           "finding": "The indefinite term that satisfies LG Funding factor two is defeasible at Buyer's option on any covenant breach, because §6.2.1 converts the obligation into a fixed sum due immediately.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "all-assets-lien-vs-nonrecourse-recital",
@@ -51,7 +55,8 @@
           "finding": "§4.10 takes a lien on every asset the merchant owns — inventory, equipment, general intangibles — not merely the purchased Receipts, which means Buyer's funds are demonstrably not \"at full risk of non-payment\" as §5.1 recites.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "amount-you-deliver-is-not-fixed",
@@ -62,7 +67,8 @@
           "finding": "The site says the amount you deliver is fixed when you sign; Appendix A fees charged during the term are added to the Remaining Balance and collected the same way, so the total delivered is not fixed at signing.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "handoff"
         },
         {
           "id": "attorneys-fees-two-different-rates",
@@ -73,7 +79,8 @@
           "finding": "The agreement states two different attorneys'-fee formulas for the same event, and §6.3 declares its charges cumulative with Appendix A and with the §6.5 liquidated damages.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "b4-ach-backstop-instrument-still-in-suite",
@@ -84,14 +91,16 @@
           "finding": "A pre-signed ACH debit authorisation for collecting the advance still exists in the contract suite, described in its own metadata as signed on every FRPA deal, even though the FRPA clause that was supposed to trigger it (§2.5) is now [Reserved].",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "bank-instruction-and-damages-waiver-residue",
           "finding": "§4.1 leaves standing an authorisation for Buyer to instruct the merchant's own depository bank without independent verification, plus a waiver of the merchant's damages claims against that bank — language whose only function is a deposit-account debit rail.",
           "why": "Misreads §4.1. The quoted sentences are real, but \"The foregoing authorizations\" refers back to the two preceding paragraphs, which grant information and verification authorizations only (\"the information and authorizations necessary to verify Merchant's Receipts into the Account\"; processor/third-party disclosure). Nothing in the quoted text authorizes any debit, and the finding's load-bearing consequence — \"this is the written debit authority the site promises does not exist\" — is contradicted by §4.16 (\"this authorization does not, by itself, authorize any debit, transfer, or withdrawal — collection mechanisms are governed exclusively by Section 2.3\") and §2.2/§2.3. The repo's own PASS1 A4, written after reading the whole FRPA, concludes \"No ACH-debit path exists.\" Invariant B4 forbids a pre-signed debit authorisation; this is not one. Telling counsel there is a live debit rail in §4.1 is a dead end.",
           "status": "refuted",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "unrecorded"
         },
         {
           "id": "bankruptcy-carveout-defeated-by-5-9",
@@ -102,7 +111,8 @@
           "finding": "§6.1.15 carves bankruptcy out of the Events of Default, but §5.9 independently invokes the whole of Section 6 on a bankruptcy filing, so the carve-out is a nullity and the agreement fails LG Funding factor three (recourse on bankruptcy).",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "broker-compensation-checkbox-unfillable",
@@ -113,7 +123,8 @@
           "finding": "The Yes/No broker-compensation question is drawn with static glyphs and carries no fillable widget, so the row can never be answered.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "business-interruption-insurance-defeats-risk",
@@ -124,14 +135,16 @@
           "finding": "§5.5 requires the merchant to insure Buyer against business interruption with Buyer as loss payee, which is a contractual arrangement to be paid when receipts stop — the direct negation of §5.1's recital that Buyer's funds are at full risk if receipts are insufficient.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-ach-program-fee-disclosed-nowhere",
           "finding": "A $395 ACH program fee is deducted from the merchant's proceeds but appears in no document: not in the finance charge, not in FRPA §1.4, not in FRPA Appendix A, and not as any AcroForm field in the FRPA.",
           "why": "REFUTED — treats a stale FRPA v3 leftover in a smoke-test fixture as a live charge. `ach_program_fee` appears ONLY in sample-data/frpa.json. It is absent from templates/frpa.fields.json (59 fields, verified), from FRPA §1.4 and Appendix A, and — decisively — from the entire lombard-platform codebase (grep for ach_program_fee across src/ returns nothing). Production computes `disbursementAmount = advanceAmount - feesDeducted`, so the real gap is the origination fee alone; the $2,895 / $395 gap does not exist in any deal the product can produce. The only true residual is a stale field in a test fixture, which is not a blocker-adjacent statutory finding. (The v3 provenance is confirmed by CA-SB-362-2025-2026-Amendment.md, which lists ach_program_fee among FRPA v3's §1 grid fields.)",
           "status": "refuted",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "unrecorded"
         },
         {
           "id": "ca-apr-understated",
@@ -142,7 +155,8 @@
           "finding": "The disclosed APR is understated by a factor of roughly two to three, and fails on the document's own numbers before any of the corrections above are applied.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-broker-row-contradicts-frpa-and-iso",
@@ -153,7 +167,8 @@
           "finding": "The form tells the merchant it will pay the broker's compensation as part of the financing, while the FRPA says Lombard charges no ISO fee to the merchant and the ISO agreement says Lombard pays the commission from its own funds.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-deductions-sentence-printed-unconditionally",
@@ -164,14 +179,16 @@
           "finding": "The \"Due to deductions or payments to others\" sentence is static template text, but §914(a)(2)(C)(ii) makes it conditional on the amount financed exceeding recipient funds.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-estimated-payment-not-derived-from-split-rate",
           "finding": "The estimated payment and estimated term are back-solved from an assumed 150-day term rather than calculated from the disclosed Specified Percentage and monthly income estimate, and are inconsistent with them by an order of magnitude.",
           "why": "REFUTED — the production pipeline does precisely what the finding demands. lombard-platform/src/lib/offer-estimates.ts: `dailyHoldback = Math.round(dailyAvg * holdbackPct)` where dailyAvg = avg_monthly_processing / days_per_month, then `estimated_payback_days = Math.round(payback / dailyHoldback)`. Payment is derived FROM the split rate times the income projection, and the term is derived from that payment — not back-solved from an assumed 150 days. The $496.66/150-day inconsistency exists only in the hand-written smoke-test fixture. The finding's own fix ('add a pipeline assertion that estimated_payment is within tolerance of specified_percentage x income / days') is already the implementation.",
           "status": "refuted",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "unrecorded"
         },
         {
           "id": "ca-extra-broker-compensation-row",
@@ -182,7 +199,8 @@
           "finding": "A tenth row, \"Broker Compensation\", has been carried over from the Virginia and Connecticut prescribed forms into the California form, which permits nine rows plus exactly one specified insertion.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-extra-text-in-only-rows",
@@ -193,7 +211,8 @@
           "finding": "Three rows carry sentences the statute does not authorise, in rows it says \"shall include only\" specified content.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-finance-charge-omits-withheld-fees",
@@ -204,7 +223,8 @@
           "finding": "The finance charge is computed as the factor spread only and omits the origination fee and ACH program fee, both of which §943 requires to be included.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-funding-provided-is-gross-purchase-price",
@@ -215,7 +235,8 @@
           "finding": "\"Funding Provided\" is populated with the gross Purchase Price rather than the amount financed net of prepaid finance charges, which inflates the APR denominator.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-itemization-cross-ref-wrong-content",
@@ -226,7 +247,8 @@
           "finding": "Even treating the cross-reference as valid, FRPA §1.4 does not contain the content §956(a) requires: wrong title, wrong line labels, no \"Prepaid Finance Charge\" line, no \"Amount Financed\" line, and no arithmetic references.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-itemization-sentence-not-verbatim",
@@ -237,7 +259,8 @@
           "finding": "The prescribed pointer sentence is altered: the word \"document\" is dropped, the quotation marks around the document title are dropped, and \"(FRPA §1)\" is appended.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-missing-estimated-monthly-cost-row",
@@ -248,7 +271,8 @@
           "finding": "Payments are daily, not monthly, so §914(a)(12) requires an \"Estimated Monthly Cost\" row immediately below the fourth row; the form has no such row.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-no-itemization-document",
@@ -259,7 +283,8 @@
           "finding": "The form promises an attached \"Itemization of Amount Financed\" and satisfies it with a cross-reference to FRPA §1; §956 requires a real, separate accompanying document, and no such document exists anywhere in the contract set.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-orphan-signature-page",
@@ -270,7 +295,8 @@
           "finding": "Page 2 carries nothing but the acknowledgement sentence and the signature block — three lines at the top of an otherwise empty sheet.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "wont-fix"
         },
         {
           "id": "ca-prepayment-wrong-statutory-branch",
@@ -281,14 +307,16 @@
           "finding": "The form uses the §914(a)(10)(B) \"you owe nothing extra\" branch, but under FRPA §8.3 prepayment requires delivering the full unpaid Purchased Amount, so branch (A) applies and the maximum non-interest finance charge must be stated.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ca-total-payment-amount-understated",
           "finding": "Estimated Total Payment Amount is computed as recipient funds plus finance charge, not as the total the merchant will actually deliver, and so is $2,895 below the Purchased Amount the FRPA obliges the merchant to pay.",
           "why": "REFUTED — misreads a smoke-test fixture as the product. sample-data/ca-disclosure.json is self-labelled 'Sample data for B.6 ... smoke test' and its $71,605 is a hand-written value. The real populator, lombard-platform/src/lib/contract-builders.ts:981, emits `estimated_total_payment_amount: formatCurrency(paybackAmount)` — i.e. exactly the $74,500 Purchased Amount the finding's own fix demands. The claimed computation 'recipient funds plus finance charge' exists nowhere in code. No defect.",
           "status": "refuted",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "unrecorded"
         },
         {
           "id": "ca-true-up-reconciliation-not-described",
@@ -299,7 +327,8 @@
           "finding": "The merchant's FRPA §3 reconciliation right — the right to a refund of over-collection — is described nowhere on the disclosure, and if that right is a true-up mechanism the statute requires it to be explained with a contract reference.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "ca-wrong-payment-channel-named",
@@ -310,7 +339,8 @@
           "finding": "The APR and Estimated Term rows name the Approved Bank Account as the income channel and the Estimated Payment row names average daily sales revenue, but collection actually runs through the Approved Processor on card receipts — three different bases in one table.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "cancellation-forfeits-origination-fee",
@@ -321,7 +351,8 @@
           "finding": "§4.14 requires the merchant to return the Net Amount Funded, which is net of the origination and equipment fees the merchant never received, and the clause says nothing about refunding them — so cancelling costs the merchant those fees for zero funding.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "charges-scattered-outside-fee-schedule",
@@ -332,7 +363,8 @@
           "finding": "Appendix A is presented as the Fee Schedule but omits six categories of charge that live in Sections 4, 6 and 7, which makes a complete \"Avoidable Fees and Charges\" disclosure impossible to derive from the fee schedule.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "class-waiver-forfeits-own-recovery",
@@ -343,7 +375,8 @@
           "finding": "§7.11 concedes that class waivers are unenforceable where prohibited by law, then requires a merchant who is lawfully permitted to proceed as a class member to forfeit its own share of the recovery — reimposing by contract the exact result the law has just refused to allow.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "closing-costs-undefined-and-unbounded",
@@ -354,7 +387,8 @@
           "finding": "§4.1 permits an undefined, unbounded \"Closing Costs\" deduction from the Purchase Price that appears nowhere in the §1.4 itemization and nowhere in the Appendix A fee schedule.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "completion-threshold-two-conflicting-tests",
@@ -365,7 +399,8 @@
           "finding": "The agreement gives two different tests for when the merchant is finished, and Appendix A fees added mid-term make them diverge; \"Remaining Balance\", the term one test turns on, is never defined.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "counterclaim-waiver-flips-by-forum",
@@ -376,7 +411,8 @@
           "finding": "§7.20's exception preserves only counterclaims that are compulsory, but New York makes every counterclaim permissive while Florida makes transaction-related counterclaims compulsory — so the same clause is an absolute bar in one Acceptable Forum and a nullity in the other, and §7.5 lets Buyer alone choose which.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-disbursement-bracket-substituted",
@@ -387,7 +423,8 @@
           "finding": "The prescribed bracketed definition of Disbursement Amount is replaced with a different, arithmetic formula.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-duplicate-acknowledgement-block",
@@ -398,7 +435,8 @@
           "finding": "A non-prescribed acknowledgement and signature block is inserted ahead of the prescribed one, giving the form two signature lines with different wording.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-fees-row-defers-to-frpa",
@@ -409,7 +447,8 @@
           "finding": "The fee row states two of its fees without any amount and expressly defers the complete schedule to the FRPA, and it omits the 35% attorneys'/collection fee that the FRPA's own Appendix A imposes.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-missing-average-projected-monthly-payment",
@@ -420,7 +459,8 @@
           "finding": "The prescribed variable-payment description requires three components — method, frequency, and the amount of the average projected payments per month; the document supplies method and frequency but no amount.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-missing-page-one-initials",
@@ -431,7 +471,8 @@
           "finding": "The prescribed Connecticut form requires an initials-and-date line at the foot of page 1; Lombard's version has none.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-missing-page1-initials-date",
@@ -442,7 +483,8 @@
           "finding": "The prescribed page-1 \"Initials / Date\" execution line is absent.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-missing-page2-continuation-block",
@@ -453,7 +495,8 @@
           "finding": "All five prescribed \"☐ SEE PAGE 2\" checkboxes and the entire page-2 \"The information provided below relates to the following checked item(s)\" routing block are absent from the document.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-missing-page2-header-fields",
@@ -464,7 +507,8 @@
           "finding": "Page 2 omits the four identification fields the prescribed form requires at the top of page 2.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-missing-statutory-citation-and-page2-title",
@@ -475,7 +519,8 @@
           "finding": "The statutory citation that appears under the title on both pages of the prescribed form is absent, and the page-2 title is replaced with a running header.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-origination-fee-double-classified",
@@ -486,7 +531,8 @@
           "finding": "The Origination Fee and Equipment Fee are deducted at funding — placing them in the prescribed \"Finance Charges Deducted or Withheld at Disbursement\" row — yet the document also lists them among fees \"NOT Included in the Finance Charge\".",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-page1-rows-spilled-to-page2",
@@ -497,7 +543,8 @@
           "finding": "Two rows the prescribed form places on page 1 are moved to page 2, which the prescribed form reserves for the continuation block and renewal itemization.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-payment-schedule-branches-collapsed",
@@ -508,7 +555,8 @@
           "finding": "The prescribed four-checkbox Payment Schedule structure is collapsed into a single \"☐ Fixed ☒ Variable\" pair, dropping the fixed-payment amount and frequency fields and both variable-branch alternatives.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-prejudgment-remedy-waiver",
@@ -519,7 +567,8 @@
           "finding": "§10's blanket waiver of notice and formal process is prohibited by Connecticut statute for contracts entered on or after 1 July 2024, and the FRPA has no state-specific rider that would disapply it for a Connecticut merchant.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-prepayment-row-mislabeled-missing-percentage",
@@ -530,7 +579,8 @@
           "finding": "The prescribed row label is replaced, and the two items the prescribed label expressly requires — the percentage of any unpaid portion of the finance charge, and the maximum dollar amount of finance charge — appear nowhere in the document.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-prepayment-row-uses-virginia-label",
@@ -541,7 +591,8 @@
           "finding": "The CT prepayment row carries Virginia's label and Virginia's content requirement; Connecticut's prescribed label demands a percentage and a maximum dollar figure that the row never states.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-renewal-rows-can-never-carry-a-value",
@@ -552,7 +603,8 @@
           "finding": "Connecticut's prescribed renewal block is four dollar rows; Lombard renders it as a prose sentence with one hard-coded $0 and no field at all for the reduction in disbursement amount, so two prescribed figures can never be disclosed.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-renewal-rows-missing",
@@ -563,7 +615,8 @@
           "finding": "Three of the four prescribed renewal dollar rows are absent, and the fourth is replaced by prose that discloses no figure.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-renewal-unpaid-interest-hardcoded-zero",
@@ -574,7 +627,8 @@
           "finding": "The disclosure hard-codes $0 for the prescribed \"Total Amount from New Financing Used to Payoff Prepayment Charges & Unpaid Interest on Existing Commercial Financing\" row, which is contradicted by the FRPA's own Backload rollover method.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-row-parentheticals-dropped",
@@ -585,7 +639,8 @@
           "finding": "Two prescribed row labels have their qualifying parentheticals removed.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-time-period-row-relabeled",
@@ -596,7 +651,8 @@
           "finding": "The prescribed row label for the central time-period disclosure is shortened and unilaterally constrained to days.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ct-two-acknowledgement-signature-blocks",
@@ -607,7 +663,8 @@
           "finding": "The CT disclosure carries two separate acknowledgement-and-signature blocks on one page, both bound to the same recipient, with the operative Connecticut statutory notices sandwiched between them; the first block is not part of the CT form at all — it is Virginia's.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "default-collection-reaches-cash-and-checks",
@@ -618,7 +675,8 @@
           "finding": "On default the Specified Percentage rises to 100% of all Receipts — a defined term that includes cash, checks and electronic transfers — and §7.16 requires the merchant to hand those proceeds over directly, contradicting both §2.2's exclusive processor-split mechanism and the unconditional site promise.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "default-on-any-term-no-cure-no-materiality",
@@ -629,7 +687,8 @@
           "finding": "Any violation of any term is an Event of Default with no materiality threshold, no notice and no cure period, and it detonates acceleration of the full uncollected Purchased Amount, a jump to 100% of receipts, 25% liquidated damages and personal liability at once.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "defined-term-drift",
@@ -640,7 +699,8 @@
           "finding": "Five capitalised terms are used as though defined and never are, including the one that measures every deadline in the merchant's reconciliation right, and the account whose unconsented change is a $5,000 default.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "disclosure-header-naming-inconsistent",
@@ -651,7 +711,8 @@
           "finding": "Four disclosures carry a descriptive running header and seven carry a generic one, so a merchant with two documents cannot tell from the header what the second one is.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "disclosures-ach-receipts-contradict-frpa",
@@ -662,7 +723,8 @@
           "finding": "Seven disclosures describe collection as a percentage of card AND ACH receipts; the FRPA collects from card settlement only, and the other four disclosures say so.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "disclosures-appendix-a-called-complete-fee-schedule",
@@ -673,7 +735,8 @@
           "finding": "The row that exists specifically to list every non-finance-charge cost points the merchant at Appendix A and calls it complete, while four FRPA clauses carry charges that are not in Appendix A and are expressly cumulative with it.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "disclosures-equipment-money-unreconciled",
@@ -684,7 +747,8 @@
           "finding": "The FRPA carries two differently-named equipment amounts on one page — one added to the Payback, one deducted at funding — with no itemization line reconciling either to the Purchased Amount, and no disclosure has an equipment line at all.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "disclosures-hardcode-daily-frequency",
@@ -695,7 +759,8 @@
           "finding": "Every disclosure hard-codes daily remittance while the FRPA leaves remittance frequency as a sender-filled field.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "disclosures-itemization-cross-ref-wrong",
@@ -706,7 +771,8 @@
           "finding": "Nine disclosures cite the itemization by a section number and a title the FRPA does not use.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "disclosures-omit-no-prepayment-discount",
@@ -717,7 +783,8 @@
           "finding": "Each statute requires a statement of whether there are costs OR discounts on prepayment; all seven forms address costs only and are silent on discounts, while Lombard's own CT and VA forms do state there is none.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "equipment-charged-in-both-documents",
@@ -728,7 +795,8 @@
           "finding": "The FRPA has two funding-terms fields that charge the merchant for equipment, and the Subscription separately charges monthly rent for equipment to which Lombard retains title — and nothing in either document says the two are alternatives or references the other.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "equipment-fee-charged-twice",
@@ -739,7 +807,8 @@
           "finding": "Section 1 provides two independent places to charge the same equipment cost — once deferred into the payback and once deducted at funding — with nothing stating they are mutually exclusive.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "estimated-periodic-vs-initial-payment",
@@ -750,7 +819,8 @@
           "finding": "Both statutes ask for the estimated amount of the initial payment when payments vary; the documents present an estimated periodic/average payment instead, without saying it is the initial one.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "fair-market-value-recital-self-refuting",
@@ -761,7 +831,8 @@
           "finding": "§2.1 makes the merchant agree that the Purchase Price equals the fair market value of the Receipts, while §1.3 on the first page shows a Factor Rate converting that Purchase Price into a larger Purchased Amount.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "fl-prepayment-discount-not-stated",
@@ -772,7 +843,8 @@
           "finding": "Florida requires the disclosure to state whether there are costs OR discounts associated with prepayment; the document addresses costs only and never states that no discount is available.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "frontload-refactors-old-balance",
@@ -783,7 +855,8 @@
           "finding": "The FRPA states three inconsistent rollover formulas, and the one Buyer may choose at its sole discretion — Frontload — applies the factor rate a second time to a balance that already carries the prior factor markup.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "rejected"
         },
         {
           "id": "frpa-22-cites-wrong-clause-title",
@@ -794,7 +867,8 @@
           "finding": "§2.2 cites §2.3 by a title §2.3 does not have.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-arbitration-clauses-with-no-arbitration-agreement",
@@ -805,7 +879,8 @@
           "finding": "Four clauses impose arbitration mechanics — including a 20-day deadline to object to arbitrability — but the agreement contains no arbitration clause; §7.5 sends every dispute to court.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-buyer-named-by-three-widgets",
@@ -816,7 +891,8 @@
           "finding": "The Buyer's legal name is captured by three independent widgets in one document, one of which sits inside the guaranty.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-cross-reference-titles-wrong",
@@ -827,7 +903,8 @@
           "finding": "The cross-references into the FRPA name sections that do not exist under those titles — the itemization is §1.4 \"Itemization of Net Amount Funded\", not §1 \"Itemization of Amount Financed\", and §2.3 is not titled \"Specified Percentage of Receipts\".",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-cross-reference-titles-wrong",
@@ -838,7 +915,8 @@
           "finding": "Two FRPA cross-references carried by all four forms name sections by titles the FRPA does not use; the prepayment reference, which is the one the statutes actually mandate, is correct.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-guarantor-widget-bound-to-merchant",
@@ -849,7 +927,8 @@
           "finding": "The Personal Guarantor signature widget is assigned to the same recipient as the Merchant signature widget, and the template has only two recipients, so a guarantor who is not the merchant's signer can never sign the guaranty.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-plaid-default-not-enumerated-in-61",
@@ -860,7 +939,8 @@
           "finding": "§4.16 declares a specific Event of Default 'under Section 6.1', but §6.1's enumerated list contains no such item — and the two slots where one would sit are [Reserved].",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-severability-text-under-entire-agreement",
@@ -871,7 +951,8 @@
           "finding": "§7.8 'Entire Agreement' opens with a severability sentence that duplicates §7.7 immediately above it.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-sub-equipment-lien-conflict",
@@ -882,7 +963,8 @@
           "finding": "A merchant who signs both documents is in immediate breach of the FRPA's negative pledge, because the Subscription Agreement creates a lien on equipment that the FRPA's Collateral definition already captures.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-undefined-capitalised-terms",
@@ -893,7 +975,8 @@
           "finding": "Six terms are capitalised and used as defined terms but are never defined, including the two that determine when the agreement ends and what every fee is added to.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ga-authority-is-a-secondary-summary",
@@ -904,7 +987,8 @@
           "finding": "The Georgia disclosure was built against a WebSearch-derived summary rather than the text of O.C.G.A. §10-1-393.18, so no field-by-field conformance claim for GA can actually be supported — including the claim that Georgia prescribes no form.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "guarantor-termination-notice-is-default",
@@ -915,7 +999,8 @@
           "finding": "A guarantor's notice of termination is itself an Event of Default of the merchant's agreement, so the guarantor's attempt to exercise a right triggers acceleration and 100% of the merchant's receipts.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "guaranty-covers-every-covenant",
@@ -926,7 +1011,8 @@
           "finding": "The personal guaranty covers performance of every covenant in the agreement — paperwork, insurance, closing for renovations, Plaid connectivity — while the site says personal recourse exists only for fraud, misrepresentation, or diverting card volume.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "guaranty-distinction-preserved-beneficiary-blank",
@@ -937,7 +1023,8 @@
           "finding": "On the wording, the payment/performance distinction between the two guaranties is preserved cleanly — refuting that half of the concern; the residual risk is mechanical, since the beneficiary of the payment guaranty is a sender-filled widget repeated eight times with nothing in the template constraining it to the Subscription's provider.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "guaranty-reaches-business-failure",
@@ -948,7 +1035,8 @@
           "finding": "§5.9 and §5.15 are warranties about the merchant's future subjective intent to keep trading, and §9.2 guarantees \"the accuracy of any representation\", so a business that simply fails hands Buyer a personal claim against the guarantor — the exact outcome published commitment #3 says never happens.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "indemnity-charges-interest-document-denies",
@@ -959,7 +1047,8 @@
           "finding": "§7.9 expressly contracts for interest at the highest lawful rate in a document whose characterization clause states that no amount due to Buyer is interest, and at a rate inconsistent with §6.3.1's fixed 24%.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "information-sharing-only-vs-any-third-party",
@@ -970,7 +1059,8 @@
           "finding": "§4.7 limits disclosure of the merchant's credit standing to a closed list \"only\", and three later clauses authorise disclosure well outside it — to any third party, to industry associations, and to MATCH/TMF.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "interest-charges-inside-a-not-a-loan",
@@ -981,7 +1071,8 @@
           "finding": "The agreement disclaims that any amount due is interest, then charges 24% per annum prejudgment and postjudgment interest and indemnity interest at the highest rate allowed by law.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a1-fee-not-tied-to-origination-revenue",
@@ -992,7 +1083,8 @@
           "finding": "§A.1 obligates payment as a flat percentage of the funded amount with no reference to origination revenue and no cap at the origination revenue actually collected.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a3-minimum-payout-threshold",
@@ -1003,7 +1095,8 @@
           "finding": "§A.3 imposes a $100 minimum payout threshold that the decided model removes.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a3-pays-before-clawback-window-closes",
@@ -1014,7 +1107,8 @@
           "finding": "§A.3 pays the commission at day 30, before the decided 45-day 100% clawback window has closed, so every early-breach recovery becomes a collection action against the partner.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a4-renewal-commission-repudiated",
@@ -1025,7 +1119,8 @@
           "finding": "§A.4 creates a perpetual 5% renewal/restack commission that the decided partner model eliminates entirely.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a5-clawback-window-and-tiers",
@@ -1036,7 +1131,8 @@
           "finding": "§A.5's clawback is a discretionary single-tier 30-day right; the decided model is a mandatory two-tier 45-day/90-day clawback.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-channel-vs-never-cold-call",
@@ -1047,7 +1143,8 @@
           "finding": "The site's channel promise says funding is only ever offered to a merchant moving processing to Lombard and that there are no purchased lead lists; the contract provides for broker-introduced deals paid out of the merchant's origination fee and disclaims responsibility for how the broker got there.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "iso-clawback-does-not-survive-termination",
@@ -1058,7 +1155,8 @@
           "finding": "§3.2 grants the partner an unqualified entitlement to commissions on pre-termination fundings and does not preserve the clawback, while §2.4 shows the drafter knew how to make a clause survive.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-inconsistent-section-numbering",
@@ -1069,7 +1167,8 @@
           "finding": "The agreement mixes a lettered section with Roman-numeral sections, and its own entire-agreement clause singles out the lettered one as if it might not be included.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-no-952-transmission-or-evidence-clause",
@@ -1080,7 +1179,8 @@
           "finding": "The agreement contains none of the broker-disclosure machinery 10 CCR §952 contemplates: no duty to transmit unaltered disclosures, no duty to return evidence of transmission with its timing, no bar on presenting an offer without disclosure, and no election of the §952(e) direct-disclosure route.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-no-bar-on-partner-charging-merchant",
@@ -1091,7 +1191,8 @@
           "finding": "Nothing in the agreement prohibits the partner from charging the merchant its own fee, and the FRPA expressly contemplates that it will — an amount Lombard will not know but must disclose on the California Offer Summary.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-partner-is-a-broker-despite-referral-agent-label",
@@ -1102,7 +1203,8 @@
           "finding": "The agreement's self-characterization as a pure \"referral agent\" does not hold under 10 CCR §900(a)(8) — §1.2 requires the partner to deliver application documentation to Lombard, which is itself an enumerated broker act.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-partner-may-communicate-terms-in-own-name",
@@ -1113,7 +1215,8 @@
           "finding": "Neither §1.2 nor §1.3 stops the partner from communicating specific terms, offers or approval likelihood to a merchant — §1.2 only bars doing so \"on behalf of Company,\" and §1.3 only bars promises made \"prior to Company's review.\"",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-recital-funding-not-processing",
@@ -1124,7 +1227,8 @@
           "finding": "The recital and §1.1 define the partner's purpose as referring merchants for MCA funding; the decided model is that partners bring merchants for processing and funding follows the normal path.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "iso-renewal-rate-fixed-above-variable-base",
@@ -1135,7 +1239,8 @@
           "finding": "The new-funding commission is a negotiable field while the renewal commission is hard-coded at 5%, so any ISO negotiated below 5% earns more on renewals than on originations.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "iso-signature-dates-share-effective-date-field",
@@ -1146,7 +1251,8 @@
           "finding": "Both signature-date widgets are bound to the same field as the recital Effective Date, so a sequentially signed two-party agreement will show one sender-prefilled date in all three places.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ks-citation-is-a-placeholder",
@@ -1157,7 +1263,8 @@
           "finding": "The KS document's authority line has no code section — it reads as an unfilled placeholder next to the properly cited FL and GA documents — and it asserts an effective date the statute text does not give.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "ks-false-claim-of-prescribed-labels",
@@ -1168,7 +1275,8 @@
           "finding": "The Kansas form states that its labels are the statutory prescribed labels; two of the six are not, and SB 345 mandates the exact wording of each.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ks-internal-drafting-note-left-in",
@@ -1179,7 +1287,8 @@
           "finding": "An internal drafting rationale addressed to Lombard, not the merchant, is printed on the merchant-facing form, and the sentence that follows it contradicts it.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ks-prepayment-discount-not-stated",
@@ -1190,7 +1299,8 @@
           "finding": "Same gap under the Kansas provision, which likewise requires a statement of whether there are costs or discounts on prepayment.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "ks-prescribed-labels-not-used",
@@ -1201,7 +1311,8 @@
           "finding": "Kansas is the only one of these three statutes that mandates verbatim disclosure labels, and two of the six are wrong — while the document affirmatively tells the merchant that all of them are the statutory labels.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ks-total-dollar-cost-omits-withheld-fees",
@@ -1212,7 +1323,8 @@
           "finding": "The KS document defines total dollar cost as a plain subtraction, but the Kansas statute adds a sentence — absent from Florida's otherwise-parallel provision — requiring the calculation to include fees the provider deducts from the funds provided.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "la-disbursed-row-omits-prior-balance-payoff",
@@ -1223,7 +1335,8 @@
           "finding": "Louisiana enumerates three things that can make disbursed less than provided, including payoff of a prior balance owed to the provider; our LA row names only two of the three.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "la-invented-short-title-and-effective-date",
@@ -1234,7 +1347,8 @@
           "finding": "The LA form gives the statute a short title and an effective date that the enrolled act in our regulatory source does not contain.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "la-usury-characterization-overstates-statute",
@@ -1245,7 +1359,8 @@
           "finding": "The LA form tells the merchant the transaction is exempt from Louisiana usury and rate limits; the subsection it cites says only that the amounts charged are not interest.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "liquidated-damages-plus-actual-costs",
@@ -1256,7 +1371,8 @@
           "finding": "§6.5 fixes 25% as a pre-estimate of enforcement expenses whose actual amount is \"difficult to ascertain\", while four other clauses recover those same actual expenses — the contract falsifies its own liquidated-damages recital and converts §6.5 into a penalty.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "liquidated-damages-plus-actual-expenses",
@@ -1267,7 +1383,8 @@
           "finding": "§6.5 liquidates Buyer's recovery expenses at 25% of the unpaid balance, and §6.3 then says the actual versions of those same expenses are recoverable in addition — double recovery of one category, which is the classic ground for voiding a liquidated-damages clause as a penalty.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "lombard-multi-position-vs-no-stack",
@@ -1278,7 +1395,8 @@
           "finding": "The site says Lombard will not add weight to a stack; the contract provides machinery for multiple concurrent Lombard positions on one merchant, for renewal before full collection, and for refinancing a prior balance into a new Purchase Price that is then multiplied by the factor rate.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "mo-citation-to-unverifiable-section",
@@ -1289,7 +1407,8 @@
           "finding": "The MO form cites §427.305 twice as the source of its required content, but the enrolled bill in our regulatory source enacts a single section, §427.300, and places every disclosure requirement at §427.300.3(2).",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "mo-prescribed-labels-not-used",
@@ -1300,7 +1419,8 @@
           "finding": "Missouri is not a pure content-only state: §427.300.3(2) prescribes the verbatim label for each of the six disclosures, and five of our six labels are wrong.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "mo-total-dollar-cost-excludes-deducted-fees",
@@ -1311,7 +1431,8 @@
           "finding": "Missouri alone requires deducted fees to be folded into the total dollar cost; our MO row states the plain-subtraction formula, which understates the figure by the origination fee.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "no-cure-period-anywhere",
@@ -1322,7 +1443,8 @@
           "finding": "Fifteen Events of Default, several triggered by third-party or ministerial events, with no notice, no grace and no cure anywhere in the document, each opening the door to acceleration, 100% of receipts and the full Section 6 charge stack.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "no-total-cost-figure-in-the-agreement",
@@ -1333,7 +1455,8 @@
           "finding": "The itemization stops at Net Amount Funded and never states the difference between what the merchant receives and what the merchant delivers — the one figure commitment 4 promises everywhere, including the 39 states with no prescribed form.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-apr-row-substitutes-fees-for-finance-charges",
@@ -1344,7 +1467,8 @@
           "finding": "The APR explanation replaces the regulation's defined term \"finance charges\" with \"fees\" in language §600.6(c)(3) prescribes verbatim.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-broker-comp-omits-how-and-by-whom",
@@ -1355,7 +1479,8 @@
           "finding": "§600.21(f) requires the provider to state how, and by whom, the broker will be compensated; the row states only an amount and that the recipient bears it, and its \"You will pay this amount\" conflicts with the FRPA's Appendix A, which says the ISO is paid out of the Origination Fee and that Buyer is not charging ISO fees to the merchant.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-broker-row-breaks-prescribed-table",
@@ -1366,7 +1491,8 @@
           "finding": "A \"Broker Compensation\" row is added to a table the regulation fixes at ten rows, displacing Prepayment out of rows eight and nine and Collateral Requirements out of row ten; §600.6(m) authorises exactly one insertion, and it is not this one.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-ca-broker-row-contradicts-frpa-721",
@@ -1377,7 +1503,8 @@
           "finding": "The disclosure tells the merchant they pay the broker's compensation as part of the financing; FRPA §7.21 says any ISO fee is outside the agreement and not paid by or on behalf of Buyer.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "ny-ca-missing-estimated-monthly-cost-row",
@@ -1388,7 +1515,8 @@
           "finding": "Both regulations require an additional 'Estimated Monthly Cost' row whenever periodic payments are not monthly; these are daily-payment transactions and the row is absent from both forms.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-ca-prepayment-wrong-statutory-alternative",
@@ -1399,7 +1527,8 @@
           "finding": "Both disclosures print the prescribed alternative that applies only when prepayment does NOT require paying the finance charge, but FRPA §8.3 requires the merchant to deliver the full unpaid Purchased Amount on prepayment — i.e. the entire finance charge.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-first-column-font-below-prescribed-size",
@@ -1410,7 +1539,8 @@
           "finding": "The whole body of the form is set at 10 point, but §600.5(f)(2)(i) requires 12- to 14-point for the first and second columns where they are not combined; 10-point is authorised only for the third column and for combined cells.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-itemization-is-only-a-crossreference",
@@ -1421,7 +1551,8 @@
           "finding": "NY does have an itemization requirement analogous to CA §956 — it is §600.17, near-verbatim — and it demands a separate document entitled \"Itemization of Amount Financed\" immediately following the offer summary; the NY disclosure instead cross-references Section 1 of the financing agreement, and no such separate document exists anywhere in the repository.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-itemization-labels-and-arithmetic-wrong",
@@ -1432,7 +1563,8 @@
           "finding": "The table the NY disclosure points to carries the wrong title, none of the six labels §600.17(a) prescribes, and runs its arithmetic in the opposite direction — it ends at recipient funds and never states the Amount Financed at all.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-law-below-gol-5-1401-threshold",
@@ -1443,7 +1575,8 @@
           "finding": "§7.5 chooses New York law for a Florida buyer funding out-of-state merchants, but New York's choice-of-law safe harbour requires a transaction of at least $250,000 — above which typical advances do not sit — so on most deals the clause depends on a \"reasonable relation\" to New York that may not exist.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "ny-missing-changing-payoff-explanation",
@@ -1454,7 +1587,8 @@
           "finding": "The amount financed can be used to pay down a prior balance owed to the same financer, which under §600.6(b)(3)(iii) requires a short explanation that the amount paid directly to the recipient may change if that balance changes; no such explanation appears.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-missing-double-dipping-paragraph",
@@ -1465,7 +1599,8 @@
           "finding": "The FRPA provides for renewals in which the outstanding Remaining Balance — which includes undelivered finance charge — is rolled into the new financing, which triggers §600.6(b)(3)(v)'s mandatory double-dipping paragraph; the template contains neither the paragraph nor a field to hold the amount.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-missing-estimated-monthly-cost-row",
@@ -1476,7 +1611,8 @@
           "finding": "Payments are daily, not monthly, which makes the additional \"Estimated Monthly Cost\" row mandatory below the fourth row; the row is absent and no AcroForm field exists to populate it.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-prepay-row-extra-crossreference",
@@ -1487,7 +1623,8 @@
           "finding": "The eighth row carries an added parenthetical cross-reference in a cell the regulation limits to the prescribed sentence alone.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-prepay-wrong-statutory-alternative",
@@ -1498,7 +1635,8 @@
           "finding": "The Prepayment row uses §600.6(j)(2) — the alternative reserved for financings where prepayment costs the recipient no finance charge — when the FRPA requires delivery of the entire Purchased Amount to prepay, so §600.6(j)(1) applies and the maximum non-interest finance charge must be stated in dollars.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-row1-prescribed-wording-altered",
@@ -1509,7 +1647,8 @@
           "finding": "The prescribed sentence pointing to the itemization is reworded: \"on what amounts\" for \"on the amounts\", and the word \"document\" is dropped.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-signature-date-field-misnamed",
@@ -1520,7 +1659,8 @@
           "finding": "The field feeding the signature-block Date is named `effective_date`, but §600.5(b) reserves that space for the date of the recipient's own signature.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-signer-capacity-not-captured",
@@ -1531,7 +1671,8 @@
           "finding": "§600.18(a) makes the signature valid only if the natural person signing for the entity is authorised and is not a broker; the block captures a printed name and nothing else, so the provider retains no evidence of either condition.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ny-true-up-mechanism-not-disclosed",
@@ -1542,7 +1683,8 @@
           "finding": "The FRPA contains a reconciliation mechanism under which Buyer credits over-collected amounts back to the Merchant and may adjust a \"Periodic Amount\"; if that is a true-up mechanism under §600.1(ap)(1), the disclosure must explain it and cite the contract clause, and must list reasonably anticipated true-ups — it does neither.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "ny-wrong-payment-channel-named",
@@ -1553,7 +1695,8 @@
           "finding": "The APR and Estimated Term rows name the Approved Bank Account as the particular payment channel, but under the FRPA collection occurs exclusively through the Approved Processor's split of card receipts — so the disclosure states its APR and term assumptions against the wrong channel, and the Payment Terms row in the same table contradicts it.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "one-year-limitations-one-sided",
@@ -1564,7 +1707,8 @@
           "finding": "The one-year contractual limitations period runs only against the merchant's and guarantor's claims, not against Buyer's, and its statutory carve-out is too thin to reliably preserve non-waivable claims.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "orphan-arbitration-references",
@@ -1575,7 +1719,8 @@
           "finding": "Four clauses operate on an arbitration regime that the agreement does not create — §7.5 designates courts as the only forums and no arbitration provision exists anywhere in the document.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "orphan-arbitration-twenty-day-bar",
@@ -1586,7 +1731,8 @@
           "finding": "§7.19 imposes a 20-day bar on contesting arbitrability in an agreement that contains no arbitration clause at all, and three other clauses assume arbitration machinery that does not exist in this document.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "payzli-hardcoded-third-party-termination-fees",
@@ -1597,7 +1743,8 @@
           "finding": "The letter states, as fact for the merchant to acknowledge, two dollar figures from a third party's contract that Lombard is not party to, hardcoded rather than fillable, and inherited unverified from the predecessor form.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "payzli-indemnity-runs-only-against-merchant",
@@ -1608,7 +1755,8 @@
           "finding": "The merchant indemnifies Payzli for following an instruction whose content and duration are controlled by Lombard, and Lombard gives Payzli no corresponding indemnity.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "payzli-no-remittance-instructions",
@@ -1619,7 +1767,8 @@
           "finding": "The operative instruction tells Payzli to forward withheld funds to \"Funding Company\" but supplies no bank account, routing number, address, or contact — the letter is not executable on its face.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "payzli-only-processor-specific-authorization",
@@ -1630,7 +1779,8 @@
           "finding": "The FRPA requires a Split Funding Authorization for each Approved Processor and leaves the processor as a free-text field, but the only such instrument in the set is hard-coded to Payzli.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "payzli-optional-dba-leaves-blank-signed-widget",
@@ -1641,7 +1791,8 @@
           "finding": "merchant_dba_name is specified as optional with the instruction \"Hide if blank,\" which an AcroForm widget cannot do — a merchant with no DBA signs a letter reading \"DBA ______\" over a live fillable field.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "payzli-two-widgets-for-one-percentage",
@@ -1652,7 +1803,8 @@
           "finding": "The one number the letter exists to communicate — the split percentage — is captured twice in two independent widgets, and the signing party is named twice under two different labels.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "payzli-unbounded-irrevocable-instruction",
@@ -1663,7 +1815,8 @@
           "finding": "The instruction is irrevocable, uncapped in total dollars, tied to no identified agreement, and terminates only when Lombard chooses to send a release notice.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "periodic-amount-undefined-fixed-draw-residue",
@@ -1674,7 +1827,8 @@
           "finding": "\"Periodic Amount\" and \"Adjusted Periodic Amount\" are used as operative terms three times and never defined — surviving residue of the fixed-daily-ACH architecture that the v3→v4 restructure was supposed to remove, and the only reading that makes §3's over-collection machinery coherent is a fixed daily amount.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "permission-guarantor-bound-without-signing",
@@ -1685,7 +1839,8 @@
           "finding": "Two clauses purport to grant consent on behalf of the Personal Guarantor, but the document has one signature block, one recipient, and no guarantor capacity line.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "plaid-connectivity-lapse-is-default",
@@ -1696,7 +1851,8 @@
           "finding": "Loss of the Plaid connection for five workdays — a bank-side credential change or token expiry, which the merchant does not control — is an Event of Default, and therefore reaches the guarantor personally.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "plaid-lapse-is-strict-liability-default",
@@ -1707,7 +1863,8 @@
           "finding": "A five-Workday break in a third-party bank-data connection — an event routinely caused by the bank, not the merchant — is a full Event of Default with no notice, no cure and no materiality qualifier.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ptr-615a-rights-understated-as-upon-request",
@@ -1718,7 +1875,8 @@
           "finding": "§4's final sentence describes the FCRA §615(a) disclosure as available only \"upon request\" and limits it to name and address, contradicting the sentence immediately before it and understating the statutory entitlement.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "ptr-no-guarantor-signature-line",
@@ -1729,7 +1887,8 @@
           "finding": "§3 and §4 purport to bind \"Merchant and any Personal Guarantor\" individually, but the document has one signature line, held by the Merchant's officer, and no Personal Guarantor signature line at all.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ptr-release-misses-section1-sources",
@@ -1740,7 +1899,8 @@
           "finding": "§6's release and §5's reliance clause run only to \"Information Sources\", a term §2 defines as banks, brokers, processors and credit reporting agencies — leaving §1's vendors, suppliers, landlord and creditors with no release and no reliance protection.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ptr-section5-adds-purposes-not-granted",
@@ -1751,7 +1911,8 @@
           "finding": "§5 extends the authorization for \"audit\" and \"dispute resolution\" — two purposes that appear in none of the three grants in §§1-3.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ptr-written-instructions-sourced-to-unsigned-frpa",
@@ -1762,7 +1923,8 @@
           "finding": "§4 sources the FCRA \"written instructions\" to a signature on a different document (the FRPA) rather than to the signature on this one, which is self-defeating on precisely the declined applications §4's next sentence addresses.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "purchased-amount-two-formulas",
@@ -1773,7 +1935,8 @@
           "finding": "The document gives two incompatible arithmetic definitions of the Purchased Amount — one that includes deferred equipment cost, one that is purely Purchase Price × Factor Rate.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "reconciliation-right-conditioned-into-near-nullity",
@@ -1784,7 +1947,8 @@
           "finding": "The reconciliation right — the clause that carries the not-a-loan position — is conditioned on a ten-workday window that nullifies late requests, on the merchant not being in default, and (via §7.3) on delivery by certified mail effective only on receipt.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "reconciliation-switched-off-by-any-breach",
@@ -1795,7 +1959,8 @@
           "finding": "The reconciliation right — LG Funding factor one — is permanently unavailable to any merchant in default, and §6.1.1 makes a merchant in default for violating any term or covenant, with no cure period anywhere in the document.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "remedy-stack-exceeds-the-debt",
@@ -1806,7 +1971,8 @@
           "finding": "The percentage remedies alone sum to 110% of the undelivered Purchased Amount before the $5,000 default fee and before 24% interest, and the contract expressly makes them additive rather than alternative.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "service-without-notice-vs-commitment-9",
@@ -1817,7 +1983,8 @@
           "finding": "The service provisions produce judgments the merchant may never learn of, which is functionally adjacent to the confession of judgment that published commitment #9 disclaims, and Pass 1 scored that commitment \"Honored\" without examining Section 10.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "shared-13-field-schema-erases-per-state-law",
@@ -1828,7 +1995,8 @@
           "finding": "LA, MO, TX and UT are driven by one identical 13-field schema, which is why the MO label mandate and the MO cost formula are both missed; the schema is itself the defect, though the broker-compensation omission it produces is correct for LA, MO and UT.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "signature-framing-inconsistent",
@@ -1839,7 +2007,8 @@
           "finding": "The KS document tells the merchant its signature is not statutorily required; the FL and GA documents carry the same signature block with no such clarifier, even though neither statute requires a merchant signature either.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "sub-3-7-notice-anchor-and-minimum-term",
@@ -1850,7 +2019,8 @@
           "finding": "The escape from indefinite month-to-month continuation requires thirty days' notice \"prior\" to an event the clause never names, and §1 measures total payments against a \"Minimum Subscription Term\" that the document does not define.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-acceleration-double-recovery",
@@ -1861,7 +2031,8 @@
           "finding": "On default Lombard can take every remaining subscription payment undiscounted, plus the fair market value of equipment it already owns as determined by itself, plus return of that same equipment within ten business days — with no mitigation duty and no present-value credit.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-broken-terms-and-conditions-cross-refs",
@@ -1872,7 +2043,8 @@
           "finding": "Two cross-references point at Terms-and-Conditions sections that do not exist under any reading of the numbering.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-crossdefault-imports-frpa-default",
@@ -1883,7 +2055,8 @@
           "finding": "§3.12(a) makes any material default under any affiliate agreement a Subscription default, so an FRPA Event of Default — including paperwork and Plaid-connectivity failures that are pure business-slowdown events — accelerates the whole remaining subscription term and fires the §4.2 personal payment guaranty; the FRPA does not cross-default back, so the entanglement runs one way only.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-fee-schedule-incomplete",
@@ -1894,7 +2067,8 @@
           "finding": "§3.4(a) is captioned as the schedule of fees but omits at least seven collectable charges that appear elsewhere in the same document, several of which are amounts Lombard sets after signing.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-guarantor-widget-bound-to-subscriber",
@@ -1905,7 +2079,8 @@
           "finding": "The Guarantor signature widget is assigned to the same recipient as the Subscriber signature widget, and the template has no guarantor recipient; the two blocks sit side by side and are near-identical.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-interim-rent-unbounded",
@@ -1916,7 +2091,8 @@
           "finding": "Interim rent accrues daily from delivery until the day before a Commencement Date that Lombard alone designates, with no outside date and no cap, so Lombard can unilaterally increase the merchant's total cost after signing.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-late-fee-schedule-vs-operative",
@@ -1927,7 +2103,8 @@
           "finding": "The captioned schedule states the late fee as a one-time 10% of an undefined \"Total Due\"; the operative clause makes it 10% of the delinquent amount recurring every month it stays unpaid.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-multiyear-obligation-not-on-site",
@@ -1938,7 +2115,8 @@
           "finding": "Live site copy tells merchants hardware is \"included\" and discloses only \"a monthly software subscription ... to paid plans\", while the contract set can attach a non-cancelable multi-month equipment subscription with a personal payment guaranty running far past the advance.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "handoff"
         },
         {
           "id": "sub-no-collection-channel-unbounded-setoff",
@@ -1949,7 +2127,8 @@
           "finding": "The ACH authorization and bank-detail block were stripped from this template and nothing replaced them, so the monthly charge has no collection channel and no ascertainable first due date in the ordinary course — while §3.12(b) grants an uncapped setoff against settlement funds that becomes available only on default.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-no-lease-financing-disclosure",
@@ -1960,7 +2139,8 @@
           "finding": "§3.6 expressly contemplates that the transaction creates a security interest in the equipment — which is New York's definition of \"lease financing\" — and no lease-financing disclosure template exists anywhere in the corpus for NY or CA.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "sub-office-use-only-holds-binding-signature",
@@ -1971,7 +2151,8 @@
           "finding": "The provider's counter-signature — the only execution by Lombard Pay LLC in the document — sits under a heading that tells the reader it is administrative.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-outside-disclosed-finance-charge",
@@ -1982,7 +2163,8 @@
           "finding": "Both states compute the finance charge by incorporating 12 CFR 1026.4, which sweeps in charges imposed as an incident to or condition of the financing including affiliate charges; the disclosures compute it from FRPA §1 alone and never mention the subscription, while §3.12(a) is Lombard's own written statement that the two agreements are one relationship.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-payment-guaranty-defeats-commitment-3",
@@ -1993,7 +2175,8 @@
           "finding": "The Subscription's personal guaranty is an absolute, defense-waived guaranty of PAYMENT of a fixed monthly obligation that does not flex with sales, so a guarantor whose business slows is personally liable for the entire remaining term — the exact outcome commitment #3 tells merchants never happens.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-provider-name-25-separate-widgets",
@@ -2004,7 +2187,8 @@
           "finding": "Every occurrence of the provider's name in the Personal Guaranty is a separate sender-filled widget — twenty-five of them across five clauses — where Section 2 uses one.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-purchase-residue",
@@ -2015,7 +2199,8 @@
           "finding": "Not a disguised financing under Florida's per se test — refuting the concern as framed — but two fragments of a lease-purchase form survive in the text and are the first sentences an adverse party will quote to argue the opposite.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-section-1-dangling-references",
@@ -2026,7 +2211,8 @@
           "finding": "A three-sentence note under the payment schedule uses two labels that appear nowhere in the document and refers to taxes 'as set forth above' when nothing above sets forth any tax.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-stale-cross-references",
@@ -2037,7 +2223,8 @@
           "finding": "Two cross-references survived the renumbering and point at sections that do not exist, both inside the sentences a merchant is told to read before signing.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "sub-ungrounded-upgrade-assumption-fees",
@@ -2048,7 +2235,8 @@
           "finding": "Two of the four fees in the Schedule of Fees are charges for events the document never provides for, and one of them is for an act §3.13 prohibits.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "tcpa-consent-not-revocable-as-promised",
@@ -2059,7 +2247,8 @@
           "finding": "The applicant-facing consent text says consent can be revoked at any time; the FRPA grants an autodialer consent for servicing and collections with no revocation right at all, and offers an opt-out only for the marketing portion, only by written notice under §7.3's certified-mail regime.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "three-inconsistent-attorney-fee-formulas",
@@ -2070,7 +2259,8 @@
           "finding": "The document states four different, additive measures of attorneys' fees, and the headline 35% formula is measured against the undelivered balance rather than work performed, so it is largest exactly where the least work is done.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "tx-broker-sentence-contradicted-by-frpa",
@@ -2081,7 +2271,8 @@
           "finding": "The TX form makes a factual representation about broker compensation that the FRPA it points to flatly contradicts, and refers to a \"percentage disclosed in the FRPA\" that does not exist as a broker-compensation percentage.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "tx-cites-disclosures-that-do-not-exist",
@@ -2092,7 +2283,8 @@
           "finding": "The Texas form asserts two facts about the FRPA that the FRPA does not contain: a disclosed broker-compensation percentage, and refinance dollar amounts in Section 8.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "tx-form-built-before-occc-rulemaking",
@@ -2103,7 +2295,8 @@
           "finding": "The Texas form asserts it discloses what Chapter 398 requires, but the only Texas authority in the repo is a bill-analysis summary that expressly says the required form does not exist yet and the disclosure cannot be built.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "tx-refinance-and-paydown-amounts-missing",
@@ -2114,7 +2307,8 @@
           "finding": "Two dollar amounts our TX source lists as required disclosure items appear on the TX form only as a conditional cross-reference to the FRPA — and the FRPA section it names does not contain the amount.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "undefined-money-terms",
@@ -2125,7 +2319,8 @@
           "finding": "Six capitalised terms are used as though defined and are defined nowhere, including the two that set the base of the liquidated-damages calculation and of all fee accrual.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "usury-defence-waiver-void",
@@ -2136,7 +2331,8 @@
           "finding": "§5.1's advance waiver of the usury defence is void as against public policy under the New York law §7.5 chooses, and its presence is affirmative evidence that the drafter contemplated an interest-bearing loan.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "usury-defense-waiver",
@@ -2147,7 +2343,8 @@
           "finding": "The merchant is made to waive the usury defense in advance — a clause that concedes the transaction might be usurious and, under the New York law this agreement selects, is the kind of pre-dispute waiver that will not hold.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "ut-commissioner-rules-not-obtained",
@@ -2158,7 +2355,8 @@
           "finding": "Utah's disclosure duty is defined by the statute *and* by rules made by the commissioner; we hold only the statute, so the UT form has been checked against half its authority.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "va-appended-material-not-required-by-form",
@@ -2169,7 +2367,8 @@
           "finding": "The document adds four elements that the prescribed form does not contain: a running heading, page-number markers, a provider name/address/website footer, and a Printed Name field beside the signature.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "va-collateral-description-understates-lien",
@@ -2180,7 +2379,8 @@
           "finding": "The disclosure describes the security interest as an enumerated list of asset classes; FRPA §4.10 grants a blanket lien over \"all assets now owned or hereafter acquired\", with the enumeration expressly non-exhaustive.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "va-fee-description-incomplete-cross-reference",
@@ -2191,7 +2391,8 @@
           "finding": "Two of the six listed fees carry no amount and the row defers to the FRPA for \"the complete fee schedule\" — but FRPA Appendix A is not complete, since §6.2.3, §6.3, §6.3.1 and §6.5 impose further percentage charges expressly stated to be cumulative with it.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "va-method-of-payment-not-a-field",
@@ -2202,7 +2403,8 @@
           "finding": "\"Method of payment:\" is a separately labeled field in the prescribed form, with its own \"SEE PAGE 2\" checkbox; in the Lombard document it survives only as a trailing sentence inside the variable-payment description paragraph.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "va-no-page1-acknowledgment",
@@ -2213,7 +2415,8 @@
           "finding": "The prescribed form carries the acknowledgment, Signature and Date block at the foot of Page 1; the Lombard document's page 1 ends with the collateral row and a Lombard footer, with no acknowledgment or signature anywhere on it.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "va-page2-missing-prescribed-continuation-header",
@@ -2224,7 +2427,8 @@
           "finding": "The document's second physical page carries page-1 content (Broker Compensation, Prepayment Policies) under a Lombard heading, rather than the prescribed Page 2, which has its own title, its own four re-identification fields, and a six-item checklist of which \"SEE PAGE 2\" items it details.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "va-payment-schedule-checkboxes-removed",
@@ -2235,7 +2439,8 @@
           "finding": "The prescribed Payment Schedule cell contains four labeled checkboxes and two labeled fill-ins; the Lombard row keeps only the Fixed/Variable pair and replaces everything else with a free-text paragraph under an abbreviated label.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "va-prepayment-description-contradicts-clause",
@@ -2246,7 +2451,8 @@
           "finding": "The prepayment description states absolutely that nothing beyond the unpaid Receivables Purchased Amount is required on prepayment; FRPA §8.3 preserves obligations accrued before the prepayment date, which under Appendix A can include unpaid fees.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "open"
         },
         {
           "id": "va-see-page-2-checkboxes-removed",
@@ -2257,7 +2463,8 @@
           "finding": "The prescribed form carries a \"☐ SEE PAGE 2\" checkbox on four rows; none of the four appears in the Lombard document.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         },
         {
           "id": "va-two-column-layout-collapsed",
@@ -2268,7 +2475,8 @@
           "finding": "The prescribed header is a two-column block interleaving the seven money rows on the left with the six identity fields on the right; the Lombard document flattens it into a single column with all identity fields first and all money rows after.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-01"
+          "review": "REVIEW-01",
+          "disposition": "implemented"
         }
       ]
     },
@@ -2276,6 +2484,8 @@
       "review": "REVIEW-02",
       "file": "REVIEW-02-findings.json",
       "sha256": "bf334c284d27aeebed00263d3e3813d234e1068e3fc55fb0a01badc1372cf9a1",
+      "manifest": "REVIEW-02-manifest.json",
+      "manifestSha256": "fc622043cc795c8c5cbd0b40f70b97a86014b19bbbaaaad6b8d8d7b3553a6ee3",
       "survived": 48,
       "refuted": 1,
       "coverageGaps": [
@@ -2295,7 +2505,8 @@
           "finding": "Every content guard in CI matches with `git grep -nI` over files that are compressed archives, so no CI guard has ever read a word of the body text of any Lombard .docx or .pdf. CONTRACT_INDEX.md is read as claiming otherwise.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "debt-vocabulary-the-language-guard-would-not-catch",
@@ -2306,7 +2517,8 @@
           "finding": "The CI language guard bans eight words. The recharacterisation-adjacent vocabulary that actually appears in the shipped documents is a different set, and none of it is on the list. This matters independently of `ci-content-guards-cannot-read-the-documents`: even if the guard could read the documents, it would pass these.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "el-3-14-subordination-runs-in-the-wrong-direction",
@@ -2317,7 +2529,8 @@
           "finding": "The clause is meant to stop the lessee repaying its guarantor ahead of the lessor. The words say the opposite: they bar payment on indebtedness \"due to you from a guarantor\" - that is, they stop the guarantor paying the lessee.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "el-3-14-was-not-conformed-when-4-2-was-narrowed",
@@ -2328,7 +2541,8 @@
           "finding": "REVIEW-01 narrowed the lease guaranty at 4.2 to three items and stated expressly that the guarantor is not liable for lease payments or for accelerated amounts. 3.14 - unexamined, and sitting in Section 3 rather than in the guaranty section - still assumes the un-narrowed guaranty: it subordinates insider debt until \"the obligations due to us are paid and satisfied in full\", and waives the guarantor's subrogation to the Equipment.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "el-3-15-hides-three-waivers-under-a-miscellaneous-caption",
@@ -2339,7 +2553,8 @@
           "finding": "3.15 contains a jury-trial waiver, a one-year contractual limitation period and a class-action waiver, all in continuous body text under a caption that discloses none of them. The FRPA gives each of the same three its own numbered and captioned clause.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "el-3-15-jury-waiver-is-one-sided-where-the-frpas-is-mutual",
@@ -2350,14 +2565,16 @@
           "finding": "In the Equipment Lease only the lessee and the guarantor waive a jury; the lessor does not. In the FRPA, signed by the same people in the same package, the waiver is mutual.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "el-3-18-entire-agreement-vs-the-cross-document-never-pay-twice-promise",
           "finding": "The single most important merchant protection in the pair - that equipment is never charged twice - is stated as two reciprocal promises in two agreements with different counterparties, and one of those agreements contains an entire-agreement clause.",
           "why": "REFUTED - the quoted clauses are real but the mechanism is misread, and the misreading is what makes it a blocker. An entire-agreement clause integrates the writing it sits in: it excludes prior and extrinsic agreements and understandings, not the clauses of its own document. Equipment Lease 3.6 and 3.18 are both clauses of the Equipment Lease, so 3.18 cannot exclude 3.6, and 3.6 is not a promise the lessee has to reach outside the four corners to reach: it ends \"You will never pay for the same equipment twice\" - an unconditional promise by Lombard Pay LLC, in Lombard Pay LLC's own integrated document, to the person who signed it. The different-obligor half fails for the same reason. FRPA 1.5 carries the reciprocal operative sentence - \"In no event does Merchant pay for the same equipment under both this Agreement and an Equipment Lease Agreement\" - inside the FRPA, binding Lombard Capital LLC. The merchant is a party to both instruments and holds each promise directly against the entity that gave it; neither promise depends on enforcing the other entity's document. 3.18's \"supersedes any previous agreements\" cannot reach the FRPA in any event: it is limited to agreements \"between the parties\", the FRPA's counterparty is a different entity, and the two are executed as a contemporaneous package, each cross-referencing the other as live (EL 3.6 \"any future receivables purchase agreement between you and any of our affiliates\"; FRPA 1.5 \"a separate Equipment Lease Agreement with Lombard Pay LLC\"). The finding's own fix confirms the misdiagnosis - option (b) proposes carving 3.6 out of 3.18, a carve-out for a problem that cannot arise. REVIEW-01's `equipment-charged-in-both-documents` fix is as strong as it reads. Verified by reading both documents end to end from the extracted word/document.xml of sources/Lombard_Equipment_Lease_Agreement_v1.docx and sources/Lombard_FRPA_v4.docx.",
           "status": "refuted",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "unrecorded"
         },
         {
           "id": "el-3-4a-declares-itself-exhaustive-and-is-not",
@@ -2368,7 +2585,8 @@
           "finding": "3.4(a) says \"This is every charge payable under this Agreement\" and closes with \"No other charge is payable, and we will not introduce one during the Lease Term.\" At least four other payment obligations appear elsewhere in the same document.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "el-3-8-grants-no-licence-to-manufacturer-owned-software",
@@ -2379,7 +2597,8 @@
           "finding": "3.8 defines \"Software\" to exclude anything owned or licensed by the Equipment's manufacturer, and grants a licence only to \"the Software\" so defined. Nothing in the Agreement grants, passes through, or promises to procure a licence to the manufacturer's software.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "el-3-8-software-licence-has-no-survival-and-the-document-has-no-survival-clause",
@@ -2390,7 +2609,8 @@
           "finding": "3.8 grants a licence to use the Software \"in your operation of the Equipment\". 3.7 passes title to the Equipment for $1 at the end of the term. Nothing in the document says the licence survives the end of the Agreement, and the document contains no survival clause at all.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "el-3-9-excludes-personal-injury-and-omits-the-carve-out-3-11-has",
@@ -2401,7 +2621,8 @@
           "finding": "3.9 excludes liability for damage or injury to persons caused by the Equipment, with no carve-out of any kind. 3.11, the clause immediately after it, carves out \"our gross negligence or willful misconduct\" - so the document knows the carve-out exists and does not apply it where the stakes are highest.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set",
@@ -2412,7 +2633,8 @@
           "finding": "3.9 ends \"The remedies available to you under this Agreement are your sole and exclusive remedies.\" No clause in the Agreement confers any remedy on the lessee. The Equipment is supplied \"as is\", every warranty is disclaimed, and no repair, replacement, credit or termination right is given.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt",
@@ -2423,7 +2645,8 @@
           "finding": "The lease guaranty makes service of legal process effective on mailing, whether or not it is received. The FRPA, signed by the same individual in the same package, makes service complete only on actual receipt or on return as refused or undeliverable.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "el-4-4-guarantor-waives-on-the-lessees-behalf-with-no-authority-recital",
@@ -2434,7 +2657,8 @@
           "finding": "4.4 has the Guarantor waive class-action rights \"in my personal capacity and as representative of Lessee\". The document contains no representation that the Guarantor has authority to bind the Lessee, and the Lessee's own signer is a different, separately captured person. Separately, the one-year limitation appears in both 3.15 and 4.4 with different lists of protected persons.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "el-4-5-fcra-authorisation-runs-to-a-different-entity-than-the-frpas",
@@ -2445,7 +2669,8 @@
           "finding": "The Equipment Lease gives Lombard Pay LLC a complete consumer-report authorisation with dispute and disclosure mechanics. The FRPA gives Lombard Capital LLC nothing equivalent in its own text; that entity's authorisation lives in a separate instrument, the Permission to Release. The same guarantor therefore signs two authorisations of very different quality to two entities in the same package.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-4-12-reopens-the-acceleration-6-2-closed",
@@ -2456,7 +2681,8 @@
           "finding": "6.2 restricts the 100%-of-settlement acceleration remedy to five enumerated Events of Default and says expressly that it is not available on 6.1.1 or any other breach of covenant. 4.12, an unexamined clause forty paragraphs earlier, grants acceleration on ANY Event of Default and declares the Section 6 remedies \"in addition to and not in limitation of these rights\".",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-4-13-unlimited-right-to-refuse-vs-ct-offer-revocation-bar",
@@ -2467,7 +2693,8 @@
           "finding": "4.13 reserves an unlimited right to refuse to fund \"for any reason or no reason\". Conn. Gen. Stat. 36a-869(a) bars a provider from revoking, withdrawing or modifying a specific offer until midnight of the third calendar day after the date of the offer, except on information obtained in the underwriting process or at the recipient's request.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument",
@@ -2478,7 +2705,8 @@
           "finding": "4.3 authorises Buyer to investigate the Merchant's and the Guarantors' \"financial responsibility and history\". It does not mention consumer reports, credit bureaus or the Fair Credit Reporting Act. The FCRA written-instructions language exists, but in a different instrument - Permission to Release Sections 3 and 4 - which the FRPA incorporates by reference and requires to be executed contemporaneously.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-4-5-exculpation-is-unqualified-where-every-sibling-clause-is-qualified",
@@ -2489,7 +2717,8 @@
           "finding": "4.5 waives consequential, punitive and exemplary damages against Buyer under any legal theory, with no carve-out for Buyer's own fraud, wilful misconduct or gross negligence, and no public-policy saving. Every comparable clause in the document set has one.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-4-8-conditions-the-counsel-review-7-22-promises",
@@ -2500,7 +2729,8 @@
           "finding": "4.8 makes the Agreement itself Confidential Information and permits disclosure to the merchant's own attorney only if that attorney \"first agrees in writing to be bound by the terms of this Section\". 7.22 and 9.6 promise an unconditional opportunity to review the Agreement with counsel of the merchant's choosing.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-4-8-may-impede-a-merchant-complaint-to-a-regulator",
@@ -2511,7 +2741,8 @@
           "finding": "A question, not a ruling. 4.8 permits disclosure of the financing agreement only where \"required by law or court order\" or to a bound Advisor. A merchant who wants to complain voluntarily to the DFPI, the Connecticut Banking Commissioner, the Virginia SCC or the Texas OCCC is not disclosing under compulsion and is on the face of the clause in breach - and under 6.1.1 that is an Event of Default.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-4-9-authorises-ucc-filings-under-a-dba-the-repository-does-not-record",
@@ -2522,7 +2753,8 @@
           "finding": "4.9 authorises Lombard to use d/b/a names when filing UCC-1 financing statements and other notices. CONTRACT_INDEX.md records no registered d/b/a for Lombard Capital LLC and lists other entity facts as unverified. The same authorisation also appears a second time as the last sentence of 4.10.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "handoff"
         },
         {
           "id": "frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2",
@@ -2533,7 +2765,8 @@
           "finding": "REVIEW-01 narrowed the guaranty to three items, one of which is limb (b): any representation of present fact that was incorrect when made. 5.11 and 5.13, both unexamined, are representations of present fact so broad that a merchant cannot know whether they are true, and each is therefore a live route to personal liability that the narrowing does not close.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-5-12-does-not-state-the-merchants-principal-place-of-business",
@@ -2544,7 +2777,8 @@
           "finding": "5.12 gives the business-purpose representation cleanly, which is what Conn. Gen. Stat. 36a-862 lets a provider rely on. It does not give a principal-place-of-business representation, which is what Va. Code 6.2-2232(A) route (i) contemplates.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-5-3-and-5-14-give-the-same-compliance-representation-twice",
@@ -2555,7 +2789,8 @@
           "finding": "Both clauses carry a compliance-with-all-applicable-law representation, in different tenses and with different scope, and both are in the 47 unexamined clauses.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-5-7-duplicates-5-18",
@@ -2566,7 +2801,8 @@
           "finding": "The same covenant appears twice, in materially identical words, eleven clauses apart.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-6-1-4-defaults-on-a-sale-5-18-expressly-permits",
@@ -2577,7 +2813,8 @@
           "finding": "5.18 permits a sale of all or substantially all the business or assets on two conditions - Buyer's prior written consent and the purchaser's written assumption. 6.1.4 makes \"Merchant shall transfer or sell all or substantially all of its assets\" an Event of Default with no consent qualifier, so a sale Lombard has consented to is still a default, and it is a default on which acceleration is available and for which there is no cure.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-6-4-24-hour-notice-cannot-be-given-under-7-3",
@@ -2588,7 +2825,8 @@
           "finding": "6.4 requires written notice of a Title 11 filing within twenty-four hours. 7.3 requires every notice under the agreement to be delivered by certified mail, return receipt requested, effective only on receipt. Certified mail cannot be received within twenty-four hours, so 6.4 is impossible to comply with as drafted.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-6-4-compels-the-notice-6-1-5-makes-a-default",
@@ -2599,7 +2837,8 @@
           "finding": "6.4 requires the Merchant to give seven days' written notice before closing a sale of all or substantially all its assets. 6.1.5 makes it an Event of Default that \"Merchant shall make or send notice of any intended bulk sale or transfer\". Complying with 6.4 triggers 6.1.5, and 6.1.5 is one of the five Events of Default on which the 100% acceleration remedy IS available and is not in the notice-and-cure list.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-7-1-has-no-except-as-expressly-provided-carve-out",
@@ -2610,7 +2849,8 @@
           "finding": "7.1 says no modification of any provision is effective unless in writing signed by both parties. At least three provisions of the agreement contemplate a change taking effect without a bilateral signature.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false",
@@ -2621,7 +2861,8 @@
           "finding": "7.10 makes both parties recite that the jury waiver is made \"ONLY AFTER EXTENSIVE CONSIDERATION OF THE RAMIFICATIONS OF THIS WAIVER WITH THEIR ATTORNEYS\". 7.22 and 9.6, two and three clauses later, expressly contemplate that the merchant and the guarantor may have \"chosen not to avail\" themselves of counsel. The document contains a recital and, a page later, its own contradiction.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-7-2-permits-delegation-of-the-reconciliation-duty",
@@ -2632,7 +2873,8 @@
           "finding": "A question, not a ruling. 7.2 lets Buyer \"delegate its duties hereunder, either in whole or in part\" without the merchant's consent and without notice. The duties include the Section 3 reconciliation and adjustment obligations, which are the merchant-protective core of the instrument.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-7-24-answers-only-half-of-conn-gen-stat-36a-868",
@@ -2643,7 +2885,8 @@
           "finding": "Conn. Gen. Stat. 36a-868 has two limbs: a ban on the contract CONTAINING a prejudgment-remedy waiver, and a rule that any such provision is unenforceable. 7.24's mechanism - disapplying the provision - answers the second limb only, and the first is backed by a civil penalty.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-7-24-does-not-name-the-statute-that-actually-bites",
@@ -2654,7 +2897,8 @@
           "finding": "7.24 names two statutes by section. Neither is the one that collides with the FRPA's own forum-selection clause. Va. Code 6.2-2234(A) makes the FRPA's choice of New York or Pasco County, Florida unenforceable for a Virginia recipient, and 7.24 does not mention it.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-7-24-misstates-what-tex-fin-code-398-055-voids",
@@ -2665,7 +2909,8 @@
           "finding": "7.24 describes Tex. Fin. Code 398.055 as a provision that \"voids confession-of-judgment and similar provisions\", and supplies a remedy under which the offending provision \"does not apply to this Agreement and the remainder of the Agreement continues in effect\". The statute voids the CONTRACT, not the provision, and the remedy 7.24 supplies is the one outcome the statute forecloses.",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-7-6-and-4-2-contradict-the-2-6-completion-test",
@@ -2676,7 +2921,8 @@
           "finding": "2.6 declares a single test for when the agreement is complete and says in terms that it overrides any other provision describing completion differently. Three other provisions still describe it differently, and one of them - 7.6 - is in the 46 unexamined clauses.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-9-3-additional-collateral-is-unbounded-and-has-no-form",
@@ -2687,7 +2933,8 @@
           "finding": "9.3 grants a security interest in \"any additional collateral identified in any schedule executed by Guarantor in connection with this Agreement\". No such schedule exists anywhere in the repository, no asset class is excluded, and the clause is the one place in the document where the all-assets lien REVIEW-01 removed from 4.10 could return.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "frpa-9-4-creates-guarantor-liability-on-merchant-bankruptcy",
@@ -2698,7 +2945,8 @@
           "finding": "The last sentence of 9.4 makes the Guarantor liable for any amount Lombard has to return because the Merchant became subject to a bankruptcy proceeding. 9.2 says in terms that no Guarantor has any liability arising from a bankruptcy filing by or against the Merchant, and the Section 6.1 proviso says a filing shall not give rise \"to any liability of any Guarantor\".",
           "decides": "counsel",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "frpa-9-5-refers-to-guarantors-the-form-cannot-collect",
@@ -2709,7 +2957,8 @@
           "finding": "9.5 makes the obligations of \"the persons or entities constituting Guarantors\" joint and several, and 9.4 and 9.2 refer to \"any other guarantor\" and \"Guarantor(s)\" throughout. The document can capture exactly one: 9.1 has a single name/title/SSN/address block and the signature page carries a single guarantor signature widget bound to r2.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "handoff"
         },
         {
           "id": "frpa-undefined-capitalised-terms-in-the-unexamined-clauses",
@@ -2720,7 +2969,8 @@
           "finding": "Four capitalised terms are used as though defined and are not. Two of them sit in unexamined clauses and one sits in the operative words of the narrowed guaranty.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "iso-1-6-representative-removal-is-a-request-with-no-obligation",
@@ -2731,7 +2981,8 @@
           "finding": "1.6 makes the partner responsible for its representatives and gives Company a right to \"request\" that one be removed, with no obligation to comply and no consequence for refusing. The indemnity in 3.3 does not name representatives.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a1-commission-out-of-a-fee-the-company-may-not-collect",
@@ -2742,7 +2993,8 @@
           "finding": "A.1 makes the commission \"payable solely out of the Origination Fee actually collected by Company\", with no commission at all if none is collected. The Origination Fee is defined and collected under the FRPA by \"Buyer\", which is Lombard Capital LLC. The ISO PRA is prepared by Lombard Pay LLC and its Company name is a single sender-filled widget. If the agreement is issued in Lombard Pay LLC's name, Company never collects an Origination Fee and, on A.1's own words, no commission is ever payable.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "handoff"
         },
         {
           "id": "iso-a2-a4-no-clawback-when-the-merchant-cancels-under-frpa-4-14",
@@ -2753,7 +3005,8 @@
           "finding": "A.2 earns the commission on disbursement. A.4 claws it back only if the merchant \"breaches its purchase agreement\". A merchant who exercises the FRPA's three-day cancellation right and returns the money has not breached anything, so the partner keeps a full commission on a transaction that was unwound.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a6-and-frpa-7-21-give-different-answers-about-a-merchant-paid-fee",
@@ -2764,7 +3017,8 @@
           "finding": "Both documents were revised together to close REVIEW-01's `iso-no-bar-on-partner-charging-merchant`, and they still say different things about where a merchant-paid ISO fee ends up. The FRPA tells the merchant the fee has nothing to do with Buyer; the ISO PRA requires the partner to hand it to Company.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "iso-a6-remedy-sends-the-merchants-money-to-company",
@@ -2775,7 +3029,8 @@
           "finding": "A.6 bars the partner from taking any fee from a merchant and then, if one is taken, requires it to be remitted to Company. The merchant who paid it is not made whole, and Company ends up holding a fee that O.C.G.A. 10-1-393.18(f)(1) says a broker may not collect from a business as an advance fee.",
           "decides": "owner",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "manifest-note-for-iso-signature-dates-does-not-match-the-sidecar",
@@ -2786,7 +3041,8 @@
           "finding": "Outside the 47, but load-bearing for anything that reads the manifest. The manifest records this fix as a sidecar rename of widgets 8 and 9 to `company_sign_date` and `iso_partner_sign_date`. The current sidecar has no such fields and no widgets 8 or 9; the fix was in fact made a different way, by replacing the date widgets with native placeholders.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "open"
         },
         {
           "id": "payzli-cessation-on-notice-vs-frpa-2-6-automatic-cessation",
@@ -2797,7 +3053,8 @@
           "finding": "FRPA 2.6 says withholdings cease automatically on the Completion Threshold. The Payzli instruction ceases either at a fixed dollar figure or when Lombard tells Payzli to stop. The merchant's protection under 2.6 is automatic; the instrument that implements it depends on Lombard acting.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "payzli-instruction-stops-short-of-the-frpa-completion-threshold",
@@ -2808,7 +3065,8 @@
           "finding": "The split-funding instruction the merchant signs tells Payzli to stop forwarding once it has forwarded the Purchased Amount. The FRPA's collection right runs until the Remaining Balance is zero, and the Remaining Balance is the Purchased Amount PLUS fees. The instrument that actually operates collection stops before the agreement says collection is complete.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         },
         {
           "id": "payzli-uses-debit-where-the-frpa-promises-no-deposit-account-debiting",
@@ -2819,7 +3077,8 @@
           "finding": "The word \"debit\" in the instruction the merchant signs is unqualified. It is in fact confined to payables owed by Payzli to the Seller, so this is a wording risk rather than a substantive one - but the FRPA makes an express promise not to debit the merchant's deposit account, and the Payzli letter does not repeat the limit.",
           "decides": "me",
           "status": "survived",
-          "review": "REVIEW-02"
+          "review": "REVIEW-02",
+          "disposition": "implemented"
         }
       ]
     }

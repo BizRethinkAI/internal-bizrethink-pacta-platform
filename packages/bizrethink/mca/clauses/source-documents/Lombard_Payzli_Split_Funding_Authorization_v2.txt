@@ -1,0 +1,43 @@
+Lombard_Payzli_Split_Funding_Authorization_v2.docx -- body text, extracted
+
+Source:    lombard-contracts/sources/Lombard_Payzli_Split_Funding_Authorization_v2.docx
+Repository: https://github.com/lombardpay/lombard-contracts at 7b8e61c3c1c9fa02ff4a98f3e4d477132066008d
+docx sha256: f94d8b5dd6b3f061abda56b2b652e4c705d62666ef779eee956b1343b9617d20
+Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
+           that repository at the commit above.
+
+WHAT THIS IS. Lombard's own executed-form agreement -- primary text in the only
+sense that matters here, because the words are ours and this file is the
+document they were published in. It is not a statute and no regulator wrote it,
+so the primary/secondary-publisher question `sources-are-primary.test.ts` asks
+of `mca/sources/` does not arise; the question this header answers instead is
+WHICH document, at WHICH revision.
+
+HOW IT WAS EXTRACTED. word/document.xml, in document order: every <w:p> as one
+line with runs joined and whitespace collapsed, every <w:tbl> as one line
+prefixed `[TABLE]` with cells joined by ` | ` and rows by ` // `. Field codes,
+comments and revision marks are not read. The `<<N>>` markers are the AcroForm
+widget anchors the Lombard pipeline injects; they are part of the published
+document and are kept.
+
+WHY IT IS HERE. A clause in `mca/clauses/` carries the body a merchant reads.
+That body is only worth anything if it is still the body the document ships,
+and this file is what re-executes that claim on every test run. If the .docx
+moves, the digest breaks and somebody has to look -- which is the event this
+exists for.
+
+--- BODY TEXT BEGINS ---
+United Payment Systems LLC, doing business as Payzli
+3350 Buschwood Park Drive, Suite 150, Tampa, FL 33618
+Re: Credit Card Receivables Split Funding Authorization
+To Whom It May Concern:
+I am writing on behalf of _____________«1»______________ (the “Seller”). Pursuant to the Future Receivables Purchase Agreement dated ____«9»____ between Seller and ________«8»________ (the “Funding Company”) (the “Purchase Agreement”), Seller has sold certain credit and debit card receivables to Funding Company, and Seller has agreed to pay _«2»_% of payments due Seller from United Payment Systems LLC, doing business as Payzli (“Payzli”), pursuant to that Merchant Processing Agreement executed by Payzli and Seller (the “Payzli Merchant Agreement”).
+Pursuant to the Payzli Merchant Agreement, Seller hereby irrevocably instructs Payzli to (a) withhold or debit, in each case only from the payments due from Payzli to Seller and not from any deposit account of Seller, _«3»_% of the payments due from Payzli to Seller under the Payzli Merchant Agreement arising from credit and debit card transactions, and (b) forward the amount so withheld to Funding Company, until Funding Company notifies Payzli in writing that Seller’s obligations under the Purchase Agreement have been satisfied. The Purchased Amount under the Purchase Agreement is $ _____«16»______; that figure is stated for information only and is not the point at which withholding stops, because Seller’s obligations under the Purchase Agreement may include fees in addition to the Purchased Amount. This instruction relates only to the Purchase Agreement and secures no other obligation. Seller may also instruct Payzli to cease withholding on producing Funding Company’s written confirmation that the Completion Threshold has been attained, which Funding Company shall provide within two Workdays (as defined in the Purchase Agreement) of a written request.
+Such payments to Funding Company shall be made in partial or complete satisfaction of any obligation Payzli may have to Seller under the Payzli Merchant Agreement.
+SELLER ACKNOWLEDGES THAT SUCH PAYMENTS TO FUNDING COMPANY ARE IN ADDITION TO ANY FEES OWED BY SELLER TO PAYZLI PURSUANT TO THE PAYZLI MERCHANT AGREEMENT OR ANY OTHER AGREEMENT BETWEEN SELLER AND PAYZLI.
+Seller hereby acknowledges that the Payzli Merchant Agreement provides that (i) if the Merchant Processing Agreement is terminated by Seller within one year of the Merchant Processing Agreement’s effective date, then Seller is obligated to pay Payzli a termination fee equal to the lesser of $295.00 or the maximum amount allowed by law; and (ii) if the Merchant Processing Agreement is terminated by Seller more than one year after the Merchant Processing Agreement’s effective date, then Seller is obligated to pay Payzli a termination fee equal to the lesser of $195.00 or the maximum amount allowed by law.
+Seller hereby agrees to indemnify Payzli from any and all losses, damages, claims, liabilities, and expenses, including reasonable attorneys’ fees, arising from Payzli’s following the instructions set forth in this letter.
+Remittance instructions. Forward the withheld amounts to: ___________«10»___________ (Funding Company), _______________«11»_______________; bank _________«12»_________, routing number ___«13»____, account number _____«14»_____. Questions about this authorization: _________«15»_________.
+Sincerely,
+SELLER (___________«4»___________ DBA ___________«5»___________)
+[TABLE] Signature: | Date: {{DATE, r1, width=110, height=16}} // {{SIGNATURE, r1, width=200, height=20}} |  // Printed Name: __________«6»___________ | Title: ________«7»________

@@ -329,6 +329,11 @@ msgstr ""
 msgid "{0} direct signing templates"
 msgstr "{0} plantillas de firma directa"
 
+#. placeholder {0}: evidence.sourcesMoved.length
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "{0} document(s) changed since these clauses were transcribed from them"
+msgstr ""
+
 #. placeholder {0}: t(FRIENDLY_FIELD_TYPE[field.type])
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
 msgid "{0} field"
@@ -2154,6 +2159,10 @@ msgstr "Analizando el diseño de la página"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "Analyzing pages"
 msgstr "Analizando las páginas"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Answer"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Any documents that you have been invited to will appear here"
@@ -6462,6 +6471,10 @@ msgstr "De"
 msgid "From address"
 msgstr "Dirección del remitente"
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "From counsel"
+msgstr ""
+
 #: apps/remix/app/components/forms/email-transport-form.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
 msgid "From name"
@@ -7801,6 +7814,12 @@ msgstr "Número máximo de destinatarios permitidos por documento. 0 = Ilimitado
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Maximum number of uploaded files per envelope allowed"
 msgstr "Número máximo de archivos subidos por sobre permitido"
+
+#: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "MCA Clauses"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/mca.tsx
 msgid "MCA conformity"
@@ -9752,6 +9771,12 @@ msgstr "Tipo de registro"
 msgid "Record Value"
 msgstr "Valor del registro"
 
+#. placeholder {0}: outstanding.length
+#. placeholder {1}: findings.length
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Recorded by attorneys through a review link. {0} of {1} are unanswered, and each unanswered one holds its clause against approval. These are separate from the findings the two document reviews raised, which are cleared in the review manifests."
+msgstr ""
+
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "Recovery code copied"
 msgstr "Código de recuperación copiado"
@@ -10256,6 +10281,10 @@ msgstr ""
 
 #: apps/remix/app/routes/_recipient+/lease-review.$token.tsx
 msgid "Review a lease · Pacta"
+msgstr ""
+
+#: apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx
+msgid "Review an agreement · Pacta"
 msgstr ""
 
 #: packages/email/templates/organisation-account-link-confirmation.tsx
@@ -11402,6 +11431,10 @@ msgstr ""
 msgid "SMTP settings saved"
 msgstr ""
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "Some evidence is not present in this environment"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Some fields are placed on top of each other. This may complicate the signing process or cause fields to not work as expected."
@@ -12360,6 +12393,10 @@ msgstr "Los métodos de autenticación necesarios para que los destinatarios fir
 msgid "The authentication methods required for recipients to view the document."
 msgstr "Los métodos de autenticación necesarios para que los destinatarios vean el documento."
 
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "The clause text below may be quoting superseded sentences. Re-vendor the affected documents from lombard-contracts and re-earn their verification dates."
+msgstr ""
+
 #: apps/remix/app/components/general/admin-site-banner-section.tsx
 msgid "The content to show in the banner, HTML is allowed"
 msgstr "El contenido que se mostrará en el banner, se permite HTML"
@@ -12557,6 +12594,10 @@ msgstr ""
 
 #: apps/remix/app/components/general/admin-license-card.tsx
 msgid "The license key has been copied to your clipboard"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "The negotiated agreements — our contract text, not a regulator's. Clauses name their parties by role ({{funder}}, {{processor}}), and the documents below are one client's copy of them. Conformity for the prescribed disclosure forms is a separate page."
 msgstr ""
 
 #. placeholder {0}: form.watch('name')
@@ -14972,6 +15013,10 @@ msgstr "Se requiere URL conocida"
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Were you trying to edit this document instead?"
 msgstr "¿Estabas intentando editar este documento en su lugar?"
+
+#: apps/remix/app/routes/_authenticated+/admin+/mca-library.tsx
+msgid "What is missing cannot be checked here, so an empty result below is not a clean one. This is a deployment fact rather than a defect in the text."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"

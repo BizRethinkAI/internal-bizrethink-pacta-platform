@@ -21,14 +21,15 @@ text being written down.
 
 | | |
 |---|---|
-| ISO Partner Referral Agreement | **24 clauses, imported** |
-| FRPA | not imported — 90 clauses |
-| Equipment Lease | not imported — 25 clauses |
-| Subscription | not imported — the Equipment Lease's twin |
-| Payzli Split Funding Authorization | no numbered clauses; it is a letter |
-| Permission to Release | no numbered clauses |
+| FRPA | **101 clauses** — 87 numbered, 14 the document leaves unnumbered |
+| ISO Partner Referral Agreement | **24 clauses** |
+| Equipment Lease | **26 clauses** |
+| Subscription | **26 clauses** — the Equipment Lease's twin |
+| Payzli Split Funding Authorization | **7 clauses** — a letter, no numbering at all |
+| Permission to Release | **8 clauses** — Phase 0 recorded it as having none |
+| **Total** | **192 clauses, all six instruments imported** |
 | Approvals, review links, an admin surface | not built |
-| Interview, engine, assembly | not built |
+| Interview, engine, assembly | not built — and it lives here, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
 
 Nothing here is publishable and nothing renders to a merchant. Every clause is
 `attorney-drafted` with a null author, and `library.test.ts` asserts the refusal
@@ -53,6 +54,28 @@ because 10 CCR §952 and 23 NYCRR §600.21 both regulate what a broker may hand 
 recipient. Putting the relation in the field name is what keeps
 `disclosuresFor`'s exact-equality filter meaning what it says.
 
+## Re-vendoring, when the documents change
+
+```
+python3 scripts/mca/revendor.py            # do it
+python3 scripts/mca/revendor.py --check    # report drift, write nothing
+```
+
+`lombard-contracts` is the source of every document and every review manifest
+here; this repository holds copies. When that repository acts on a finding or
+edits a `.docx`, these copies go stale **and nothing here notices** — the
+digests are taken over our own copy, so they still match.
+
+That is not hypothetical. This script's first `--check` run found the review
+register a commit behind: `lombard-contracts` #10 had recorded five findings as
+`implemented` and Pacta was still holding them as live work, over-blocking the
+approval gate by seven clauses.
+
+**What it deliberately does not do.** It updates the vendored TEXT and prints
+the digests that have moved. It does not touch a clause body and does not
+re-stamp `bodiesVerifiedAt`. Those two acts assert that a human re-read the
+document, and a script cannot make that claim — see rule 3 below.
+
 ## Rules for adding a clause
 
 1. **Nothing enters unexamined.** `examinedBy` is required and may not be empty.
@@ -76,16 +99,23 @@ recipient. Putting the relation in the field name is what keeps
    fixes that review produced removed a section above it. There is deliberately
    no string match from locus to clause; a match would break exactly when a
    review had been acted on.
-5. **A clause published in two agreements is one clause with two instruments.**
-   Not two clauses that agree. The Equipment Lease and the Subscription are the
-   same document with its vocabulary swapped and its numbering identical, and
-   REVIEW-02's finding is the reason this matters: *every Equipment Lease
-   finding lands twice, in two live templates, and a fix applied to one and not
-   the other is a divergence nothing checks for.*
-6. **Slugs are globally unique**, across instruments as well as within them.
+5. **A twin is two clauses whose agreement is asserted, not one clause rendered
+   twice.** This was the other way round when the field was designed, and the
+   documents refused it — see `twins.ts`. The Equipment Lease and the
+   Subscription share no vocabulary-bearing sentence, so there is nothing to
+   store once; what there is instead is `__tests__/twins.test.ts`, which
+   answers REVIEW-02's *"a fix applied to one and not the other is a divergence
+   nothing checks for"* by checking for it. `instrument` is consequently
+   singular: across 177 clauses not one names a second.
+6. **A clause the document does not number still gets imported.** Fourteen FRPA
+   clauses carry no number, including the granting clause — the sentence that
+   makes the instrument a sale rather than a loan.
+   `__tests__/frpa-coverage.test.ts` asserts that nothing in the document is
+   missing from the library, which is the direction that fails silently.
+7. **Slugs are globally unique**, across instruments as well as within them.
    The lease library learned this when one attorney approval hid another's,
    because approvals are keyed by slug alone.
-7. **Reach a clause through `libraryFor`, never by importing an instrument's
+8. **Reach a clause through `libraryFor`, never by importing an instrument's
    module.** The California disclosure shipped carrying New York's phrasing and
    survived a human reading both regulations side by side; the failure was that
    a caller could reach the wrong text at all. The instruments here are more
@@ -97,14 +127,34 @@ They prove the words in this directory are the words the documents ship, that
 the documents have not moved under them, and that every clause names a review
 that read it.
 
-They do not prove a clause is any good. The twenty-four ISO PRA clauses cite
-**seventeen distinct findings, every one of which survived refutation** — a
-blocker against the clawback tiers, a broker-status question routed to counsel,
-a remedy that sends a merchant's refund to the wrong party. A green suite means
-the record is intact, not that the record is empty, and
-`bodies-match-the-document.test.ts` asserts those counts so the difference
-cannot be lost by accident. `findingsFor` and `outstandingFindingsFor` are how a
-surface shows it.
+**The twins are checked against each other as well as against their documents.**
+`twins.test.ts` asserts that the two number their clauses identically, that
+every clause not declared divergent agrees word for word once the vocabulary is
+applied, and that every declared divergence still diverges — so the register
+cannot go write-only. Five clauses differ in substance (§§3.4–3.8) and ten more
+places differ only in wording; both lists are pinned.
+
+They do not prove a clause is any good. The clauses here cite **136 distinct
+findings that survived refutation**, of which **43 are still outstanding** — the
+other 93 were fixed or rejected, and the two review manifests are what say so.
+
+Both reviews now carry dispositions. REVIEW-02's manifest landed in
+lombard-contracts PR #9; before it, all 48 of that review's findings were
+`unrecorded` and counted as outstanding, and 19 of them turned out to be fixed.
+`unrecorded` remains in the vocabulary for a finding whose manifest does not
+name it — which is still true of the refuted ones, and is where the next review
+to arrive without a manifest will land.
+
+**`findingsFor` and `outstandingFindingsFor` mean different things and the
+difference is the point.** A finding surviving refutation says it was RIGHT.
+Whether anybody acted on it is a separate question with its own authoritative
+answer, and reading only the first is how this library spent two PRs reporting
+more than twice the real backlog. See `__tests__/dispositions.test.ts`.
+
+**REVIEW-01 keeps a manifest; REVIEW-02 does not.** Its dispositions are prose
+in `change-notes/16-review-02-document-defects.md` — 23 of 48 fixed, without
+saying which in a form anything can read. Every REVIEW-02 finding is therefore
+`unrecorded`, counted as outstanding because unknown is not done.
 
 They also do not prove the findings say what a clause claims. The register keeps
 `id`, `severity`, `locus` and the finding's one-line statement, and drops the

@@ -30,6 +30,22 @@
 // `provenance/` and nothing else, and a root export that offered both under one
 // namespace would be the first step back towards one list.
 
+// READS THE FILESYSTEM, for the same reason and with the same rule as the
+// conformity surface above. `mcaLibrarySurface` reaches `mca/clauses/documents`
+// and `mca/clauses/examination`, both of which import `node:fs` — one to digest
+// the vendored agreements, the other to read the review register. Import it
+// ONLY from server code, through
+// `apps/remix/app/utils/bizrethink-mca-library.server.ts`.
+//
+// The types beside it are erased at compile time and are safe to import
+// anywhere, which is what lets the route render without pulling the module in.
+export {
+  type McaLibraryClauseView,
+  type McaLibraryFindingView,
+  type McaLibraryInstrumentView,
+  mcaLibrarySurface,
+  type SourceState,
+} from './mca/clauses/surface/view';
 export {
   JURISDICTION_NAMES,
   MCA_JURISDICTIONS,
@@ -37,6 +53,21 @@ export {
 } from './mca/jurisdictions';
 export { OPEN_READINGS, type OpenReading } from './mca/readings';
 export { disclosuresFor } from './mca/registry';
+// READS THE FILESYSTEM *AND* THE DATABASE. `mcaLibraryPage` is
+// `mcaLibrarySurface` plus the approval rows and the counsel links — the whole
+// of what `/admin/mca-library` renders, in one read, so the clause list and the
+// approval badges cannot disagree because one refetched and the other did not.
+//
+// Same rule as everything above it: server code only, through
+// `apps/remix/app/utils/bizrethink-mca-library.server.ts`. The types beside it
+// are erased at compile time and are safe to import anywhere.
+export {
+  type McaCounselFindingView,
+  type McaLibraryApprovalView,
+  type McaLibraryPageClause,
+  type McaLibraryReviewView,
+  mcaLibraryPage,
+} from './mca/server-only/library-page';
 // READS THE FILESYSTEM. `conformitySurface` and `envelopeShapes` reach
 // `mca/provenance/source-text.ts`, which imports `node:fs`, `node:path` and
 // `node:crypto` to re-earn every verification date against the vendored
@@ -51,6 +82,7 @@ export {
   assertSingleLibrary,
   type ConformityEntry,
   type ConformityKind,
+  type ConformitySummary,
   type ConformitySurface,
   conformitySurface,
   type DigestState,

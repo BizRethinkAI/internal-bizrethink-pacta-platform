@@ -1,5 +1,5 @@
 import { router } from '@documenso/trpc/server/trpc';
-
+import { mcaClauseLibraryRouter } from '../../mca/server-only/trpc/clause-library-router';
 import { instanceAiRouter } from './instance-ai-router';
 import { instanceSigningRouter } from './instance-signing-router';
 import { instanceStorageRouter } from './instance-storage-router';
@@ -43,4 +43,13 @@ export const bizrethinkRouter = router({
   // blocks on. Every procedure re-checks the access gate: a tRPC procedure is
   // reachable without going through the page that renders it.
   leaseBuilder: leaseBuilderRouter,
+  // MCA clause library — per-clause attorney approval and the tokenised
+  // counsel review link (ADR 0008 / 0009). Deliberately NOT part of the
+  // conformity surface: approving a regulator's prescribed words would be a
+  // category error, and `/admin/mca` has no mutation of any kind.
+  //
+  // Admin-gated rather than organisation-scoped. The clause library is
+  // instance content — the same clauses and the same approvals for every
+  // customer — so there is no tenancy to authorise against.
+  mcaClauseLibrary: mcaClauseLibraryRouter,
 });

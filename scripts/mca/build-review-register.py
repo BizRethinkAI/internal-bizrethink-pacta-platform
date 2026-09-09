@@ -30,6 +30,20 @@ KEEP = ('id', 'severity', 'category', 'document', 'locus', 'finding', 'decides',
 commit = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'],
                         capture_output=True, text=True).stdout.strip()
 
+# BOTH reviews now record what was done about each finding. REVIEW-02's
+# manifest landed in lombard-contracts PR #9; before it, every one of that
+# review's 48 findings was `unrecorded` -- unknown, and counted as outstanding
+# because unknown is not done. `unrecorded` stays in the vocabulary rather than
+# being deleted: it is the honest answer for a review that has no manifest, and
+# the next review to arrive without one should land on it rather than on a
+# default that looks like an answer.
+MANIFESTS = {'REVIEW-01': 'REVIEW-01-manifest.json', 'REVIEW-02': 'REVIEW-02-manifest.json'}
+DISPOSITION, MANIFEST_SHA = {}, {}
+for _review, _file in MANIFESTS.items():
+    _raw = (REPO / _file).read_bytes()
+    DISPOSITION[_review] = {e['id']: e['status'] for e in json.loads(_raw)['entries']}
+    MANIFEST_SHA[_review] = hashlib.sha256(_raw).hexdigest()
+
 reviews = []
 for review, fname in (('REVIEW-01', 'REVIEW-01-findings.json'),
                       ('REVIEW-02', 'REVIEW-02-findings.json')):
@@ -41,12 +55,15 @@ for review, fname in (('REVIEW-01', 'REVIEW-01-findings.json'),
             e = {k: f[k] for k in KEEP if k in f}
             e['status'] = status
             e['review'] = review
+            e['disposition'] = DISPOSITION.get(review, {}).get(f['id'], 'unrecorded')
             entries.append(e)
     entries.sort(key=lambda e: e['id'])
     reviews.append({
         'review': review,
         'file': fname,
         'sha256': hashlib.sha256(raw).hexdigest(),
+        'manifest': MANIFESTS.get(review),
+        'manifestSha256': MANIFEST_SHA.get(review),
         'survived': len(doc.get('survived', [])),
         'refuted': len(doc.get('refuted', [])),
         'coverageGaps': [g if isinstance(g, str) else g.get('id', g.get('gap', str(g)))
@@ -61,6 +78,12 @@ out = {
               'than editing this file.'),
     '_repository': 'https://github.com/lombardpay/lombard-contracts',
     '_commit': commit,
+    '_dispositions': ('Each finding carries the status from its review manifest '
+                      '(implemented / open / handoff / rejected / wont-fix). A '
+                      'finding absent from its manifest is `unrecorded` -- '
+                      'unknown, which is not the same as open and not the same '
+                      'as done, and which counts as outstanding. REVIEW-02 had '
+                      'no manifest at all until lombard-contracts PR #9.'),
     '_whatThisProves': ('That a finding id a clause names is a finding that was '
                         'actually raised, what it was about and where it routed. '
                         'It does NOT prove the finding says what a clause claims '
