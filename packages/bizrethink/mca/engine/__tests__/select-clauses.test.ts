@@ -121,10 +121,20 @@ describe('which agreements a product involves at all', () => {
     // Lombard runs a broker channel and pulls consumer reports.
     expect(instruments).toContain('iso-pra');
     expect(instruments).toContain('permission-to-release');
-    // v4 defers equipment into the Purchased Amount rather than leasing it, so
-    // the twins are not part of this product.
-    expect(instruments).not.toContain('equipment-lease');
-    expect(instruments).not.toContain('subscription');
+    /*
+     * The twins ARE part of this product, and this assertion used to say the
+     * opposite on the reasoning that "v4 defers equipment into the Purchased
+     * Amount rather than leasing it". Deferred equipment is gone (owner,
+     * 2026-09-10), the merchant elects buy or lease at signing, and §002 sends
+     * the lease path to a separate written agreement — so a suite without them
+     * has a clause pointing at a document that does not exist.
+     */
+    expect(instruments).toContain('equipment-lease');
+    expect(instruments).toContain('subscription');
+    // And a funder that does not offer equipment at all still gets neither.
+    const noEquipment = instrumentsFor({ ...LOMBARD_FACTS, equipment: 'none' });
+    expect(noEquipment).not.toContain('equipment-lease');
+    expect(noEquipment).not.toContain('subscription');
   });
 
   it('drops the broker agreement for a funder with no channel', () => {

@@ -79,8 +79,25 @@ export type McaFacts = {
    */
   settlementBase: 'net' | 'gross';
 
-  /** Decides the equipment explainers, the §5.5 insurance clause and §4.11's ranking limb. */
-  equipment: 'none' | 'purchased-at-funding' | 'deferred' | 'separate-lease';
+  /**
+   * Whether point-of-sale equipment is part of this funder's offering at all.
+   *
+   * Decides the equipment explainers, the §5.5 insurance clause and §4.11's
+   * ranking limb — all four gates read `!== 'none'` and nothing reads more.
+   *
+   * IT IS NOT WHERE BUY-VERSUS-LEASE IS DECIDED. That is the merchant's, made
+   * in Section 1 before signature (owner, 2026-09-10: *"Lease or buy, merchant
+   * decide while signing up"*), and §002 offers both paths with a
+   * no-double-charge rule between them.
+   *
+   * The row used to carry four values naming a funder-side model —
+   * `purchased-at-funding`, `deferred`, `separate-lease`. Three were
+   * indistinguishable to every gate that read them, and `deferred` stopped
+   * having clause text behind it once §2.6 said the Remaining Balance never
+   * includes an equipment charge: a Purchased Amount of `(Purchase Price ×
+   * Factor Rate) + Equipment Cost Deferred` puts one inside it by construction.
+   */
+  equipment: 'none' | 'merchant-elects';
 
   /**
    * Whether a prior balance can be carried into a new purchase.
@@ -154,14 +171,32 @@ export type McaFacts = {
  * does and, where it matters, why. An interview may override per template; this
  * is the default and the place the reasoning lives.
  *
- * IT DESCRIBES THE PAPER, NOT THE RECOMMENDATION, and the first draft of this
- * row got that wrong in four places — it encoded what the 2026-09-09 memo
- * proposes rather than what v4 ships. A profile that describes a document
- * nobody has signed would make every selection disagree with the document it is
- * supposed to reproduce, and the disagreement would have surfaced as a failing
- * fidelity test with no obvious cause. `equipment`, `renewalModel`,
- * `concurrentPositions` and `venueRule` are all the shipped values, each noted
- * inline with what the memo asks for instead.
+ * IT USED TO DESCRIBE THE PAPER. It no longer does, and that is an owner
+ * decision of 2026-09-10, not a drift.
+ *
+ * The old rule was that `equipment`, `renewalModel`, `concurrentPositions` and
+ * `venueRule` record what v4 ships rather than what the 2026-09-09 memo
+ * recommends, because *"a profile that describes a document nobody has signed
+ * would make every selection disagree with the document it is supposed to
+ * reproduce, and the disagreement would have surfaced as a failing fidelity
+ * test"*.
+ *
+ * **That reason is gone.** [ADR 0012](../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md)
+ * retired the fidelity tests, so nothing is trying to reproduce v4 any more,
+ * and four rows were left anchored to a document the library has stopped
+ * copying. The owner's instruction is to adopt the memo's recommended design,
+ * which the memo itself states as one coherent set: narrow the purchased asset
+ * to a percentage of net card settlements; remove deferred equipment; separate
+ * fees from the collection cap; eliminate automatic Carry and concurrent Buyer
+ * positions; use merchant-state venue; restrict the guaranty to the
+ * signatory's own covered misconduct.
+ *
+ * **`equipment` has moved. `renewalModel`, `concurrentPositions` and
+ * `venueRule` have not yet**, because moving a row deselects the clause it
+ * gates and each of those three gates a clause still carrying v4 text — a
+ * `payoff-only` funder would lose §8.2 entirely rather than lose its Carry
+ * limb. They move with the `renewal-positions` rewrite, in one change, so the
+ * library never holds a profile that selects an incoherent document.
  *
  * `split-only` is the value with no written history anywhere. §2.5 (the gated
  * ACH backstop) and §7.14 (a blanket debit authority) both left the paper
@@ -186,10 +221,11 @@ export const LOMBARD_FACTS: McaFacts = {
   */
   settlementBase: 'net',
   guarantyScope: 'limited-conduct',
-  /* v4 carries "Equipment Cost Deferred" in Section 1.3. The memo proposes
-     removing deferred equipment from the FRPA entirely; that is a proposal, and
-     this row records the paper. */
-  equipment: 'deferred',
+  /* Lombard offers equipment; the merchant elects buy or lease when signing.
+     v4 carried "Equipment Cost Deferred" in Section 1.3 and this row used to
+     record that, on the principle retired above. §§002/003 state it as
+     $0.00, so `deferred` no longer names anything the corpus can build. */
+  equipment: 'merchant-elects',
   /* v4's §8.2 offers Carry. Same distinction. */
   renewalModel: 'carry',
   /* v4's §4.15 affirmatively authorises concurrent Lombard positions. The memo
