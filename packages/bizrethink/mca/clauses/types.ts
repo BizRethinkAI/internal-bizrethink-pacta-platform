@@ -26,6 +26,66 @@ export type { ClauseExamination } from './examination';
  * need a facts type, and that type should be derived from what the clauses
  * actually branch on rather than guessed at now.
  */
+/**
+ * What a library entry actually is.
+ *
+ * THE DISCRIMINATOR THAT DID NOT EXIST, AND WHAT ITS ABSENCE COST. Three
+ * guarantor-identity grids were imported with `body: ''` — the FRPA's §9.1 and
+ * both twins' §4.1 — because that is genuinely what those sections hold: a
+ * table of AcroForm widgets under a heading, no prose. `feat/mca-clauses-twins`
+ * recorded the decision under "Not done, on purpose".
+ *
+ * The reading was defensible; the representation was not. **A deliberate empty
+ * body and a dropped one are byte-identical**, so nothing could tell them apart
+ * — not `frpa-coverage.test.ts`, which asks whether every LINE is inside a
+ * clause and never whether every CLAUSE has content, and not a reader. An
+ * outside attorney opened the FRPA on a counsel link in September 2026 and
+ * could not review the guarantor execution block at all.
+ *
+ * `kind` says which it is, and `__tests__/every-clause-has-content.test.ts`
+ * then demands the right content for each.
+ *
+ * NO FOURTH VALUE WITHOUT A MEMBER AND A DISTINCT BEHAVIOUR. `frpa.definitions`
+ * is a `clause`, not a `definition` — defined terms bind, so it is operative
+ * text, and a kind no gate branches on is a field with no user.
+ * [ADR 0011](../../../../docs/adr/0011-the-mca-clause-library-is-a-library.md).
+ */
+export type McaClauseKind =
+  /** Operative contract text. The default, and all but three of the corpus. */
+  | 'clause'
+  /** A grid the parties complete. Holds `fields`, never a body. */
+  | 'field-group'
+  /**
+   * Non-operative prose describing an operative term — the FRPA's four Funding
+   * Terms explainers. Still text a merchant reads, so it still needs an author
+   * before it may be published; it is separated because it READS as operative
+   * while describing something that is not, which is why the 2026-09-09 counsel
+   * memo rates the holdback explainer High.
+   */
+  | 'explainer';
+
+/**
+ * One blank in a form grid.
+ *
+ * `widget` is the `«N»` AcroForm anchor the Lombard pipeline injects, carried
+ * verbatim for the same reason clause bodies carry theirs (README rule 2):
+ * without it nothing can be filled in, and a tidied copy would make the check
+ * a check against a tidied document.
+ *
+ * IT IS NOT OPTIONAL EVEN THOUGH IT LOOKS INCIDENTAL. The Equipment Lease and
+ * the Subscription number their fields IDENTICALLY — both `«21»`–`«24»` — so a
+ * group copied from one twin to the other looks correct in review and is only
+ * wrong at injection time.
+ */
+export type ClauseField = {
+  /** As the document prints it: "Full Name", "Social Security Number". */
+  label: string;
+  /** The AcroForm anchor, e.g. `«35»`. */
+  widget: string;
+  kind: 'text' | 'date' | 'signature' | 'ssn' | 'currency';
+  required: boolean;
+};
+
 export type McaClause = {
   slug: string;
   version: number;
@@ -55,6 +115,19 @@ export type McaClause = {
    * argument `jurisdictions.ts` makes about adding a federal disclosure.
    */
   instrument: McaInstrument;
+
+  /** What this entry is. See `McaClauseKind`. */
+  kind: McaClauseKind;
+
+  /**
+   * The blanks, when `kind` is `field-group`; absent otherwise.
+   *
+   * Deliberately not `ClauseField[]` defaulting to `[]`: an empty array on a
+   * prose clause would be a third way of saying "no fields" beside `undefined`
+   * and `kind !== 'field-group'`, and the test asserts the absence rather than
+   * tolerating either.
+   */
+  fields?: ClauseField[];
 
   /**
    * The number the document itself prints — `A.4`, `2.6`, `3.12`.

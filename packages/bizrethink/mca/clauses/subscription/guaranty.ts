@@ -13,11 +13,26 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     slug: 'subscription.guarantor-information',
     version: 1,
     instrument: 'subscription',
+    kind: 'field-group',
     number: '4.1',
     section: 'guaranty',
     sortKey: 10,
     heading: 'Guarantor Information',
     body: '',
+    /*
+      Four blanks, «21»-«24». Fewer than the FRPA's six — no Title and no Email
+      — and that difference is real, not an import gap: the twins collect a
+      Phone NUMBER where the FRPA collects a Phone.
+
+      The two twins number these IDENTICALLY, which is why `widget` is required
+      on every field. A group copied from one to the other reads as correct.
+    */
+    fields: [
+      { label: 'Full Name', widget: '«21»', kind: 'text', required: true },
+      { label: 'Social Security Number', widget: '«22»', kind: 'ssn', required: true },
+      { label: 'Home Address', widget: '«23»', kind: 'text', required: true },
+      { label: 'Phone Number', widget: '«24»', kind: 'text', required: true },
+    ],
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -27,6 +42,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     slug: 'subscription.guaranty-of-payment',
     version: 1,
     instrument: 'subscription',
+    kind: 'clause',
     number: '4.2',
     section: 'guaranty',
     sortKey: 20,
@@ -51,6 +67,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     slug: 'subscription.independent-decision-governing-law',
     version: 1,
     instrument: 'subscription',
+    kind: 'clause',
     number: '4.3',
     section: 'guaranty',
     sortKey: 30,
@@ -68,6 +85,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     slug: 'subscription.jury-trial-and-class-action-waiver',
     version: 1,
     instrument: 'subscription',
+    kind: 'clause',
     number: '4.4',
     section: 'guaranty',
     sortKey: 40,
@@ -91,6 +109,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     slug: 'subscription.credit-reporting-authorization',
     version: 1,
     instrument: 'subscription',
+    kind: 'clause',
     number: '4.5',
     section: 'guaranty',
     sortKey: 50,
@@ -105,6 +124,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     slug: 'subscription.communications-consent',
     version: 1,
     instrument: 'subscription',
+    kind: 'clause',
     number: '4.6',
     section: 'guaranty',
     sortKey: 60,
@@ -119,6 +139,7 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     slug: 'subscription.acknowledgment',
     version: 1,
     instrument: 'subscription',
+    kind: 'clause',
     number: '4.7',
     section: 'guaranty',
     sortKey: 70,

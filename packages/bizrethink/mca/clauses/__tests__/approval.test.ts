@@ -31,6 +31,7 @@ const clause = (overrides: Partial<McaClause> = {}): McaClause => ({
   slug: 'frpa-test-clause',
   version: 1,
   instrument: 'frpa',
+  kind: 'clause',
   number: '2.1',
   section: 'purchase',
   sortKey: 10,

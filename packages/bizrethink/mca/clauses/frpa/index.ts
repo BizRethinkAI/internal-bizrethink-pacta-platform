@@ -99,7 +99,6 @@ export const FRPA_NON_CLAUSE: NonClauseLine[] = [
   { anchor: 'Section 8: Renewal and Rollover', reason: 'section header' },
   { anchor: 'Section 9: Personal Guaranty of Performance', reason: 'section header' },
   { anchor: 'Section 10: Waiver of Personal Service', reason: 'section header' },
-  { anchor: '[TABLE] Field | Value', reason: 'the Section 9 guarantor-information form grid' },
   { anchor: 'Appendix A: Fee Schedule', reason: 'appendix header' },
   {
     anchor: '[TABLE] Fee | Amount | When Applied',

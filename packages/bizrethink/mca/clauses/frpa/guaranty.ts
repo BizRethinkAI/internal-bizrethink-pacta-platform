@@ -12,11 +12,33 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.guarantor-information-9-1',
     version: 1,
     instrument: 'frpa',
+    kind: 'field-group',
     number: '9.1',
     section: 'guaranty',
     sortKey: 10,
     heading: 'Guarantor Information',
     body: '',
+    /*
+      Six blanks, «35»-«40», exactly as Section 9 prints them. The body stays
+      empty and that is now a statement rather than an omission: this section
+      holds a table, and `kind` says so.
+
+      Title is the one optional field. A guarantor signing in a personal
+      capacity may hold no office, and the 2026-09-09 counsel memo asks for
+      corporate and personal capacity to be kept distinct rather than merged.
+
+      The SSN is collected here and MUST NOT be reproduced in distributed
+      copies; the same memo raises it. Nothing in this package distributes
+      anything, so that is a rendering obligation recorded where the field is.
+    */
+    fields: [
+      { label: 'Full Name', widget: '«35»', kind: 'text', required: true },
+      { label: 'Title', widget: '«36»', kind: 'text', required: false },
+      { label: 'Social Security Number', widget: '«37»', kind: 'ssn', required: true },
+      { label: 'Home Address', widget: '«38»', kind: 'text', required: true },
+      { label: 'Phone', widget: '«39»', kind: 'text', required: true },
+      { label: 'Email', widget: '«40»', kind: 'text', required: true },
+    ],
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -29,6 +51,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.guaranty-of-performance-9-2',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '9.2',
     section: 'guaranty',
     sortKey: 20,
@@ -62,6 +85,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.cross-collateral-9-3',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '9.3',
     section: 'guaranty',
     sortKey: 30,
@@ -76,6 +100,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.guarantor-waivers-9-4',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '9.4',
     section: 'guaranty',
     sortKey: 40,
@@ -98,6 +123,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.joint-and-several-liability-9-5',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '9.5',
     section: 'guaranty',
     sortKey: 50,
@@ -112,6 +138,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.guarantor-acknowledgement-9-6',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '9.6',
     section: 'guaranty',
     sortKey: 60,
@@ -134,6 +161,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.section-10-1',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '10.1',
     section: 'service',
     sortKey: 10,
@@ -150,6 +178,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.section-10-2',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '10.2',
     section: 'service',
     sortKey: 20,
@@ -164,6 +193,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.section-10-3',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '10.3',
     section: 'service',
     sortKey: 30,
@@ -178,6 +208,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.section-10-4',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '10.4',
     section: 'service',
     sortKey: 40,
@@ -192,6 +223,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.section-10-5',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '10.5',
     section: 'service',
     sortKey: 50,
@@ -206,6 +238,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     slug: 'frpa.section-10-6',
     version: 1,
     instrument: 'frpa',
+    kind: 'clause',
     number: '10.6',
     section: 'service',
     sortKey: 60,

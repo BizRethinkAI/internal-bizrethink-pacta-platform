@@ -163,9 +163,34 @@ export const documentLines = (file: string): string[] =>
  */
 export const linesNotAccountedFor = (
   file: string,
-  clauses: readonly { number: string; heading: string; body: string }[],
+  clauses: readonly { number: string; heading: string; body: string; fields?: readonly { widget: string }[] }[],
   declared: readonly NonClauseLine[],
 ): string[] => {
+  /*
+    A FIELD GROUP ACCOUNTS FOR ITS OWN GRID LINE, so it does not also need a
+    hand-written non-clause declaration.
+
+    Three grid lines used to be declared non-clause — the FRPA's Section 9 grid
+    and both twins' — while a clause record for the same section existed with an
+    empty body. That is contradictory: the line was simultaneously "not part of
+    any clause" and the entire content of one. Deleting the declarations and
+    letting the group answer for its line removes the contradiction, and the
+    reason a reader gets is better: not "this is a form grid" but "this is the
+    grid of THIS clause".
+
+    Matched on WIDGETS, not on labels. The document pads its cells with runs of
+    underscores — `Full Name | __________«35»___________` — so neither
+    containment nor equality works against a reconstructed label list. The
+    widgets are exact, ordered and unique per document, and a line carrying
+    every widget of a group is that group's line and cannot be another's.
+  */
+  const groupLines = clauses
+    .filter((clause) => clause.fields && clause.fields.length > 0)
+    .map((clause) => clause.fields?.map((field) => field.widget) ?? []);
+
+  const isFieldGroupLine = (line: string) =>
+    groupLines.some((widgets) => widgets.every((widget) => line.includes(widget)));
+
   /*
     Reconstructed the way the DOCUMENT prints it, in every way the corpus prints
     it.
@@ -199,6 +224,7 @@ export const linesNotAccountedFor = (
   );
 
   return documentLines(file).filter(
-    (line) => !held.includes(norm(line)) && !declared.some(({ anchor }) => line.startsWith(anchor)),
+    (line) =>
+      !held.includes(norm(line)) && !isFieldGroupLine(line) && !declared.some(({ anchor }) => line.startsWith(anchor)),
   );
 };
