@@ -108,17 +108,33 @@ describe('the FRPA library accounts for the whole document', () => {
   /**
    * §6.1's limbs are not clauses.
    *
-   * `6.1.1`–`6.1.15` are enumerated limbs under one lead-in — "Each of the
-   * following constitutes an Event of Default hereunder:" — and a limb approved
-   * in isolation from its lead-in means nothing. They live inside §6.1's body,
-   * which is why the count is 87 and not the 90 Phase 0 reports.
+   * An enumerated limb under a lead-in — v4's "Each of the following constitutes
+   * an Event of Default hereunder:", today's "An Event of Default occurs only if
+   * Merchant" — is meaningless approved in isolation from that lead-in. Section 6
+   * is one clause per numbered section and its limbs live in the body, which is
+   * why the count is 87 and not the 90 Phase 0 reports.
+   *
+   * TWO ASSERTIONS RETIRED 2026-09-10 by ADR 0012, for the reason given at the
+   * head of this describe and on the same authority as the line-accounting above.
+   * They read `expect(events?.body).toContain('6.1.4')` and `'6.1.15'` — a
+   * transcription guard wearing a structural test's clothes. What they actually
+   * pinned was that §6.1 still has a fourth and a fifteenth limb, i.e. that v4's
+   * fifteen enumerated defaults survive. The `default-remedies` rewrite replaces
+   * them with three lettered limbs of misconduct, so keeping the assertions would
+   * have required preserving the defect the rewrite exists to remove:
+   * `default-on-any-term-no-cure-no-materiality` IS limbs 6.1.1–6.1.15.
+   *
+   * NOT SILENCED THE CHEAP WAY. The structural claim survives below and is
+   * widened rather than narrowed: no limb of §6.1, under any numbering, may be
+   * imported as a clause of its own. That can still go red — it is what an
+   * importer keyed on `N.M.P` headings would do — which is the whole test of
+   * whether an assertion is worth keeping.
    */
   it('keeps the Events of Default limbs inside §6.1', () => {
     const events = clauses.find((clause) => clause.number === '6.1');
 
-    expect(events?.body).toContain('6.1.4');
-    expect(events?.body).toContain('6.1.15');
-    expect(clauses.some((clause) => clause.number === '6.1.4')).toBe(false);
+    expect(events).toBeDefined();
+    expect(clauses.filter((clause) => /^6\.1\.[0-9]/.test(clause.number))).toEqual([]);
   });
 });
 

@@ -236,6 +236,44 @@ export const FRPA_ENROLLMENT: McaClause[] = [
       { review: 'REVIEW-01', findings: ['all-assets-lien-vs-nonrecourse-recital', 'frpa-sub-equipment-lien-conflict'] },
     ],
   },
+  /*
+    DRAFTED WITH SECTION 6, NOT WITH THIS FILE. §4.12 is the `default-remedies`
+    cluster's fifth clause; it lives here because the document puts it in the
+    security section, twenty pages from the limits it depends on.
+
+    WHAT WAS WRONG. It is a general remedies grant — "any remedy available at law
+    (including those available under the UCC) or in equity to collect, enforce,
+    or satisfy any obligations then owing" — sitting outside Section 6. The
+    subject-to clause was doing all the work, and a reader who finds §4.12 first
+    finds a different agreement. That is
+    `frpa-4-12-reopens-the-acceleration-6-2-closed`: §6.2's lead-in restricted
+    the 100% sweep to five enumerated triggers, and this sentence handed back
+    every remedy the law allows on ANY Event of Default, including under old
+    §6.1.1's any-breach-of-any-covenant.
+
+    "Any obligations then owing" was the second half of the problem. Under a
+    purchase there is no obligation to pay the uncollected Purchased Amount, so
+    the phrase either means nothing or means the thing §2.1 and the granting
+    clause say does not exist.
+
+    WHAT CHANGED. A pointer, not a grant. Buyer's remedies are the ones §6.2
+    gives and no others, and the four limits are named rather than gestured at.
+    The second sentence states what no provision anywhere may do, because the
+    defect this clause created was a remedy grant in an unexpected place, and one
+    unexpected place having been closed is not the same as the class being closed.
+
+    THE DELETED CROSS-REFERENCE. v4 pointed at "the remedy in Section 6.2.1",
+    which no longer exists — §6.2 has no numbered subsections. The rewrite of
+    Section 6 and this clause had to happen in one pass or this reference would
+    dangle; `remedies-reach-no-further.test.ts` asserts over the whole FRPA that
+    nothing points at a deleted subsection of §6.2.
+
+    DEPARTURE FROM THE MEMO. The memo's replacement says Buyer may enforce "only
+    the rights and remedies expressly permitted by Section 6". Written as Section
+    6.2 specifically, since §6.1 defines defaults and §6.3 caps costs — neither
+    grants a remedy — and a pointer at a whole Section is how a reader ends up
+    back in the prose that made §6.2.5 possible.
+  */
   {
     slug: 'frpa.remedies-4-12',
     version: 1,
@@ -246,7 +284,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     section: 'enrollment',
     sortKey: 120,
     heading: 'Remedies',
-    body: 'Upon any Event of Default, Buyer may pursue any remedy available at law (including those available under the UCC) or in equity to collect, enforce, or satisfy any obligations then owing, subject in every case to the limits in Section 6 — including the restriction in Section 6.2 on the availability of the remedy in Section 6.2.1, the notice and cure requirement in Section 6.1, and the aggregate limit in Section 6.3.',
+    body: 'Buyer may enforce only the rights and remedies Section 6.2 expressly gives it, and only subject to the notice and cure requirement in Section 6.1, the aggregate limit in Section 6.3, Section 9.2 for any claim against a Guarantor, and applicable law. Nothing in this Section, and nothing elsewhere in this Agreement, enlarges the Purchased Receipts, accelerates Card Receipts that have not been generated, permits collection of Merchant’s retained share of Card Receipts, or makes Buyer’s remedies cumulative of any remedy Section 6.2 does not give.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

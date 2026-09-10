@@ -3,19 +3,26 @@ import type { McaClause } from '../types';
 /**
  * Sections 2 and 3 — the sale, its collection and its reconciliation.
  *
- * SIX OF THESE ARE AUTHORED, THE RECONCILIATION FOUR ARE NOT. §2.1–§2.6 and the
- * definitions were rewritten on 2026-09-10 under
+ * ALL TEN ARE AUTHORED. §2.1–§2.6 and the definitions were rewritten on
+ * 2026-09-10 under
  * [ADR 0012](../../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md),
  * as the spine the rest of the corpus depends on: one purchased share, one
  * settlement base, one aggregate cap, one delivery cap that does not float.
- * §§3.1–3.4 still print v4’s words and still reconcile against a base the
- * definitions clause has now moved underneath them — the first thing the next
- * cluster has to fix.
+ * §§3.1–3.4 followed immediately, because they reconciled against a base the
+ * definitions clause had moved underneath them — every deadline and every
+ * credit mechanic in Section 3 was written for a wider number than the one
+ * Buyer now collects on.
  *
- * `__tests__/one-settlement-base.test.ts` is what holds the six together: the
- * base is defined once, `Receipts` and `Daily Receipts` are bridged to it, and
- * the grant, the collection clause and the completion test all measure the same
- * asset. It was red on every assertion before the rewrite.
+ * TWO TESTS HOLD THIS FILE TOGETHER, AND THEY ASK DIFFERENT QUESTIONS.
+ * `__tests__/one-settlement-base.test.ts` asks whether the six spine clauses
+ * agree with each other: the base is defined once, `Receipts` and `Daily
+ * Receipts` are bridged to it, and the grant, the collection clause and the
+ * completion test all measure the same asset.
+ * `__tests__/reconciliation-cannot-be-switched-off.test.ts` asks whether the
+ * reconciliation four can be conditioned out of existence — which is how v4
+ * defeated them, not by denying the right but by attaching eight separate
+ * conditions to it. Both were red on every substantive assertion before their
+ * bodies existed.
  */
 export const FRPA_PURCHASE: McaClause[] = [
   /*
@@ -115,6 +122,22 @@ export const FRPA_PURCHASE: McaClause[] = [
     reporters by anybody on this project. Recorded here, never in a body.
   */
   {
+    /*
+      LAST SENTENCE ADDED 2026-09-10, and it is here rather than in §5.5 because
+      §5.5 is now gated on `equipment !== 'none'`.
+
+      §5.5 carries "takes no interest in a policy that would pay Buyer because
+      Merchant's Card Receipts have fallen". That is characterisation-load-bearing
+      in EVERY template: a funder insured against non-generation has not taken the
+      risk of non-generation, whatever §2.1 recites. Behind an equipment gate it
+      vanishes from a no-equipment funder's agreement, which is exactly the
+      template where the recital is doing the most work alone.
+
+      Widened past insurance to guaranty and indemnity, because the defect is the
+      arrangement rather than its name. Found by the representations cluster,
+      which could not fix it itself — adding a 98th clause trips the count
+      `frpa-coverage` pins.
+    */
     slug: 'frpa.sales-of-receipts-not-a-loan-2-1',
     version: 1,
     instrument: 'frpa',
@@ -124,7 +147,7 @@ export const FRPA_PURCHASE: McaClause[] = [
     section: 'purchase',
     sortKey: 10,
     heading: 'Sales of Receipts; Not a Loan',
-    body: 'The parties intend a present purchase of a contingent interest in future Card Receipts, on the terms of the sale stated above. There is no maturity date, no minimum collection, and no obligation on Merchant to deliver Card Receipts that are never generated. The Purchase Price is negotiated consideration for the Purchased Receipts. Merchant makes no representation or warranty as to the fair market value of the Purchased Receipts or as to what Buyer will collect. Buyer’s remedies are limited by Section 6, and the Guaranty is limited by Section 9. How this transaction is characterized, and whether it is enforceable, are determined by applicable law and by how this Agreement actually operates, not by this Section. No party waives any usury or other defence that law does not permit to be waived, and no provision of this Agreement permits Buyer to collect an amount that law does not permit it to collect. Buyer shall promptly refund any amount it collects in excess of its lawful entitlement.',
+    body: 'The parties intend a present purchase of a contingent interest in future Card Receipts, on the terms of the sale stated above. There is no maturity date, no minimum collection, and no obligation on Merchant to deliver Card Receipts that are never generated. The Purchase Price is negotiated consideration for the Purchased Receipts. Merchant makes no representation or warranty as to the fair market value of the Purchased Receipts or as to what Buyer will collect. Buyer’s remedies are limited by Section 6, and the Guaranty is limited by Section 9. How this transaction is characterized, and whether it is enforceable, are determined by applicable law and by how this Agreement actually operates, not by this Section. No party waives any usury or other defence that law does not permit to be waived, and no provision of this Agreement permits Buyer to collect an amount that law does not permit it to collect. Buyer shall promptly refund any amount it collects in excess of its lawful entitlement. Buyer holds no insurance, guaranty, indemnity or other arrangement that would pay Buyer because Card Receipts have fallen or were not generated, and takes no interest in one.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -380,6 +403,91 @@ export const FRPA_PURCHASE: McaClause[] = [
       },
     ],
   },
+  /*
+    WHAT WAS WRONG. Not a denial of the right — a set of conditions on it. The
+    trigger was an "unforeseen" decrease or increase, so a merchant whose
+    receipts fell for a reason anyone could have foreseen had nothing to ask
+    for. The reach was ONE calendar month immediately preceding the request, so
+    an error four months old was unreachable however plainly it was an error.
+    Initiation was Merchant's alone. And the correction ran both ways: an
+    over-collection came back, an under-collection was "corrected prospectively
+    through the Approved Processor split", which is a catch-up by raising the
+    percentage, described as a correction.
+
+    That last mechanic is the one REVIEW-01 caught from the other end.
+    `periodic-amount-undefined-fixed-draw-residue` observes that a true
+    percentage of settlement CANNOT over-collect, so §3's crediting machinery
+    only makes sense if a fixed amount is being drawn — the residue of the ACH
+    architecture the v3→v4 restructure was meant to remove. Its recommended fix
+    is exactly this clause's job: recast the crediting as correcting processor
+    mis-withholding rather than as truing up a periodic draw.
+
+    WHAT CHANGED. Reconciliation is verification and correction. Either party
+    may initiate, at any time, for any period, on no showing about trading, and
+    while a default is alleged or after completion. Buyer reconciles monthly
+    whether or not anyone asks — a right nobody exercises is not evidence the
+    percentage operated. An over-collection is refunded on a clock that starts
+    from information Buyer already has. An under-collection is corrected ONLY by
+    the percentage continuing to operate on receipts as they are generated,
+    which is the whole of the correction that a purchase of a share permits.
+
+    DEPARTURES FROM THE MEMO. Six.
+    (1) The memo leaves the UNDER-collection route unstated. Silence would leave
+        v4's "prospectively through the Approved Processor split" as the implied
+        mechanic, so it is stated and closed.
+    (2) The memo's prohibition is percentage, minimum remittance and extended
+        deadline. Added: an account debit and a fee. Both reach the same
+        catch-up by another road, and §2.3 already forbids the debit at
+        processor level — leaving it out here would make the two clauses differ
+        on the same question.
+    (3) "Information already available to Buyer" is written to include what it
+        can obtain from an Approved Processor or through electronic account
+        access Merchant has authorized. That access is §4.16, which is another
+        cluster's clause; it is described rather than cited, because a number
+        that cluster may move would otherwise become a dangling cross-reference.
+    (4) Added the sentence putting a correction into the Remaining Balance.
+        §2.6 defines that balance "after any correction made under Section 3"
+        and, until this sentence, nothing in Section 3 said a correction reached
+        the ledger at all.
+    (5) The heading was "Merchant's Right to Reconciliation". With either party
+        initiating and Buyer under a standing monthly duty, that misdescribes
+        the clause; it is "Reconciliation".
+    (6) The memo's "a decline in receipts creates no arrearage" is kept and
+        paired with the amount-becomes-due negation, because "arrearage" is the
+        label and "no amount becomes due" is the operative consequence. §2.2
+        already says the same thing for a period with no Card Receipts; these
+        two must not diverge.
+    (7) The memo negates an "unforeseen or sustained" change; "steady" is added
+        to the list, because that is §3.4's own trigger word and one clause of
+        this section should not negate a gate the next one still imposes.
+
+    THE CROSS-REFERENCE THE SPINE HANDED OVER, DISCHARGED HERE. v4 reconciled
+    against "the Receipts that Merchant collected during that month" — gross,
+    everything, including refunded and charged-back sales and the processor's
+    own charges. Buyer collects on Card Receipts, which is net of all of those.
+    Reconciling a net collection against a gross base manufactures a permanent
+    apparent under-collection in Buyer's favour, every month, on every deal. The
+    definitions bridge would have hidden it rather than fixed it, which is why
+    this clause names Card Receipts in terms.
+
+    A CONFLICT HANDED ON, NOT RESOLVED. "Buyer shall not increase the Specified
+    Percentage ... in order to recover the difference" is narrower than §6.2.1,
+    which raises the percentage to 100% on default. This clause speaks only to
+    recovering an estimate shortfall, so the two do not collide on their face;
+    the real collision is between §6.2.1 and the definitions clause, and
+    `default-remedies` owns it.
+
+    UNVERIFIED AUTHORITY. The memo's assessment rests on Richmond Capital,
+    246 AD3d 585, for the proposition that what decides these cases is whether
+    the promised percentage actually operated. REVIEW-01 cites LG Funding,
+    181 AD3d 664, factor (1) — "whether there is a reconciliation provision" —
+    and the Davis v. Richmond Capital Group line, 194 AD3d 516 (1st Dep't 2021),
+    for a discretionary reconciliation being illusory; its own note records that
+    holding as stated from memory. Apollo Funding 241 AD3d 1508, NewCo
+    250 AD3d 1641, Principis and Grafton are cited around them in the memo.
+    NOBODY ON THIS PROJECT HAS PULLED ANY OF THESE FROM THE OFFICIAL REPORTERS.
+    Recorded here, never in a body.
+  */
   {
     slug: 'frpa.merchant-s-right-to-reconciliation-3-1',
     version: 1,
@@ -389,13 +497,73 @@ export const FRPA_PURCHASE: McaClause[] = [
     number: '3.1',
     section: 'reconciliation',
     sortKey: 10,
-    heading: 'Merchant’s Right to Reconciliation',
-    body: 'If at any time during the term of this Agreement Merchant experiences an unforeseen decrease or increase in its Daily Receipts, Merchant shall have the right, at its sole and absolute discretion but subject to the procedure set forth below, to request retroactive reconciliation of the Estimated Daily Holdback for one (1) full calendar month immediately preceding the day when such request for reconciliation is received by Buyer (each such calendar month, a “Reconciliation Month”).\nSuch reconciliation (the “Reconciliation”) shall be performed by Buyer within five (5) Workdays following its receipt of the Merchant’s request by crediting any over-collected difference back to Merchant, or correcting any under-collection prospectively through the Approved Processor split, so that the total amount collected by Buyer during the Reconciliation Month is equal to the Specified Percentage of the Receipts that Merchant collected during that month. One or more Reconciliation procedures may reduce or increase the effective Estimated Daily Holdback and may shorten or extend the term of this Agreement.',
+    heading: 'Reconciliation',
+    body: 'Reconciliation is verification and correction. Either Merchant or Buyer may request a reconciliation at any time, for any period, and without showing an unforeseen, steady or sustained change in Card Receipts. A request may be made while an Event of Default is alleged or continuing, and after the Completion Threshold is attained. Buyer shall in addition reconcile each Approved Processor’s ledger against the Card Receipts settled to Merchant at least once each month, whether or not Merchant has asked it to.\nA reconciliation compares the amount actually credited to the Purchased Amount for the period with the Specified Percentage of the Card Receipts actually generated in that period. Buyer shall give Merchant the calculation and shall refund any amount over-collected within five (5) Workdays after it has sufficient information, counting as sufficient the information already in Buyer’s possession or obtainable by it from an Approved Processor or through electronic account access Merchant has authorized. A correction under this Section reduces or increases the Remaining Balance under Section 2.6 accordingly.\nAn under-collection is corrected only by the continued operation of the Specified Percentage on Card Receipts as they are generated. Buyer shall not increase the Specified Percentage, impose a minimum or fixed remittance, debit an account of Merchant, set or extend a deadline, or charge a fee, in order to recover the difference between the Estimated Daily Holdback and what the Specified Percentage actually produced. A decline in Card Receipts creates no arrearage, and no amount becomes due because a period produced less than the Estimated Daily Holdback. A documented failure to remit Purchased Receipts that were actually generated is dealt with under Section 7.16.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['defined-term-drift', 'undefined-money-terms'] }],
   },
+  /*
+    WHAT WAS WRONG. Four conditions, each defensible alone. Initiation was
+    Merchant's "sole responsibility"; every request had to carry a bank
+    statement AND a processing statement for the month at issue; there was a
+    thirty-Workday window; and a request made after the term had expired
+    AUTOMATICALLY EXTENDED the agreement until Buyer had collected the whole
+    Purchased Amount.
+
+    The last is the worst thing in this cluster and it is easy to read past. It
+    converts the merchant's own request for a reconciliation into a guarantee of
+    the full sum — the merchant asks whether it was over-charged and, by asking,
+    revives an obligation the completion test had ended. It is
+    `acceleration-defeats-indefinite-term` pointed the other way: that finding is
+    about a term made finite at Buyer's option, this is about a term made
+    infinite at the merchant's expense, and both defeat LG Funding factor two.
+
+    v4 had already SOFTENED two of REVIEW-01's three targets — ten Workdays
+    became thirty, and "requests received after this period are nullified"
+    became "not nullified". A deadline that does not forfeit is not a deadline;
+    it is a sentence that makes a merchant think it has missed something. It
+    goes entirely rather than being lengthened again.
+
+    WHAT CHANGED. Any reasonable channel, out of §7.3's certified mail. Buyer
+    acknowledges in one Workday and starts from what it already holds, which is
+    the processor ledger — the merchant's statements are corroboration, not a
+    precondition. Buyer may ask for more only where it is reasonably necessary
+    and must say what is missing. Nothing is forfeited for lateness, informality
+    or repetition. The undisputed part of a calculation is paid while the rest is
+    investigated, and there is a named human to argue the arithmetic with.
+
+    DEPARTURES FROM THE MEMO. Five.
+    (1) The §7.3 carve-out is not in the memo. It is v4's own, and REVIEW-01's
+        `reconciliation-right-conditioned-into-near-nullity` names §7.3 as one
+        of the three conditions, so it is kept and widened to cover a §3.4
+        request as well. §7.3 is `miscellaneous`'s clause and is untouched here.
+    (2) The memo allows a telephone request. No requirement to confirm it in
+        writing is added, because a confirmation requirement is a documentary
+        precondition wearing a different hat — the exact defect being removed.
+    (3) "Repeated" is added to the memo's late-or-informal-or-post-completion
+        list. v4 permitted requests "as many times as it deems proper, provided
+        that each request is made in accordance with this section", and the
+        proviso is where the forfeiture lived.
+    (4) The memo deletes the automatic post-completion extension and says
+        nothing further. An express negation is added — a post-completion
+        request does not extend the Agreement, revive the right to Purchased
+        Receipts, or authorize further withholding. Deleting a sentence does not
+        answer the question it answered, and §2.6's "may not resume withholding"
+        should not have to carry this alone.
+    (5) "Applicable statutory limitation periods remain in effect" is written as
+        an operative prohibition on shortening one, which is the only version a
+        contract can perform. The heading loses "Request for", since the section
+        now imposes duties on Buyer rather than describing Merchant's paperwork.
+
+    TWO DEFINED TERMS DROPPED. "Reconciliation Information" and "Reconciliation
+    Month" are gone: the first named a fixed documentary bundle that is no
+    longer a precondition, the second a one-month reach that no longer exists.
+    Nothing else in the corpus cites either — checked across all six instruments
+    before removing them, because dropping a term other clauses reach is how
+    `frpa-undefined-capitalised-terms` gets recreated in the act of fixing it.
+  */
   {
     slug: 'frpa.request-for-reconciliation-procedure-3-2',
     version: 1,
@@ -405,8 +573,8 @@ export const FRPA_PURCHASE: McaClause[] = [
     number: '3.2',
     section: 'reconciliation',
     sortKey: 20,
-    heading: 'Request for Reconciliation Procedure',
-    body: 'It shall be Merchant’s sole responsibility to initiate Reconciliation by sending a written request to Buyer. Each request shall include a copy of Merchant’s bank statement and credit card processing statements for the Reconciliation Month at issue (the “Reconciliation Information”) and shall be received by Buyer within thirty (30) Workdays after the last day of the Reconciliation Month at issue. A request received after that period is not nullified; Buyer shall perform the Reconciliation for the month at issue if the Reconciliation Information supports it. Notwithstanding Section 7.3, a request for Reconciliation or an Adjustment may be sent by email to the address stated in Section 1, and is effective on receipt.\nMerchant shall have the right to request Reconciliation as many times during the term of this Agreement as it deems proper, provided that each request is made in accordance with this section. If a request is made after the expiration of the term of this Agreement and the total amount actually collected by Buyer is less than the Purchased Amount, the term of this Agreement shall automatically be extended until the total amount collected equals the Purchased Amount.\nNothing in this section shall modify the Estimated Daily Holdback for any calendar month other than the Reconciliation Month(s) as the result of the Reconciliation.',
+    heading: 'Reconciliation Procedure',
+    body: 'A request for reconciliation may be made by email to the address stated in Section 1, through any servicing portal Buyer makes available, by telephone, or by any other reasonable method. Section 7.3 does not apply to a request under this Section or to a request under Section 3.4. Buyer shall acknowledge a request within one (1) Workday and shall begin from the processor and account information it already holds.\nBuyer may ask Merchant for further records only where they are reasonably necessary to reconcile the identified period, and shall state what is missing and why it is needed. Merchant shall cooperate reasonably. Where a standard bank or processor statement is unavailable, Buyer shall accept equivalent records, including a processor report or data obtained through electronic account access Merchant has authorized.\nNo request is forfeited because it is late, informal, repeated, or made after the Completion Threshold is attained, and Merchant may request reconciliation as often as it reasonably needs to. A request made after the Completion Threshold does not extend this Agreement, does not revive Buyer’s right to receive Purchased Receipts, and does not authorize any further withholding; Section 2.6 governs what happens on completion.\nWhere Buyer disputes part of a calculation, it shall resolve and refund the undisputed part within the time stated in Section 3.1 while it investigates the rest. Buyer shall give Merchant a written calculation showing the figures it used, and the name and contact details of a person who will review it on request. Nothing in this Section shortens a limitation period that applies by law.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -421,6 +589,68 @@ export const FRPA_PURCHASE: McaClause[] = [
       },
     ],
   },
+  /*
+    WHAT WAS WRONG. This is the clause a plaintiff's counsel reads aloud, and it
+    is four sentences long. A merchant who asked for a reconciliation and did
+    not produce two statements within five Workdays had its request treated as
+    WITHDRAWN. A merchant who did not answer Buyer's own request was "considered
+    interference with Buyer's rights and deemed a default of this Agreement" —
+    and under §6.1.1 an Event of Default is any breach of any covenant, with the
+    word "cure" appearing nowhere in the document. That is
+    `reconciliation-switched-off-by-any-breach` exactly: the merchant most
+    likely to need reconciliation, the one whose receipts fell and who is
+    therefore behind on paperwork, is the one the clause disqualifies, and once
+    disqualified there is no route back.
+
+    The third sentence is separately wrong. "Any request for reconciliation must
+    be initiated prior to the payoff of the Purchased Amount plus any other sums
+    due" bars a merchant from ever asking whether it was over-collected, because
+    the only moment the question can be answered in full is after collection has
+    stopped. The memo names this as incorrect in terms.
+
+    WHAT CHANGED. An incomplete request stays open. Buyer says what is missing,
+    allows ten Workdays and more where the cause is not Merchant's, and then
+    reconciles anyway on the best reliable information — stating what it
+    assumed, because a reconciliation built on assumptions the merchant cannot
+    see is not a verification of anything. Missing records authorise nothing:
+    not a higher percentage, not a fixed remittance, not a refusal to refund,
+    not a withdrawal, not a default. Requests may be made after payoff.
+
+    DEPARTURES FROM THE MEMO. Four.
+    (1) The memo allows "a reasonable extension for circumstances outside
+        Merchant's control". A bank or processor outage is named as an example,
+        because §2.4 already provides that such an outage is not an Event of
+        Default and the two clauses must not answer the same fact differently.
+    (2) Added the duty to state what was assumed when reconciling on incomplete
+        information. Without it, "best reliable information available" is a
+        discretion, and a discretionary reconciliation is the thing the memo
+        says is worth nothing.
+    (3) The memo's "Buyer may pursue relief only for conduct independently
+        satisfying Section 6.1" is narrowed to a remedy IN RESPECT OF MERCHANT'S
+        RECORDS. As written it reads as limiting every remedy in the agreement,
+        which is Section 6's subject and not this clause's; a records clause
+        that silently rewrites the remedies clause is how contradictions of the
+        §5.17-versus-§2.4 kind get made.
+    (4) Added the express negation of the deeming provision — making a request,
+        or being slow to answer one, is not interference. The memo removes the
+        sentence; removing it does not stop Buyer arguing the point, and this
+        clause exists precisely because that argument was once printed.
+
+    A WEAKNESS IN THE MEMO'S OWN FIX, REPORTED NOT CURED. "Conduct that
+    independently satisfies Section 6.1" is a real limit only if Section 6.1 is
+    a real list. As this clause was drafted, §6.1.1 read "Merchant shall violate
+    any term or covenant in this Agreement", so almost any conduct satisfied it
+    and the cross-reference did less than it reads; the "proved to have caused
+    Buyer loss" limb was carrying the sentence. That dependency belongs to
+    `default-remedies`, which owns §6.1 and which REVIEW-01 asks to narrow it.
+    THIS CLAUSE IS ONLY AS STRONG AS THAT ONE — if §6.1 is ever widened back,
+    this limit weakens with it and nothing here will say so.
+
+    UNVERIFIED AUTHORITY. As recorded on §3.1. The LG Funding factor-one
+    analysis and the Davis v. Richmond Capital line are what make a switchable
+    reconciliation right the centre of a recharacterisation argument; neither
+    has been read from an official reporter by anybody on this project.
+  */
   {
     slug: 'frpa.failure-to-provide-reconciliation-information-3-3',
     version: 1,
@@ -430,8 +660,8 @@ export const FRPA_PURCHASE: McaClause[] = [
     number: '3.3',
     section: 'reconciliation',
     sortKey: 30,
-    heading: 'Failure to Provide Reconciliation Information',
-    body: 'If Merchant requests a Reconciliation and fails to provide the Reconciliation Information within five (5) Workdays after the request, Buyer may consider the request withdrawn. If Buyer requests a reconciliation and Merchant fails to provide the Reconciliation Information within five (5) Workdays, Buyer may adjust the Estimated Daily Holdback based on the best information reasonably available. Any request for reconciliation must be initiated prior to the payoff of the Purchased Amount plus any other sums due. Merchant’s refusal to deliver Reconciliation Information pursuant to Buyer’s request may be considered interference with Buyer’s rights and deemed a default of this Agreement.',
+    heading: 'Incomplete Reconciliation Information',
+    body: 'A request that is incomplete remains open. Buyer shall state in writing what is missing, shall allow Merchant at least ten (10) Workdays to supply it, and shall allow a reasonable further period where the delay arises from a cause outside Merchant’s reasonable control, including a bank or processor outage. If information is still missing at the end of that period, Buyer shall reconcile on the best reliable information available to it and shall state what it assumed.\nMissing records, an unavailable statement, and the loss of electronic account access do not by themselves authorize Buyer to increase the Specified Percentage, impose a fixed or minimum remittance, refuse a refund that the available information supports, treat a request as withdrawn, or declare an Event of Default. Making a request, or being slow to answer one, is not interference with Buyer’s rights.\nA request may be made before or after the Purchased Amount has been delivered in full.\nBuyer may pursue a remedy in respect of Merchant’s records only for conduct that independently satisfies Section 6.1 and is proved to have caused Buyer loss. Buyer shall not presume fraud, diversion or concealment from incomplete information.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -448,6 +678,51 @@ export const FRPA_PURCHASE: McaClause[] = [
       },
     ],
   },
+  /*
+    WHAT WAS WRONG. Least of the four, and the memo says so: the mandatory grant
+    and the survival sentence are protective and they stay. Three things did not
+    work. The trigger was a "steady decrease", so an abrupt one did not qualify.
+    The grant was conditioned on "the Reconciliation Information", carrying
+    §3.2's documentary precondition into a clause that only needs Buyer's own
+    ledger. And the new figure "replaced and superseded" the Estimated Daily
+    Holdback — which is `periodic-amount-undefined-fixed-draw-residue`
+    showing through. An informational illustration cannot be superseded by
+    another informational illustration in any sense that matters; the sentence
+    only means something if a fixed amount is being drawn, which is precisely
+    the architecture the v3→v4 restructure was supposed to have removed.
+
+    WHAT CHANGED. The request needs no showing at all. Buyer computes the update
+    from the Card Receipts data it holds. And the clause now says the four
+    things an updated estimate does NOT do — alter the Specified Percentage,
+    change what §2.2 collects, oblige Merchant to deliver any amount, or fix a
+    date for delivery of the Purchased Amount. That is the point of the memo's
+    note: adjusting an informational estimate must not silently change the
+    actual settlement percentage, and "informational" is a word v4 also used
+    while making the new figure supersede the old one.
+
+    DEPARTURES FROM THE MEMO. Three.
+    (1) "Applies from the request date for reporting purposes" is written as
+        applying from the date the request was received — v4's own trigger — and
+        the "for reporting purposes" qualifier is expanded into the four express
+        negations. The qualifier alone repeats the mistake it is correcting.
+    (2) The defined terms "Adjustment" and "Adjusted Daily Holdback" are
+        dropped, and the clause speaks of an updated Estimated Daily Holdback.
+        Nothing in the corpus cites either term — checked. Introducing a
+        capitalised term that `frpa.definitions` does not point at would
+        recreate `frpa-undefined-capitalised-terms`, and this cluster may not
+        edit the definitions clause to add one. The heading keeps the ordinary
+        word "Adjustment", which now carries no defined meaning.
+    (3) The memo's survival sentence covers "reconciliation and adjustment
+        rights". It is written to cover §§3.1–3.3 and this Section by number, so
+        that a reader of §3.3 — the clause that used to switch the right off —
+        finds the survival rule from where the argument will start.
+
+    v4's LAST SENTENCE IS DELETED WITHOUT REPLACEMENT. "One or more Adjustments
+    may substantially extend the term of this Agreement" was true only on the
+    fixed-draw reading. On a percentage of Card Receipts, changing an estimate
+    changes nothing about when the Purchased Amount is delivered; §2.6's
+    Completion Threshold decides that and nothing else does.
+  */
   {
     slug: 'frpa.adjustment-of-the-estimated-daily-holdback-3-4',
     version: 1,
@@ -458,7 +733,7 @@ export const FRPA_PURCHASE: McaClause[] = [
     section: 'reconciliation',
     sortKey: 40,
     heading: 'Adjustment of the Estimated Daily Holdback',
-    body: 'If at any time during the term of this Agreement Merchant experiences a steady decrease in its Receipts, Merchant shall have the right, at its sole and absolute discretion, to request a modification (the “Adjustment”) of the Estimated Daily Holdback. Where the request is supported by the Reconciliation Information, Buyer shall grant the Adjustment; Buyer has no discretion to withhold it. The Adjustment shall become effective as of the date the request is received by Buyer, and the new Adjusted Daily Holdback shall replace and supersede the Estimated Daily Holdback set forth above. The Adjustment shall be performed by Buyer within five (5) Workdays following its receipt of the request. Merchant’s right to request Reconciliation under Section 3.1 and an Adjustment under this Section survives an Event of Default and may be exercised while an Event of Default is continuing. One or more Adjustments may substantially extend the term of this Agreement.',
+    body: 'Merchant may request an updated Estimated Daily Holdback at any time, and need not show a decline that is steady or sustained. Buyer shall calculate a supported update from the Card Receipts data then available to it and shall communicate it to Merchant within five (5) Workdays after the request. The update applies from the date the request was received.\nAn updated Estimated Daily Holdback is informational. It restates the illustration given in Section 1, and does not alter the Specified Percentage, does not change what Buyer collects under Section 2.2, does not create an obligation on Merchant to deliver any amount, and does not fix a date by which the Purchased Amount is to be delivered. What Buyer collects continues to rise and fall with actual Card Receipts.\nThe rights given by Sections 3.1, 3.2, 3.3 and this Section survive an alleged or continuing Event of Default and remain exercisable after the Completion Threshold is attained, so that a collection already made can be verified, corrected and refunded.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
