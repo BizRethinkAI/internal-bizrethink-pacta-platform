@@ -65,8 +65,12 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 101 clauses: 87 the document numbers, 14 it does not', () => {
-    expect(clauses).toHaveLength(101);
+  it('holds 97 clauses: 83 the document numbers, 14 it does not', () => {
+    // 101 until the four `[Reserved]` records were removed. They were section
+    // numbers the document holds open after a clause was taken out — lines of
+    // the document, not clauses of it — and are now declared in
+    // FRPA_NON_CLAUSE with the reason each one actually has.
+    expect(clauses).toHaveLength(97);
     expect(clauses.filter((clause) => clause.number !== '').length).toBeGreaterThan(0);
   });
 

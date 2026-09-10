@@ -168,8 +168,12 @@ describe('a finding that was acted on is not outstanding', () => {
     const distinct = new Set(ALL_MCA_CLAUSES.flatMap((clause) => findingsFor(clause)).map((f) => f.id));
     const stillOpen = new Set(ALL_MCA_CLAUSES.flatMap((clause) => outstandingFindingsFor(clause)).map((f) => f.id));
 
-    expect(distinct.size).toBe(136);
+    // 136 until §9.3 was removed with its one REVIEW-02 finding.
+    expect(distinct.size).toBe(135);
     expect(stillOpen.size).toBe(38);
-    expect(distinct.size - stillOpen.size).toBe(98);
+    // 98 until §9.3 was removed. Its finding was `implemented` — the clause was
+    // deleted by owner decision 6 — so the resolved count fell and the still-open
+    // count did not, which is the arithmetic confirming which side it was on.
+    expect(distinct.size - stillOpen.size).toBe(97);
   });
 });

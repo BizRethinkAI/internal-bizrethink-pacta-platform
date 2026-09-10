@@ -32,6 +32,7 @@ const clause = (overrides: Partial<McaClause> = {}): McaClause => ({
   version: 1,
   instrument: 'frpa',
   kind: 'clause',
+  includeWhen: null,
   number: '2.1',
   section: 'purchase',
   sortKey: 10,

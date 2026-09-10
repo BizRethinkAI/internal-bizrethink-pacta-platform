@@ -26,7 +26,9 @@ describe('the MCA clause library surface', () => {
 
   it('shows every clause in the library, and no others', () => {
     expect(surface.clauses).toHaveLength(ALL_MCA_CLAUSES.length);
-    expect(surface.clauses).toHaveLength(204);
+    // 204 until the four `[Reserved]` records were removed — section numbers the
+    // document holds open after a clause was taken out, now declared non-clause.
+    expect(surface.clauses).toHaveLength(200);
   });
 
   it('groups by instrument, in the declared order', () => {
@@ -37,20 +39,20 @@ describe('the MCA clause library surface', () => {
       expect(entry.clauseCount).toBe(ALL_MCA_CLAUSES.filter((c) => c.instrument === entry.id).length);
     }
 
-    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(204);
+    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(200);
   });
 
   /**
    * THE SENTENCE THE PAGE EXISTS TO MAKE TRUE.
    *
-   * Not one of these 204 clauses may reach a merchant, and the reason is the
+   * Not one of these 200 clauses may reach a merchant, and the reason is the
    * same for every one: `attorney-drafted` with no named author. The page states
    * it as a count with the reason attached, rather than leaving a reader to
-   * infer it from 204 identical badges.
+   * infer it from 200 identical badges.
    */
   it('reports that nothing is publishable, and why', () => {
     expect(surface.totals.publishable).toBe(0);
-    expect(surface.totals.clauses).toBe(204);
+    expect(surface.totals.clauses).toBe(200);
 
     for (const clause of surface.clauses) {
       expect(clause.publishProblems).toEqual([
@@ -65,7 +67,9 @@ describe('the MCA clause library surface', () => {
    * is what the library did before #129.
    */
   it('counts outstanding findings, not all findings', () => {
-    expect(surface.totals.findingsCited).toBe(136);
+    // 136 until §9.3 was removed; it carried the one REVIEW-02 finding about an
+    // unbounded cross-collateral grant, and that clause no longer exists.
+    expect(surface.totals.findingsCited).toBe(135);
     expect(surface.totals.outstanding).toBe(38);
     expect(surface.totals.outstanding).toBeLessThan(surface.totals.findingsCited);
   });

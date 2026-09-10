@@ -99,6 +99,37 @@ export const FRPA_NON_CLAUSE: NonClauseLine[] = [
   { anchor: 'Section 8: Renewal and Rollover', reason: 'section header' },
   { anchor: 'Section 9: Personal Guaranty of Performance', reason: 'section header' },
   { anchor: 'Section 10: Waiver of Personal Service', reason: 'section header' },
+  /*
+    THE FOUR RESERVED LINES. Each is a section number the document holds open
+    after its clause was removed, which is what a document edited IN PLACE has
+    to do: deleting §5.7 and renumbering would break every cross-reference below
+    it. `change-notes/18` says so in terms — "Reserved, not renumbered."
+
+    They were imported as four clause records with `body: '[Reserved]'`, and the
+    selection engine is what made that wrong visible: a library assembles a
+    document, and an assembled document has no reserved sections because a
+    clause that is not selected simply is not there. Holding a contentless
+    record so the OUTPUT can reproduce an artifact of in-place editing is
+    backwards. They are lines of this document, not clauses of it.
+
+    None of the four is coming back as-is. §5.7 duplicated §5.18 and was merged
+    into it; §9.3 granted a lien over collateral in a schedule that does not
+    exist and was deleted by owner decision 6. §2.5 and §7.14 are the ACH pair
+    and DO belong in the library — gated on `collectionMethod` — but they return
+    with their real v3 bodies, which is a separate change: it needs
+    `bodies-match-the-document` to narrow to the selected set first, and that is
+    the last transcription anchor in this package.
+  */
+  { anchor: '2.5 [Reserved]', reason: 'a section held open after the ACH Debit Authorization was removed' },
+  {
+    anchor: '5.7 [Reserved]',
+    reason: 'a section held open after Change of Name or Location was merged into §5.18 (change-notes/16)',
+  },
+  { anchor: '7.14 [Reserved]', reason: 'a section held open after the blanket ACH Authorization was removed' },
+  {
+    anchor: '9.3 [Reserved]',
+    reason: 'a section held open after Cross-Collateral was deleted by owner decision 6 (change-notes/18)',
+  },
   { anchor: 'Appendix A: Fee Schedule', reason: 'appendix header' },
   {
     anchor: '[TABLE] Fee | Amount | When Applied',

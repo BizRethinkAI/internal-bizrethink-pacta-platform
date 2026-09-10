@@ -13,6 +13,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.1',
     section: 'miscellaneous',
     sortKey: 10,
@@ -28,6 +29,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.2',
     section: 'miscellaneous',
     sortKey: 20,
@@ -43,6 +45,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.3',
     section: 'miscellaneous',
     sortKey: 30,
@@ -61,6 +64,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.4',
     section: 'miscellaneous',
     sortKey: 40,
@@ -76,6 +80,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.5',
     section: 'miscellaneous',
     sortKey: 50,
@@ -101,6 +106,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.6',
     section: 'miscellaneous',
     sortKey: 60,
@@ -116,6 +122,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.7',
     section: 'miscellaneous',
     sortKey: 70,
@@ -131,6 +138,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.8',
     section: 'miscellaneous',
     sortKey: 80,
@@ -146,6 +154,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.9',
     section: 'miscellaneous',
     sortKey: 90,
@@ -175,6 +184,11 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      One of four clauses the memo proposes deleting separately; they are one fact.
+      A jury waiver is meaningless under an arbitration template.
+    */
+    includeWhen: (facts) => facts.disputeResolution === 'courts',
     number: '7.10',
     section: 'miscellaneous',
     sortKey: 100,
@@ -190,6 +204,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      All three market forms pair a class waiver WITH arbitration. A bare one, as
+      here, is the weakest of the three positions — but that is a drafting
+      question, not a reason to exclude it from a courts template.
+    */
+    includeWhen: (facts) => facts.disputeResolution === 'courts',
     number: '7.11',
     section: 'miscellaneous',
     sortKey: 110,
@@ -205,6 +225,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.12',
     section: 'miscellaneous',
     sortKey: 120,
@@ -222,6 +243,10 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      Master-agreement treatment and the ROFR are renewal machinery.
+    */
+    includeWhen: (facts) => facts.renewalModel !== 'none',
     number: '7.13',
     section: 'miscellaneous',
     sortKey: 130,
@@ -235,25 +260,11 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     ],
   },
   {
-    slug: 'frpa.reserved-7-14',
-    version: 1,
-    instrument: 'frpa',
-    kind: 'clause',
-    number: '7.14',
-    section: 'miscellaneous',
-    sortKey: 140,
-    heading: '[Reserved]',
-    body: '[Reserved]',
-    source: { kind: 'attorney-drafted', author: null },
-    status: 'draft',
-    appliesInStates: [],
-    examinedBy: [{ review: 'REVIEW-02', findings: [] }],
-  },
-  {
     slug: 'frpa.reporting-7-15',
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.15',
     section: 'miscellaneous',
     sortKey: 150,
@@ -269,6 +280,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.16',
     section: 'miscellaneous',
     sortKey: 160,
@@ -284,6 +296,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.17',
     section: 'miscellaneous',
     sortKey: 170,
@@ -299,6 +312,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.18',
     section: 'miscellaneous',
     sortKey: 180,
@@ -314,6 +328,10 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      Same bundle.
+    */
+    includeWhen: (facts) => facts.disputeResolution === 'courts',
     number: '7.19',
     section: 'miscellaneous',
     sortKey: 190,
@@ -339,6 +357,10 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      Same bundle. Under arbitration the rules of the forum govern instead.
+    */
+    includeWhen: (facts) => facts.disputeResolution === 'courts',
     number: '7.20',
     section: 'miscellaneous',
     sortKey: 200,
@@ -364,6 +386,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.21',
     section: 'miscellaneous',
     sortKey: 210,
@@ -382,6 +405,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.22',
     section: 'miscellaneous',
     sortKey: 220,
@@ -405,6 +429,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.23',
     section: 'miscellaneous',
     sortKey: 230,
@@ -420,6 +445,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '7.24',
     section: 'miscellaneous',
     sortKey: 240,
@@ -444,6 +470,10 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      Renewal eligibility presupposes renewal.
+    */
+    includeWhen: (facts) => facts.renewalModel !== 'none',
     number: '8.1',
     section: 'renewal',
     sortKey: 10,
@@ -459,6 +489,10 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      Carry IS the fact. A payoff-only funder has no rollover method to describe.
+    */
+    includeWhen: (facts) => facts.renewalModel === 'carry',
     number: '8.2',
     section: 'renewal',
     sortKey: 20,
@@ -484,6 +518,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '8.3',
     section: 'renewal',
     sortKey: 30,

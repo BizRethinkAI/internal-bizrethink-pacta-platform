@@ -13,6 +13,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '',
     section: 'funding-terms',
     sortKey: 10,
@@ -28,6 +29,10 @@ export const FRPA_PREAMBLE: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      Nothing to explain when the product involves no equipment.
+    */
+    includeWhen: (facts) => facts.equipment !== 'none',
     number: '',
     section: 'funding-terms',
     sortKey: 20,
@@ -43,6 +48,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '',
     section: 'funding-terms',
     sortKey: 30,
@@ -58,6 +64,10 @@ export const FRPA_PREAMBLE: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      The election only means something once a renewal mechanism exists.
+    */
+    includeWhen: (facts) => facts.renewalModel !== 'none',
     number: '',
     section: 'funding-terms',
     sortKey: 40,
@@ -73,6 +83,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '',
     section: 'preamble',
     sortKey: 10,
@@ -88,6 +99,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    includeWhen: null,
     number: '',
     section: 'preamble',
     sortKey: 20,

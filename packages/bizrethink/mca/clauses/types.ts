@@ -2,6 +2,7 @@ import type { ClauseSource } from '../../provenance/types';
 import type { ClauseStatus } from '../../server-only/feature-access';
 import type { McaJurisdiction } from '../jurisdictions';
 import type { ClauseExamination } from './examination';
+import type { McaFacts } from './facts';
 import type { McaInstrument } from './instruments';
 
 export type { ClauseExamination } from './examination';
@@ -118,6 +119,21 @@ export type McaClause = {
 
   /** What this entry is. See `McaClauseKind`. */
   kind: McaClauseKind;
+
+  /**
+   * When this clause is in the agreement. `null` means always.
+   *
+   * REQUIRED RATHER THAN OPTIONAL, and that is the whole point. An optional
+   * `includeWhen` would let a conditional clause be added with no condition and
+   * silently reach every template — the failure this field exists to prevent.
+   * `null` is a decision a reader can see; a missing field is not.
+   *
+   * A predicate rather than a data structure, following the lease's `Clause`.
+   * The alternative — a serialisable rule tree — buys storage in a database
+   * nothing here has, at the cost that the condition stops being readable
+   * beside the words it governs.
+   */
+  includeWhen: ((facts: McaFacts) => boolean) | null;
 
   /**
    * The blanks, when `kind` is `field-group`; absent otherwise.
