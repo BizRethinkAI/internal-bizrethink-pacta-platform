@@ -4,11 +4,6 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ZNameSchema } from '@documenso/lib/types/name';
 import { env } from '@documenso/lib/utils/env';
 import { zEmail } from '@documenso/lib/utils/zod';
-// MODIFIED for BizRethink (overlay 048c): pending-invite preview at signup
-// form. Calls trpc.bizrethink.signupInvite.lookup with the entered email
-// (debounced) and renders "You'll join: <orgName> as <role>" so the user
-// knows they're landing in the invited team's org, not a Personal Org.
-import { trpc } from '@documenso/trpc/react';
 import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -269,8 +264,6 @@ export const SignUpForm = ({
                 )}
               />
 
-              <PendingInvitePreview email={form.watch('email')} />
-
               <FormField
                 control={form.control}
                 name="password"
@@ -408,51 +401,6 @@ export const SignUpForm = ({
           </Trans>
         </p>
       </div>
-    </div>
-  );
-};
-
-// ADDED for BizRethink (overlay 048c): inline preview component for
-// pending OrganisationMemberInvites matching the entered email. Renders
-// nothing when the email is empty/invalid or no invites are found.
-// Debounced 400ms so we don't hammer the lookup endpoint on every
-// keystroke. The lookup endpoint is public (no auth) but only returns
-// org NAME + role — no token, no inviter identity.
-const PendingInvitePreview = ({ email }: { email: string | undefined }) => {
-  const [debounced, setDebounced] = useState('');
-
-  useEffect(() => {
-    const trimmed = (email ?? '').trim().toLowerCase();
-    if (!trimmed || !trimmed.includes('@') || !trimmed.includes('.')) {
-      setDebounced('');
-      return;
-    }
-    const timer = setTimeout(() => setDebounced(trimmed), 400);
-    return () => clearTimeout(timer);
-  }, [email]);
-
-  const { data } = trpc.bizrethink.signupInvite.lookup.useQuery(
-    { email: debounced },
-    { enabled: debounced.length > 0 },
-  );
-
-  if (!data || data.pendingInvites.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm dark:border-blue-900/50 dark:bg-blue-950/30">
-      <p className="font-medium text-blue-900 dark:text-blue-200">
-        <Trans>You'll join after signup</Trans>
-      </p>
-      <ul className="mt-1 space-y-0.5 text-blue-800 dark:text-blue-300">
-        {data.pendingInvites.map((invite, idx) => (
-          <li key={idx}>
-            • <span className="font-medium">{invite.organisationName}</span> as{' '}
-            <span className="lowercase">{invite.organisationRole}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
