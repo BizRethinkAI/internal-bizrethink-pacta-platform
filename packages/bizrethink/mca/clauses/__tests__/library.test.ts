@@ -42,14 +42,43 @@ describe('the MCA clause library', () => {
    * the document deliberately leaves unnumbered, and an invented number is
    * exactly the kind of thing a later reader would try to "fix" against the
    * document. `slug` is the identity; this is what a reader sees on the page.
+   *
+   * NARROWED 2026-09-10, BY THE SAME REVERSAL THAT RETIRED
+   * `engine/__tests__/select-clauses.test.ts`'s completeness assertion, and
+   * inverted here rather than deleted. This read `new Set(numbers).size ===
+   * numbers.length` over the whole instrument, which is true only while the
+   * library is a LIST of one document's clauses. It is a library: §4.15 is now
+   * two clauses, one for each value of `concurrentPositions`, and §8.2 is two,
+   * one for `payoff-only` and one for `carry`. Both alternatives print the same
+   * section number, because both ARE that section on the page of the document
+   * that contains them, and inventing a second number for one of them would put
+   * a number in the corpus no document has — the exact thing the paragraph above
+   * refuses to do for the unnumbered clauses.
+   *
+   * WHAT SURVIVES IS THE HALF THAT CATCHES THE ACCIDENT. A number carried by
+   * more than one record must be carried by CONDITIONAL records only. A clause
+   * copied with an existing number and left ungated still fails here, which is
+   * the collision worth catching. That at most one of a shared number is ever
+   * selected is a property of an assembled document rather than of the library,
+   * and it is asserted where documents are assembled — `select-clauses.test.ts`,
+   * *"gives an assembled document one clause per section number"*.
    */
-  it('numbers each numbered clause once within an instrument', () => {
+  it('shares a clause number only between conditional clauses', () => {
     for (const id of MCA_INSTRUMENTS) {
-      const numbers = libraryFor(id)
-        .map((clause) => clause.number)
-        .filter((number) => /^\d+\.\d+$/.test(number));
+      const numbered = libraryFor(id).filter((clause) => /^\d+\.\d+$/.test(clause.number));
 
-      expect(new Set(numbers).size).toBe(numbers.length);
+      for (const number of new Set(numbered.map((clause) => clause.number))) {
+        const sharing = numbered.filter((clause) => clause.number === number);
+
+        if (sharing.length > 1) {
+          expect(
+            sharing.every((clause) => clause.includeWhen !== null),
+            `${id} §${number} is carried by ${sharing.length} clauses and at least one is unconditional: ${sharing
+              .map((clause) => clause.slug)
+              .join(', ')}`,
+          ).toBe(true);
+        }
+      }
     }
   });
 
@@ -77,10 +106,13 @@ describe('the MCA clause library', () => {
    * because the moment a genuinely shared clause appears this is the test that
    * should be reconsidered, and a count in prose would not be.
    */
-  it('gives every clause exactly one instrument, across all 200', () => {
+  it('gives every clause exactly one instrument, across all 202', () => {
     // 204 until the four `[Reserved]` records were removed — section numbers the
     // document holds open after a clause was taken out, now declared non-clause.
-    expect(ALL_MCA_CLAUSES).toHaveLength(200);
+    // 200 until `renewal-positions` split the FRPA's §4.15 and §8.2 into
+    // alternatives on 2026-09-10; see `frpa-coverage.test.ts` for why that adds
+    // records without adding sections.
+    expect(ALL_MCA_CLAUSES).toHaveLength(202);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 

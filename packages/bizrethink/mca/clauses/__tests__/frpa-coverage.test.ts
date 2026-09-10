@@ -88,12 +88,21 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 97 clauses: 83 the document numbers, 14 it does not', () => {
+  it('holds 99 records for 97 sections: 83 the document numbers, 14 it does not', () => {
     // 101 until the four `[Reserved]` records were removed. They were section
     // numbers the document holds open after a clause was taken out — lines of
     // the document, not clauses of it — and are now declared in
     // FRPA_NON_CLAUSE with the reason each one actually has.
-    expect(clauses).toHaveLength(97);
+    //
+    // 97 until `renewal-positions` split §4.15 and §8.2 on 2026-09-10. Neither
+    // split adds a SECTION: `concurrentPositions` chooses between two §4.15s and
+    // `renewalModel` between two §8.2s, so every assembled document still holds
+    // one of each. What moved is the number of RECORDS the library keeps, which
+    // is what this counts. The alternative was `includeWhen` gating a whole
+    // clause on a fact that decides one limb of it, which deleted the
+    // multi-position rule instead of replacing it — see `frpa/enrollment.ts`
+    // §4.15 and `frpa/miscellaneous.ts` §8.2.
+    expect(clauses).toHaveLength(99);
     expect(clauses.filter((clause) => clause.number !== '').length).toBeGreaterThan(0);
   });
 

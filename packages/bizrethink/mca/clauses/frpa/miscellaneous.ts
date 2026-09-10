@@ -320,6 +320,46 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       { review: 'REVIEW-01', findings: ['ct-prejudgment-remedy-waiver', 'service-without-notice-vs-commitment-9'] },
     ],
   },
+  /*
+    WHAT WAS WRONG. Three mechanisms, each of which quietly undoes a protection
+    stated somewhere else.
+
+    (1) AUTOMATIC MASTER-AGREEMENT TREATMENT. "This Agreement shall serve as a
+        Master Agreement which sets forth all of the terms and conditions
+        governing any such sale", performed by "an additional schedule". A
+        schedule is not a new agreement: it carries no fresh disclosures, no
+        fresh underwriting and no fresh signature on the terms, and it makes
+        every later funding inherit the terms of the first — including any term
+        a later review finds wrong.
+    (2) REDUCTION BY PRIOR PURCHASED AMOUNTS. "The Purchase Price listed on such
+        schedule shall be reduced dollar-for-dollar by Purchased Amounts then
+        outstanding from prior purchases." The Purchased Amount is a FACE
+        figure. What is actually owed on a live purchase is the Remaining
+        Balance, which §2.6 defines and which is smaller by everything already
+        collected. Deducting the face amount overstates the payoff and
+        understates the cash — REVIEW-01's `frontload-refactors-old-balance`.
+    (3) THE RIGHT OF FIRST REFUSAL. Lawful, and unnecessary: Buyer already owns
+        the share it bought, and a ROFR over Merchant's future sales protects
+        nothing this Agreement gives.
+
+    WHAT CHANGED. All three are denied rather than repaired, which is the memo's
+    disposition, and the machinery moves to Section 8 where a subsequent purchase
+    is actually governed. Nothing in the replacement is new law; it is the
+    negation of three things v4 asserted.
+
+    DEPARTURE FROM THE MEMO — "SECTION 8" IS NAMED AS §8.1 AND §8.2. The memo
+    says "must comply with Section 8". A bare Section 8 reference resolves
+    against §8.3 (voluntary prepayment) even in a template where the renewal
+    clauses are gated out, so it would read as satisfied while pointing at a
+    section that does not answer it. The two clauses that do are named.
+
+    THE GATE STAYS ON `renewalModel`. A funder that does no subsequent purchases
+    has nothing to deny here, and the clause's own text points at §8.1 and §8.2,
+    which that funder's template does not contain.
+
+    THE HEADING CHANGES for the reason §5.16's does: it named the machinery, and
+    the machinery is gone.
+  */
   {
     slug: 'frpa.sale-of-additional-pool-of-receipts-right-of-first-refusal-7-13',
     version: 1,
@@ -332,8 +372,8 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     number: '7.13',
     section: 'miscellaneous',
     sortKey: 130,
-    heading: 'Sale of Additional Pool of Receipts; Right of First Refusal',
-    body: 'In the event that Merchant wishes to sell, and Buyer agrees to purchase, an additional pool (or additional pools) of Receipts, this Agreement shall serve as a Master Agreement which sets forth all of the terms and conditions governing any such sale. The parties shall execute an additional schedule for each such purchase, setting forth the Purchase Price, Specified Percentage, Estimated Daily Holdback, and Purchased Amount applicable to that additional pool of future receivables. The Purchase Price listed on such schedule shall be reduced dollar-for-dollar by Purchased Amounts then outstanding from prior purchases of Receipts by Buyer. Nothing herein shall obligate either party to sell and purchase additional pools; however, Merchant grants Buyer the right of first refusal to purchase any such pool of additional future receivables that Merchant may wish to sell.',
+    heading: 'No Master Agreement; No Right of First Refusal',
+    body: 'This Agreement is not a master agreement for future funding, and it creates no right of first refusal in Buyer over any sale of receipts Merchant may wish to make. Neither party is obliged to enter a further purchase, and no schedule, addendum or acceptance of an offer varies this Section.\nEvery subsequent purchase must be separately offered, disclosed, documented and accepted, and must satisfy Section 8.1. No Purchased Amount and no Remaining Balance under a prior transaction is automatically deducted from the Purchase Price of a new one; a prior transaction is dealt with only as Section 8.2 provides and only where Merchant has authorized it.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -547,6 +587,50 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       },
     ],
   },
+  /*
+    WHAT WAS WRONG. Two sentences, and the second one is the whole finding.
+
+    "Merchant may be eligible for a renewal funding prior to full collection of
+    the Purchased Amount" is fine on its own — renewal before completion is not
+    inherently a defect. "Any renewal shall be documented under a new Future
+    Receivables Purchase Agreement incorporating the outstanding balance from
+    this Agreement" is not: read with v4's §4.15 cascade and §8.2 Carry, it
+    double-commits the same pool. The old purchase stays alive and keeps
+    collecting, its balance is folded into the new Purchased Amount, and the
+    merchant is delivering against both. That is the mechanism REVIEW-01 records
+    as `lombard-multi-position-vs-no-stack` and the memo describes as a
+    "$100,000 advance" that delivers $65,000.
+
+    WHAT CHANGED. A subsequent purchase becomes an offer, not an entitlement:
+    fresh underwriting on the receipts and obligations as they then stand, a
+    complete new agreement, the disclosures the law then requires, and a fresh
+    acceptance. The net-proceeds sentence is the memo's and is the one that
+    makes the arithmetic visible before signature — the additional cash stated
+    separately from the old obligation settled, and a payoff not counted as cash
+    delivered.
+
+    DEPARTURE FROM THE MEMO — TWO LIMBS ARE POINTED AT §4.15 RATHER THAN STATED.
+    The memo ends "No automatic renewal, concurrent position, or continuing
+    guaranty arises from this Agreement", and requires the prior purchase to be
+    "completed or expressly settled at or before the new Purchase Date". Both of
+    those are true of a single-position funder and false of a funder that holds
+    concurrent positions, and §4.15 is the clause `concurrentPositions` decides.
+    Stating them here would put the answer in two places and make one of them
+    wrong for half the profiles. The automatic-renewal and continuing-guaranty
+    limbs stay, because they are true under both.
+
+    DEPARTURE — NO REFERENCE TO SECTION 9. The memo does not make one; the draft
+    that pointed the guaranty sentence at Section 9 was withdrawn because §9.2 is
+    gated on `guarantyScope` and six clauses already dangle at it in a
+    no-guaranty template. That gap is the `guaranty` cluster's and is recorded in
+    `engine/__tests__/select-clauses.test.ts`; this clause does not add a seventh.
+
+    UNVERIFIED. The memo's renewal analysis rests on Richmond Capital 246 AD3d
+    585 and LG Funding for the proposition that reconciliation and completion
+    mechanics are read as evidence of whether a transaction is a purchase or a
+    loan. Nobody on this project has pulled either from an official reporter.
+    Recorded here, never in a body.
+  */
   {
     slug: 'frpa.renewal-eligibility-8-1',
     version: 1,
@@ -560,26 +644,136 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'renewal',
     sortKey: 10,
     heading: 'Renewal Eligibility',
-    body: 'Merchant may be eligible for a renewal funding prior to full collection of the Purchased Amount under this Agreement, subject to Buyer’s underwriting approval. Any renewal shall be documented under a new Future Receivables Purchase Agreement incorporating the outstanding balance from this Agreement.',
+    body: 'Neither party is obliged to enter a subsequent purchase, and no renewal arises automatically from this Agreement.\nA subsequent purchase requires new underwriting on Merchant’s Card Receipts and existing obligations as they stand at that time, a new and complete agreement, every disclosure the law then requires, and Merchant’s fresh acceptance. Before Merchant accepts, Buyer shall state separately the additional cash Merchant will receive and the amount of any existing obligation to be settled out of the new consideration. A payoff is not cash delivered to Merchant.\nThis Agreement is settled or completed as Section 8.2 provides. Whether Buyer may hold this purchase and a subsequent purchase at the same time is governed by Section 4.15. No Guarantor’s obligation under this Agreement extends to a subsequent purchase.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['lombard-multi-position-vs-no-stack'] }],
   },
+  /*
+    §8.2 IS THE SECOND EXHAUSTIVE PAIR. §4.15's comment in `enrollment.ts`
+    carries the argument; this is the other instance and the harder one, because
+    `renewalModel` has three values rather than two.
+
+    `none` selects neither of these. `payoff-only` selects the clause below.
+    `carry` selects the one after it. Every value selects exactly one §8.2, and
+    the four clauses that cite §8.2 by number — §004, §7.13, §8.1 and §4.15's
+    single-position half — find it in every template that has a Section 8.
+
+    WHY A PAIR AND NOT A CLAUSE PLUS A LIMB. The old gate was
+    `renewalModel === 'carry'`, which read as though Carry were the whole
+    subject. It is not: the section holds a payoff method and a carry method,
+    and the payoff method is the one a `payoff-only` funder needs. Gating the
+    section on Carry deleted the payoff along with it. The two clauses below are
+    each complete; neither is a fragment of the other.
+
+    THE MEMO'S NARRATIVE AND THE MEMO'S TEXT DO NOT DISAGREE HERE, AND THE BRIEF
+    SAYS THEY DO. Recorded because the next reader will check. The brief states
+    that "the memo contradicts itself: its narrative says the design removes
+    Carry, while its own §8.2 replacement text retains Carry as method (b) with a
+    merchant election", and that "the current body already matches the memo's
+    replacement text verbatim". Neither is so in the memo extract this cluster
+    was given (`.cluster-briefs/renewal-positions.json`, entry 082). The
+    two-method Deduct/Carry text with the merchant election is `current_body` —
+    v4's shipped §8.2 — and `memo_replacement` opens "No prior Remaining Balance
+    is carried into the new Purchased Amount" and never mentions Carry again.
+    The memo document itself is not vendored in this repository or in
+    `lombard-contracts`, so the JSON extract is the only text available to check
+    against, and it is consistent with its own rationale.
+
+    HOW IT IS RESOLVED, GIVEN THAT. Carry is removed from LOMBARD'S DOCUMENT and
+    kept in THE LIBRARY. The owner's instruction is to adopt the memo's design in
+    the funder profile, and `renewalModel: 'payoff-only'` does that. Deleting the
+    Carry clause outright would leave `renewalModel: 'carry'` as a value of
+    `McaFacts` with nothing behind it, which is precisely what
+    `equipment: 'deferred'` was and what
+    `__tests__/equipment-is-a-merchant-election.test.ts` was written about. So it
+    stays, redrafted rather than preserved, for a funder that answers the
+    interview that way.
+  */
   {
     slug: 'frpa.rollover-methods-8-2',
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
     /*
-      Carry IS the fact. A payoff-only funder has no rollover method to describe.
+      The payoff half of the pair. Selected for a funder that settles a prior
+      balance out of the new Purchase Price and never folds it into the new
+      Purchased Amount.
     */
+    includeWhen: (facts) => facts.renewalModel === 'payoff-only',
+    number: '8.2',
+    section: 'renewal',
+    sortKey: 20,
+    heading: 'Settlement of a Prior Purchase',
+    body: 'No Remaining Balance under a prior transaction is carried into the Purchased Amount stated in Section 1.3. That Purchased Amount is the Purchase Price multiplied by the Factor Rate, and nothing is added to it.\nMerchant may separately authorize a stated part of the Purchase Price to be applied to settle an identified prior transaction, whether it is owed to Buyer or to another person. Before Merchant accepts, Buyer shall state in writing the prior transaction identified, its settlement amount as at the Purchase Date, the amounts already credited to it, any unpaid charge included in that settlement amount, any rebate or discount applied, the part of the Purchase Price to be applied to it, and the cash Merchant will actually receive. Buyer shall make any further disclosure the law requires of a refinancing, and shall not count a payoff as cash delivered to Merchant.\nOn the Purchase Date the authorized settlement fully extinguishes the identified prior transaction. Where that transaction is owed to Buyer, Buyer shall stop every instruction it has given an Approved Processor under it, close its ledger, record the settlement once in the ledger of each transaction, confirm to Merchant that no claim or collection right under it remains, and file or authorize the release of every filing that records its interest under it.\nMerchant is bound only by the offer it accepted, as fully calculated. A change to the settlement amount, to the Purchase Price or to the cash Merchant will receive requires corrected disclosures, and Merchant’s renewed acceptance where the law requires it. No use of the word “renewal” waives a rebate the law requires or permits a charge the law does not.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [
+      {
+        review: 'REVIEW-01',
+        findings: [
+          'frontload-refactors-old-balance',
+          'frpa-undefined-capitalised-terms',
+          'lombard-multi-position-vs-no-stack',
+          'purchased-amount-two-formulas',
+        ],
+      },
+    ],
+  },
+  /*
+    THE CARRY HALF, for a funder whose profile says `renewalModel: 'carry'`.
+    Lombard's does not, as of 2026-09-10, so nothing in the corpus selects this
+    today. It is drafted rather than preserved, and the redraft is what makes
+    keeping it defensible.
+
+    WHAT WAS WRONG, AND IT IS ONE THING. "The outstanding Remaining Balance is
+    carried into the new Purchased Amount rather than paid off." v4 never said
+    what happens to the OLD agreement. Nothing terminated it, nothing closed its
+    ledger, nothing stopped its split instructions — so the same balance could be
+    inside the new Purchased Amount and still collectible under the old
+    agreement. That is the memo's objection in full: "Carry can leave the old
+    agreement alive while its remaining balance is included in a second Purchased
+    Amount." It is a double-collection risk, not a disclosure quibble.
+
+    WHAT CHANGED. A paragraph that ends the prior agreement on the new Purchase
+    Date under EITHER method — instructions stopped, ledger closed, filings
+    released, confirmation to Merchant, and the carried balance collected only
+    under the new agreement and only once. The election survives, and it is the
+    protective part of v4's drafting: the two methods produce different Purchased
+    Amounts, so pricing is fixed before signature and Merchant may require the
+    method it prefers.
+
+    THE SPINE'S ARITHMETIC, AND WHY IT IS SAFE NOW. `(Purchase Price × Factor
+    Rate) + Remaining Balance` is REVIEW-01's `purchased-amount-two-formulas`,
+    and it stays, because under this method it is what the Purchased Amount
+    actually is. What makes it survivable is that §2.6 now defines the Remaining
+    Balance as a purchase-only figure — never a fee, an equipment charge, a cost
+    of enforcement or an amount owed under another agreement, and nothing charged
+    after the Purchase Date increases it. v4 carried whatever had accumulated;
+    this carries the unpaid part of a purchase and says so in the body.
+
+    DEPARTURE FROM v4 — THE DISCLOSURE SENTENCE IS WIDENED. v4 disclosed only
+    "the amount of the new financing used to pay unpaid finance charges", and
+    only "on any state disclosure that requires it". Both halves are narrower
+    than the memo's list for the payoff method, and there is no reason the carry
+    method should disclose less than the payoff method of the same section.
+
+    NUMBERS. None invented. The formula and "$0.00" are v4's; "Less: Prior
+    Balance(s)" is Section 1.4's own label.
+  */
+  {
+    slug: 'frpa.rollover-carry-method-8-2',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
     includeWhen: (facts) => facts.renewalModel === 'carry',
     number: '8.2',
     section: 'renewal',
     sortKey: 20,
     heading: 'Rollover Methods',
-    body: 'If Merchant has an outstanding Remaining Balance at the time of renewal, the balance shall be handled by whichever of the following methods Merchant elects. Under both methods the Purchase Price is the consideration for the new Purchased Amount, and Merchant may apply part of the Purchase Price to satisfy an existing obligation, whether owed to Buyer or to another funder:\n(a) Deduct. The outstanding Remaining Balance is satisfied out of the Purchase Price, and appears as “Less: Prior Balance(s)” in the itemization in Section 1.4. The new Purchased Amount is Purchase Price × Factor Rate. Merchant receives a reduced disbursement because part of the Purchase Price has been applied to retire the existing obligation, in the same way as if it had been applied to retire an obligation owed to another funder. Where the obligation retired is owed to Buyer, the amount of the new financing used to pay unpaid finance charges on it is disclosed to Merchant on any state disclosure that requires it.\n(b) Carry. The outstanding Remaining Balance is carried into the new Purchased Amount rather than paid off, so that the new Purchased Amount is (Purchase Price × Factor Rate) + Remaining Balance. The Remaining Balance is carried at face value and no Factor Rate is applied to it. “Less: Prior Balance(s)” in Section 1.4 is $0.00 under this method. Merchant receives the full Net Amount Funded, but the total delivery obligation increases by the rollover amount.\nThe Deduct or Carry method applicable to any renewal shall be elected by Merchant. Because the two methods produce different Purchased Amounts, the election is made before this Agreement is issued for signature: Buyer shall explain both methods and the Purchased Amount each produces, Merchant elects, and the elected method is recorded in Section 1 as the Rollover Method with the Purchased Amount in Section 1.3 calculated on that method. Buyer may propose a method when presenting the offer, but Merchant may require the other, in which case Buyer shall re-issue the offer priced on the method Merchant elects. Merchant is not bound by a proposed method it has not elected.',
+    body: 'If Merchant has an outstanding Remaining Balance with Buyer when a subsequent purchase is made, that balance is dealt with by whichever of the following methods Merchant elects. Under both methods the Remaining Balance is the figure Section 2.6 gives, and so includes no fee, no equipment charge, no cost of enforcement and no amount owed under any other agreement.\n(a) Deduct. The Remaining Balance is settled out of the Purchase Price and appears as “Less: Prior Balance(s)” in the itemization in Section 1.4. The new Purchased Amount is the Purchase Price multiplied by the Factor Rate. Merchant receives a reduced disbursement, because part of the Purchase Price has been applied to retire the existing obligation.\n(b) Carry. The Remaining Balance is carried into the new Purchased Amount instead of being settled out of the Purchase Price, so that the new Purchased Amount is (Purchase Price × Factor Rate) + Remaining Balance. It is carried at face value and no Factor Rate is applied to it. “Less: Prior Balance(s)” in Section 1.4 is $0.00 under this method, and Merchant receives the full Net Amount Funded.\nUnder either method the prior agreement is at an end on the new Purchase Date. Buyer shall stop every instruction it has given an Approved Processor under it, close its ledger, record the amount dealt with once in the ledger of each transaction, confirm to Merchant that no claim or collection right under the prior agreement remains, and file or authorize the release of every filing that records its interest under it. A balance carried under (b) is collected only under the new agreement and only once.\nBefore Merchant accepts, Buyer shall state in writing the prior transaction identified, its Remaining Balance as at the Purchase Date, the amounts already credited to it, any unpaid charge included in that balance, any rebate or discount applied, the Purchased Amount each method produces, and the cash Merchant will actually receive under each. Buyer shall make any further disclosure the law requires of a refinancing, and shall not count a settlement of a prior balance as cash delivered to Merchant.\nThe elected method is recorded in Section 1 and the Purchased Amount in Section 1.3 is calculated on it. Buyer may propose a method when presenting the offer; Merchant may require the other, in which case Buyer shall re-issue the offer priced on the method Merchant elects. Merchant is not bound by a method it has not elected.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

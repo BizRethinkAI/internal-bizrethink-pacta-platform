@@ -732,6 +732,66 @@ export const FRPA_ENROLLMENT: McaClause[] = [
       { review: 'REVIEW-02', findings: ['iso-a2-a4-no-clawback-when-the-merchant-cancels-under-frpa-4-14'] },
     ],
   },
+  /*
+    ONE SECTION, TWO CLAUSES, AND THIS IS WHERE THE LIMB PROBLEM GETS ANSWERED.
+
+    §4.11's comment above states the problem and records that it could not be
+    solved there: *"`includeWhen` has no limb granularity … Splitting the clause
+    in two would answer it properly and is not available: the count
+    `frpa-coverage.test.ts` pins would move."* The count moves here, on purpose,
+    97 → 99, and `library.test.ts`'s 200 → 202 with it.
+
+    THE FACT DECIDES A WHOLE CLAUSE, WHICH IS THE ONLY SHAPE `includeWhen` CAN
+    EXPRESS HONESTLY. `concurrentPositions` gated the whole of §4.15 while the
+    memo's objection was to one limb of it — the automatic cascade — and the
+    memo does not want silence in its place, it wants the opposite rule stated:
+    *"Buyer shall not maintain more than one active purchase of the same Card
+    Receipts under this Agreement or a renewal."* Turning the fact off deleted
+    the section instead of replacing it, and left §7.1's "Except as expressly
+    provided in Sections 3.3, 3.4 and 4.15" carving out a clause that was not
+    there. `engine/__tests__/select-clauses.test.ts` catches that now; it is the
+    first thing the new cross-reference assertion found.
+
+    So §4.15 is an EXHAUSTIVE PAIR: `concurrentPositions` is a boolean, one
+    clause answers each value, and every template has exactly one §4.15. Neither
+    is a fragment of the other and neither needs the other to read.
+
+    WHAT WAS WRONG WITH THE CASCADE, kept below for the funder that runs one.
+    (1) It applied "the Specified Percentage and Estimated Daily Holdback", as
+        though the estimate were a second thing collected. `frpa.definitions`
+        now says an estimate "creates no obligation to deliver any amount by any
+        date"; only the Specified Percentage of Card Receipts is collected.
+    (2) "Position 1 being the first-priority funding" invented a priority scheme
+        between Buyer's own purchases and called an ordering a priority. The
+        same confusion §4.11 records about equipment charges "ranking after the
+        Specified Percentage".
+    (3) It described §5.16 as "the prohibition on third-party Stacking", with
+        `Stacking` capitalised and undefined — `frpa-undefined-capitalised-terms`
+        — and §5.16 is no longer a stacking prohibition at all.
+    (4) THE SPINE'S EIGHTH HANDOVER. The cascade turns on the Completion
+        Threshold, and §2.6 now defines the Remaining Balance as a purchase-only
+        figure: no fee, no equipment charge, no cost of enforcement, and nothing
+        charged after the Purchase Date increases it. So a purchase completes,
+        and the cascade fires, on the purchase amount alone — an unpaid
+        Appendix A fee no longer holds an earlier position open and no longer
+        keeps a later one from starting.
+
+    WHAT CHANGED. Each purchase is its own transaction with its own ledger.
+    Application is to the earliest outstanding purchase and is recorded once.
+    Nothing reaches a later purchase before the earlier one is complete under
+    §2.6. The Specified Percentage does not rise because a second purchase
+    exists, and the total withheld across all of them is stated to Merchant
+    before Merchant signs the later one — which is the disclosure the
+    multi-position product actually owes and v4 did not make.
+
+    UNVERIFIED. REVIEW-01's `lombard-multi-position-vs-no-stack` reports that
+    Lombard's marketing promises no stacking while this clause authorised
+    Buyer's own. Nobody on this project has read that marketing; the finding is
+    the only evidence of it, and the memo says either it changes or the product
+    does. Lombard's profile now changes the product. A funder that keeps the
+    cascade has an unresolved marketing question, which is a UDAP question
+    before it is a contract one.
+  */
   {
     slug: 'frpa.position-and-cascade-of-collections-4-15',
     version: 1,
@@ -739,13 +799,79 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     kind: 'clause',
     /*
       The cascade exists only where the funder may hold more than one position.
+      Its pair below covers the other value; between them the section is always
+      present.
     */
     includeWhen: (facts) => facts.concurrentPositions,
     number: '4.15',
     section: 'enrollment',
     sortKey: 150,
     heading: 'Position and Cascade of Collections',
-    body: 'If Merchant has multiple active funding agreements with Buyer (each a “Position”), collections of the Specified Percentage and Estimated Daily Holdback shall be applied to the lowest-numbered Position first (Position 1 being the first-priority funding). Upon completion of any Position (i.e., upon attainment of the Completion Threshold for that Position), collections shall automatically cascade to the next active Position in ascending order. The provisions of this Section 4.15 supplement (and do not waive) the prohibition on third-party Stacking under Section 5.16; this Section governs only Buyer’s own multi-position fundings on the same Merchant.',
+    body: 'Where Buyer holds more than one active purchase of Card Receipts from Merchant, each purchase is a separate transaction with its own Purchased Amount, its own Remaining Balance and its own ledger. Buyer shall apply each amount it receives to the earliest purchase then outstanding, shall record it once and in that purchase’s ledger, and shall not apply any amount to a later purchase before the earlier one has reached its Completion Threshold under Section 2.6.\nThe Specified Percentage under this Agreement does not increase because another purchase is active. Before Merchant signs a later purchase, Buyer shall state to Merchant in writing the total percentage of Card Receipts that will be withheld across all of Buyer’s active purchases. On Merchant’s reasonable request Buyer shall give Merchant a statement showing, for each active purchase, the amounts credited to it and its Remaining Balance.\nThis Section governs only Buyer’s own purchases. Merchant’s dealings with any other person are governed by Sections 4.11 and 5.16.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-01', findings: ['lombard-multi-position-vs-no-stack'] }],
+  },
+  /*
+    THE OTHER HALF OF §4.15, and the memo's own sentence for it.
+
+    Selected when the funder holds one position at a time, which is Lombard as
+    of 2026-09-10. The memo's replacement text is the base and is kept almost
+    whole; three departures.
+
+    DEPARTURE 1 — NO REFERENCE TO SECTION 8. The memo ends "completion or
+    separately authorized settlement of the prior purchase at or before the new
+    Purchase Date under Section 8". Sections 8.1 and 8.2 are both gated on
+    `renewalModel`, so a funder with `renewalModel: 'none'` and one position at a
+    time — the arbitration profile in the engine test is exactly that — would
+    read a clause pointing at two sections its document does not contain. The
+    duty is stated in full here instead, and §2.6 supplies completion, which is
+    ungated. This is the failure the new cross-reference assertion exists to
+    catch, found while drafting rather than after.
+
+    DEPARTURE 2 — "OF THE SAME CARD RECEIPTS" IS WIDENED TO "FROM MERCHANT".
+    Every purchase under this form is of a percentage of the same stream, so
+    "the same Card Receipts" adds a qualifier a funder could argue about while
+    running two purchases against one merchant. The rule is one active purchase
+    per merchant.
+
+    DEPARTURE 3 — THE LAST SENTENCE IS NEW. Without it the clause reads as a
+    restriction on MERCHANT, which is the opposite of what it is: it binds
+    Buyer, and Merchant's own financing is §5.16's subject and expressly not an
+    Event of Default under §6.1.
+
+    DEPARTURE 4 — "THE NEW PURCHASE DATE" IS NOT USED. `Purchase Date` is a
+    defined term and §4.13 defines it as THIS Agreement's, so "the new Purchase
+    Date" would use a defined term to mean something the definition does not
+    cover. The deadline is expressed as the date the subsequent purchase is
+    funded, which is the same moment and needs no second definition. §7.13 and
+    §8.1 avoid the phrase for the same reason; §8.2 and §004 keep it, because
+    there it does mean this Agreement's own.
+
+    WHAT IT DELIBERATELY DOES NOT SAY. It states no operational consequence of a
+    settlement — stopping the split instructions, closing the ledger, releasing
+    the filings. §2.6 already carries those for completion and §8.2 carries them
+    for a settlement, and writing them a third time here is how §2.4 and §5.17
+    came to contradict each other. The rule this clause owns is the POSITION
+    rule, and it owns it alone.
+
+    NO INVENTED FREQUENCY. The statement duty in the cascade clause above reads
+    "on Merchant's reasonable request" rather than a monthly cap: the brief
+    forbids inventing counts the memo and the current body do not fix, and a
+    number is what a first draft of that sentence reached for.
+  */
+  {
+    slug: 'frpa.single-active-position-4-15',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    includeWhen: (facts) => !facts.concurrentPositions,
+    number: '4.15',
+    section: 'enrollment',
+    sortKey: 150,
+    heading: 'Single Active Position',
+    body: 'Buyer shall not maintain more than one active purchase of Card Receipts from Merchant, whether under this Agreement or under a subsequent purchase. No amount collected under this Agreement is applied to any other transaction, and no remittance cascades automatically from one transaction to another.\nA subsequent purchase requires a new agreement, every disclosure the law then requires, and fresh signatures. This Agreement must have reached its Completion Threshold under Section 2.6, or have been settled with Merchant’s separate written authorization, at or before the date the subsequent purchase is funded.\nThis Section binds Buyer. It does not restrict Merchant’s financing from any other person, which Section 5.16 addresses.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

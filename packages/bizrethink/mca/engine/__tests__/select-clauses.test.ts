@@ -88,85 +88,81 @@ const danglingIn = (facts: McaFacts, library?: McaClause[]): string[] => {
  * None of these is `renewal-positions`' to fix, and fixing someone else's
  * clause to quiet a check is how a cluster's blast radius grows.
  */
-const KNOWN_GAPS: { from: string; to: string; quote: string; owner: string }[] = [
+const KNOWN_GAPS: { to: string; from: string[]; quote: string; owner: string }[] = [
   {
-    from: 'frpa.electronic-account-monitoring-authorization-plaid-4-16',
-    to: 'Section 6.1.1',
-    quote: 'shall constitute an Event of Default under Section 6.1.1',
     /*
       §6.1 had fifteen numbered limbs when §4.16 was written. `default-remedies`
       replaced them with three lettered ones on 2026-09-10, so there is no 6.1.1
       any more — and a Plaid outage is now expressly IN §6.1's not-a-default
-      list, which means the citation is wrong twice over. `data-and-channel`
-      owns §4.16.
+      list, so the citation is wrong twice over. `data-and-channel` owns §4.16.
     */
+    to: 'Section 6.1.1',
+    from: ['frpa.electronic-account-monitoring-authorization-plaid-4-16'],
+    quote: 'shall constitute an Event of Default under Section 6.1.1',
     owner: 'data-and-channel',
   },
   {
-    from: 'frpa.indemnification-7-9',
-    to: 'Section 6.3.1',
-    quote: 'interest accrues only as Section 6.3.1 permits',
     /*
       Same cause. §6.3 was rewritten to a single aggregate ceiling with no
       numbered limbs; §7.9's own comment already records that it "defers to
       §6.3.1", which now supplies nothing. `miscellaneous` owns §7.9.
     */
+    to: 'Section 6.3.1',
+    from: ['frpa.indemnification-7-9'],
+    quote: 'interest accrues only as Section 6.3.1 permits',
     owner: 'miscellaneous',
   },
-  /*
-    THE GUARANTY GAP, WHICH THE GUARANTY CLUSTER FOUND AND THIS TEST CONFIRMS
-    FROM THE OTHER SIDE.
+  {
+    /*
+      THE GUARANTY GAP, SEEN FROM OUTSIDE SECTION 9.
 
-    `guarantyScope: 'none'` drops §9.2 and every operative guaranty clause with
-    it — but six clauses outside Section 9 still point at §9.2 to say how far a
-    Guarantor's liability reaches, and `frpa.guarantor-information-9-1` is an
-    ungated `field-group` that goes on collecting a guarantor's name, address
-    and Social Security Number into a document with no guaranty in it.
+      §§9.2, 9.4, 9.5 and 9.6 gate on `guarantyScope === 'limited-conduct'`,
+      which is the only guaranty this library has drafted. `full-performance` is
+      a value of the fact with no clause behind it — deliberately, because the
+      wide guaranty is the one all three market forms use and the one the memo
+      argues against — so a full-performance funder selects §9.1's identity grid
+      and §§10.2/10.4's guarantor execution blocks with **no guaranty between
+      them**, and these six clauses go on limiting a Guarantor's liability by
+      reference to a §9.2 the document does not contain. `guarantyScope: 'none'`
+      produces the same six.
 
-    §9.1 does not appear below because it has no body and therefore cites
-    nothing: this test cannot see it, and that is worth stating rather than
-    leaving as an absence. The six that DO cite §9.2 are the same defect in the
-    form this test can see. `guaranty` owns all seven.
-  */
-  {
-    from: 'frpa.security-interest-4-10',
+      NOT §9.1'S OWN GATE, which is fixed: `frpa.guarantor-information-9-1` was
+      ungated and is now `guarantyScope !== 'none'`, so a `none` funder collects
+      no Social Security Number for a guaranty it does not have. What is left is
+      the `full-performance` half, and it is real. `guaranty` owns it.
+    */
     to: 'Section 9.2',
-    quote: 'to Section 9.2 for any claim against a Guarantor',
-    owner: 'guaranty',
-  },
-  {
-    from: 'frpa.remedies-4-12',
-    to: 'Section 9.2',
-    quote: 'Section 9.2 for any claim against a Guarantor, and applicable law',
-    owner: 'guaranty',
-  },
-  {
-    from: 'frpa.unencumbered-receipts-5-11',
-    to: 'Section 9.2',
-    quote: 'only where the conduct and proof requirements of Section 9.2 are satisfied',
-    owner: 'guaranty',
-  },
-  {
-    from: 'frpa.remedies-6-2',
-    to: 'Section 9.2',
+    from: [
+      'frpa.security-interest-4-10',
+      'frpa.remedies-4-12',
+      'frpa.unencumbered-receipts-5-11',
+      'frpa.remedies-6-2',
+      'frpa.costs-of-collection-6-3',
+      'frpa.indemnification-7-9',
+    ],
     quote: 'A claim against a Guarantor may be brought only as Section 9.2 permits.',
     owner: 'guaranty',
   },
   {
-    from: 'frpa.costs-of-collection-6-3',
-    to: 'Section 9.2',
-    quote: 'liable only for the costs attributable to a valid claim against that Guarantor under Section 9.2',
-    owner: 'guaranty',
-  },
-  {
-    from: 'frpa.indemnification-7-9',
-    to: 'Section 9.2',
-    quote: 'a claim against a Guarantor may be brought only as Section 9.2 permits',
+    /*
+      And the whole of Section 9 under `guarantyScope: 'none'`, where four
+      clauses reserve remedies to a section that is now entirely absent. Visible
+      only since §9.1 was gated — while §9.1 was ungated, its number answered a
+      bare "Section 9" and hid these four behind a grid of blanks.
+    */
+    to: 'Section 9',
+    from: [
+      'frpa.sales-of-receipts-not-a-loan-2-1',
+      'frpa.completion-threshold-2-6',
+      'frpa.representations-lead-in',
+      'frpa.civil-criminal-regulatory-matters-5-14',
+    ],
+    quote: 'Buyer’s remedies are limited by Section 6, and the Guaranty is limited by Section 9.',
     owner: 'guaranty',
   },
 ];
 
-const KNOWN = new Set(KNOWN_GAPS.map(({ from, to }) => `${from} -> ${to}`));
+const KNOWN = new Set(KNOWN_GAPS.flatMap(({ from, to }) => from.map((slug) => `${slug} -> ${to}`)));
 
 /**
  * The profiles this property is checked over.
@@ -184,10 +180,19 @@ const PROFILES: { name: string; facts: McaFacts }[] = [
   },
   { name: 'a funder that takes no guaranty', facts: { ...LOMBARD_FACTS, guarantyScope: 'none' } },
   {
+    name: 'a funder that takes the wide guaranty',
+    facts: { ...LOMBARD_FACTS, guarantyScope: 'full-performance' },
+  },
+  {
     name: 'a funder with no broker channel and no consumer report',
     facts: { ...LOMBARD_FACTS, brokerChannel: false, consumerReportPulled: false },
   },
   { name: 'a funder that offers no equipment', facts: { ...LOMBARD_FACTS, equipment: 'none' } },
+  { name: 'a funder that collects by ACH', facts: { ...LOMBARD_FACTS, collectionMethod: 'ach-only' } },
+  {
+    name: 'a funder lending into Texas on an accepted split',
+    facts: { ...LOMBARD_FACTS, processorSplitAccepted: true, recipientStates: ['US-TX'] },
+  },
 ];
 
 describe('selection turns a funder profile into a document', () => {
@@ -244,9 +249,12 @@ describe('selection turns a funder profile into a document', () => {
     const reachable = new Set(PROFILES.flatMap(({ facts }) => danglingIn(facts)));
 
     for (const { from, to, owner } of KNOWN_GAPS) {
-      expect(reachable.has(`${from} -> ${to}`), `${from} -> ${to} no longer dangles; delete it (owner: ${owner})`).toBe(
-        true,
-      );
+      for (const slug of from) {
+        expect(
+          reachable.has(`${slug} -> ${to}`),
+          `${slug} -> ${to} no longer dangles; delete it (owner: ${owner})`,
+        ).toBe(true);
+      }
     }
   });
 
@@ -261,15 +269,33 @@ describe('selection turns a funder profile into a document', () => {
       throw new Error('no frpa.definitions');
     }
 
-    const intact: McaClause[] = [{ ...anchor, body: 'Merchant shall do as Section 2.6 provides.' }];
-    const broken: McaClause[] = [{ ...anchor, body: 'Merchant shall do as Section 44.7 provides.' }];
+    const citing: McaClause = { ...anchor, slug: 'test.cites', number: '', body: 'As Section 44.7 provides.' };
+    const cited: McaClause = { ...anchor, slug: 'test.cited', number: '44.7', body: 'Buyer shall do it.' };
 
     // The reference resolves when the clause it names is in the same document…
-    expect(danglingIn(LOMBARD_FACTS, [...intact, ...libraryFor('frpa').filter((c) => c.number === '2.6')])).toEqual([]);
+    expect(danglingIn(LOMBARD_FACTS, [citing, cited])).toEqual([]);
     // …and does not when it is not.
-    expect(danglingIn(LOMBARD_FACTS, broken)).toEqual(['frpa.definitions -> Section 44.7']);
+    expect(danglingIn(LOMBARD_FACTS, [citing])).toEqual(['test.cites -> Section 44.7']);
     // A statute is not an internal reference, whatever the word before it.
     expect(citations('Connecticut General Statutes Section 36a-869 where that section applies')).toEqual([]);
+  });
+
+  /**
+   * The other half of `library.test.ts`'s narrowed number rule.
+   *
+   * That file can prove a shared number is shared only by conditional clauses;
+   * it cannot prove that no two of them reach the same document, because it has
+   * no facts and no engine. This can. A document with two §4.15s is a document
+   * whose every cross-reference to §4.15 is ambiguous, which is the failure the
+   * two assertions are jointly for.
+   */
+  it('gives an assembled document one clause per section number', () => {
+    for (const { name, facts } of PROFILES) {
+      const { selected } = selectClauses({ facts, instrument: 'frpa' });
+      const numbers = selected.map((clause) => clause.number).filter((number) => /^\d+\.\d+$/.test(number));
+
+      expect(new Set(numbers).size, `${name} assembles a document with a repeated section number`).toBe(numbers.length);
+    }
   });
 
   /**

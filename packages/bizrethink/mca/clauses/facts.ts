@@ -191,12 +191,27 @@ export type McaFacts = {
  * positions; use merchant-state venue; restrict the guaranty to the
  * signatory's own covered misconduct.
  *
- * **`equipment` has moved. `renewalModel`, `concurrentPositions` and
- * `venueRule` have not yet**, because moving a row deselects the clause it
- * gates and each of those three gates a clause still carrying v4 text — a
- * `payoff-only` funder would lose §8.2 entirely rather than lose its Carry
- * limb. They move with the `renewal-positions` rewrite, in one change, so the
- * library never holds a profile that selects an incoherent document.
+ * **`equipment`, `renewalModel` and `concurrentPositions` have moved.
+ * `venueRule` has not.**
+ *
+ * The three that moved could only move once the clauses they gate stopped
+ * hiding a second rule inside the one the fact decides. `renewalModel` gated
+ * the whole of §8.2, which held both methods, so `payoff-only` would have
+ * dropped the Deduct method a payoff funder needs along with the Carry method
+ * it does not. `concurrentPositions` gated the whole of §4.15, so `false` would
+ * have deleted the multi-position rule rather than stating the opposite one,
+ * and left §7.1's "Except as expressly provided in Sections 3.3, 3.4 and 4.15"
+ * pointing at nothing. Both are now exhaustive pairs of clauses — see
+ * `frpa/enrollment.ts` §4.15 and `frpa/miscellaneous.ts` §8.2 — so every value
+ * of the fact selects exactly one clause and the fact decides a whole clause.
+ *
+ * `venueRule` stays at `funder-state` because the clause it describes is not
+ * this cluster's and does not read it. §7.5 is `includeWhen: null` and mandates
+ * New York law with New York or Pasco County, Florida forums in its body;
+ * nothing in the corpus reads `venueRule` at all. Flipping the row would leave
+ * the profile asserting merchant-state venue while the only venue clause in the
+ * library mandates the funder's — a contradiction rather than a gap, and harder
+ * to see than one. It moves with §7.5, which is `disputes-service`'s (memo 061).
  *
  * `split-only` is the value with no written history anywhere. §2.5 (the gated
  * ACH backstop) and §7.14 (a blanket debit authority) both left the paper
@@ -226,14 +241,27 @@ export const LOMBARD_FACTS: McaFacts = {
      record that, on the principle retired above. §§002/003 state it as
      $0.00, so `deferred` no longer names anything the corpus can build. */
   equipment: 'merchant-elects',
-  /* v4's §8.2 offers Carry. Same distinction. */
-  renewalModel: 'carry',
-  /* v4's §4.15 affirmatively authorises concurrent Lombard positions. The memo
-     recommends a single active position; the shipped document does not. */
-  concurrentPositions: true,
+  /* The memo's design: a prior balance is settled out of the new Purchase
+     Price and disclosed, never folded into the new Purchased Amount. v4's §8.2
+     offered Carry and this row used to record that, on the principle retired
+     above. Carry survives in the library as `frpa.rollover-carry-method-8-2`,
+     which this value deselects — a fact value with no clause behind it is what
+     `equipment: 'deferred'` was. */
+  renewalModel: 'payoff-only',
+  /* v4's §4.15 affirmatively authorised concurrent Lombard positions while
+     Lombard's own marketing promised no stacking — REVIEW-01's
+     `lombard-multi-position-vs-no-stack`. The memo resolves it by changing the
+     product, and this is that change. `frpa.single-active-position-4-15` is
+     selected in its place; the cascade clause is not. */
+  concurrentPositions: false,
   disputeResolution: 'courts',
-  /* v4 mandates New York or Florida. The memo recommends merchant-state venue,
-     partly because Va. Code §6.2-2236(A) voids a non-Virginia forum. */
+  /* THE ONE ROW OF THE FOUR THAT HAS NOT MOVED, and deliberately. §7.5 mandates
+     New York law and New York or Pasco County, Florida forums, in its body, with
+     no gate. The memo recommends merchant-state venue, partly because Va. Code
+     §6.2-2236(A) voids a non-Virginia forum for covered transactions. Moving
+     this row before §7.5 is rewritten would make the profile disagree with the
+     only clause on the subject. It moves with §7.5 — `disputes-service`, memo
+     entry 061. */
   venueRule: 'funder-state',
   recipientStates: ['US-FL'],
   brokerChannel: true,

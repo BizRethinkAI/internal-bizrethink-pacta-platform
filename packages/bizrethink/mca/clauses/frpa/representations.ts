@@ -177,8 +177,8 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
         request": written as a WRITTEN request, because an oral request with a
         default attached is not a thing a merchant can diary.
     (2) The extension is expressed as a duty on Buyer to allow one, not as a
-        passive "with reasonable extensions". A passive extension has no grantor
-        and is unenforceable against the party who would refuse it.
+        passive "with reasonable extensions". A passive extension has no grantor,
+        so there is nobody it obliges and nobody to ask when it is refused.
     (3) The memo's "subject to identified qualifications" is written "subject to
         any qualification identified in them", so the qualification has to be on
         the face of the record rather than asserted later.
@@ -840,6 +840,62 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['guaranty-reaches-business-failure'] }],
   },
+  /*
+    THREE CLAUSES GAVE THREE DIFFERENT STACKING ANSWERS. This is where they are
+    made one, and two of the three had already moved before this clause was
+    touched.
+
+    WHAT WAS WRONG (1) — THE PROHIBITION. "Merchant shall not, without Buyer's
+    prior written consent, sign any agreement for the sale of future receipts
+    with any party other than Buyer" bans a sale of Merchant's OWN retained
+    share, which Buyer never bought. §4.11 already states the rule that protects
+    what Buyer did buy — no knowing second sale of the same Purchased Receipts,
+    no voluntary conflicting interest in them — and stating a second, wider
+    version of it in Section 5 is `defined-term-drift` in the form that matters:
+    two texts, one subject, and a reader who finds either one first finds a
+    different agreement.
+
+    WHAT WAS WRONG (2) — THE SHARING LIMB. "Buyer may share information regarding
+    this Agreement with any third party in order to determine whether Merchant is
+    in compliance with this provision" is REVIEW-01's
+    `information-sharing-only-vs-any-third-party`: an unrestricted disclosure
+    right to anyone, granted to police a covenant. §4.7 already limits disclosure
+    to agents, affiliates, subsidiaries and credit bureaux. The limb is deleted
+    and the limit is pointed at.
+
+    WHAT THE OTHER TWO CLAUSES NOW SAY, CHECKED RATHER THAN ASSUMED. §6.1.13
+    banned all further financing; §6.1 was rewritten to three lettered limbs of
+    misconduct and a not-a-default list, and "additional financing taken by
+    Merchant" is now expressly IN that list, so the ban is gone. §4.15 permitted
+    Buyer's own stacks; it is now a pair of clauses, and for a funder that holds
+    one position at a time the rule reads the other way. Nothing here contradicts
+    either.
+
+    WHAT CHANGED. The clause stops prohibiting and starts doing the one thing
+    neither §4.11 nor §6.1 does: it says financing is not forbidden merely by
+    being financing, and it sets up the information exchange the memo asks for
+    when a proposed arrangement would touch the share already sold. The memo is
+    explicit that this narrow covenant "is a commercial risk choice" rather than
+    a legal requirement, and it is recorded as one.
+
+    DEPARTURE FROM THE MEMO — "SECTIONS 4.15 AND 8" BECOMES "SECTION 4.15".
+    Section 8's renewal clauses are gated on `renewalModel`; a fixed reference to
+    them from an ungated clause dangles in a no-renewal template, and Section 8
+    would then hold only §8.3, which is about prepayment and says nothing about a
+    subsequent purchase. §4.15 is always present in one of its two forms and both
+    forms answer the question.
+
+    DEPARTURE FROM THE BRIEF'S GATE. The brief marks this `action: both` on
+    `concurrentPositions`. It stays `includeWhen: null`, for the reason §4.11
+    gives about the same fact: gating it would delete the information-exchange
+    duty and the not-an-Event-of-Default sentence from exactly the funder that
+    holds one position at a time, which is the funder Lombard now is. The fact is
+    about what BUYER may hold; this clause is about what MERCHANT may do.
+
+    THE HEADING CHANGES. "Stacking Prohibited" describes a rule the clause no
+    longer contains, and a heading that survives the text under it is how a
+    reader ends up citing the wrong provision.
+  */
   {
     slug: 'frpa.stacking-prohibited-5-16',
     version: 1,
@@ -849,8 +905,8 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
     number: '5.16',
     section: 'representations',
     sortKey: 160,
-    heading: 'Stacking Prohibited',
-    body: 'Merchant shall not, without Buyer’s prior written consent, sign any agreement for the sale of future receipts with any party other than Buyer for the duration of this Agreement. Buyer may share information regarding this Agreement with any third party in order to determine whether Merchant is in compliance with this provision.',
+    heading: 'Other Financing; Conflicting Sales',
+    body: 'Merchant’s undertaking not to sell the same Purchased Receipts to another person, and not to grant a voluntary interest that conflicts with Buyer’s interest in them, is stated in Section 4.11. This Section does not enlarge it.\nFinancing that Merchant obtains on other assets, or on Merchant’s retained share of Card Receipts, is not prohibited by this Agreement, and taking it is not an Event of Default; Section 6.1 states the only conduct that is. Before entering an arrangement that would affect the share of Card Receipts sold to Buyer, Merchant shall give Buyer the information reasonably necessary to assess the conflict, and Buyer shall respond reasonably and promptly.\nBuyer may use and disclose information given under this Section only as Section 4.7 permits, and may not disclose it to any other person in order to police this Section.\nBuyer’s own subsequent purchases from Merchant are governed by Section 4.15.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

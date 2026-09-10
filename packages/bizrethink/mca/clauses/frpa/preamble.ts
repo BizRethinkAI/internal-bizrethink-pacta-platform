@@ -3,15 +3,15 @@ import type { McaClause } from '../types';
 /**
  * The deal itself — Section 1’s notes, the parties, the grant.
  *
- * FIVE OF THESE ARE AUTHORED, ONE IS STILL TRANSCRIBED, and the file has to say
- * which. `frpa.holdback-explainer` and `frpa.granting-clause` were rewritten by
- * the spine cluster on 2026-09-10 under
+ * ALL SIX ARE NOW AUTHORED. `frpa.holdback-explainer` and
+ * `frpa.granting-clause` were rewritten by the spine cluster on 2026-09-10 under
  * [ADR 0012](../../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md):
  * the baseline is drafting input, not specification, and reproducing it is not
  * a goal. `frpa.parties`, `frpa.equipment-cost-explainer` and
  * `frpa.equipment-cost-exclusivity` were rewritten by the enrollment cluster the
- * same day, under the same ADR. `frpa.rollover-method-election` is still the
- * words v4 prints; it belongs to `renewal-positions`.
+ * same day, under the same ADR, and `frpa.rollover-method-election` by
+ * `renewal-positions` after it — last, because an election is incoherent until
+ * the mechanism it elects between is settled.
  *
  * WHAT THAT COSTS, STATED RATHER THAN HIDDEN. `bodies-match-the-document` is
  * red on both rewritten clauses, which ADR 0012 authorises. `frpa-coverage`’s
@@ -187,6 +187,39 @@ export const FRPA_PREAMBLE: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    WHAT WAS WRONG. The row named two methods — "Deduct or Carry" — and so
+    described a Section 8.2 that only one kind of funder has. Under
+    `renewalModel: 'payoff-only'` §8.2 offers no election at all, and the
+    explainer would have sent a merchant looking for a choice the agreement does
+    not contain. It also said nothing about what the entry must CONTAIN, which is
+    the memo's whole point: a Section 1 row that reads "Carry" discloses a
+    treatment and no figures.
+
+    WHAT CHANGED. The row states a treatment and the numbers behind it: the prior
+    transaction identified, its settlement amount, any rebate or discount, the
+    part of the Purchase Price applied to it, and the resulting Net Amount
+    Funded. It may not be blank, and no amount it states may be blank — the
+    memo's "No election or amount may remain blank when Merchant signs".
+
+    DEPARTURE FROM THE MEMO — THE CARRY SENTENCE IS CONDITIONAL. The memo's flat
+    "No prior balance is carried into the new Purchased Amount" is true of the
+    payoff §8.2 and false of the carry one, and this explainer is selected for
+    both. It is written as a rule with its exception pointed at the clause that
+    decides: nothing is added to the Purchased Amount except as §8.2 expressly
+    provides and Merchant has elected in writing before the Agreement issues for
+    signature. Under `payoff-only` §8.2 provides nothing, so the sentence bites
+    exactly as the memo intends; under `carry` it points at method (b).
+
+    DEPARTURE — "PRIOR TRANSACTION TREATMENT" REPLACES "ROLLOVER METHOD". The
+    memo renames the row. The slug does not follow, because a slug is the stable
+    identity and renaming one breaks every approval keyed to it (README rule 7).
+
+    THE WIDGET STAYS. `«25»` is the AcroForm anchor the Lombard pipeline injects
+    (README rule 2). The row's LABEL changes, which is a form change in
+    `lombard-contracts` and is handed back rather than made here — the same
+    handoff §4.13 records for the three Section 1 rows it specifies.
+  */
   {
     slug: 'frpa.rollover-method-election',
     version: 1,
@@ -200,7 +233,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     section: 'funding-terms',
     sortKey: 40,
     heading: '',
-    body: 'Rollover Method (renewals only): _________«25»_________. This states the method Merchant elected under Section 8.2 — Deduct or Carry — and the Purchased Amount in Section 1.3 is calculated on it. On a first-time transaction with no prior balance, this reads “Not applicable”.',
+    body: 'Prior transaction treatment: _________«25»_________. This reads “Not applicable” where Merchant has no prior transaction to be settled out of this funding. Otherwise it states the treatment Merchant has elected under Section 8.2, and identifies the prior transaction, its settlement amount as at the Purchase Date, any rebate or discount applied, the part of the Purchase Price applied to it, and the resulting Net Amount Funded. Nothing is added to the Purchased Amount in Section 1.3 except as Section 8.2 expressly provides and Merchant has elected in writing before this Agreement is issued for signature. This entry may not be blank when Merchant signs, and no amount it states may be left blank.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
