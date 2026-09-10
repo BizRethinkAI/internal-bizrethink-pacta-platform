@@ -114,6 +114,32 @@ funder in the library had a product whose FRPA sends the lease path to *"a
 separate written agreement"* the product did not include. Found by the
 typechecker after the union collapsed, not by any test.
 
+### 6. ADR 0012's `lombard-contracts` section was stale when it was written
+
+It records as owed: *"REVIEW-02 needs a manifest. Its dispositions live in the
+prose of `change-notes/16`, so every one of its findings reads `unrecorded`, and
+unknown counts as outstanding. **That is most of the clauses the approval gate
+holds.**"*
+
+**None of that is true, and it had already been fixed.** `lombard-contracts`
+PR #9 derived REVIEW-02 a manifest from records that already existed.
+`dispositions.test.ts` inverted its assertion at the time and says so in terms.
+The register today holds **254 findings, of which 5 are `unrecorded`** — the 4
+refuted in REVIEW-01 and the 1 in REVIEW-02, which is what a refuted finding
+correctly gets, since no manifest names one.
+
+A duplicate of the same stale claim sat in `approval.ts`'s
+`findingsHold` docblock (*"`unrecorded` … is REVIEW-02's whole register"*) and is
+corrected in the same change. Neither was load-bearing: the test and the
+generated register were both right, and only the prose describing them was wrong.
+
+**This is the staleness pattern, not an instance of bad luck.** A fact gets fixed
+in one repository, the test that guards it is updated, and two or three prose
+descriptions of the old state survive in files nobody re-reads — then get quoted
+into an ADR as current. What still stands from that section: the six findings the
+2026-09-09 memo refuted, and that the rendered documents follow the library
+rather than the reverse.
+
 ## How a fact row moves
 
 **A fact row and the clauses it gates move in the same change.** Moving a row
@@ -175,6 +201,7 @@ ADR that supersedes this one. ADR 0012's table stands except where noted.
 | Does the funder choose buy-versus-lease? | **No.** The funder chooses whether equipment is offered; the merchant elects at signing. |
 | May a fact row move before the clauses it gates? | **No.** Same change, or the profile selects a document with a hole in it. |
 | What do we do when a fact decides a limb? | **Split the clause** so the fact decides a whole clause, and move the pinned counts in the same commit. |
+| Does REVIEW-02 still need a manifest? | **No.** `lombard-contracts` PR #9 gave it one. 5 findings of 254 are `unrecorded`, and all 5 are refuted findings, which is correct. ADR 0012 records the opposite. |
 
 ## What this does not change
 
