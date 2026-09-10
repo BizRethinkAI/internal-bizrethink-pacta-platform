@@ -421,11 +421,26 @@ render count used as the library size.
   only credential on the machine is `PACTA_PROD_DATABASE_URL`. Every Prisma query
   in `packages/bizrethink/server-only/` is unit-tested and has **never executed
   against a real Postgres**.
-- **`npm test` cannot run on the workstation.** Node 26 removed the `recursive`
-  option from `fs.rm`; `zod-prisma-types` still calls it, so `prisma generate`
-  dies and takes the whole turbo pipeline with it. CI runs Node 22 and is
-  unaffected — meaning **CI is currently more capable than the dev machine**, and
-  the local pre-merge gate in `UPSTREAM.md` cannot be run as written.
+- ~~**`npm test` cannot run on the workstation.**~~ **RESOLVED 2026-09-09.**
+  The workstation is on Node 24.20.0 — Homebrew's Node 26 uninstalled and
+  `node@24` linked in its place — and the full suite runs locally again. CI takes
+  `v24.x` from `.github/actions/node-install`'s default, so both are on 24 and
+  the inversion is over.
+
+  Three things this bullet asserted were wrong even while it was true in
+  substance, and each is the same failure: **asserting a version without opening
+  the file that decides it.** It is `fs.rmdirSync`, not `fs.rm`
+  (`zod-prisma-types/dist/classes/directoryHelper.js:25`); the removal lands
+  **after 24**, not at 26 — measured here, 24.20.0 succeeds with a `DEP0147`
+  warning and 26.0.0 throws; and CI was on **24**, not 22, from the moment the
+  composite action's default moved. An external survey reading `node-version:`
+  out of the workflow files reported "pacta CI runs Node 20" and had to retract
+  it, for the same reason: the version lives in a composite action's `default:`
+  that no caller overrides.
+
+  **Still unguarded:** `engines.node` is `">=24.0.0"`, an open upper bound that
+  admits the versions where this breaks. `.node-version` (24) is what actually
+  pins it, and only for tools that read it.
 
 ## Decisions taken
 

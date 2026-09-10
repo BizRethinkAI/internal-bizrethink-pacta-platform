@@ -22,9 +22,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      # MODIFIED for BizRethink (2026-09-09): 20 -> 24. This file is
+      # byte-identical across several repos and propagated Node 20 as a unit;
+      # 20 is EOL. Every other workflow here reaches Node through
+      # .github/actions/node-install, whose default is already v24.x — this was
+      # the last literal version left. check-pr-body.mjs imports only node:fs,
+      # so nothing about the runtime bump is load-bearing.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       - name: Check the description against the template
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
