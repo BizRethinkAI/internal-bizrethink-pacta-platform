@@ -113,10 +113,32 @@ authored answers**, neither of which we hold cleanly today.
 
 ## What could not be verified
 
-**No test was run.** `node_modules` in this checkout is a Linux tree — rollup and
-esbuild resolve to `@esbuild/linux-arm64` on a darwin host — so `npx vitest`
-cannot start. That is the staleness the #143 lockfile merge warned about;
-`npm install` is the fix and was not run here. CI is the check.
+**No test was run when this PR was opened.** `node_modules` in the checkout was a
+Linux tree — rollup and esbuild resolved to `@esbuild/linux-arm64` on a darwin
+host — so `npx vitest` could not start. CI was the check.
+
+> **CORRECTED 2026-09-09, after the PR merged.** This paragraph originally said
+> the Linux tree was *"the staleness the #143 lockfile merge warned about"* and
+> that `npm install` was the fix. **Both were wrong, and the diagnosis is worth
+> keeping visible because it was confidently stated three times before it was
+> checked.**
+>
+> #143's warning was that three package *versions* moved. That is unrelated. The
+> lockfile changed **zero** platform entries and still listed all 43 Darwin
+> packages. The actual cause was eight `docker run -v "$PWD":/app -w /app
+> node:24-alpine3.23 … npm install` invocations against this exact checkout, the
+> first at 04:30:34 UTC on 2026-09-09; the Linux binaries were born **six seconds
+> later**. Docker here is Colima, whose generated Lima config mounts `~` writable,
+> so a container install rewrites the Mac's `node_modules` in place.
+>
+> Repaired 2026-09-09 with `npm ci` on Node 24.20.0 followed by
+> `npm run prisma:generate` — after which **48 files / 1889 MCA tests pass** and
+> both typechecks exit 0 on darwin/arm64. So there was no Mac-specific defect from
+> the 2.17.0 upgrade either; the tree was the only casualty.
+>
+> The mechanism and the recovery are now in
+> [`UPSTREAM.md`](../../../UPSTREAM.md) under *Never install from a container into
+> this checkout*.
 
 The change is three documentation files plus one vendored `.txt`, so there is no
 behaviour to test — but the claim is "nothing runs locally", not "the suite is

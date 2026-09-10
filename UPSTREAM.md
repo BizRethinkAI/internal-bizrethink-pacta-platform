@@ -8,10 +8,12 @@ Runbook for keeping `internal-bizrethink-pacta-platform` in sync with `documenso
 
 1. Fetches `documenso/main`
 2. Attempts `git merge upstream/main`
-3. **If clean merge:** opens a PR titled `chore(upstream-sync): YYYY-MM-DD` with the upstream diff
-4. **If conflicts:** opens a PR with conflict markers + a list of which `overlays/` patches need re-application
+3. Pushes a `sync/YYYY-MM-DD` branch — **always**, clean merge or not
+4. Writes a **job summary** carrying the compare URL and, on conflicts, the `overlays/` patches that may need re-application
 
-Review the PR, run smoke tests, merge.
+**It does NOT open a pull request.** Token policy prevents it (`upstream-sync.yml:4-9,110-152`), and the conflict step records status rather than committing conflict markers. **Open the PR yourself from the compare URL in the job summary.** A session that only looks for an open weekly PR will conclude the sync never ran.
+
+Review, run the local gates below, merge.
 
 ## Manual sync (when the action fails)
 
@@ -27,8 +29,9 @@ Resolve conflicts. **Conflicts only happen in three places** (by design):
 1. **`packages/bizrethink/`** — our own files. Conflicts here mean we put a file in the same path as a new upstream file. Rename ours, accept upstream.
 2. **Files patched by `overlays/*.patch`** — upstream changed a file we patch. Re-apply the patch:
    ```bash
-   git apply overlays/001-default-claim-enterprise.patch
+   git apply overlays/001-add-bizrethink-claim-tier.patch
    ```
+   Check the real filename in [`overlays/README.md`](overlays/README.md) rather than copying the one above — patch names change when their purpose does.
    If the patch fails (line numbers drifted), edit it: re-run `diff` against the new upstream content, regenerate the patch.
 3. **`package-lock.json`** — see below. Never hand-merge it.
 
@@ -55,7 +58,62 @@ npm ls @react-pdf/renderer --workspace=@bizrethink/customizations
 npm audit --omit=dev --audit-level=high
 ```
 
-If `npm install` fails during `prisma generate` with *"The property 'options.recursive' is no longer supported"*, that is **not** a merge problem: `zod-prisma-types` calls `fs.rm` with an option Node 26 removed. The Prisma client itself generates fine and only the zod generator's cleanup step fails. Run the workstation on Node 22 (the Docker image already does) or pin the generator, and treat the lockfile conflict as resolved.
+If `npm install` fails during `prisma generate` with *"The property 'options.recursive' is no longer supported"*, that is **not** a merge problem. `zod-prisma-types@3.3.5` calls **`fs.rmdirSync(path, {recursive: true})`** (`dist/classes/directoryHelper.js:25`), and recursive `rmdir` no longer works after Node 24. Verified on this machine: **Node 24.20.0 succeeds** (with a `DEP0147` deprecation warning), **Node 26.0.0 throws** that exact message. Node's own documentation dates the removal to **v25**, so 25 and 26 both fail. The Prisma client itself generates fine; only the zod generator's cleanup step fails.
+
+**Run the workstation on Node 24**, which is what [`.node-version`](.node-version) pins and what the Docker image uses (`node:24-alpine3.23`). Note that `engines.node: ">=24.0.0"` still *admits* 25 and 26, so the range does not protect you — check the Node you are actually running.
+
+> **Do NOT work around this by running the install inside a Linux container against this checkout.** See *Never install from a container into this checkout* below. It is the mistake that cost a day on 2026-09-09.
+
+## Never install from a container into this checkout
+
+**This cost a working day on 2026-09-09 and every gate stayed green while it happened.**
+
+Docker on the dev Mac is **Colima** — a linux/aarch64 VM. Its generated Lima config
+(`~/.colima/_lima/colima/lima.yaml`) mounts `location: "~"` with `writable: true`,
+so the whole home tree, this repo included, is the *same directory* seen from
+inside the VM. `mounts: []` in `colima.yaml` does not mean "no shared
+directories"; check the generated Lima file, not the user-facing one.
+
+So this, run to verify dependencies in a clean Linux environment:
+
+```bash
+docker run -v "$PWD":/app -w /app node:24-alpine3.23 sh -c 'npm install && npm audit'
+```
+
+does exactly what it says — and npm, correctly, installs **linux-arm64** optional
+dependencies **into the Mac's `node_modules`**. Darwin binaries for esbuild,
+Rollup, Biome, Turbo, sharp, bcrypt and skia-canvas are replaced with ELF ones.
+Afterwards no local build, test, lint or typecheck can start, with errors that
+point at npm bugs and missing packages rather than at what happened.
+
+**Nothing catches it.** CI is Linux, so the same tree is correct there and every
+check passes. `git status` is clean because `node_modules` is ignored. The
+lockfile is untouched and still lists every Darwin package. The only visible
+symptom is on one machine, hours later.
+
+**Instead:**
+
+- Give the container its own copy of the source, or mount the source **read-only**
+  so an attempted install fails loudly instead of succeeding quietly.
+- Or use a separate checkout / worktree with its own `node_modules` that no Mac
+  process uses.
+- After any container work that touched a shared path, run the Mac-side check
+  below before trusting a local gate.
+
+```bash
+# Mac postflight — run from a normal shell, not a container
+node -p "process.platform + '/' + process.arch + '  ' + process.execPath"
+node -e "require('rollup'); require('esbuild'); require('sharp'); console.log('native ok')"
+file node_modules/esbuild/bin/esbuild        # must say Mach-O, never ELF
+```
+
+**Recovery, if it happens anyway:** `npm ci` from a normal Mac shell on Node 24,
+then `npm run prisma:generate --workspace=@documenso/prisma` — `npm ci` wipes the
+generated Prisma client and the typecheck fails with phantom
+`'@prisma/client' has no exported member` errors until you regenerate. Do **not**
+run `turbo` first, even `turbo --version`: `node_modules/turbo/bin/turbo` sets
+`SHOULD_INSTALL=true` and runs its own `npm install` when the platform binary is
+missing.
 
 ## Adding a new overlay patch
 
@@ -122,7 +180,16 @@ to the new version in `node_modules`, and rename the file to the new version.
 
 ## Pre-merge gates (REQUIRED before merging any upstream-sync PR)
 
-These run on every PR via `.github/workflows/ci.yml` (`Build App` + `Build Docker Image` jobs). **Do not merge until both are green.** Branch protection on `main` *should* enforce this — verify with `gh api repos/BizRethinkAI/internal-bizrethink-pacta-platform/branches/main/protection` (returns `Branch not protected` if disabled).
+These run on every PR via `.github/workflows/ci.yml` (`Build App` + `Build Docker Image` jobs). **Do not merge until both are green.** `main` is protected by the **ruleset `protect-main`** (id `16850885`, enforcement `active`), not by classic branch protection.
+
+**The classic endpoint returns a false negative.** `gh api repos/.../branches/main/protection` answers `Branch not protected` (HTTP 404) *even though main is protected* — classic protection is genuinely off and the ruleset does the work. Verify with the rulesets endpoint instead:
+
+```bash
+gh api repos/BizRethinkAI/internal-bizrethink-pacta-platform/rulesets
+gh api repos/BizRethinkAI/internal-bizrethink-pacta-platform/rulesets/16850885
+```
+
+Its four required checks are **Build App**, **Build Docker Image**, **E2E Tests** and **Validate PR title**. A pull request is required; approvals required: **0**. Governance, PR description, npm audit and CodeQL run on every PR but are **not** required statuses — a red one does not block merge.
 
 ### Why this section exists
 
@@ -162,7 +229,7 @@ The take-ours / take-theirs conflict strategy resolves files in isolation, but T
 # All of these should be green:
 npm test --workspace=@bizrethink/customizations
 npm test --workspace=@documenso/lib
-npm run test:e2e:dev    # Playwright regression gate (HARD RULE: never skip)
+npm run test:e2e -w @documenso/app-tests   # Playwright regression gate (HARD RULE: never skip)
 
 # Manual: log into sign.pacta.ink, send a test contract, sign it, verify webhook fires
 ```

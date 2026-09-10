@@ -89,6 +89,38 @@ repo's characteristic failure is a change that *looks* finished.
 
 Learned the hard way. Each one cost something.
 
+### The development machine
+
+Written down 2026-09-09, after a day was lost to a broken local toolchain that
+no gate could see. Until then this contract existed nowhere.
+
+- **Node 24, and check what you are actually running.** [`.node-version`](../.node-version)
+  pins `24`; the Docker image is `node:24-alpine3.23`. `engines.node` is
+  `">=24.0.0"`, which still *admits* 25 and 26 — and `zod-prisma-types@3.3.5`
+  calls `fs.rmdirSync(path, {recursive: true})`, which no longer works after
+  Node 24 — verified here: 24.20.0 succeeds with a `DEP0147` warning, 26.0.0
+  throws. Node's docs date the removal to v25. The range does not protect you.
+- **A non-login shell is not your shell.** Node selection is `fnm`, initialised
+  from `~/.zshrc`. A script, a CI-like invocation or an agent running a
+  non-interactive shell gets Homebrew's Node instead — which is how a machine
+  running Node 24 correctly was reported as running Node 26. Verify with
+  `node -p "process.version + ' ' + process.execPath"`, never with `node -v` alone.
+- **`npm ci` is not enough on its own.** It wipes the generated Prisma client, so
+  the next typecheck fails with phantom
+  `'@prisma/client' has no exported member` errors. Always follow it with
+  `npm run prisma:generate --workspace=@documenso/prisma`.
+- **Never run an installer from a container against this checkout.** Docker here
+  is Colima, and its generated Lima config mounts `~` writable — so
+  `docker run -v "$PWD":/app … npm install` rewrites the Mac's `node_modules`
+  with Linux binaries. CI stays green, `git status` stays clean, the lockfile is
+  untouched, and every local gate stops working. The full mechanism, the
+  postflight check and the recovery are in
+  [`UPSTREAM.md`](../UPSTREAM.md) under *Never install from a container into this
+  checkout*.
+- **Green CI does not mean the local tree is sound, and a broken local tree does
+  not mean the project is broken.** They are separate claims about separate
+  machines. Say which one you are making.
+
 ### Testing
 
 - **TDD-first.** Every feature and every bugfix gets a failing vitest test first,
