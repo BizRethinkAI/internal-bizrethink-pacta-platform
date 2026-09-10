@@ -3,11 +3,14 @@ import type { McaClause } from '../types';
 /**
  * Sections 9 and 10 — the personal guaranty and service of process.
  *
- * TEN OF THE ELEVEN HAVE BEEN REWRITTEN, under
+ * ALL ELEVEN HAVE NOW BEEN REWRITTEN, under
  * [ADR 0012](../../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md).
  * The `guaranty` cluster did §§9.2, 9.4, 9.5, 9.6, 10.2 and 10.4 on 2026-09-10;
- * `disputes-service` did §§10.1, 10.3, 10.5 and 10.6 later the same day. §9.1 is
- * a field group nobody's brief names and still prints v4's grid.
+ * `disputes-service` did §§10.1, 10.3, 10.5 and 10.6 later the same day. §9.1
+ * was the last, and it was last because **no cluster brief named it** — it fell
+ * through the nine briefs built from the 2026-09-09 memo, along with §4.8. Its
+ * grid was always right; its body was empty, which is why an outside reviewer
+ * reported that no field block was visible at all.
  *
  * **SECTION 10 IS NOW ONE RULE WITH FIVE POINTERS AT IT.** §10.1 states how
  * judicial process is served and applies to every party including each
@@ -77,25 +80,125 @@ export const FRPA_GUARANTY: McaClause[] = [
     section: 'guaranty',
     sortKey: 10,
     heading: 'Guarantor Information',
-    body: '',
     /*
-      Six blanks, «35»-«40», exactly as Section 9 prints them. The body stays
-      empty and that is now a statement rather than an omission: this section
-      holds a table, and `kind` says so.
+      THE FOURTH ROUTE TO GUARANTOR LIABILITY, AND IT IS THE PLACE THE PEN
+      TOUCHES THE PAPER.
+
+      Three routes were closed on 2026-09-10 — §9.2's own scope, §7.21's ISO
+      indemnity, and `frpa.execution`'s recital *"legally binding Merchant and
+      Guarantor to comply with the terms of this Agreement"*. This is the same
+      defect at the identity block: a grid collecting a natural person's name,
+      home address and Social Security number under the heading of a Guaranty
+      that **nowhere said what makes that person a Guarantor**. A person who
+      filled it in and then signed once, as an officer, had no way to know from
+      this Section whether they had just guaranteed anything.
+
+      `personal-liability-is-section-9-only.test.ts` cannot see it: its set-level
+      assertion filters `entry.section !== 'guaranty'`, and this record had no
+      body for a detector to read. **§9.1 IS DELIBERATELY NOT ADDED TO THAT
+      FILE'S `MINE`.** That list is a statement of what the guaranty cluster
+      owned, its length is asserted at ten, and widening somebody else's
+      ownership list to reach a clause they correctly left alone as outside their
+      brief would make their docstring false. The property is stated in
+      `a-signature-for-merchant-is-not-a-guaranty.test.ts` instead.
+
+      THE MEMO'S FIRST PREMISE IS FALSE, AND CHECKING IT WAS THE INSTRUCTION.
+      Entry 084 says *"No substantive field block is visible in the exported
+      clause; the site's note reports a single signature widget. THE ACTUAL
+      LAYOUT MUST BE INSPECTED."* It was — `sources/Lombard_FRPA_v4.docx`
+      unzipped and read, not the vendored `.txt` alone.
+
+        - §9.1 DOES hold a substantive field block: a two-column Field/Value
+          table with six rows, `«35»`-`«40»`, which this library has carried
+          since import. What was invisible to the reviewer was this record's
+          empty BODY, which is the defect `every-clause-has-content.test.ts` and
+          `McaClauseKind` were built for.
+        - The signature note is TRUE and is the real finding. The execution grid
+          holds exactly one guarantor block — `PERSONAL GUARANTOR`, `Guarantor
+          Signature: {{SIGNATURE, r2}}`, `Printed Name: «47»`, `Date: {{DATE,
+          r2}}` — non-repeating, and with **no capacity line at all**, while
+          Buyer gets a Title at `«42»` and Merchant a Title at `«46»`. §9.5 makes
+          the obligations of *"the persons or entities constituting Guarantors"*
+          joint and several. The form collects one. That is REVIEW-02's
+          `frpa-9-5-refers-to-guarantors-the-form-cannot-collect`, already on
+          this record and now answered in words.
+
+      WHAT CHANGED. Four rules and no new blank: who is a Guarantor, what a
+      Merchant-only signature does not do, a separate identification and
+      signature block for each intended Guarantor, and the handling of the
+      identification number.
+
+      DEPARTURE 1 — THE MEMO'S DRAFTING INSTRUCTION BECOMES A DUTY ON BUYER.
+      *"Repeat the identification and signature block for each intended
+      Guarantor"* is an instruction to whoever builds the form, and an
+      instruction cannot be breached. It is written as a duty on Buyer, who
+      prepares the document, with the consequence stated: a person not so
+      identified and not separately signing is not a Guarantor. Without the
+      consequence the sentence is a layout note in the middle of an operative
+      section.
+
+      DEPARTURE 2 — "SEPARATELY SIGNS SECTION 9" BECOMES "SEPARATELY SIGNS THE
+      GUARANTY". `frpa.execution` made the same departure for the same reason and
+      it is worth repeating: §9.2 is gated on `guarantyScope === 'limited-
+      conduct'`, so under `full-performance` this grid is selected and §9.2 is
+      not. A citation by number would dangle in the one profile where the section
+      is most obviously incomplete. Naming the act rather than the number is true
+      under every value of the fact.
+
+      DEPARTURE 3 — NO LIMB SAYS WHAT A GUARANTOR IS LIABLE FOR. The memo does
+      not ask for one and the temptation is real, because this is now the first
+      operative text in Section 9. §9.2 is the only guaranty, and a second
+      description of the obligation in the identity block is how two clauses
+      start disagreeing. The test asserts the absence.
+
+      **THE FORM DOES NOT YET HONOUR THE FOURTH RULE, AND THAT IS RECORDED
+      RATHER THAN DRAFTED AROUND.** `«37»` prints a full Social Security number
+      into the body of the agreement, so every completed PDF — including a copy
+      an ISO holds — carries it. The clause now requires a secure separate
+      channel and a truncated identifier in distributed copies. **The clause and
+      the form disagree, and the form is what renders.** Fixing it is a change to
+      the `.docx` and to the Lombard AcroForm pipeline in `lombard-contracts`,
+      not a change here: adding, renumbering or masking a widget from this
+      library would put an anchor in the record that the pipeline has nothing to
+      inject into. Handed back, and asserted as an open conflict so it cannot be
+      mistaken for closed.
+
+      **CAPACITY IS A GAP IN THE PLATFORM, NOT A GAP IN THE DRAFTING.**
+      `miscellaneous` established by reading this repository that Pacta records a
+      recipient's ROLE IN AN ENVELOPE — signer, approver, viewer, cc — and has no
+      field for the legal capacity in which a human signed. One natural person
+      commonly signs both as an officer of Merchant and personally as Guarantor,
+      and this clause turns on telling those apart. Drafting cannot supply the
+      evidence and does not pretend to; the clause requires the signature block
+      to SHOW the capacity, which is where the evidence would come from if the
+      form and the envelope carried it.
+
+      A GUARANTY THAT DOES NOT EXIST COLLECTS NO SOCIAL SECURITY NUMBER — the
+      gate, unchanged. This was `null` while §§9.2-9.6 gated on `guarantyScope`,
+      so under `none` the whole section dropped except this grid, which asked a
+      natural person for their home address and Social Security number in support
+      of a guaranty the assembled document does not contain. Found by the
+      guaranty cluster, which correctly left it alone as outside its brief, and
+      closed in commit `923b97be9`.
+
+      `full-performance` is NOT fixed by that gate and is not meant to be: that
+      funder has a guaranty, so the grid belongs, but §§9.2-9.6 are unauthored.
+      A gate cannot close that; only drafting the full-performance guaranty can.
+    */
+    body: 'A person is a Guarantor under this Agreement only if that person is identified in this Section by full legal name and by an address for notice, and separately signs the Guaranty in that person’s own name or, where the Guarantor is an entity, in the stated capacity of the person signing for it. A signature given solely for Merchant does not create personal liability, and a signature given in one capacity is not a signature in the other.\nBuyer shall provide a separate identification block under this Section, and a separate signature block, for each intended Guarantor, each showing printed name, capacity where the Guarantor is an entity, signature and date. A person who is not identified in this Section, and who does not sign a guarantor signature block, is not a Guarantor and has no liability under the Guaranty. No owner, spouse, officer, employee or affiliate of Merchant becomes a Guarantor by reason of that relationship, by an entry in another document, or by signing this Agreement in any other capacity.\nThe mailing address and the email address a Guarantor gives in this Section are that Guarantor’s address for notice and for service of process, as Section 10.4 provides.\nBuyer shall collect a Guarantor’s Social Security number or other government identification number through a secure channel separate from this Agreement, and shall not include the full number in a copy of this Agreement given to any person, except where applicable law requires it. A copy that identifies the Guarantor by a truncated or masked identifier satisfies this Section.',
+    /*
+      Six blanks, «35»-«40», exactly as Section 9 prints them, and unchanged by
+      this rewrite on purpose: a widget is an anchor the Lombard pipeline
+      injects, so adding or renumbering one here would describe a form that does
+      not exist. README rule 2.
 
       Title is the one optional field. A guarantor signing in a personal
       capacity may hold no office, and the 2026-09-09 counsel memo asks for
       corporate and personal capacity to be kept distinct rather than merged.
 
-      The SSN is collected here and MUST NOT be reproduced in distributed
-      copies; the same memo raises it. Nothing in this package distributes
-      anything, so that is a rendering obligation recorded where the field is.
-
-      UNGATED, AND THAT IS A GAP THIS CLUSTER COULD NOT CLOSE. No brief names
-      §9.1, so it is nobody's to edit, and it is the one Section 9 record that
-      is not selected by `guarantyScope`. A funder answering `none` therefore
-      still gets a guarantor-identity grid, collecting a Social Security Number
-      for a guaranty the document does not contain. Reported rather than fixed.
+      The SSN is collected here and the body now says it must not reach a
+      distributed copy in full. Nothing in this package distributes anything —
+      that is the form's obligation, and it is not discharged today.
     */
     fields: [
       { label: 'Full Name', widget: '«35»', kind: 'text', required: true },

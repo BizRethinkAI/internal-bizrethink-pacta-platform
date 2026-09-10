@@ -567,6 +567,106 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['information-sharing-only-vs-any-third-party'] }],
   },
+  /*
+    THE SEVENTH REFUTATION, AND IT IS RIGHT — BUT ONLY ABOUT HALF OF WHAT THE
+    REGISTER CLAIMS.
+
+    THE MEMO'S POSITION. *"The earlier site finding is stale: the actual last
+    substantive sentence expressly permits disclosures to governmental and
+    regulatory authorities and professional advisers without an undertaking.
+    PRESERVE THAT PROTECTION."* Checked against the primary copy rather than
+    inferred: `sources/Lombard_FRPA_v4.docx` was unzipped and read paragraph by
+    paragraph, and the sentence is there. It is an owner edit made after
+    REVIEW-02 ran, which is why the sibling finding
+    `frpa-4-8-conditions-the-counsel-review-7-22-promises` is recorded
+    `implemented` in the review register while the regulator one is `open` and
+    still quotes a clause that had already moved under it.
+
+    AND THE SECOND HALF OF THAT FINDING HAS ALSO GONE. Its reasoning was *"under
+    6.1.1 that is an Event of Default"*. §6.1.1 no longer exists: `default-
+    remedies` replaced fifteen enumerated defaults with three lettered limbs of
+    misconduct and added *"Merchant's covenants in this Agreement ... remain
+    covenants, and a breach of one is an Event of Default only where it is
+    conduct described in (a), (b) or (c) above."* A disclosure cannot be an Event
+    of Default under any numbering. Asserted from this side in
+    `a-merchant-can-complain-to-a-regulator.test.ts`, so that a later §6.1 that
+    restores a breach-any-covenant limb goes red in the file that cares.
+
+    SO THE REGISTER OVERSTATES THE DEFECT AND THE CLAUSE IS STILL DEFECTIVE.
+    Three things survive the refutation, and they are what this rewrite is for.
+
+    (1) THE FIX WAS APPLIED BY ADDING A CONTRADICTION RATHER THAN REMOVING A
+        CONDITION. Sentence two forbids disclosure *"to any person other than"*
+        an Advisor who *"first agrees in writing to be bound"*; sentence three
+        begins *"Notwithstanding that proviso"* and takes the undertaking away.
+        Both are in force at once. A merchant reads the prohibition first, and a
+        merchant's lawyer asked to sign a funder's terms before reading a client's
+        contract does not get to sentence three. This is the same shape of defect
+        §4.7's *"only to agents, affiliates, subsidiaries and credit reporting
+        bureaus"* already cost this document — a word that was false in three
+        places at once with no way to know which provision won.
+
+    (2) THE PERMISSION IS NARROWER THAN THE PEOPLE WHO NEED IT. v4 names a
+        governmental or regulatory authority and stops. It does not name law
+        enforcement; it does not permit testimony that is not under a court
+        order; the closed Advisor list reaches no owner and no employee outside
+        one who is advising Merchant; and there is no prospective financing
+        source, which matters because §4.15 and §5.16 both contemplate a merchant
+        holding or shopping a concurrent position, and a merchant cannot shop one
+        without showing this Agreement to the funder being asked.
+
+    (3) IT RUNS ONE WAY. Only Buyer's information is protected, only Merchant is
+        bound, and *"this Agreement"* itself is made Buyer's property.
+
+    WHAT CHANGED. A mutual duty of reasonable care over nonpublic business
+    information; one list of permitted recipients with no undertaking attached to
+    any of them; an express statement that no consent and no advance notice is
+    required for a complaint, a protected report, testimony or cooperation with
+    an authority, and that none of those is a breach; a public-information
+    carve-out; and a duration.
+
+    DEPARTURE 1 — THE ANTI-SELF-HELP LIMB IS KEPT. The memo's carve-out reads
+    *"Information lawfully public or independently obtained is not
+    confidential."* v4's reads *"public other than THROUGH A BREACH OF THIS
+    SECTION"*. On its face the memo's version lets a party publish in breach and
+    then argue the information had stopped being confidential; "lawfully" may
+    carry that weight and may not, and a carve-out is the wrong place to find
+    out. Both limbs are written out.
+
+    DEPARTURE 2 — THE CLOCK RUNS FROM COMPLETION AS WELL AS TERMINATION. The
+    memo says *"three years after termination"*. §7.6 lists *"the confidentiality
+    duties in Section 4.8"* among the provisions that survive COMPLETION under
+    §2.6, and an agreement that completes normally never terminates. v4's own
+    trigger — completed under Section 2.6, or otherwise terminated — is the one
+    that matches the survival clause, so it is kept and the citation with it.
+
+    DEPARTURE 3 — §4.7 IS CITED, AND THE MEMO DOES NOT CITE IT. Making this
+    Section mutual creates a second, softer standard — reasonable care — for
+    conduct §4.7 already governs completely and in detail, and §4.7 says in terms
+    that it *"controls any inconsistent information-sharing provision of this
+    Agreement"*. Without the pointer a reader has two rules for Buyer's handling
+    of merchant data and no way to rank them. Same reasoning `miscellaneous` gave
+    for adding §7.22's citation of this clause.
+
+    DEPARTURE 4 — "CONFIDENTIAL INFORMATION" IS NOT REDEFINED HERE. §4.8 was the
+    only clause in the corpus using the capitalised term — searched, not assumed
+    — so nothing points at the definition and README rule 8 puts defined terms in
+    `frpa.definitions`.
+
+    THE SET-LEVEL FINDING, HANDED BACK. The property is stated over every
+    instrument, and doing that found the worse instance in a different document:
+    `iso-pra.confidentiality` reads *"ISO Partner shall not disclose such
+    information to any third party without prior written consent from Company"*
+    with **no carve-out of any kind** — not for a regulator, not for a court, not
+    for the broker's own lawyer. The 2026-09-09 memo covers the FRPA only, and
+    the ISO PRA is outside this cluster's two files. It is conceded by name and
+    owner in the test rather than fixed here.
+
+    UNVERIFIED. No anti-gag, whistleblower or complaint-protection provision of
+    any state's commercial-financing law is vendored in `mca/sources/`, and
+    nobody on this project has read one. Nothing here is a conclusion about what
+    any of them requires.
+  */
   {
     slug: 'frpa.confidentiality-4-8',
     version: 1,
@@ -577,7 +677,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     section: 'enrollment',
     sortKey: 80,
     heading: 'Confidentiality',
-    body: 'Merchant agrees that the terms and conditions of the products and services offered by Buyer, including this Agreement and any other Buyer documentation (collectively, “Confidential Information”), are proprietary and confidential information of Buyer. Unless disclosure is required by law or court order, Merchant shall not disclose Confidential Information to any person other than Merchant’s attorney, accountant, financial advisor, or employee who needs to know such information for the purpose of advising Merchant (each, an “Advisor”), provided such Advisor uses such information solely for advising Merchant and first agrees in writing to be bound by the terms of this Section. Notwithstanding that proviso, Merchant may disclose Confidential Information to its attorney, accountant or other professional adviser for the purpose of advising Merchant without that adviser giving any undertaking to Buyer, and may disclose Confidential Information to any governmental or regulatory authority. Confidential Information does not include information that is or becomes public other than through a breach of this Section. Merchant’s obligations under this Section end three (3) years after this Agreement is completed under Section 2.6 or is otherwise terminated.',
+    body: 'Each party shall use reasonable care to protect the other’s nonpublic business information received in connection with this Agreement. Section 4.7 governs Buyer’s use and disclosure of Merchant’s and each Guarantor’s information, and nothing in this Section reduces a duty it imposes on Buyer or a right it gives Merchant or a Guarantor.\nEither party may disclose this Agreement and information about it to its lawyers, accountants, financial advisers, employees and owners with a legitimate need to know; to a prospective financing source, assignee or acquirer that is subject to appropriate confidentiality; in a legal proceeding, including in testimony; and to a governmental, regulatory, tax or law-enforcement authority, whether voluntarily or under compulsion. No adviser is required to give an undertaking to the other party as a condition of receiving a disclosure under this Section.\nNo consent from, and no advance notice to, the other party is required for a complaint, a protected report, testimony, or cooperation with an authority, and none of those is a breach of this Agreement or an Event of Default. This Section waives no right of either party to make a report or a complaint that applicable law protects.\nInformation that is or becomes public without a breach of this Section, that a party already lawfully held, or that a party obtains independently of this Agreement, is not protected by this Section.\nThese duties continue for three (3) years after this Agreement is completed under Section 2.6 or is otherwise terminated, and for any longer period applicable law requires.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
