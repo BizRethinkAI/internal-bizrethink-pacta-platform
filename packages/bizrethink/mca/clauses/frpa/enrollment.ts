@@ -108,6 +108,84 @@ export const FRPA_ENROLLMENT: McaClause[] = [
       { review: 'REVIEW-02', findings: ['frpa-7-6-and-4-2-contradict-the-2-6-completion-test'] },
     ],
   },
+  /*
+    WHAT WAS WRONG. Three authorities in three sentences, none of them bounded.
+    An authority to "investigate their financial responsibility and history"
+    with no purpose and no end; a duty to hand over anything "as Buyer deems
+    necessary prior to or AT ANY TIME AFTER execution"; and a standing licence
+    to "update such information and financial profiles from time to time as it
+    deems appropriate". A scope that is whatever Buyer decides it is has no
+    scope, and this one reached Guarantors — natural persons — as well.
+
+    THE PHOTOCOPY SENTENCE IS DELETED, AND THE MEMO DROPS IT SILENTLY. "A
+    photocopy of this authorization will be deemed acceptable for release of
+    financial information" is the mechanism by which an instrument nobody
+    executed gets treated as executed: it tells an information source not to ask
+    for the original. The vendored Permission to Release carries the same
+    sentence in its §5, and REVIEW-01 separately found that form has no
+    Guarantor signature line at all — `ptr-no-guarantor-signature-line`. A
+    photocopy rule plus a missing signature line is how a consent that was never
+    given is relied on twice.
+
+    THE REFUTATION, RECORDED HERE AND NOT IN THE BODY. The 2026-09-09 memo
+    refutes our register's finding that Lombard has no FCRA authority, on the
+    ground that permissible purpose may lawfully sit in the Permission to
+    Release, which "was never supplied" to either review.
+
+    THE MEMO'S PREMISE IS FALSE AS TO THIS REPOSITORY, and that is worth writing
+    down rather than repeating. The Permission to Release is vendored — the
+    source `.docx` is in `lombard-contracts/sources/` and the instrument is in
+    this library as eight `permission-to-release.*` clauses. Reading it does not
+    settle the question either way:
+
+      - its §3 grants credit-bureau authority over "Merchant and any Personal
+        Guarantor ... individually", so authority is not absent on the face of
+        the form; and
+      - its §4 sources the FCRA §604(a)(2) "written instructions" to "The
+        Personal Guarantor's signature below", which REVIEW-01 records does not
+        exist on the form — `ptr-no-guarantor-signature-line`,
+        `permission-guarantor-bound-without-signing`,
+        `ptr-written-instructions-sourced-to-unsigned-frpa`.
+
+    So neither conclusion is established, and NEITHER IS WRITTEN INTO A CLAUSE.
+    The body states a condition on Buyer's conduct and nothing about whether the
+    condition is met. UNVERIFIED: nobody on this project has read 15 U.S.C.
+    §1681b, and `mca/sources/` vendors eleven state commercial-financing
+    statutes and no federal consumer-credit law.
+
+    DEPARTURE 1 — THE GATE THE BRIEF ASKED FOR IS NOT APPLIED, and the reason is
+    ADR 0013's own diagnostic. The brief marks this clause `include-when` on
+    `consumerReportPulled`. The clause carries two rules: Merchant's grant of
+    access to BUSINESS records, which every funder needs, and a restriction on
+    BUYER's consumer-report pulls, which a funder that pulls none is not harmed
+    by. *"If the two limbs bind different parties or answer different questions,
+    the fact is wrong rather than too coarse"* — they do both. The fix is
+    `includeWhen: null` plus a cross-reference, exactly as §5.16 and §4.11 were
+    resolved.
+
+    It is not only a judgement call: §5.2 is ungated and ends *"Records duties,
+    and the remedies for them, remain subject to Section 3, Section 4.3 and
+    Section 6"*, so gating this clause would dangle that citation for the engine
+    test's profile *"a funder with no broker channel and no consumer report"*.
+    The cross-reference property found it before the drafting did.
+    `consumerReportPulled` still gates Exhibit C, which IS genuinely absent.
+
+    DEPARTURE 2 — "EXHIBIT C DOES NOT EXPAND THESE LIMITS" BECOMES GENERIC.
+    Exhibit C is gated on `consumerReportPulled` and this clause is not, so
+    naming it here points an always-present clause at an exhibit half the
+    profiles do not have. "No separate authorization, however described" covers
+    the same ground and covers a release the exhibit does not describe.
+
+    DEPARTURE 3 — THE HEADING. "Financial Condition" names a subject this clause
+    does not have and that §6.1 and §5.2 now expressly say creates no liability;
+    the clause is about financial INFORMATION. §5.16's rewrite made the same
+    change for the same reason.
+
+    DEPARTURE 4 — THE MECHANICS GO TO §5.2 BY REFERENCE. The memo leaves "must
+    be proportionate" freestanding. §5.2 already fixes ten Workdays, a specific
+    written request and an extension where a record is unavailable; restating any
+    of that here is how two rules drift apart.
+  */
   {
     slug: 'frpa.financial-condition-4-3',
     version: 1,
@@ -117,8 +195,8 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     number: '4.3',
     section: 'enrollment',
     sortKey: 30,
-    heading: 'Financial Condition',
-    body: 'Merchant and Guarantor(s) authorize Buyer and its agents to investigate their financial responsibility and history and shall provide to Buyer any bank or financial statements, tax returns, and other financial documentation as Buyer deems necessary prior to or at any time after execution of this Agreement. A photocopy of this authorization will be deemed acceptable for release of financial information. Buyer is authorized to update such information and financial profiles from time to time as it deems appropriate.',
+    heading: 'Financial Information',
+    body: 'Merchant authorizes Buyer to obtain the business financial information reasonably necessary to underwrite this transaction before the Purchase Date, and after the Purchase Date to service this Agreement, to reconcile under Section 3, or to investigate a specific suspected diversion of Purchased Receipts. Each request shall be proportionate to that purpose and shall state it. Section 5.2 governs how and when Merchant provides records, and Section 4.7 governs what Buyer may then do with them.\nBuyer shall obtain a consumer report on an individual only with a permissible purpose under the Fair Credit Reporting Act and any authority state law requires, documented separately for that individual and that intended use. Merchant’s signature to this Agreement does not authorize a consumer report on any individual who has not signed a separate authorization for it. No investigation authority in this Agreement permits a recurring or open-ended consumer-report pull. Buyer shall give the notices applicable law requires and shall meet the accuracy, adverse-action and dispute duties that apply to it.\nNo separate authorization, however described, enlarges the purposes or the limits stated in this Section.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -126,6 +204,34 @@ export const FRPA_ENROLLMENT: McaClause[] = [
       { review: 'REVIEW-02', findings: ['frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument'] },
     ],
   },
+  /*
+    WHAT WAS WRONG, IN FOUR WORDS. "Continuation in this program" makes the data
+    feed serve an ongoing credit qualification, which a completed sale does not
+    have. A purchase is either made or not; there is nothing to re-qualify for,
+    and a clause that says otherwise supports the recharacterisation argument
+    the whole instrument is drafted against.
+
+    WHAT CHANGED. The authority is split at the Purchase Date: underwriting
+    before it, verification and reconciliation after it. The memo's second
+    sentence is kept nearly whole, because it is the operative one — a decline
+    after funding buys Buyer nothing.
+
+    DEPARTURE 1 — "SUBJECT TO SECTIONS 4.3, 4.7, AND 4.16" IS WRITTEN OUT AS
+    THREE SEPARATE CITATIONS. Cosmetic on the page and not in the code: the
+    corpus checks cross-references by the literal `Section N.M`, and a merged
+    "Sections 4.3, 4.7 and 4.16" reads as one token to a reader looking for
+    whether §4.16 is cited anywhere. §5.2 writes its three the same way.
+
+    DEPARTURE 2 — "THE APPROVED PROCESSOR AND BANK" BECOMES "EACH". Both are
+    defined in `frpa.definitions` as sets — §2.4 permits adding either — and a
+    singular reads as the one named in Section 1 on the Purchase Date.
+
+    DEPARTURE 3 — THE LAST SENTENCE POINTS AT §6.1 RATHER THAN REPEATING IT.
+    The memo says a decline does not let Buyer revoke, demand repayment or
+    suspend reconciliation. §6.1 already says a decline is not an Event of
+    Default and gives no remedy; two statements of one rule is how §2.4 and
+    §5.17 came to contradict each other.
+  */
   {
     slug: 'frpa.transaction-history-4-4',
     version: 1,
@@ -136,7 +242,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     section: 'enrollment',
     sortKey: 40,
     heading: 'Transaction History',
-    body: 'Merchant authorizes the Bank and the Approved Processor to provide Buyer with Merchant’s banking and credit-card processing history from time to time to determine qualification or continuation in this program.',
+    body: 'Subject to Section 4.3, Section 4.7 and Section 4.16, Merchant authorizes each Approved Processor and each Bank to give Buyer Merchant’s card processing and account history: before the Purchase Date, the history reasonably necessary to underwrite this transaction; and after the Purchase Date, the history reasonably necessary to verify Purchased Receipts, to reconcile under Section 3, and to service this Agreement lawfully.\nA decline in Merchant’s sales, receipts or creditworthiness after the Purchase Date does not permit Buyer to revoke the purchase, require repayment, or suspend a reconciliation under Section 3, and does not change the Specified Percentage. Section 6.1 states the only conduct that is an Event of Default.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -286,6 +392,61 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    WHAT WAS WRONG. A clause headed "Protection of Information" that protected
+    none: it was an AUTHORISATION to disclose, with a damages waiver attached.
+
+    THE CLOSED LIST WAS THE FINDING AND THE WAIVER IS WORSE.
+    `information-sharing-only-vs-any-third-party` records that "only to agents,
+    affiliates, subsidiaries, and credit reporting bureaus" contradicts §§5.16,
+    7.15 and 7.23, each of which authorises a wider disclosure — so the word
+    "only" was false in three places at once, and a reader had no way to know
+    which provision won. The waiver then removed the remedy for whichever one
+    did: "any claim for damages ... relating to any (i) investigation ... or
+    (ii) disclosure of information as permitted by this Agreement" waives the
+    claim for exactly the conduct the clause purports to bound.
+
+    WHY THIS CLAUSE IS NOW LOAD-BEARING IN A WAY IT WAS NOT. `representations`
+    rewrote §5.16 to point here — *"Buyer may use and disclose information given
+    under this Section only as Section 4.7 permits"* — rather than restating a
+    sharing rule of its own. So §4.7 has to be a complete policy on BOTH verbs,
+    use and disclosure, or §5.16 now points at a gap. It is written that way and
+    `information-leaves-only-on-a-stated-purpose` asserts both halves.
+
+    AND THE FIRST DRAFT OF IT MISSED §5.16 BY ONE WORD. It read "only for the
+    purpose for which it was collected UNDER SECTION 4.3, SECTION 4.4 OR SECTION
+    4.16" — an exhaustive list of three collection routes that does not include
+    §5.16's own, which obliges Merchant to hand over "the information reasonably
+    necessary to assess the conflict". §5.16 would have pointed at a policy whose
+    scope excluded the very information §5.16 collects. The scope sentence is
+    written as a general rule with the four sections as examples.
+
+    WHAT CHANGED. One policy. Purpose limits on use; minimum-necessary
+    disclosure to a bound recipient; the two wider channels named by number
+    instead of implied; no sale and no unrelated marketing; safeguards,
+    retention and secure deletion; a correction right; and a control sentence
+    that makes this Section win an inconsistency rather than lose one.
+
+    DEPARTURE 1 — "THE SERVICING ADDRESS" IS NOT USED. The memo says a person
+    "may contact the servicing address to request correction". This Agreement
+    defines no servicing address, and §7.3's notice rule requires certified mail
+    — a formality that would make the correction right harder to exercise than
+    the disclosure it corrects. The duty is written as a plain written request
+    with a duty to respond, borrowing §5.16's "reasonably and promptly".
+
+    DEPARTURE 2 — NO STATUTE IS NAMED. The memo's own note is the reason:
+    financial-privacy coverage is activity- and data-dependent, and not all
+    corporate banking data is consumer nonpublic personal information. Naming
+    GLBA or a state analogue here would assert a scope conclusion the clause has
+    no business asserting, and the duties are written as absolute obligations
+    instead, which do not depend on the answer. UNVERIFIED: nobody on this
+    project has read 15 U.S.C. §§6801-6809 or Regulation P.
+
+    DEPARTURE 3 — MARKETING CONTACT IS SENT TO §7.18. The memo bars disclosure
+    "for unrelated marketing without separate lawful consent" and stops there.
+    §7.18 is where a marketing consent is actually taken, and an unanchored
+    consent standard in two clauses is two standards.
+  */
   {
     slug: 'frpa.protection-of-information-4-7',
     version: 1,
@@ -296,7 +457,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     section: 'enrollment',
     sortKey: 70,
     heading: 'Protection of Information',
-    body: 'Merchant and each person signing this Agreement on behalf of Merchant and/or as Guarantor authorizes Buyer to disclose information concerning Merchant’s and each Guarantor’s credit standing and business conduct only to agents, affiliates, subsidiaries, and credit reporting bureaus as is required in connection with the Receipts. Merchant and Guarantor(s) waive to the maximum extent permitted by law any claim for damages against Buyer or any of its affiliates relating to any (i) investigation undertaken by or on behalf of Buyer as permitted by this Agreement, or (ii) disclosure of information as permitted by this Agreement.',
+    body: 'Buyer shall use Merchant’s and each Guarantor’s information only for underwriting, servicing, reconciliation, fraud prevention, lawful enforcement and legal compliance, and only for the purpose for which it was collected. This Section applies to all information Buyer obtains under this Agreement, including information obtained under Section 4.3, Section 4.4, Section 4.16 and Section 5.16.\nBuyer may disclose the minimum necessary information to a service provider or an authorized assignee that is bound by confidentiality, security and purpose restrictions; to a credit-reporting recipient or a card network only as Section 7.15 and Section 7.23 permit; and to a governmental authority as applicable law permits or requires. Buyer shall not sell Merchant’s or a Guarantor’s account data, and shall not disclose it for unrelated marketing without a separate lawful consent; Section 7.18 governs marketing contact.\nBuyer shall maintain written safeguards appropriate to the information, including access controls, encryption, oversight of each service provider, a retention period no longer than the purpose requires, and secure deletion at the end of it. Buyer shall give the incident notices applicable law requires.\nMerchant and each Guarantor may ask Buyer in writing to correct inaccurate information, and Buyer shall respond reasonably and promptly and shall correct what it finds inaccurate.\nThis Section controls any inconsistent information-sharing provision of this Agreement and of any document incorporated into it. It waives no liability and no statutory privacy, reporting, access or dispute right of Merchant or of any Guarantor.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -877,6 +1038,72 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['lombard-multi-position-vs-no-stack'] }],
   },
+  /*
+    THE ONE CLAUSE IN THIS CLUSTER THAT WAS PROTECTIVE AND STILL WRONG.
+
+    Read-only access is a genuinely good term and the owner's note keeps it: it
+    is the alternative to a debit authority, and this funder has none. What was
+    wrong sat around it.
+
+    (1) IT MADE A LOST CONNECTION A DEFAULT. "Prolonged loss of Plaid
+        connectivity ... shall constitute an Event of Default under Section
+        6.1.1" — strict liability for an outage at a third party, on a covenant
+        the Guarantor was then answerable for. Four REVIEW-01 findings say so:
+        `plaid-connectivity-lapse-is-default`,
+        `plaid-lapse-is-strict-liability-default`,
+        `frpa-plaid-default-not-enumerated-in-61`, `no-cure-period-anywhere`.
+
+    (2) THE CITATION DANGLED TWICE OVER — THE SPINE'S HANDOVER TO THIS CLUSTER.
+        §6.1 had fifteen numbered limbs when this was written; `default-remedies`
+        replaced them with three lettered ones, so there is no §6.1.1 to point
+        at. And §6.1's not-a-default list now expressly includes "a loss of
+        access to information or to a system" and "the failure, outage or
+        withdrawal of service of a Bank or an Approved Processor", so the
+        citation would have been wrong even if it resolved. It was registered in
+        `select-clauses.test.ts`'s `KNOWN_GAPS` naming this cluster as owner;
+        that entry is deleted in the same change, because a register that keeps
+        a gap after it is closed is a line of a test that can no longer be red.
+
+    (3) PURPOSE (d) WAS A SECOND UNDERWRITING. "Ongoing creditworthiness review
+        by Buyer" is the same defect as §4.4's "continuation in this program",
+        and it is unnecessary: Buyer receives processor settlement data through
+        the split, which is the number the Agreement actually runs on. The same
+        sentence survives in `permission-to-release` §3 and is nobody's clause
+        in this wave — reported, not fixed.
+
+    (4) `defined-term-drift`. "Daily and weekly Receipts", "the Reconciliation
+        procedures", "Merchant's bank-data". `frpa.definitions` now says
+        Receipts means Card Receipts, and there is no defined "Reconciliation".
+
+    WHAT CHANGED. The connection is a permission Merchant may give, not a
+    covenant Merchant must maintain. Disclosure before connection. Purposes tied
+    to §§4.3 and 4.4 rather than restated. An express alternative — processor
+    reports or account statements — so a funder that loses the feed has a way to
+    verify without a remedy. And the distinction the owner's note asks for:
+    revoking a data feed is not hiding money, and is not evidence that it is.
+
+    DEPARTURE 1 — THE MEMO'S "A LAPSE ... IS NOT ITSELF AN EVENT OF DEFAULT" IS
+    STATED WITHOUT "ITSELF". The qualifier invites the reading that a lapse plus
+    something makes one. §6.1 is closed — "Nothing else is an Event of Default"
+    — so the hedge would contradict it. The genuine case, a lapse used to
+    conceal a diversion, is §6.1(b) on its own facts and is written as the
+    evidence rule instead.
+
+    DEPARTURE 2 — THE DAY COUNTS GO AND NONE REPLACES THEM. Five Workdays to
+    default and ten to re-authorise both existed only to run the default
+    machinery this clause no longer has. The brief forbids inventing counts; it
+    does not require keeping ones whose purpose was deleted.
+
+    DEPARTURE 3 — THE DATA-HANDLING PROMISE IS NOT RESTATED HERE. v4 gave one in
+    this clause ("applicable privacy and data-protection laws", "essential
+    personnel only") and another in §4.7, and the two were already different from
+    each other. Encryption, access control, vendor oversight and retention are
+    §4.7's; this clause points at §4.7 for everything it obtains.
+
+    UNVERIFIED. Whether Plaid's own terms permit the retention this clause
+    allows, and what a bank-side aggregation agreement obliges. Nobody here has
+    read either, and neither is vendored.
+  */
   {
     slug: 'frpa.electronic-account-monitoring-authorization-plaid-4-16',
     version: 1,
@@ -887,7 +1114,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     section: 'enrollment',
     sortKey: 160,
     heading: 'Electronic Account Monitoring Authorization (Plaid)',
-    body: "Merchant authorizes Buyer to obtain read-only electronic access to the Approved Bank Account through Plaid, Inc. (or any equivalent secure bank-data aggregation service designated by Buyer) for the purpose of (a) verifying Merchant's daily and weekly Receipts during the term of this Agreement, (b) supporting the Reconciliation procedures set forth in Section 3, (c) confirming that the Specified Percentage of Receipts is being properly remitted by the Approved Processor, and (d) ongoing creditworthiness review by Buyer.\nMerchant shall (i) authorize the Plaid connection during onboarding, (ii) maintain the connection in active status throughout the term of this Agreement, and (iii) promptly re-authorize if the connection lapses for any reason (including bank-side credential changes or token expiry). Buyer's access via Plaid is read-only; this authorization does not, by itself, authorize any debit, transfer, or withdrawal — collection mechanisms are governed exclusively by Section 2.3 (Split Funding via Approved Processor).\nMerchant acknowledges that prolonged loss of Plaid connectivity (more than five (5) consecutive Workdays without Buyer's prior written consent) shall constitute an Event of Default under Section 6.1.1, except that a lapse arising from a cause outside Merchant's reasonable control — including a bank-side credential change, token expiry, or an outage at the aggregation service — shall not be an Event of Default if Merchant re-authorizes the connection within ten (10) Workdays after notice from Buyer.\nBuyer agrees to (i) handle all data obtained through Plaid in accordance with applicable privacy and data-protection laws, (ii) limit access to essential personnel only, and (iii) not share Merchant's bank-data with third parties except as required for servicing this Agreement (e.g., the Approved Processor or industry-standard performance reporting per Section 7.15).",
+    body: 'Merchant may authorize read-only electronic access to an Approved Bank Account identified for the purpose, through Plaid, Inc. or another bank-data aggregation service Buyer identifies to Merchant before the connection is made. Before the connection is made, Buyer shall tell Merchant the categories of data Buyer will receive, the service provider, how long the access will run, and how Merchant may revoke it. The access is limited to the purposes Section 4.3 and Section 4.4 permit: verifying Card Receipts, supporting a reconciliation under Section 3, and confirming that the Specified Percentage is being remitted by an Approved Processor.\nThis authorization never permits a debit, transfer or withdrawal. Collection is governed by Section 2.3.\nMerchant may instead give Buyer the equivalent processor reports or account statements, and shall do so if the connection is not made, lapses or is revoked. Buyer shall provide a reasonable alternative and reasonable assistance. A lapse, a token expiry, a bank-side restriction, an outage at the service, or a good-faith revocation by Merchant is not an Event of Default and gives Buyer no remedy; Section 6.1 states that a loss of access to information or to a system is not one. Withholding or revoking data access is not the conduct described in Section 6.1(b), and Buyer may treat it as evidence of that conduct only together with other evidence of it.\nBuyer shall end active access when this Agreement reaches the Completion Threshold under Section 2.6 or is otherwise terminated, shall retain only the records reasonably needed for legal compliance or for a specific identified dispute, and shall apply Section 4.7 to everything obtained under this Section. No bank credentials and no raw transaction data may be furnished to a reporting organization under Section 7.15.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

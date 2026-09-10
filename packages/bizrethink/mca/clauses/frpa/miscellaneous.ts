@@ -381,6 +381,45 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       { review: 'REVIEW-01', findings: ['frontload-refactors-old-balance', 'lombard-multi-position-vs-no-stack'] },
     ],
   },
+  /*
+    WHAT WAS WRONG. A blanket authority to hand information about Merchant AND
+    ITS PRINCIPALS to any number of unnamed "industry associations", twice
+    stated to be exercisable "without further notice to" anybody. No purpose, no
+    named recipient, no accuracy duty, no correction route, and — because it
+    reached principals — natural persons.
+
+    THE ONE SENTENCE THE OWNER'S NOTE CALLS THE EXPOSURE, and it is the second
+    paragraph: **never report the non-generation of Purchased Receipts as a
+    delinquent fixed debt.** This Agreement fixes no payment and no maturity
+    date; §6.1 says an absence of Card Receipts is not a default and §2.6 says
+    the Purchased Amount is not made due by one. A furnisher who nevertheless
+    reports "past due" is reporting a debt the document says does not exist.
+    Everything else in this clause is a control around that sentence.
+
+    THE MEMO IS CAREFUL ABOUT SOMETHING WORTH KEEPING CAREFUL. An association
+    may or may not be a consumer reporting agency depending on what it does with
+    what it receives, and not all business-only reporting is FCRA-covered. The
+    clause therefore states a CONDITION on Buyer — establish the authority the
+    law requires before furnishing information about an individual — and decides
+    nothing about whether a given recipient is covered. UNVERIFIED: nobody here
+    has read 15 U.S.C. §1681s-2, and no federal consumer-credit statute is
+    vendored in `mca/sources/`.
+
+    DEPARTURE 1 — "INDUSTRY ASSOCIATION" IS NOT USED AT ALL. The memo keeps
+    "reporting organization"; v4's term is what created the problem, since an
+    association is defined by nothing. "A reporting organization that Buyer has
+    specifically identified" is the operative half — identification is the duty,
+    and the category is not.
+
+    DEPARTURE 2 — THE MEMO'S "IDENTIFY A REASONABLY SUBSTANTIATED DISPUTE WHERE
+    REQUIRED" IS TIED TO THE RECIPIENT'S RULES AS WELL AS TO LAW, because a
+    network or trade recipient may impose a dispute flag the law does not.
+
+    DEPARTURE 3 — THE DIVERSION LIMB IS POINTED AT §6.1(b) BY NUMBER. The memo
+    says "distinguish a genuine payment diversion from ordinary non-generation".
+    §6.1(b) is the only place this Agreement defines that conduct, and an
+    unanchored "diversion" is a word a furnisher can decide for itself.
+  */
   {
     slug: 'frpa.reporting-7-15',
     version: 1,
@@ -391,7 +430,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 150,
     heading: 'Reporting',
-    body: 'Buyer and its affiliates are or may become members of one or more industry associations that exchange and share information regarding the performance by merchants under merchant cash advance and related documents. Buyer and its affiliates reserve the right, without further notice to Merchant, to provide information to such industry associations relating to Merchant and its principals, as well as Merchant’s performance under this Agreement and related documents. Merchant, for itself and its principals, authorizes Buyer and its affiliates to provide such information without further notice to or consent of Merchant or its principals.',
+    body: 'Buyer may report accurate information about Merchant’s performance of this Agreement to a reporting organization that Buyer has specifically identified, for a lawful purpose Buyer has disclosed, and only as Section 4.7 and applicable law permit. Before furnishing information about an individual that a recipient may use in a consumer report, Buyer shall establish the authority applicable law requires for it and shall meet the accuracy, adverse-action and dispute duties that apply to the furnisher of it.\nBuyer shall not report the non-generation of Purchased Receipts as a delinquent or past-due fixed debt. This Agreement fixes no payment and no maturity date, so an absence of Card Receipts is not a missed payment; only the conduct described in Section 6.1(b) may be reported as a diversion, and a reasonably substantiated dispute shall be identified as disputed wherever applicable law or the recipient’s rules require.\nMerchant, and an individual whose information was furnished, may request the recipient’s identity and the process for correcting the information, and Buyer shall give both. No raw account data, no credentials and no information unrelated to Merchant’s performance of this Agreement may be furnished. This Section authorizes no marketing and no general disclosure to a trade body.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -429,6 +468,74 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    THREE DIFFERENT CONSENTS IN ONE CLAUSE, EACH TAKEN FROM THE WRONG PERSON.
+
+    (1) RECORDING. "By signing this Agreement, each Merchant and Guarantor
+        agrees that any such call may be monitored and/or recorded" — and the
+        first sentence reaches calls with "their respective owners, employees,
+        or agents". A company's signature cannot supply the recording consent of
+        an employee who has not signed and may not have been hired yet, and
+        several states require every participant's.
+
+    (2) AUTOMATED CONTACT. A consent for "servicing, collections, marketing, or
+        promoting", to any number in the Agreement OR ANY APPLICATION, for Buyer
+        plus its servicers plus their subsidiaries and affiliates, "regardless
+        of their inclusion on any do-not-call list". Four separate over-reaches:
+        a number the signer may not control, an unnamed set of callers, a
+        registration a private signature cannot override, and marketing bundled
+        with servicing in one grant.
+
+    (3) REVOCATION, WHICH IS THE FINDING. `tcpa-consent-not-revocable-as-
+        promised`: the clause promises revocation "by any reasonable means" and
+        then honours it only "for all contact that is not required to service
+        this Agreement" — which is the contact a collector actually makes. A
+        revocation right with the collector's own purpose carved out of it is
+        the defect, not a detail of it.
+
+    (4) PREMISES. Entry "during business hours, without prior notice, at any
+        time after the occurrence of an Event of Default" to protect an interest
+        in "the Receivables and the Collateral". §6.2 as `default-remedies`
+        rewrote it says Buyer takes no self-help remedy; an unannounced entry
+        right is a self-help remedy filed under communications.
+
+    WHAT CHANGED. Consent is taken from the person entitled to give it for the
+    number it is given for. Revocation is real, effective on receipt, with no
+    servicing carve-out. Marketing is separated and optional. Recording takes
+    each participant's consent with an unrecorded alternative. Entry needs
+    consent or a court.
+
+    DEPARTURE 1 — §7.3 IS EXPRESSLY DISAPPLIED TO A REVOCATION. v4 sent
+    revocation "to the address in Section 7.3", and §7.3 requires certified mail
+    effective only on receipt. A revocation that must be sent by certified mail
+    is not revocable "by any reasonable means", and the two sentences were
+    already inconsistent. §7.3 is `miscellaneous`'s clause and is not touched;
+    this one says which rule governs a revocation, so the inconsistency has an
+    answer wherever §7.3 lands.
+
+    DEPARTURE 2 — NO STATEMENT OF WHAT THE LAW CURRENTLY REQUIRES. The memo is
+    careful and the brief is emphatic, so this clause names no rule and no date.
+    UNVERIFIED, and recorded here rather than anywhere a merchant reads: as of
+    this memo the FCC's cross-topic informational revocation requirement is
+    deferred to 31 January 2027 while the core revocation duties stand, and the
+    one-to-one marketing consent rule was vacated. **Nobody on this project has
+    read the FCC orders, the vacating opinion, or 47 U.S.C. §227.** A deferral is
+    not an exemption, and the vacated rule must not be described as live law in
+    any Pacta material. The clause is written to be correct under either state
+    of that question: it obliges Buyer to honour a revocation within the period
+    applicable law allows, and to use a method that is lawful without consent
+    afterwards.
+
+    DEPARTURE 3 — "SERVICERS AND THEIR SUBSIDIARIES AND AFFILIATES" IS NOT
+    REPLACED WITH A NARROWER LIST. It is dropped. Buyer may contact; §7.2 governs
+    who stands in Buyer's shoes; a consent naming a class of companies the signer
+    cannot enumerate is not a consent to any of them.
+
+    DEPARTURE 4 — THE GUARANTOR IS "SEPARATELY IDENTIFIED FOR THE PURPOSE". The
+    memo's phrase, kept deliberately: §9.1 collects a Guarantor's contact
+    details, and a guaranty is gated on `guarantyScope`, so this clause must not
+    assume a Guarantor exists.
+  */
   {
     slug: 'frpa.communications-recording-and-premises-access-7-18',
     version: 1,
@@ -439,7 +546,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 180,
     heading: 'Communications, Recording, and Premises Access',
-    body: "Buyer may monitor and/or record any telephone call between Buyer and any Merchant or Guarantor, or any of their respective owners, employees, or agents. By signing this Agreement, each Merchant and Guarantor agrees that any such call may be monitored and/or recorded.\nEach Merchant and Guarantor expressly consents and authorizes Buyer, its servicers, and their respective subsidiaries and affiliates to call, send text messages, and/or send other electronic messages (including prerecorded or artificial voice messages) using an automatic telephone dialing system to any telephone number provided by any Merchant or Guarantor in this Agreement or any application for funding, including cellular phone numbers and landlines, regardless of their inclusion on any do-not-call list, for purposes of servicing, collections, marketing, or promoting any product offered by Buyer.\nEach Merchant and Guarantor are not required to consent to the marketing portion of the foregoing as a condition of qualifying for or obtaining the funding under this Agreement. To opt out of marketing or promotional contact, Merchant or Guarantor may notify Buyer in writing at the address set forth in Section 7.3.\nEach Merchant and Guarantor may revoke the consent given in this Section at any time by any reasonable means, including by replying STOP to a text message, by telephone, or by email to the address in Section 7.3, and Buyer will honour the revocation for all contact that is not required to service this Agreement. Revoking consent does not affect any other right or obligation under this Agreement.\nEach Merchant grants Buyer the right to enter and observe Merchant's premises during business hours, without prior notice, at any time after the occurrence of an Event of Default, for the purpose of protecting Buyer's interest in the Receivables and the Collateral.",
+    body: 'Buyer may contact Merchant, and a Guarantor separately identified for the purpose, to administer and lawfully service this Agreement, by a method applicable law permits. Where an automated call, an artificial or prerecorded voice call, or a text message requires consent, Buyer shall obtain that consent from the person legally entitled to provide it for the specified number, and shall record when and how it was given.\nA recipient may revoke consent at any time by any reasonable means, including by replying STOP to a text message, by telephone, or in writing; a revocation is effective when Buyer receives it, and Section 7.3 does not apply to it. Buyer shall honor a revocation within the period applicable law allows. Servicing or collecting this Agreement does not by itself preserve consent, and after a revocation Buyer shall use only a method that is lawful without it.\nMarketing consent, if Buyer asks for it, shall be obtained separately, shall identify the caller and the number the contact will come from, shall carry the disclosures applicable law requires, and shall be optional and not a condition of funding or of any term of it. This Agreement supplies no blanket do-not-call override and no consent for an unnamed affiliate.\nBefore recording a call, Buyer shall give the notice applicable law requires and obtain the consent applicable law requires from each participant, and shall offer an unrecorded alternative where that is practicable. A signature to this Agreement is not the consent of a person who has not given it.\nBuyer may enter Merchant’s premises only with reasonable advance notice and Merchant’s contemporaneous consent, or under an order of a court of competent jurisdiction, and in no case by force, by disruption of Merchant’s business, or by a breach of the peace. Section 6.2 states what Buyer may do on an Event of Default and that Buyer takes no self-help remedy.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -503,17 +610,90 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       },
     ],
   },
+  /*
+    THE WIDEST GUARANTOR LIABILITY IN THE DOCUMENT, AND NO BRIEF NAMED IT.
+
+    Found by `personal-liability-is-section-9-only.test.ts`, which states its
+    property over the SET rather than over its own ten clauses, and found by
+    nothing else — not the 2026-09-09 memo, which files this clause under
+    channel oversight and does not raise it under Section 9, and not this
+    cluster's own brief. The sentence:
+
+      "Each Merchant and Guarantor agrees to indemnify and hold harmless Buyer
+      ... from and against all losses, damages, claims, liabilities, and
+      expenses ... resulting from any act or omission by any ISO."
+
+    That is unlimited personal liability, for a broker the guarantor did not
+    choose, cannot control, and whose agreement with Buyer they have never seen,
+    triggered by conduct nobody in the room has to prove was wrongful — "any act
+    or omission" is not qualified by fault. §9.2 makes a Guarantor answerable for
+    their OWN proved fraud or intentional diversion, with Buyer bearing the
+    burden; this made them answerable for a stranger's negligence, on Buyer's
+    say-so. It is the third route around §9.2 rather than the second, and it is
+    wider than §7.9, which the guaranty cluster closed.
+
+    THE CONCESSION IN THAT TEST IS DELETED IN THE SAME CHANGE. A concession left
+    standing after the defect is fixed is a line that can no longer be red.
+
+    THE RISK ALLOCATION WAS BACKWARDS ON ITS OWN TERMS. Buyer selects, contracts
+    with, pays and can terminate the ISO. Merchant meets it once. The party that
+    controls the channel is the party that should carry it, and the memo says so.
+
+    AND THE REFUND PROMISE WAS WORTH NOTHING. "Buyer will on notice require the
+    ISO to refund it" is a promise to ASK. If the ISO has taken the fee and gone,
+    Merchant has a promise that was performed and no money. The owner's note is
+    the fix: give the merchant a direct remedy against us — we can recover from
+    the ISO, the merchant cannot. `iso-a6-and-frpa-7-21-give-different-answers-
+    about-a-merchant-paid-fee` is the finding, and it closes from both sides: ISO
+    PRA §A.6 already obliges the ISO to refund the merchant and to evidence it,
+    so the two documents now describe one outcome reached two ways rather than
+    two different outcomes.
+
+    THE "INDEPENDENT" LABEL. `iso-channel-vs-never-cold-call` reports that the
+    channel exists at all while the funder's marketing promises no cold calling.
+    Whatever that resolves to, a clause cannot decide its own agency question:
+    apparent authority is created by the principal's conduct toward the third
+    party, not by a recital between two of them. The clause keeps the disclaimer
+    of unincorporated promises — that is ordinary and useful — and stops the
+    disclaimer reaching responsibility the law attributes.
+
+    THE GATE. `brokerChannel`, and it is a whole-clause gate under ADR 0013: a
+    funder with no broker channel has no ISO, so the clause is genuinely absent
+    rather than differently worded. It is cited by no ungated clause, which is
+    the direction that would dangle. `instrumentsFor` already drops the ISO PRA
+    on the same fact, so the two move together.
+
+    DEPARTURE 1 — "BUYER'S AGREEMENTS WITH ITS ISOs PROHIBIT ..." BECOMES A
+    PROMISE BY BUYER. v4 recited the contents of a contract the merchant has
+    never seen and cannot enforce. A recital about a third document is worth
+    nothing to the person reading this one; an undertaking that Buyer will
+    require it is worth something and is checkable.
+
+    DEPARTURE 2 — "SHOULD NOTIFY BUYER AT ONCE" BECOMES "MAY NOTIFY". A duty
+    phrased as advice is neither, and a merchant who fails to report promptly
+    should not thereby lose the refund this clause now owes them.
+
+    DEPARTURE 3 — TEN WORKDAYS, NOT TEN DAYS. The memo fixes ten; `Workday` is
+    the defined term this Agreement counts in everywhere else.
+
+    NOT FIXED HERE, AND NOT THIS CLUSTER'S. `frpa.appendix-a-origination-fee-to-
+    iso` is ungated and speaks of ISO fees, so a funder with `brokerChannel:
+    false` gets an Appendix A paragraph about a channel it does not have. It is
+    `fees-and-money`'s clause. UNVERIFIED, separately: the memo says to verify
+    any anti-lead-list marketing claim; no marketing material is in this
+    repository and nobody here has read one.
+  */
   {
     slug: 'frpa.independent-sales-organizations-and-brokers-7-21',
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
-    includeWhen: null,
+    includeWhen: (facts) => facts.brokerChannel,
     number: '7.21',
     section: 'miscellaneous',
     sortKey: 210,
     heading: 'Independent Sales Organizations and Brokers',
-    body: "Each Merchant and Guarantor acknowledges that Merchant may have been introduced to Buyer by, or received assistance in entering into this Agreement from, an independent sales organization, broker, or marketing affiliate (“ISO”). Each Merchant and Guarantor agrees that any ISO is separate from and is not an agent or representative of Buyer, and that Buyer is not bound by any promises, representations, or agreements made by any ISO that are not expressly contained in this Agreement. Each Merchant and Guarantor agrees to indemnify and hold harmless Buyer and its officers, directors, members, shareholders, employees, and agents from and against all losses, damages, claims, liabilities, and expenses (including reasonable attorneys' fees and expert fees) resulting from any act or omission by any ISO. Buyer’s agreements with its ISOs prohibit an ISO from charging, accepting or soliciting any fee or other consideration from a merchant in connection with any financing; the commission Buyer pays is the ISO’s entire compensation. Merchant is therefore not required to pay any ISO anything as a condition of this Agreement, and should notify Buyer at once if any ISO asks it to. If Merchant nevertheless pays an ISO a fee, Buyer will on notice require the ISO to refund it to Merchant.",
+    body: 'Section 1 shall identify any independent sales organization, broker or marketing affiliate involved in this transaction (an “ISO”), its role, what it is paid, who pays it, and any disclosure applicable law requires. An ISO may be an independent contractor of Buyer, and that description does not waive any responsibility of Buyer arising from an ISO’s actual or apparent authority, from Buyer’s own conduct, or under applicable law. Buyer is not bound by a promise or representation of an ISO that is not contained in this Agreement and is not otherwise legally attributable to Buyer.\nBuyer shall maintain reasonable controls over the channel it engages, including onboarding, verification of any licensing or registration applicable law requires, training, monitoring, complaint handling, and compensation.\nMerchant and Guarantor do not indemnify Buyer, or any person associated with Buyer, for an act or omission of an ISO. Section 7.9 states the only indemnity Merchant gives under this Agreement.\nBuyer shall require by contract that an ISO it engages charge or collect from Merchant no compensation beyond what is expressly permitted, disclosed and agreed under applicable law; the commission Buyer pays is that ISO’s entire compensation for a transaction Buyer funds. Merchant is not required to pay an ISO anything as a condition of this Agreement, and may notify Buyer of a request for such a payment. Buyer shall investigate a reported unauthorized charge promptly, and shall refund a substantiated unauthorized charge collected by an ISO Buyer engaged within ten (10) Workdays after it is substantiated, without requiring Merchant to recover from the ISO first. Buyer may separately pursue the ISO. Nothing in this Section disclaims a representation legally attributable to Buyer, or limits a claim for deception or for an unauthorized fee.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -546,6 +726,59 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       },
     ],
   },
+  /*
+    THE MEMO REFUTES THE FIRST INSTINCT AND IT IS RIGHT TO. The v4 text already
+    conditions reporting on network rules and law; it does not license a false
+    report. Three other things about it were wrong.
+
+    (1) THE RELEASE. "Merchant waives and releases Buyer and its assignees,
+        servicers, and processor partners from any claim arising from such
+        reporting that is consistent with applicable law and card-network
+        rules." A MATCH listing can end a merchant's ability to accept cards for
+        five years. The release is circular — it releases only lawful reporting,
+        which needs no release — and its practical effect is to put the merchant
+        to proving unlawfulness before it has been told who reported what.
+
+    (2) NOBODY IS IDENTIFIED. "Buyer or its assignees, servicers, or processor
+        partners may report" names four candidate reporters, and under the
+        network rules the acquirer is generally the party with standing to
+        submit. A consent to being reported by whoever turns out to be able to
+        is not a consent to anything in particular.
+
+    (3) THE MISSING PREMISE, WHICH IS THE OWNER'S EMPHASIS. **This Agreement does
+        not establish that an MCA default is a network-reportable event at all.**
+        The reason codes are the network's, and they describe merchant conduct in
+        a card acceptance relationship, not a purchaser's dispute with a seller
+        of receivables. A form that recites consent to reporting without saying
+        what the criteria are invites a report whose only basis is the consent.
+
+    WHAT CHANGED. Only an authorized reporter may report. A report needs
+    documented facts that satisfy the network's own criteria. No report and no
+    threat of one as payment pressure. Identification and a correction channel
+    where the rules permit. And nothing is released.
+
+    THE CLAUSE MUST NOT BE READ AS A CONSENT AT ALL, WHICH IS WHY THE HEADING
+    KEEPS "CONSENT AND RELEASE" AND THE BODY GIVES NEITHER. Departure noted
+    deliberately: the heading is v4's and is retained so a reader looking for the
+    provision they were told about finds it, while the text under it grants no
+    consent and no release. If a later cluster renumbers or retitles Section 7,
+    this heading is the first candidate.
+
+    UNVERIFIED, AND THE MOST CONSEQUENTIAL IN THIS CLUSTER. **No card-network
+    rulebook is in this repository and nobody on this project has read one.**
+    The Mastercard MATCH reason codes, the standing to submit, the five-year
+    retention, the correction procedure, and whether a TMF is a distinct file or
+    a legacy name for the same thing are all asserted nowhere in this clause
+    precisely because none of them has been checked. The acquirer agreement with
+    the processor is likewise not in this repository. Before anyone reports
+    anything, the current rules have to be obtained and read.
+
+    DEPARTURE — "SOLELY TO PRESSURE PAYMENT" LOSES "SOLELY". The memo writes
+    "shall not report or threaten to report ... solely to pressure payment". A
+    reporter with a mixed motive is the ordinary case, and "solely" is the word a
+    defendant reaches for. The prohibition is written on the purpose of obtaining
+    payment of a disputed claim, without the qualifier.
+  */
   {
     slug: 'frpa.tmf-match-reporting-consent-and-release-7-23',
     version: 1,
@@ -556,7 +789,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 230,
     heading: 'TMF/MATCH Reporting Consent and Release',
-    body: 'Merchant acknowledges and consents that, in connection with this Agreement and any related processor relationship, Buyer or its assignees, servicers, or processor partners may report Merchant or any of its principals to industry-standard databases including but not limited to the Member Alert to Control High-risk Merchants (MATCH) database operated by Mastercard and the Terminated Merchant File (TMF), where such reporting is permitted by applicable card-network rules and applicable law. Merchant waives and releases Buyer and its assignees, servicers, and processor partners from any claim arising from such reporting that is consistent with applicable law and card-network rules.',
+    body: 'Only a party authorized under the applicable card-network rules may submit a report to the Member Alert to Control High-risk Merchants (MATCH) database, to a Terminated Merchant File, or to a similar card-network database. A report shall be based on documented facts that satisfy the reporting criteria those rules state, shall carry the information those rules require and no more, and is subject to applicable law and to Section 4.7.\nBuyer shall not report or threaten to report Merchant or a principal of Merchant in order to obtain payment of a disputed claim under this Agreement, or because Card Receipts have declined.\nWhere the card-network rules and applicable law permit, Buyer shall identify the entity that made a report and the channel available for disputing it or requesting a correction, and shall cooperate promptly in correcting information it learns is inaccurate. Merchant and each Guarantor do not release claims for an inaccurate, unauthorized, negligent, malicious or unlawful report.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

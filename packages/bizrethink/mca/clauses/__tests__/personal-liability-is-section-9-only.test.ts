@@ -160,23 +160,24 @@ const PERSONAL_LIABILITY: { pattern: RegExp; why: string; firesOn: string }[] = 
  */
 const CONCEDED: Record<string, string> = {
   /*
-    FOUND BY THIS ASSERTION, AND BY NOTHING ELSE. §7.21 is in the
-    `data-and-channel` brief as an ISO clause; no brief names it as a guaranty
-    problem, and the 2026-09-09 memo does not raise it under Section 9.
+    §7.21 WAS THE FIRST ENTRY HERE AND IS DELETED, WHICH IS THE POINT OF THE
+    RULE ABOVE.
 
-    It makes "Each Merchant and Guarantor" indemnify Buyer and its officers,
-    directors, members, shareholders, employees and agents against ALL losses
-    "resulting from any act or omission by any ISO" — a human being personally
-    liable, without limit, for the conduct of a BROKER they did not choose,
-    cannot control and whose agreement with Buyer they have never seen. It is
-    the widest guarantor liability left in the document, wider than the §7.9 it
-    was hiding behind, and it is the third route around §9.2 rather than the
-    second. Handed to `data-and-channel` and to the brief-writer.
+    This assertion found it and nothing else did — no brief named it, and the
+    2026-09-09 memo files it under channel oversight rather than under Section 9.
+    It made "Each Merchant and Guarantor" indemnify Buyer against ALL losses
+    "resulting from any act or omission by any ISO": unlimited personal liability
+    for a broker the guarantor did not choose and cannot control, on conduct
+    nobody had to prove was wrongful. It was the third route around §9.2, wider
+    than the §7.9 it was hiding behind.
+
+    `data-and-channel` closed it on 2026-09-10. §7.21 now reads "Merchant and
+    Guarantor do not indemnify Buyer, or any person associated with Buyer, for an
+    act or omission of an ISO" and points at §7.9 as the only indemnity Merchant
+    gives, so the set-level assertion below covers it with no concession —
+    which is the difference between a defect that was fixed and one that was
+    tolerated.
   */
-  'frpa.independent-sales-organizations-and-brokers-7-21':
-    'DATA-AND-CHANNEL. "Each Merchant and Guarantor agrees to indemnify and hold harmless Buyer ... from and ' +
-    'against all losses, damages, claims, liabilities, and expenses ... resulting from any act or omission by any ' +
-    'ISO" — unlimited personal liability for a third party’s conduct, outside Section 9 and unmentioned by any brief.',
   'frpa.security-interest-4-10':
     'ENROLLMENT. "Merchant and Guarantor shall be liable for" the costs of perfecting Buyer’s security interest — ' +
     'personal liability for a cost, granted outside Section 9 and reachable without proving any conduct.',

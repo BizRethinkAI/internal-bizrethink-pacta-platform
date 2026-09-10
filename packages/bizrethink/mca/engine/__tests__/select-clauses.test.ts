@@ -89,18 +89,18 @@ const danglingIn = (facts: McaFacts, library?: McaClause[]): string[] => {
  * clause to quiet a check is how a cluster's blast radius grows.
  */
 const KNOWN_GAPS: { to: string; from: string[]; quote: string; owner: string }[] = [
-  {
-    /*
-      §6.1 had fifteen numbered limbs when §4.16 was written. `default-remedies`
-      replaced them with three lettered ones on 2026-09-10, so there is no 6.1.1
-      any more — and a Plaid outage is now expressly IN §6.1's not-a-default
-      list, so the citation is wrong twice over. `data-and-channel` owns §4.16.
-    */
-    to: 'Section 6.1.1',
-    from: ['frpa.electronic-account-monitoring-authorization-plaid-4-16'],
-    quote: 'shall constitute an Event of Default under Section 6.1.1',
-    owner: 'data-and-channel',
-  },
+  /*
+    CLOSED 2026-09-10 AND DELETED, NOT LEFT STANDING.
+
+    `frpa.electronic-account-monitoring-authorization-plaid-4-16 -> Section
+    6.1.1` was the first entry here. §4.16 no longer makes a lapse a default at
+    all, so the citation has gone rather than moved: the clause now says a lapse,
+    a token expiry, an outage or a good-faith revocation "is not an Event of
+    Default and gives Buyer no remedy", and points at the §6.1 that exists for
+    the reason — a loss of access to information or to a system is in its
+    not-a-default list. `data-and-channel` owned it and removed it in the same
+    change, which is what the assertion below exists to force.
+  */
   {
     /*
       Same cause. §6.3 was rewritten to a single aggregate ceiling with no
