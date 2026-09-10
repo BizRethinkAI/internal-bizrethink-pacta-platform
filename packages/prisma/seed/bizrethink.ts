@@ -303,9 +303,14 @@ export const resetAllBizRethinkSingletons = async () => {
     prisma.siteSettings.deleteMany({
       where: {
         id: {
-          in: ['site.signup', 'site.captcha', 'site.webhook', 'site.security-headers'],
+          in: ['site.captcha', 'site.webhook', 'site.security-headers'],
         },
       },
     }),
+    // site.signup is RESET, not deleted (overlay 071). Signup fails closed, so
+    // a missing row means closed — and the suite runs fullyParallel on one DB,
+    // so deleting it here would close signup under any spec that happens to be
+    // signing up in another worker at that moment. The E2E baseline is "open".
+    seedSiteSettingsSignup(),
   ]);
 };

@@ -30,11 +30,17 @@ describe('ZSiteSettingsSignupSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('applies safe defaults when data omitted (signup enabled, no domain gate, no invite gate)', () => {
+  // Fail-closed (2026-09-10 incident): an omitted value must never mean "open".
+  it('applies safe defaults when data omitted (signup CLOSED, no domain gate, no invite gate)', () => {
     const parsed = ZSiteSettingsSignupSchema.parse(VALID_BASE);
-    expect(parsed.data?.signupDisabled).toBe(false);
+    expect(parsed.data?.signupDisabled).toBe(true);
     expect(parsed.data?.allowedDomains).toEqual([]);
     expect(parsed.data?.requireInviteWhenDomainGated).toBe(false);
+  });
+
+  it('defaults signupDisabled to true when data is present but omits it', () => {
+    const parsed = ZSiteSettingsSignupSchema.parse({ ...VALID_BASE, data: { allowedDomains: [] } });
+    expect(parsed.data?.signupDisabled).toBe(true);
   });
 
   it('rejects empty-string entries in allowedDomains', () => {

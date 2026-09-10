@@ -14,11 +14,13 @@ import { ZSiteSettingsBaseSchema } from '@documenso/lib/server-only/site-setting
 
 export const SITE_SETTINGS_SIGNUP_ID = 'site.signup';
 
+// Fail-closed (2026-09-10 incident): an omitted signupDisabled means CLOSED.
+// Opening signup has to be an explicit `signupDisabled: false`.
 export const ZSiteSettingsSignupSchema = ZSiteSettingsBaseSchema.extend({
   id: z.literal(SITE_SETTINGS_SIGNUP_ID),
   data: z
     .object({
-      signupDisabled: z.boolean().default(false),
+      signupDisabled: z.boolean().default(true),
       allowedDomains: z.array(z.string().min(1)).default([]),
       // Phase L (2026-05-11): when true AND allowedDomains is non-empty,
       // signups are additionally required to match a PENDING
@@ -29,7 +31,7 @@ export const ZSiteSettingsSignupSchema = ZSiteSettingsBaseSchema.extend({
     })
     .optional()
     .default({
-      signupDisabled: false,
+      signupDisabled: true,
       allowedDomains: [],
       requireInviteWhenDomainGated: false,
     }),
