@@ -5,8 +5,13 @@
 and [ADR 0013](../../adr/0013-a-funder-profile-describes-the-funder.md).
 
 **28 of 97 FRPA clauses rewritten.** 58 test files, 2158 tests, typecheck 0.
-Nothing here is reviewed: every clause keeps `author: null` and
-`assertPublishable` refuses all 28.
+
+Nothing here is reviewed. Every clause is `status: 'draft'` with `author: null`
+and zero counsel approvals exist. **`assertPublishable` does not refuse them** —
+it returns early on anything not `published`, and the surfaces call it on a
+hypothetical to display what *would* be wrong. What actually keeps this text away
+from a merchant is that **no render or assembly path exists in `mca/` yet.** The
+first thing that path must do is fail closed on `assertPublishable`; see ADR 0013.
 
 ## What has landed
 

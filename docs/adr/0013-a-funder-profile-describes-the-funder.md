@@ -215,6 +215,18 @@ ADR that supersedes this one. ADR 0012's table stands except where noted.
 - The digest assertion, `agreementDigest(file) === digest`, survives all three
   retirements. It catches a vendored document changing underneath us and has
   never been about clause bodies.
-- **Nothing in the library is reviewed.** Every rewritten clause keeps
-  `author: null` and `assertPublishable` refuses it. That gate is why drafting
-  proceeds without counsel in the room.
+- **Nothing in the library is reviewed**, and the guard is weaker than ADR 0012
+  says. That ADR states *"a clause with `author: null` cannot reach a third
+  party"*. **`assertPublishable` does not enforce that.** It returns early on
+  `status !== 'published'`, so for a `draft` clause it reports nothing at all;
+  the surfaces call it as `assertPublishable({ ...clause, status: 'published' })`
+  to ask a hypothetical, and `view.ts` says in terms that the result is
+  *"Reported, never acted on"* and *"NOT folded in"* to the assurance level.
+
+  The accurate statement: **every rewritten clause is `status: 'draft'` with
+  `author: null`, zero counsel approvals exist, and no render or assembly path
+  exists in `mca/` for a clause to reach anybody through.** Nothing is enforcing
+  a refusal because there is not yet a consumer to refuse. That is a real
+  protection today and a fragile one tomorrow — **the first thing the render
+  path must do is fail closed on `assertPublishable`**, and it should be built
+  with that test written first.
