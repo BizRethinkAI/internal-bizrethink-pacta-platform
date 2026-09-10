@@ -55,11 +55,19 @@ jobs:
       # every test in packages/bizrethink, which is where all our behaviour
       # lives. See docs/engineering-standard.md §1.
       #
-      # Note the inversion this exposes: CI runs Node 22 (the default in
-      # .github/actions/node-install) where `prisma generate` works, while a
-      # workstation on Node 26 cannot run `npm test` at all — zod-prisma-types
-      # calls fs.rm with the `recursive` option Node 26 removed. CI is
-      # currently the only place the full suite can run.
+      # CORRECTED 2026-09-09. This said "CI runs Node 22", "fs.rm" and "Node 26
+      # removed". All three were wrong, and the inversion it described is over:
+      # CI takes v24.x from .github/actions/node-install's default, and the
+      # workstation is on 24.20.0 since Homebrew's Node 26 was removed, so the
+      # full suite runs in both places.
+      #
+      # The underlying hazard is real and still unguarded: zod-prisma-types
+      # calls fs.rmdirSync(path, {recursive: true}) — verified at
+      # node_modules/zod-prisma-types/dist/classes/directoryHelper.js:25 — which
+      # stops working AFTER Node 24. Measured here: 24.20.0 succeeds with a
+      # DEP0147 warning, 26.0.0 throws. engines.node is ">=24.0.0", which still
+      # admits 25 and 26. `.node-version` is what actually pins this; see
+      # docs/engineering-standard.md, "The development machine".
       - name: Unit tests
         run: npm test -- --filter=!@documenso/docs
 

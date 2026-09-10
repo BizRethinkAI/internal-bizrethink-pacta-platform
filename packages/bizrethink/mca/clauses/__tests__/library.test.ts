@@ -77,8 +77,10 @@ describe('the MCA clause library', () => {
    * because the moment a genuinely shared clause appears this is the test that
    * should be reconsidered, and a count in prose would not be.
    */
-  it('gives every clause exactly one instrument, across all 204', () => {
-    expect(ALL_MCA_CLAUSES).toHaveLength(204);
+  it('gives every clause exactly one instrument, across all 200', () => {
+    // 204 until the four `[Reserved]` records were removed — section numbers the
+    // document holds open after a clause was taken out, now declared non-clause.
+    expect(ALL_MCA_CLAUSES).toHaveLength(200);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 

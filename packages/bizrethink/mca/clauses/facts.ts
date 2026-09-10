@@ -1,0 +1,169 @@
+import type { McaJurisdiction } from '../jurisdictions';
+
+/**
+ * The narrow set of facts a clause may branch on.
+ *
+ * DERIVED, NOT GUESSED. `clauses/types.ts` refused to ship this type early and
+ * said why: *"that type should be derived from what the clauses actually branch
+ * on rather than guessed at now"*, because this package had already paid once
+ * for forward scaffolding — an AI config that asked for a GCP project id, a
+ * location and an API key for four months before anything read any of them.
+ *
+ * What made it derivable was the counsel memo of 2026-09-09. Reviewing all 101
+ * FRPA clauses split them three ways: 58 defects that are wrong under every
+ * template, 23 that are a defect **and** conditional, and **12 that are not
+ * textual fixes at all** — the memo proposes deleting or rewriting a clause
+ * where the real question is whether that clause belongs in this deal. Those 12
+ * are where these keys come from.
+ *
+ * THE STANDARD FOR ADDING ONE, inherited verbatim from the lease's
+ * `ClauseFacts`: *"a clause that needs to know something not on this list is a
+ * signal that the answer schema is missing a field, not a licence to reach into
+ * arbitrary state."*
+ *
+ * THESE ARE TEMPLATE FACTS, NOT DEAL FACTS, and the distinction is load-bearing.
+ * They are answered **once by a funder**, in Pacta's interview, and produce a
+ * template. Per-deal values — merchant identity, the funding figures, Section 1
+ * — arrive from `lombard-platform` over the API and fill widgets; they select no
+ * clauses. A per-deal interview would put a human in the loop on every funding,
+ * which is exactly the automation
+ * [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md)
+ * exists to preserve.
+ *
+ * See [ADR 0011](../../../../docs/adr/0011-the-mca-clause-library-is-a-library.md).
+ */
+export type McaFacts = {
+  /**
+   * How money actually reaches the funder.
+   *
+   * Decides whether the ACH backstop clause exists at all. Also the fact the
+   * Texas analysis turns on: 7 TAC §86.313 permits automatically debiting a
+   * deposit account only while holding a validly perfected, FIRST-PRIORITY
+   * security interest in all of the recipient's accounts receivable — and
+   * "automatic" expressly includes a recipient handing over more than one
+   * prewritten cheque.
+   */
+  collectionMethod: 'split-only' | 'ach-only' | 'split-with-ach-backstop';
+
+  /**
+   * How far a human signer is personally on the hook.
+   *
+   * `limited-conduct` is fraud, materially false present-fact representations
+   * and intentional diversion, with business failure, insolvency and bankruptcy
+   * expressly excluded. `full-performance` guarantees every representation,
+   * warranty and covenant — which is what all three market forms filed as SEC
+   * exhibits in 2024-2026 actually do, so the narrow version is the unusual one.
+   */
+  guarantyScope: 'none' | 'limited-conduct' | 'full-performance';
+
+  /** Decides the equipment explainers, the §5.5 insurance clause and §4.11's ranking limb. */
+  equipment: 'none' | 'purchased-at-funding' | 'deferred' | 'separate-lease';
+
+  /**
+   * Whether a prior balance can be carried into a new purchase.
+   *
+   * `carry` is the mechanism that produces a "$100,000 advance" delivering
+   * $65,000 of new cash while the new Purchased Amount still reads $140,000.
+   */
+  renewalModel: 'none' | 'payoff-only' | 'carry';
+
+  /** Whether the funder may hold more than one live position against the same merchant. */
+  concurrentPositions: boolean;
+
+  /**
+   * Courts or arbitration — and it decides four clauses as one bundle: the jury
+   * waiver, the class waiver, the contractual limitations period and the
+   * counterclaim provision.
+   *
+   * All three market forms pair arbitration WITH a class waiver. This corpus
+   * currently holds a bare class waiver and no arbitration clause, which is the
+   * weakest of the three available positions and is why the memo proposes
+   * deleting four separate clauses that are really one decision.
+   */
+  disputeResolution: 'courts' | 'arbitration';
+
+  /**
+   * Whose courts hear a dispute.
+   *
+   * Not merely a preference: Va. Code §6.2-2236(A) makes any provision
+   * mandating a forum outside the Commonwealth unenforceable for covered
+   * transactions, so `merchant-state` is what removes the need for a Virginia
+   * variant rather than merely being conservative.
+   */
+  venueRule: 'funder-state' | 'merchant-state';
+
+  /**
+   * The states this template will be offered in.
+   *
+   * ONLY TEXAS ADDS CONTENT. Of the eleven states tracked, 7 TAC §86.310(d) is
+   * the sole rule that requires words INSIDE the agreement — the OCCC complaint
+   * notice, verbatim, "as a separate section or otherwise conspicuously set out".
+   * Connecticut §36a-868 and Virginia §6.2-2236(A) are prohibitions, satisfied
+   * by a base form that omits the terms, and the rest are separate disclosure
+   * documents on the conformity surface
+   * ([ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md)).
+   *
+   * So this is base-plus-Texas, not eleven of anything.
+   */
+  recipientStates: McaJurisdiction[];
+
+  /** Whether a broker channel exists — decides §7.21 and whether the ISO PRA is in the set. */
+  brokerChannel: boolean;
+
+  /** Whether an individual consumer report is pulled — decides §4.3 and Exhibit C. */
+  consumerReportPulled: boolean;
+
+  /**
+   * Whether the processor has actually agreed to the split.
+   *
+   * A UCC §9-406 notification of a PARTIAL assignment does not compel an
+   * acquirer to split settlement, so a split nobody has accepted is not a
+   * collection mechanism. The memo rates this Critical and holds the whole
+   * Exhibit A reference on it.
+   */
+  processorSplitAccepted: boolean;
+};
+
+/**
+ * Lombard Capital LLC's answers — the first funder profile, and today the only one.
+ *
+ * A PROFILE IS NOT AN INTERVIEW ANSWER. It records what this funder normally
+ * does and, where it matters, why. An interview may override per template; this
+ * is the default and the place the reasoning lives.
+ *
+ * IT DESCRIBES THE PAPER, NOT THE RECOMMENDATION, and the first draft of this
+ * row got that wrong in four places — it encoded what the 2026-09-09 memo
+ * proposes rather than what v4 ships. A profile that describes a document
+ * nobody has signed would make every selection disagree with the document it is
+ * supposed to reproduce, and the disagreement would have surfaced as a failing
+ * fidelity test with no obvious cause. `equipment`, `renewalModel`,
+ * `concurrentPositions` and `venueRule` are all the shipped values, each noted
+ * inline with what the memo asks for instead.
+ *
+ * `split-only` is the value with no written history anywhere. §2.5 (the gated
+ * ACH backstop) and §7.14 (a blanket debit authority) both left the paper
+ * between change-notes 10 and 16 in `lombard-contracts`, and **no change note
+ * records when or why**. It is recorded here as the funder's design because
+ * that is what the shipped v4 does, not because a decision was found.
+ */
+export const LOMBARD_FACTS: McaFacts = {
+  collectionMethod: 'split-only',
+  guarantyScope: 'limited-conduct',
+  /* v4 carries "Equipment Cost Deferred" in Section 1.3. The memo proposes
+     removing deferred equipment from the FRPA entirely; that is a proposal, and
+     this row records the paper. */
+  equipment: 'deferred',
+  /* v4's §8.2 offers Carry. Same distinction. */
+  renewalModel: 'carry',
+  /* v4's §4.15 affirmatively authorises concurrent Lombard positions. The memo
+     recommends a single active position; the shipped document does not. */
+  concurrentPositions: true,
+  disputeResolution: 'courts',
+  /* v4 mandates New York or Florida. The memo recommends merchant-state venue,
+     partly because Va. Code §6.2-2236(A) voids a non-Virginia forum. */
+  venueRule: 'funder-state',
+  recipientStates: ['US-FL'],
+  brokerChannel: true,
+  consumerReportPulled: true,
+  processorSplitAccepted: false,
+};

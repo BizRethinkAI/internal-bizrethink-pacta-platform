@@ -47,7 +47,6 @@ export const SUBSCRIPTION_NON_CLAUSE: NonClauseLine[] = [
   { anchor: '[TABLE] SUBSCRIBER INFORMATION', reason: 'the Section 1 form grid — widgets and labels, not prose' },
   { anchor: 'Section 2: Subscription Agreement Acceptance', reason: 'section header' },
   { anchor: 'Section 3: Terms and Conditions', reason: 'section header' },
-  { anchor: '[TABLE] Field | Value', reason: 'the guarantor-information form grid' },
   { anchor: '[TABLE] SUBSCRIBER ', reason: 'signature block' },
   { anchor: 'ACCEPTED BY LOMBARD PAY LLC', reason: 'signature block header' },
   { anchor: 'Accepted by ', reason: 'signature block' },
