@@ -132,7 +132,26 @@ export const FL_BOILERPLATE: Clause[] = [
 
   {
     slug: 'general.entire-agreement',
-    version: 1,
+    /*
+      v2: THE DEFAULT WAS BACKWARDS, AND TWO ADDENDA HAD TO SAY SO BY HAND.
+
+      It read "the body prevails unless the addendum says otherwise". An
+      addendum is the specific, separately negotiated, separately signed term;
+      the body is the general one, and the ordinary canon is that the specific
+      governs. Reversing it made every addendum carrying real rights
+      responsible for remembering a sentence claiming them back.
+
+      Two already did, and `addendum-precedence.test.ts` records what each was
+      protecting: the §83.595(4) election, whose whole point is the landlord's
+      waiver of additional rent — collapsed by a body clause preserving the
+      landlord's remedies — and the assistance-animal carve-out, overridden by
+      a body occupancy cap that never mentions disability.
+
+      The flip fixes both structurally instead of by remembering. Their
+      explicit sentences stay: redundancy is cheap, and a separately signed
+      document is a good place to be explicit.
+    */
+    version: 2,
     jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'general',
@@ -145,7 +164,7 @@ export const FL_BOILERPLATE: Clause[] = [
       the same thing conflict with nothing outside the document to resolve them.
       That is the case for duplicate-assertion detection, stated in the lease.
     */
-    body: 'This Lease, together with the addenda and disclosures attached to or delivered with it, is the entire agreement between the parties about the Premises and replaces any prior agreement, representation or understanding, whether written or oral. It may be varied only in writing signed by the party to be bound. Where an addendum conflicts with the body of this Lease, the body prevails unless the addendum says otherwise.',
+    body: 'This Lease, together with the addenda and disclosures attached to or delivered with it, is the entire agreement between the parties about the Premises and replaces any prior agreement, representation or understanding, whether written or oral. It may be varied only in writing signed by the party to be bound. Where an addendum conflicts with the body of this Lease, the addendum prevails.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,

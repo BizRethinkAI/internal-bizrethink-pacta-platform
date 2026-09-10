@@ -167,13 +167,29 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
 
   {
     slug: 'insurance.renters',
-    version: 1,
+    /*
+      v2: AN OBLIGATION WITH NOTHING BEHIND IT.
+
+      The clause required the cover and evidence of it, then stopped. Nothing
+      said what happens when the policy lapses in month seven — which is when
+      it lapses. A term a tenant can drop at no cost is not a term.
+
+      GENERIC, SO NO STATUTE IS NAMED. North Carolina selects this clause too.
+      Calling a lapse a breach engages whichever state's remedy governs;
+      naming §83.56(2) would quietly make the clause Florida's.
+
+      THE FORCE-PLACED LIMB IS CONFINED TO THE LANDLORD'S OWN INTEREST. There
+      is no insurable interest in a tenant's possessions, so a promise to
+      insure them would be empty. It buys what can be bought and bills it
+      through the existing Other Charge machinery rather than inventing a fee.
+    */
+    version: 2,
     jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'utilities',
     sortKey: 20,
     heading: "Tenant's Insurance",
-    body: "Tenant shall obtain and maintain renter's insurance covering Tenant's personal property and Tenant's liability, with liability cover of not less than {{rentersInsuranceMinUsd}}, and shall name Landlord as an additional interested party for notice purposes where Tenant's insurer offers that designation. Tenant shall provide evidence of that cover before taking possession and on request during the term. Landlord's insurance does not cover Tenant's possessions.",
+    body: "Tenant shall obtain and maintain renter's insurance covering Tenant's personal property and Tenant's liability, with liability cover of not less than {{rentersInsuranceMinUsd}}, and shall name Landlord as an additional interested party for notice purposes where Tenant's insurer offers that designation. Tenant shall provide evidence of that cover before taking possession and on request during the term. Failure to obtain or maintain that cover, or to provide evidence of it on request, is a breach of this Lease, and Landlord may in addition obtain insurance protecting Landlord's own interest and recover the reasonable cost as an Other Charge. Landlord's insurance does not cover Tenant's possessions.",
     source: drafted(),
     status: 'draft',
     includeWhen: null,

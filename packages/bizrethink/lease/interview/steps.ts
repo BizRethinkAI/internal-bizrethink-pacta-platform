@@ -697,6 +697,19 @@ export const FL_INTERVIEW: InterviewStep[] = [
         required: true,
       },
       {
+        name: 'landlordRentsFiveOrMoreUnits',
+        /*
+          Unmarked, like every other selection fact. `jurisdictions` describes
+          fields whose VALUE is interpolated into one state's clause text; this
+          one only opens or closes a gate, so the jurisdiction guard would read
+          it as marked-but-unused.
+        */
+        target: 'fact',
+        kind: 'boolean',
+        label: 'Do you rent out five or more dwelling units in total?',
+        help: 'Not units in this building \u2014 units you rent anywhere. Fla. Stat. \u00a783.49(2) makes a landlord notify the tenant in writing, within 30 days, of where the deposit is held, and closes "This subsection does not apply to any landlord who rents fewer than five individual dwelling units." Answer no and the lease leaves that duty out, rather than volunteering an obligation you do not owe.',
+      },
+      {
         name: 'hasCdd',
         target: 'fact',
         kind: 'boolean',
@@ -728,6 +741,33 @@ export const FL_INTERVIEW: InterviewStep[] = [
         kind: 'text',
         label: 'Who pays the association’s amenity registration and access-card fees?',
         help: 'The association charges to register a tenant and to issue access cards and gate devices. Someone pays it, and a lease that stays silent means an argument on move-in week. Answer in words that will read in a sentence — “Landlord” or “Tenant”.',
+        showWhen: (a) => a.facts.hasHoa,
+        required: true,
+      },
+      {
+        name: 'rentPaymentMethod',
+        target: 'value',
+        kind: 'text',
+        label: 'How is rent paid?',
+        help: 'Name the method, not your bank details. This lease is handed to the association under the declaration\u2019s leasing section and sits in a management company\u2019s file \u2014 an account number written into it is a disclosure you cannot take back. "ACH or bank transfer to the account Landlord notifies to Tenant in writing" binds just as well, and you send the details once, separately.',
+        placeholder: 'ACH or bank transfer to the account Landlord notifies to Tenant in writing',
+        required: true,
+      },
+      {
+        name: 'amenityRegistrationDays',
+        target: 'value',
+        kind: 'number',
+        label: 'How long does the tenant have to file the association\u2019s registration?',
+        help: 'The association\u2019s form is completed by the TENANT \u2014 it wants their signature, their household\u2019s dates of birth and their vehicle details, none of which you can supply. So the lease gives them a deadline rather than promising an access date you do not control. Business days from signing.',
+        suggestion: {
+          value: 5,
+          /*
+            An observation about how associations run this, not a view on what
+            is fair. Estancia's manager confirmed on 8 September 2026 that
+            cards activate only once all documentation is in hand.
+          */
+          note: 'Associations commonly need a week or more to process a tenant registration, and most ask for the completed forms well before the occupancy date.',
+        },
         showWhen: (a) => a.facts.hasHoa,
         required: true,
       },

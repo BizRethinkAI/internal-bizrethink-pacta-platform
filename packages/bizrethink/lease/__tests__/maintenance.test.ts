@@ -25,6 +25,7 @@ import { selectClauses } from '../engine/select-clauses';
  */
 
 const SINGLE_FAMILY: ClauseFacts = {
+  landlordRentsFiveOrMoreUnits: false,
   termMonths: 12,
   depositHeldUsd: 6900,
   advanceRentHeldUsd: 6900,
@@ -195,5 +196,112 @@ describe('administrative charges', () => {
   it('does not dress a cost up as rent', () => {
     // Calling everything rent turns a key dispute into a three-day notice.
     expect(bySlug('fees.administrative').body).not.toContain('additional rent');
+  });
+});
+
+describe('maintenance.storm does not pay for damage the tenant caused', () => {
+  const storm = () => {
+    const clause = FL_LIBRARY.find((c) => c.slug === 'maintenance.storm');
+    if (!clause) {
+      throw new Error('maintenance.storm is missing');
+    }
+    return clause;
+  };
+
+  /*
+    THE SENTENCE THAT ATE THE ONE BEFORE IT. The clause tells the tenant to
+    bring the patio furniture in, and then says, without qualification, that
+    "Landlord is responsible for the cost of storm damage".
+
+    Read literally that covers the garden table the tenant left out, which then
+    went through the window — the exact failure the preceding sentence exists
+    to prevent. A duty whose breach costs the tenant nothing is not a duty.
+
+    Bounded, not reversed: the landlord still carries ordinary storm damage,
+    which is the point of the clause and is where §83.63 puts the risk anyway.
+  */
+  it('carves out damage caused by the tenant ignoring this clause', () => {
+    const { body } = storm();
+
+    expect(body).toMatch(/except to the extent/i);
+    expect(body).toMatch(/Tenant'?s failure to comply/i);
+  });
+
+  it('still puts ordinary storm damage and debris on the landlord', () => {
+    const { body } = storm();
+
+    expect(body).toMatch(/Landlord is responsible for the cost of storm damage/i);
+    expect(body).toMatch(/removal of storm debris/i);
+  });
+
+  /*
+    NOBODY WAS TOLD TO PUT THE SHUTTERS UP. "Close and secure windows and
+    doors" does not reach accordion shutters, panels or fabric screens, and the
+    tenant is the only person at the property — this landlord is in North
+    Carolina. Conditional prose rather than a new fact: a house without
+    shutters simply never satisfies the condition.
+  */
+  it('assigns storm shutters, and their removal afterwards', () => {
+    const { body } = storm();
+
+    expect(body).toMatch(/shutters, panels or screens/i);
+    expect(body).toMatch(/Tenant shall deploy them/i);
+    expect(body).toMatch(/remove them/i);
+  });
+
+  /*
+    And the two protections that were already right must survive the edit.
+  */
+  it('keeps the emergency suspension and §83.63', () => {
+    const { body } = storm();
+
+    expect(body).toMatch(/declared state of emergency/i);
+    expect(body).toMatch(/83\.63/);
+  });
+});
+
+describe('fees.administrative does not charge for a device it never replaces', () => {
+  const fees = () => {
+    const clause = FL_LIBRARY.find((c) => c.slug === 'fees.administrative');
+    if (!clause) {
+      throw new Error('fees.administrative is missing');
+    }
+    return clause;
+  };
+
+  /*
+    "EACH KEY, REMOTE OR ACCESS DEVICE" SWEPT IN SOMEBODY ELSE'S PROPERTY.
+
+    An association amenity card is not the landlord's to replace. Estancia's
+    district says so in terms — "Facility Access Cards are the property of the
+    District" — and its manager confirmed the cards simply deactivate at the
+    end of the lease term. So the landlord incurs no replacement cost, and a
+    clause charging the "actual documented cost of replacing" one charges a
+    cost that does not exist. Meanwhile the charge that DOES exist, the
+    association's own fee for a card not handed back, went unallocated.
+
+    Generic wording: this clause is selected in North Carolina too, so it says
+    "an association or other community body" rather than naming a Florida
+    community development district.
+  */
+  it('carves out a device the association issued', () => {
+    const { body } = fees();
+
+    expect(body).toMatch(/association or other community body/i);
+    expect(body).toMatch(/remains that body\u2019s property/i);
+  });
+
+  it('routes the surrender and the charge to that body instead', () => {
+    const { body } = fees();
+
+    expect(body).toMatch(/surrender it as that body requires/i);
+    expect(body).toMatch(/pay any charge it makes/i);
+  });
+
+  it("still charges the landlord's own keys at documented cost", () => {
+    const { body } = fees();
+
+    expect(body).toMatch(/actual documented cost of replacing/i);
+    expect(body).toMatch(/re-keying/i);
   });
 });

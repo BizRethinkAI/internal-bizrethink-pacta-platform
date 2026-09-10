@@ -130,13 +130,31 @@ export const FL_MAINTENANCE: Clause[] = [
   */
   {
     slug: 'maintenance.storm',
-    version: 1,
+    /*
+      v2: THE LAST SENTENCE ATE THE FIRST ONE.
+
+      The clause tells the tenant to bring the loose items in, then says
+      without qualification that "Landlord is responsible for the cost of storm
+      damage". Read literally that covers the garden table the tenant left out
+      which then went through the window — the very outcome the preceding
+      sentence exists to prevent. A duty whose breach costs nothing is not one.
+
+      Bounded rather than reversed: ordinary storm damage stays the landlord's,
+      which is the point of the clause and where §83.63 puts the risk anyway.
+
+      AND NOBODY WAS TOLD TO PUT THE SHUTTERS UP. "Close and secure windows and
+      doors" does not reach accordion shutters, panels or fabric screens, and
+      the person at the property is the only one who can deploy them. Written
+      as a condition rather than a new fact: a house without shutters never
+      satisfies it.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'maintenance',
     sortKey: 45,
     heading: 'Storms and Severe Weather',
-    body: "On a hurricane or tropical storm warning for the area, Tenant shall secure or bring indoors outdoor furniture, garden equipment and other loose items at the Premises, and shall close and secure windows and doors. Landlord is responsible for the cost of storm damage and for the removal of storm debris beyond routine upkeep, including fallen trees and limbs. Tenant's obligations for outdoor upkeep are suspended for the duration of a declared state of emergency affecting the Premises and for a reasonable period afterwards. Nothing in this clause limits Tenant's rights under Fla. Stat. \u00a783.63 where the Premises are damaged.",
+    body: "On a hurricane or tropical storm warning for the area, Tenant shall secure or bring indoors outdoor furniture, garden equipment and other loose items at the Premises, and shall close and secure windows and doors. Where the Premises are fitted with storm shutters, panels or screens, Tenant shall deploy them and remove them once the warning has passed. Landlord is responsible for the cost of storm damage and for the removal of storm debris beyond routine upkeep, including fallen trees and limbs, except to the extent the damage is caused by Tenant's failure to comply with this clause. Tenant's obligations for outdoor upkeep are suspended for the duration of a declared state of emergency affecting the Premises and for a reasonable period afterwards. Nothing in this clause limits Tenant's rights under Fla. Stat. \u00a783.63 where the Premises are damaged.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => alterableUnder8351(facts.propertyType),
@@ -300,7 +318,7 @@ export const FL_MAINTENANCE: Clause[] = [
 
   {
     slug: 'fees.administrative',
-    version: 1,
+    version: 2,
     jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'maintenance',
@@ -322,8 +340,18 @@ export const FL_MAINTENANCE: Clause[] = [
       The key charge was "$N, or the actual replacement cost if greater". A
       floor plus actual-cost recovery is a one-way election, and a one-way
       election is what makes a liquidated sum unenforceable. Charge the cost.
+
+      v2: AND "EACH ACCESS DEVICE" SWEPT IN SOMEBODY ELSE'S PROPERTY.
+
+      An association amenity card is not the landlord's to replace. One
+      district says so in terms — "Facility Access Cards are the property of
+      the District" — and its manager confirmed they deactivate at the end of
+      the lease term. The landlord therefore incurs no replacement cost, and
+      charging one that does not exist is the same defect as the flat fee
+      above. Meanwhile the charge that DOES exist, the association's own fee
+      for a card not handed back, was allocated to nobody.
     */
-    body: 'Tenant shall pay the actual documented cost of replacing each key, remote or access device not returned on vacating, including the cost of re-keying where a key is not returned.',
+    body: 'Tenant shall pay the actual documented cost of replacing each key, remote or access device not returned on vacating, including the cost of re-keying where a key is not returned. An access card or gate device issued by an association or other community body remains that body\u2019s property and is dealt with under its rules: Tenant shall surrender it as that body requires and pay any charge it makes for one not returned.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
