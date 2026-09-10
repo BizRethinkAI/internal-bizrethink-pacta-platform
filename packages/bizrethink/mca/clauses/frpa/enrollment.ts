@@ -22,6 +22,110 @@ import type { McaClause } from '../types';
  * document is missing from the library — the direction that fails silently.
  */
 export const FRPA_ENROLLMENT: McaClause[] = [
+  /*
+    THE CLUSTER'S CRITICAL, IN ITS FIRST OF TWO LOCATIONS.
+
+    WHAT WAS WRONG (1) — THE FEE RIDES ON THE PURCHASE. "Buyer may charge fees
+    as set forth on Appendix A (the “Fee Structure”); such fees are added to the
+    Remaining Balance and collected through the same settlement remittance as
+    the Purchased Amount." §2.6 now says the Remaining Balance "never includes a
+    fee", so this sentence and that one cannot both stand.
+
+    It is not a tidiness problem. The purchased pool is swept out of card
+    settlements by a processor that adjudicates nothing, so a fee inside the
+    pool is a **disputed charge collected before anyone decides it was owed** —
+    the merchant pays first and argues afterwards, through a mechanism built to
+    collect a purchase price. A fee is a debt, and a debt is collected by
+    asking. It also made the delivery cap a figure Buyer could raise after
+    signature, which is `amount-you-deliver-is-not-fixed` and
+    `closing-costs-undefined-and-unbounded` in one sentence.
+
+    §2.3'S SINGLE CAP FOLLOWS FROM THE SAME RULE, and the brief is right that it
+    has to be said: §2.3 caps "the total remitted to Buyer under all Split
+    Funding Authorizations" at the Purchased Amount. If a fee cannot be swept it
+    cannot sit inside that cap either, so this clause says so rather than leaving
+    the reader to derive it from two clauses that never mention each other.
+
+    WHAT WAS WRONG (2) — THE SECOND COMPLETION TEST. "The foregoing
+    authorizations shall continue in effect until Buyer receives final payment
+    of the entire Purchased Amount **and all other amounts due**." That is
+    `completion-threshold-two-conflicting-tests` in its second location: an
+    unpaid Appendix A fee kept the collection authorizations alive after the
+    purchase had been delivered in full. It now ends at the Completion Threshold,
+    which §2.6 makes "the only test of completion".
+
+    WHAT WAS WRONG (3) — THE BANK PARAGRAPH, AND THIS IS A DEPARTURE FROM THE
+    MEMO. The memo would preserve Buyer's responsibility for wrongful
+    instructions while NARROWING the bank-reliance, ownership, release and
+    hold-harmless language. **Owner's decision, adopted: delete it instead.**
+
+    Two reasons, and the second is the one that matters. A Bank has not signed
+    this Agreement, so an agreement between Merchant and Buyer cannot establish
+    what a Bank may rely on or what duties it owes; narrowing that language
+    leaves a clause that reads as though it works. And "Merchant agrees to hold
+    Buyer harmless" for the acts of a Bank Buyer chose to instruct is the
+    deposit-account form of the §7.21 defect this project closed on 2026-09-10:
+    **the party with no control indemnifies the party with all of it.** What
+    survives is the half the memo is right about — Buyer issues the
+    instructions, so Buyer answers for them, and §4.6 already requires a copy of
+    each to reach Merchant when it is sent.
+
+    "Funds representing the Purchased Amount ... constitute property owned
+    solely by Buyer, and Merchant disclaims any and all interest therein" goes
+    with it. Buyer bought a percentage of each Card Receipt, not the settlement
+    it arrives in, and a blanket disclaimer of interest in the account is a
+    wider grant than §4.10 makes — `all-assets-lien-vs-nonrecourse-recital`
+    reached the same conclusion from the security-interest side.
+
+    WHAT WAS WRONG (4) — "AN AGREEMENT ACCEPTABLE TO BUYER" WITH A BANK
+    "ACCEPTABLE TO BUYER". §2.4 as the spine rewrote it lets Merchant add or
+    replace an account or a processor on notice, with approval "not unreasonably
+    withheld, conditioned or delayed". A standing requirement that the bank be
+    acceptable to Buyer is the same approval with no standard on it, in a clause
+    a reader meets first. Deleted; §2.4 is the rule.
+
+    THE GATE, AND IT IS A DEPARTURE FROM THE BRIEF. The brief marks this clause
+    `action: both` on `collectionMethod`. `includeWhen` stays `null`, on ADR
+    0013's own diagnostic: *"if two limbs bind different parties or answer
+    different questions, the fact is wrong, not the granularity."* Nothing here
+    changes with the collection method — the itemization duty, the fee
+    prohibition, the ownership limit and the non-signatory rule are identical
+    for a split funder and an ACH funder — so gating would produce an exhaustive
+    pair of near-identical clauses, which ADR 0013 rejects as the wrong shape,
+    or a hole where an ACH funder has no §4.1 at all. §6.2 declined the same
+    gate for the same reason and recorded it. The one sentence that could have
+    read as split-only is written to cover any mechanism by which Purchased
+    Receipts reach Buyer. **`collectionMethod` today gates no FRPA clause**; it
+    gates the `split-funding` instrument in `instrumentsFor`, and §2.5 and
+    §7.14 — the ACH pair `frpa/index.ts` records as removed from the paper — are
+    the clauses that would read it if they returned.
+
+    THE HEADING CHANGED, AND IT IS A FORM CHANGE HANDED BACK. With the Merchant
+    Deposit Agreement gone the heading "Merchant Deposit Agreement" names
+    nothing the clause contains. It is "Authorizations, Deductions and Fees",
+    following §3.1's precedent, where the heading was changed because the clause
+    had stopped being what it was called. The rendered document in
+    `lombard-contracts` needs the same change; **this session does not make it.**
+
+    THE ORIGINATION FEE SENTENCE ARRIVED FROM APPENDIX A, deliberately. See the
+    comment above `frpa.appendix-a-origination-fee-to-iso`: the itemization limb
+    is a question every funder answers and the ISO limb is not, so the limb that
+    every funder needs moves to an ungated clause rather than the pair being
+    split. §4.13 already points its "itemized as dollar figures in Section 1.4"
+    at this clause, so this is where it belongs.
+
+    NOT INVENTED. No dollar figure, percentage or day count appears here. The
+    fee amounts Lombard actually charges are in the shipped Appendix A table,
+    which this library does not hold — see the report and the comment on
+    `frpa.appendix-a-fees-collectible`.
+
+    UNVERIFIED AUTHORITY. The recharacterisation reasoning that makes a
+    post-signature increase in the collectible figure dangerous runs through LG
+    Funding's factors with Richmond Capital 246 AD3d 585, Apollo Funding 241
+    AD3d 1508 and NewCo 250 AD3d 1641 cited around them. NOBODY ON THIS PROJECT
+    HAS PULLED ANY OF THEM FROM AN OFFICIAL REPORTER. Recorded here, never in a
+    body.
+  */
   {
     slug: 'frpa.merchant-deposit-agreement-4-1',
     version: 1,
@@ -31,8 +135,8 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     number: '4.1',
     section: 'enrollment',
     sortKey: 10,
-    heading: 'Merchant Deposit Agreement',
-    body: 'Merchant shall execute an agreement (the “Merchant Deposit Agreement”) acceptable to Buyer and have the Approved Bank Account with a depository institution (“Bank”) acceptable to Buyer. Merchant shall provide Buyer and/or its authorized agent with the information and authorizations necessary to verify Merchant’s Receipts into the Approved Bank Account.\nMerchant authorizes its merchant processor and applicable third parties to provide Buyer all information necessary to permit Buyer to determine the Specified Percentage due.\nBuyer may charge fees as set forth on Appendix A (the “Fee Structure”); such fees are added to the Remaining Balance and collected through the same settlement remittance as the Purchased Amount. Every amount deducted from the Purchase Price before delivery to Merchant must appear as a line in the itemization in Section 1.4 and be stated as a dollar figure before Merchant signs. Buyer may not deduct any amount that does not so appear.\nThe foregoing authorizations shall continue in effect until Buyer receives final payment of the entire Purchased Amount and all other amounts due. Bank may rely upon the instructions of Buyer without independent verification. Merchant waives any claim for damages against Bank in connection with actions taken based upon instructions from Buyer, unless such damages were due to Bank’s failure to follow Buyer’s instructions.\nMerchant acknowledges that: (i) Bank will be acting on behalf of Buyer with respect to portions of the Purchased Amount until remitted to Buyer through the settlement process; (ii) Bank may or may not be an affiliate of Buyer; (iii) Merchant has no power or authority to control Bank’s or Buyer’s actions with respect to remittance; (iv) Buyer is not responsible and shall not be liable for the actions of Bank, and Merchant agrees to hold Buyer harmless; and (v) funds representing the Purchased Amount in the possession of Bank and Buyer constitute property owned solely by Buyer, and Merchant disclaims any and all interest therein.',
+    heading: 'Authorizations, Deductions and Fees',
+    body: 'Merchant shall give Buyer the information and the processor authorizations reasonably necessary to verify Card Receipts and to remit the Purchased Receipts, and shall keep them in place while this Agreement continues. Buyer’s use of that information is governed by Section 4.7. This Section authorizes no debit of any deposit account of Merchant.\nEvery amount deducted from the Purchase Price before delivery to Merchant shall appear as a separate dollar item in the itemization in Section 1.4 before Merchant signs, and shall be disclosed as applicable law requires. The Origination Fee, if any, is the dollar amount so itemized. Buyer may not deduct, retain or collect an amount that is not itemized there, an amount that has not been earned, or an amount greater than the figure itemized.\nA fee is a separate debt and is not part of the purchase. No fee is added to the Purchased Amount or the Remaining Balance, and no fee is collected through a Split Funding Authorization, through the split under Section 2.3, or through any other mechanism by which Purchased Receipts reach Buyer. No fee is counted in the aggregate cap in Section 2.3. Buyer’s route to an unpaid fee is an itemized written demand and, failing payment, a claim; and while Merchant disputes a fee in good faith, Buyer shall not collect it. A cost of enforcement is not a fee, and Section 6.3 governs it and states the only ceiling on it.\nBuyer owns the Purchased Receipts and the identifiable proceeds of that purchased share, and nothing else. Merchant keeps every other interest in its own card settlements and in every account into which they settle.\nA Bank is not a party to this Agreement. This Agreement does not state, create or alter a Bank’s duties, and it releases no person from liability for an unauthorized instruction, for negligence, for fraud or for a violation of law. Buyer is responsible for the accuracy and scope of the instructions it or its agents issue, and shall send Merchant a copy of each of them when it sends it, as Section 4.6 requires. The authorizations given under this Section end when this Agreement reaches the Completion Threshold under Section 2.6, and Buyer shall then withdraw every instruction it has given.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -874,6 +978,66 @@ export const FRPA_ENROLLMENT: McaClause[] = [
       },
     ],
   },
+  /*
+    WHAT WAS WRONG. A three-day right with no way to exercise it and no account
+    of what it unwinds.
+
+    (1) THE CHANNEL. "Notifying Buyer in writing" runs into §7.3, which requires
+        certified mail, return receipt requested, "effective only upon receipt".
+        A right that expires on the third calendar day cannot be exercised
+        through a channel that takes longer than that to arrive. This is
+        `frpa-6-4-24-hour-notice-cannot-be-given-under-7-3` in a second
+        location, and REVIEW-02 did not find it here. §3.2 and §6.4 both already
+        carve out of §7.3 for exactly this reason, so the pattern is the
+        document's own.
+    (2) THE TRIGGER. "Three calendar days after Buyer has delivered the Net
+        Amount Funded" is not the Purchase Date. §4.13 defines the Purchase Date
+        as delivery of the Net Amount Funded **plus** completion of each
+        authorized third-party disbursement and payoff, so on a deal with a
+        payoff the two dates differ and the clause counted from the earlier one.
+    (3) THE UNWIND. "Returning the Net Amount Funded ... including any payoffs"
+        says nothing about the fee Buyer withheld at funding, the collections
+        Buyer has already taken, or the prior transaction the payoff
+        extinguished. REVIEW-01's `cancellation-forfeits-origination-fee` reads
+        the silence as forfeiture.
+
+    THE MEMO REFUTES OUR OWN PRIOR NOTE, AND IT IS RIGHT TO. The register's
+    assumption that the merchant necessarily loses every fee is not established
+    by the definition supplied. The answer is stated instead of assumed: a fee
+    withheld at funding is cancelled, a fee separately paid is credited once or
+    refunded once, and neither is left to inference.
+
+    DEPARTURE 1 — THE NOTICE CARVE-OUT. The memo routes the notice "under
+    Section 7.3" without qualification. That recreates defect (1) above, so this
+    clause carries its own carve-out: email to the address in Section 1,
+    effective **when sent**. §7.3 is `miscellaneous`'s clause and is still v4's
+    text; a bare reference would depend on a rewrite that has not happened.
+
+    DEPARTURE 2 — NO SECTION 8 CITATION IN THE RESTORATION PARAGRAPH. The memo's
+    "prior transaction owed to Buyer and settled internally from this purchase"
+    is §8.2's machinery, and §8.2 is gated on `renewalModel`. Citing it would
+    dangle in a `renewalModel: 'none'` template, which `select-clauses.test.ts`
+    checks for. The paragraph is written conditionally instead — it does nothing
+    where there was no prior transaction — and §4.13's ungated "prior-purchase
+    payoff Merchant has expressly authorized" is the hook that makes it reachable
+    without §8.2.
+
+    DEPARTURE 3 — THE EQUIPMENT SENTENCE IS WRITTEN TO BE TRUE EITHER WAY. The
+    memo says "Separate equipment return rights are governed by the equipment
+    agreement", which presupposes one. This clause is ungated and `equipment:
+    'none'` is a real profile, so it is written as a conditional rather than a
+    reference to a document that may not be in the suite.
+
+    NUMBERS. Three calendar days and three Workdays are the memo's and v4's own.
+    Nothing else here fixes a figure.
+
+    NOT CLOSED, AND IT IS NOT IN THIS INSTRUMENT.
+    `iso-a2-a4-no-clawback-when-the-merchant-cancels-under-frpa-4-14` observes
+    that the ISO PRA gives Buyer no clawback when a merchant cancels here. With
+    the withheld fee now cancelled rather than forfeited, Buyer bears the ISO
+    commission out of a transaction that never happened. That is a change to the
+    ISO PRA, which no cluster in this wave owns. Reported.
+  */
   {
     slug: 'frpa.right-to-cancel-4-14',
     version: 1,
@@ -884,7 +1048,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     section: 'enrollment',
     sortKey: 140,
     heading: 'Right to Cancel',
-    body: 'Merchant has the right to cancel this Agreement within three (3) calendar days after Buyer has delivered the Net Amount Funded. Merchant may exercise this right by notifying Buyer in writing that it is cancelling this Agreement and returning the Net Amount Funded to Buyer, including any payoffs made on Merchant’s behalf by Buyer. For the cancellation to be effective, Buyer must receive both the notice and the return of the funds within three (3) calendar days after Buyer has delivered the Net Amount Funded.',
+    body: 'Merchant may cancel this Agreement by giving Buyer notice no later than the third calendar day after the Purchase Date. If that day is not a Workday, the deadline extends to the next Workday. Notwithstanding Section 7.3, the notice may be given by email to the address stated in Section 1 and is effective when sent.\nWithin three (3) Workdays after giving a timely notice, Merchant shall return the cash it actually received, plus any amount Buyer actually paid to a third party at Merchant’s written direction and has not recovered, less every amount Buyer has already collected under this Agreement. Buyer shall stop withholding promptly and shall give Merchant an itemized unwind statement showing each of those figures.\nA fee Buyer withheld at funding is cancelled and is not included in the amount Merchant returns. A fee Merchant paid separately is credited against that amount or refunded once, and not both. No purchase discount is earned on a cancelled purchase and none is payable. No amount is counted twice.\nWhere a prior transaction owed to Buyer was settled out of this purchase, cancellation reverses that settlement. It restores that transaction’s contractual rights and its Remaining Balance as they stood immediately before the settlement, adjusted for every amount collected since, and without a new fee, an increase or a maturity date; the amount used to settle it is then not also included in the amount Merchant returns. Merchant may instead elect to leave that transaction settled and include the agreed settlement amount in the amount it returns. A restoration is subject to applicable law and does not by itself revive a released lien or its former priority.\nA payoff Buyer made to a third party that cannot be recovered stays in the amount Merchant returns. Buyer shall identify each such payoff to Merchant, as a separate figure, before Merchant accepts this Agreement. Where Merchant has obtained equipment under a separate agreement, that agreement governs any right to return it. A cancellation right that applicable law gives Merchant on terms more favorable to Merchant controls over this Section.\nOn an effective cancellation Buyer shall withdraw every instruction it has given an Approved Processor and shall file or authorize the release of every filing that records its interest, on the timetable Section 2.6 states.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

@@ -1022,6 +1022,55 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       },
     ],
   },
+  /*
+    "WITHOUT PENALTY" IS THE DEFECT, AND IT READS AS A CONCESSION.
+
+    WHAT WAS WRONG. "Merchant may, at any time and without penalty, deliver ...
+    any or all of the unpaid Purchased Amount" tells a merchant nothing it needs
+    to know. The question a merchant asks before paying early is *does this save
+    me money*, and on a factor-rate purchase the answer is normally no: the
+    discount was priced into the Purchased Amount at the outset and early
+    delivery does not reduce it. "Without penalty" reads as though it does. The
+    memo's rationale is exactly this — disclose the full-face economics rather
+    than borrowing a loan's vocabulary for reassurance.
+
+    SECOND, IT STATED A COMPLETION TEST OF ITS OWN. "Shall extinguish all future
+    remittance obligations under this Agreement upon receipt of the full
+    Purchased Amount." §2.6 says the Completion Threshold "is the only test of
+    completion, and it governs wherever another provision of this Agreement
+    describes completion differently", so this sentence was the provision §2.6
+    was written to override. It now points at §2.6 instead of restating it, and
+    the figure it names is the Remaining Balance — which §2.6 defines and which,
+    since the spine, contains no fee.
+
+    THIRD, "PREPAYMENT" IS LOAN VOCABULARY IN A DOCUMENT WHOSE §2.1 SAYS THIS IS
+    NOT A LOAN. `defined-term-drift` and `frpa-undefined-capitalised-terms` are
+    both carried on this clause, and "the unpaid Purchased Amount" was a fourth
+    name for a figure §2.6 defines. The heading is "Early Completion" and the
+    body uses the defined term throughout.
+
+    DEPARTURE FROM THE MEMO — ONE, AND IT IS THE QUOTATION. The memo asks for "a
+    dated written settlement quote showing credits, any discount or rebate, and
+    the exact amount that ends collection". Added: the date through which the
+    quotation holds good. A quotation with a date of issue and no expiry is one a
+    merchant cannot safely act on, because collection continues while the money
+    is in transit and the figure moves under them. It is a disclosure duty, not a
+    commercial term, and no period is fixed.
+
+    NO DAY COUNT AND NO DISCOUNT IS INVENTED. "Unless Section 1 expressly
+    provides a discount" leaves the commercial answer where it belongs — in the
+    completed Section 1 — and the mandatory-rebate carve-out is the memo's.
+
+    THE SECTION 8 TRAP THE BRIEF NAMES, AND IT IS REAL. This clause is ungated
+    while §8.1 and both §8.2s are gated on `renewalModel`, so a bare "Section 8"
+    reference from anywhere in the corpus resolves against this clause even in a
+    template that has no renewal provisions at all. Nothing cites a bare "Section
+    8" today; the body below cites §2.6 and §1 and nothing in Section 8, and any
+    later cluster wanting the renewal machinery must cite §8.1 or §8.2 by
+    subsection. Reported: under `renewalModel: 'none'` an assembled document has
+    a Section 8 containing only §8.3, which is a numbering question ADR 0011
+    phase 4 owns rather than a drafting one.
+  */
   {
     slug: 'frpa.voluntary-prepayment-8-3',
     version: 1,
@@ -1031,8 +1080,8 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     number: '8.3',
     section: 'renewal',
     sortKey: 30,
-    heading: 'Voluntary Prepayment',
-    body: 'Merchant may, at any time and without penalty, deliver to Buyer any or all of the unpaid Purchased Amount before its full collection in the ordinary course. Voluntary prepayment shall not relieve Merchant of any obligation accrued prior to the prepayment date, but shall extinguish all future remittance obligations under this Agreement upon receipt of the full Purchased Amount.',
+    heading: 'Early Completion',
+    body: 'Merchant may deliver all or part of the Remaining Balance to Buyer early. Buyer shall charge nothing for doing so and shall not require a period of notice.\nDelivering early does not change the amount. Unless Section 1 expressly provides a discount for early completion, or applicable law requires a rebate, completing early requires the full Remaining Balance and does not reduce the purchase discount already priced into the Purchased Amount. Buyer shall state that plainly in its offer and in every disclosure applicable law requires, and shall not describe early completion as a saving where it is not one.\nOn Merchant’s request Buyer shall promptly give Merchant a dated written settlement quotation showing the Remaining Balance, every amount credited to it, any discount or rebate applied, the exact amount that ends collection, and the date through which the quotation holds good.\nEarly completion is Merchant’s option and not an obligation on any date. When Buyer receives the amount its quotation states, this Agreement reaches the Completion Threshold, and Section 2.6 governs what Buyer shall then do and by when.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
