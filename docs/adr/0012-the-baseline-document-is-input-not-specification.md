@@ -68,6 +68,26 @@ asserting the defect.
 underneath us and has nothing to do with clause bodies. It is not part of the
 retirement.
 
+**AMENDED 2026-09-10, on the first rewrite: `frpa-coverage`'s line-accounting
+assertion retires too.** This ADR named `bodies-match-the-document` and missed
+its mirror. `linesNotAccountedFor` asks whether anything in the **document** is
+missing from the library; `bodies-match` asks whether every **clause** is in the
+document. They are one transcription guard pointed in two directions, and
+retiring only one leaves the other asserting that we have PRESERVED v4 — the
+thing this ADR decided not to care about.
+
+Found by the agent drafting the spine cluster, which hit the red and **refused to
+silence it**, correctly: declaring the superseded lines in `FRPA_NON_CLAUSE`
+would leave a check that passes by construction as the remaining 89 clauses are
+rewritten, and nulling `bodiesVerifiedAt` would hide the authorised reds with it.
+
+**What replaces it, later.** When the library renders v5, a completeness check on
+the RENDER — every selected clause reaches the output — is the same guard aimed
+at a document we generate rather than one we inherited. That belongs with the
+render. `letters-coverage.test.ts` and `coverage.test.ts` carry the same
+assertion for the other instruments and retire the same way as those are
+rewritten.
+
 **3. Findings are drafting input, not review-page furniture.** REVIEW-01 and
 REVIEW-02 audited *that document*. Rendering their notes beside a clause on the
 counsel review page frames the wrong question — *"check our patches to Lombard's
@@ -106,7 +126,7 @@ ADR that supersedes this one.
 | Is fidelity to v4 a test we keep? | **No.** Retired with rule 2. |
 | Do findings render to reviewing counsel? | **No.** They are drafting input. |
 | Is `lombard-contracts` upstream of the library? | **No.** See below. |
-| Are clauses tenant-specific? | **No.** Parties are roles — `{{funder}}`, `{{merchant}}`, `{{processor}}`, `{{broker}}`. No role is privileged. |
+| Are clauses tenant-specific? | **No.** Parties are roles and no role is privileged. **The placeholders are exactly three** — `{{funder}}`, `{{equipmentAffiliate}}`, `{{processor}}` — pinned by `tenant-agnostic.test.ts`. *Merchant* and *Buyer* are document-defined terms, not placeholders; there is no `{{merchant}}` and no `{{broker}}`. (This row first listed four roles including two that do not exist; corrected on the first rewrite, when an agent tried to use them.) |
 | Does the baseline's numbering bind us? | **No.** Numbering is emitted at assembly (ADR 0011). |
 
 ## `lombard-contracts` after this

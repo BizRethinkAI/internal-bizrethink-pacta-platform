@@ -3,11 +3,50 @@ import type { McaClause } from '../types';
 /**
  * The deal itself — Section 1’s notes, the parties, the grant.
  *
- * Bodies are the words the shipped document prints.
- * `__tests__/frpa-coverage.test.ts` additionally asserts that NOTHING in the
- * document is missing from the library — the direction that fails silently.
+ * TWO OF THESE ARE AUTHORED, THE REST ARE STILL TRANSCRIBED, and the file has
+ * to say which. `frpa.holdback-explainer` and `frpa.granting-clause` were
+ * rewritten on 2026-09-10 under
+ * [ADR 0012](../../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md):
+ * the baseline is drafting input, not specification, and reproducing it is not
+ * a goal. The other four bodies here are still the words v4 prints.
+ *
+ * WHAT THAT COSTS, STATED RATHER THAN HIDDEN. `bodies-match-the-document` is
+ * red on both rewritten clauses, which ADR 0012 authorises. `frpa-coverage`’s
+ * *leaves no line unaccounted for* is red too, and the ADR does NOT speak to
+ * it: that test asks the opposite question — is anything in the DOCUMENT
+ * missing from the library — and once a body is authored, the line it replaced
+ * is accounted for by nothing. The answer is to re-render the `.docx` from the
+ * library, which is `lombard-contracts` work and is not done here. Declaring
+ * those lines non-clause would make the check vacuous and is not the answer.
  */
 export const FRPA_PREAMBLE: McaClause[] = [
+  /*
+    WHAT WAS WRONG. The estimate was drawn on "average sales revenue" while the
+    only collection mechanism in the document takes a percentage of CARD
+    settlements. The illustration and the thing it illustrates had different
+    denominators, so the figure a merchant reads in Section 1 is not a
+    percentage of anything this Agreement collects. `types.ts` records why an
+    explainer is dangerous rather than harmless: it READS as operative while
+    describing something that is not, which is why the 2026-09-09 memo rates
+    this High.
+
+    WHAT CHANGED. One base — Card Receipts, as the definitions clause defines
+    it. The estimate is stated to authorise nothing: not a payment, not a
+    minimum, not a schedule, not a payoff date. Collection is pointed at
+    Sections 2 and 3, which now say the same thing as each other and as this.
+
+    DEPARTURE FROM THE MEMO. The memo grounds the illustration in "the
+    historical period and assumptions identified in Section 1". Section 1
+    identifies neither — 1.3 holds an Estimated Daily Holdback and a Holdback
+    Effective Date and no history at all — so the memo's sentence would
+    cross-reference a blank, which is `frpa-undefined-capitalised-terms` in
+    another form. It refers instead to the Card Receipts history Merchant
+    actually gave Buyer before funding, which exists and is producible.
+
+    NOT CHANGED, AND NOT THIS CLUSTER'S. `kind` stays `clause` although this is
+    one of the four Funding Terms explainers `types.ts` describes. Reclassifying
+    it belongs to `feat-mca-clause-kind-and-fields`.
+  */
   {
     slug: 'frpa.holdback-explainer',
     version: 1,
@@ -18,7 +57,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     section: 'funding-terms',
     sortKey: 10,
     heading: '',
-    body: 'What is the Estimated Daily Holdback? The Estimated Daily Holdback is an estimate of the Specified Percentage of Merchant’s average sales revenue. The Estimated Daily Holdback is an informational estimate only; collection occurs exclusively through the Specified Percentage withheld by the Approved Processor from Merchant’s card settlement proceeds. Refer to Section 3 (Reconciliation and Adjustment) for how Merchant may adjust the Estimated Daily Holdback. A separate Split Funding Authorization (Exhibit A) shall be executed for each Approved Processor identified above.',
+    body: 'What is the Estimated Daily Holdback? The Estimated Daily Holdback stated in Section 1 is a good-faith illustration of the Specified Percentage of Merchant’s average daily Card Receipts, calculated from the Card Receipts history Merchant gave Buyer before the Purchase Date. It is not a payment, it is not a minimum, it is not a scheduled amount, and it is not a promise that any amount will be collected on any day. Collection occurs only as the Specified Percentage of actual Card Receipts under Sections 2 and 3, and no fixed amount is collected under this Agreement. If Merchant’s Card Receipts fall, what Buyer collects falls with them. Section 3 states how the illustration is reconciled and adjusted. A separate Split Funding Authorization (Exhibit A) is executed for each Approved Processor identified in Section 1.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -94,6 +133,40 @@ export const FRPA_PREAMBLE: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    WHAT WAS WRONG. The single most important defect in the document. It sold
+    "all of Merchant's future accounts, contract rights and other obligations
+    ... cash, check, credit or debit card, electronic transfer or other form of
+    monetary payment" — the whole receipts universe — while 2.2 collected a
+    fixed percentage of card settlements and Section 3 reconciled against
+    something wider again. One agreement, three assets. That mismatch is the
+    recharacterisation vector, the undisclosed catch-up claim and the
+    ordinary-course dispute generator at once, and it is what a UCC-1 gets
+    over-filed on: 4.10 already narrows the security interest to "the purchased
+    Receipts", and until now the two clauses disagreed about what those were.
+
+    WHAT CHANGED. The grant is the Specified Percentage of Card Receipts and
+    nothing else. The retained percentage, the non-card receipts and every other
+    asset are expressly outside the sale. The shortfall risk is Buyer's, said in
+    the operative sentence rather than left to 2.1's recital.
+
+    DEPARTURES FROM THE MEMO. Two.
+    (1) The memo funds "under Sections 1 and 4.13, including only lawful,
+        disclosed, expressly authorized deductions and payoffs". That is pointed
+        at the itemization in 1.4, which is where 4.1 already requires every
+        deduction to appear as a dollar line before signature, so the
+        cross-reference is made specific rather than left as a standard.
+    (2) The memo's "Buyer acquires no ownership of ..." is restated as what
+        Buyer DOES own, as and when each Card Receipt is generated. A grant that
+        says what passes is worth more than one that lists what does not, and
+        the second form is how the old clause and 4.10 drifted apart.
+
+    UNVERIFIED AUTHORITY. The memo's recharacterisation reasoning cites Richmond
+    Capital, 246 AD3d 585, Apollo Funding, 241 AD3d 1508, and NewCo, 250 AD3d
+    1641, alongside LG Funding. NOBODY ON THIS PROJECT HAS PULLED ANY OF THEM
+    FROM THE OFFICIAL REPORTERS. They are recorded so a reviewer checks them
+    rather than inherits them, and no citation appears in any clause body.
+  */
   {
     slug: 'frpa.granting-clause',
     version: 1,
@@ -104,7 +177,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     section: 'preamble',
     sortKey: 20,
     heading: '',
-    body: 'Effective as of the Purchase Date, Merchant hereby sells, assigns and transfers to Buyer (making Buyer the absolute owner) in consideration of the funds provided (the “Purchase Price”), all of Merchant’s future accounts, contract rights and other obligations arising from or relating to the payment of monies from Merchant’s customers and/or other third-party payors (collectively, the “Receipts”), defined as all payments made by cash, check, credit or debit card, electronic transfer or other form of monetary payment in the ordinary course of Merchant’s business, until the amount specified herein (the “Purchased Amount”) has been received by Buyer.',
+    body: 'Effective on the Purchase Date, and in consideration of the Purchase Price funded under Section 4.13 net only of the deductions and payoffs itemized in Section 1.4, Merchant sells, assigns and transfers to Buyer the Specified Percentage of the Card Receipts generated on and after the Purchase Date, until Buyer has received the Purchased Amount (the “Purchased Receipts”). Buyer owns each Purchased Receipt as and when the Card Receipt it is part of is generated. Buyer owns nothing else: Merchant’s retained percentage of Card Receipts, Merchant’s cash, cheque, electronic-transfer and other non-card receipts, and every other asset of Merchant remain Merchant’s and are outside this sale. Buyer takes the risk that the Purchased Receipts are generated more slowly than the Estimated Daily Holdback illustrates, or are never sufficient to deliver the Purchased Amount. Merchant does not repurchase Purchased Receipts that are never generated and owes no shortfall arising from a decline or failure of its business. This sale gives Buyer no interest larger than the Purchased Receipts, and Buyer’s rights on an Event of Default are only those Section 6 gives it.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

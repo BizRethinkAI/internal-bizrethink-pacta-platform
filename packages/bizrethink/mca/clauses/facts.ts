@@ -56,6 +56,29 @@ export type McaFacts = {
    */
   guarantyScope: 'none' | 'limited-conduct' | 'full-performance';
 
+  /**
+   * Which number the Specified Percentage is taken of.
+   *
+   * `net` is the card settlement actually payable to the merchant, after
+   * refunds, chargebacks, separately identified taxes and gratuities payable to
+   * others, and the processor's own lawful charges and reserves. `gross` is the
+   * settlement before those.
+   *
+   * THIS IS A PRICING DECISION, NOT A DRAFTING ONE, and it is why it is a fact
+   * rather than a sentence in a clause. Five adjustments sit between the two
+   * numbers, and each of them moves the economic percentage. A funder who prices
+   * on one base and defines the other has an agreement that collects a different
+   * amount than it quoted.
+   *
+   * IT REACHES BEYOND THE AGREEMENT. Underwriting, the processor instruction and
+   * **every state disclosure** must be computed on the same base — the finance
+   * charge, the total cost, the estimated periodic payment. A mismatch here is
+   * not a clause defect, it is a disclosure defect on the conformity surface
+   * ([ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md)),
+   * which is a different regulator's problem.
+   */
+  settlementBase: 'net' | 'gross';
+
   /** Decides the equipment explainers, the §5.5 insurance clause and §4.11's ranking limb. */
   equipment: 'none' | 'purchased-at-funding' | 'deferred' | 'separate-lease';
 
@@ -148,6 +171,20 @@ export type McaFacts = {
  */
 export const LOMBARD_FACTS: McaFacts = {
   collectionMethod: 'split-only',
+  /*
+    UNCONFIRMED, AND THE MOST CONSEQUENTIAL UNKNOWN IN THIS ROW.
+
+    `net` describes the clause as drafted on 2026-09-10 — `frpa.definitions`
+    defines Card Receipts net of the five adjustments. It does NOT describe a
+    confirmed business fact: nobody has established which base Lombard actually
+    prices on.
+
+    If Lombard prices on gross settlement, the definitions clause is wrong for
+    Lombard AND every disclosure figure computed from it is wrong with it. That
+    is the one question in this profile whose answer changes documents on two
+    surfaces at once.
+  */
+  settlementBase: 'net',
   guarantyScope: 'limited-conduct',
   /* v4 carries "Equipment Cost Deferred" in Section 1.3. The memo proposes
      removing deferred equipment from the FRPA entirely; that is a proposal, and

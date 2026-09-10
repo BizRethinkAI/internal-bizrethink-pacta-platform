@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { documentLines, linesNotAccountedFor } from '../documents';
+import { documentLines } from '../documents';
 import { FRPA_LOCUS_EXCLUSIONS, FRPA_NON_CLAUSE } from '../frpa';
 
 import { libraryFor } from '../library';
-import { LOMBARD, resolveClauses } from '../parties';
+import { LOMBARD } from '../parties';
 
 /**
  * EVERY LINE OF THE DOCUMENT IS ACCOUNTED FOR, OR THIS FAILS.
@@ -35,9 +35,32 @@ describe('the FRPA library accounts for the whole document', () => {
   const clauses = libraryFor('frpa');
   const file = LOMBARD.documents.frpa.file;
 
-  it('leaves no line unaccounted for', () => {
-    expect(linesNotAccountedFor(file, resolveClauses(clauses, LOMBARD), FRPA_NON_CLAUSE)).toEqual([]);
-  });
+  /*
+    RETIRED 2026-09-10 by ADR 0012, alongside `bodies-match-the-document`.
+
+    This asked the mirror question — is anything in the DOCUMENT missing from the
+    library — and it is the same transcription guard pointed the other way. It
+    was worth having while the library was a copy of v4: it caught the granting
+    clause and ISO PRA §2.6, both of which an import keyed on numbered headings
+    would have dropped in silence.
+
+    Once clauses are authored it asserts that we have PRESERVED v4, which is
+    exactly what ADR 0012 decided not to care about. It went red on the eight
+    rewritten spine clauses and would go red once more for every cluster after.
+
+    NOT SILENCED THE TWO CHEAP WAYS, both of which are worse. Declaring those
+    lines in `FRPA_NON_CLAUSE` would leave a check that passes by construction as
+    the other 89 clauses are rewritten — a green assertion that can never be red.
+    Nulling `bodiesVerifiedAt` would hide the authorised reds too.
+
+    WHAT REPLACES IT, LATER. When the library renders v5, a completeness check on
+    the RENDER — every selected clause reaches the output — is the same guard
+    pointed at a document we generate rather than one we inherited. That belongs
+    with the render, not here.
+
+    `FRPA_NON_CLAUSE` is now vestigial and goes when the last clause is rewritten;
+    the assertions below still read it and still pass.
+  */
 
   it('reads the whole document, not a prefix of it', () => {
     expect(documentLines(file).length).toBeGreaterThan(200);
