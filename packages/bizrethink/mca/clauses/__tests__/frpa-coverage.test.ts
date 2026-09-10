@@ -88,7 +88,7 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 99 records for 97 sections: 83 the document numbers, 14 it does not', () => {
+  it('holds 100 records for 98 sections: 84 the document numbers, 14 it does not', () => {
     // 101 until the four `[Reserved]` records were removed. They were section
     // numbers the document holds open after a clause was taken out — lines of
     // the document, not clauses of it — and are now declared in
@@ -102,7 +102,18 @@ describe('the FRPA library accounts for the whole document', () => {
     // clause on a fact that decides one limb of it, which deleted the
     // multi-position rule instead of replacing it — see `frpa/enrollment.ts`
     // §4.15 and `frpa/miscellaneous.ts` §8.2.
-    expect(clauses).toHaveLength(99);
+    //
+    // 99 records for 97 sections until `miscellaneous` added §7.25 on
+    // 2026-09-10. That one DOES add a section, and deliberately: 7 TAC
+    // §86.310(d) requires the OCCC complaint notice to appear in a Texas
+    // contract "as a separate section or otherwise conspicuously set out from
+    // surrounding written material", so it cannot share §7.24's number and
+    // cannot be a paragraph inside it. It is gated on `recipientStates`
+    // including US-TX and is an addition rather than an alternative — the §7.21
+    // shape, not the §4.15 shape — so a non-Texas document simply does not have
+    // it. Neither is it a section of `Lombard_FRPA_v4`, which is why this count
+    // moved and the non-clause register did not.
+    expect(clauses).toHaveLength(100);
     expect(clauses.filter((clause) => clause.number !== '').length).toBeGreaterThan(0);
   });
 

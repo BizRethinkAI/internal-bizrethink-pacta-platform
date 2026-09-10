@@ -106,13 +106,17 @@ describe('the MCA clause library', () => {
    * because the moment a genuinely shared clause appears this is the test that
    * should be reconsidered, and a count in prose would not be.
    */
-  it('gives every clause exactly one instrument, across all 202', () => {
+  it('gives every clause exactly one instrument, across all 203', () => {
     // 204 until the four `[Reserved]` records were removed — section numbers the
     // document holds open after a clause was taken out, now declared non-clause.
     // 200 until `renewal-positions` split the FRPA's §4.15 and §8.2 into
     // alternatives on 2026-09-10; see `frpa-coverage.test.ts` for why that adds
     // records without adding sections.
-    expect(ALL_MCA_CLAUSES).toHaveLength(202);
+    // 202 until `miscellaneous` split the Texas OCCC notice out of §7.24 into
+    // its own §7.25 the same day — that one DOES add a section, because
+    // 7 TAC §86.310(d) requires the notice to be conspicuously separate from the
+    // material around it. Same file, same reasoning.
+    expect(ALL_MCA_CLAUSES).toHaveLength(203);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 

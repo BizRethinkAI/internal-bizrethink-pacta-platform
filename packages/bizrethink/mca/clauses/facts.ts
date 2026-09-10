@@ -125,7 +125,15 @@ export type McaFacts = {
   /**
    * Whose courts hear a dispute.
    *
-   * Not merely a preference: Va. Code §6.2-2236(A) makes any provision
+   * THE CITATION HERE WAS WRONG IN THREE PLACES UNTIL 2026-09-10, copied from
+   * the 2026-09-09 memo. The venue rule is **§6.2-2234(A)**, "Place for bringing
+   * action". §6.2-2236 is "Validity of noncompliant sales-based financing", has
+   * no subsection (A), and says nothing about forum. Both are vendored in
+   * `mca/sources/VA-Code-6.2-2228-2238.txt`, and `statutes/ct-va-obligations.ts`
+   * already carried the correct one, verbatim and digest-checked. REVIEW-02 also
+   * had it right; the memo is the outlier.
+   *
+   * Not merely a preference: Va. Code §6.2-2234(A) makes any provision
    * mandating a forum outside the Commonwealth unenforceable for covered
    * transactions, so `merchant-state` is what removes the need for a Virginia
    * variant rather than merely being conservative.
@@ -138,7 +146,7 @@ export type McaFacts = {
    * ONLY TEXAS ADDS CONTENT. Of the eleven states tracked, 7 TAC §86.310(d) is
    * the sole rule that requires words INSIDE the agreement — the OCCC complaint
    * notice, verbatim, "as a separate section or otherwise conspicuously set out".
-   * Connecticut §36a-868 and Virginia §6.2-2236(A) are prohibitions, satisfied
+   * Connecticut §36a-868 and Virginia §6.2-2234(A) are prohibitions, satisfied
    * by a base form that omits the terms, and the rest are separate disclosure
    * documents on the conformity surface
    * ([ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md)).
@@ -258,7 +266,7 @@ export const LOMBARD_FACTS: McaFacts = {
   /* THE ONE ROW OF THE FOUR THAT HAS NOT MOVED, and deliberately. §7.5 mandates
      New York law and New York or Pasco County, Florida forums, in its body, with
      no gate. The memo recommends merchant-state venue, partly because Va. Code
-     §6.2-2236(A) voids a non-Virginia forum for covered transactions. Moving
+     §6.2-2234(A) voids a non-Virginia forum for covered transactions. Moving
      this row before §7.5 is rewritten would make the profile disagree with the
      only clause on the subject. It moves with §7.5 — `disputes-service`, memo
      entry 061. */

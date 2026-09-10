@@ -178,13 +178,28 @@ const CONCEDED: Record<string, string> = {
     which is the difference between a defect that was fixed and one that was
     tolerated.
   */
+  /*
+    §7.21 WAS THE FIRST DELETION. `frpa.execution` IS THE SECOND, AND IT IS THE
+    ONE THIS FILE FOUND ON ITS OWN.
+
+    The signature block bound "Merchant and Guarantor to comply with the terms of
+    this Agreement" — a full-performance guaranty on the page every signer looks
+    at, twenty pages from §9.2's promise that the Guaranty does not guarantee the
+    performance of any other covenant — and made any misrepresentation "a
+    separate cause of action for fraud" without supplying scienter, reliance,
+    causation or damage.
+
+    `miscellaneous` closed it on 2026-09-10. The record now answers the capacity
+    question first — a person signing for Merchant "takes on no personal
+    obligation by giving it", and "becomes a Guarantor only by separately signing
+    the Guaranty in that capacity" — narrows the certification to Merchant's own
+    identified written submissions on knowledge after reasonable inquiry, and
+    says a claim for fraud "requires proof of every element applicable law
+    imposes". The set-level assertion below now covers it with no concession.
+  */
   'frpa.security-interest-4-10':
     'ENROLLMENT. "Merchant and Guarantor shall be liable for" the costs of perfecting Buyer’s security interest — ' +
     'personal liability for a cost, granted outside Section 9 and reachable without proving any conduct.',
-  'frpa.execution':
-    'MISCELLANEOUS. "legally binding Merchant and Guarantor to comply with the terms of this Agreement" is a ' +
-    'full-performance guaranty in the signature block, and its second sentence makes any misrepresentation ' +
-    '"a separate cause of action for fraud" — a route around §9.2’s proof requirements.',
 };
 
 describe('no clause outside Section 9 creates personal liability', () => {

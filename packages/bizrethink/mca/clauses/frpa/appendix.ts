@@ -238,6 +238,93 @@ export const FRPA_APPENDIX: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    A FULL-PERFORMANCE GUARANTY AND A FRAUD CLAIM, IN THE SIGNATURE BLOCK.
+
+    WHAT WAS WRONG. "Each of Merchant and Guarantor represents that he or she is
+    authorized to sign this Agreement, LEGALLY BINDING MERCHANT AND GUARANTOR TO
+    COMPLY WITH THE TERMS OF THIS AGREEMENT and that the information provided
+    herein and IN ALL OF BUYER'S DOCUMENTS, FORMS, AND RECORDED INTERVIEWS is
+    true, accurate, and COMPLETE IN ALL RESPECTS. ANY MISREPRESENTATION made by
+    Merchant or Guarantor in connection with this Agreement MAY CONSTITUTE A
+    SEPARATE CAUSE OF ACTION FOR FRAUD or intentional misrepresentation."
+
+    Three defects, in ascending order of how well they hide.
+
+    (1) THE GUARANTY. "Legally binding Merchant AND GUARANTOR to comply with the
+        terms of this Agreement" is a full-performance guaranty — the market form
+        §9.2 deliberately refuses — obtained in the signature block, twenty pages
+        from §9.2's promise that "this Guaranty does not guarantee ... the
+        performance of any other covenant". `personal-liability-is-section-9-
+        only.test.ts` found this and conceded it to `miscellaneous`, and it was
+        the FOURTH route around §9.2 after §7.9's indemnity, §7.21's ISO
+        indemnity and §4.10's perfection costs.
+
+        **THE CONCESSION IN THAT FILE IS DELETED IN THIS CHANGE.** Its own
+        docstring requires it — *"When the owning cluster fixes one, delete its
+        line here"* — and `data-and-channel` set the precedent when it closed
+        §7.21. A concession left standing after the defect is fixed is a line of
+        a test that can no longer be red, which is the exact failure this package
+        shipped once in two assertions that filtered on `Divergence` kinds that
+        do not exist. With the line gone, the set-level assertion covers this
+        clause with no exception.
+
+    (2) THE CERTIFICATION'S SCOPE. "All of Buyer's documents, forms, and recorded
+        interviews", certified "complete in all respects". Buyer's documents
+        include a broker's write-up, an underwriter's summary and a call-centre
+        note. The signer did not write them, may never have seen them, and is
+        made to warrant them absolutely — no materiality, no knowledge
+        qualifier, no as-of date. And "recorded interviews": a transcript or
+        summary of a phone call, adopted by signature, which is §7.18's recording
+        consent turned into a warranty.
+
+    (3) THE FRAUD SENTENCE. Calling any misrepresentation a "separate cause of
+        action for fraud" supplies none of the elements — no scienter, no
+        reliance, no causation, no damage — and a contract cannot supply them.
+        What it does supply is a sentence a collector can quote to a guarantor
+        whose only error was a wrong figure on a form, which is what the memo
+        means by "does not establish scienter, reliance, causation, or damages".
+
+    WHAT CHANGED. The capacity question is answered first and separately: a
+    person signing for Merchant signs in a business capacity and takes on nothing
+    personally by doing so, and becomes a Guarantor only by separately signing
+    the Guaranty in that capacity. The certification narrows to Merchant's own
+    identified written submissions, on knowledge after reasonable inquiry, as of
+    the dates they bear, subject to disclosed qualifications — which is the same
+    standard `representations` put on the §5 lead-in, so the two agree. The fraud
+    sentence becomes what it should always have been: a statement that the
+    elements are the law's, and that an error is not one of them. And each signer
+    gets the papers.
+
+    DEPARTURE 1 — NO CITATION TO SECTION 9. The memo writes "unless separately
+    signing as Guarantor under Section 9". §9.1 is gated on `guarantyScope !==
+    'none'` and §9.2 on `=== 'limited-conduct'`, so under `guarantyScope: 'none'`
+    the whole of Section 9 is absent and the citation would dangle — a fifth
+    entry in `select-clauses.test.ts`'s "Section 9" register, in the one clause
+    of the document that is in front of every signer. Written as "separately
+    signs the Guaranty", which is true under every value of the fact.
+
+    DEPARTURE 2 — "AS OF THEIR STATED SIGNATURE DATES" BECOMES THE DATES BESIDE
+    THE SIGNATURES. v4 executed "as of the Effective Date", which is a single
+    date in Section 1 that both parties may sign on different days from. The
+    signature block is a `{{DATE}}` widget per signer — see `FRPA_NON_CLAUSE`,
+    "[TABLE] Printed Name:" and "{{SIGNATURE," — so the dates exist and the
+    recital should use them.
+
+    DEPARTURE 3 — THE NON-ADOPTION SENTENCE IS ADDED. Not in the memo, which
+    narrows the certification but does not say what happens to the documents it
+    no longer covers. Without it, a broker's write-up is merely un-warranted
+    rather than un-adopted, and "un-warranted" is a weaker answer to the same
+    question.
+
+    NO WIDGET MARKERS, AND THE BRIEF EXPECTED SOME. It says *"Exhibit A and the
+    execution block have many"* `«N»` markers. Neither record has one and neither
+    ever did: the signature grid — "[TABLE] BUYER Lombard Capital LLC",
+    "PERSONAL GUARANTOR", "Guarantor Signature:", "{{SIGNATURE," — is declared in
+    `frpa/index.ts` as SIX separate `FRPA_NON_CLAUSE` lines, and this record is
+    only the prose paragraph above it. Nothing was dropped. `frpa-coverage.test.ts`
+    is what would notice if it had been.
+  */
   {
     slug: 'frpa.execution',
     version: 1,
@@ -248,12 +335,162 @@ export const FRPA_APPENDIX: McaClause[] = [
     section: 'appendix',
     sortKey: 40,
     heading: '',
-    body: 'IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date. Each of Merchant and Guarantor represents that he or she is authorized to sign this Agreement, legally binding Merchant and Guarantor to comply with the terms of this Agreement and that the information provided herein and in all of Buyer’s documents, forms, and recorded interviews is true, accurate, and complete in all respects. Any misrepresentation made by Merchant or Guarantor in connection with this Agreement may constitute a separate cause of action for fraud or intentional misrepresentation.',
+    body: 'IN WITNESS WHEREOF, the parties execute this Agreement as of the dates written beside their signatures.\nA person signing for Merchant signs in the business capacity identified beside that signature, represents that Merchant has authorized the signature, and takes on no personal obligation by giving it. A person becomes a Guarantor only by separately signing the Guaranty in that capacity, and a signature given in one capacity is not a signature in the other.\nMerchant confirms that the written statements of fact it identified and submitted to Buyer for this transaction are, to its knowledge after reasonable inquiry, materially accurate as of the dates they bear, subject to any qualification or correction Merchant disclosed. No person adopts, by signing this Agreement, a document that person did not submit, a summary or recording made by another, or an application completed by another.\nA claim for fraud or intentional misrepresentation requires proof of every element applicable law imposes. An error, an omission or a figure later corrected does not establish one, and no provision of this Agreement supplies an element of one.\nEach signer shall be given the complete signed documents, including every exhibit and every disclosure that forms part of this transaction, at or promptly after signing.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    THE CRITICAL, AND THE ONE THAT DECIDES WHETHER THE PRODUCT WORKS AT ALL.
+
+    THE OWNER'S NOTE IS THE PREMISE: *"A UCC §9-406 notice of a PARTIAL
+    assignment does not compel an acquirer to split settlement. Nothing else in
+    this agreement matters if Payzli will not honour the split."* Every other
+    clause in this library allocates a risk. This one names the mechanism the
+    whole instrument depends on, and the mechanism belongs to a third party.
+
+    WHAT WAS WRONG. "The form of the Split Funding Authorization is ATTACHED AND
+    INCORPORATED BY REFERENCE." Two words doing all the work and neither of them
+    true in the way a reader would take it. The form is not attached to anything
+    a merchant is shown; it is a separate `.docx` in `lombard-contracts`. And
+    incorporating by reference a document the signer has not read is how this
+    exhibit came to be reviewed twice without its own text ever being looked at
+    — the identical defect `data-and-channel` found at Exhibit C and fixed the
+    same way.
+
+    THE MEMO SAYS THE AUTHORIZATION "IS NOT SUPPLIED". IT IS, AND READING IT IS
+    WHAT MAKES THIS CRITICAL RATHER THAN THEORETICAL. `Lombard_Payzli_Split_
+    Funding_Authorization_v2.docx` is vendored at
+    `clauses/source-documents/`, and the instrument is in this library as seven
+    `split-funding.*` clauses. Four things are true of it, and they are handed
+    back rather than fixed here — **no cluster in this wave owns
+    `split-funding`**, and it is outside this cluster's two files:
+
+      (a) **IT SWEEPS A FEE.** *"The Purchased Amount under the Purchase
+          Agreement is $«16»; that figure is stated for information only and IS
+          NOT THE POINT AT WHICH WITHHOLDING STOPS, because Seller's obligations
+          under the Purchase Agreement MAY INCLUDE FEES IN ADDITION to the
+          Purchased Amount."* That is, in terms, the thing §4.1 forbids — "no fee
+          is collected through a Split Funding Authorization" — written on the
+          only piece of paper the processor actually reads. `fees-and-money`'s
+          requirement that this exhibit forbid a fee exists because of this
+          sentence, and its absence is why §4.1's rule had no counterpart where
+          the money moves.
+      (b) **IT HAS NO CAP.** Withholding runs "until Funding Company notifies
+          Payzli in writing that Seller's obligations ... have been satisfied" —
+          a stop at the funder's discretion rather than at the Purchased Amount,
+          against §2.3's single aggregate cap and §2.6's Completion Threshold.
+      (c) **IT TAKES AN INDEMNITY.** *"Seller hereby agrees to indemnify Payzli
+          from any and all losses ... arising from Payzli's following the
+          instructions set forth in this letter."* The instructions are Buyer's;
+          the indemnity is Merchant's; and §7.9 as rewritten is the only
+          indemnity Merchant gives under this Agreement.
+      (d) **NOBODY COUNTERSIGNS IT.** The letter is signed by SELLER alone —
+          "SELLER (`«4»` DBA `«5»`)", one signature widget, one date widget.
+          **There is no acceptance block for the processor at all.** So §2.3's
+          duty on Buyer to "obtain each Approved Processor's written acceptance
+          ... before the Purchase Date" has nowhere on the paper to be
+          discharged, and `LOMBARD_FACTS.processorSplitAccepted: false` is not a
+          gap in the record — it is what the form makes inevitable.
+
+      Two smaller ones, also handed back: the percentage is collected TWICE, in
+      `«2»` (recital) and `«3»` (instruction), so two blanks can disagree about
+      the one number in the deal; and the letter recites Payzli's own $295/$195
+      termination fees, which is a third party's price list inside our form.
+
+      All four are pinned in `__tests__/a-notice-can-arrive-in-time.test.ts` as a
+      register that must stay reachable — the `KNOWN_GAPS` discipline — so the
+      day somebody rewrites the letter the test goes red and the entry is deleted
+      rather than left as a line that can no longer fail.
+
+    WHAT CHANGED. The exhibit becomes the SPECIFICATION the authorization must
+    meet, drafted to §2.3 and §2.6 exactly: the settlement base is Card Receipts
+    as this Agreement defines them, the Specified Percentage, a transaction
+    reference, a start date, a servicing and reconciliation contact, and a stop
+    procedure tied to the Completion Threshold. ONE aggregate cap across every
+    processor, with the processor-level limit Buyer sets under §2.3 stated in the
+    document so the merchant can see it. A closed list of what the authorization
+    may not do — fixed or minimum remittance, default increase, deposit-account
+    debit, a fee, anything that is not a Purchased Receipt. The processor's own
+    charges, reserves and settlement timing identified, so that what reaches
+    Buyer can be checked against Card Receipts. And the executed pair — the
+    authorization and the processor's written acceptance — kept with the
+    transaction record and copied to Merchant.
+
+    NOT GATED ON `processorSplitAccepted`, AND THE BRIEF ASKED FOR THE GATE. It
+    marks this `both` on that fact. Refused. **The spine cluster's reasoning for
+    refusing it on §2.3 applies here, and one of its two limbs no longer exists
+    while a third has appeared.**
+
+      - The spine's reason (1) HOLDS AND IS STRONGER HERE. Gating §2.3 out
+        "produces an agreement with no collection mechanism at all — worse paper,
+        not safer paper". Gating the EXHIBIT out is worse again: it deletes the
+        specification precisely for the funder whose processor has not accepted,
+        which is the funder that needs it. A gate that removes a requirement when
+        the requirement is unmet is inverted.
+      - The spine's reason (2) HAS GONE. It was that `select-clauses.test.ts`
+        required `LOMBARD_FACTS` to select the whole FRPA. That invariant is
+        retired — `renewal-positions` replaced it with the dangling-reference
+        check — so the collision the spine named is no longer a reason for
+        anything. Said plainly because the brief asks which of the spine's
+        reasoning applies: **one of its two reasons does not.**
+      - A THIRD REASON, WHICH IS THIS CLUSTER'S. Gating this out leaves a
+        dangling reference that NOTHING IN THE PACKAGE CAN SEE. §2.3 ("a Split
+        Funding Authorization in the form of Exhibit A") and
+        `frpa.holdback-explainer` ("A separate Split Funding Authorization
+        (Exhibit A) is executed for each Approved Processor") are both ungated and
+        both name this exhibit BY NAME. `select-clauses.test.ts` reads `Section N`
+        tokens; "Exhibit A" is not one. The gap would be silent. Asserted in this
+        cluster's test instead.
+      - AND THE FACT IS THE WRONG KIND. `clauses/facts.ts` says these are
+        TEMPLATE facts, answered once by a funder, and that per-deal values
+        "select no clauses". Whether a given processor has countersigned is a
+        transaction-record fact that varies by processor and by deal. It belongs
+        in the transaction file §86.311(b)(3) describes, not in a predicate that
+        decides what the template says.
+
+    So `processorSplitAccepted` is still read by nothing, and that remains a real
+    gap: a template can be assembled whose split nobody has agreed to. What this
+    cluster can do about it is make the requirement checkable against paper,
+    which is what the exhibit now is, and say out loud that the vendored form
+    does not meet it. Both are done.
+
+    DEPARTURE 1 — "BEFORE FUNDING" BECOMES "BEFORE THE PURCHASE DATE". §4.13
+    defines the Purchase Date and §2.3 already uses that term for the same
+    moment. Two names for one moment in two clauses is how they drift apart.
+
+    DEPARTURE 2 — THE MEMO'S "COORDINATED PROCESSOR-LEVEL LIMITS" IS WRITTEN AS
+    A DISCLOSURE TO MERCHANT. The memo requires the limits to exist. §2.3 already
+    puts the duty to set and update them on Buyer; what the merchant cannot
+    otherwise see is what the limit IS, because it cannot observe another
+    processor's remittance. So the authorization states it.
+
+    DEPARTURE 3 — "SECTION 1.5" IS DROPPED. v4 pointed at "each Approved
+    Processor identified in Section 1.5". `frpa.definitions` now defines Approved
+    Processor as each processor identified in Section 1 AND each processor added
+    under §2.4, and a §1.5-only reference would exclude every processor added
+    afterwards — the case §2.4 exists for and the case an interruption produces.
+
+    DEPARTURE 4 — NO ATTACHMENT, NO INCORPORATION. Exhibit C's departure 4,
+    applied here for the same reason and stated the same way: the form is given
+    in full before signature, and the executed pair is delivered afterwards.
+
+    UNVERIFIED. Nobody on this project has read UCC §9-406, and the owner's
+    premise about what a notification of a partial assignment does and does not
+    compel is recorded here rather than relied on in the body. The body says only
+    that an Approved Processor is not a party and that this Agreement does not
+    bind it, which is true whatever §9-406 turns out to say. Note also 7 TAC
+    §86.312(b)(12), vendored, which makes it an abusive practice to instruct a
+    recipient's customer to redirect payments previously scheduled to another
+    person unless that person consented or the debt was validly assigned —
+    another reason the acceptance is obtained rather than assumed.
+
+    NOT FIXED HERE. The `split-funding` instrument itself, all four defects above.
+    A countersigned processor acceptance, and a real settlement tested end to end
+    including tax, tips, refunds and reserves, are operational work that no
+    drafting change substitutes for.
+  */
   {
     slug: 'frpa.exhibit-a-split-funding',
     version: 1,
@@ -264,7 +501,7 @@ export const FRPA_APPENDIX: McaClause[] = [
     section: 'appendix',
     sortKey: 50,
     heading: '',
-    body: 'A separate Split Funding Authorization Letter shall be executed for each Approved Processor identified in Section 1.5, instructing the Approved Processor to remit the Specified Percentage of credit and debit card receipts directly to Buyer’s designated account. The form of the Split Funding Authorization is attached and incorporated by reference, and shall be executed contemporaneously with this Agreement.',
+    body: 'Before the Purchase Date, Merchant and Buyer shall sign a separate Split Funding Authorization for each Approved Processor, and Buyer shall obtain that Approved Processor’s written acceptance of it, as Section 2.3 requires. This Exhibit states what each authorization shall contain. It incorporates no form, and a form that has not been given to Merchant in full before signature is not part of this Agreement.\nEach Split Funding Authorization shall state: the parties and the date of this Agreement; that the amount withheld is the Specified Percentage of Card Receipts as this Agreement defines them; a transaction reference by which a remittance can be identified; the date withholding begins; a servicing and reconciliation contact for Merchant; and how the instruction is stopped, including that Buyer shall instruct the Approved Processor to stop withholding immediately on the Completion Threshold under Section 2.6.\nOne aggregate cap applies. Each authorization shall state that the total remitted to Buyer under all Split Funding Authorizations for this Agreement shall not exceed the Purchased Amount, shall state the limit Buyer has set for that Approved Processor under Section 2.3, and shall require Buyer to update that limit so the aggregate cap is not exceeded.\nAn authorization shall not authorize a fixed or minimum remittance, an increase in the Specified Percentage on an Event of Default or otherwise, a debit to any deposit account of Merchant, the collection of a fee, or the collection of any amount that is not a Purchased Receipt. No fee is collected through a Split Funding Authorization, as Section 4.1 provides, and an authorization that would collect one is not the authorization this Agreement requires.\nEach authorization shall identify the Approved Processor’s own charges, reserves, chargeback rights and existing rights, and the settlement timing that applies, so that what reaches Buyer can be checked against Card Receipts. It shall state how an over-remittance is identified, corrected and refunded under Section 3 and Section 2.6.\nNo Split Funding Authorization enlarges the purchase, the Guaranty or Buyer’s remedies. An Approved Processor is not a party to this Agreement and this Agreement does not bind it. The complete executed authorization and the Approved Processor’s written acceptance shall be kept with the transaction record, and a copy of each shall be given to Merchant.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

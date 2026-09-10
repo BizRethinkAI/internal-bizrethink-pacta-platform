@@ -8,6 +8,64 @@ import type { McaClause } from '../types';
  * document is missing from the library — the direction that fails silently.
  */
 export const FRPA_MISCELLANEOUS: McaClause[] = [
+  /*
+    A CARVE-OUT THAT RESOLVES AND MEANS NOTHING.
+
+    WHAT WAS WRONG. "Except as expressly provided in Sections 3.3, 3.4 and 4.15,
+    no modification, amendment, waiver, or consent ... shall be effective unless
+    the same shall be in writing and signed by both parties."
+
+    The three exceptions were the places v4 let one party move a term without the
+    other's signature: §3.3's deemed withdrawal of a reconciliation request,
+    §3.4's unilateral adjustment of the Estimated Daily Holdback, and §4.15's
+    automatic cascade of collections between concurrent positions. All three have
+    been rewritten out of existence — §3.3 now says "a request that is incomplete
+    remains open", §3.4's update "is informational" and "does not alter the
+    Specified Percentage", and under `concurrentPositions: false` the cascade
+    clause is not selected at all.
+
+    So the sentence is worse than wrong: it is CORRECT AND EMPTY. Every number in
+    it resolves, `select-clauses.test.ts` sees nothing, and a reader meets an
+    exception to the signature rule and goes looking for the power it protects.
+    The brief hands this over as *"the reference resolves and means nothing"*,
+    and a resolving reference to nothing is the failure mode that check cannot
+    catch by construction.
+
+    WHAT CHANGED. The rule is stated over the terms that are priced, so a reader
+    can tell an amendment from an administration. Reconciliation and correction
+    are named as what they are — the performance of terms this Agreement already
+    contains — rather than as exceptions to the signature rule. And a subsequent
+    purchase is named as a separate agreement, because that is the other way a
+    "modification" arrives: §8.1 and §7.13 both already say a further purchase is
+    separately offered, disclosed and signed.
+
+    THE GUARANTOR LIMB IS THE MEMO'S AND IS THE ONE WITH A PARTY IN IT. An
+    amendment between Buyer and Merchant that enlarges what a Guarantor owes is
+    an amendment binding somebody who is not at the table.
+
+    NOT GATED, AND THE BRIEF ASKED FOR ONE. `action: both`, `fact: renewalModel`.
+    Refused under ADR 0013's diagnostic — *"if two limbs bind different parties
+    or answer different questions, the fact is wrong, not the granularity"* —
+    and here it does not even get that far, because there are no two limbs. The
+    question this clause answers is *what does it take to change a priced term*,
+    and the answer is a signed writing under every renewal model. `renewalModel`
+    decides how a PRIOR BALANCE is dealt with in a NEW agreement (§8.2); it
+    decides nothing about amending this one. A gate would produce two clauses
+    saying the same thing, or one clause absent for `renewalModel: 'none'`, which
+    is a template with no amendment rule.
+
+    DEPARTURE FROM THE MEMO — NO CITATION TO SECTION 8. The memo's design has a
+    renewal be a new agreement, and saying so here is useful. It is said without
+    naming §8.1 or §8.2, because both are gated on `renewalModel !== 'none'` and
+    a citation would dangle in a no-renewal template. The fifth cluster in a row
+    to hit that shape; the register in `select-clauses.test.ts` is where the
+    ones that could not be avoided live.
+
+    DEPARTURE — "PURCHASED-RECEIPTS BASE" BECOMES THE DEFINED TERM. The memo
+    writes "purchased-receipts base"; `frpa.definitions` calls it Card Receipts
+    and says so once. A second name for the settlement base is the defect
+    `one-settlement-base.test.ts` exists to prevent.
+  */
   {
     slug: 'frpa.modifications-amendments-7-1',
     version: 1,
@@ -18,12 +76,70 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 10,
     heading: 'Modifications; Amendments',
-    body: 'Except as expressly provided in Sections 3.3, 3.4 and 4.15, no modification, amendment, waiver, or consent of any provision of this Agreement shall be effective unless the same shall be in writing and signed by both parties.',
+    body: 'A change to the Purchase Price, the Purchased Amount, the Specified Percentage, the Card Receipts on which the Specified Percentage is taken, a fee, or any other substantive term of this Agreement requires a written amendment signed by Merchant and Buyer, together with any disclosure or renewed acceptance applicable law then requires. An amendment that enlarges a Guarantor’s obligation also requires that Guarantor’s own signed consent, and no amendment binds a person who has not signed it.\nA reconciliation, a correction of an amount collected in error, and an updated Estimated Daily Holdback perform terms this Agreement already contains. They are not amendments. Section 3 states what each of them does, and none of them changes the Specified Percentage, the Purchased Amount or any other priced term. Updating an informational estimate changes no obligation of either party.\nA subsequent purchase is a separate agreement, separately offered, disclosed, signed and funded. It is not an amendment of this one. This Agreement is not amended by a processor’s form, by an application, by a document an independent sales organization supplies, or by a course of dealing.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: ['frpa-7-1-has-no-except-as-expressly-provided-carve-out'] }],
   },
+  /*
+    THE ECONOMICS ARE SALEABLE. THE MERCHANT'S RIGHTS ARE NOT SEVERABLE FROM
+    THEM.
+
+    WHAT WAS WRONG. "Buyer may assign, transfer, or sell its rights to receive
+    the Purchased Amount OR DELEGATE ITS DUTIES hereunder, either in whole or in
+    part. Merchant may not assign this Agreement without Buyer's prior written
+    consent, which consent may be withheld in Buyer's SOLE DISCRETION."
+
+    `frpa-7-2-permits-delegation-of-the-reconciliation-duty` is the finding, and
+    the word that carries it is "delegate". Section 3 is the merchant's only
+    protection against over-collection, and it is a set of duties owed by Buyer:
+    acknowledge within one Workday, reconcile monthly whether or not asked,
+    refund within five Workdays, give a written calculation and a named person
+    who will review it. A clause permitting Buyer to hand those to somebody else
+    — with no requirement that the somebody else be capable of them, and no
+    statement that Buyer stays answerable — makes the whole of §3 assignable to a
+    party the merchant never chose.
+
+    The asymmetry in the second sentence is the same defect facing the other way.
+    A merchant selling its business cannot novate, at the absolute discretion of
+    a counterparty with no stated criteria, while §5.18 contemplates exactly that
+    sale and requires notice of it.
+
+    WHAT CHANGED. Buyer may sell the interest; the assignee takes it subject to
+    this Agreement, to Merchant's defences and to the reconciliation, correction
+    and refund rights, and no transfer raises an amount or a percentage. Notice
+    identifying the assignee, the effective date, the servicing contact and any
+    changed payment instruction — before where practicable, promptly after
+    otherwise — and Merchant may keep dealing with Buyer until it has that
+    notice. Delegation is permitted and does NOT discharge: a novation needs
+    Merchant's express written agreement naming the substitute. A partial
+    assignment uses one servicing interface, and the §2.3 aggregate cap keeps
+    running across every holder. Merchant's own transfer moves from sole
+    discretion to consent not unreasonably withheld.
+
+    DEPARTURE 1 — THE AGGREGATE CAP IS CARRIED ACROSS HOLDERS. The memo says a
+    partial assignment "may not multiply Merchant's costs". The worse
+    multiplication is of the CAP: two holders each collecting to the Purchased
+    Amount is the §2.3 defect reached by a different route, and §2.3's cap is
+    written across processors rather than across assignees. Stated here so the
+    two are one cap.
+
+    DEPARTURE 2 — "MERCHANT MAY CONTINUE TO DEAL WITH BUYER UNTIL IT RECEIVES
+    THAT NOTICE." Not in the memo. Without it, "prompt notice after the
+    transfer" leaves a merchant who paid or reconciled with the assignor in the
+    interval exposed on a transaction it had no way to know about.
+
+    DEPARTURE 3 — NO CITATION TO SECTION 9. The memo does not make one; neither
+    does this. §9.2 is gated on `guarantyScope` and already carries six dangling
+    citations in a no-guaranty template.
+
+    UNVERIFIED. Whether an assignee of an interest in accounts takes subject to
+    the account debtor's defences, and on what conditions, is governed by UCC
+    §9-404 and the mandatory rules of Article 9 as enacted. Nobody on this
+    project has read either. The clause states the position as a contract term
+    between the parties, which does not depend on the answer.
+  */
   {
     slug: 'frpa.assignment-7-2',
     version: 1,
@@ -34,12 +150,110 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 20,
     heading: 'Assignment',
-    body: 'Buyer may assign, transfer, or sell its rights to receive the Purchased Amount or delegate its duties hereunder, either in whole or in part. Merchant may not assign this Agreement without Buyer’s prior written consent, which consent may be withheld in Buyer’s sole discretion.',
+    body: 'Buyer may assign or transfer its interest in the Purchased Receipts to a person lawfully entitled to hold it. The assignee takes subject to this Agreement, to Merchant’s defenses and claims, to Merchant’s reconciliation, correction and refund rights under Section 3, and to applicable law. No transfer increases an amount or a percentage payable by Merchant, adds an obligation, or interrupts servicing.\nBuyer shall give Merchant notice before a transfer where that is practicable, and otherwise promptly after it, identifying the assignee, the effective date, the servicing contact, and any changed payment instruction. Merchant may continue to deal with Buyer until it receives that notice, and is not in breach for having done so.\nBuyer may delegate a duty under this Agreement, and delegation does not discharge Buyer. Buyer remains responsible for its own prior acts and for the performance of every duty it delegates, unless Merchant expressly agrees in writing to a novation that names the substitute and releases Buyer.\nWhere the interest is assigned in part, Buyer and each assignee shall give Merchant a single servicing and collection interface. A partial assignment shall not multiply Merchant’s costs, its points of contact, or the number of persons entitled to collect, and the aggregate cap in Section 2.3 continues to apply once across every holder.\nMerchant may assign this Agreement in connection with a transfer of its business of the kind described in Section 5.18, with Buyer’s consent, which Buyer shall not unreasonably withhold, condition or delay.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: ['frpa-7-2-permits-delegation-of-the-reconciliation-duty'] }],
   },
+  /*
+    THE CLAUSE THAT SWITCHED OTHER CLAUSES OFF.
+
+    WHAT WAS WRONG. "All notices, requests, consents, demands, and other
+    communications hereunder shall be delivered by certified mail, return receipt
+    requested ... and shall become effective ONLY UPON RECEIPT."
+
+    Three defects in one sentence, and none of them is visible while the sentence
+    is read on its own.
+
+    (1) ONE MANDATORY METHOD. Certified mail is not an option, it is the whole
+        list. An email a servicer actually reads is not a notice.
+    (2) EFFECT WITHHELD UNTIL DELIVERY. The sender does the sending; the postal
+        service decides when the sender has performed.
+    (3) "ALL ... COMMUNICATIONS HEREUNDER" reaches every request under Section 3,
+        every consent, every revocation and — because nothing excluded it —
+        judicial process.
+
+    WHAT THAT COST, WHICH IS FOUR CLAUSES AND COUNTING. `reconciliation-right-
+    conditioned-into-near-nullity` (REVIEW-01) is §3's timetable running on a
+    letter. `frpa-6-4-24-hour-notice-cannot-be-given-under-7-3` (REVIEW-02) is a
+    notice due within a day. §4.14's three-CALENDAR-day cancellation right was
+    found by `fees-and-money` and by no review. §7.18's "revoke by any reasonable
+    means" against "send it to the address in Section 7.3" was found by
+    `data-and-channel`. Four agents, four local fixes, four "notwithstanding
+    Section 7.3" carve-outs, and nobody counted.
+
+    THE SWEEP, AND WHY IT IS A TEST RATHER THAN A LIST. `__tests__/a-notice-can-
+    arrive-in-time.test.ts` runs the question over the whole corpus: which
+    clauses put a communication on a clock, and does the Agreement supply a
+    channel that clock can travel on. Under v4's §7.3 the answer names twelve
+    clauses and at least four of them are real defects nobody had found —
+    **§2.4, §4.13, §5.18 and §8.3**:
+
+      - §2.4 lets Merchant replace an Approved Processor "on notice to Buyer" and
+        requires notice "promptly after learning of an unplanned interruption".
+        A right exercisable only when a letter lands is not exercisable during
+        the interruption it exists for, and §7.16 meanwhile obliges Merchant to
+        remit within three Workdays. Same shape as §4.14 exactly.
+      - §4.13 lets Merchant terminate for a missed funding date "by notice". In
+        transit, Buyer can fund late and defeat it.
+      - §5.18 requires "reasonable advance notice" of a change of name, processor
+        or location. §6.4 carves out its own sale notice; §5.18's does not.
+      - §8.3 has Buyer "promptly" give a settlement quotation carrying "the date
+        through which the quotation holds good". Requested and answered by
+        certified mail, a quotation can expire in transit — in a clause that
+        also says Buyer "shall not require a period of notice".
+
+    A FIFTH CARVE-OUT WOULD HAVE BEEN THE WRONG FIX, and that is the finding.
+    Every one of these was written by an agent who read the clause carefully and
+    did not read §7.3 at the same time. The defect is not in any of them; it is
+    in the channel, so the channel is what changed.
+
+    WHAT CHANGED. Four things. Scope is limited to the administration of this
+    Agreement and judicial process is sent to §7.12 and Section 10 expressly.
+    Four channels, none mandatory. **Effective when sent**, with the email
+    exception that matters — the sender who is told it bounced has not given
+    notice and must send it again. And a precedence rule: where another provision
+    measures from receipt or states its own method, that provision governs.
+
+    "EFFECTIVE WHEN SENT" RATHER THAN THE MEMO'S DEEMED-RECEIPT RULE — DEPARTURE
+    1, AND THE ONE THAT MATTERS. The memo writes "effective on actual receipt; an
+    email is deemed received on the next Workday after transmission". That is the
+    conventional drafting and it is nearly good enough. It is not good enough for
+    §4.14, whose deadline is the third CALENDAR day: a merchant emailing on day
+    three has, under the memo's rule, given notice on day four. The three
+    existing carve-outs all chose "effective when sent" for exactly this reason
+    and they were right. A rule that disagrees with the four clauses written
+    against it is the rule that is wrong.
+
+    WHAT HAPPENS TO THE FOUR CARVE-OUTS. They become REDUNDANT AND STAY TRUE, and
+    the brief is explicit that they are not to be deleted. §3.2, §4.14, §6.4 and
+    §7.18 each say "notwithstanding Section 7.3" and then supply a channel this
+    Section now supplies anyway. Two reasons they stay. Their authors wrote
+    clauses that work whatever §7.3 says, and that independence is worth more
+    than the tidiness of removing it. And §7.18's is not in fact redundant: it
+    adds "by any reasonable means, including by replying STOP", which is wider
+    than the four methods here, and it makes a revocation effective on RECEIPT,
+    which the precedence rule in this Section preserves. `a-notice-can-arrive-in-
+    time.test.ts` asserts all four still carve out, so a later reader cannot
+    quietly re-couple them.
+
+    DEPARTURE 2 — §6.1'S CURE PERIOD IS PROTECTED RATHER THAN OVERRIDDEN. §6.1
+    runs ten Workdays from when Merchant RECEIVES the default notice, which is
+    more favourable to Merchant than "when sent" and is deliberate. The
+    precedence sentence is what keeps it, and it is not in the memo.
+
+    DEPARTURE 3 — THE DEFAULT NOTICE GOES BY TWO ROUTES. The memo's, kept: the
+    one notice whose consequence is the loss of the business is the one that
+    should not depend on a single channel. It points at §6.1 for content rather
+    than restating the identification requirement.
+
+    NOT FIXED HERE, AND HANDED OVER. §7.5's last sentence makes a certified
+    letter into "valid and lawful service of process", which is this clause's
+    defect seen from the other end, in the governing-law clause where nobody
+    looks for a service rule. §7.5 is `disputes-service`'s (memo 061). Conceded,
+    with an owner, in `a-notice-can-arrive-in-time.test.ts`.
+  */
   {
     slug: 'frpa.notices-7-3',
     version: 1,
@@ -50,7 +264,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 30,
     heading: 'Notices',
-    body: 'All notices, requests, consents, demands, and other communications hereunder shall be delivered by certified mail, return receipt requested, to the respective parties at the addresses set forth in this Agreement (or at such other address as the party shall specify in writing) and shall become effective only upon receipt.',
+    body: 'This Section governs a notice, a request, a consent and any other communication between the parties about the administration of this Agreement. It does not govern service of process or any other judicial process, which Section 7.12 and Section 10 govern. Nothing in this Section substitutes for valid service of process or is evidence that service has been made.\nThe postal address and the email address of each party are stated in Section 1. Buyer shall maintain a working servicing email address and either a servicing portal or a servicing telephone number, and shall tell Merchant promptly when either changes. A party may change its own contact details by a communication given under this Section.\nA communication under this Section may be given by email to the address stated in Section 1, by a submission through a servicing portal Buyer makes available which that portal acknowledges, by a recognized overnight carrier, or by certified mail, return receipt requested. It is effective when it is sent. An email is not effective if the sender receives a delivery-failure message or otherwise knows it did not arrive, and the sender shall then send it again by another method stated in this Section. Neither party may require a communication under this Agreement to be given by certified mail, or by any one method, as a condition of its effect; and a communication the other party actually received is not ineffective because of the method used to send it.\nWhere another provision of this Agreement measures a period from receipt, states its own method, or makes a communication effective on a different event, that provision governs. A request under Section 3 and a revocation under Section 7.18 may be made by the methods those Sections state.\nA notice asserting an Event of Default shall identify the conduct and the facts Buyer relies on and shall state the cure Buyer requires, as Section 6.1 provides, and shall be sent both by email and by one other method stated in this Section.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -59,6 +273,33 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       { review: 'REVIEW-02', findings: ['frpa-6-4-24-hour-notice-cannot-be-given-under-7-3'] },
     ],
   },
+  /*
+    A ROUTINE NONWAIVER CLAUSE WITH ONE SENTENCE THAT REOPENS SECTION 6.
+
+    WHAT WAS WRONG. Two things, and the memo rates the clause Low because
+    neither is dramatic. It ran one way — "No failure ON THE PART OF BUYER" —
+    so a merchant's forbearance was a waiver and Buyer's was not. And it ended
+    "The remedies provided hereunder are CUMULATIVE AND NOT EXCLUSIVE of any
+    remedies provided by law or equity."
+
+    That second sentence is the one worth the rewrite. `default-remedies` spent
+    a clause closing §6.2 to a stated list, and §4.12 says in terms that nothing
+    "makes Buyer's remedies cumulative of any remedy Section 6.2 does not give".
+    A cumulative-remedies sentence in the miscellaneous section reopens all of
+    it, and it is the shape a court reads as the parties having agreed to it.
+
+    WHAT CHANGED. Reciprocal. A waiver has to be signed and waives only what it
+    says. Remedies stay inside Section 6, with the no-double-recovery rule
+    stated rather than implied.
+
+    DEPARTURE FROM THE MEMO — NO "SECTIONS 6 AND 9". The memo writes "subject to
+    Sections 6 and 9". §9.2 is gated on `guarantyScope`, and under
+    `guarantyScope: 'none'` the whole of Section 9 is absent — a citation of
+    "Section 9" is already in `select-clauses.test.ts`'s register from four other
+    clauses and this one does not add a fifth. The limit is stated by naming the
+    Guaranty rather than its section number, which is true whether or not there
+    is one.
+  */
   {
     slug: 'frpa.waiver-of-remedies-7-4',
     version: 1,
@@ -69,7 +310,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 40,
     heading: 'Waiver of Remedies',
-    body: 'No failure on the part of Buyer to exercise, and no delay in exercising, any right under this Agreement shall operate as a waiver thereof, nor shall any single or partial exercise of any right under this Agreement preclude any other or further exercise thereof or the exercise of any other right. The remedies provided hereunder are cumulative and not exclusive of any remedies provided by law or equity.',
+    body: 'A party’s delay in exercising a right under this Agreement, or its failure to exercise one, is not a waiver of that right, and a single or partial exercise does not prevent a further lawful exercise of that right or the exercise of another. A waiver is effective only if it is in writing and signed by the party giving it, and it waives only what it says.\nEvery remedy under this Agreement remains subject to Section 6 and to applicable law. No remedy is cumulative of one that Section 6.2 does not give, as Section 4.12 states, and no loss may be recovered twice. A claim against a Guarantor is limited by the Guaranty and is not enlarged by this Section.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -101,6 +342,53 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       { review: 'REVIEW-02', findings: ['frpa-7-24-does-not-name-the-statute-that-actually-bites'] },
     ],
   },
+  /*
+    A SURVIVAL CLAUSE THAT DESCRIBED COMPLETION, IN A DOCUMENT WHERE COMPLETION
+    IS DEFINED ONCE.
+
+    WHAT WAS WRONG. "All representations, warranties, and covenants herein shall
+    survive ... and shall continue in full force until the Completion Threshold
+    is attained AND ALL AMOUNTS THEN DUE HAVE BEEN PAID."
+
+    `frpa-7-6-and-4-2-contradict-the-2-6-completion-test`. §2.6 says the
+    Completion Threshold "is the only test of completion, and it governs wherever
+    another provision of this Agreement describes completion differently". The
+    words after "and" describe a different one. Under v4 they described a
+    materially different one, because v4's Remaining Balance was "the Purchased
+    Amount PLUS ANY FEES CHARGED under Section 4.1 and Appendix A": an unpaid fee
+    kept every covenant, every authorization and every collection power alive
+    after the purchase had been delivered in full. `fees-and-money` closed that
+    route at §4.1 and Appendix A; this is the third door.
+
+    The first half was wrong in the other direction. "All representations ...
+    shall survive ... and shall continue in full force" turns a statement about
+    the facts at the Purchase Date into a promise about the facts every day
+    afterwards — the defect `representations-are-present-fact` exists for, and
+    the §5 lead-in now says a present-fact statement is not a continuing covenant
+    unless it says so.
+
+    WHAT CHANGED. Representations speak as the §5 lead-in says and no longer.
+    Completion ends the collection authority and does not extinguish an accrued
+    claim, which runs for whatever limitation period applicable law gives it. The
+    duties that must outlive the deal to work at all are named — reconciliation
+    and refund, the final ledger, the lien releases, confidentiality and data
+    protection, and dispute resolution — and nothing else survives.
+
+    DEPARTURE 1 — THE SURVIVING LIST IS NAMED WITH SECTION NUMBERS. The memo
+    lists the duties in prose. Named here, because "lawful confidentiality and
+    data-protection duties" is the kind of phrase that is argued about, and §4.7
+    and §4.8 are the clauses that actually contain them.
+
+    DEPARTURE 2 — "DISPUTE-RESOLUTION PROVISIONS" IS WRITTEN WITHOUT A CITATION.
+    Which clauses those are is `disputeResolution`'s answer, not this clause's:
+    §§7.10, 7.11, 7.19 and 7.20 are all gated on it, and a citation would dangle
+    in an arbitration template. Described by subject instead.
+
+    DEPARTURE 3 — CANCELLATION AND TERMINATION ARE ADDED TO "COMPLETION". §2.2
+    and §4.14 both end this Agreement without the Remaining Balance reaching
+    zero, and a survival clause that only contemplates completion says nothing
+    about the case where a merchant cancelled on day three.
+  */
   {
     slug: 'frpa.survival-of-representations-7-6',
     version: 1,
@@ -111,7 +399,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 60,
     heading: 'Survival of Representations',
-    body: 'All representations, warranties, and covenants herein shall survive the execution and delivery of this Agreement and shall continue in full force until the Completion Threshold is attained and all amounts then due have been paid.',
+    body: 'A representation in this Agreement speaks as the lead-in to Section 5 provides and no further. Completion does not turn a statement about the facts as they stood on a stated date into a continuing warranty about the facts afterwards.\nThe Completion Threshold in Section 2.6 ends Buyer’s right to receive Purchased Receipts and ends every authorization given to collect them. It does not extinguish an accrued claim of either party, which remains enforceable for the limitation period applicable law gives it.\nThe following survive completion, cancellation or other lawful termination, and only so far as is necessary to give them effect: reconciliation, correction and refund under Section 3 and Section 2.6; the final ledger and the release of every filing that records Buyer’s interest; the confidentiality duties in Section 4.8 and the information-protection duties in Section 4.7; and the provisions of this Agreement governing how a dispute between the parties is resolved.\nNo survival provision enlarges an obligation, revives a collection right, creates recourse against Merchant for Card Receipts that were never generated, or enlarges the Guaranty.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -133,6 +421,64 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['frpa-severability-text-under-entire-agreement'] }],
   },
+  /*
+    ELEVEN WORDS OF MERGER OVER A SUITE OF SIX DOCUMENTS.
+
+    THE BRIEF'S PREMISE IS FALSE AND THE TRUE VERSION IS DIFFERENT, NOT SMALLER.
+    The brief says *"§7.8's merger clause currently incorporates five unseen
+    instruments"*. It incorporates none: v4's §7.8 is "This Agreement embodies
+    the entire agreement between Merchant and Buyer and supersedes all prior
+    agreements and understandings relating to the subject matter hereof", and
+    that is the whole of it. The phrase "attached and incorporated by reference"
+    appears exactly twice in `Lombard_FRPA_v4.txt`, both times in an EXHIBIT —
+    Exhibit A and Exhibit C — never in §7.8.
+
+    So the defect is the opposite shape. The FRPA refers to documents it does not
+    incorporate, incorporates two it does not attach, and states no hierarchy
+    anywhere, while the merger clause asserts that this one document is all of
+    it. Read literally, §7.8 says the Split Funding Authorization the money
+    actually moves through is not part of the deal.
+
+    AND THE SUITE IS LARGER THAN ANY REVIEW SAW. `instrumentsFor(LOMBARD_FACTS)`
+    now returns six instruments. The Equipment Lease and the Subscription entered
+    this product in THIS branch — the assertion in `select-clauses.test.ts` used
+    to say the opposite, on the reasoning that "v4 defers equipment into the
+    Purchased Amount rather than leasing it" — so neither review, and neither
+    counsel memo, read them as part of Lombard's package. They are unreviewed in
+    that role.
+
+    WHAT CHANGED. The package is listed and closed: the completed Section 1,
+    these terms, Appendix A, each exhibit actually delivered before signature,
+    the Guaranty if one is signed, and any state rider delivered before
+    acceptance. A precedence order, because six documents drafted separately WILL
+    conflict and the merchant should not have to argue about which wins. A
+    firewall sentence for the separate agreements. And the two things a merger
+    clause must not be allowed to do: erase a required disclosure, or exclude
+    liability for what was said to get the signature.
+
+    THE PRECEDENCE ORDER IS THE MEMO'S, WITH ITS MIDDLE TIER MADE CONCRETE. The
+    memo says "the nonrecourse, collection-cap, reconciliation, and guaranty
+    limits control inconsistent ancillary authorizations". Written as the
+    provisions doing that work, because "the nonrecourse limits" is not a term
+    this Agreement defines and the sentence has to be applied by a servicer.
+
+    DEPARTURE 1 — THE SPLIT FUNDING AUTHORIZATION IS NAMED AS AN ANCILLARY
+    INSTRUCTION, AT THE BOTTOM. Not in the memo, and it is the whole point of
+    having an order: the vendored Payzli letter presently says withholding runs
+    past the Purchased Amount "because Seller's obligations under the Purchase
+    Agreement may include fees in addition". That contradicts §2.6 and §4.1, and
+    without a precedence rule the party reading it is a processor with no copy of
+    this Agreement.
+
+    DEPARTURE 2 — "NO UNSEEN OR LATER-ADDED DOCUMENT IS INCORPORATED" GAINS A
+    ROUTE. The memo's sentence forbids addition absolutely. A document can be
+    added — by an amendment under §7.1, signed by both parties. Otherwise the
+    merger clause forbids the parties from agreeing to anything else in writing,
+    which is not what anybody means by it.
+
+    DEPARTURE 3 — NO CITATION TO SECTION 9. "The Guaranty if one is signed" is
+    true under every value of `guarantyScope` and cites nothing.
+  */
   {
     slug: 'frpa.entire-agreement-7-8',
     version: 1,
@@ -143,7 +489,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 80,
     heading: 'Entire Agreement',
-    body: 'This Agreement embodies the entire agreement between Merchant and Buyer and supersedes all prior agreements and understandings relating to the subject matter hereof.',
+    body: 'This Agreement consists of the completed Section 1, these terms, Appendix A, each exhibit identified in Section 1 and given to Merchant in full before signature, the Guaranty if one is signed, and any state rider given to Merchant before it accepted. Nothing else is part of it. A document referred to but not given to Merchant is not incorporated, and no document is added afterwards except by an amendment under Section 7.1.\nWhere two of those documents conflict, the first of the following that applies controls: a mandatory rule of applicable law; an applicable state rider; the provisions of this Agreement that limit recourse to the Purchased Receipts, that cap the cost of enforcement, that give Merchant reconciliation and refund rights, and that limit the Guaranty; then these general terms; then an ancillary authorization or instruction, including a Split Funding Authorization. A processor’s, a bank’s or a service provider’s own form does not vary this Agreement.\nA separate equipment lease, a separate subscription agreement, and an agreement between Buyer and an independent sales organization are different contracts. None of them creates an Event of Default under this Agreement, adds to the Collateral, adds a fee under this Agreement, or creates or enlarges a guaranty, and this Agreement creates no cross-default with any of them.\nEvery disclosure applicable law requires shall be given as that law requires, shall describe the transaction as it is actually agreed, and shall be kept with the executed documents. This Section does not waive a disclosure or a statutory right, and does not exclude liability for fraud, for a misrepresentation applicable law does not permit to be excluded, or for the breach of an offer that binds Buyer.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -436,6 +782,61 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['information-sharing-only-vs-any-third-party'] }],
   },
+  /*
+    "PROCEEDS OF THE PURCHASED AMOUNT" — A FACE AMOUNT HAS NO PROCEEDS.
+
+    WHAT WAS WRONG. "In the event that Merchant, OR ANY OF MERCHANT'S RESPECTIVE
+    DIRECTORS, OFFICERS, EMPLOYEES, AGENTS, SUBCONTRACTORS, OR AFFILIATES
+    receives or comes into possession of any PROCEEDS OF THE PURCHASED AMOUNT,
+    Merchant shall ... IMMEDIATELY SEGREGATE and hold such proceeds IN EXPRESS
+    TRUST for Buyer's sole and exclusive benefit."
+
+    Four defects. The Purchased Amount is a number — the ceiling on what Buyer
+    collects — and a number generates no proceeds, so the clause has no subject
+    until a reader supplies one, and every reader supplies the widest one. It
+    binds directors, officers, employees, agents, subcontractors and affiliates,
+    none of whom signed. It declares an express trust over receipts that do not
+    exist yet, which is `default-collection-reaches-cash-and-checks` in its
+    second location and is memo entry 006 wearing different words: a label
+    cannot create ownership of a future receivable, and if it did it would make
+    the transaction something other than a sale of specific receipts. And
+    "immediately segregate and hold" is a freeze on an account the merchant runs
+    a business out of.
+
+    §2.4 AND §3.1 BOTH DEPEND ON THIS CLAUSE, AND THE BRIEF SAYS SO: do not
+    narrow it. §2.4 — "While an interruption continues, Merchant shall account
+    for the Purchased Receipts it actually receives and shall remit them under
+    Section 7.16." §3.1 — "A documented failure to remit Purchased Receipts that
+    were actually generated is dealt with under Section 7.16." Both survive: the
+    interruption case is precisely the case where a Purchased Receipt reaches
+    Merchant because the split was not running, and it is the first sentence.
+
+    WHAT CHANGED, AND WHAT IS NOT NARROWED. The subject is the Purchased Receipt
+    — the Specified Percentage of an identified Card Receipt Merchant actually
+    received — and the duty is to record it separately and deliver it with the
+    settlement reference. What is REMOVED is the whole-account freeze, the
+    express trust, the non-signatories, and the reach into Merchant's retained
+    share and non-card money. What is ADDED is the other half of a remittance
+    duty: Buyer credits it promptly and does not also collect it through the
+    split, which is the double-recovery §2.3 and §2.6 are otherwise silent about
+    in this direction.
+
+    DEPARTURE 1 — "BUSINESS DAYS" BECOMES "WORKDAYS". `frpa.definitions` defines
+    Workday and every other period in this Agreement counts in them. v4 used
+    "business days" here and nowhere near a definition of it.
+
+    DEPARTURE 2 — THE CLOCK RUNS FROM AVAILABILITY, NOT RECEIPT. The memo's
+    "within three Workdays after the funds become available", kept deliberately
+    against v4's "within three (3) business days of such receipt". A settlement
+    credited but not yet available is not money the merchant can send.
+
+    DEPARTURE 3 — THE TRUST QUESTION IS SENT TO THE LAW RATHER THAN ANSWERED.
+    The memo's, and it is the honest position: whether Buyer owns an identifiable
+    proceed, and whether any trust arises, is a question of Article 9 and of the
+    law of the relevant state. The clause says the parties' labels do not decide
+    it. UNVERIFIED: nobody on this project has read UCC §9-315 or any state's
+    law on the point.
+  */
   {
     slug: 'frpa.return-of-buyer-proceeds-7-16',
     version: 1,
@@ -446,12 +847,71 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 160,
     heading: 'Return of Buyer Proceeds',
-    body: 'In the event that Merchant, or any of Merchant’s respective directors, officers, employees, agents, subcontractors, or affiliates receives or comes into possession of any proceeds of the Purchased Amount, Merchant shall, or shall cause such other recipients to, immediately segregate and hold such proceeds in express trust for Buyer’s sole and exclusive benefit. Such proceeds shall be delivered to Buyer in full within three (3) business days of such receipt.',
+    body: 'If Merchant receives Purchased Receipts that an Approved Processor should have remitted to Buyer, Merchant shall record them separately and deliver that purchased share to Buyer within three (3) Workdays after the funds are available to Merchant, with the settlement reference that identifies them. Section 2.4 requires this of Purchased Receipts Merchant receives while an interruption in the split continues, and Section 3.1 sends a documented failure to remit to this Section.\nThis duty reaches only the Specified Percentage of Card Receipts that Merchant actually received and that can be identified. It does not reach Merchant’s retained share, a non-card receipt, a sum Merchant never received, or an amount already credited to the Purchased Amount. It does not require Merchant to segregate, freeze, or stop using any account, and it binds no person who has not signed this Agreement.\nBuyer shall credit each delivery to the Remaining Balance promptly and shall not collect the same amount twice; an amount delivered under this Section is not also collected through the split under Section 2.3. Ownership of a Card Receipt, the tracing of its proceeds, and whether any trust arises are determined by applicable law, and no description in this Agreement decides them. Nothing in this Section obliges Merchant to pay for a receipt that was never generated.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['default-collection-reaches-cash-and-checks'] }],
   },
+  /*
+    RETAINED, UNCHANGED, AND THE REASON IS THAT THE REAL CONTENT IS NOT TEXT.
+
+    The memo's only RETAIN in this cluster, and its rationale is a list of
+    operational controls rather than a drafting note: *"Preserve signer identity,
+    capacity, document version, timing, consent/attribution evidence, required
+    disclosure signatures, and a downloadable complete copy. This clause does not
+    cure missing assent or satisfy every separate statutory delivery
+    requirement."*
+
+    The owner's note goes further — *"Pacta should be able to evidence every one
+    of those — worth confirming we actually can"* — and that is a platform
+    question. It is answered here as a record of what was CHECKED, because the
+    alternative is to answer it by drafting, which would put a claim about
+    Pacta's capabilities into a merchant-facing sentence.
+
+    WHAT WAS CHECKED, on 2026-09-10, by reading this repository. Not by running
+    the platform, and not by reading a signed envelope.
+
+    EVIDENCED TODAY, on the face of the code:
+      - **Signer identity as asserted, and timing.** Every audit entry carries
+        `recipientEmail`, `recipientName`, `recipientId` and `recipientRole`
+        (`packages/lib/types/document-audit-logs.ts`), with `ipAddress` and
+        `userAgent`, and the event vocabulary includes `EMAIL_SENT`,
+        `DOCUMENT_OPENED`, `DOCUMENT_FIELD_INSERTED` and `DOCUMENT_COMPLETED`.
+      - **Substitution of the document after sending.** There is an
+        `ENVELOPE_ITEM_PDF_REPLACED` event, so a swapped PDF is a recorded act
+        rather than an invisible one.
+      - **A downloadable complete copy.** `packages/lib/server-only/htmltopdf/`
+        holds `get-certificate-pdf.ts` and `get-audit-logs-pdf.ts`, and the fork
+        signs the finished PDF cryptographically (CAdES / PKCS#7, per the project
+        CLAUDE.md), which is what makes the copy checkable rather than merely
+        downloadable.
+
+    NOT EVIDENCED, OR NOT CHECKED — and the first of these is the one this
+    cluster's own work depends on:
+      - **CAPACITY.** The platform records a recipient's ROLE IN AN ENVELOPE —
+        signer, approver, viewer, cc — and nothing records the legal capacity in
+        which a human signed: as an officer of Merchant, or personally as
+        Guarantor. `frpa.execution` as rewritten turns on exactly that
+        distinction, and one natural person commonly signs in both. There is no
+        field for it. **This is a gap, not an unknown.**
+      - **A separate, affirmative consent to transact electronically**, with the
+        disclosures such a consent requires, stored as its own artifact. Nothing
+        in this repository was found that captures one. Not established either
+        way; not assumed.
+      - **The document version the signer actually saw**, pinned to the moment of
+        consent as distinct from the completed PDF. Not checked.
+      - **Identity beyond control of an email address.** Recipient action and
+        access auth exist as configurable fields; whether any Lombard envelope
+        uses them is a deployment question nobody here has asked.
+
+    UNVERIFIED. Nobody on this project has read 15 U.S.C. §7001 (E-SIGN) or any
+    state's UETA, and no conclusion about what either requires is stated in this
+    clause or drawn here. The memo's closing sentence is the one to keep in mind
+    and is not drafted around: this clause does not cure missing assent and does
+    not satisfy a separate statutory delivery requirement — §7.8 and
+    `frpa.execution` carry the delivery duties instead.
+  */
   {
     slug: 'frpa.electronic-signatures-7-17',
     version: 1,
@@ -702,6 +1162,54 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       { review: 'REVIEW-02', findings: ['iso-a6-and-frpa-7-21-give-different-answers-about-a-merchant-paid-fee'] },
     ],
   },
+  /*
+    A RECITAL THAT TWO OTHER CLAUSES CONTRADICT, IN OPPOSITE DIRECTIONS.
+
+    WHAT WAS WRONG. The first sentence is fine and is kept in substance: an
+    opportunity to consult counsel, or a choice not to. The second is not —
+    "further acknowledges that it has NOT RELIED ON ANY REPRESENTATION by Buyer
+    or ANY THIRD PARTY that is not set forth in this Agreement." A blanket
+    nonreliance recital, obtained at signature, about statements the signer heard
+    before signature, from a channel Buyer selected and pays. §7.21 as
+    `data-and-channel` rewrote it says the opposite in terms: a disclaimer does
+    not reach "a representation legally attributable to Buyer".
+
+    TWO FINDINGS, AND THEY POINT AT DIFFERENT CLAUSES.
+
+    (1) `frpa-4-8-conditions-the-counsel-review-7-22-promises`. §7.22 recites a
+        free opportunity to consult counsel; v4's §4.8 let a merchant show this
+        Agreement to an adviser only if the adviser FIRST AGREED IN WRITING to be
+        bound by Buyer's confidentiality terms. A lawyer asked to sign a
+        funder's NDA before reading a client's contract is a lawyer who is not
+        consulted. `representations` fixed §4.8 — it now carries an express
+        exception for an attorney, accountant or other professional adviser,
+        with no undertaking to Buyer — so this clause points at §4.8 rather than
+        restating it, and the promise and its former condition are read
+        together.
+
+    (2) `frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false`. §7.10
+        recites in capitals that the jury waiver was made "ONLY AFTER EXTENSIVE
+        CONSIDERATION OF THE RAMIFICATIONS OF THIS WAIVER WITH THEIR ATTORNEYS",
+        while this clause contemplates a signer who chose not to consult anybody.
+        On every signing where nobody called a lawyer, one of the two is a false
+        recital that the signature attests to. **§7.10 is `disputes-service`'s
+        (memo 061) and is not touched.** What this clause does instead is state
+        the rule once and generally — "no recital elsewhere in this Agreement is
+        evidence that counsel was consulted" — which is correct whether §7.10 is
+        kept, rewritten or deleted with the arbitration decision.
+
+    WHAT CHANGED. The opportunity is stated as a fact about what was actually
+    delivered, so it can be checked: the complete documents, including exhibits,
+    appendix and disclosures. The nonreliance sentence is deleted rather than
+    narrowed — narrowing leaves a clause that reads as though it works. And the
+    acknowledgement is expressly not a waiver of fraud, of a non-waivable right,
+    of a required disclosure, or of a statement attributable to Buyer.
+
+    DEPARTURE FROM THE MEMO — THE §4.8 CROSS-REFERENCE IS ADDED. The memo does
+    not make it. Without it the finding is closed in §4.8 alone, and a reader of
+    §7.22 has no way to know the condition that used to sit on the promise has
+    gone.
+  */
   {
     slug: 'frpa.attorney-review-7-22',
     version: 1,
@@ -712,7 +1220,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 220,
     heading: 'Attorney Review',
-    body: 'Each Merchant and Guarantor acknowledges that it has had an opportunity to review this Agreement and all addenda with counsel of its choosing before signing or has chosen not to avail itself of that opportunity. Each Merchant and Guarantor further acknowledges that it has not relied on any representation by Buyer or any third party that is not set forth in this Agreement.',
+    body: 'Merchant and each Guarantor have been given the complete transaction documents, including every exhibit, the Appendix and every disclosure, and a reasonable opportunity to read them, ask questions and consult independent counsel before signing. Section 4.8 does not restrict a disclosure made to an attorney, an accountant or another professional adviser for that purpose.\nEach of them may choose whether to consult counsel, and choosing not to costs nothing under this Agreement. No party represents that counsel was consulted unless that occurred, and no recital elsewhere in this Agreement is evidence that it did.\nThis acknowledgement does not waive a claim for fraud or misrepresentation, a right applicable law does not permit to be waived, a required disclosure, or a statement legally attributable to Buyer.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -795,6 +1303,105 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['information-sharing-only-vs-any-third-party'] }],
   },
+  /*
+    THE DEPLOYMENT SURFACE FOR ELEVEN STATES, AND IT MISSTATED THE ONE WITH THE
+    WORST CONSEQUENCE.
+
+    Three findings, all REVIEW-02, one of them the only `blocker` in this
+    cluster. Each is verified below against vendored primary text rather than
+    against the memo, and **two of the memo's own premises turned out to be
+    wrong** — see VERIFICATION.
+
+    (1) `frpa-7-24-misstates-what-tex-fin-code-398-055-voids` (blocker). v4 said
+        §398.055 "voids confession-of-judgment and similar provisions" and then
+        supplied the remedy: the offending provision "does not apply to this
+        Agreement and the remainder of the Agreement continues in effect." The
+        statute voids the CONTRACT. Severance is the one outcome it forecloses,
+        so a clause promising it is worse than silence — it tells the reader the
+        risk is handled.
+
+    (2) `frpa-7-24-answers-only-half-of-conn-gen-stat-36a-868`. The section has
+        two limbs: a contract SHALL NOT CONTAIN a prejudgment-remedy waiver, and
+        any such provision shall be unenforceable. Disapplying a provision
+        answers the second. The first is a rule about what may be written down,
+        it carries a civil penalty under §36a-872(a), and no severance clause
+        answers it.
+
+    (3) `frpa-7-24-does-not-name-the-statute-that-actually-bites`, whose locus is
+        "7.24 ... read against 7.5". §7.5 mandates New York or Pasco County,
+        Florida. For a Virginia recipient that is a provision mandating that an
+        action be brought outside the Commonwealth.
+
+    VERIFICATION — WHAT WAS OPENED, AND WHAT THE BRIEF GOT WRONG. The brief says
+    both statutes are "not vendored" and instructs marking them UNVERIFIED. Both
+    ARE vendored, and one of the memo's citations is to the wrong section.
+
+      - **Tex. Fin. Code §398.055 is vendored**, in
+        `mca/sources/TX-Fin-Code-Ch-398.txt`: *"UNENFORCEABILITY OF CERTAIN
+        CONTRACT PROVISIONS. A commercial sales-based financing contract that
+        contains a confession of judgment provision or any similar provision is
+        void and unenforceable."* VERIFIED, and it confirms finding (1): the
+        subject of "void and unenforceable" is the CONTRACT.
+      - **The Virginia venue rule is vendored**, in
+        `mca/sources/VA-Code-6.2-2228-2238.txt`, and it is **§6.2-2234(A)**, not
+        the §6.2-2236(A) the memo, the brief and `clauses/facts.ts` all cite:
+        *"any cause of action arising under such contract or agreement shall be
+        brought in a court in the Commonwealth. Any provision in the contract or
+        agreement mandating that such action be brought outside the Commonwealth
+        shall be unenforceable."* §6.2-2236 is a different section — "Validity of
+        noncompliant sales-based financing" — with no subsection (A) and nothing
+        about forum. `mca/statutes/ct-va-obligations.ts` already carries the
+        correct citation as `va-venue-in-the-commonwealth`, digest-checked
+        against the vendored file by `ct-va-statutes.test.ts`, and REVIEW-02's
+        own finding text gets it right too. **The memo is the outlier.**
+      - Va. Code **§6.2-2234(C)** separately prohibits a confession of judgment
+        and makes such a PROVISION unenforceable — the opposite consequence from
+        Texas's, which is precisely why one severance sentence cannot serve both.
+      - Conn. Gen. Stat. §36a-868 is vendored in `mca/sources/CT-CGS-36a-861-
+        872.txt` and reads as finding (2) describes.
+
+    WHAT CHANGED. The clause stops being a severance clause and becomes the
+    thing its heading claims: the rule that a rider is chosen BEFORE the offer.
+    Severance is left to §7.7 and is expressly not the answer to a prohibited
+    term. The Connecticut containment limb and the Texas whole-contract
+    consequence are both answered the only way they can be — by stating what
+    this Agreement does not contain, which §6.2 and §4.6 already make true. The
+    Virginia forum rule is stated as an operative term with priority.
+
+    DEPARTURE 1 — NO STATUTORY CONCLUSION IN THE BODY. The memo's text says
+    "the parties acknowledge that Texas Finance Code Section 398.055 makes a
+    contract containing such a provision void and unenforceable". That is a
+    conclusion about the law stated in a merchant-facing sentence, which the
+    brief forbids and which the Governance workflow's `No legal-advice language`
+    grep would catch. The conclusion is recorded here, verified, and the body
+    states the fact about the paper instead: this Agreement contains none.
+
+    DEPARTURE 2 — THE VIRGINIA SENTENCE DOES NOT DESCRIBE §7.5. The memo writes
+    "actions shall be brought in Virginia as required by Section 7.5". §7.5 does
+    not require that; it requires the opposite. The sentence states the rule and
+    claims priority over "any different forum provision of this Agreement,
+    including Section 7.5", which is true today and stays true whatever
+    `disputes-service` does with §7.5. **The conflict is handed over, not
+    resolved here.** `venueRule` remains `funder-state` and is not flipped; the
+    correct citation for the comment above `venueRule` in `clauses/facts.ts`
+    is §6.2-2234(A), and that file is not this cluster's to edit.
+
+    DEPARTURE 3 — THE CALIFORNIA APR RULE IS STATED WITHOUT ITS CITATION. The
+    memo names Cal. Fin. Code §22806. That section is NOT vendored —
+    `mca/sources/CA-10CCR-900-956.txt` is the regulation, not the Financial Code
+    — so the rule is written conditionally ("Where a state requires ...") and the
+    citation stays here. UNVERIFIED: nobody on this project has read §22806.
+
+    DEPARTURE 4 — TEXAS IS SPLIT OUT INTO ITS OWN SECTION. See the record below.
+
+    THE GATE, AND WHY IT IS NOT ON THIS CLAUSE. The brief marks this `both` on
+    `recipientStates`. This half is NOT gated: every duty in it — determine the
+    applicable law, deliver the disclosures, attach the rider, omit what the law
+    forbids — is owed by Buyer in every state, including Florida, which is the
+    only state in `LOMBARD_FACTS`. What is gated is the Texas notice, and it is a
+    separate record because §86.310(d) requires it "as a separate section or
+    otherwise conspicuously set out from surrounding written material".
+  */
   {
     slug: 'frpa.state-law-riders-7-24',
     version: 1,
@@ -805,7 +1412,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 240,
     heading: 'State Law Riders',
-    body: 'To the extent any provision of this Agreement is prohibited or rendered unenforceable by the law of the state in which Merchant is located, including Conn. Gen. Stat. §36a-868 (which bars a waiver of a recipient’s right to notice, judicial hearing or prior court order in connection with a prejudgment remedy) and Tex. Fin. Code §398.055 (which voids confession-of-judgment and similar provisions), that provision does not apply to this Agreement and the remainder of the Agreement continues in effect. Nothing in Section 7.12 or Section 10 waives any right to notice, to a judicial hearing, or to a prior court order that the law of Merchant’s state makes non-waivable.',
+    body: 'Before Buyer makes a specific offer, Buyer shall determine which state’s law applies to the transaction, shall give the disclosures that law requires in the form and at the time it requires, shall obtain any signature it requires on them, and shall attach the applicable state rider before this Agreement is executed. Buyer shall omit any provision that applicable law forbids this Agreement to contain. No party waives a statutory right, and this Section cures no prohibited term: a provision the law forbids this Agreement to contain is one that must not be written into it, not one to be severed under Section 7.7 afterwards.\nThis Agreement contains no confession of judgment or comparable provision, as Section 6.2 and Section 4.6 state, and it contains no waiver of a right to notice, to a judicial hearing or to a prior court order in connection with a prejudgment remedy. Nothing in Section 7.12 or Section 10 is such a waiver.\nWhere Merchant’s principal place of business is in Virginia and this Agreement is sales-based financing under Virginia law, a cause of action arising under this Agreement shall be brought in a court in the Commonwealth of Virginia. This paragraph governs over any different forum provision of this Agreement, including Section 7.5.\nWhere applicable law requires an annual percentage rate to be stated whenever a charge, a pricing metric or a financing amount is stated for a specific offer, Buyer shall state it, using the words “annual percentage rate” or “APR”, from the time the specific offer is made and throughout the application process.\nThis Agreement authorizes no debit of any deposit account of Merchant. Where a protection applicable law gives Merchant is more favorable to Merchant than a provision of this Agreement, that protection controls.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -814,6 +1421,110 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
         review: 'REVIEW-02',
         findings: [
           'frpa-7-24-answers-only-half-of-conn-gen-stat-36a-868',
+          'frpa-7-24-does-not-name-the-statute-that-actually-bites',
+          'frpa-7-24-misstates-what-tex-fin-code-398-055-voids',
+        ],
+      },
+    ],
+  },
+  /*
+    THE ONLY RULE IN ELEVEN STATES THAT PUTS WORDS INSIDE THE AGREEMENT.
+
+    A NEW RECORD, SPLIT OUT OF §7.24, and the split is the substance rather than
+    a filing convenience. 7 TAC §86.310(d), vendored verbatim in
+    `mca/sources/TX-7TAC-86-310-313.txt`: *"A contract for services under Texas
+    Finance Code, Chapter 398 must contain the following statement AS A SEPARATE
+    SECTION OR OTHERWISE CONSPICUOUSLY SET OUT FROM SURROUNDING WRITTEN MATERIAL"*.
+    Folding the notice into §7.24's fifth paragraph, among four other states'
+    rules, is the arrangement that rule exists to forbid.
+
+    THE WORDS ARE THE REGULATOR'S AND ARE NOT REWRITTEN. This is the conformity
+    surface of ADR 0008 reaching into the clause library: ADR 0012 says the
+    baseline DOCUMENT is input rather than specification, and none of that
+    applies to text a state wrote. `__tests__/a-notice-can-arrive-in-time.test.ts`
+    re-matches the notice against the vendored adopted rule on every run through
+    `containsPrescribedText`, with a paraphrase as the negative control, so a
+    tidy-up of the address or a rewording is red rather than invisible.
+
+    THE COMMISSION ENDORSED EXACTLY THIS STRUCTURE in its response to comments,
+    quoted in the vendored file's header: *"If providers wish to use the same
+    contract for multiple states, they might consider including the OCCC notice
+    in a state-specific provision for Texas transactions."*
+
+    A SEPARATE DISCLOSURE DOES NOT SATISFY IT, which is the owner's note and the
+    reason this is not left to `mca/content/`. §86.310(a)-(c) govern the
+    DISCLOSURES; §86.310(d) governs the CONTRACT. Texas's disclosure obligations
+    live on the other surface and are a different set of rules — note that the
+    Finance Commission expressly declined to adopt a model disclosure form, so
+    Texas prescribes content there and layout nowhere.
+
+    THE GATE, AND WHAT "PARTITION" MEANS FOR A `string[]`. ADR 0013 says a fact
+    may only gate a whole clause and that the values of a fact must partition the
+    clauses it gates. `recipientStates` is `McaJurisdiction[]` — a list, not an
+    enum — so "one clause per value" is not available: there are 2^11 values and
+    a template may be offered in several states at once. What partitions is the
+    PREDICATE. `recipientStates.includes('US-TX')` is true or false, those two
+    answers are exhaustive and disjoint, and they select this clause or do not.
+
+    IT IS AN ADDITION, NOT AN ALTERNATIVE, and that is the §7.21 shape rather
+    than the §4.15 shape. §7.21 is gated on `brokerChannel` with no replacement,
+    because a funder with no broker channel has no ISO; a transaction outside
+    Texas has no OCCC, so the clause is genuinely absent rather than differently
+    worded. §7.24 is ungated and carries every duty that is owed in every state,
+    so `false` leaves no hole.
+
+    APPLYING THE DIAGNOSTIC RATHER THAN THE GATE. *"If two limbs bind different
+    parties or answer different questions, the fact is wrong, not the
+    granularity."* Here the two limbs answer different questions and bind
+    different people — §7.24 tells BUYER what to do before it makes an offer;
+    this notice tells the RECIPIENT that a state agency exists and how to reach
+    it, in the agency's own words, and imposes no duty on anybody. That is the
+    signal to split, and splitting is what the diagnostic asks for when the fact
+    is genuinely a whole-clause question. It is a whole-clause question here
+    because the clause is the notice.
+
+    IT IS §7.25, NOT A SECOND §7.24. Two records sharing a number is the §4.15
+    and §8.2 arrangement, and it is only safe because those pairs are mutually
+    exclusive. This one is selected ALONGSIDE §7.24, so sharing the number would
+    give a Texas document two §7.24s and make every cross-reference to §7.24
+    ambiguous — the failure `select-clauses.test.ts`'s one-clause-per-number
+    assertion exists for.
+
+    EXAMINED BY. REVIEW-02, carrying the two §7.24 findings that are about Texas
+    and the statute §7.24 failed to name. The record is new; the findings were
+    raised against the text it is split out of, which is the same basis on which
+    `frpa.rollover-carry-method-8-2` carries §8.2's.
+
+    NOT DECIDED HERE. Whether a Lombard transaction into Texas is "commercial
+    sales-based financing" under Chapter 398, and whether Lombard is a registered
+    provider under §398.052, are questions for counsel and for the business.
+    `LOMBARD_FACTS.recipientStates` is `['US-FL']`, so this clause is not in
+    Lombard's template today. UNVERIFIED, and worth stating: 7 TAC §86.313 makes
+    an automatic deposit-account debit lawful only while the provider holds a
+    validly perfected FIRST-PRIORITY security interest in all of the recipient's
+    accounts receivable, and §4.10 expressly disclaims any priority warranty —
+    so a Texas deployment on anything but `collectionMethod: 'split-only'` needs
+    that read properly first.
+  */
+  {
+    slug: 'frpa.texas-occc-notice-7-25',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    includeWhen: (facts) => facts.recipientStates.includes('US-TX'),
+    number: '7.25',
+    section: 'miscellaneous',
+    sortKey: 250,
+    heading: 'Texas Transactions: Office of Consumer Credit Commissioner Notice',
+    body: 'This Section applies where this Agreement is a contract for services under Texas Finance Code Chapter 398.\nThe Office of Consumer Credit Commissioner (OCCC) is a state agency that enforces certain laws that apply to this contract. If a complaint cannot be resolved by contacting the provider, a commercial sales-based financing recipient can contact the OCCC to file a complaint. OCCC address: 2601 N. Lamar Blvd., Austin, Texas 78705. Phone: (800) 538-1579. Website: occc.texas.gov.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: ['US-TX'],
+    requiredBy: '7 TAC §86.310(d)',
+    examinedBy: [
+      {
+        review: 'REVIEW-02',
+        findings: [
           'frpa-7-24-does-not-name-the-statute-that-actually-bites',
           'frpa-7-24-misstates-what-tex-fin-code-398-055-voids',
         ],

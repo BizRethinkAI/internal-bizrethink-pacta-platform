@@ -30,8 +30,11 @@ describe('the MCA clause library surface', () => {
     // document holds open after a clause was taken out, now declared non-clause.
     // 200 until `renewal-positions` split the FRPA's §4.15 and §8.2 into
     // alternatives on 2026-09-10; see `frpa-coverage.test.ts` for why that adds
-    // records without adding sections.
-    expect(surface.clauses).toHaveLength(202);
+    // records without adding sections. 202 until `miscellaneous` split the Texas
+    // OCCC notice out of §7.24 into its own §7.25 the same day, which DOES add a
+    // section because 7 TAC §86.310(d) requires the notice to be conspicuously
+    // separate from the material around it.
+    expect(surface.clauses).toHaveLength(203);
   });
 
   it('groups by instrument, in the declared order', () => {
@@ -42,20 +45,20 @@ describe('the MCA clause library surface', () => {
       expect(entry.clauseCount).toBe(ALL_MCA_CLAUSES.filter((c) => c.instrument === entry.id).length);
     }
 
-    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(202);
+    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(203);
   });
 
   /**
    * THE SENTENCE THE PAGE EXISTS TO MAKE TRUE.
    *
-   * Not one of these 202 clauses may reach a merchant, and the reason is the
+   * Not one of these 203 clauses may reach a merchant, and the reason is the
    * same for every one: `attorney-drafted` with no named author. The page states
    * it as a count with the reason attached, rather than leaving a reader to
-   * infer it from 202 identical badges.
+   * infer it from 203 identical badges.
    */
   it('reports that nothing is publishable, and why', () => {
     expect(surface.totals.publishable).toBe(0);
-    expect(surface.totals.clauses).toBe(202);
+    expect(surface.totals.clauses).toBe(203);
 
     for (const clause of surface.clauses) {
       expect(clause.publishProblems).toEqual([
