@@ -18,6 +18,11 @@ type GetOrganisationAuthenticationPortalOptions =
 export const getOrganisationAuthenticationPortalOptions = async (
   options: GetOrganisationAuthenticationPortalOptions,
 ) => {
+  // MODIFIED for BizRethink (overlay 071): SSO removed from this build (2026-09 incident); no portal row can revive org OIDC.
+  if ((await import('@bizrethink/customizations/feature-flags')).isSsoDisabledByBuild()) {
+    throw new AppError(AppErrorCode.NOT_SETUP, { message: 'SSO is disabled in this build' });
+  }
+
   const organisation = await prisma.organisation.findFirst({
     where:
       options.type === 'url'
