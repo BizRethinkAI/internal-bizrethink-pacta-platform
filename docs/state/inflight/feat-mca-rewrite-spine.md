@@ -4,7 +4,8 @@
 2026-09-10). The drafting under [ADR 0012](../../adr/0012-the-baseline-document-is-input-not-specification.md)
 and [ADR 0013](../../adr/0013-a-funder-profile-describes-the-funder.md).
 
-**28 of 97 FRPA clauses rewritten.** 58 test files, 2158 tests, typecheck 0.
+**34 of 99 FRPA clause records rewritten, 2 added.** 57 test files, 2172 tests,
+typecheck 0, Governance clean.
 
 Nothing here is reviewed. Every clause is `status: 'draft'` with `author: null`
 and zero counsel approvals exist. **`assertPublishable` does not refuse them** —
@@ -22,9 +23,11 @@ first thing that path must do is fail closed on `assertPublishable`; see ADR 001
 | `854964e2d` | `equipment` becomes a merchant election; the profile stops describing v4 |
 | `4933d23de` | ADR 0013 |
 | `0c9d4e895` | ADR 0012's stale `lombard-contracts` section, corrected |
+| `923b97be9` | §9.1 stops collecting a guarantor's SSN with no guaranty in the document |
+| `2903976ed` | renewal-positions (6 rewritten, 2 added); completeness retires, coherence replaces it |
 
-**In flight:** `renewal-positions` (§§004, 4.15, 5.16, 7.13, 8.1, 8.2), which also
-carries the three remaining fact rows.
+**Next:** `data-and-channel` (9), `fees-and-money` (6), `miscellaneous` (12),
+`disputes-service` (11).
 
 ## The structural finding this exists to fix
 
@@ -41,7 +44,7 @@ is how eight clauses reach the fifteen they never edit.
 
 ## The fact model was the real defect
 
-Three of eleven facts were **inert** — declared in `McaFacts`, read by nothing.
+**Four** of eleven facts were inert — declared in `McaFacts`, read by nothing.
 A fact that nothing gates on is a hardcode wearing a fact's clothes, and it is
 invisible until a template is assembled from it.
 
@@ -55,6 +58,12 @@ invisible until a template is assembled from it.
   answering `none` still got a personal guaranty.
 - **`equipment`** — `'none' | 'merchant-elects'`. Owner: *"Lease or buy, merchant
   decide while signing up."*
+- **`venueRule`** — **still inert, and deliberately so.** Nothing in the corpus
+  reads it; §7.5 is ungated and hard-codes New York law with New York and Pasco
+  County, Florida forums. The renewal cluster was told to flip it to
+  `merchant-state` and **refused**: that would leave the profile asserting one
+  venue while the only venue clause mandates the other, and a contradiction is
+  harder to see than a hole. → `disputes-service`, with §7.5's body.
 
 **`equipment` was hiding a missing product.** `instrumentsFor` gated the Equipment
 Lease and Subscription instruments on `equipment === 'separate-lease'` while the
@@ -74,8 +83,14 @@ ADR 0012 retired two and missed the third; ADR 0013 catches it.
 3. **`selectClauses` completeness** — *"selects every clause of the FRPA for the
    funder whose paper it is"*. Its own docstring says the property holds *because*
    the profile describes v4 rather than the memo, which is exactly the premise the
-   owner reversed. Replaced by **cross-reference coherence**: every cross-reference
-   in a selected clause points at a clause that is also selected.
+   owner reversed. Replaced by **cross-reference coherence** across nine funder
+   profiles. **The replacement was red on real defects the retired one could never
+   see**: §7.1 carving out a §4.15 that `concurrentPositions: false` had deleted,
+   and §004 pointing at a §8.2 that `renewalModel: 'payoff-only'` had deselected.
+4. A fourth, found by the same cluster: `library.test.ts`'s *"numbers each
+   numbered clause once within an instrument"* rests on the same premise and
+   cannot survive alternatives. Inverted to *"shares a clause number only between
+   conditional clauses"*, which still catches a copy-pasted ungated duplicate.
 
 Four drafting agents were told the completeness invariant was sacred before the
 owner's decision made it wrong. That reversal is in ADR 0013 so it is not
@@ -104,9 +119,12 @@ Both are cases where asserting over the **set** beat reading clauses one at a ti
   any act or omission by any ISO"* — unlimited personal liability for a broker the
   guarantor did not choose and whose agreement with Buyer they have never seen.
   The memo does not raise it. → `data-and-channel`.
-- **`frpa.guarantor-information-9-1`** is an ungated `field-group`, so a
-  `guarantyScope: 'none'` template still collects a guarantor's SSN for a guaranty
-  the document does not contain. The new coherence property should catch it.
+- **`frpa.guarantor-information-9-1`** was an ungated `field-group`, so a
+  `guarantyScope: 'none'` template collected a guarantor's name, home address and
+  SSN for a guaranty the document did not contain. **Fixed** (`923b97be9`), after
+  verifying the defect by selecting at each value rather than trusting the report.
+  The `full-performance` half is unfixed and registered: §9.1 plus §§10.2/10.4
+  with no guaranty between them.
 
 ## Departures worth a second look
 
@@ -121,22 +139,39 @@ Both are cases where asserting over the **set** beat reading clauses one at a ti
 - **`guarantyScope: 'full-performance'` is deliberately unauthored.** It is what
   all three market forms filed as SEC exhibits do, which is precisely why it is not
   a drafting agent's decision. A named gap.
-- **The memo contradicts itself on Carry** — its narrative says the design removes
-  it; its own §8.2 replacement text keeps it as a merchant election.
-  `renewal-positions` must resolve it and say which way.
+- **The memo does NOT contradict itself on Carry — I did.** I briefed the renewal
+  cluster that the memo's narrative removes Carry while its §8.2 replacement text
+  retains it, and that the library body already matched that replacement. Both
+  false. The memo marks the Deduct/Carry text **`DELETE — entire current clause`**;
+  its `INSERT` opens *"No prior Remaining Balance is carried into the new
+  Purchased Amount"*. The body matched the deleted text because the library was a
+  verbatim transcription of v4 — which is what the memo was deleting. I grepped
+  for "Carry", found a block, and never read the marker above it. **The agent
+  refused the premise and asked to be checked; it was right.**
 
 ## Owed
 
 - **`every-fact-value-is-reachable` (#150)** enumerates the `equipment` union and
   must drop the two retired values when it merges; it also needs `settlementBase`.
-- **`examinedBy` over-claims** on every rewritten clause. REVIEW-01 and REVIEW-02
-  read the *old* text and `ReviewId` admits no third value, so there is no honest
-  way to record that the 2026-09-09 memo informed these. **Giving the memo an
-  identity in the review vocabulary would close this and the six refuted
-  dispositions below at once.**
+- **`examinedBy` over-claims** on every rewritten clause: it cites reviews that
+  read the *predecessor* text. **A third `ReviewId` for the memo would NOT fix
+  this** — the memo read that same old text, so it would make three reviews claim
+  to have read text none of them read. The field answers *"who audited the slot"*,
+  not *"who read this body"*. What is actually missing is **provenance for the
+  current body** — which memo entry it came from and whether we adopted, adapted
+  or departed. Roughly a dozen DEPARTURE notes live only in prose comments nobody
+  can query.
 - **Six findings the memo refuted** still need corrected dispositions in
-  `lombard-contracts`. (The REVIEW-02 manifest gap ADR 0012 records is **already
-  closed** — see ADR 0013 §6.)
+  `lombard-contracts`. **No vocabulary change is needed** — `rejected` already
+  exists in `FindingDisposition` and REVIEW-01 already uses it once. Data fix plus
+  regenerate the register. (The REVIEW-02 manifest gap ADR 0012 records is
+  **already closed** — see ADR 0013 §6.)
+- **§7.1's carve-out for §4.15 is now empty**, §7.9 → §6.3.1 dangles, and §4.16 →
+  §6.1.1 dangles twice over (a Plaid outage is expressly not an Event of Default
+  under the rewritten §6.1). All three are registered in `KNOWN_GAPS` with quotes,
+  and each belongs to a cluster still to run.
+- **§004's `«25»` row label** becomes "Prior transaction treatment" — a
+  `lombard-contracts` form change, handed back, not made.
 - **`frpa.holdback-explainer` still has `kind: 'clause'`** although ADR 0011 and
   the memo both treat it as an explainer.
 - **§4.13 needs three Section 1 grid rows** that do not exist — offer expiry,
@@ -155,3 +190,7 @@ Both are cases where asserting over the **set** beat reading clauses one at a ti
 `data-and-channel` (9), `fees-and-money` (6), `miscellaneous` (12),
 `disputes-service` (11). **All four touch `miscellaneous.ts`, so they run one at a
 time**, not in parallel.
+
+`disputes-service` carries the `venueRule` flip together with §7.5's body.
+`data-and-channel` owns §7.21, the unlimited guarantor indemnity for an ISO's
+conduct.

@@ -152,23 +152,48 @@ This is why `equipment` moved on its own while `renewalModel`,
 broke, whereas `renewalModel: 'payoff-only'` deselects the whole of §8.2
 including the Deduct method the funder still needs.
 
-### The limb problem
+### The limb problem, and the rule that came out of it
 
-**A fact frequently decides a limb, and `includeWhen` only decides a clause.**
-Three sightings so far: `equipment` decides *"§4.11's ranking limb"*;
-`renewalModel` decides §8.2's Carry method but gates all of §8.2;
-`concurrentPositions` decides §4.15's cascade but gates all of §4.15 — and the
-memo does not want silence there, it wants the opposite rule stated.
+**A fact frequently appears to decide a limb, and `includeWhen` only decides a
+clause.** Three sightings before this was settled: `equipment` and *"§4.11's
+ranking limb"*; `renewalModel` and §8.2's Carry method; `concurrentPositions` and
+§4.15's cascade.
 
-**The resolution is to split the clause so that a fact decides a whole clause:**
-an always-selected clause carrying what is true either way, and a gated clause
-carrying the limb. Splitting moves the counts `frpa-coverage.test.ts` and
-`library.test.ts` pin, which is a deliberate change and belongs in the same
-commit.
+**The rule is a property, not a procedure:** *a fact may only gate a whole
+clause, and the values of a fact must partition the clauses it gates.* When a
+fact appears to decide a limb, the clause is carrying two rules and the fix is to
+separate them.
+
+**Limb granularity in `includeWhen` would be the wrong feature.** §4.15's two
+answers are not one text with a variable piece; they are **opposite rules that
+share a section number and almost no words**. A sub-clause condition would have
+produced one record whose body reads as both rules with a hole in it, and would
+have hidden the thing the split makes visible — that `concurrentPositions` is a
+product decision with two documents behind it, not a formatting toggle.
+
+**The shape is the exhaustive pair, not "always-selected plus gated limb."** An
+"always" clause covering §4.15 would have had almost nothing true to say, because
+the two designs contradict each other. `renewalModel`'s three values partition
+across two clauses; `concurrentPositions`'s two across two. **The assertion to
+write once: for every value of the fact, exactly one clause of the group is
+selected.**
+
+**When splitting is WRONG, with the diagnostic.** §5.16 and §4.11 both looked
+like limb problems and neither is. §5.16 binds *Merchant*; `concurrentPositions`
+describes what *Buyer* may hold. **If the two limbs bind different parties or
+answer different questions, the gate is misattributed rather than too coarse**,
+and the fix is `includeWhen: null` plus a cross-reference. Only where both limbs
+answer the same question for different values of one fact is splitting right.
+
+**Splitting moves the clause counts, and those counts are record counts, not
+section counts.** FRPA 97 → 99 and all instruments 200 → 202 with **zero new
+section numbers**. `frpa-coverage`, `library` and `surface` pin these, and the
+enrollment cluster explicitly declined to split §4.11 *because* it read a pinned
+number as a prohibition. It is not one. Move the counts in the same commit.
 
 ## Consequences
 
-**Three of the eleven facts were inert when this was written** — declared, and
+**Four of the eleven facts were inert when this was written** — `venueRule` is the fourth, found when the renewal cluster refused to flip it: nothing in the corpus reads it, and §7.5 is ungated and hard-codes New York law with New York and Pasco County, Florida forums. Flipping the row would have left the profile asserting merchant-state venue while the only venue clause mandates the funder's, which is harder to see than a hole. **Three of the eleven were inert when this was written** — declared, and
 read by nothing. `every-fact-value-is-reachable` (#150) measures this. Two are
 now closed: `settlementBase` and `guarantyScope`, the latter gating §§9.2, 9.4,
 9.5 and 9.6 so that a funder answering `none` stops receiving a personal guaranty
@@ -200,7 +225,10 @@ ADR that supersedes this one. ADR 0012's table stands except where noted.
 | Is completeness of selection a test we keep? | **No.** Replaced by cross-reference coherence. |
 | Does the funder choose buy-versus-lease? | **No.** The funder chooses whether equipment is offered; the merchant elects at signing. |
 | May a fact row move before the clauses it gates? | **No.** Same change, or the profile selects a document with a hole in it. |
-| What do we do when a fact decides a limb? | **Split the clause** so the fact decides a whole clause, and move the pinned counts in the same commit. |
+| What do we do when a fact decides a limb? | **The values of a fact must partition the clauses it gates**, as an exhaustive set — not an always-selected clause plus a gated limb. Assert that exactly one clause of the group is selected for every value. |
+| Should `includeWhen` gain limb granularity? | **No.** Opposite rules sharing a section number are two clauses, and a sub-clause condition would hide that the fact is a product decision. |
+| How do we tell a limb problem from a misattributed gate? | **If the two limbs bind different parties or answer different questions, the fact is wrong, not the granularity** — `includeWhen: null` plus a cross-reference. §5.16 and §4.11 are both this. |
+| Do the pinned clause counts forbid splitting? | **No.** They are record counts, not section counts. Move them in the same commit. |
 | Does REVIEW-02 still need a manifest? | **No.** `lombard-contracts` PR #9 gave it one. 5 findings of 254 are `unrecorded`, and all 5 are refuted findings, which is correct. ADR 0012 records the opposite. |
 
 ## What this does not change
