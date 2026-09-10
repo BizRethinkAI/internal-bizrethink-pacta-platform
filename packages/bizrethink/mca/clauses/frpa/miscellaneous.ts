@@ -316,6 +316,115 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    ONE CLAUSE THAT CHOSE A STATE, A FORUM, AN ASSIGNMENT RULE AND A METHOD OF
+    SERVICE — AND WAS WRONG ON ALL FOUR.
+
+    WHAT WAS WRONG. Four separate defects sharing a paragraph.
+
+    (1) NEW YORK LAW FOR A FLORIDA BUYER FUNDING OUT-OF-STATE MERCHANTS.
+        `ny-law-below-gol-5-1401-threshold`. The memo and REVIEW-01 agree that
+        the choice is not automatically bad below New York's safe-harbour
+        threshold — the ordinary relationship and conflicts analysis simply
+        continues to apply, and on a small advance to an out-of-state merchant
+        from a Florida buyer there may be nothing to relate the deal to New
+        York. The memo's own point, which the brief tells this cluster not to
+        conflate: GOL §5-1401 (choice of LAW) and §5-1402 (choice of FORUM) have
+        DIFFERENT thresholds, $250,000 and $1,000,000. UNVERIFIED — neither
+        section is vendored, and REVIEW-01 records its own quotation as
+        "statutory text from memory; counsel to verify".
+
+    (2) A FORUM BUYER ALONE PICKED, FROM TWO. "shall, IF BUYER SO ELECTS, be
+        instituted in any court sitting in New York State or in Pasco County,
+        Florida (the 'Acceptable Forums')". That election is the second half of
+        `counterclaim-waiver-flips-by-forum`: New York makes every counterclaim
+        permissive and Florida makes a transaction-related one compulsory, so
+        the SAME §7.20 was an absolute bar in one Acceptable Forum and a nullity
+        in the other, and the party choosing between them was the plaintiff.
+
+    (3) AN ASSIGNMENT RULE THAT ALREADY CONTRADICTED §7.2, AND NO BRIEF NAMED
+        IT. This clause said Merchant may not assign without consent "which
+        consent may be withheld in Buyer's SOLE DISCRETION". §7.2 as rewritten
+        moved that to consent "not unreasonably withheld". Two rules over one
+        subject, live in the corpus since wave 2 — the §10.1/§10.2 failure shape
+        exactly. The rule is now stated once, in §7.2, and this Section points
+        at it.
+
+    (4) A SERVICE RULE IN THE GOVERNING-LAW CLAUSE. "mailing by certified or
+        registered mail ... will constitute valid and lawful service of process
+        against them, without the necessity for service by any other means."
+        `a-notice-can-arrive-in-time.test.ts` conceded this sentence to this
+        cluster by name; the concession is deleted in the same change, which is
+        what that register exists to force.
+
+    WHAT CHANGED. Binding effect and successors stay and the assignment rule
+    goes to §7.2. The governing law and the forum both become the state of
+    Merchant's principal place of business. Article 9's mandatory perfection and
+    priority rules are stated to govern themselves, because a choice-of-law
+    sentence cannot displace them. Judicial process goes to §10.1. And the
+    Section says in terms that it is not a waiver of service, of a jurisdictional
+    objection or of a mandatory rule about where an action must be brought.
+
+    WHY MERCHANT-STATE IS NOT MERELY "THE CONSERVATIVE NATIONAL ANSWER".
+    VERIFIED, from `mca/sources/VA-Code-6.2-2228-2238.txt`. Va. Code
+    §6.2-2234(A), "Place for bringing action": *"any cause of action arising
+    under such contract or agreement shall be brought in a court in the
+    Commonwealth. Any provision in the contract or agreement mandating that such
+    action be brought outside the Commonwealth shall be unenforceable."* And
+    §6.2-2228 defines "Recipient" as *"a person whose principal place of
+    business is in the Commonwealth"*. So for every transaction Virginia covers,
+    the merchant's state IS Virginia, and a merchant-state rule satisfies
+    §6.2-2234(A) BY CONSTRUCTION rather than by a rider. That is why §7.24's
+    Virginia paragraph stops being an override and becomes a restatement.
+
+    THE MEMO'S VIRGINIA CITATION IS WRONG AND THIS CLUSTER DOES NOT REPEAT IT.
+    The memo cites §6.2-2236(A). §6.2-2236 is "Validity of noncompliant
+    sales-based financing", has no subsection (A), and says nothing about forum.
+    `facts.ts` had copied the error three times and is corrected; the correct
+    citation is §6.2-2234(A) and it appears only here, in a comment.
+
+    DEPARTURE 1 — THE VIRGINIA SENTENCE IS NOT REPEATED IN THIS CLAUSE. The
+    memo's replacement writes "For a transaction subject to Virginia Code
+    Section 6.2-2234, any action shall be brought in the Commonwealth of
+    Virginia." §7.24 already says that, in the rider clause where a state rule
+    belongs. Writing it here as well would be the two-rules-over-one-subject
+    defect this very clause was carrying at (3). This Section states the general
+    rule and yields to §7.24; §7.24 keeps the precedence claim it made
+    deliberately, and now nothing contradicts it.
+
+    DEPARTURE 2 — THE STATUTORY CITATION IS NOT IN THE BODY. House rule, and the
+    same call §7.24 made about Tex. Fin. Code §398.055: a citation in a
+    merchant-facing sentence is a statement about the law rather than about the
+    paper. The rule is written as a rule; the authority is here.
+
+    THE GATE WAS REFUSED, AND `venueRule` IS FLIPPED ANYWAY. The brief marks
+    this `both` on `venueRule`. Refused, on three grounds, in the order ADR 0013
+    asks them.
+
+      - **The fact decides a limb, not the clause.** This Section answers three
+        questions — who is bound and may transfer, which substantive law
+        governs, and where an action is brought. `venueRule` answers the third.
+        Gating the whole record on it would take the binding-effect and
+        governing-law rules away from a `funder-state` template as well.
+      - **The exhaustive-pair shape fails on its own stated criterion.** ADR
+        0013: §4.15's and §8.2's pairs are *"opposite rules that share a section
+        number and almost no words"*. A funder-state §7.5 and a merchant-state
+        §7.5 would share every word but two sentences. That is a VARIABLE, not
+        two rules — and `McaClause` deliberately has no `variables` field.
+      - **The funder-state arm cannot be drafted at all.** `McaFacts` has no
+        field naming the funder's state. `venueRule` asks "whose courts" without
+        supplying whose. `facts.ts` states the standard for that case: *"a clause
+        that needs to know something not on this list is a signal that the answer
+        schema is missing a field."*
+
+    So `includeWhen` stays `null`, and the row moves with the clause as ADR 0013
+    requires — `LOMBARD_FACTS.venueRule` is now `merchant-state`, which is what
+    this body says. The row remains INERT: nothing reads it. Closing that
+    properly needs either a `funderState` field plus a variables mechanism, or
+    the row deleted — an owner decision, reported as a gap. What is no longer
+    true is `renewal-positions`' reason for refusing the flip: the profile and
+    the only clause on the subject now agree.
+  */
   {
     slug: 'frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5',
     version: 1,
@@ -326,7 +435,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 50,
     heading: 'Binding Effect; Governing Law, Venue, and Jurisdiction',
-    body: 'This Agreement shall be binding upon and inure to the benefit of the parties and their respective successors and assigns, except that Merchant shall not have the right to assign its rights hereunder or any interest herein without the prior written consent of Buyer, which consent may be withheld in Buyer’s sole discretion. This Agreement shall be governed by and construed in accordance with the laws of the State of New York. This Agreement is for the sale of Merchant’s future Receipts and is subject to the Uniform Commercial Code as adopted in New York. Any suit, action, or proceeding arising hereunder, or the interpretation, performance, or breach hereof, shall, if Buyer so elects, be instituted in any court sitting in New York State or in Pasco County, Florida (the “Acceptable Forums”). The parties agree that the Acceptable Forums are convenient and submit to the jurisdiction of the Acceptable Forums and waive any and all objections to jurisdiction or venue. Should a proceeding be initiated in any other forum, the parties waive any right to oppose any motion or application made by either party to transfer such proceeding to an Acceptable Forum. Merchant and Guarantor(s) further agree that mailing by certified or registered mail, return receipt requested, of any process required by any such court will constitute valid and lawful service of process against them, without the necessity for service by any other means.',
+    body: 'This Agreement binds the parties and their permitted successors and assigns, and is for their benefit. Section 7.2 states when an interest under this Agreement may be transferred, by whom, and on what terms, and nothing in this Section permits a transfer that Section does not.\nSubject to mandatory federal law and to applicable conflict-of-laws rules, the substantive law of the state of Merchant’s principal place of business stated in Section 1 governs this Agreement. An action arising under this Agreement shall be brought in a state court of competent jurisdiction in that state, or in a federal court of competent jurisdiction sitting in that state. Neither party may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction. Section 7.24 states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it.\nPerfection, the effect of perfection or non-perfection, and the priority of a security interest are governed by the mandatory rules of the Uniform Commercial Code that apply to them. This Section does not vary those rules and does not choose the law that decides them.\nService of a summons, a complaint or other judicial process is governed by Section 10.1. Nothing in this Section makes a mailing, an email or any other communication into service of process. This Section is not a waiver of valid service, of a jurisdictional objection, of a mandatory rule about where an action must be brought, or of any protection applicable law does not permit to be given up.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -405,6 +514,64 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: ['frpa-7-6-and-4-2-contradict-the-2-6-completion-test'] }],
   },
+  /*
+    TWO STATUTES, THE SAME DEFECT, AND OPPOSITE CONSEQUENCES. THAT IS THE WHOLE
+    OF THIS CLAUSE.
+
+    WHAT WAS WRONG. "the validity, legality, and enforceability of any other
+    provision contained herein SHALL NOT IN ANY WAY BE AFFECTED OR IMPAIRED."
+    Unconditional. A promise this Agreement is not in a position to make.
+
+    THE THREE STATUTES, ALL VENDORED, ALL READ. They are written as rules about
+    what a contract may CONTAIN, and two of the three take the provision while
+    the third takes the contract:
+
+      - **Va. Code §6.2-2234(C)** (`VA-Code-6.2-2228-2238.txt`): *"No sales-based
+        financing contract shall contain any confession by judgment provision or
+        any similar provision. Any such provision in the contract shall be
+        unenforceable."* — the PROVISION.
+      - **Conn. Gen. Stat. §36a-868** (`CT-CGS-36a-861-872.txt`): *"No commercial
+        financing contract ... shall contain any provision waiving a recipient's
+        right to notice, judicial hearing or prior court order ... Any such
+        provision ... shall be unenforceable."* — the PROVISION.
+      - **Tex. Fin. Code §398.055** (`TX-Fin-Code-Ch-398.txt`): *"A commercial
+        sales-based financing contract that CONTAINS a confession of judgment
+        provision or any similar provision is void and unenforceable."* — the
+        CONTRACT.
+
+    VERIFIED, each quoted from the vendored file. The same defect that costs one
+    clause in Virginia and Connecticut costs the whole agreement in Texas, and no
+    severability language can reach across that: a savings clause is a term of
+    the contract the statute has already voided. §7.24 gets this right and says
+    so — *"a provision the law forbids this Agreement to contain is one that
+    must not be written into it, not one to be severed under Section 7.7
+    afterwards"* — and this Section is the other end of that sentence.
+
+    WHAT CHANGED. Severance is available only so far as applicable law permits
+    and only where it does not defeat the essential lawful bargain. Savings
+    language is expressly denied the power to preserve a contract the law makes
+    void in whole. No provision may be read down so as to permit a prohibited
+    charge, waiver or collection practice — which is the other way a savings
+    clause is used, to keep an over-wide term alive at its maximum lawful width.
+    And the operative duty is stated where it belongs: leave the provision out
+    of the form.
+
+    DEPARTURE FROM THE MEMO — THE MEMO'S LAST SENTENCE IS POINTED AT §7.24
+    RATHER THAN REPEATED. The memo writes "Buyer shall omit prohibited terms
+    from the form before presenting it for signature." §7.24's first paragraph
+    already imposes that duty, with the determination of which law applies in
+    front of it. Both are kept, because this is the clause a reader reaches for
+    when a term has already gone wrong, but this one names §7.24 instead of
+    restating the whole duty.
+
+    NOT ARGUED IN THE BODY, AND IT IS THE REASON THIS IS RATED A BLOCKER. Nothing
+    in a clause can make a Texas transaction safe. The rider mechanism is what
+    keeps the prohibited term out of a Texas form in the first place, and
+    `frpa.texas-occc-notice-7-25` is the worked example of the shape. Whether a
+    Lombard transaction into Texas is commercial sales-based financing under
+    Chapter 398 at all is a question for counsel and the business, and §7.25's
+    note records it.
+  */
   {
     slug: 'frpa.severability-7-7',
     version: 1,
@@ -415,7 +582,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 70,
     heading: 'Severability',
-    body: 'In case any of the provisions in this Agreement is found to be invalid, illegal, or unenforceable in any respect, the validity, legality, and enforceability of any other provision contained herein shall not in any way be affected or impaired. Any provision hereof prohibited by law shall be ineffective only to the extent of such prohibition without invalidating the remaining provisions hereof.',
+    body: 'A provision of this Agreement that is held invalid or unenforceable may be severed only so far as applicable law permits, and only where severing it does not defeat the essential lawful bargain between the parties. Where it is severed, the remainder continues in effect. This Section states no wider rule than that.\nNo severability or savings language in this Agreement preserves this Agreement where applicable law makes the entire contract void. No provision of this Agreement is to be rewritten, narrowed or read down so as to permit a charge, a waiver or a collection practice that applicable law prohibits, and a provision so read down is severed instead.\nA provision applicable law forbids this Agreement to contain is a provision to be left out of the form before it is presented for signature, and not one to be cured afterwards. Section 7.24 states that duty, states that this Section cures no prohibited term, and states which law Buyer must determine before making a specific offer.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -607,6 +774,60 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       },
     ],
   },
+  /*
+    THE THIRD AND LAST RECITAL OF SOMETHING THAT DID NOT HAPPEN.
+
+    WHAT WAS WRONG. "THE PARTIES HERETO ACKNOWLEDGE THAT EACH MAKES THIS WAIVER
+    ... ONLY AFTER EXTENSIVE CONSIDERATION OF THE RAMIFICATIONS OF THIS WAIVER
+    WITH THEIR ATTORNEYS." §7.22 contemplates a signer who is offered counsel and
+    declines; §9.6 made the same recital and was rewritten for it. As of wave 6
+    §7.22 says in terms that *"no recital elsewhere in this Agreement is evidence
+    that it did"*, which named this sentence without being able to reach it.
+    `frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false`.
+
+    WHAT DID NOT CHANGE, AND THE OWNER'S INSTRUCTION AGAINST THE MEMO. The memo's
+    disposition is to delete the waiver from the national form, on the ground
+    that predispute jury waivers vary by forum. They do — and the variation cuts
+    one way, in one state. **Grafton** is UNVERIFIED; nobody on this project has
+    pulled it from an official reporter. What it is cited for is that a
+    contractual jury waiver made before a dispute arises is not given effect in
+    California STATE court absent statutory authorisation. It says nothing about
+    Florida, New York or Texas, and deleting the clause nationally to answer one
+    state's rule gives away the waiver in the other ten.
+
+    WHAT CHANGED. The waiver stays, mutual, and limits ITSELF: it operates only
+    to the extent the law of the forum gives effect to a predispute waiver, and
+    where that law does not, the Section has no effect and each party keeps the
+    right. The recital goes, and is replaced by a pointer to §7.22 — which
+    records what each signer was actually given and actually offered, and is
+    therefore the only place in the document where a statement about counsel can
+    be true.
+
+    WHY THIS IS NOT GATED ON `recipientStates`, THOUGH §7.25 IS. §7.25's
+    predicate partitions cleanly because the OCCC notice is an ADDITION that a
+    Texas document needs and no other document does. A California carve-out is
+    not that shape: `recipientStates` is a list, so a template offered in
+    California AND Florida would lose the waiver in Florida too, and the answer
+    a jury waiver needs is per-FORUM at the time of suit, not per-template at
+    the time of drafting. A merchant in one state can be sued in another. The
+    self-limiting sentence answers the question where it is actually asked.
+
+    NOT DECIDED HERE, AND IT IS A REAL GAP. **Conspicuousness.** v4 set this
+    clause in capitals; this rewrite does not, following the rule §10.4 settled
+    — capitals are for a disclosure a regulator requires to be conspicuous, and
+    spending them elsewhere devalues the one that needs them (7 TAC §86.310(d)).
+    A jury waiver is nevertheless the classic place a court asks whether the term
+    was conspicuous, and no vendored authority in this repository fixes what is
+    required. Inventing a typographic convention is not a drafting decision.
+    Reported as an open question for counsel: capitals, bold, a separate
+    initial, or nothing.
+
+    DEPARTURE FROM THE MEMO — THE MEMO'S SECOND SENTENCE IS KEPT AND MOVED. "No
+    party represents that it consulted an attorney unless it actually did so" is
+    the memo's and is right; written here as a flat statement that no party
+    represents it, with §7.22 named, because a conditional recital is still a
+    recital.
+  */
   {
     slug: 'frpa.jury-trial-waiver-7-10',
     version: 1,
@@ -621,12 +842,68 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 100,
     heading: 'Jury Trial Waiver',
-    body: 'THE PARTIES HERETO WAIVE TRIAL BY JURY IN ANY COURT IN ANY SUIT, ACTION, OR PROCEEDING ON ANY MATTER ARISING IN CONNECTION WITH OR IN ANY WAY RELATED TO THE TRANSACTIONS OF WHICH THIS AGREEMENT IS A PART OR THE ENFORCEMENT HEREOF. THE PARTIES HERETO ACKNOWLEDGE THAT EACH MAKES THIS WAIVER KNOWINGLY, WILLINGLY, AND VOLUNTARILY AND WITHOUT DURESS, AND ONLY AFTER EXTENSIVE CONSIDERATION OF THE RAMIFICATIONS OF THIS WAIVER WITH THEIR ATTORNEYS.',
+    body: 'Each party waives trial by jury in an action arising out of or relating to this Agreement, to the extent the law of the forum gives effect to a waiver of that right made before a dispute has arisen. Where the law of the forum does not give effect to such a waiver, this Section has no effect and each party retains its right to trial by jury.\nThis waiver is mutual and is limited to the parties to this Agreement. It reaches no right of a person who has not signed this Agreement, and it does not reach a claim applicable law requires to be tried to a jury.\nNo party represents that it consulted an attorney before signing this Agreement. Section 7.22 states what each signer was given and what each was offered, and this Section adds no acknowledgement to it.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: ['frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false'] }],
   },
+  /*
+    THE CLAUSE THE MEMO REMOVED WITHOUT ASKING THE QUESTION UNDERNEATH IT.
+
+    WHAT WAS WRONG, AND IT IS SMALLER THAN THE REGISTER IMPLIES. The library
+    body is one sentence: a mutual class waiver with an "except where prohibited
+    by law or against public policy" proviso. The proviso is real, and the memo
+    says so: the clause is not categorically unlawful.
+
+    **THE DOCUMENT IS NOT WHAT REVIEW-01 READ.** `class-waiver-forfeits-own-
+    recovery` is written against a §7.11 with two further limbs — the prevailing
+    party recovers no fees in a class action "NOTWITHSTANDING ANY OTHER PROVISION
+    IN THIS AGREEMENT", and a party who participates as a class member "WILL NOT
+    SUBMIT A CLAIM OR OTHERWISE PARTICIPATE IN ANY RECOVERY". Those are the
+    limbs that make the finding, and they are the ones REVIEW-01 said to delete.
+    They are already gone from `Lombard_FRPA_v4.docx`; the finding was
+    implemented, and the register carries it forward against a sentence it no
+    longer describes. Checked against the source .docx, not against the memo.
+
+    WHAT REMAINS WRONG IS STRUCTURAL, NOT TEXTUAL. A standalone class waiver
+    with no arbitration agreement behind it is the weakest of the three
+    positions available, and `facts.ts` says why: all three MCA forms filed as
+    SEC exhibits in 2024-2026 pair a class waiver WITH arbitration, and this
+    corpus holds the waiver and no arbitration clause. The waiver's
+    enforceability then turns entirely on the forum, which under the old §7.5
+    Buyer alone chose.
+
+    WHAT CHANGED. The memo's replacement, adopted: no party waives a class,
+    collective, representative or public-enforcement right applicable law gives
+    it, and the availability and form of any such proceeding is the court's to
+    determine. Two sentences added — a participant keeps its own share of a
+    recovery and any statutory fee right, which is the half of REVIEW-01's
+    finding worth stating affirmatively so the deleted limbs cannot come back;
+    and enforcement cost goes to §6.3, which holds the only entitlement and the
+    only ceiling.
+
+    THE HEADING CHANGES, for §7.13's reason and not §7.23's. §7.23 kept a
+    misleading heading deliberately, so that a reader told about a provision
+    could find it. Here the heading names a waiver that no longer exists in any
+    form, and a reader who finds "Class Action Waiver" and reads a clause that
+    waives nothing has been told the opposite of the truth twice.
+
+    NOT DECIDED HERE, AND REPORTED AS A GAP. **Whether this should be an
+    arbitration product at all.** The owner's note is explicit that the memo
+    removes the waiver on a correct ground and then never asks the question, and
+    that for a small-dollar B2B product across eleven states it is a first-order
+    choice with pricing and enforceability consequences. `disputeResolution:
+    'arbitration'` selects no clause today — there is no arbitration clause in
+    the merchant-facing library — and drafting one is not a drafting agent's
+    decision, for the same reason `guarantyScope: 'full-performance'` is a named
+    unauthored gap. One VERIFIED fact for whoever takes it: Va. Code
+    §6.2-2234(B) (vendored) bars a covered contract from requiring face-to-face
+    arbitration outside the jurisdiction of the recipient's principal place of
+    business, and requires the PROVIDER to pay the arbitrators' fees and the
+    administrative fees of the proceeding. An arbitration product carries that
+    cost in Virginia by statute.
+  */
   {
     slug: 'frpa.class-action-waiver-7-11',
     version: 1,
@@ -641,13 +918,68 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     number: '7.11',
     section: 'miscellaneous',
     sortKey: 110,
-    heading: 'Class Action Waiver',
-    body: 'THE PARTIES HERETO WAIVE ANY RIGHT TO ASSERT ANY CLAIMS AGAINST THE OTHER PARTY, AS A REPRESENTATIVE OR MEMBER IN ANY CLASS OR REPRESENTATIVE ACTION, EXCEPT WHERE SUCH WAIVER IS PROHIBITED BY LAW OR AGAINST PUBLIC POLICY.',
+    heading: 'Class and Representative Proceedings',
+    body: 'No party waives a right to bring, to defend, or to take part in a class, collective, representative or public-enforcement proceeding that applicable law permits. Whether such a proceeding is available, and in what form, is for the court to determine under applicable law and its own rules.\nA party that takes part in such a proceeding keeps whatever share of a recovery the proceeding awards it, and keeps any right to costs or to a fee award that applicable law gives it. Nothing in this Agreement requires a party to give up either.\nSection 6.3 governs what Buyer may recover from Merchant for enforcement, and this Section adds nothing to it and takes nothing from it.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['class-waiver-forfeits-own-recovery'] }],
   },
+  /*
+    THE SENTENCE THAT TURNS AN UNREAD LETTER INTO A DEFAULT JUDGMENT.
+
+    WHAT WAS WRONG. "SERVICE HEREUNDER SHALL BE COMPLETE UPON MERCHANT'S ACTUAL
+    RECEIPT OF PROCESS **OR UPON BUYER'S RECEIPT OF THE RETURN THEREOF BY THE
+    UNITED STATES POSTAL SERVICE AS REFUSED OR UNDELIVERABLE** ... SERVICE BY
+    BUYER TO THE LAST KNOWN ADDRESS SHALL BE SUFFICIENT. MERCHANT WILL HAVE
+    THIRTY (30) CALENDAR DAYS AFTER SERVICE HEREUNDER IS COMPLETE IN WHICH TO
+    RESPOND."
+
+    Undeliverable mail counts as service, and the clock to respond starts from
+    the moment the envelope comes back. REVIEW-01 reached the same place from
+    the commitments side — `service-without-notice-vs-commitment-9` — and its
+    observation is the one worth keeping: Pass 1 scored the published "no
+    confession of judgment" commitment **Honored** *without examining §7.12 or
+    Section 10 at all*. Nobody wrote a confession of judgment. Four clauses
+    between them built the thing a confession of judgment is banned to prevent.
+
+    REVIEW-01's own fix was narrower than this — keep "AS REFUSED" and drop "OR
+    UNDELIVERABLE", because refusal is the merchant's own act and
+    undeliverability often is not. That is a good distinction and it is not
+    enough: the thirty-day response period, the last-known-address rule and the
+    blanket email consent each survive it.
+
+    THE MEMO'S SIXTH REFUTATION IS ADOPTED, AND THE REGISTER IS WRONG WITHOUT
+    IT. `service-without-notice-vs-commitment-9` reads the service scheme as
+    "functionally adjacent to a confession of judgment". **A consensual
+    email-service arrangement is not in itself a confession of judgment**, and
+    some consensual service mechanisms are given effect. Nothing in this rewrite
+    asserts otherwise. The clause goes on the narrower ground that these
+    particular mechanisms — completion on non-delivery, sufficiency of a stale
+    address, and a contractual response period — are how a judgment is entered
+    against somebody who never learned of the case.
+
+    WHAT CHANGED. Judicial process is sent to §10.1 and to nothing else, which
+    is the consolidation the memo asks for and which §7.3 already relies on when
+    it routes process to "Section 7.12 and Section 10". The three mechanisms are
+    denied by name. The response period becomes the one procedural law or the
+    court gives. The address duty survives — a merchant should keep its address
+    current — but is stripped of its consequence: failing to do so does not make
+    an invalid service valid.
+
+    DEPARTURE 1 — THE ADDRESS DUTY IS KEPT AND POINTED AT §10.5. The memo's
+    replacement drops it entirely. It is a real and useful obligation, it is
+    §10.5's subject after the consolidation, and stating it in one place with a
+    cross-reference is what stops §7.12 and §10.5 becoming two rules that drift.
+
+    DEPARTURE 2 — THE OBJECTION SENTENCE IS WRITTEN AS A NOUN. The memo writes
+    that a returned mailing does not "waive any objection to it". Written as
+    "This Agreement contains no waiver of an objection to service", matching
+    §7.24's construction, because the verb form reads as though the parties are
+    doing the waiving somewhere and this sentence is carving out of it.
+
+    THE CAPITALS ARE GONE, for §10.4's reason.
+  */
   {
     slug: 'frpa.service-of-process-7-12',
     version: 1,
@@ -658,7 +990,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 120,
     heading: 'Service of Process',
-    body: 'IN ADDITION TO THE METHODS OF SERVICE ALLOWED BY STATE LAW, MERCHANT HEREBY CONSENTS TO SERVICE OF PROCESS UPON IT BY REGISTERED OR CERTIFIED MAIL, RETURN RECEIPT REQUESTED. SERVICE HEREUNDER SHALL BE COMPLETE UPON MERCHANT’S ACTUAL RECEIPT OF PROCESS OR UPON BUYER’S RECEIPT OF THE RETURN THEREOF BY THE UNITED STATES POSTAL SERVICE AS REFUSED OR UNDELIVERABLE. MERCHANT MUST PROMPTLY NOTIFY BUYER, IN WRITING, OF EACH AND EVERY CHANGE OF ADDRESS TO WHICH SERVICE OF PROCESS CAN BE MADE. SERVICE BY BUYER TO THE LAST KNOWN ADDRESS SHALL BE SUFFICIENT. MERCHANT WILL HAVE THIRTY (30) CALENDAR DAYS AFTER SERVICE HEREUNDER IS COMPLETE IN WHICH TO RESPOND. THE PARTIES FURTHER AGREE TO ACCEPT SERVICE OF PROCESS BY EMAIL TO ANY EMAILS DESIGNATED IN THIS AGREEMENT.',
+    body: 'Service of a summons, a complaint or other judicial process on any party is governed by Section 10.1, and by no other provision of this Agreement.\nAn operational notice given under Section 7.3, an email that is not acknowledged, and a mailing that is returned, refused or undeliverable are not service of process under this Agreement and are not evidence that service was made. Delivery to an address a party has stopped using is not service. This Agreement contains no waiver of an objection to service.\nThe time a party has to respond to a proceeding is the time the applicable procedural law or an order of the court gives it. This Agreement neither shortens that time nor starts it running on an event of its own.\nEach party shall keep current the addresses it gives in this Agreement, as Section 10.5 provides. A failure to do so does not make an otherwise invalid service valid.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -1012,6 +1344,78 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['tcpa-consent-not-revocable-as-promised'] }],
   },
+  /*
+    A CLOCK THAT RAN IN ONE DIRECTION, AND A NUMBER THIS CLUSTER COULD NOT
+    CONFIRM.
+
+    WHAT WAS WRONG. "Each **Merchant and Guarantor** agrees that any claim ...
+    that is not asserted **against Buyer** within one (1) year after its accrual
+    will be time-barred and forever waived". One year, running only against the
+    merchant and the human who signed for it, covering every kind of claim, with
+    a carve-out — "except to the extent such limitation is prohibited by
+    applicable law" — that saves only a claim whose period a statute expressly
+    makes non-waivable. `one-year-limitations-one-sided`. REVIEW-01 rates the
+    clause as probably enforceable in isolation and says the cost is cumulative:
+    it is one more provision running one way in a document full of them.
+
+    THE OWNER'S INSTRUCTION, AND THE PART OF IT THIS CLUSTER DID NOT FOLLOW.
+    *"Do not simply delete. A one-sided one-year period covering every claim type
+    is indefensible; a mutual two-year period is ordinarily enforceable and worth
+    keeping. Redraft rather than remove, and carve out non-waivable statutory
+    claims."* Three of those four are done. **The two-year figure is not, and
+    the reason is that it could not be confirmed.**
+
+    The brief instructs: *"The two-year limitations period in my §7.19 note is
+    the memo's figure, not an invention — confirm that before using it."*
+    Checked. The 2026-09-09 memo is not vendored in this repository or in
+    `lombard-contracts`; what exists of it are the `memo_rationale` and
+    `memo_replacement` fields in `.cluster-briefs/`. **Memo entry 075's
+    replacement text fixes no period at all** — it says the periods applicable
+    law supplies apply and that "This Agreement does not shorten them" — and the
+    string "two-year" appears in exactly one place across all nine cluster
+    briefs: the owner's own note on this entry. REVIEW-01's fix says "make it
+    mutual" and names no number either. So the premise is unconfirmed, which
+    makes it the fifth memo premise this rewrite has failed to verify.
+
+    WHAT CHANGED, AND WHY NO NUMBER IS IN THE BODY. The standing rule is *"Do
+    not invent commercial values. No percentages, dollar figures or day counts
+    unless the current body or the memo already fixes them"*, and the brief
+    conditioned the two-year figure on a confirmation that failed. A day count
+    written into a merchant-facing form on an unconfirmed premise is exactly the
+    thing that rule exists to stop, and shortening a limitation period is the
+    direction that costs the merchant. So the clause is redrafted rather than
+    removed — it survives as a record and as an operative rule — and the rule it
+    states is the mutual one with no shortening: the law's periods, accrual and
+    tolling apply to every party alike, this Agreement shortens none of them,
+    and no other provision of it does either. The last limb matters: a
+    limitations clause that only disclaims itself leaves the next drafter free
+    to put a period somewhere else.
+
+    **REINSTATING A MUTUAL PERIOD IS A ONE-LINE OWNER DECISION** and is reported
+    as an open item rather than taken. Nothing in this draft resists it.
+
+    DEPARTURE FROM THE MEMO — THE CARVE-OUT IS WIDER THAN THE OLD ONE AND IS
+    STATED AFFIRMATIVELY. v4's proviso saved a claim only "to the extent such
+    limitation is prohibited"; REVIEW-01's consequence paragraph is that this
+    may not save claims under state commercial-financing statutes whose periods
+    are not expressly declared non-waivable. Written instead as: a claim
+    applicable law does not permit to be shortened or given up is unaffected,
+    whoever brings it.
+
+    THE GATE IS THE BUNDLE'S AND IS THE WEAKEST OF THE FOUR. `facts.ts` says
+    `disputeResolution` *"decides four clauses as one bundle"*, and
+    `select-clauses.test.ts` pins that this record drops under arbitration. On
+    its own terms the rule this clause now states — the law's periods apply and
+    this Agreement shortens none — is true under arbitration too, so its absence
+    from an arbitration template is a redundancy rather than a hole. It stays in
+    the bundle because the bundle is one product decision and because an
+    arbitration clause, when one is written, is where an arbitration template's
+    limitation rule will live. Recorded rather than quietly relied on.
+
+    THE HEADING CHANGES because the clause no longer contains a contractual
+    statute of limitations, which is the §7.13 rule: a heading that names
+    machinery that is gone.
+  */
   {
     slug: 'frpa.contractual-statutes-of-limitations-7-19',
     version: 1,
@@ -1024,8 +1428,8 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     number: '7.19',
     section: 'miscellaneous',
     sortKey: 190,
-    heading: 'Contractual Statutes of Limitations',
-    body: 'Each Merchant and Guarantor agrees that any claim, whether sounding in contract, tort, law, equity, or otherwise, that is not asserted against Buyer within one (1) year after its accrual will be time-barred and forever waived, except to the extent such limitation is prohibited by applicable law.',
+    heading: 'Limitation of Actions',
+    body: 'The limitation period, the accrual rule, and any tolling or discovery rule that applicable law supplies apply to a claim by every party to this Agreement alike, whoever brings it and whoever it is brought against. This Agreement does not shorten any of them, and no other provision of this Agreement shortens one.\nA claim that applicable law does not permit to be shortened or given up is unaffected by this Agreement. This Section gives no party a period the law does not give it, and gives neither party a longer or a shorter period than the other.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -1041,6 +1445,48 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
       },
     ],
   },
+  /*
+    THE SAME SENTENCE MEANT OPPOSITE THINGS IN THE TWO FORUMS BUYER COULD PICK
+    BETWEEN.
+
+    WHAT WAS WRONG, AND IT IS HALF WHAT THE REGISTER SAYS. The library body
+    preserves a counterclaim "arising out of the same transaction or occurrence
+    as Buyer's claim", so it is not the total bar `counterclaim-waiver-flips-by-
+    forum` describes; that finding is written against an earlier text preserving
+    only what "under applicable rules of civil procedure, is compulsory". The
+    fix landed. What remains is the second half of the finding, and it is
+    entirely §7.5's doing: New York makes every counterclaim permissive and
+    Florida makes a transaction-related one compulsory, so the exception was
+    generous in one Acceptable Forum and empty in the other — and §7.5 gave the
+    choice between them to Buyer, the party who would be the plaintiff.
+    UNVERIFIED: REVIEW-01 quotes N.Y. CPLR 3019(a) and Fla. R. Civ. P. 1.170(a)
+    and records "Rule texts stated from memory; counsel to verify wording."
+
+    So the forum election is the defect, and it is fixed in §7.5. What is left
+    here is the residue the memo correctly rates Moderate: forcing every other
+    claim into a separate proceeding costs both parties money, obscures the
+    defences a merchant has, and buys Buyer nothing a procedural rule would not
+    give it.
+
+    WHAT CHANGED. The memo's replacement, adopted and made two-sided in fact as
+    well as in form: each party may assert a defence, a setoff, a recoupment and
+    a counterclaim so far as the procedural law of the court permits, and this
+    Agreement requires nothing to be brought separately. A sentence added for
+    the compulsory-counterclaim case, because that rule cuts against the party
+    who fails to plead and a form should not leave a merchant to discover it.
+
+    DEPARTURE 1 — "DEFENCES" IS SPELLED AS §5.1, §6.2 AND §9.4 SPELL IT. One
+    spelling per document; §9.4's note settled this.
+
+    DEPARTURE 2 — §6.3 IS NAMED. The memo does not name it. Four clauses about
+    litigation are the obvious place for a second enforcement-cost entitlement
+    to appear, and `a-fee-is-a-debt-not-a-purchase.test.ts` asserts that §6.3
+    holds the only one and the only ceiling. Naming §6.3 and adding nothing is
+    the safest form of saying so.
+
+    THE HEADING CHANGES for the §7.13 reason: there is no counterclaim waiver
+    here to be found under that name.
+  */
   {
     slug: 'frpa.counterclaim-waiver-7-20',
     version: 1,
@@ -1053,8 +1499,8 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     number: '7.20',
     section: 'miscellaneous',
     sortKey: 200,
-    heading: 'Counterclaim Waiver',
-    body: 'In any litigation commenced by Buyer to enforce this Agreement, the Guaranty, or any related agreement, no Merchant or Guarantor will be permitted to interpose any counterclaim, except for any counterclaim arising out of the same transaction or occurrence as Buyer’s claim, which Merchant and Guarantor may assert in that proceeding. Any non-compulsory counterclaim must be brought as a separate proceeding.',
+    heading: 'Defences, Setoff, and Counterclaims',
+    body: 'Each party may assert a defence, a setoff, a recoupment and a counterclaim so far as the applicable procedural law of the court permits. This Agreement requires no claim to be brought as a separate proceeding, and no provision of this Agreement causes a party to give up a claim it does not assert in a particular action.\nWhere the procedural law of the court makes a counterclaim compulsory, that law governs and this Agreement neither enlarges nor reduces its effect.\nSection 6.3 governs the cost of enforcement. Nothing in this Section adds a cost, a remedy or an entitlement to either party.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

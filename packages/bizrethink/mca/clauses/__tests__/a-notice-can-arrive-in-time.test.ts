@@ -227,49 +227,33 @@ describe('an administrative notice is not service of process', () => {
    * Clauses that still turn a mailing into service, outside the two provisions
    * whose subject that is.
    *
-   * NAMED WITH AN OWNER, never silently skipped — `personal-liability-is-
-   * section-9-only`'s rule, and its caveat too: the offender is NOT pinned as
-   * still-offending, because `disputes-service` is rewriting §7.5 and §10 in
-   * this checkout and an assertion about another agent's uncommitted draft is a
-   * tripwire on their work rather than a check on ours. The control below
-   * carries the anti-vacuity weight instead, over v4's own words.
+   * THE CONCESSION IS GONE, AND THAT IS THE POINT OF HAVING HAD ONE. This
+   * assertion carried a `CONCEDED` register holding one entry — §7.5's last
+   * sentence, *"mailing by certified or registered mail ... will constitute
+   * valid and lawful service of process against them"* — owned by
+   * `disputes-service` under memo 061, and skipped rather than pinned, because
+   * an assertion about another agent's uncommitted draft is a tripwire on their
+   * work rather than a check on ours. §7.5 was rewritten on 2026-09-10 and the
+   * sentence is gone, so the register goes with it and the filter goes with the
+   * register: what is left is the property, unfiltered.
+   *
+   * `a-default-judgment-needs-a-served-defendant.test.ts` states the wider form
+   * of this over every instrument, and its own register names what it could not
+   * fix — two clauses of the Equipment Lease and the Subscription, which nobody
+   * owns.
    */
-  it('leaves service to Sections 7.12 and 10, or names who owns the one it could not move', () => {
+  it('leaves service to Sections 7.12 and 10', () => {
     const offenders = clauses
       .filter((entry) => entry.slug !== PROCESS && entry.section !== 'service')
       .filter((entry) => SERVICE_BY_MAIL.test(entry.body))
       .map((entry) => entry.slug)
-      .filter((slug) => CONCEDED[slug] === undefined)
       .sort();
 
     expect(offenders).toEqual([]);
   });
-
-  it('concedes only a clause that exists and belongs to another cluster', () => {
-    for (const slug of Object.keys(CONCEDED)) {
-      expect(clause(slug).instrument).toBe('frpa');
-      expect(CONCEDED[slug]?.length ?? 0).toBeGreaterThan(40);
-    }
-  });
 });
 
 const SERVICE_BY_MAIL = /constitute[s]? valid and lawful service of process/i;
-
-/**
- * §7.5's last sentence, and it is not this cluster's to edit.
- *
- * It makes a certified letter into service of process, which is the same
- * conflation §7.3 made from the other end, and it does it in the governing-law
- * clause where nobody looks for a service rule. §7.24's REVIEW-02 finding
- * `frpa-7-24-does-not-name-the-statute-that-actually-bites` reads §7.24
- * "against 7.5", so the two clauses are already coupled in the register.
- */
-const CONCEDED: Record<string, string> = {
-  [FORUM]:
-    'DISPUTES-SERVICE (memo 061). §7.5 ends by agreeing that "mailing by certified or registered mail ... of any ' +
-    'process required by any such court will constitute valid and lawful service of process against them, without ' +
-    'the necessity for service by any other means" — a service rule inside the governing-law clause.',
-};
 
 describe('the amendment rule stops carving out a cascade that is gone', () => {
   /**
@@ -853,6 +837,8 @@ describe('the detectors fire on the text they were written for', () => {
   it('flags the sentence that turns a letter into service of process', () => {
     expect(SERVICE_BY_MAIL.test(V4_SEVEN_FIVE)).toBe(true);
     expect(SERVICE_BY_MAIL.test(clause(PROCESS).body)).toBe(false);
+    // The clause this file conceded to `disputes-service` until 2026-09-10.
+    expect(SERVICE_BY_MAIL.test(clause(FORUM).body)).toBe(false);
   });
 
   it('flags the signature block’s guaranty and its fraud sentence', () => {

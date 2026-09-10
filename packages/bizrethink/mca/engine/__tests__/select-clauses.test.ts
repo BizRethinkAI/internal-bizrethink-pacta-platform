@@ -105,12 +105,31 @@ const KNOWN_GAPS: { to: string; from: string[]; quote: string; owner: string }[]
     /*
       Same cause. §6.3 was rewritten to a single aggregate ceiling with no
       numbered limbs; §7.9's own comment already records that it "defers to
-      §6.3.1", which now supplies nothing. `miscellaneous` owns §7.9.
+      §6.3.1", which now supplies nothing.
+
+      THE OWNER WAS STALE AND IS CORRECTED RATHER THAN LEFT. This entry said
+      `miscellaneous`. That cluster has run: it rewrote §7.9 and wrote the
+      citation of §6.3.1 into the new body deliberately, because §6.3.1 exists as
+      a NUMBERED PARAGRAPH inside `frpa.costs-of-collection-6-3` — the body ends
+      "6.3.1 Prejudgment and Postjudgment Interest" followed by the rule — and a
+      reader of the assembled document finds it. What does not find it is this
+      check, which reads `McaClause.number` and sees only `6.3`.
+
+      So it is not §7.9's defect and it is not §6.3's either. It is the one place
+      in the corpus where a clause record holds two numbered provisions, and the
+      fix is a library change: split §6.3.1 into its own record, which moves the
+      pinned counts in `frpa-coverage`, `library` and `surface` and renumbers
+      nothing. `disputes-service` found this on 2026-09-10 while closing out the
+      rewrite and did not take it: §6.3 is not its clause, and
+      `a-fee-is-a-debt-not-a-purchase.test.ts` pins §6.3's contents in three
+      assertions that a split would have to be checked against.
+
+      **UNOWNED. The nine-cluster rewrite is finished and no cluster follows.**
     */
     to: 'Section 6.3.1',
     from: ['frpa.indemnification-7-9'],
     quote: 'interest accrues only as Section 6.3.1 permits',
-    owner: 'miscellaneous',
+    owner: 'UNASSIGNED — §6.3.1 is a paragraph inside frpa.costs-of-collection-6-3, not a record',
   },
   {
     /*

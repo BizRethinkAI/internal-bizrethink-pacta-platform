@@ -3,11 +3,20 @@ import type { McaClause } from '../types';
 /**
  * Sections 9 and 10 — the personal guaranty and service of process.
  *
- * FIVE OF THE ELEVEN WERE REWRITTEN ON 2026-09-10 under
- * [ADR 0012](../../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md):
- * §§9.2, 9.4, 9.5, 9.6, 10.2 and 10.4. §9.1 is a field group nobody's brief
- * names; §§10.1, 10.3, 10.5 and 10.6 are the `disputes-service` cluster's and
- * still print v4's words.
+ * TEN OF THE ELEVEN HAVE BEEN REWRITTEN, under
+ * [ADR 0012](../../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md).
+ * The `guaranty` cluster did §§9.2, 9.4, 9.5, 9.6, 10.2 and 10.4 on 2026-09-10;
+ * `disputes-service` did §§10.1, 10.3, 10.5 and 10.6 later the same day. §9.1 is
+ * a field group nobody's brief names and still prints v4's grid.
+ *
+ * **SECTION 10 IS NOW ONE RULE WITH FIVE POINTERS AT IT.** §10.1 states how
+ * judicial process is served and applies to every party including each
+ * Guarantor; §§10.2-10.6 each add a designation, a duty or a boundary, and none
+ * of them states a second rule. That
+ * was the memo's disposition for the whole Section and it is the reason §10.2's
+ * note flagged a risk — it asserted §10.1 "applies to each party" while §10.1
+ * still said "Merchant". The rewrite of §10.1 makes that sentence true.
+ * `a-default-judgment-needs-a-served-defendant.test.ts` holds the property.
  *
  * THE CLUSTER IS FIVE CLAUSES IN THREE FILES, AND THAT IS THE POINT. §9.2 is
  * the product — a guaranty limited to fraud, materially false present-fact
@@ -419,6 +428,74 @@ export const FRPA_GUARANTY: McaClause[] = [
       },
     ],
   },
+  /*
+    THE MOST DANGEROUS SENTENCE IN SECTION 10, AND IT IS THE SECOND ONE.
+
+    WHAT WAS WRONG. "Merchant hereby irrevocably and unconditionally waives
+    personal service of any summons, complaint, or other process ... **Merchant
+    further agrees to waive any objection to the absence of formal service of
+    process.**"
+
+    The first sentence is survivable on its own; parties consent to alternative
+    service in commercial contracts and courts often give effect to it. The
+    second is different in kind. A waiver of personal service says how process
+    may be delivered. A waiver of the OBJECTION to the absence of formal service
+    says the merchant may not complain that it was never delivered at all — it
+    removes the remedy for getting the first sentence wrong. Read with the old
+    §7.12, which completed service when a letter came back undeliverable, and
+    §10.6, which made Section 10 supersede every notice provision, the three
+    sentences are a procedure for obtaining a judgment against somebody who
+    never learned of the case. REVIEW-01 carries both
+    `service-without-notice-vs-commitment-9` and `ct-prejudgment-remedy-waiver`
+    here for that reason.
+
+    WHAT REVIEW-01 READ AND WHAT THE DOCUMENT NOW SAYS — CHECKED, NOT ASSUMED.
+    REVIEW-01's evidence quotes a third sentence: *"Merchant understands and
+    agrees that an action, lawsuit, or controversy may be taken up and considered
+    by a court without any further notice."* It is not in the library body and it
+    is not in `sources/Lombard_FRPA_v4.docx`. `REVIEW-01-manifest.json` records
+    it deleted from both §10.1 and §10.2 — *"that was the wording the Connecticut
+    statute is aimed at."* The fix landed; the finding stayed open on the rest.
+    `a-default-judgment-needs-a-served-defendant.test.ts` now asserts that
+    sentence never returns, with REVIEW-01's own quotation as the control.
+
+    WHAT CHANGED, AND THIS IS THE CONSOLIDATION. Service must be made in a
+    manner the procedural law of the court and any applicable court order
+    authorise. The Section is stated to apply to each party INCLUDING each
+    Guarantor, which is what §10.2 already claims for it and could not make true
+    while this clause said "Merchant" — `guaranty.ts` recorded that risk in terms
+    when it rewrote §10.2. Then the four things that must not be given up in
+    advance, in one paragraph: valid service, a jurisdictional objection, a
+    notice or hearing the law requires, and a prior court order required before a
+    prejudgment remedy. That last is Conn. Gen. Stat. §36a-868 answered in its own
+    vocabulary — VERIFIED, `mca/sources/CT-CGS-36a-861-872.txt`: *"No commercial
+    financing contract ... shall contain any provision waiving a recipient's
+    right to notice, judicial hearing or prior court order under chapter 903a ...
+    in connection with the provider obtaining any prejudgment remedy."*
+
+    THE MEMO'S SIXTH REFUTATION IS HONOURED HERE TOO. Nothing in this clause
+    says that a consensual email-service arrangement is invalid or that it is a
+    confession of judgment. The last sentence says the opposite of that: a party
+    may accept or give up service AFTER a proceeding has begun, in the manner
+    the law then permits. What this Agreement does not do is arrange it in
+    advance, before there is a case to be served in.
+
+    DEPARTURE 1 — THE SECTION SAYS WHAT IT APPLIES TO, IN ITS FIRST PARAGRAPH.
+    The memo's replacement names "Merchant, Buyer, or a Guarantor" once, in the
+    service sentence. Written as a separate sentence about the Section's reach,
+    because §10.2, §10.3, §10.4, §10.5, §10.6, §7.5 and §7.12 all now point here
+    and each of them needs this Section to cover the person it is talking about.
+
+    DEPARTURE 2 — NO CITATION TO SECTION 9. The Guarantor is named as a party
+    rather than by reference to the Guaranty, because §§9.2-9.6 are gated on
+    `guarantyScope` and six clauses already dangle at Section 9 in a no-guaranty
+    template. §10.1 is ungated and must not become the seventh.
+
+    DEPARTURE 3 — "OPERATIONAL NOTICE" IS TIED TO §7.3 BY NUMBER. The memo says
+    "Operational notice methods do not establish service of process" without
+    saying which methods. §7.3 is the clause that supplies them, it is ungated,
+    and it already sends judicial process here.
+  */
   {
     slug: 'frpa.section-10-1',
     version: 1,
@@ -429,7 +506,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     section: 'service',
     sortKey: 10,
     heading: '',
-    body: 'Merchant hereby irrevocably and unconditionally waives personal service of any summons, complaint, or other process, which may be made by any other means permitted by New York or Florida law. Merchant further agrees to waive any objection to the absence of formal service of process.',
+    body: 'A summons, a complaint or other judicial process must be served on Merchant, on Buyer, or on a Guarantor in a manner that the procedural law of the court, and any applicable order of that court, authorizes. This Section applies to each party to this Agreement, including each Guarantor, and it is the only provision of this Agreement that governs how judicial process is served.\nThis Agreement contains no waiver by any party of valid service, of an available jurisdictional objection, of a notice or a hearing that applicable law requires, or of a prior court order that applicable law requires before a prejudgment remedy is obtained. It contains no confession of judgment, and it gives no person authority to obtain a judgment otherwise than by lawful process.\nA method of giving an operational notice under Section 7.3 is not service of process, and using one is not evidence that service has been made. A party may accept service, or give up service, after a proceeding has begun, in the manner the law then applicable permits; nothing in this Agreement does so in advance.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -489,6 +566,49 @@ export const FRPA_GUARANTY: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['ct-prejudgment-remedy-waiver'] }],
   },
+  /*
+    THE FREESTANDING ADVANCE CONSENT, AND THE TWO WIDGETS THAT MUST OUTLIVE IT.
+
+    WHAT WAS WRONG. "MERCHANT HEREBY AGREES TO ACCEPT SERVICE OF ANY SUMMONS,
+    COMPLAINT, OR OTHER PROCESS BY ELECTRONIC MAIL AT «48» OR BY UNITED STATES
+    POSTAL SERVICE AT «49» OR BY ANY OTHER MEANS PERMITTED BY NEW YORK OR FLORIDA
+    LAW." An agreement, given at signature, to accept service by two channels the
+    merchant may not be reading in two years' time — and a second place, after
+    Section 1, where the merchant's addresses are collected. A form that collects
+    one party's address twice will eventually hold two different addresses, and
+    service is the one subject where that costs a default judgment. §10.4's
+    rewrite made exactly this argument about §9.1 and the Guarantor.
+
+    WHAT CHANGED — THE §10.4 SHAPE, DELIBERATELY. The advance consent goes and
+    the blanks survive as an OPTIONAL designation of a different address, which
+    is what §10.4 now does for the Guarantor. The two clauses become symmetrical
+    instead of being one designation and one consent, and the Section says in
+    terms what a designated address is: a place a document may be sent, not an
+    agreement about what counts as service.
+
+    THE MEMO SAYS "[Reserved]" AND THE LIBRARY CANNOT. ADR 0012 closed
+    `[Reserved]` — `select-clauses.ts` says an assembled document has no reserved
+    sections — and deleting the record moves `library.test.ts`'s 203 and
+    `frpa-coverage`'s 100. §10.2's note recorded that deletion is the better fix
+    and needs the counts moved in the same change. It is the better fix for
+    §10.2. It is NOT available here, and the reason is «48» and «49»: they are
+    AcroForm anchors the Lombard pipeline injects into the rendered FRPA, and a
+    body that stops claiming them is a body the injector fills into nothing. If
+    this record is ever removed, «48» and «49» must come out of the field map in
+    the same change — the identical warning §10.4 carries for «50» and «51».
+    VERIFIED against `sources/Lombard_FRPA_v4.docx`: §10.3 carries «48» and «49»
+    in two FORMTEXT fields, and §10.4 carries «50» and «51».
+
+    DEPARTURE FROM THE MEMO — MERCHANT'S ADDRESSES ARE SENT TO SECTION 1, NOT TO
+    §7.3. The memo routes contact data to "§9.1 and ordinary notices". §9.1 is
+    the Guarantor's grid and is gated on `guarantyScope`; Merchant's addresses
+    are in Section 1, which every template has and which the dangling-reference
+    check excludes because the Lombard pipeline injects it.
+
+    THE CAPITALS ARE GONE, for the reason §10.4 gives: capitals are for a
+    disclosure a regulator requires to be conspicuous, and 7 TAC §86.310(d)'s
+    OCCC notice is the one that needs them.
+  */
   {
     slug: 'frpa.section-10-3',
     version: 1,
@@ -499,7 +619,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     section: 'service',
     sortKey: 30,
     heading: '',
-    body: 'MERCHANT HEREBY AGREES TO ACCEPT SERVICE OF ANY SUMMONS, COMPLAINT, OR OTHER PROCESS BY ELECTRONIC MAIL AT _____________«48»_____________ OR BY UNITED STATES POSTAL SERVICE AT ____________________________«49»____________________________ OR BY ANY OTHER MEANS PERMITTED BY NEW YORK OR FLORIDA LAW.',
+    body: 'The email address and the mailing address Merchant gives in Section 1 are Merchant’s addresses for notice under Section 7.3. Merchant may designate a different email address at _____________«48»_____________ or a different mailing address at ____________________________«49»____________________________, and a designated address governs from the date it is given.\nA designated address is a place at which a document may be sent to Merchant. It is not an agreement about what counts as service of process, it does not make a communication sent to it into service of process, and it gives up no right to be served by a means applicable law permits. Section 10.1 governs judicial process.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -554,6 +674,35 @@ export const FRPA_GUARANTY: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    THE QUIET HALF OF THE SAME MACHINE.
+
+    WHAT WAS WRONG. The duty is fine. "Unless Buyer is notified of a change in
+    address, all addresses shall be **presumed to be accurate**" is not. Read
+    with the old §7.12 — service complete on a returned envelope, service to the
+    last known address sufficient — the presumption is the sentence that makes a
+    letter to an address the merchant left two years ago into good service, and
+    puts the merchant to rebutting its own contract afterwards. It is one of the
+    four sentences that, together, do what a confession of judgment does.
+
+    WHAT CHANGED. The duty stays and is made reciprocal — Buyer's servicing
+    addresses go stale too, and §7.3 already obliges Buyer to maintain a working
+    servicing email address and to say when it changes. The presumption goes, and
+    the consequence of a stale address is stated exactly: failing to update one
+    does not by itself establish valid service and does not give up a procedural
+    protection.
+
+    DEPARTURE FROM THE MEMO — THE CROSS-REFERENCES ARE ONE, NOT TWO. The memo
+    writes "shall promptly update its operational notice contacts under Sections
+    7.3 and 9.1". §9.1 is the Guarantor identity grid and is gated on
+    `guarantyScope !== 'none'`, so an ungated §10.5 citing it would dangle in a
+    no-guaranty template — a fifth entry in `select-clauses.test.ts`'s Section 9
+    register, added by the cluster that is meant to be closing that file out.
+    Written as §7.3 alone, with the Guarantor named as a person who owes the same
+    duty rather than by a reference to the Section that collects its details.
+    This is §7.6's device — describe by subject where the number is gated — and
+    the sixth time this rewrite has needed it.
+  */
   {
     slug: 'frpa.section-10-5',
     version: 1,
@@ -564,12 +713,39 @@ export const FRPA_GUARANTY: McaClause[] = [
     section: 'service',
     sortKey: 50,
     heading: '',
-    body: 'Merchant or Guarantor shall notify Buyer of any changes to its physical address or email address for service. Unless Buyer is notified of a change in address, all addresses shall be presumed to be accurate.',
+    body: 'Merchant, Buyer and each Guarantor shall keep current the addresses each gives in this Agreement, and shall give a change of address under Section 7.3.\nA failure to keep an address current does not by itself establish valid service of judicial process, does not give up a procedural protection, and does not make a communication sent to a former address into service. Section 10.1 governs judicial process.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    ELEVEN WORDS THAT SUBORDINATED EVERY NOTICE PROVISION IN THE AGREEMENT.
+
+    WHAT WAS WRONG. "This Section shall **supersede any notice requirements in
+    this Agreement** with respect to service of process." Read alone it is
+    housekeeping. Read with the Section it sat at the end of, it is the sentence
+    that made the rest of Section 10 win: §7.3's channels, §6.1's cure notice,
+    §3.2's reconciliation timetable — anything a party might argue was a notice
+    requirement bearing on process gave way to a Section that completed service
+    on an undeliverable envelope. REVIEW-01 quotes it in both of the findings it
+    carries on §10.1 and §7.12, in each case as the third element.
+
+    WHAT CHANGED. It stops subordinating and starts distinguishing, which is the
+    memo's disposition. Two subjects, one Section each, neither displacing the
+    other and neither displacing mandatory procedural law or a court order. A
+    third sentence decides the hard case by subject rather than by hierarchy: a
+    step in a proceeding is judicial process, and everything else is a notice.
+
+    DEPARTURE FROM THE MEMO — THE TIE-BREAK SENTENCE IS ADDED. The memo's
+    replacement states the two rules and stops. A clause whose whole job is to
+    tell a reader which of two Sections applies should answer the case where it
+    is not obvious, or the reader is back where v4 left them.
+
+    THE WORD "SUPERSEDE" DOES NOT APPEAR. Deliberately, and asserted: a Section
+    that supersedes is the shape this clause is being rewritten out of, and the
+    word is where a later editor would start putting it back.
+  */
   {
     slug: 'frpa.section-10-6',
     version: 1,
@@ -580,7 +756,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     section: 'service',
     sortKey: 60,
     heading: '',
-    body: 'This Section shall supersede any notice requirements in this Agreement with respect to service of process.',
+    body: 'Section 10.1 governs the service of a summons, a complaint and other judicial process, and it is the only provision of this Agreement that does. Section 7.3 governs a notice, a request, a consent and any other communication between the parties about the administration of this Agreement.\nNeither Section displaces a mandatory rule of procedural law or an order of a court, and neither of them overrides the other.\nWhere it is unclear which of the two applies to a communication, the subject decides: a step in a proceeding is judicial process, and anything else is a notice.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

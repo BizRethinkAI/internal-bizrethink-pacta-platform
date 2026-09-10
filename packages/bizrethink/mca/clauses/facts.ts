@@ -199,8 +199,9 @@ export type McaFacts = {
  * positions; use merchant-state venue; restrict the guaranty to the
  * signatory's own covered misconduct.
  *
- * **`equipment`, `renewalModel` and `concurrentPositions` have moved.
- * `venueRule` has not.**
+ * **All four have now moved.** `equipment`, `renewalModel` and
+ * `concurrentPositions` moved on 2026-09-10; `venueRule` moved later the same
+ * day, with §7.5.
  *
  * The three that moved could only move once the clauses they gate stopped
  * hiding a second rule inside the one the fact decides. `renewalModel` gated
@@ -213,13 +214,26 @@ export type McaFacts = {
  * `frpa/enrollment.ts` §4.15 and `frpa/miscellaneous.ts` §8.2 — so every value
  * of the fact selects exactly one clause and the fact decides a whole clause.
  *
- * `venueRule` stays at `funder-state` because the clause it describes is not
- * this cluster's and does not read it. §7.5 is `includeWhen: null` and mandates
- * New York law with New York or Pasco County, Florida forums in its body;
- * nothing in the corpus reads `venueRule` at all. Flipping the row would leave
- * the profile asserting merchant-state venue while the only venue clause in the
- * library mandates the funder's — a contradiction rather than a gap, and harder
- * to see than one. It moves with §7.5, which is `disputes-service`'s (memo 061).
+ * `venueRule` moved differently from the other three, and the difference is
+ * worth reading before anyone treats it as closed. `renewal-positions` refused
+ * to flip it while §7.5 still mandated New York law with New York and Pasco
+ * County, Florida forums, because the flip would have left the profile
+ * asserting merchant-state venue while the only venue clause in the library
+ * mandated the funder's — *"a contradiction rather than a gap, and harder to
+ * see than one."* That reason is gone: `disputes-service` rewrote §7.5 to the
+ * merchant's own state in the same change as this row.
+ *
+ * **But §7.5 is still `includeWhen: null`, and this row is still read by
+ * nothing.** The gate was refused rather than forgotten, on three grounds set
+ * out in full above §7.5 in `frpa/miscellaneous.ts`: the fact decides one limb
+ * of a clause that answers three questions; the exhaustive-pair shape fails ADR
+ * 0013's own criterion, because the two answers would share every word but two
+ * sentences and that is a variable rather than two rules; and the `funder-state`
+ * arm cannot be drafted at all, because `McaFacts` has no field naming the
+ * funder's state — the row asks "whose courts" without supplying whose. Closing
+ * it needs a `funderState` field and a variables mechanism, or the row deleted.
+ * Both are owner decisions. What the flip buys today is only that the profile
+ * and the clause agree.
  *
  * `split-only` is the value with no written history anywhere. §2.5 (the gated
  * ACH backstop) and §7.14 (a blanket debit authority) both left the paper
@@ -263,14 +277,18 @@ export const LOMBARD_FACTS: McaFacts = {
      selected in its place; the cascade clause is not. */
   concurrentPositions: false,
   disputeResolution: 'courts',
-  /* THE ONE ROW OF THE FOUR THAT HAS NOT MOVED, and deliberately. §7.5 mandates
-     New York law and New York or Pasco County, Florida forums, in its body, with
-     no gate. The memo recommends merchant-state venue, partly because Va. Code
-     §6.2-2234(A) voids a non-Virginia forum for covered transactions. Moving
-     this row before §7.5 is rewritten would make the profile disagree with the
-     only clause on the subject. It moves with §7.5 — `disputes-service`, memo
-     entry 061. */
-  venueRule: 'funder-state',
+  /* Moved with §7.5 on 2026-09-10, which now puts both the governing law and
+     the forum in the state of Merchant's principal place of business. Va. Code
+     §6.2-2234(A) makes a provision mandating a forum outside the Commonwealth
+     unenforceable for a covered transaction, and §6.2-2228 defines "Recipient"
+     as a person whose principal place of business is in the Commonwealth — so a
+     merchant-state rule satisfies Virginia by construction rather than by a
+     rider. Both sections are vendored in `mca/sources/VA-Code-6.2-2228-2238.txt`
+     and were read, not quoted from the memo, which cites the wrong section.
+
+     STILL INERT: nothing reads this row. See the docblock above for why §7.5
+     could not be gated on it and what closing that would take. */
+  venueRule: 'merchant-state',
   recipientStates: ['US-FL'],
   brokerChannel: true,
   consumerReportPulled: true,
