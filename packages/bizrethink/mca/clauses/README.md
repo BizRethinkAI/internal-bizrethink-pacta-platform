@@ -84,15 +84,25 @@ document, and a script cannot make that claim — see rule 3 below.
    seeded from unexamined text **launders that text into apparent authority**.
    A clause on a page under a heading and a version number reads as considered
    whoever typed it.
-2. **The body is the document's words, verbatim, `«N»` markers and all.** Those
-   markers are the AcroForm anchors the Lombard pipeline injects and they are
-   part of what ships. Tidying them out would make
-   `bodies-match-the-document.test.ts` a check against a cleaned-up copy of the
-   agreement rather than against the agreement.
-3. **Amend the document, then follow it.** This library is downstream of
-   `lombard-contracts`. Editing a body here to fix a defect turns the test red,
-   which is correct — the fix belongs in the `.docx`, and this file is
-   re-derived after it.
+2. **The body is the clause's words, and the `«N»` markers are kept.** Those
+   markers are the AcroForm anchors the Lombard pipeline injects and are part of
+   what ships.
+
+   **REPLACED 2026-09-10 by [ADR 0012](../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md).**
+   This rule used to read *"the document's words, verbatim"*, enforced by
+   `bodies-match-the-document.test.ts`. That test is retired. The baseline
+   document is AI-generated from a poorly-drafted source, carries 254 review
+   findings and a counsel memo proposing REPLACE IN FULL on 93 of 101 clauses,
+   and has never been signed. Requiring a clause to match it was requiring the
+   defect. The digest assertion survives separately: it catches a vendored
+   document changing underneath us and is not about clause bodies.
+3. **The library is upstream; the documents are rendered from it.** Editing a
+   body here is how a defect gets fixed. `lombard-contracts` holds the rendered
+   documents, the AcroForm pipeline and the two historical reviews — it is no
+   longer where clause text comes from.
+
+   **REVERSED 2026-09-10 by ADR 0012.** This rule used to say *"Amend the
+   document, then follow it. This library is downstream of `lombard-contracts`."*
 4. **A finding attaches by judgement, and the judgement is visible.** REVIEW-01's
    loci name the numbering of the document as it stood then: its
    `iso-a5-clawback-window-and-tiers` is the shipped v2's **A.4**, because the
