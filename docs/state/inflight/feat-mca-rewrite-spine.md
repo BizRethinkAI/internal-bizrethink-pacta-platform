@@ -1,196 +1,154 @@
-# feat/mca-rewrite-spine — rewriting the FRPA, and the fact model that had to move with it
+# feat/mca-rewrite-spine — the FRPA rewritten, and what it turned up
 
-**Branch:** `feat/mca-rewrite-spine`, PR #152, now based on `main` (#151 merged
+**Branch:** `feat/mca-rewrite-spine`, PR #152, based on `main` (#151 merged
 2026-09-10). The drafting under [ADR 0012](../../adr/0012-the-baseline-document-is-input-not-specification.md)
 and [ADR 0013](../../adr/0013-a-funder-profile-describes-the-funder.md).
 
-**34 of 99 FRPA clause records rewritten, 2 added.** 57 test files, 2172 tests,
-typecheck 0, Governance clean.
+**All 100 FRPA clause records rewritten**, across ten agent runs. 63 test files,
+2474 tests, typecheck 0, biome clean, Governance clean.
 
-Nothing here is reviewed. Every clause is `status: 'draft'` with `author: null`
-and zero counsel approvals exist. **`assertPublishable` does not refuse them** —
-it returns early on anything not `published`, and the surfaces call it on a
-hypothetical to display what *would* be wrong. What actually keeps this text away
-from a merchant is that **no render or assembly path exists in `mca/` yet.** The
-first thing that path must do is fail closed on `assertPublishable`; see ADR 0013.
+**Nothing here is reviewed.** Every clause is `status: 'draft'` with
+`author: null` and zero counsel approvals exist. **`assertPublishable` does not
+refuse them** — it returns early on anything not `published`, and the surfaces
+call it on a hypothetical to display what *would* be wrong. What actually keeps
+this text from a merchant is that **no render or assembly path exists in `mca/`**.
+The first thing that path must do is fail closed on `assertPublishable`.
 
-## What has landed
+## Read this first: the FRPA is not the document a merchant signs
 
-| commit | what |
+`instrumentsFor(LOMBARD_FACTS)` returns **six** instruments. Only the FRPA was
+rewritten. In the same envelope, a natural person signs the Equipment Lease and
+Subscription guaranties, which say:
+
+> *"I understand that the cost of litigating in Florida may be in excess of the
+> amount at stake in the litigation. **Nonetheless, I waive any objection that
+> such courts are an inconvenient forum**… {{equipmentAffiliate}} may properly
+> serve me with legal process via certified mail… and **upon such mailing,
+> service shall be effective irrespective of whether a signed certified mail
+> return receipt is returned**."*
+
+**Service effective on mailing, receipt irrelevant** — worse than the v4 §7.12
+the memo rated Critical. Beside it: exclusive Pasco County venue, jury waiver,
+class waiver, a one-sided one-year limitation, and the nonreliance clause §7.22
+just deleted. **Those are the four defects §§7.5, 7.10, 7.11 and 7.19 were
+rewritten to fix**, re-imposed on the same merchant by the documents next to it.
+
+They entered Lombard's suite on 2026-09-10 through the `equipment` fix. **Neither
+review nor the counsel memo read them in this role.** Found by the last cluster
+stating its property over every instrument rather than the FRPA — because all
+three vendored statutes are rules about what a contract may *contain*.
+
+Two more from the same sweep:
+
+- **`iso-pra.confidentiality`** forbids disclosure *"to any third party without
+  prior written consent"* with **no carve-out at all** — not a regulator, not a
+  court, not the broker's own lawyer. It is §4.8's defect in unrefuted form, on
+  the signer a regulator most wants to hear from.
+- **`iso-pra.governing-law` mandates binding arbitration in Pasco County.** So
+  *"there is no arbitration clause in this library"* is true of the FRPA and false
+  of the corpus.
+
+## The Critical, answered on the paper
+
+The owner's question was whether the product works at all: *a UCC §9-406 notice of
+a partial assignment does not compel an acquirer to split settlement.*
+
+`Lombard_Payzli_Split_Funding_Authorization_v2.txt` — **nobody countersigns it.**
+One signature widget, one date widget, both Seller's. **There is no processor
+acceptance block.** §2.3's duty on Buyer to obtain written acceptance before the
+Purchase Date has nowhere on the paper to be discharged, so
+`processorSplitAccepted: false` is not a record-keeping gap — it is what the form
+makes inevitable. It also sweeps a fee in terms, has no aggregate cap, and makes
+Merchant indemnify the processor for following Buyer's instructions.
+
+**No cluster owns `split-funding`.**
+
+## Six memo premises proved false
+
+The memo is drafting input, not authority. **Verify anything it asserts about our
+documents.** Every one was caught by an agent checking rather than assuming, and
+four were repeated by me in a brief.
+
+| premise | truth |
 |---|---|
-| `e3175f01f` | wave 1 — the spine (8), reconciliation, default-remedies, representations |
-| `03058943c` | wave 2 — guaranty (10), enrollment (10) |
-| `854964e2d` | `equipment` becomes a merchant election; the profile stops describing v4 |
-| `4933d23de` | ADR 0013 |
-| `0c9d4e895` | ADR 0012's stale `lombard-contracts` section, corrected |
-| `923b97be9` | §9.1 stops collecting a guarantor's SSN with no guaranty in the document |
-| `2903976ed` | renewal-positions (6 rewritten, 2 added); completeness retires, coherence replaces it |
+| §8.2 "the memo contradicts itself on Carry" | It does not. The Deduct/Carry text is marked `DELETE — entire current clause`; the `INSERT` opens *"No prior Remaining Balance is carried"*. **My error, in the brief.** |
+| Permission to Release "is missing" | Vendored twice, and eight clauses in this library. Reading it sharpens the question: §3 grants bureau authority; §4 sources the FCRA written instructions to a guarantor signature line **the form does not have**. |
+| Appendix A "fee table/rates are not supplied" | A completed nine-row grid. Changing your bank account costs **$75 and is also an Event of Default carrying $5,000**, while §2.4 permits the change with approval not unreasonably withheld. |
+| Virginia venue is §6.2-2236(A) | It is **§6.2-2234(A)**. §6.2-2236 has no subsection (A) and is not about forum. `facts.ts` had copied the memo's error three times; `ct-va-obligations.ts` was already right. |
+| §7.19's "two-year period" is the memo's figure | It appears nowhere but **my own note**. §7.19 is redrafted mutual with no shortened period. |
+| §9.1 "no substantive field block is visible" | The block is there, «35»–«40». What was missing was the record's *body*. |
 
-**Next:** `data-and-channel` (9), `fees-and-money` (6), `miscellaneous` (12),
-`disputes-service` (11).
+Two more I got wrong in briefs: §7.8 "incorporates five unseen instruments" (it
+is eleven words and incorporates nothing), and that Exhibit A and the execution
+block carry `«N»` markers (neither has one).
 
-## The structural finding this exists to fix
+## Four routes to guarantor liability, all closed
 
-> **The purchased asset and the payment base are different assets.** The granting
-> clause sold all cash, cheque, ACH and card receipts; collection was a fixed
-> percentage of card settlements; reconciliation could reach the broader universe.
+1. **§9.2's scope** — gated on `guarantyScope`, insolvency and bankruptcy excluded.
+2. **§7.21** — made each Guarantor indemnify Buyer for *"any act or omission by
+   any ISO"*. Unlimited liability for a broker they did not choose. **The memo
+   does not raise it.**
+3. **`frpa.execution`** — a binding recital plus a standalone fraud cause of action.
+4. **§9.1** — the execution grid holds **one** guarantor block, non-repeating,
+   **with no capacity line**, while §9.5 makes *"the persons or entities
+   constituting Guarantors"* jointly liable.
 
-`Card Receipts` is now defined once — net card settlement actually payable to
-Merchant, after refunds, chargebacks, separately identified taxes and gratuities
-payable to others, and the processor's own lawful charges and reserves. **Those
-five were the silent movers**: each could shift the economic percentage with no
-amendment and no disclosure. `Receipts` and `Daily Receipts` bridge to it, which
-is how eight clauses reach the fifteen they never edit.
+Each was found by an assertion stated **over the set**. None was found by reading
+a clause.
 
-## The fact model was the real defect
+**`«37»` is labelled "Social Security Number" and prints a full SSN into the body
+of the agreement** — every completed PDF carries it, including a broker's copy.
+§9.1 now requires a masked identifier in distributed copies; **the form still
+renders the full number**, and the test asserts that disagreement.
 
-**Four** of eleven facts were inert — declared in `McaFacts`, read by nothing.
-A fact that nothing gates on is a hardcode wearing a fact's clothes, and it is
-invisible until a template is assembled from it.
+## Rules that stopped being re-argued
 
-- **`settlementBase`** — added on the owner's call; net vs gross is a pricing
-  decision, per org, and it reaches the conformity surface because every state
-  disclosure must compute on the same base. `LOMBARD_FACTS` says `net` and says
-  loudly that this describes the clause as drafted, **not a confirmed business
-  fact**.
-- **`guarantyScope`** — closed in wave 2. §§9.2, 9.4, 9.5, 9.6 gate on
-  `limited-conduct`; §§10.2, 10.4 on `!== 'none'`. Before this a funder
-  answering `none` still got a personal guaranty.
-- **`equipment`** — `'none' | 'merchant-elects'`. Owner: *"Lease or buy, merchant
-  decide while signing up."*
-- **`venueRule`** — **still inert, and deliberately so.** Nothing in the corpus
-  reads it; §7.5 is ungated and hard-codes New York law with New York and Pasco
-  County, Florida forums. The renewal cluster was told to flip it to
-  `merchant-state` and **refused**: that would leave the profile asserting one
-  venue while the only venue clause mandates the other, and a contradiction is
-  harder to see than a hole. → `disputes-service`, with §7.5's body.
+- **Three fidelity guards retired** — `bodies-match-the-document`,
+  `frpa-coverage`'s line-accounting, and `selectClauses` completeness. Replaced by
+  **cross-reference coherence** across nine profiles, which was red on real
+  defects completeness could not see.
+- **A fact may only gate a whole clause, and its values must partition the clauses
+  it gates.** **Six clusters refused a gate their brief asked for and every
+  refusal was right** (§4.11, §5.16, §4.3, §4.1, §7.1, §7.5).
+- **Diagnostic:** if two limbs bind different parties or answer different
+  questions, the fact is misattributed, not too coarse.
+- **A fact row and the clauses it gates move in the same change.**
+- Pinned clause counts are **record counts, not section counts.**
 
-**`equipment` was hiding a missing product.** `instrumentsFor` gated the Equipment
-Lease and Subscription instruments on `equipment === 'separate-lease'` while the
-profile said `'deferred'` — so the only funder in the library had a suite whose
-FRPA sends the lease path to *"a separate written agreement"* the product did not
-include. **Found by the typechecker, not a test**, when collapsing the union made
-the comparison provably empty. Both instruments are now in Lombard's suite and
-**both are unreviewed**.
+## The facts, and what still does nothing
 
-## Three fidelity guards, all retired
+- **`settlementBase`** — `net`, and the row says loudly this describes the clause
+  as drafted, **not a confirmed business fact**. Still the most consequential
+  unknown: it reaches every state disclosure.
+- **`guarantyScope`** — closed. `full-performance` is a **deliberately unauthored
+  gap** and is what all three SEC-filed market forms do.
+- **`equipment`** — `'none' | 'merchant-elects'`.
+- **`venueRule`** — flipped to `merchant-state`, and **still inert**. The gate was
+  refused because **the funder-state arm cannot be drafted: `McaFacts` has no
+  field naming the funder's state.** Needs a `funderState` field plus a variables
+  mechanism, or the row deleted.
+- **`collectionMethod`** — gates no FRPA clause; it gates the `split-funding`
+  instrument. §2.5/§7.14 would read it if they returned.
+- **`disputeResolution: 'arbitration'`** selects no merchant-facing clause.
 
-ADR 0012 retired two and missed the third; ADR 0013 catches it.
+## Open, with owners
 
-1. `bodies-match-the-document`'s body assertions — **the digest assertion survives**
-   and is not part of the retirement.
-2. `frpa-coverage`'s line-accounting — the same guard pointed the other way.
-3. **`selectClauses` completeness** — *"selects every clause of the FRPA for the
-   funder whose paper it is"*. Its own docstring says the property holds *because*
-   the profile describes v4 rather than the memo, which is exactly the premise the
-   owner reversed. Replaced by **cross-reference coherence** across nine funder
-   profiles. **The replacement was red on real defects the retired one could never
-   see**: §7.1 carving out a §4.15 that `concurrentPositions: false` had deleted,
-   and §004 pointing at a §8.2 that `renewalModel: 'payoff-only'` had deselected.
-4. A fourth, found by the same cluster: `library.test.ts`'s *"numbers each
-   numbered clause once within an instrument"* rests on the same premise and
-   cannot survive alternatives. Inverted to *"shares a clause number only between
-   conditional clauses"*, which still catches a copy-pasted ungated duplicate.
+| item | owner |
+|---|---|
+| **Five instruments never rewritten** — Equipment Lease, Subscription, ISO PRA, Split Funding, Permission to Release. The first two are the largest open exposure. | **Owner: scope decision** |
+| Arbitration product decision. Va. §6.2-2234(B) bars face-to-face arbitration outside the recipient's PPB **and puts the arbitrators' fees on the provider**. | Owner |
+| `guarantyScope: 'full-performance'` — §9.1 + §§10.2/10.4 with no guaranty between them | Owner |
+| §7.19's period; §7.10 conspicuousness | Owner / counsel |
+| `frpa.indemnification-7-9 -> Section 6.3.1` — §6.3.1 is a paragraph inside another record, not a record | Unassigned; needs a split + three counts moved |
+| Appendix A grid, §9.1's SSN and repeating block, §4.13's three missing Section 1 rows, §5.11's permitted-prior-interests row, §004's `«25»` label, Section 10's empty headings | `lombard-contracts` form changes |
+| UCC-1 collateral description vs the rewritten §4.10 | Operations |
+| Six memo-refuted dispositions — **`rejected` already exists in `FindingDisposition`**, so this is a data fix plus regenerate | `lombard-contracts` |
+| `examinedBy` over-claims on every rewritten clause. **A third `ReviewId` would not fix it** — the memo read the same old text. What is missing is provenance for the *current body*: which memo entry, and adopted/adapted/departed | Unassigned |
+| `types.ts`'s `McaClauseKind` says a `field-group` "holds `fields`, never a body" — now false | One-line fix |
+| Pacta records an envelope **role**, not the legal **capacity** in which a human signed — and §9.1 and `frpa.execution` both turn on it | Platform |
 
-Four drafting agents were told the completeness invariant was sacred before the
-owner's decision made it wrong. That reversal is in ADR 0013 so it is not
-re-argued.
+## What the cross-reference checker still cannot see
 
-## The limb problem — three sightings, one rule
-
-**A fact frequently decides a limb; `includeWhen` only decides a clause.**
-`equipment` decides §4.11's ranking limb; `renewalModel` decides §8.2's Carry
-method but gates all of §8.2; `concurrentPositions` decides §4.15's cascade but
-gates all of §4.15 — and the memo wants the opposite rule *stated* there, not
-silence.
-
-Rule, now in ADR 0013: **split the clause so a fact decides a whole clause**, and
-move the counts `frpa-coverage` and `library.test.ts` pin in the same commit.
-
-**A fact row and the clauses it gates move in the same change.** This is why
-`equipment` moved alone and `renewalModel`, `concurrentPositions`, `venueRule`
-wait for the cluster that owns §§4.15, 8.1, 8.2.
-
-## What the set-level assertions found that no brief named
-
-Both are cases where asserting over the **set** beat reading clauses one at a time.
-
-- **§7.21** makes each Guarantor indemnify Buyer for all losses *"resulting from
-  any act or omission by any ISO"* — unlimited personal liability for a broker the
-  guarantor did not choose and whose agreement with Buyer they have never seen.
-  The memo does not raise it. → `data-and-channel`.
-- **`frpa.guarantor-information-9-1`** was an ungated `field-group`, so a
-  `guarantyScope: 'none'` template collected a guarantor's name, home address and
-  SSN for a guaranty the document did not contain. **Fixed** (`923b97be9`), after
-  verifying the defect by selecting at each value rather than trusting the report.
-  The `full-performance` half is unfixed and registered: §9.1 plus §§10.2/10.4
-  with no guaranty between them.
-
-## Departures worth a second look
-
-- **Deferred equipment is zeroed out.** §2.6 says the Remaining Balance never
-  includes an equipment charge, and `(Purchase Price × Factor Rate) + Equipment
-  Cost Deferred` puts one inside it by construction. Equipment can still be funded
-  out of the Purchase Price; what goes is applying the factor and *then* adding the
-  goods price on top.
-- **§4.6's notice is a condition, not a promise** — *"An act taken without that
-  notice is not authorized by this Section"*. The memo's version leaves an
-  unnoticed act effective.
-- **`guarantyScope: 'full-performance'` is deliberately unauthored.** It is what
-  all three market forms filed as SEC exhibits do, which is precisely why it is not
-  a drafting agent's decision. A named gap.
-- **The memo does NOT contradict itself on Carry — I did.** I briefed the renewal
-  cluster that the memo's narrative removes Carry while its §8.2 replacement text
-  retains it, and that the library body already matched that replacement. Both
-  false. The memo marks the Deduct/Carry text **`DELETE — entire current clause`**;
-  its `INSERT` opens *"No prior Remaining Balance is carried into the new
-  Purchased Amount"*. The body matched the deleted text because the library was a
-  verbatim transcription of v4 — which is what the memo was deleting. I grepped
-  for "Carry", found a block, and never read the marker above it. **The agent
-  refused the premise and asked to be checked; it was right.**
-
-## Owed
-
-- **`every-fact-value-is-reachable` (#150)** enumerates the `equipment` union and
-  must drop the two retired values when it merges; it also needs `settlementBase`.
-- **`examinedBy` over-claims** on every rewritten clause: it cites reviews that
-  read the *predecessor* text. **A third `ReviewId` for the memo would NOT fix
-  this** — the memo read that same old text, so it would make three reviews claim
-  to have read text none of them read. The field answers *"who audited the slot"*,
-  not *"who read this body"*. What is actually missing is **provenance for the
-  current body** — which memo entry it came from and whether we adopted, adapted
-  or departed. Roughly a dozen DEPARTURE notes live only in prose comments nobody
-  can query.
-- **Six findings the memo refuted** still need corrected dispositions in
-  `lombard-contracts`. **No vocabulary change is needed** — `rejected` already
-  exists in `FindingDisposition` and REVIEW-01 already uses it once. Data fix plus
-  regenerate the register. (The REVIEW-02 manifest gap ADR 0012 records is
-  **already closed** — see ADR 0013 §6.)
-- **§7.1's carve-out for §4.15 is now empty**, §7.9 → §6.3.1 dangles, and §4.16 →
-  §6.1.1 dangles twice over (a Plaid outage is expressly not an Event of Default
-  under the rewritten §6.1). All three are registered in `KNOWN_GAPS` with quotes,
-  and each belongs to a cluster still to run.
-- **§004's `«25»` row label** becomes "Prior transaction treatment" — a
-  `lombard-contracts` form change, handed back, not made.
-- **`frpa.holdback-explainer` still has `kind: 'clause'`** although ADR 0011 and
-  the memo both treat it as an explainer.
-- **§4.13 needs three Section 1 grid rows** that do not exist — offer expiry,
-  outstanding conditions, latest funding date. Same shape as §2.3's Exhibit A and
-  §5.11's permitted prior interests. **Form changes, not drafting.**
-- **The UCC-1 collateral description must be re-checked** against §4.10 as
-  rewritten. A filing drafted against v4 describes more than the clause now
-  authorises. Operations, not drafting.
-- **The `No legal-advice language` gate's comment-exclusion regex** only skips
-  lines starting with `//`, `*` or `/*`, so it fires on the bare-indented
-  continuation lines the drafting comments use. Deciding whether to widen it is
-  deliberately separate from making our own text pass.
-
-## Still to draft
-
-`data-and-channel` (9), `fees-and-money` (6), `miscellaneous` (12),
-`disputes-service` (11). **All four touch `miscellaneous.ts`, so they run one at a
-time**, not in parallel.
-
-`disputes-service` carries the `venueRule` flip together with §7.5's body.
-`data-and-channel` owns §7.21, the unlimited guarantor indemnity for an ISO's
-conduct.
+A reference **by name** rather than `Section N` (found with "Exhibit A"); a
+sub-provision inside another record (§6.3.1); and a citation that resolves but
+means nothing (§7.1's old carve-out for a cascade that no longer exists).
