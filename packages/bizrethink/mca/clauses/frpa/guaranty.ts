@@ -46,7 +46,24 @@ export const FRPA_GUARANTY: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'field-group',
-    includeWhen: null,
+    /*
+      A GUARANTY THAT DOES NOT EXIST COLLECTS NO SOCIAL SECURITY NUMBER.
+
+      This was `null` — ungated — while §§9.2–9.6 gate on `guarantyScope`. Under
+      `none` the whole section dropped except this grid, which asks a natural
+      person for their home address and Social Security number in support of a
+      guaranty the assembled document does not contain. Collecting identity data
+      for an obligation that does not exist is a privacy defect before it is a
+      drafting one, and nothing in the rendered document would have shown it.
+
+      Found by the guaranty cluster, which correctly left it alone as outside its
+      brief, and closed here.
+
+      `full-performance` is NOT fixed by this gate and is not meant to be: that
+      funder has a guaranty, so the grid belongs, but §§9.2–9.6 are unauthored.
+      A gate cannot close that; only drafting the full-performance guaranty can.
+    */
+    includeWhen: (facts) => facts.guarantyScope !== 'none',
     number: '9.1',
     section: 'guaranty',
     sortKey: 10,

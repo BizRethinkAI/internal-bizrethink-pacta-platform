@@ -523,17 +523,38 @@ describe('the guaranty is selected by the funder’s answer', () => {
   });
 
   /**
-   * The invariant every gate in this package is checked against: Lombard's
-   * answers select the whole FRPA. Verified here rather than assumed, because a
-   * gate written against what the memo RECOMMENDS instead of what the funder
-   * BUYS is the failure this catches.
+   * THIS USED TO ASSERT THAT LOMBARD SELECTS THE WHOLE FRPA, AND THAT IS NO
+   * LONGER TRUE ON PURPOSE.
+   *
+   * It read: *"The invariant every gate in this package is checked against:
+   * Lombard's answers select the whole FRPA … because a gate written against
+   * what the memo RECOMMENDS instead of what the funder BUYS is the failure
+   * this catches."* Sound while `LOMBARD_FACTS` described v4. The owner reversed
+   * that on 2026-09-10 — the profile now records the design the 2026-09-09 memo
+   * recommends — so a gate written against the recommendation is CORRECT and
+   * this assertion had become the thing catching the fix.
+   *
+   * It is the third fidelity guard, retired with the two ADR 0012 already
+   * retired; [ADR 0013](../../../../../docs/adr/0013-a-funder-profile-describes-the-funder.md)
+   * decision 3 carries the reasoning, and `select-clauses.test.ts` holds the
+   * replacement — cross-reference coherence, which is a stronger property than
+   * completeness ever was.
+   *
+   * What is kept is the part that is still true and still this cluster's
+   * business: **Lombard's profile takes the limited-conduct guaranty**, so the
+   * §9 gates must select for it. That is what a gate written against the wrong
+   * thing would break, and it is checked directly rather than through a
+   * whole-corpus count that now moves for unrelated reasons.
    */
-  it('still gives the funder whose paper this is every clause of it', () => {
-    const { selected, excluded } = selectClauses({ facts: LOMBARD_FACTS, instrument: 'frpa' });
+  it('gives the funder whose paper this is the guaranty it actually takes', () => {
+    const { selected } = selectClauses({ facts: LOMBARD_FACTS, instrument: 'frpa' });
+    const selectedSlugs = selected.map((entry) => entry.slug);
 
     expect(LOMBARD_FACTS.guarantyScope).toBe('limited-conduct');
-    expect(excluded).toHaveLength(0);
-    expect(selected).toHaveLength(clauses.length);
+
+    for (const slug of MINE) {
+      expect(selectedSlugs).toContain(slug);
+    }
   });
 
   /**
@@ -574,5 +595,53 @@ describe('rewriting changed nothing about provenance', () => {
    */
   it.each(MINE)('%s cites no case in its body', (slug) => {
     expect(body(slug)).not.toMatch(/\bAD3d\b|\bNY3d\b|Richmond Capital|Apollo Funding|LG Funding|Principis|Grafton/);
+  });
+});
+
+/**
+ * **A template that has no guaranty does not ask for a guarantor's SSN.**
+ *
+ * `frpa.guarantor-information-9-1` is a `field-group`, not a clause, and it was
+ * the one member of Section 9 that no brief owned and nothing gated. The
+ * guaranty cluster found it and correctly left it alone; it is closed here.
+ *
+ * Under `guarantyScope: 'none'` the whole of §§9.2–9.6 drops and §9.1 was the
+ * ONLY thing left standing in the section — a grid collecting a natural
+ * person's name, home address and Social Security number in support of a
+ * guaranty the document does not contain. Collecting identity data for an
+ * obligation that does not exist is a privacy defect before it is a drafting
+ * one, and no reader of the assembled document could have told it was a bug.
+ *
+ * `full-performance` is NOT fixed by this gate and is not meant to be. §9.1 is
+ * correctly selected there — that funder has a guaranty — but §§9.2–9.6 are
+ * unauthored, so the section is still incomplete. That is the named gap in ADR
+ * 0013, and a gate cannot close it; only drafting the full-performance guaranty
+ * can.
+ */
+describe('a template with no guaranty collects no guarantor data', () => {
+  const guarantySection = (scope: McaFacts['guarantyScope']) =>
+    selectClauses({ facts: { ...LOMBARD_FACTS, guarantyScope: scope }, instrument: 'frpa' })
+      .selected.filter((clause) => clause.section === 'guaranty')
+      .map((clause) => clause.slug);
+
+  it('selects nothing in Section 9 when the funder takes no guaranty', () => {
+    expect(guarantySection('none')).toEqual([]);
+  });
+
+  it('still collects guarantor information wherever a guaranty exists', () => {
+    expect(guarantySection('limited-conduct')).toContain('frpa.guarantor-information-9-1');
+    expect(guarantySection('full-performance')).toContain('frpa.guarantor-information-9-1');
+  });
+
+  /**
+   * The gap this does not close, pinned so it cannot be mistaken for closed:
+   * a `full-performance` funder gets the information grid and the §10 waivers
+   * and no guaranty between them.
+   */
+  it('leaves full-performance visibly incomplete rather than silently wrong', () => {
+    const selected = guarantySection('full-performance');
+
+    expect(selected).toContain('frpa.guarantor-information-9-1');
+    expect(selected).not.toContain('frpa.guaranty-of-performance-9-2');
   });
 });
