@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 071): claim pending invites on verification, not signup.
+import { claimInvitesOnVerification } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
 import { prisma } from '@documenso/prisma';
 import { DateTime } from 'luxon';
 
@@ -97,6 +99,11 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   if (!updatedUser) {
     throw new Error('Something went wrong while verifying your email. Please try again.');
   }
+
+  // MODIFIED for BizRethink (overlay 071): claim pending org invites only now
+  // that the email is proven. Never throws; runs once (a re-click returns
+  // ALREADY_VERIFIED above).
+  await claimInvitesOnVerification({ userId: updatedUser.id, email: updatedUser.email });
 
   return {
     state: EMAIL_VERIFICATION_STATE.VERIFIED,

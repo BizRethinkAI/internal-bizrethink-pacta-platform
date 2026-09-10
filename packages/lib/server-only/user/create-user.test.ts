@@ -3,24 +3,32 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { onCreateUserHook } from './create-user';
 
-// onCreateUserHook calls two helpers we want to observe without touching
-// the DB: autoClaimInvitesOnSignup (overlay 048) and createPersonalOrganisation.
+// onCreateUserHook calls helpers we want to observe without touching the DB:
+// autoClaimInvitesOnSignup + hasPendingInvites (overlays 048/071) and
+// createPersonalOrganisation.
 const mockedAutoClaim = vi.fn();
+const mockedHasPendingInvites = vi.fn();
 const mockedCreatePersonalOrg = vi.fn();
 
 vi.mock('@bizrethink/customizations/server-only/auto-claim-invites-on-signup', () => ({
   autoClaimInvitesOnSignup: (...args: unknown[]) => mockedAutoClaim(...args),
+  hasPendingInvites: (...args: unknown[]) => mockedHasPendingInvites(...args),
 }));
 
 vi.mock('../organisation/create-organisation', () => ({
   createPersonalOrganisation: (...args: unknown[]) => mockedCreatePersonalOrg(...args),
 }));
 
-const TEST_USER = { id: 42, email: 'alice@example.com' } as unknown as User;
+// A verified user (SSO new-user path) — auto-claim runs at creation.
+const VERIFIED_USER = { id: 42, email: 'alice@example.com', emailVerified: new Date() } as unknown as User;
+// An unverified user (email-password signup) — auto-claim is deferred to verification.
+const UNVERIFIED_USER = { id: 43, email: 'bob@example.com', emailVerified: null } as unknown as User;
 
 beforeEach(() => {
   mockedAutoClaim.mockReset();
+  mockedHasPendingInvites.mockReset();
   mockedCreatePersonalOrg.mockReset();
+  mockedHasPendingInvites.mockResolvedValue(false);
 });
 
 /**
@@ -34,7 +42,7 @@ beforeEach(() => {
  * These tests pin both contracts:
  *   - The 1-arg call still works (preserves backward compat for our own callers)
  *   - The 2-arg call honours `skipPersonalOrganisation`
- *   - Auto-claim of invites (overlay 048's behaviour) runs in BOTH modes
+ *   - Auto-claim of invites runs in BOTH modes, for a VERIFIED user
  *   - Personal Org creation is gated by BOTH `!skipPersonalOrganisation`
  *     AND `accepted.length === 0`
  *
@@ -46,7 +54,7 @@ describe('onCreateUserHook — overlay 048 + post-merge 2-arg signature', () => 
     mockedAutoClaim.mockResolvedValueOnce([]);
     mockedCreatePersonalOrg.mockResolvedValueOnce(undefined);
 
-    await onCreateUserHook(TEST_USER);
+    await onCreateUserHook(VERIFIED_USER);
 
     expect(mockedAutoClaim).toHaveBeenCalledWith({ userId: 42, userEmail: 'alice@example.com' });
     expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 42 });
@@ -55,15 +63,15 @@ describe('onCreateUserHook — overlay 048 + post-merge 2-arg signature', () => 
   it('accepts a 2nd options arg (upstream contract from handle-oauth-organisation-callback-url)', async () => {
     mockedAutoClaim.mockResolvedValueOnce([]);
 
-    await onCreateUserHook(TEST_USER, { skipPersonalOrganisation: true });
+    await onCreateUserHook(VERIFIED_USER, { skipPersonalOrganisation: true });
 
     expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
   });
 
-  it('runs auto-claim even when skipPersonalOrganisation=true (overlay 048: universal invite consumption)', async () => {
+  it('runs auto-claim for a verified user even when skipPersonalOrganisation=true', async () => {
     mockedAutoClaim.mockResolvedValueOnce([]);
 
-    await onCreateUserHook(TEST_USER, { skipPersonalOrganisation: true });
+    await onCreateUserHook(VERIFIED_USER, { skipPersonalOrganisation: true });
 
     expect(mockedAutoClaim).toHaveBeenCalledWith({ userId: 42, userEmail: 'alice@example.com' });
   });
@@ -71,7 +79,7 @@ describe('onCreateUserHook — overlay 048 + post-merge 2-arg signature', () => 
   it('skips Personal Org creation when invites were accepted (overlay 048 primary path)', async () => {
     mockedAutoClaim.mockResolvedValueOnce([{ inviteId: 'x' }]);
 
-    await onCreateUserHook(TEST_USER);
+    await onCreateUserHook(VERIFIED_USER);
 
     expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
   });
@@ -80,7 +88,7 @@ describe('onCreateUserHook — overlay 048 + post-merge 2-arg signature', () => 
     mockedAutoClaim.mockResolvedValueOnce([]);
     mockedCreatePersonalOrg.mockResolvedValueOnce(undefined);
 
-    await onCreateUserHook(TEST_USER, { skipPersonalOrganisation: false });
+    await onCreateUserHook(VERIFIED_USER, { skipPersonalOrganisation: false });
 
     expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 42 });
   });
@@ -92,9 +100,69 @@ describe('onCreateUserHook — overlay 048 + post-merge 2-arg signature', () => 
     // Silence the console.error the handler emits on failure.
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await onCreateUserHook(TEST_USER);
+    await onCreateUserHook(VERIFIED_USER);
 
     expect(mockedCreatePersonalOrg).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+/**
+ * Overlay 071: a pending invite is claimed only for a VERIFIED email.
+ * Claiming at signup (before verification) let anyone who typed an invited
+ * address join the inviting org. Unverified users get the claim at
+ * verify-email time instead (claimInvitesOnVerification).
+ */
+describe('onCreateUserHook — overlay 071: claim only for a verified email', () => {
+  it('unverified user → autoClaimInvitesOnSignup is NOT called', async () => {
+    await onCreateUserHook(UNVERIFIED_USER);
+
+    expect(mockedAutoClaim).not.toHaveBeenCalled();
+  });
+
+  it('unverified user + pending invite → no Personal Org (deferred to verification)', async () => {
+    mockedHasPendingInvites.mockResolvedValueOnce(true);
+
+    await onCreateUserHook(UNVERIFIED_USER);
+
+    expect(mockedHasPendingInvites).toHaveBeenCalledWith('bob@example.com');
+    expect(mockedAutoClaim).not.toHaveBeenCalled();
+    expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
+  });
+
+  it('unverified user + no pending invite → Personal Org created', async () => {
+    mockedHasPendingInvites.mockResolvedValueOnce(false);
+    mockedCreatePersonalOrg.mockResolvedValueOnce(undefined);
+
+    await onCreateUserHook(UNVERIFIED_USER);
+
+    expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 43 });
+  });
+
+  it('unverified user + skipPersonalOrganisation → no Personal Org, no claim', async () => {
+    await onCreateUserHook(UNVERIFIED_USER, { skipPersonalOrganisation: true });
+
+    expect(mockedAutoClaim).not.toHaveBeenCalled();
+    expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
+  });
+
+  it('unverified user + hasPendingInvites throws → Personal Org created (safety net)', async () => {
+    mockedHasPendingInvites.mockRejectedValueOnce(new Error('DB blip'));
+    mockedCreatePersonalOrg.mockResolvedValueOnce(undefined);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await onCreateUserHook(UNVERIFIED_USER);
+
+    expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 43 });
+    errorSpy.mockRestore();
+  });
+
+  it('verified user + invite → claimed, no Personal Org', async () => {
+    mockedAutoClaim.mockResolvedValueOnce([{ inviteId: 'x' }]);
+
+    await onCreateUserHook(VERIFIED_USER);
+
+    expect(mockedAutoClaim).toHaveBeenCalledWith({ userId: 42, userEmail: 'alice@example.com' });
+    expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
   });
 });
