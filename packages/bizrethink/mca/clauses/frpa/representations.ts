@@ -36,17 +36,68 @@ import type { McaClause } from '../types';
  * catches a vendored `.docx` moving underneath us and is not about bodies.
  */
 export const FRPA_REPRESENTATIONS: McaClause[] = [
+  /*
+    THE CLAUSE THAT DECIDES WHAT THE OTHER SEVENTEEN ARE.
+
+    WHAT WAS WRONG. Eleven words: "represents, warrants, and covenants that as
+    of the Effective Date **and during the term of this Agreement**". Three
+    things collapse into one. A representation is a statement of present fact; a
+    warranty is a promise that it is true; a covenant is a promise about the
+    future. Saying all three of every sentence beneath it turns "Merchant has
+    good title" into "Merchant will always have good title", and a statement that
+    was true at funding into a breach the day it stops being true.
+
+    Run that through v4's §6.1.1 — any covenant violation is an Event of Default
+    — and through §9.2(b), which reached any materially inaccurate present-fact
+    representation, and ordinary business deterioration becomes personal
+    liability for a human being. This lead-in is the multiplier on every other
+    defect in Section 5, and it is why it sits in the guaranty cluster rather
+    than the representations one: what makes it dangerous is §9.2.
+
+    THE REPRESENTATIONS CLUSTER DELIBERATELY DID NOT DEPEND ON THIS FIX.
+    `representations-are-present-fact.test.ts` requires each of its fourteen
+    clauses to carry its OWN temporal anchor — "Purchase Date", "when furnished"
+    — precisely so that the section is sound whether or not this clause was ever
+    rewritten. This is the fix; that belt-and-braces stays, and should.
+
+    WHAT CHANGED. Facts are made as at the Effective Date and, after a
+    reasonable opportunity to update disclosures, the Purchase Date. Nothing
+    continues unless a provision says in terms that it is a continuing covenant.
+    A representation is expressly not a promise about future financial
+    condition, revenue, solvency or business continuity — the four things a
+    purchaser of future receivables has bought the risk of.
+
+    DEPARTURES FROM THE MEMO. Two.
+    (1) The memo's last sentence — "An inaccurate statement or covenant breach
+        gives rise to remedies only as provided in Sections 6 and 9" — is kept
+        but written as remedies "under this Agreement", because Sections 6 and 9
+        are not the only places a remedy could be asserted from and an exclusive
+        list that is not exhaustive is worse than a general rule.
+    (2) The trailing colon is gone. v4's lead-in ended with ":" and each
+        representation beneath it was a grammatical continuation of it. Under
+        ADR 0011 the numbering and the assembly order are emitted, and a clause
+        selected out would leave the sentence dangling, so each representation
+        is a sentence of its own and this is a paragraph rather than a stem.
+
+    UNVERIFIED AUTHORITY. None is needed; the memo cites none here. The change
+    is a drafting correction, not a position about New York law.
+  */
   {
     slug: 'frpa.representations-lead-in',
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /*
+      NOT GATED. It scopes representations every template contains, and a
+      funder who takes no guaranty needs it as much as one who does — more, if
+      anything, because there is no §9.2 to limit what an inaccuracy costs.
+    */
     includeWhen: null,
     number: '',
     section: 'representations',
     sortKey: 5,
     heading: '',
-    body: 'Merchant represents, warrants, and covenants that as of the Effective Date and during the term of this Agreement:',
+    body: 'Merchant makes each representation of existing fact in this Section as of the Effective Date and, after a reasonable opportunity to update its disclosures, as of the Purchase Date only. A representation is not a promise of future financial condition, revenue, solvency or business continuity. Only a provision expressly stated as a continuing covenant applies after the Purchase Date. An inaccurate statement, and a breach of a covenant in this Section, give rise to remedies under this Agreement only as Section 6 and Section 9 provide.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -499,17 +550,72 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    AN ABSOLUTE WARRANTY OF SOMETHING NOBODY CAN KNOW, MADE PERSONAL BY §9.2(b).
+
+    WHAT WAS WRONG. "good, complete, and marketable title to all Receipts, free
+    and clear of any and all liabilities, liens, claims, charges, restrictions,
+    conditions, options, rights, mortgages, security interests, equities,
+    pledges, and encumbrances of any kind or nature whatsoever, or any other
+    rights or interests that may be inconsistent with the transactions
+    contemplated with, or adverse to the interests of, Buyer".
+
+    Every word after "liens" reaches things a merchant cannot know: an unfiled
+    statutory interest, a processor's contractual right of setoff, an equity
+    somebody may later assert. And v4's §9.2(b) guaranteed any materially
+    inaccurate present-fact representation, unqualified by knowledge, so an
+    innocent error about an unknown adverse right became recourse against a
+    human being. REVIEW-02 raised it with §5.13 as
+    `frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2`, and
+    it is the reason both clauses are drafted in this cluster.
+
+    IT IS ALSO THE WRONG PARTY'S JOB. Priority is a search: UCC-1 filings, the
+    processor agreement, prior funders' notices. Buyer runs those searches
+    before funding, has the merchant's authorisation to do so under §4.3, and is
+    the only party that can. A warranty is not a substitute for diligence; it is
+    a way of charging the merchant for not doing it.
+
+    WHAT CHANGED. Knowledge after reasonable inquiry, disclosure of known prior
+    assignments and consensual liens, an express refusal to warrant unknown
+    statutory interests and processor rights, and Buyer owning priority
+    verification. An inaccurate statement reaches a Guarantor only where §9.2's
+    conduct and proof requirements are satisfied — stated in the clause, so a
+    reader of Section 5 does not have to find Section 9 to learn it.
+
+    THE EQUIPMENT CARVE-OUT IS GONE, and it is not a loss. It said the monthly
+    equipment payment was "a permitted claim ranking after the Specified
+    Percentage", which states a priority for something with no security interest
+    to prioritise and invites the reading that {{equipmentAffiliate}} holds a
+    junior lien on the purchased share. The representations cluster removed the
+    same sentence from §5.10 and gave the reason: `frpa.definitions` settles the
+    economics, because an equipment charge is not deducted in determining Card
+    Receipts and so falls on Merchant's retained share.
+
+    DEPARTURE FROM THE MEMO. One, and it is the same one §5.12 hit. The memo says
+    "Section 1 shall identify any permitted prior interests and required releases
+    or subordinations". **Section 1 has no such row.** Its grid is Legal Name,
+    DBA, Tax ID, Entity Type, State of Inc., contacts and two addresses. Writing
+    a cross-reference to a field that does not exist would invent an AcroForm
+    widget the pipeline does not inject, so the disclosure is required in
+    writing before the Purchase Date instead — the route the spine took for the
+    processor's charges and reserves and §5.12 took for use of proceeds. A grid
+    row is the better fix and belongs to whoever owns `frpa.parties`.
+
+    UNVERIFIED AUTHORITY. The memo cites none for this clause; the narrowing is
+    a drafting and allocation judgement, not a reading of a case.
+  */
   {
     slug: 'frpa.unencumbered-receipts-5-11',
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /* A title representation is not a guaranty. See the lead-in. */
     includeWhen: null,
     number: '5.11',
     section: 'representations',
     sortKey: 110,
     heading: 'Unencumbered Receipts',
-    body: 'Merchant has good, complete, and marketable title to all Receipts, free and clear of any and all liabilities, liens, claims, charges, restrictions, conditions, options, rights, mortgages, security interests, equities, pledges, and encumbrances of any kind or nature whatsoever, or any other rights or interests that may be inconsistent with the transactions contemplated with, or adverse to the interests of, Buyer, other than the monthly Equipment payment billed at merchant level by the Approved Processor under an Equipment Lease Agreement between Merchant and {{equipmentAffiliate}}, which is a permitted claim ranking after the Specified Percentage.',
+    body: 'To Merchant’s knowledge after reasonable inquiry, Merchant is entitled to sell the Purchased Receipts, and Merchant has disclosed to Buyer all known prior assignments of and consensual liens on them. Merchant has identified to Buyer in writing before the Purchase Date any prior interest the parties permit to remain and any release or subordination Buyer requires. Merchant does not warrant the absence of unknown statutory interests, processor rights or legal claims. Buyer shall independently verify priority before funding. An inaccurate statement in this Section creates liability under the Guaranty only where the conduct and proof requirements of Section 9.2 are satisfied.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -576,17 +682,68 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
       { review: 'REVIEW-02', findings: ['frpa-5-12-does-not-state-the-merchants-principal-place-of-business'] },
     ],
   },
+  /*
+    A MERCHANT WARRANTING HOW A BANKRUPTCY COURT WILL RULE.
+
+    WHAT WAS WRONG. The clause had the merchant warrant that this transaction
+    "will not ... be considered a fraudulent transfer or fraudulent conveyance,
+    or otherwise be void or voidable under similar laws or principles, the
+    doctrine of equitable subordination, laws regarding preferential transfers,
+    **or for any other reason**."
+
+    Every item on that list is a judicial conclusion, not a fact. Whether a
+    transfer is avoidable turns on reasonably equivalent value, on insolvency at
+    the time, on intent, and on timing — and reasonably equivalent value is a
+    question about what BUYER gave. So the merchant warranted the outcome of a
+    question that depends on the counterparty's own conduct, and, through
+    v4's §9.2(b), warranted it personally. "Or for any other reason" then
+    warranted every ground that has not been invented yet.
+
+    It is also self-defeating for the funder. A warranty that the transaction is
+    not avoidable is worth nothing in the proceeding where it matters — a
+    trustee is not bound by the debtor's contractual opinion — and it is
+    evidence the parties contemplated the risk.
+
+    WHAT CHANGED. Disclosure of known contractual restrictions that would
+    actually prevent the sale or the split, which is a fact a merchant has. An
+    express refusal to give a legal warranty about avoidance, subordination or
+    challenge. And the sentence that closes the loop with §6.1 and §9.2: a
+    challenge or an avoidance is not itself an Event of Default and creates no
+    liability under the Guaranty.
+
+    WHY THE "EVENT OF DEFAULT UNDER ANOTHER CONTRACT" LIMB SHRANK. v4 warranted
+    that performing this Agreement would not put the merchant in default under
+    ANY contract with anyone. A merchant with a landlord, a franchisor, a bank
+    line and three suppliers cannot audit that, and the funder does not need it:
+    what it needs is to know about a restriction that would stop the receipts
+    being sold or the split being installed. That is what the clause now asks.
+
+    DEPARTURES FROM THE MEMO. Two, both small.
+    (1) The split is identified as "the processor split under Section 2.3"
+        rather than "the agreed processor split", because §2.3 is where the
+        instruction and the single aggregate cap live and an unanchored "agreed"
+        invites a second, different arrangement.
+    (2) "Merchant retains every defence available to it under those laws" is
+        added. The memo's replacement removes the warranty but does not say the
+        defences survive, and a clause that goes quiet about defences in a
+        bankruptcy paragraph is a clause somebody will argue waived them.
+
+    UNVERIFIED AUTHORITY. The memo cites none here. The reasoning is the
+    Bankruptcy Code's own structure rather than any decision, and nobody on this
+    project has verified it against the Code either.
+  */
   {
     slug: 'frpa.defaults-under-other-contracts-improper-transfers-5-13',
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
+    /* A disclosure representation, in every template. See the lead-in. */
     includeWhen: null,
     number: '5.13',
     section: 'representations',
     sortKey: 130,
     heading: 'Defaults under Other Contracts; Improper Transfers',
-    body: 'Merchant’s execution of and performance under this Agreement will not cause or create an event of default by Merchant under any contract with another person or entity, nor will it be considered a fraudulent transfer or fraudulent conveyance, or otherwise be void or voidable under similar laws or principles, the doctrine of equitable subordination, laws regarding preferential transfers, or for any other reason.',
+    body: 'Merchant has disclosed to Buyer each known contractual restriction that would materially prevent the sale of the Purchased Receipts or the processor split under Section 2.3. Merchant does not make a legal warranty that this transaction cannot be avoided, subordinated or challenged under bankruptcy, fraudulent-transfer, preference or other law, and Merchant retains every defence available to it under those laws. No such challenge, and no such avoidance, itself creates an Event of Default or liability under the Guaranty.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

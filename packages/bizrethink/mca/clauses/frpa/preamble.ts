@@ -3,12 +3,15 @@ import type { McaClause } from '../types';
 /**
  * The deal itself — Section 1’s notes, the parties, the grant.
  *
- * TWO OF THESE ARE AUTHORED, THE REST ARE STILL TRANSCRIBED, and the file has
- * to say which. `frpa.holdback-explainer` and `frpa.granting-clause` were
- * rewritten on 2026-09-10 under
+ * FIVE OF THESE ARE AUTHORED, ONE IS STILL TRANSCRIBED, and the file has to say
+ * which. `frpa.holdback-explainer` and `frpa.granting-clause` were rewritten by
+ * the spine cluster on 2026-09-10 under
  * [ADR 0012](../../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md):
  * the baseline is drafting input, not specification, and reproducing it is not
- * a goal. The other four bodies here are still the words v4 prints.
+ * a goal. `frpa.parties`, `frpa.equipment-cost-explainer` and
+ * `frpa.equipment-cost-exclusivity` were rewritten by the enrollment cluster the
+ * same day, under the same ADR. `frpa.rollover-method-election` is still the
+ * words v4 prints; it belongs to `renewal-positions`.
  *
  * WHAT THAT COSTS, STATED RATHER THAN HIDDEN. `bodies-match-the-document` is
  * red on both rewritten clauses, which ADR 0012 authorises. `frpa-coverage`’s
@@ -63,6 +66,45 @@ export const FRPA_PREAMBLE: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    WHAT WAS WRONG. Not the safeguard — the safeguard is the best thing in the
+    clause and the memo keeps it. What was wrong is the first limb of the choice
+    it offers: *"the cost is added to the Purchased Amount and repaid through the
+    Specified Percentage"*. That commingles equipment consideration with the
+    receivables purchase, and it is the sentence that makes `frpa-sub-equipment-lien-conflict`
+    and the disclosure defect below possible at once.
+
+    WHAT CHANGED. Equipment is bought or leased under a separate written
+    agreement that identifies the equipment, the seller or lessor, the cash
+    price, the taxes, who ends up owning it and any recurring charge — so a
+    merchant can see what it is paying for before it agrees. Where Merchant
+    elects to buy for cash, the price comes out of the Purchase Price as an
+    itemized, separately authorized line in Section 1.4, which is where §4.1
+    already requires every deduction to appear as a dollar figure before
+    signature. Nothing is added on top of the factored Purchased Amount. The
+    no-double-charge safeguard survives word for word in substance.
+
+    THE ARITHMETIC IS NOT A PREFERENCE, IT IS FORCED BY §2.6. The spine's
+    Remaining Balance *"never includes a fee, an equipment charge, a cost of
+    enforcement"*, and the Remaining Balance is the Purchased Amount less
+    credits. A Purchased Amount computed as (Purchase Price × Factor Rate) +
+    Equipment Cost Deferred therefore puts an equipment charge inside the
+    Remaining Balance by construction, and §2.6 and §003 cannot both stand. The
+    spine landed first and is the base this cluster drafts against.
+
+    DEPARTURE FROM THE BRIEF'S `my_note`, AND IT IS A REAL ONE. The note says
+    removing deferred equipment is a product decision with revenue consequences
+    that should wait until 100/101 clear, and asks for the Equipment Lease and
+    the Subscription to be read first. Drafting cannot sit on the fence: the
+    clause either states an addition or it does not. What is reported instead is
+    that the revenue consequence is smaller than it looks — equipment can still
+    be funded, out of the Purchase Price, with the factor applied to a Purchase
+    Price that includes it. What goes is only the structure that applies the
+    factor and *then* adds the goods price on top. If the owner wants deferral
+    back, §2.6's sentence has to change with it, and `LOMBARD_FACTS.equipment`
+    moves from `deferred` to `purchased-at-funding`. Neither is this cluster's
+    file.
+  */
   {
     slug: 'frpa.equipment-cost-explainer',
     version: 1,
@@ -76,23 +118,70 @@ export const FRPA_PREAMBLE: McaClause[] = [
     section: 'funding-terms',
     sortKey: 20,
     heading: '',
-    body: 'What is the Equipment Cost? Point-of-sale equipment may be paid for in one of two ways, and only one. Either the cost is added to the Purchased Amount and repaid through the Specified Percentage (“Equipment Cost Deferred” in Section 1.3), or it is deducted from the Purchase Price at funding (“Less: Equipment fee (paid at funding)” in Section 1.4). Under either, Merchant owns the equipment outright. If either figure is greater than $0.00, Merchant is not asked to lease the same equipment and no monthly lease payment is payable for it. If instead Merchant leases the equipment under a separate Equipment Lease Agreement with {{equipmentAffiliate}}, both figures in Section 1 are stated as $0.00 rather than left blank. In no event does Merchant pay for the same equipment under both this Agreement and an Equipment Lease Agreement.',
+    body: 'What is the Equipment Cost? Point-of-sale equipment is bought or leased under a separate written agreement, and that agreement — not this one — governs it. It identifies the equipment, the seller or lessor, the cash price, any taxes, who owns the equipment, when it is delivered, and any recurring charge. If Merchant elects to buy the equipment for cash, Merchant may separately authorize the price as an itemized deduction from the Purchase Price, shown as a dollar figure in the itemization in Section 1.4 before Merchant signs. If Merchant instead leases or subscribes for the equipment from {{equipmentAffiliate}}, no equipment amount is deducted at funding and both equipment figures in Section 1 are stated as $0.00 rather than left blank. No equipment charge is added to the Purchased Amount or to the Remaining Balance, and “Equipment Cost Deferred” in Section 1.3 is stated as $0.00. Merchant does not pay for the same equipment twice: where an equipment price has been deducted at funding, no lease or subscription charge is payable for that equipment, and where a lease or subscription charge is payable, no equipment price is deducted. A charge billed at merchant level for equipment leased or subscribed from {{equipmentAffiliate}} does not reduce Card Receipts. Where the law requires an equipment or related service charge to be reflected in a disclosure given with this Agreement, it is reflected as that law requires; the description of a charge in this Agreement decides nothing about how the law treats it.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    THE CRITICAL ONE IN THIS CLUSTER, AND THE DEFECT IS ONE SENTENCE.
+
+    WHAT WAS WRONG. *"Because that amount is the price of goods and not a cost of
+    the financing, it is excluded from the finance charge and from the amount
+    financed stated on any state disclosure accompanying this Agreement."*
+
+    Finance charge and amount financed are two DIFFERENT statutory calculations
+    with different definitions, and a charge cannot be outside both by
+    description — if it is genuinely a goods price funded by the transaction it
+    belongs in the amount financed, and if it is a charge required as a condition
+    of funding it belongs in the finance charge. An affiliate charge that a
+    merchant must accept to get funded is the textbook inclusion case, not the
+    textbook exclusion. The clause also had a private party declaring the
+    contents of a disclosure field a state regulator defines, which is the
+    disclosure-surface half of ADR 0008 being decided on the agreement surface.
+
+    WHAT CHANGED. The exclusion is deleted outright. The clause now says the
+    opposite thing: the calculation is the law's, Buyer performs it, and nothing
+    in this Agreement determines the answer. The exclusivity rule survives —
+    it is what stops the same equipment being charged twice — and the formula is
+    restated without the addition, for the §2.6 reason set out above §002.
+
+    DEPARTURE FROM THE MEMO. The memo says "Buyer shall calculate the finance
+    charge, amount financed or funds provided, disbursement amount, and other
+    required disclosure fields under applicable law". Kept, but pointed at the
+    fields the statutes actually name rather than listing four of them, because
+    the eleven tracked states do not use one vocabulary and an incomplete list
+    reads as an exhaustive one.
+
+    GATED, per the brief's `action: both` on `equipment`. A funder that sells no
+    equipment has no exclusivity rule to state, and the disclosure sentence
+    inside it would then be the only place the corpus says who computes a
+    disclosure field — which would be the wrong home for it. NOT a departure but
+    worth naming: the general proposition survives outside the gate, because
+    §002 carries the same sentence and both gates are identical.
+
+    UNVERIFIED. The memo cites NY Fin. Servs. Law §803 and Cal. Fin. Code §22802
+    as the definitional sources. Neither is vendored in
+    `packages/bizrethink/mca/sources/` — 23 NYCRR 600 and 10 CCR 900-956 are the
+    regulations, not the statutes — and nobody on this project has read either
+    section. Recorded here, never in a body.
+  */
   {
     slug: 'frpa.equipment-cost-exclusivity',
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
-    includeWhen: null,
+    /*
+      Same gate as the explainer above, and deliberately identical: two clauses
+      that state one rule between them must appear and disappear together.
+    */
+    includeWhen: (facts) => facts.equipment !== 'none',
     number: '',
     section: 'funding-terms',
     sortKey: 30,
     heading: '',
-    body: 'Only one of “Equipment Cost Deferred” in Section 1.3 and “Less: Equipment fee (paid at funding)” in Section 1.4 may be completed with an amount greater than $0.00; the other must be stated as $0.00. The Purchased Amount shown in Section 1.3 is calculated as (Purchase Price × Factor Rate) + Equipment Cost Deferred, and is therefore inclusive of any Equipment Cost Deferred. Because that amount is the price of goods and not a cost of the financing, it is excluded from the finance charge and from the amount financed stated on any state disclosure accompanying this Agreement.',
+    body: 'An equipment amount is deducted at funding or it is not charged under this Agreement at all. “Equipment Cost Deferred” in Section 1.3 is stated as $0.00, and the Purchased Amount in Section 1.3 is the Purchase Price multiplied by the Factor Rate, without any equipment or fee addition. An equipment amount deducted at funding must be separately invoiced, expressly authorized by Merchant, and itemized as a dollar figure in Section 1.4; an amount that does not so appear may not be deducted. Buyer is responsible for calculating the finance charge, the amount financed or funds provided, the disbursement amount, and every other field a disclosure required by law obliges it to state, under the definitions that law supplies and on the commercial facts of this transaction. No description in this Agreement determines whether a charge is included in or excluded from a calculation required by applicable law, and the fact that a charge is called the price of goods decides nothing. A factor rate is not an annual percentage rate.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -117,6 +206,47 @@ export const FRPA_PREAMBLE: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    WHAT WAS WRONG. Three things, none of them fatal, which is why the memo
+    rates it Moderate and the disposition is still REPLACE IN FULL.
+
+    (1) "the “Merchant” or “Seller”" defines a second name for the same party
+        and then no clause in any of the six instruments ever uses it —
+        `defined-term-drift` in its cheapest form. A reader who meets "Seller"
+        in a later draft has no way to know it is not a third party.
+    (2) The preamble said the Agreement is "entered into and effective as of"
+        the Effective Date, in a document whose granting clause transfers on the
+        PURCHASE DATE. Signing and transfer are different events and v4 ran them
+        together in its first sentence.
+    (3) Naming an Approved Processor and an equipment affiliate in Section 1
+        reads, to a merchant, as making them parties. They are not, and two of
+        the memo's findings elsewhere turn on that.
+
+    WHAT CHANGED. The alias goes. Signing is separated from transfer, with the
+    cross-reference pointed at §4.13 where the Purchase Date is defined. A closing
+    sentence says who is not a party and what it would take to become one.
+
+    WHAT THE CLAUSE CANNOT DO, AND THE MEMO SAYS SO. Entity status, the actual
+    office and the merchant's identity are unverified, and no drafting cures a
+    wrong party name. `lombard-contracts`' CONTRACT_INDEX records the EIN, the
+    payee bank details and the sender address as NOT verified, with the warning
+    that "the last index stated them confidently and every one was wrong". The
+    fix is an entity-verification step at underwriting, which is operations.
+
+    DEPARTURE FROM THE MEMO — THE WIDGETS STAY. The memo's replacement moves the
+    Effective Date, the office and the merchant name into Section 1 and drops
+    «31», «96» and «32». README rule 2 keeps the `«N»` AcroForm anchors exactly
+    where the body has them; they are what the Lombard pipeline injects, and a
+    body without them cannot be filled in. They are kept in the same three roles
+    and the Section 1 cross-references are added around them.
+
+    A TENANT FACT THIS LIBRARY CANNOT YET EXPRESS, LEFT AS IT WAS. "a Florida
+    limited liability company" is Lombard's entity type and state, hard-coded in
+    a library whose whole point is that it is not one funder's paperwork
+    (`tenant-agnostic.test.ts`). It survives because the party placeholders are
+    exactly three and there is no `{{funderState}}`; inventing a fourth is
+    outside this cluster's authority. Reported rather than fixed.
+  */
   {
     slug: 'frpa.parties',
     version: 1,
@@ -127,7 +257,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     section: 'preamble',
     sortKey: 10,
     heading: '',
-    body: 'This Future Receivables Purchase Agreement (this “Agreement”) is entered into and effective as of ____«31»_____ (the “Effective Date”) by and between {{funder}}, a Florida limited liability company, with its principal office at _______________«96»_______________ (the “Buyer”), and _____________«32»_____________ (the “Merchant” or “Seller”), with reference to the Merchant Information, Deposit Account, Funding Terms, Itemization, and Approved Processors set forth in Section 1 above.',
+    body: 'This Future Receivables Purchase Agreement (this “Agreement”) is entered into as of ____«31»_____ (the “Effective Date”) by {{funder}}, a Florida limited liability company, with its principal office at _______________«96»_______________ (the “Buyer”), and _____________«32»_____________ (the “Merchant”), identified by its full legal name, entity type and state of organization in Section 1. The Merchant Information, Deposit Account, Funding Terms, Itemization and Approved Processors set out in Section 1 form part of this Agreement, and the address and operational notice contact of each party are stated there; notice is given as Section 7.3 provides.\nSigning this Agreement transfers nothing. The sale and transfer of the Purchased Receipts take effect only on the Purchase Date, as Section 4.13 provides, and only when Buyer has funded the Purchase Price.\nAn Approved Processor, an equipment seller, lessor or subscription provider, an affiliate of Buyer, a broker and a servicer are not parties to this Agreement and acquire no right and assume no obligation under it, whether or not they are named in Section 1, unless one of them separately signs this Agreement in that capacity.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

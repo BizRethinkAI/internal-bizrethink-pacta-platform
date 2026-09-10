@@ -149,6 +149,88 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['frpa-severability-text-under-entire-agreement'] }],
   },
+  /*
+    THE SECOND GUARANTY, AND IT WAS WIDER THAN THE FIRST.
+
+    WHAT WAS WRONG. "Upon the occurrence of any Event of Default, Merchant and
+    Guarantor(s) jointly and severally shall assume liability for and hereby
+    agree to indemnify ... Buyer and any third-party servicers from and against
+    any and all liabilities, claims, losses, obligations, damages, penalties,
+    actions, and suits of whatsoever kind and nature ... in any way relating to
+    or arising out of such Event of Default."
+
+    Read that beside §9.2, which guarantees fraud, materially false present-fact
+    statements and intentional diversion and NOTHING ELSE. This clause made a
+    guarantor liable for EVERY Event of Default — which, under v4's §6.1.1, was
+    every breach of every covenant — and did it in the miscellaneous section,
+    twenty pages from the Guaranty, without citing it. §9.2's promise that "this
+    Guaranty does not guarantee ... the performance of any other covenant" was
+    true of §9.2 and false of the document.
+
+    It is a first-party indemnity wearing a third-party indemnity's clothes.
+    "Losses incurred by Buyer relating to an Event of Default" is Buyer's own
+    collection loss; an indemnity is for what a STRANGER claims. Section 6.2 and
+    Section 6.3 already govern what Buyer may recover for itself, with a cure
+    period, a proof requirement and a 25% ceiling — none of which this clause
+    acknowledged, so it was also a way around all three.
+
+    Three more defects, each its own finding. It indemnified "any third-party
+    servicers" as principals in their own right. It reached "penalties", which
+    can include regulatory penalties imposed on Buyer for Buyer's conduct. And
+    its last sentence charged interest "at the rate set forth in Section 6.3.1,
+    from the date of demand until paid in full" — `indemnity-charges-interest-document-denies`
+    and `interest-charges-inside-a-not-a-loan` together.
+
+    CROSS-REFERENCE 2, HANDED OVER BY THE BRIEF AND RESOLVED HERE. §6.3.1 no
+    longer supplies a rate. As rewritten it says interest is recoverable "only
+    if, from the date and at the rate, that applicable law authorizes or a court
+    orders", that no contractual or default rate accrues, and that "an invoice or
+    a demand for payment creates no right to interest". So v4's sentence pointed
+    at a rate that does not exist AND asserted the one thing §6.3.1 denies. The
+    sentence is deleted rather than repaired: this clause now defers to §6.3.1
+    instead of restating it.
+
+    WHAT CHANGED. A third-party indemnity, for the portion of a third-party
+    claim a court finally determines — or a settlement Merchant approves —
+    was directly caused by Merchant's fraud or intentional diversion. Given by
+    MERCHANT alone. Notice, cooperation and a defence Merchant may conduct. An
+    exclusions paragraph covering Buyer's own negligence, fraud, willful
+    misconduct and legal violations, penalties for their conduct, the ordinary
+    failure of future receipts to arise, and first-party claims, which stay in
+    Section 6.2.
+
+    DEPARTURES FROM THE MEMO. Four.
+    (1) The memo says "Costs and interest remain subject to Section 6.3". Written
+        as costs under Section 6.3 "including its single aggregate ceiling", and
+        interest "only as Section 6.3.1 permits". The memo predates the Section 6
+        rewrite and its sentence would have left the reader to discover that
+        §6.3.1 now grants nothing.
+    (2) "no amount increases the purchased balance or split" is written against
+        the defined terms: the Purchased Amount, the Remaining Balance and the
+        Specified Percentage. §2.6 says the Remaining Balance never includes a
+        fee, and "purchased balance" is not a term this document has.
+    (3) The memo's settlement sentence reads as a limit on Merchant's settlement
+        authority but is drafted without a subject. Written with one.
+    (4) Third-party servicers are dropped as indemnitees rather than narrowed. A
+        servicer is Buyer's agent; if Buyer wants its servicer covered, the
+        indemnity Buyer holds is what covers it, and naming the servicer
+        separately creates a claimant the merchant never contracted with.
+
+    IT IS NOT GATED, AND THAT IS DELIBERATE. The brief marks it `action: both`
+    with `fact: guarantyScope`, and the owner's mid-flight instruction reverses
+    that: an indemnity is not a guaranty. A funder taking no personal guaranty
+    still needs one, and gating it would leave that template with no indemnity
+    at all. The fix is that it stops reaching a Guarantor, which is what "creates
+    no independent Guarantor liability" says in terms.
+
+    NOT FIXED HERE. The register carries three arbitration findings on this
+    clause — `frpa-arbitration-clauses-with-no-arbitration-agreement`,
+    `orphan-arbitration-references` and `orphan-arbitration-twenty-day-bar`.
+    They are about the FRPA referring to an arbitration agreement it does not
+    contain, they are the `disputes-service` cluster's `disputeResolution`
+    decision, and the whole of what this rewrite can honestly do about them is
+    mention arbitration nowhere.
+  */
   {
     slug: 'frpa.indemnification-7-9',
     version: 1,
@@ -159,7 +241,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     section: 'miscellaneous',
     sortKey: 90,
     heading: 'Indemnification',
-    body: 'Upon the occurrence of any Event of Default, Merchant and Guarantor(s) jointly and severally shall assume liability for and hereby agree to indemnify, protect, and keep harmless Buyer and any third-party servicers from and against any and all liabilities, claims, losses, obligations, damages, penalties, actions, and suits of whatsoever kind and nature imposed on, incurred by, or asserted against Buyer or any third-party servicers in any way relating to or arising out of such Event of Default (collectively, “Indemnified Amounts”), including, subject to the aggregate limit in Section 6.3, the payment of costs and expenses reasonably incurred for the enforcement of Buyer’s rights and remedies hereunder, including the collection of amounts due to Buyer hereunder and attorneys’ fees and costs in any trial court or appellate court proceeding or administrative proceeding, or any negotiations or consultations, in connection with any Event of Default. Such Indemnified Amounts shall accrue at the rate set forth in Section 6.3.1, from the date of demand until paid in full.',
+    body: 'Merchant shall indemnify Buyer only for the portion of a third-party claim finally determined by a court, or resolved in a written settlement Merchant has approved, to have been directly caused by Merchant’s fraud or intentional diversion of Purchased Receipts. Buyer shall give Merchant prompt written notice of the claim, shall cooperate reasonably, and shall permit Merchant to defend it with competent counsel. Merchant shall not settle a claim in a way that imposes an admission or a non-monetary duty on Buyer, or that fails to release Buyer, without Buyer’s consent, which shall not be unreasonably withheld. Late notice reduces Merchant’s liability only to the extent of the resulting material prejudice.\nThis indemnity does not cover the negligence, fraud, willful misconduct or violation of law of Buyer or of its representatives, a penalty imposed for their conduct, the ordinary failure of future receipts to arise, or a first-party claim by Buyer, which is governed by Section 6.2. It creates no independent Guarantor liability, and a claim against a Guarantor may be brought only as Section 9.2 permits. Costs are recoverable only under Section 6.3, including its single aggregate ceiling, and interest accrues only as Section 6.3.1 permits. No amount under this Section increases the Purchased Amount, the Remaining Balance or the Specified Percentage, and no loss may be recovered twice.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
