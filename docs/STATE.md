@@ -12,7 +12,7 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-08-31_
+_Last updated: 2026-09-09_
 
 ---
 
@@ -51,20 +51,21 @@ architecture is recorded in ADRs rather than here:
   track, not a prerequisite. `assertPublishable` gates text reaching a *third
   party*, not text being written. Building the clause library is unblocked.
 
-Where it stands, 2026-09-07:
+Where it stands, **2026-09-09**:
 
 | | |
 |---|---|
-| Conformity surface | **built** — `/admin/mca`, instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, CT/VA primary text sourced |
-| The 47 never-examined clauses | **read** — REVIEW-02, in `lombard-contracts`; 23 fixes applied there |
-| `packages/bizrethink/mca/clauses/` | **does not exist** — the clause library, sibling of `/admin/lease-library`, is the next build |
-| Agreement builder | **not started — and it is the deliverable** |
+| Conformity surface | **built** — `/admin/mca`, instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, CT/VA primary text sourced, source strength and reading age on every card (#134) |
+| Clause library | **built** — `packages/bizrethink/mca/clauses/`, **204 clauses across all six instruments**, every one carrying an examination record |
+| `/admin/mca-library` | **built** (#132) — per-clause approval (#135), a `From counsel` section (#140) |
+| Counsel review link | **built** — `/mca-clause-review/:token`, scoped by instrument, with a derived briefing (#139) and a findings box (#140) |
+| Agreement builder | **not started — and it is still the deliverable.** [ADR 0011](adr/0011-the-mca-clause-library-is-a-library.md) settles its shape |
+| Interview / Section 1 | **not started.** The merchant and funding grid is captured nowhere in Pacta |
 
-The MCA package today holds `content/`, `prescribed/` and `__tests__/`. Those are
-the *rule packs* — what a state demands of a disclosure. They are not clauses and
-were never going to become clauses, so "I only see MCA conformity" is an accurate
-reading of the package, not a misunderstanding of it. The lease equivalent has
-sixteen directories; the mapping from one to the other is the build plan.
+**The library is text with provenance, not an engine.** There is no
+`includeWhen`, no `variables`, no selection. ADR 0011 decides that those arrive
+next and that numbering is emitted at assembly rather than stored — the lease
+builder's model, which is built and proven.
 
 ## In flight
 
@@ -72,13 +73,20 @@ sixteen directories; the mapping from one to the other is the build plan.
 pull request.** Reading the current state means this file plus every note in
 that folder. The table below is history and stays until compaction.
 
+**Open right now: one PR.** #145, correcting the runbook claims that misled a
+session into breaking the dev Mac's toolchain.
+
+Everything else has merged. **Twenty in-flight notes were folded into this file
+and deleted on 2026-09-09** — the first compaction since the convention was
+introduced, and it was overdue: every note in that folder belonged to a merged
+PR, while this file still said the clause library did not exist.
+
 | PR | What | State |
 |---|---|---|
-| #26 | Lease party list + sending wired | Open. Base of the current stack. |
-| #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. You are reading its STATE update. |
+| #26 | Lease party list + sending wired | Open. Base of the lease stack. |
+| #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. |
 | #3 | `default-deny GITHUB_TOKEN` scope in CI workflows | Rebased 2026-08-29 |
 | #4 | AATL signing setup plan (DigiCert + GCP Cloud HSM) | Rebased 2026-08-29. AATL confirmed still live. |
-| — | MCA — conformity surface | Landed. Architecture in [ADR 0008](adr/0008-mca-is-two-surfaces-not-one.md) / [0009](adr/0009-counsel-is-parallel-not-a-gate.md), not in the 09-01→09-07 section below, which is lease-only. The clause library is **not** built. |
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
 **#21** (route), **#22** (preview link), **#23** (custom clauses + interview
@@ -124,6 +132,121 @@ of what ran; when it goes out of date, the correction belongs here, not there.
 The move was safe only because nothing had been signed — `envelopeId` was NULL
 and the organisation had zero envelopes. **There is no code path to move an
 envelope between teams.** Anything similar must happen before the first send.
+
+## The week of 2026-09-07 → 09-09: the MCA clause library was built
+
+**Twenty in-flight notes folded here and deleted**, per the convention in
+CLAUDE.md. #145's note stays until it merges. This is synthesis, not
+concatenation — several notes list as *open* things a later note settled, and
+those are marked below.
+
+### What landed, and what each one was actually for
+
+`#124` Georgia had been "verified" against a **secondary and truncated** capture
+of `law.justia.com` — subsection (a)'s definitions were missing, so *"advance
+fee"*, the term the broker prohibition turns on, was defined nowhere in what we
+held. Its card was indistinguishable from California's. `#137` then gave the
+other nine sources a `Publisher:` line, deliberately **not** a `Retrieved from:`
+one: the deep links were never recorded and are unrecoverable, and inventing a
+URL would be worse than admitting the gap.
+
+`#126` `#128` `#130` `#131` built the corpus, one instrument at a time, and the
+census was wrong three times on the way — the Payzli addressee line that was not
+a clause, the Subscription Agreement missing entirely, and the FRPA's §6.1/§6.2
+limbs. `#133` re-vendored after owner edits and found **eleven clauses never
+imported at all**, taking the library from 192 to **204**.
+
+`#129` found `outstandingFindingsFor` reporting **more than twice** the real
+backlog: it filtered on `status === 'survived'`, which answers *"was the finding
+right?"*, not *"has anybody done anything about it?"* REVIEW-01's manifest holds
+205 findings, **166 already `implemented`**. The error ran in the direction that
+makes the corpus look worse than it is, which is the direction that gets a
+mechanism ignored.
+
+`#132` made the library reachable; `#134` put source strength and reading age on
+every conformity card and stopped calling a state *verified* when only our own
+digest still matched. `#135` added per-clause approval pinned to a content
+fingerprint, and the tokenised counsel link. `#138` parameterised clause bodies
+by tenant role, which is what turned a client's paperwork into a product.
+`#139` gave counsel a briefing instead of 101 unexplained paragraphs; `#140`
+gave them somewhere to write back.
+
+`#141` `#142` `#143` are toolchain: `.node-version` 24 and committed generated
+output, the upstream **2.17.0** sync (36 commits, 177 files), and a lockfile
+refresh. `#144` is [ADR 0011](adr/0011-the-mca-clause-library-is-a-library.md).
+
+### Settled — do not carry these forward as open
+
+Older notes list all four; each was closed by a later one.
+
+| Was open in | Settled by |
+|---|---|
+| Where the agreement builder lives | [ADR 0010](adr/0010-agreement-builder-lives-in-pacta.md) — **Pacta assembles**; `lombard-platform` keeps computing the numbers |
+| `/admin/mca` summary honesty — the "15 of 15" banner | `#134`. **No state reaches `verified`**, and the page says why |
+| Whether `instrument` should be an array | `#130` — singular. Across 204 clauses **not one names a second**; `twins.ts` asserts the two documents' agreement instead of generating it |
+| Owner decisions 5 and 6 | Applied in `lombard-contracts/change-notes/18` |
+
+### The lessons that cost something
+
+**A finding attaches to a clause by judgement, never by matching its locus
+string.** REVIEW-01's `§A.5` is the shipped v2's **A.4**, because the fix that
+review produced deleted a section above it. A string match would have been wrong
+exactly where the review had been acted on. The FRPA is the checked exception —
+v4 was locked before both reviews — and `FRPA_LOCUS_EXCLUSIONS` pins the seven
+numbers that do not resolve so the exception cannot widen.
+
+**Eight REVIEW-01 findings name FRPA §6.5, which does not exist.** It was deleted
+outright by that review's own fix. The library would have pointed an attorney at
+eight live findings against a section that is gone.
+
+**Two registers drift, so there is one per origin.** Findings from the two
+adversarial *document* reviews live in `lombard-contracts` manifests; findings
+counsel writes on a review link live in `BizrethinkMcaLibraryFinding`. Both pages
+label which origin a finding came from. **REVIEW-02 has no manifest** — its
+dispositions are prose — so every one of its findings reads `unrecorded`, and
+unknown is counted as outstanding. That is most of the **73 of 204** clauses the
+approval gate currently holds.
+
+**An empty clause body was a deliberate choice before it was a defect.** `#128`
+records importing §4.1 *Guarantor Information* with an empty body *"because that
+is what the document holds — a block of AcroForm widgets under a heading"*, and
+files it under **Not done, on purpose**. ADR 0011 reframes the same pattern at
+the FRPA's §9.1 as a defect, because an outside reviewer hit it and could not
+review the guarantor execution block. Both readings are in the record: the
+coverage test asks whether every *line* is in a clause and nobody asked whether
+every *clause* has content.
+
+**A guard that cites work the reader cannot reach is a dead end they route
+around** — so the approval gate's refusal names the finding ids and the manifest
+file to record them in. A guard that names the file is a handoff.
+
+**`outstandingFindingsFor` returned `[]` for a missing register**, making an
+unreadable file and a clean clause indistinguishable to the approval gate. It now
+takes an availability flag and refuses outright. On the counsel page the same
+defect was worse — an absent register rendered as "no findings" to the attorney
+acting on it.
+
+### Still open, and each is the owner's
+
+- **Counsel: who, when, budget.** Parked at the owner's request. Does not block
+  the build ([ADR 0009](adr/0009-counsel-is-parallel-not-a-gate.md)), and the
+  backlog accrues either way.
+- **A second tenant's documents do not exist here**, so `#138`'s "checked against
+  two real documents" property is available and unexercised. Circular Payments'
+  set would exercise it.
+- **CT and VA record no retrieval.** Two of eleven sources do (Georgia, Texas);
+  the rest name a publisher only. Separately, the memo of 2026-09-09 says
+  Connecticut's renewal moved to a **December 31 expiry with November–December
+  filing**, while our vendored §36a-865(c) still reads *"by the fifteenth of
+  September"*. **One of them is wrong and it has not been resolved.**
+- **The five Pacta templates (100, 102, 119–121) have not been republished** since
+  the owner edits of `change-notes/18`.
+- **No local database**, so the MCA migrations have never been applied anywhere
+  and neither `/admin/mca-library` nor the counsel page has ever been rendered
+  locally. Everything in this vertical is verified as pure functions and
+  typechecking. That is a standing choice, not damage.
+- **ADR 0011 is decided and unimplemented.** Six phases; 1 and 2 (`kind`,
+  `field-group`) close §9.1 and unblock the interview.
 
 ## The week of 2026-09-01 → 09-07: the lease product's build finished
 
