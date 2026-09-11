@@ -54,16 +54,32 @@ in front of a LANDLORD on the next.
 So `tenantElectionBox(parties)` derives it, beside the other party-derived
 values, and `hydrateMatter` supplies it.
 
+## And the signer can now open the governing documents
+
+The receipt addendum has the tenant acknowledge receiving sixteen instruments
+"and has had the opportunity to read them". A REVIEWER could open them; a SIGNER
+could not — `lease-review.$token.attachment.$documentId` is scoped to a review
+token and the signing view had no attachment route at all. The acknowledgement
+was stronger than the delivery, for the one person it binds.
+
+Documenso already renders an envelope's attachments beside the document being
+signed (`document-signing-page-view-v2.tsx:172`) and hides the control when the
+list is empty, which is why the gap was invisible: nothing ever populated it.
+
+**Keyed on the matter, and both halves of that are forced.** `EnvelopeAttachment`
+belongs to an envelope and carries one `data` string shared by every recipient,
+so no per-signer token can go in the URL; and `createEnvelope` creates the
+envelope and its attachments in the same call, so there is no envelope id yet to
+put in one. The matter id exists first and survives a re-send.
+
+That makes it a capability URL, and the `kind: 'hoa-governing'` filter is what
+makes that acceptable — enforced in the route as well as in the link builder.
+Every governing document is a public record already obtainable from the county
+recorder. A `move-in-report` is photographs of the inside of somebody's home; it
+stays on the review route, which is token-scoped and expires.
+
 ## Not in this PR
 
-Two related items, deliberately left:
-
-- **Signer access to the governing documents.** `EnvelopeAttachment` is
-  `{label, data, type:'link'}` and `createEnvelope` already accepts an
-  `attachments` array; the signing view already renders them
-  (`document-signing-page-view-v2.tsx:172`). Nothing populates it, so a signer
-  acknowledges receipt of 16 documents with no way to open one. Needs a
-  signing-token-scoped route, modelled on the 95-line review one.
 - **Heading orphans above the 800 threshold.** `hoa.amenity-access` is 1,307
   characters and stranded its heading on page 12. The fix is to bind the
   heading to the clause's FIRST PARAGRAPH, but `text()` renders a body as one
