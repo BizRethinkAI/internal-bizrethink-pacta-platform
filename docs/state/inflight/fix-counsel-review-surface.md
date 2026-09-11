@@ -42,8 +42,8 @@ What was on the page:
 | file | what |
 |---|---|
 | `packages/bizrethink/mca/review/counsel-view.ts` | **new.** The counsel payload, extracted from `openLibrary` as a pure function so a property can be stated over it without a database |
-| `packages/bizrethink/mca/review/__tests__/counsel-surface.test.ts` | **new.** 83 assertions over the payload of all six agreements and over the route source |
-| `packages/bizrethink/mca/review/briefing.ts` | `history` section deleted; numbering paragraph rewritten; `outstandingCount`/`findingsReadable` in, `unnumberedCount` out |
+| `packages/bizrethink/mca/review/__tests__/counsel-surface.test.ts` | **new.** 89 assertions over the payload of all six agreements and over the route source |
+| `packages/bizrethink/mca/review/briefing.ts` | `history` section deleted; numbering paragraph rewritten; `outstandingCount` and `findingsReadable` gone from the input, `unnumberedCount` added |
 | `apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx` | findings block and the unreadable-register alert removed; the stale component docstring corrected |
 | `packages/bizrethink/mca/server-only/trpc/clause-library-router.ts` | `openLibrary` now returns `counselReviewView(...)` |
 
