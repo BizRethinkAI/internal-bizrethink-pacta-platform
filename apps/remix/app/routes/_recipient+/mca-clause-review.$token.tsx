@@ -159,33 +159,31 @@ function FindingBox({
  * that makes it parallel. Without this page the only way to get an attorney in
  * front of this text is to add them to the organisation as a user.
  *
- * READ-ONLY, AND THAT IS A DECISION RATHER THAN AN OMISSION — a narrower one
- * than the lease's, deliberately, and the difference is worth stating because
- * the lease link went the other way.
+ * IT TAKES FINDINGS AND NOT APPROVALS, and that asymmetry is the decision.
  *
  * Recording an APPROVAL stays inside the admin surface: it carries a bar number
  * and a jurisdiction, it is checked against the states whose law puts the
  * clause in the agreement, and it must be attributable to somebody who signed
  * in. Sending a link should not be the same act as granting that.
  *
- * Recording a FINDING is not offered either, and this is where MCA differs from
- * the lease. The lease's counsel link takes findings because there was nowhere
- * else for them to go. Here there already is somewhere: two adversarial reviews
- * of these documents, with dispositions recorded in `lombard-contracts`
- * manifests, which is what `outstandingFindings` below is read from. A second
- * register of what was found and what was done about it would drift from the
- * first, and when two registers disagree there is no principled way to say
- * which is right — the same argument `mca/README.md` makes for having one
- * calculator. Counsel's findings on this agreement come back the way the
- * previous two reviews did, and are recorded where those are.
+ * Recording a FINDING is the other direction — saying what is wrong — and needs
+ * no such ceremony. It arrives on a link we minted, it is attributable to the
+ * reviewer named on that link, and an unanswered one holds the clause against
+ * approval by anybody. That is what separates the box from a comment field.
  *
  * WHAT THE READER IS SHOWN, AND WHY EACH PART. The clauses of ONE agreement, in
- * document order, verbatim — `«N»` markers and all, because those are printed
- * in the contract a merchant signs and where a value lands in a sentence
- * changes the sentence. Whether an approval already covers the exact words.
- * Which state's law put the clause in the document, where one did. And what the
- * earlier reviews found and nobody has disposed of, because an attorney reading
- * a clause is the person best placed to use that.
+ * document order — `«N»` markers and all, because those are printed in the
+ * contract a merchant signs and where a value lands in a sentence changes the
+ * sentence. Whether an approval already covers the exact words. Which state's
+ * law put the clause in the document, where one did. Nothing else.
+ *
+ * WHAT SHE IS NO LONGER SHOWN, because it is the change this file exists to
+ * record: the two adversarial DOCUMENT reviews' findings, which were printed
+ * under the clause each one names. ADR 0012 decided they are drafting input —
+ * *"they stop being shown to a reviewing attorney as annotations on the
+ * product"* — and they audited a draft every FRPA clause has since been
+ * rewritten away from, so they described text that no longer exists. The
+ * register survives, and is what a DRAFTER works from.
  */
 /**
  * `**like this**` becomes bold, and nothing else is interpreted.
@@ -229,7 +227,7 @@ export default function McaClauseReviewPage() {
     );
   }
 
-  const { reviewerName, instrument, parties, agreementMoved, findingsReadable, briefing, sections } = query.data;
+  const { reviewerName, instrument, parties, agreementMoved, briefing, sections } = query.data;
 
   const clauses = sections.flatMap((section) => section.clauses);
   const approved = clauses.filter((clause) => clause.approved).length;
@@ -284,27 +282,15 @@ export default function McaClauseReviewPage() {
       </section>
 
       {/*
-        AN EMPTY FINDING LIST AND AN UNREADABLE REGISTER LOOK IDENTICAL, and on
-        this page the person acting on the difference is the attorney. Said
-        before the count, because the count is exactly what cannot be trusted.
-      */}
-      {!findingsReadable && (
-        <Alert className="mt-4" variant="warning">
-          <AlertTitle>What the earlier reviews found cannot be read here</AlertTitle>
-          <AlertDescription>
-            Two adversarial reviews read these documents before you, and their register is not present in this
-            environment. No finding is shown below, and that is an absence of evidence rather than an absence of
-            findings.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/*
-        The outstanding-COUNT alert that used to sit here is now the briefing's
-        `history` section, which says the same number with the context that
-        makes it mean something. The two warnings above are kept as alerts
-        because each is an exceptional condition the reader must act on, not a
-        description of what they are about to read.
+        THE "THE REGISTER CANNOT BE READ HERE" WARNING IS GONE WITH THE FINDINGS
+        IT DESCRIBED. It told an attorney that two adversarial reviews existed
+        and that their register was absent from this environment, so that an
+        empty finding list would not read as a clean bill. With no finding list
+        there is nothing for it to qualify — and a page that names a register
+        the reader cannot see either invites a request for it or reads as
+        something withheld. The register is still read, and still holds an
+        approval: see `findingsHold` on the staff side, which is where the
+        readable/unreadable distinction has consequences.
       */}
 
       {sections.map((section) => (
@@ -357,27 +343,33 @@ export default function McaClauseReviewPage() {
 
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>
 
-                {clause.outstandingFindings.length > 0 && (
-                  <div className="mt-3 border-[#a2560c]/40 border-l-2 pl-3 dark:border-[#d99a4e]/40">
-                    {/*
-                      LABELLED BY ORIGIN, now that this page holds two kinds of
-                      finding. These came from the two earlier document reviews
-                      and are read out of the vendored register; the box below
-                      holds what THIS reader writes. Unlabelled, a reviewer
-                      would read her own findings and someone else's as one
-                      list and could not tell which she was expected to answer.
-                    */}
-                    <p className="font-medium text-muted-foreground text-xs">From the earlier document reviews</p>
-                    <ul className="mt-1 space-y-1">
-                      {clause.outstandingFindings.map((finding) => (
-                        <li key={finding} className="text-muted-foreground text-xs">
-                          {finding}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {/*
+                  THE EARLIER REVIEWS' FINDINGS WERE PRINTED HERE, under the
+                  clause each one names. ADR 0012 decided on 2026-09-10 that
+                  they are drafting input and stop being shown to a reviewing
+                  attorney; the decision was recorded and the code change never
+                  happened, and no test in this repository asserted anything
+                  about what this page renders, so nothing was red for a day.
 
+                  THEY DESCRIBED TEXT THAT NO LONGER EXISTS. They audited
+                  `Lombard_FRPA_v4` and every FRPA clause has since been
+                  rewritten. Under §2.1 the clause now says the merchant makes
+                  NO representation as to fair market value; the note beneath it
+                  said §2.1 makes the merchant agree that the price EQUALS fair
+                  market value — an annotation asserting the opposite of the
+                  clause it sat under. Two of them named an internal working
+                  paper by filename and told outside counsel our own entity
+                  records were unverified.
+
+                  They are not fetched and hidden. The router no longer sends
+                  them: a field the page declines to paint is still in the JSON
+                  the browser holds and still readable by anyone with the link.
+
+                  The box below is the other register — what THIS reader writes,
+                  on a link we minted, attributable to the reviewer named on it.
+                  It stays, and with nothing above it no longer needs a label to
+                  tell the two apart.
+                */}
                 <FindingBox
                   clauseSlug={clause.slug}
                   onRecorded={() => void findings.refetch()}

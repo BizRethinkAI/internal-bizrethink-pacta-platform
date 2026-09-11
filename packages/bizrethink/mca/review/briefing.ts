@@ -59,9 +59,17 @@ export type BriefingInput = {
   tenant: McaTenant;
   clauseCount: number;
   approvedCount: number;
-  outstandingCount: number;
-  /** False when the earlier reviews' register cannot be read in this environment. */
-  findingsReadable: boolean;
+  /**
+   * How many of those clauses the document does not number.
+   *
+   * MEASURED, NOT REMEMBERED. The sentence this feeds used to say "forty
+   * clauses across the library carry no number". Twenty-nine do; forty is the
+   * count carrying no HEADING. Two different facts, one of them printed to an
+   * attorney as the other — and per agreement rather than per library, because
+   * the briefing is per agreement and a reader counting the clauses in front of
+   * her is entitled to reach the same number.
+   */
+  unnumberedCount: number;
   /** Who minted the link. Null when the row does not resolve to a person. */
   sender: { name: string; email: string } | null;
   /** Null means the link lives until staff close it. */
@@ -139,7 +147,7 @@ const theOthers = (instrument: McaInstrument): string =>
   listOf(MCA_INSTRUMENTS.filter((id) => id !== instrument).map((id) => `the ${INSTRUMENTS[id].title}`));
 
 export const counselBriefing = (input: BriefingInput): BriefingSection[] => {
-  const { instrument, tenant, clauseCount, approvedCount, outstandingCount, findingsReadable, sender } = input;
+  const { instrument, tenant, clauseCount, approvedCount, unnumberedCount, sender } = input;
   const record = INSTRUMENTS[instrument];
   const funder = tenant.parties.funder;
 
@@ -197,26 +205,33 @@ export const counselBriefing = (input: BriefingInput): BriefingSection[] => {
         `**The commercial terms.** The «angle-bracketed numbers» you will see inside clauses are fill-in fields — advance amount, factor rate, the specified percentage, the merchant's own details. The numbers that land in them are underwritten per deal and are not part of this review. Where they sit in a sentence **is** part of it.`,
       ],
     },
-    {
-      id: 'history',
-      title: 'What earlier readers found',
-      body: findingsReadable
-        ? [
-            `These documents have been read adversarially twice already, and what those reviews found is recorded in a register kept alongside the source documents. Where a finding was acted on, the register says how; where it was not, the finding is quoted underneath the clause it concerns.`,
-            outstandingCount > 0
-              ? `${outstandingCount} of the ${clauseCount} clauses below carry a finding that nothing has yet disposed of. Those are the ones we would most like your eye on, and they are marked in place so you can read the finding beside the text it is about.`
-              : `Every finding either of those reviews raised against this agreement has a recorded disposition. You are not inheriting an open list.`,
-          ]
-        : [
-            `These documents have been read adversarially twice already. **That register cannot be read in this environment**, so no earlier finding is shown below. Treat the absence of a finding under a clause as telling you nothing — it is missing evidence, not a clean bill.`,
-          ],
-    },
+    /*
+      THE SECTION THAT USED TO SIT HERE IS GONE, AND ITS ABSENCE IS THE CHANGE.
+
+      "What earlier readers found" told counsel that two adversarial reviews of
+      these documents were recorded in a register and that anything undisposed
+      was "quoted underneath the clause it concerns", then named a count: *"40
+      of the 100 clauses below carry a finding that nothing has yet disposed
+      of."*
+
+      ADR 0012 closed the question those sentences answer — *"Do findings render
+      to reviewing counsel? **No.** They are drafting input."* — and the
+      annotations they pointed at are gone from the page. What is left of the
+      paragraph once they are is worse than nothing: a register the reader is
+      told about and cannot see, and a number that reads as "40% of this
+      agreement has known unresolved problems, please approve it".
+
+      The findings audited `Lombard_FRPA_v4`. Every FRPA clause has since been
+      rewritten, so those notes described text that no longer existed — one of
+      them asserting the exact opposite of the clause it sat under. They remain
+      drafting input, in the register, where a drafter works from them.
+    */
     {
       id: 'reading',
       title: 'How to read what follows',
       body: [
         `The text is quoted exactly as the document publishes it. **«Angle-bracketed numbers» are left in.** They are the fill-in fields the executed contract carries, and where one sits changes the sentence it sits in — "«7»% of daily receipts" is a different obligation depending on which side of the percentage the field falls. Stripping them would show you a document we do not publish.`,
-        `**Clause numbers are the document's own, never invented.** Forty clauses across the library carry no number in the contract — granting clauses, recitals, the sentence that makes the instrument a sale rather than a loan — and those are shown without one. Each clause also carries a short reference in grey beside its heading — “frpa.holdback-explainer” and the like. It is our internal handle, not part of the contract, and on a clause the document neither numbers nor heads it is the only stable way to name it. Cite it back to us and we will know exactly which words you mean.`,
+        `**A clause is shown with the number it carries, and ${unnumberedCount} of the ${clauseCount} clauses below carry no number.** Those are shown without one rather than given one here. The numbering is not what we are asking you about — the words are — though a cross-reference inside a clause that points at the wrong section is worth telling us about. Each clause also carries a short reference in grey beside its heading — “frpa.holdback-explainer” and the like. It is our internal handle, not part of the contract, and on a clause that is neither numbered nor headed it is the only stable way to name it. Cite it back to us and we will know exactly which words you mean.`,
         `Where a clause is in the document because a particular state's law puts it there, that is noted under the heading. Most of this corpus is commercial drafting and says nothing there, which is itself information about where your hour is best spent.`,
       ],
     },

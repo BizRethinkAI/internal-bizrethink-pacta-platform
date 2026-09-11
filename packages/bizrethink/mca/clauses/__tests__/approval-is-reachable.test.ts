@@ -165,14 +165,24 @@ describe('the two pages', () => {
   });
 
   /*
-    THE SAME "EMPTY OR UNREADABLE" PROBLEM, ON THE PAGE A THIRD PARTY READS.
-    The findings shown under each clause come from a register read off disk,
-    and an absent file yields an empty list. Telling an attorney that nothing
-    was found when we cannot tell is worse than saying nothing at all.
+    THE "EMPTY OR UNREADABLE" PROBLEM, NOW ASSERTED WHERE IT STILL HAS
+    CONSEQUENCES.
+
+    This used to require the counsel page to carry `findingsReadable`, so that
+    an attorney reading an empty findings list was told the register might
+    simply be absent. ADR 0012 closed the question that rests on — *"Do findings
+    render to reviewing counsel? **No.** They are drafting input."* — and the
+    page shows none, so there is no empty list to qualify.
+
+    The register is still read and an unreadable one still HOLDS: `findingsHold`
+    refuses an approval rather than letting a missing file read as a clean
+    clause. That is a staff decision on a staff page, and it is what this now
+    pins. `review/__tests__/counsel-surface.test.ts` asserts the other half —
+    that no finding, and no register, reaches counsel at all.
   */
-  it('tells the reviewer when the earlier reviews could not be read', () => {
+  it('refuses an approval when the earlier reviews cannot be read', () => {
     expect(router).toContain('REGISTER_AVAILABLE');
-    expect(counselPage).toContain('findingsReadable');
+    expect(adminPage).toContain('heldByFindings');
   });
 
   it('declares the counsel route as ours', () => {
