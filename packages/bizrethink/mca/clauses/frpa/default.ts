@@ -146,12 +146,157 @@ export const FRPA_DEFAULT: McaClause[] = [
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
-    includeWhen: null,
+    /*
+      THIS WAS `null` UNTIL 2026-09-11, AND THAT IS WHAT MADE SECTION 6 DECIDE
+      THE GUARANTY. See the note above the record below. The gate is the
+      complement of that record's, so every template gets one §6.1 and no
+      template gets two; `guarantyScope: 'none'` takes this one, because a
+      funder with no Guarantor still needs an Events of Default clause and the
+      denial is trivially true where there is no Guarantor to deny.
+    */
+    includeWhen: (facts) => facts.guarantyScope !== 'full-performance',
     number: '6.1',
     section: 'default',
     sortKey: 10,
     heading: 'Events of Default',
     body: 'An Event of Default occurs only if Merchant (a) commits fraud in procuring or performing this Agreement; (b) intentionally diverts, conceals or transfers Purchased Receipts that have actually arisen, for the purpose of preventing their delivery to Buyer; or (c) knowingly sells or grants another person a conflicting interest in the same Purchased Receipts, for the purpose of defeating Buyer’s ownership. Nothing else is an Event of Default.\nNotice and Opportunity to Cure. Buyer shall give Merchant written notice identifying the conduct and the facts Buyer relies on. Where the conduct is capable of cure, no Event of Default occurs unless it remains uncured ten (10) Workdays after Merchant receives that notice, and Buyer shall exercise no remedy under Section 6.2 before that period has run. Buyer may apply to a court for temporary relief in accordance with applicable law.\nWhat is not an Event of Default. None of the following is itself an Event of Default, and none of them gives Buyer any remedy under this Section 6: a decline in or an absence of Card Receipts; a delay in payment by Merchant’s customers; an ordinary loss of the business; a good-faith closure, suspension, relocation, dissolution or sale of the business; Merchant’s insolvency, or a bankruptcy filing by or against Merchant; the failure, outage or withdrawal of service of a Bank or an Approved Processor; a loss of access to information or to a system; a collection below the Estimated Daily Holdback; a reconciliation request under Section 3, an adjustment to the Estimated Daily Holdback under Section 3.4, or a good-faith dispute; a failure or delay in giving Buyer records or information requested under this Agreement; a notice of termination or non-renewal given by a Guarantor; the addition or replacement of an Approved Bank Account or an Approved Processor under Section 2.4; additional financing taken by Merchant; a fall in the value of any Collateral; and a default by Merchant under any other agreement, including another agreement with Buyer.\nBankruptcy and Business Failure. Notwithstanding anything in this Agreement to the contrary, neither the filing of a voluntary or involuntary petition under Title 11 of the United States Code, nor Merchant’s insolvency, nor the cessation of Merchant’s business for lack of revenue, shall constitute an Event of Default or give rise to any remedy under this Section 6 or to any liability of any Guarantor.\nCovenants that are not Events of Default. Merchant’s covenants in this Agreement, including those in Sections 4 and 5, remain covenants, and a breach of one is an Event of Default only where it is conduct described in (a), (b) or (c) above. A breach that is not an Event of Default may support proportionate lawful relief for proven direct loss under Section 6.2; it does not make the uncollected Purchased Amount payable, does not suspend Merchant’s rights under Section 3, and does not create liability for any Guarantor. Incomplete information is not evidence of the conduct described in (a), (b) or (c). Buyer bears the risk that Purchased Receipts may never arise. This Section controls any inconsistent term of this Agreement and of any document incorporated into it, subject to mandatory law.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [
+      {
+        review: 'REVIEW-01',
+        findings: [
+          'bankruptcy-carveout-defeated-by-5-9',
+          'default-on-any-term-no-cure-no-materiality',
+          'defined-term-drift',
+          'frpa-plaid-default-not-enumerated-in-61',
+          'frpa-undefined-capitalised-terms',
+          'guarantor-termination-notice-is-default',
+          'guaranty-covers-every-covenant',
+          'guaranty-reaches-business-failure',
+          'no-cure-period-anywhere',
+          'reconciliation-switched-off-by-any-breach',
+        ],
+      },
+      {
+        review: 'REVIEW-02',
+        findings: [
+          'frpa-6-1-4-defaults-on-a-sale-5-18-expressly-permits',
+          'frpa-6-4-compels-the-notice-6-1-5-makes-a-default',
+          'frpa-9-4-creates-guarantor-liability-on-merchant-bankruptcy',
+        ],
+      },
+    ],
+  },
+  /*
+    THE SAME SECTION, FOR THE FUNDER WHO TAKES THE WIDE GUARANTY.
+
+    WHAT WAS WRONG, AND IT WAS WRONG IN A CLAUSE NOBODY LOOKS AT FOR IT. The
+    record above is the whole of §6.1 and was ungated, so it was in every
+    template. It ends "This Section controls any inconsistent term of this
+    Agreement and of any document incorporated into it, subject to mandatory
+    law", and four sentences earlier it says a breach that is not an Event of
+    Default "does not create liability for any Guarantor". An Event of Default
+    is one of three kinds of misconduct. Read together those two sentences say a
+    guarantor answers for those three and for nothing else, WHATEVER SECTION 9
+    SAYS.
+
+    That is the right rule for `guarantyScope: 'limited-conduct'` and it is the
+    product's one genuinely better-than-market term. It is the wrong rule for
+    `full-performance`, where the owner decided on 2026-09-11 that the guaranty
+    reaches every representation, warranty and covenant — which is what all
+    three MCA forms filed as SEC exhibits in 2024-2026 do.
+    `frpa.full-performance-guaranty-9-2` says so openly, "whether or not that
+    failure is an Event of Default", and §6.1 then overrode it. The wide guaranty
+    was text the document contradicted twenty pages later, and
+    `__tests__/a-full-recourse-guaranty-is-still-a-purchase.test.ts` pinned the
+    contradiction with a block written to go red the day it was closed.
+
+    WHY A PAIR RATHER THAN AN EDIT, AND WHY NOT A GATED SENTENCE. Deleting the
+    denial outright takes it away from the narrow template, where it is the
+    point. Keeping it takes the wide guaranty away from the funder who bought
+    it. The fact decides a whole clause, so
+    [ADR 0013](../../../../../docs/adr/0013-a-funder-profile-describes-the-funder.md)
+    settles the shape: one section number, two records, opposite rules, mutually
+    exclusive gates, exactly one selected for every value of the fact. It is the
+    §4.15 / §8.2 / §§9.2-9.6 shape. ADR 0013 rejects limb granularity in terms,
+    so gating the sentence inside one clause was not available and was not tried.
+    `__tests__/one-section-6-1-per-document.test.ts` states the partition over
+    every value of the fact and reconstructs this body from the one above by
+    swapping the single sentence, which is what stops the two drifting.
+
+    THE BANKRUPTCY / INSOLVENCY / BUSINESS-FAILURE CARVE-OUT IS UNCHANGED HERE,
+    AND THAT IS DRAFTING JUDGEMENT RATHER THAN A FUNDER PREFERENCE. It is v4's
+    own paragraph, verbatim, including its reach to "any liability of any
+    Guarantor". A guaranty that pays when the business simply fails is the
+    single strongest argument that the transaction was a loan, which is the
+    characterisation this entire document is built to defend — and every market
+    form guarantees covenants while still excluding business failure, so keeping
+    it costs the wide product nothing it actually wanted. §9.2's wide record
+    already excludes the same events and points here for each of them; this is
+    the clause they point at, and if it moved they would point at nothing.
+
+    WHAT REPLACED THE GUARANTOR SENTENCE. Under full recourse a covenant breach
+    that is not an Event of Default can reach a Guarantor — that is the decision
+    — but only for the same thing Merchant answers for. §6.2 gives Buyer, for
+    such a breach, "proportionate judicial relief for proven direct loss" and
+    nothing else, and already says "A claim against a Guarantor may be brought
+    only as Section 9.2 permits". So the replacement caps the guarantor claim at
+    that same relief, on the same proof, routes it through §9.2, and denies in
+    terms that any breach makes the uncollected Purchased Amount payable by a
+    Guarantor. A guaranty OF THE MONEY is the recharacterisation vector, and it
+    is denied here as well as in §9.2 because §6.1 is the clause that claims to
+    control.
+
+    THE HOUSE PATTERN, FOLLOWED RATHER THAN INVENTED. §§4.10, 4.12, 6.2, 6.3,
+    7.4 and 7.9 all reach a Guarantor the same way: they cap and point at §9.2,
+    they never grant. A §6.1 that granted would be a second guaranty living
+    outside Section 9, which is the defect
+    `__tests__/personal-liability-is-section-9-only.test.ts` exists to catch and
+    which this record is deliberately drafted to stay clear of — no concession
+    was needed in that file.
+
+    NOT DRAFTED, AND REPORTED RATHER THAN INVENTED. A cure period for a covenant
+    breach that is not an Event of Default. §6.1's ten Workdays run on conduct
+    capable of cure that would otherwise BE an Event of Default; §6.2 gives "at
+    least ten (10) Workdays to cure" for a non-default covenant breach. Neither
+    is a period this record may set, and inventing one would be a commercial
+    value nobody decided. The same gap is recorded above
+    `frpa.full-performance-guaranty-9-2`.
+
+    §6.4 CARRIES THE SAME SENTENCE AND IS NOT FIXED HERE. "A failure or delay in
+    giving a notice under this Section ... does not create liability for any
+    Guarantor" is in `frpa.required-notifications-6-4`, which is ungated. Read
+    against a guaranty of every covenant it carves §6.4's own notice covenant
+    out of the guaranty. It is a narrowing rather than a contradiction — §9.2
+    forbids a clause that EXPANDS the Guaranty, not one that limits it — and it
+    is a different record answering a different question, so it is reported
+    rather than edited.
+
+    EXAMINED BY. The same findings as the record above, because it is the same
+    section and every one of them was raised against this text too. A split that
+    dropped them would make the wide template look reviewed where the narrow one
+    is not.
+
+    UNVERIFIED AUTHORITY. Unchanged from the record above: the narrowing rests
+    on the memo's [A1-A4], which the standing brief identifies as Richmond
+    Capital, Apollo Funding, NewCo and LG Funding. NOBODY ON THIS PROJECT HAS
+    PULLED ANY OF THEM FROM THE OFFICIAL REPORTERS. No citation appears in any
+    body.
+  */
+  {
+    slug: 'frpa.full-performance-events-of-default-6-1',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    /* The complement of the record above. Between them the section is always present. */
+    includeWhen: (facts) => facts.guarantyScope === 'full-performance',
+    number: '6.1',
+    section: 'default',
+    sortKey: 10,
+    heading: 'Events of Default',
+    body: 'An Event of Default occurs only if Merchant (a) commits fraud in procuring or performing this Agreement; (b) intentionally diverts, conceals or transfers Purchased Receipts that have actually arisen, for the purpose of preventing their delivery to Buyer; or (c) knowingly sells or grants another person a conflicting interest in the same Purchased Receipts, for the purpose of defeating Buyer’s ownership. Nothing else is an Event of Default.\nNotice and Opportunity to Cure. Buyer shall give Merchant written notice identifying the conduct and the facts Buyer relies on. Where the conduct is capable of cure, no Event of Default occurs unless it remains uncured ten (10) Workdays after Merchant receives that notice, and Buyer shall exercise no remedy under Section 6.2 before that period has run. Buyer may apply to a court for temporary relief in accordance with applicable law.\nWhat is not an Event of Default. None of the following is itself an Event of Default, and none of them gives Buyer any remedy under this Section 6: a decline in or an absence of Card Receipts; a delay in payment by Merchant’s customers; an ordinary loss of the business; a good-faith closure, suspension, relocation, dissolution or sale of the business; Merchant’s insolvency, or a bankruptcy filing by or against Merchant; the failure, outage or withdrawal of service of a Bank or an Approved Processor; a loss of access to information or to a system; a collection below the Estimated Daily Holdback; a reconciliation request under Section 3, an adjustment to the Estimated Daily Holdback under Section 3.4, or a good-faith dispute; a failure or delay in giving Buyer records or information requested under this Agreement; a notice of termination or non-renewal given by a Guarantor; the addition or replacement of an Approved Bank Account or an Approved Processor under Section 2.4; additional financing taken by Merchant; a fall in the value of any Collateral; and a default by Merchant under any other agreement, including another agreement with Buyer.\nBankruptcy and Business Failure. Notwithstanding anything in this Agreement to the contrary, neither the filing of a voluntary or involuntary petition under Title 11 of the United States Code, nor Merchant’s insolvency, nor the cessation of Merchant’s business for lack of revenue, shall constitute an Event of Default or give rise to any remedy under this Section 6 or to any liability of any Guarantor.\nCovenants that are not Events of Default. Merchant’s covenants in this Agreement, including those in Sections 4 and 5, remain covenants, and a breach of one is an Event of Default only where it is conduct described in (a), (b) or (c) above. A breach that is not an Event of Default may support proportionate lawful relief for proven direct loss under Section 6.2; it does not make the uncollected Purchased Amount payable and does not suspend Merchant’s rights under Section 3. Where Section 9.2 guarantees the covenant breached, a claim against a Guarantor is limited to that same proportionate lawful relief for that same proven direct loss, on the same proof, and is brought only as Section 9.2 permits; no breach of this Agreement, and no Event of Default, makes the uncollected Purchased Amount payable by a Guarantor. Incomplete information is not evidence of the conduct described in (a), (b) or (c). Buyer bears the risk that Purchased Receipts may never arise. This Section controls any inconsistent term of this Agreement and of any document incorporated into it, subject to mandatory law.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

@@ -246,17 +246,32 @@ describe('a full-performance document is still a purchase', () => {
    * GREEN ON THE FIRST RUN, DELIBERATELY KEPT. They name what the change had to
    * preserve, so each could have gone red — a wide guaranty drafted carelessly
    * is exactly the change that would have edited one of them.
+   *
+   * **TWO OF THE THREE ARE STILL UNGATED AND ONE IS NOT.** §6.1 became an
+   * exhaustive pair on 2026-09-11 — see the block at the end of this file — so
+   * the clause carrying the risk allocation in a wide document is
+   * `frpa.full-performance-events-of-default-6-1`. The row is retargeted at the
+   * record that is actually assembled rather than left pointing at the one this
+   * document no longer contains, and the assertion below it checks that BOTH
+   * halves of the pair carry the sentence, which is more than this row asked
+   * for when §6.1 was one record.
    */
   it.each([
     [
       'frpa.sales-of-receipts-not-a-loan-2-1',
       /holds no insurance, guaranty, indemnity or other arrangement that would pay Buyer/,
     ],
-    ['frpa.events-of-default-6-1', /Buyer bears the risk that Purchased Receipts may never arise/],
+    ['frpa.full-performance-events-of-default-6-1', /Buyer bears the risk that Purchased Receipts may never arise/],
     ['frpa.remedies-6-2', /uncollected Purchased Amount is not automatically due/],
   ])('%s still says so, and is in the document', (slug, pattern) => {
     expect(slugsUnder('full-performance')).toContain(slug);
     expect(body(slug)).toMatch(pattern);
+  });
+
+  /** And the other half of the pair says it too, so a narrow document is no worse. */
+  it('allocates the same risk in the limited-conduct document', () => {
+    expect(slugsUnder('limited-conduct')).toContain('frpa.events-of-default-6-1');
+    expect(body('frpa.events-of-default-6-1')).toMatch(/Buyer bears the risk that Purchased Receipts may never arise/);
   });
 
   /**
@@ -389,43 +404,117 @@ describe('the wide acknowledgement tells the signer which guaranty they signed',
 });
 
 /**
- * THE ONE SENTENCE THAT NULLIFIES ALL FOUR, AND IT IS NOT IN THIS CHANGE'S
- * FILES.
+ * THE ONE SENTENCE THAT NULLIFIED ALL FOUR — AND THIS BLOCK IS THE PIN
+ * RETARGETED, NOT DELETED.
  *
- * `frpa.events-of-default-6-1` is ungated, so it is in the full-performance
- * document, and it ends *"This Section controls any inconsistent term of this
- * Agreement and of any document incorporated into it"*. Earlier in the same
- * clause: *"A breach that is not an Event of Default … does not create liability
- * for any Guarantor."*
+ * WHAT IT SAID, AND WHY IT WAS WRITTEN TO FAIL. `frpa.events-of-default-6-1`
+ * was ungated, so it was in the full-performance document, and it ended *"This
+ * Section controls any inconsistent term of this Agreement and of any document
+ * incorporated into it"*. Earlier in the same clause: *"A breach that is not an
+ * Event of Default … does not create liability for any Guarantor."* An Event of
+ * Default is one of three kinds of misconduct, so §6.1 said a guarantor answers
+ * for nothing but those three, whatever Section 9 says — the narrow guaranty,
+ * imposed on every template by a clause in Section 6, with the wide guaranty
+ * reduced to text the document then overrode.
  *
- * An Event of Default is one of three kinds of misconduct. **So §6.1 says a
- * guarantor answers for nothing but those three, whatever Section 9 says** —
- * which is the narrow guaranty, imposed on every template by a clause in
- * Section 6. The wide guaranty is text the document then overrides.
+ * §6.1 was not this change's clause, so the conflict was asserted with both
+ * halves quoted **so that it would fail the day somebody closed it and forgot
+ * to delete this** — the `KNOWN_GAPS` discipline, which exists because a
+ * tolerated defect that has quietly been fixed is a line of a test that can no
+ * longer be red.
  *
- * `frpa/default.ts` is not this change's file and §6.1 is not this change's
- * clause. The conflict is asserted, with both halves quoted, so that it fails
- * the day somebody fixes it in `default.ts` and forgets to delete this — the
- * `KNOWN_GAPS` discipline, which exists because a tolerated defect that has
- * quietly been fixed is a line of a test that can no longer be red.
+ * **CLOSED 2026-09-11.** §6.1 is now an exhaustive pair on the same fact these
+ * four records gate on: `frpa.events-of-default-6-1` keeps the denial and is
+ * selected when `guarantyScope !== 'full-performance'`;
+ * `frpa.full-performance-events-of-default-6-1` replaces that one sentence with
+ * a guarantor claim capped at §6.2's proportionate lawful relief for proven
+ * direct loss, routed through §9.2, and expressly never the uncollected
+ * Purchased Amount. The bankruptcy / insolvency / business-failure carve-out is
+ * unchanged in both.
  *
- * **It needs an owner decision before a `full-performance` template may be
- * assembled.** Reported, not drafted around: adding a "notwithstanding Section
- * 6.1" override here would be a second clause claiming to control the same
- * subject, which is the defect §7.5 and §7.24 were rewritten out of.
+ * WHY THE RETARGET IS STRICTER RATHER THAN WEAKER. The old block asserted a
+ * defect in ONE named clause. This one asserts, over the whole assembled
+ * document, that **no** clause of a full-performance template denies guarantor
+ * liability for a covenant breach; that the pair partitions, so neither
+ * document has two §6.1s or none; and that the `limited-conduct` document still
+ * carries the denial, which the old block never checked and which is the thing
+ * a careless fix would have destroyed. The full property over the set lives in
+ * `one-section-6-1-per-document.test.ts`; what stays here is the half that is
+ * about these four records.
  */
-describe('the conflict this change could not close', () => {
-  it('§6.1 still denies guarantor liability for a covenant breach, and still claims to control', () => {
-    const text = body('frpa.events-of-default-6-1');
+/**
+ * The one clause that still carries the sentence, named with an owner and a
+ * reason rather than filtered out silently.
+ *
+ * **FOUND BY THE SET-LEVEL ASSERTION BELOW, NOT BY READING ANYTHING.** The
+ * retargeted pin was written to check §6.1 and reported §6.4 on its first run.
+ *
+ * It is not the same defect. §6.1's denial was joined to *"This Section
+ * controls any inconsistent term of this Agreement"*, so it decided the whole
+ * guaranty from Section 6; §6.4's applies to *"a notice under this Section"*
+ * and to nothing else, and §9.2 forbids a clause that EXPANDS the Guaranty, not
+ * one that narrows it. What it does mean is that a wide template guarantees
+ * every covenant except §6.4's notice covenant, and nobody decided that.
+ *
+ * **Reported, not fixed: §6.4 is a different record answering a different
+ * question, and editing it to quiet this check is how a change's blast radius
+ * grows.** The entry stays reachable — the assertion fails if it stops matching
+ * — for the reason `select-clauses.test.ts` gives about `KNOWN_GAPS`.
+ */
+const STILL_DENIES: Record<string, string> = {
+  'frpa.required-notifications-6-4':
+    'DEFAULT CLUSTER. “A failure or delay in giving a notice under this Section … does not create liability for ' +
+    'any Guarantor.” Ungated, so it is in the wide document, where it carves §6.4’s own notice covenant out of a ' +
+    'guaranty of every covenant. Narrower than §6.1’s was and not joined to a control clause, so it is an ' +
+    'unratified carve-out rather than a contradiction — but it is still an owner decision nobody has taken.',
+};
 
-    expect(text).toContain('does not create liability for any Guarantor');
-    expect(text).toContain('This Section controls any inconsistent term of this Agreement');
-    expect(slugsUnder('full-performance')).toContain('frpa.events-of-default-6-1');
+describe('the conflict this change could not close, and the change that did', () => {
+  it('lets no clause of a wide document deny guarantor liability for a covenant breach', () => {
+    const deniers = selected('full-performance')
+      .filter((entry) => entry.body.includes('does not create liability for any Guarantor'))
+      .map((entry) => entry.slug)
+      .filter((slug) => STILL_DENIES[slug] === undefined)
+      .sort();
+
+    expect(deniers).toEqual([]);
+    expect(slugsUnder('full-performance')).not.toContain('frpa.events-of-default-6-1');
   });
 
-  /** And the wide guaranty really does say the thing §6.1 contradicts. */
+  /** The concession cannot go write-only, and it cannot be a slug that does not exist. */
+  it('concedes only clauses that are really in the wide document and really say it', () => {
+    for (const [slug, reason] of Object.entries(STILL_DENIES)) {
+      const entry = selected('full-performance').find((candidate) => candidate.slug === slug);
+
+      expect(entry, `${slug} is not in the full-performance document; delete its concession`).toBeDefined();
+      expect(entry?.body).toContain('does not create liability for any Guarantor');
+      expect(reason.length).toBeGreaterThan(40);
+    }
+  });
+
+  it('gives the wide document a §6.1 of its own, and only one', () => {
+    const sixOne = selected('full-performance').filter((entry) => entry.number === '6.1');
+
+    expect(sixOne.map((entry) => entry.slug)).toEqual(['frpa.full-performance-events-of-default-6-1']);
+    expect(body('frpa.full-performance-events-of-default-6-1')).toContain(
+      'This Section controls any inconsistent term of this Agreement',
+    );
+  });
+
+  /** And the wide guaranty really does say the thing the old §6.1 contradicted. */
   it('§9.2’s wide record reaches a covenant breach that is not an Event of Default', () => {
     expect(body(FULL.guaranty)).toMatch(/whether or not that failure is an Event of Default/);
+  });
+
+  /**
+   * The half the old pin did not have. Closing the conflict by deleting the
+   * denial outright would have gone green here and taken the one genuinely
+   * better-than-market term out of the narrow product.
+   */
+  it('leaves the narrow document’s §6.1 denying it, exactly as before', () => {
+    expect(slugsUnder('limited-conduct')).toContain('frpa.events-of-default-6-1');
+    expect(body('frpa.events-of-default-6-1')).toContain('does not create liability for any Guarantor');
+    expect(slugsUnder('none')).toContain('frpa.events-of-default-6-1');
   });
 });
 

@@ -315,12 +315,17 @@ describe('the gate and the provenance are unchanged', () => {
    *
    * **The numbers moved on 2026-09-11 and this clause is not why**, which is
    * the assertion still doing its job: 100 → 105 and 203 → 208 for the four
-   * `full-performance` guaranty records and `frpa.arbitration-7-26`. §9.1 is
-   * still one record and still the only §9.1.
+   * `full-performance` guaranty records and `frpa.arbitration-7-26`, then 105 →
+   * 106 and 208 → 209 for the full-recourse §6.1 the next day. §9.1 is still one
+   * record and still the only §9.1.
+   *
+   * **This is the fourth pinned count and the easiest to miss** — it is in a
+   * file about the execution grid, not about counting — so it is named in both
+   * of the last two changes rather than found again each time.
    */
   it('adds no record to the library', () => {
-    expect(libraryFor('frpa')).toHaveLength(105);
-    expect(ALL_MCA_CLAUSES).toHaveLength(208);
+    expect(libraryFor('frpa')).toHaveLength(106);
+    expect(ALL_MCA_CLAUSES).toHaveLength(209);
     expect(ALL_MCA_CLAUSES.filter((entry) => entry.number === '9.1' && entry.instrument === 'frpa')).toHaveLength(1);
   });
 

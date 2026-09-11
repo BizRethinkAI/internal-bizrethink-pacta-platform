@@ -36,7 +36,7 @@ describe('the MCA clause library surface', () => {
     // separate from the material around it.
     // 203 until 2026-09-11 added the four `full-performance` guaranty records
     // and `frpa.arbitration-7-26`.
-    expect(surface.clauses).toHaveLength(208);
+    expect(surface.clauses).toHaveLength(209);
   });
 
   it('groups by instrument, in the declared order', () => {
@@ -47,20 +47,20 @@ describe('the MCA clause library surface', () => {
       expect(entry.clauseCount).toBe(ALL_MCA_CLAUSES.filter((c) => c.instrument === entry.id).length);
     }
 
-    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(208);
+    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(209);
   });
 
   /**
    * THE SENTENCE THE PAGE EXISTS TO MAKE TRUE.
    *
-   * Not one of these 208 clauses may reach a merchant, and the reason is the
+   * Not one of these 209 clauses may reach a merchant, and the reason is the
    * same for every one: `attorney-drafted` with no named author. The page states
    * it as a count with the reason attached, rather than leaving a reader to
-   * infer it from 208 identical badges.
+   * infer it from 209 identical badges.
    */
   it('reports that nothing is publishable, and why', () => {
     expect(surface.totals.publishable).toBe(0);
-    expect(surface.totals.clauses).toBe(208);
+    expect(surface.totals.clauses).toBe(209);
 
     for (const clause of surface.clauses) {
       expect(clause.publishProblems).toEqual([
