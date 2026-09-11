@@ -45,8 +45,20 @@ Resolve conflicts. **Conflicts only happen in three places** (by design):
 # Take upstream's lockfile wholesale, then let npm re-add our workspace deps.
 git checkout --theirs package-lock.json
 npm install                      # rewrites the lock from every package.json
+npm update qs morgan joi fflate  # re-apply our security overrides (see below)
 git add package-lock.json
 ```
+
+**Why the `npm update` line (overlay 072, 2026-09-10).** The root `overrides`
+block pins patched versions of transitive packages (`qs`, `morgan`, `joi`,
+`fflate`). **npm does not apply an override to a package that is already in the
+lockfile** — so after taking upstream's lockfile, `npm install` alone leaves
+the vulnerable versions in place, silently. `npm update <name>` forces the
+re-resolve. Verified by simulating exactly this sequence: without the line, four
+floors regress; with it, all hold. If overlay 072's override list grows, grow
+this line with it. Direct dependencies don't need it: their raised ranges in
+`package.json` no longer match upstream's locked versions, so `npm install`
+re-resolves them on its own.
 
 Then confirm nothing was silently dropped or newly flagged:
 
@@ -54,7 +66,10 @@ Then confirm nothing was silently dropped or newly flagged:
 # Our workspace deps must still resolve
 npm ls @react-pdf/renderer --workspace=@bizrethink/customizations
 
-# The security.yml CI gate blocks on high+; make sure the merge didn't add any
+# The security floors must hold — this fails if the sync reverted a patched version
+(cd packages/bizrethink && npx vitest run regression-tests/dependency-security-floors.test.ts)
+
+# The security.yml gate is ADVISORY (see its comment); compare with its baseline
 npm audit --omit=dev --audit-level=high
 ```
 

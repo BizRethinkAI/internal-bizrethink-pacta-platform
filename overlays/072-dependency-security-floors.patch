@@ -1,0 +1,244 @@
+# Why: 32 open Dependabot alerts (prod `npm audit`: 20, 1 critical). Upstream
+#      had fixed none of them (its v2.18.0 lockfile carries the same versions),
+#      so the weekly sync would not help. This raises the declared versions of
+#      the affected direct dependencies and extends the root `overrides` block
+#      for the transitive ones. Result: prod `npm audit` 20 -> 6, 0 critical;
+#      the 6 left are two ACCEPTED chains (deepmerge-ts via @prisma/config,
+#      ts-deepmerge via @anatine/zod-openapi) with reasons in
+#      packages/bizrethink/regression-tests/dependency-security-floors.test.ts.
+#
+# Why not a new file: package.json files are upstream and JSON cannot carry a
+#      MODIFIED comment. The version pins are the whole change.
+#
+# Durability (the non-obvious part): the sync takes upstream's lockfile
+#      wholesale (UPSTREAM.md). Raised ranges no longer match upstream's locked
+#      versions, so `npm install` re-resolves the direct deps. Overrides are NOT
+#      applied by npm to a package already in the lockfile, so UPSTREAM.md now
+#      runs `npm update qs morgan joi fflate` after `npm install`. Simulated:
+#      without that line 4 floors regress; with it, none. The floor test fails
+#      the sync PR if anything slips anyway.
+#
+# Fragility: MEDIUM. Upstream bumps these same lines; on conflict keep the
+#      HIGHER version. Drop an override once upstream's own range reaches the
+#      floor — the floor test stays.
+diff --git a/apps/docs/package.json b/apps/docs/package.json
+index 9539148d0..4354dc8aa 100644
+--- a/apps/docs/package.json
++++ b/apps/docs/package.json
+@@ -15,7 +15,7 @@
+     "fumadocs-ui": "16.14.3",
+     "lucide-react": "^0.563.0",
+     "mermaid": "^11.12.2",
+-    "next": "16.3.0",
++    "next": "16.3.3",
+     "next-plausible": "^3.12.5",
+     "next-themes": "^0.4.6",
+     "react": "^19.2.4",
+diff --git a/apps/openpage-api/package.json b/apps/openpage-api/package.json
+index 1b7c14350..8d7142752 100644
+--- a/apps/openpage-api/package.json
++++ b/apps/openpage-api/package.json
+@@ -12,7 +12,7 @@
+   "dependencies": {
+     "@documenso/prisma": "*",
+     "luxon": "^3.7.2",
+-    "next": "16.3.0"
++    "next": "16.3.3"
+   },
+   "devDependencies": {
+     "@types/node": "^20",
+diff --git a/apps/remix/package.json b/apps/remix/package.json
+index 24a66cffd..86e24dd4b 100644
+--- a/apps/remix/package.json
++++ b/apps/remix/package.json
+@@ -26,7 +26,7 @@
+     "@documenso/trpc": "*",
+     "@documenso/ui": "*",
+     "@epic-web/remember": "^1.1.0",
+-    "@faker-js/faker": "^10.1.0",
++    "@faker-js/faker": "^10.5.0",
+     "@hono/node-server": "^1.19.11",
+     "@hono/standard-validator": "^0.2.0",
+     "@hono/trpc-server": "^0.4.0",
+@@ -41,10 +41,10 @@
+     "@react-router/serve": "^7.18.1",
+     "@sentry/node": "^10.48.0",
+     "@simplewebauthn/browser": "^13.2.2",
+-    "@simplewebauthn/server": "^13.2.2",
++    "@simplewebauthn/server": "^13.3.2",
+     "@tanstack/react-query": "5.90.10",
+     "autoprefixer": "^10.4.22",
+-    "colord": "^2.9.3",
++    "colord": "^2.9.4",
+     "content-disposition": "^1.0.1",
+     "didyoumean": "^1.2.2",
+     "dlv": "^1.1.3",
+diff --git a/package.json b/package.json
+index 8fc2d3547..a1f6dd898 100644
+--- a/package.json
++++ b/package.json
+@@ -72,7 +72,7 @@
+     "inngest-cli": "^1.17.9",
+     "lint-staged": "^16.2.7",
+     "nanoid": "^5.1.6",
+-    "nodemailer": "^9.0.0",
++    "nodemailer": "^9.1.1",
+     "pdfjs-dist": "5.4.296",
+     "pino": "^9.14.0",
+     "pino-pretty": "^13.1.2",
+@@ -135,7 +135,7 @@
+     "posthog-node": "4.18.0",
+     "react": "^19.2.7",
+     "react-dom": "^19.2.7",
+-    "sharp": "0.35.3",
++    "sharp": "0.35.4",
+     "typescript": "5.6.2",
+     "zod": "^3.25.76"
+   },
+@@ -163,7 +163,13 @@
+     "h3": "^1.15.11",
+     "react-hook-form": "7.66.1",
+     "fast-uri": "^3.1.2",
+-    "hono": "^4.12.18",
+-    "dlv": "^1.1.3"
++    "hono": "^4.13.5",
++    "dlv": "^1.1.3",
++    "qs": "^6.16.0",
++    "morgan": "^1.12.0",
++    "joi": "^18.2.5",
++    "@shuding/opentype.js": {
++      "fflate": "^0.7.5"
++    }
+   }
+ }
+diff --git a/packages/auth/package.json b/packages/auth/package.json
+index 0ee09aeec..ea1c01bb9 100644
+--- a/packages/auth/package.json
++++ b/packages/auth/package.json
+@@ -15,7 +15,7 @@
+     "@hono/standard-validator": "^0.2.0",
+     "@oslojs/crypto": "^1.0.1",
+     "@oslojs/encoding": "^1.1.0",
+-    "@simplewebauthn/server": "^13.2.2",
++    "@simplewebauthn/server": "^13.3.2",
+     "arctic": "^3.7.0",
+     "hono": "^4.12.18",
+     "luxon": "^3.7.2",
+@@ -25,6 +25,6 @@
+   },
+   "devDependencies": {
+     "@vitest/coverage-v8": "^4.1.6",
+-    "vitest": "^4.1.6"
++    "vitest": "^4.1.11"
+   }
+ }
+diff --git a/packages/ee/package.json b/packages/ee/package.json
+index 2ed1daed0..18d21f95f 100644
+--- a/packages/ee/package.json
++++ b/packages/ee/package.json
+@@ -27,6 +27,6 @@
+   },
+   "devDependencies": {
+     "@vitest/coverage-v8": "^4.1.6",
+-    "vitest": "^4.1.6"
++    "vitest": "^4.1.11"
+   }
+ }
+diff --git a/packages/email/package.json b/packages/email/package.json
+index 9abb6b2c8..44fac3783 100644
+--- a/packages/email/package.json
++++ b/packages/email/package.json
+@@ -23,7 +23,7 @@
+     "@documenso/nodemailer-resend": "5.0.0",
+     "@documenso/tailwind-config": "*",
+     "@react-email/render": "2.1.0",
+-    "nodemailer": "^9.0.0",
++    "nodemailer": "^9.1.1",
+     "react-email": "^6.9.0",
+     "resend": "^6.5.2"
+   },
+@@ -31,6 +31,6 @@
+     "@documenso/tsconfig": "*",
+     "@types/nodemailer": "^8.0.1",
+     "@vitest/coverage-v8": "^4.1.6",
+-    "vitest": "^4.1.6"
++    "vitest": "^4.1.11"
+   }
+ }
+diff --git a/packages/lib/package.json b/packages/lib/package.json
+index a2501b68e..9af5efec6 100644
+--- a/packages/lib/package.json
++++ b/packages/lib/package.json
+@@ -40,14 +40,14 @@
+     "@node-rs/bcrypt": "^1.10.7",
+     "@pdf-lib/fontkit": "^1.1.1",
+     "@scure/base": "^1.2.6",
+-    "@simplewebauthn/server": "^13.2.2",
++    "@simplewebauthn/server": "^13.3.2",
+     "@sindresorhus/slugify": "^3.0.0",
+     "@team-plain/typescript-sdk": "^5.11.0",
+     "@vvo/tzdb": "^6.196.0",
+     "ai": "^7.0.58",
+     "bullmq": "^5.71.1",
+-    "colord": "^2.9.3",
+-    "csv-parse": "^6.1.0",
++    "colord": "^2.9.4",
++    "csv-parse": "^7.0.2",
+     "inngest": "^3.54.0",
+     "ioredis": "^5.10.1",
+     "jose": "^6.1.2",
+@@ -68,7 +68,7 @@
+     "posthog-node": "4.18.0",
+     "react": "^19.2.7",
+     "remeda": "^2.32.0",
+-    "sharp": "0.35.3",
++    "sharp": "0.35.4",
+     "stripe": "^12.18.0",
+     "ts-pattern": "^5.9.0",
+     "zod": "^3.25.76"
+@@ -78,6 +78,6 @@
+     "@types/luxon": "^3.7.1",
+     "@types/pg": "^8.15.6",
+     "@vitest/coverage-v8": "^4.1.6",
+-    "vitest": "^4.0.18"
++    "vitest": "^4.1.11"
+   }
+ }
+diff --git a/packages/signing/package.json b/packages/signing/package.json
+index 9485c087b..8713b6d4c 100644
+--- a/packages/signing/package.json
++++ b/packages/signing/package.json
+@@ -21,6 +21,6 @@
+   "devDependencies": {
+     "@documenso/tsconfig": "*",
+     "@vitest/coverage-v8": "^4.1.6",
+-    "vitest": "^4.1.6"
++    "vitest": "^4.1.11"
+   }
+ }
+diff --git a/packages/trpc/package.json b/packages/trpc/package.json
+index 5ffcec7fb..3c922c098 100644
+--- a/packages/trpc/package.json
++++ b/packages/trpc/package.json
+@@ -10,7 +10,7 @@
+   "dependencies": {
+     "@documenso/lib": "*",
+     "@documenso/prisma": "*",
+-    "@simplewebauthn/server": "^13.2.2",
++    "@simplewebauthn/server": "^13.3.2",
+     "@tanstack/react-query": "5.90.10",
+     "@trpc/client": "11.17.0",
+     "@trpc/react-query": "11.17.0",
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 70f51658d..436d3c968 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -34,7 +34,7 @@
+     "class-variance-authority": "^0.7.1",
+     "clsx": "^1.2.1",
+     "cmdk": "^1.1.1",
+-    "colord": "^2.9.3",
++    "colord": "^2.9.4",
+     "framer-motion": "^12.43.0",
+     "lucide-react": "^0.554.0",
+     "luxon": "^3.7.2",

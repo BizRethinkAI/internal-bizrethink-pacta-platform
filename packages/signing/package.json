@@ -21,6 +21,6 @@
   "devDependencies": {
     "@documenso/tsconfig": "*",
     "@vitest/coverage-v8": "^4.1.6",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.11"
   }
 }
