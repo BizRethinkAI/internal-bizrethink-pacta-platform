@@ -112,7 +112,17 @@ export const instrumentsFor = (facts: McaFacts): McaInstrument[] =>
       return facts.collectionMethod !== 'ach-only';
     }
     if (id === 'equipment-lease' || id === 'subscription') {
-      return facts.equipment === 'separate-lease';
+      /*
+       * A funder that offers equipment needs both documents in the suite,
+       * because the merchant elects buy or lease when signing and the FRPA
+       * sends the lease path to "a separate written agreement" (§002). Which
+       * one a given merchant signs is decided at the deal, not here.
+       *
+       * This read `=== 'separate-lease'` while `LOMBARD_FACTS` said `deferred`,
+       * so the only funder in the library got a product whose FRPA referred to
+       * two agreements the product did not include.
+       */
+      return facts.equipment !== 'none';
     }
 
     return true;

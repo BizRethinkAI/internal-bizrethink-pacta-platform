@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { agreementDigest, containsClauseText, readAgreementBody } from '../documents';
-import { ALL_MCA_CLAUSES, libraryFor } from '../library';
-import { MCA_TENANTS, type McaTenant, resolveParties } from '../parties';
+import { agreementDigest, readAgreementBody } from '../documents';
+import { libraryFor } from '../library';
+import { MCA_TENANTS, type McaTenant } from '../parties';
 
 /**
  * A clause body is a copy of words a merchant or a partner actually signs, and
@@ -32,57 +32,36 @@ const pairs: [string, McaTenant, string][] = MCA_TENANTS.flatMap((tenant) =>
     .map(([instrument, doc]) => [`${tenant.id}/${instrument}`, tenant, instrument] as [string, McaTenant, string]),
 );
 
-describe('every clause body is still in the document it was taken from', () => {
+describe('the documents the clauses were drafted from are unchanged', () => {
   it.each(pairs)('%s: the vendored document is unchanged', (_label, tenant, instrument) => {
     const doc = tenant.documents[instrument];
 
     expect(agreementDigest(doc.file)).toBe(doc.digest);
   });
 
-  it.each(
-    MCA_TENANTS.flatMap((tenant) =>
-      ALL_MCA_CLAUSES.filter((clause) => tenant.documents[clause.instrument]?.bodiesVerifiedAt !== null).map(
-        (clause) => [`${tenant.id}/${clause.slug}`, tenant, clause] as const,
-      ),
-    ),
-  )('%s', (_label, tenant, clause) => {
-    const body = readAgreementBody(tenant.documents[clause.instrument].file);
+  /*
+    RETIRED 2026-09-10 by ADR 0012, and this is where the two assertions were.
 
-    expect(containsClauseText(body, resolveParties(clause.heading, tenant))).toBe(true);
-    expect(containsClauseText(body, resolveParties(clause.body, tenant))).toBe(true);
-  });
+    They asserted that every clause body appears verbatim in the vendored
+    document, and that a clause's number and heading sit adjacent in it. Both
+    were transcription guards: they defined a clause as correct when it matched
+    `Lombard_FRPA_v4`.
 
-  /**
-   * The number the document prints, checked beside the heading rather than
-   * instead of it.
-   *
-   * REVIEW-01's finding loci name `§A.5 Clawback Provision`; the shipped v2
-   * numbers that clause A.4, because the fixes that review produced removed a
-   * section above it. A clause cannot be identified by its number alone across
-   * time, and this asserts only that the number and the heading are adjacent in
-   * the document TODAY.
-   *
-   * THE CORPUS PUNCTUATES ITS NUMBERING TWO WAYS, and neither is wrong. The FRPA
-   * prints "2.1 Sales of Receipts; Not a Loan"; the Permission to Release prints
-   * "1. Trade, Landlord, and Bank Information." `number` holds the number and
-   * not the punctuation around it, so both forms are accepted rather than a dot
-   * being written into six clause records to satisfy one assertion.
-   */
-  it.each(
-    MCA_TENANTS.flatMap((tenant) =>
-      ALL_MCA_CLAUSES.filter((clause) => tenant.documents[clause.instrument]?.bodiesVerifiedAt !== null).map(
-        (clause) => [`${tenant.id}/${clause.slug}`, tenant, clause] as const,
-      ),
-    ),
-  )('%s prints its number beside its heading', (_label, tenant, clause) => {
-    const body = readAgreementBody(tenant.documents[clause.instrument].file);
-    const heading = resolveParties(clause.heading, tenant);
+    That document is a rebranded, AI-generated form carrying 254 review findings
+    and a counsel memo proposing REPLACE IN FULL on 93 of 101 clauses. Requiring
+    a clause to match it was requiring the defect, and the moment the first eight
+    clauses were rewritten these went red on exactly the work they were meant to
+    permit.
 
-    expect(
-      containsClauseText(body, `${clause.number} ${heading}`) ||
-        containsClauseText(body, `${clause.number}. ${heading}.`),
-    ).toBe(true);
-  });
+    WHAT SURVIVES, ABOVE. The digest assertion — the vendored document is
+    unchanged — which catches a `.docx` being edited and re-rendered underneath
+    us. That has nothing to do with clause bodies and is not retired.
+
+    WHAT REPLACES THEM. `assertPublishable` (a clause with `author: null` cannot
+    reach a third party), counsel approval pinned to a content fingerprint, and
+    rule 1's `examinedBy`. Before, a clause was checkable against a bad document;
+    now it is checkable against an attorney.
+  */
 
   it('every instrument that has clauses has a vendored document for each tenant', () => {
     for (const tenant of MCA_TENANTS) {

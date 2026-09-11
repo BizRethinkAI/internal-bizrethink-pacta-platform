@@ -89,46 +89,64 @@ const unauthored = (): string[] => {
  * `equipment: 'none'` selects no equipment clauses, and that is the whole
  * content of the answer. Demanding a clause here would be demanding prose that
  * says a thing is absent, which is how documents acquire sentences nobody
- * needs.
+ * needs. `guarantyScope: 'none'` joined it on 2026-09-10: no guaranty means no
+ * guaranty clauses, and §9.1's grid — which used to be selected anyway, asking
+ * a natural person for a Social Security number in support of a guaranty the
+ * document did not contain — is now gated with the rest of Section 9.
+ *
+ * **`concurrentPositions: false` LEFT this list, and the direction matters.**
+ * It used to mean silence: no cascade clause, nothing said. The memo's design
+ * does not want silence there, it wants the opposite rule stated, so
+ * `frpa.single-active-position-4-15` now says it. A value can stop meaning
+ * nothing.
  */
 const NO_CLAUSE_OWED = [
   'brokerChannel:false',
-  'concurrentPositions:false',
   'consumerReportPulled:false',
   'equipment:none',
+  'guarantyScope:none',
   'renewalModel:none',
 ];
 
 /**
  * Values a funder would expect substance behind, and there is none.
  *
- * **Three of the eleven facts are inert.** `guarantyScope`, `venueRule` and
- * `processorSplitAccepted` gate nothing at all: whatever a funder answers, the
- * same clauses come out. They were declared as axes the corpus branches on and
- * only four of the eleven were wired. That is exactly the "hardcode wearing a
- * fact's clothes" this file was written to detect, and it detected it in the
- * change that introduced it.
+ * **This said "three of the eleven facts are inert" — `guarantyScope`,
+ * `venueRule` and `processorSplitAccepted`. `guarantyScope` is closed**, on the
+ * owner's decision of 2026-09-10 that the guaranty is an interview answer:
+ * §§9.2, 9.4, 9.5 and 9.6 gate on `limited-conduct`, §§10.2 and 10.4 on
+ * `!== 'none'`, and §9.1 with them. `venueRule` and `processorSplitAccepted`
+ * remain, for reasons now understood rather than merely observed.
+ *
+ * **WHAT THIS FILE MEASURES IS DISTINGUISHABILITY, NOT COMPLETENESS**, and the
+ * difference matters at exactly one row. `guarantyScope: 'full-performance'`
+ * left this list because it now selects a different set — §9.1 and §§10.2/10.4 —
+ * from the other two values. It is **not** a funder-ready answer: the
+ * full-performance guaranty itself is unauthored, deliberately, so that profile
+ * assembles an identity grid and two service waivers with no guaranty between
+ * them. That gap is named in ADR 0013 and is an owner decision, not a drafting
+ * one — all three market forms filed as SEC exhibits guarantee every
+ * representation, warranty and covenant, which is precisely why a drafting agent
+ * did not invent our version of it.
  *
  * | gap | what is missing |
  * |---|---|
- * | `guarantyScope` (all three) | §9.2 and the guaranty block are always selected. A `none` funder gets a personal guaranty they did not ask for; a `full-performance` funder gets Lombard's narrow one |
- * | `venueRule` (both) | §7.5 always mandates the funder's state. `merchant-state` is what removes the need for a Virginia variant — Va. Code §6.2-2236(A) voids a non-Virginia forum — so this one has a legal consequence, not just a preference |
- * | `disputeResolution:arbitration` | the four waivers drop and nothing replaces them. All three market forms filed as SEC exhibits pair arbitration WITH a class waiver |
- * | `collectionMethod:ach-only` | drops the Split Funding Authorization and puts no collection mechanism in its place |
- * | `processorSplitAccepted` (both) | nothing reads it. Exhibit A is issued either way, and a split nobody accepted is not a collection mechanism |
+ * | `venueRule` (both) | Nothing reads it. §7.5 is the only venue clause and the gate was refused because **the `funder-state` arm cannot be drafted at all: `McaFacts` has no field naming the funder's state.** `LOMBARD_FACTS` now says `merchant-state` and §7.5 agrees with it, which removes the contradiction without closing the gap. Needs a `funderState` field plus a variables mechanism, or the row deleted. The legal consequence is real: Va. Code **§6.2-2234(A)** requires an action under a covered contract to be brought in the Commonwealth |
+ * | `disputeResolution:arbitration` | the four waivers drop and nothing replaces them. All three market forms filed as SEC exhibits pair arbitration WITH a class waiver. Va. §6.2-2234(B) also bars face-to-face arbitration outside the recipient's principal place of business and puts the arbitrators' fees on the provider |
+ * | `collectionMethod:ach-only` | drops the Split Funding Authorization and puts no collection mechanism in its place. It gates no FRPA clause at all — §2.5 and §7.14 are the clauses that would read it if they returned |
+ * | `processorSplitAccepted` (both) | nothing reads it, and the gate was refused twice on the same ground: gating §2.3 leaves a template with no collection mechanism, and gating Exhibit A deletes the specification precisely for the funder whose processor has not accepted. **The vendored authorization has no processor acceptance block at all**, so `false` is not a record-keeping gap — it is what the form makes inevitable |
  *
- * Each needs authored clauses before the interview may offer the choice.
- * Authoring them is not transcription — no Lombard or CircularPayments document
- * contains an arbitration clause, a merchant-state venue clause or a
- * full-performance guaranty — which is why
- * `bodies-match-the-document` has to narrow before they can land.
+ * The Virginia citation in this file read **§6.2-2236(A)** until 2026-09-10,
+ * copied from the 2026-09-09 memo. That section is "Validity of noncompliant
+ * sales-based financing", has no subsection (A), and says nothing about forum.
+ * `statutes/ct-va-obligations.ts` had the right one all along.
+ *
+ * Each remaining gap needs authored clauses, or a field, before the interview
+ * may offer the choice.
  */
 const GAPS = [
   'collectionMethod:ach-only',
   'disputeResolution:arbitration',
-  'guarantyScope:full-performance',
-  'guarantyScope:limited-conduct',
-  'guarantyScope:none',
   'processorSplitAccepted:false',
   'processorSplitAccepted:true',
   'venueRule:funder-state',
