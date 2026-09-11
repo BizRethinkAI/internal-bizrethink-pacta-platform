@@ -299,7 +299,20 @@ describe('no provision of any instrument manufactures service of process', () =>
   it('sweeps every clause, with nothing excused', () => {
     expect(ALL_MCA_CLAUSES.filter((entry) => deemsService(entry.body)).map((entry) => entry.slug)).toEqual([]);
     expect(ALL_MCA_CLAUSES.filter((entry) => waivesServiceOrForum(entry.body)).map((entry) => entry.slug)).toEqual([]);
-    expect(ALL_MCA_CLAUSES.length).toBe(203);
+    /*
+      THE FIFTH PINNED COUNT, AND THE ONE THE QUEUE MISSED.
+
+      #163 and #164 each edited this file on different lines, so git merged them
+      without a word — and each was green alone while their union was red. 203
+      was correct until #164 added five records. `strict_required_status_checks`
+      is off, so no branch had to be current and nothing ever ran the union.
+
+      Four count pins live in `frpa-coverage`, `library`, `surface` and
+      `a-signature-for-merchant-is-not-a-guaranty`. This is the fifth, buried in
+      a sweep about service of process, which is why two agents looking for
+      "the pinned counts" both found four.
+    */
+    expect(ALL_MCA_CLAUSES.length).toBe(208);
   });
 });
 
