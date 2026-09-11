@@ -71,6 +71,26 @@ export type PartyValues = {
   tenantNoticeEmails: string;
 };
 
+/**
+ * The signer placeholder for the §83.595(4) election, as a token the PDF
+ * carries into `extractPlaceholdersFromPDF`.
+ *
+ * IT HAS TO BE DERIVED, because a recipient index is POSITIONAL:
+ * `signature-blocks.ts` numbers signers `r${index + 1}` over the party list, so
+ * the tenant is r3 on a lease listing both landlords first and r2 on one that
+ * interleaves them. A literal `{{CHECKBOX, r2}}` in library text would be right
+ * for one lease and silently wrong for the next — it would put the election in
+ * front of a LANDLORD, who has no election to make.
+ *
+ * Empty when there is no tenant, which `validateParties` already rejects; the
+ * clause then renders the option with no box rather than a broken token.
+ */
+export const tenantElectionBox = (parties: LeasePartyInput[]): string => {
+  const at = parties.findIndex((party) => party.role === 'tenant');
+
+  return at === -1 ? '' : `{{CHECKBOX, r${at + 1}}}`;
+};
+
 export const derivePartyValues = (parties: LeasePartyInput[]): PartyValues => ({
   landlordNames: joinNames(namesFor(parties, 'landlord')),
   tenantNames: joinNames(namesFor(parties, 'tenant')),

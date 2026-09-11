@@ -384,7 +384,34 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
       the one paragraph of the whole library whose wording Fla. Stat. §83.595(4)
       prescribes.
     */
-    version: 2,
+    /*
+      v3: THE ELECTION COULD NOT BE MADE.
+
+      The two options printed as the literal characters "[ ]". There was nothing
+      to mark — no field, no widget, nothing a signer could click — so on the
+      addendum's own terms ("If neither is marked, no early termination fee is
+      agreed") the landlord lost the liquidated-damages remedy by default, on
+      every lease, silently. The clause note above had already identified that
+      an election needs "two options and a way to pick between them"; the
+      options shipped and the way to pick did not.
+
+      CHECKBOX RATHER THAN RADIO, which is the semantically obvious choice and
+      is not available. A Documenso RADIO is ONE field carrying a `values`
+      array, and a placeholder cannot express one: `auto-place-fields` splits
+      the token on commas and `parseFieldMetaFromPlaceholder` coerces only to
+      string, boolean and number. A radio would have to be patched onto the
+      field row after `createEnvelope`. Two checkboxes need none of that, and
+      they are what §83.595(4) prescribes in the first place — the statutory
+      form has two.
+
+      The cost is that both can be ticked. The paragraph above says to mark one,
+      as the statute's own form does.
+
+      The token is DERIVED, never literal: a recipient index is positional, so
+      hard-coding r2 would put the election in front of a landlord on any lease
+      that lists its parties in another order.
+    */
+    version: 3,
     jurisdiction: 'US-FL',
     // A SEPARATE addendum, because §83.595(4) makes the remedy available only
     // where the tenant signed one containing the election. Folding it into the
@@ -393,12 +420,18 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'termination',
     sortKey: 10,
     heading: 'Early Termination Addendum',
-    body: "Fla. Stat. §83.595 gives Landlord a choice of remedies where Tenant breaches the Lease and vacates before the end of the term. This Addendum records the parties' election under §83.595(4). Tenant must mark ONE of the two options below. If neither is marked, no early termination fee is agreed and Landlord's remedies are those in Fla. Stat. §83.595(1)-(3).\n\n[ ] I agree, as provided in the rental agreement, to pay {{earlyTerminationFeeUsd}} as liquidated damages or an early termination fee if I elect to terminate the rental agreement, and Landlord waives the right to seek additional rent beyond the month in which Landlord retakes possession.\n\n[ ] I do not agree to liquidated damages or an early termination fee, and I acknowledge that Landlord may seek damages as provided by law.\n\nTenant shall give Landlord at least {{earlyTerminationNoticeDays}} days' written notice of a termination under this Addendum. This Addendum does not release Tenant from liability for unpaid rent accrued before the termination date, or for damage to the Premises beyond fair wear and tear. The early termination fee is payable on the termination date and is separate from the security deposit and the advance rent. It is not the security deposit and is not satisfied by it: the security deposit is returned, or claimed against, under Fla. Stat. §83.49 and the sections of this Lease governing it, and the advance rent is applied to the last month of Tenant's occupancy in the ordinary way. This Addendum prevails over any conflicting provision in the body of this Lease.",
+    body: "Fla. Stat. §83.595 gives Landlord a choice of remedies where Tenant breaches the Lease and vacates before the end of the term. This Addendum records the parties' election under §83.595(4). Tenant must mark ONE of the two options below. If neither is marked, no early termination fee is agreed and Landlord's remedies are those in Fla. Stat. §83.595(1)-(3).\n\n{{tenantElectionBox}} I agree, as provided in the rental agreement, to pay {{earlyTerminationFeeUsd}} as liquidated damages or an early termination fee if I elect to terminate the rental agreement, and Landlord waives the right to seek additional rent beyond the month in which Landlord retakes possession.\n\n{{tenantElectionBox}} I do not agree to liquidated damages or an early termination fee, and I acknowledge that Landlord may seek damages as provided by law.\n\nTenant shall give Landlord at least {{earlyTerminationNoticeDays}} days' written notice of a termination under this Addendum. This Addendum does not release Tenant from liability for unpaid rent accrued before the termination date, or for damage to the Premises beyond fair wear and tear. The early termination fee is payable on the termination date and is separate from the security deposit and the advance rent. It is not the security deposit and is not satisfied by it: the security deposit is returned, or claimed against, under Fla. Stat. §83.49 and the sections of this Lease governing it, and the advance rent is applied to the last month of Tenant's occupancy in the ordinary way. This Addendum prevails over any conflicting provision in the body of this Lease.",
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.595(4)',
     includeWhen: (facts) => facts.earlyTerminationOffered,
     variables: [
+      {
+        name: 'tenantElectionBox',
+        type: 'string',
+        label: 'Election checkbox for the tenant (derived from the party order)',
+        required: true,
+      },
       {
         name: 'earlyTerminationFeeUsd',
         type: 'usd',

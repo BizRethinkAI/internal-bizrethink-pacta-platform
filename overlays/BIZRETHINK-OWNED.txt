@@ -91,6 +91,17 @@ apps/remix/app/routes/_recipient+/lease-review.$token.document.tsx
 # a wildcard there would exempt their files to cover ours.
 apps/remix/app/routes/_recipient+/lease-review.$token.attachment.$documentId.tsx
 
+# The same document, served to a SIGNER. The route above is scoped to a REVIEW
+# token, and the signing view had no attachment route at all — so the receipt
+# addendum's "has had the opportunity to read them" was true of a reviewer and
+# false of the one person it binds.
+#
+# Keyed on the matter because `EnvelopeAttachment` carries one URL for every
+# recipient (no per-signer token can go in it) and is created in the same call
+# as the envelope (so there is no envelope id yet). Listed individually, for the
+# reason the line above gives.
+apps/remix/app/routes/_recipient+/lease-attachment.$matterId.$documentId.tsx
+
 # Counsel's side of the same loop. The clause library was always meant to be
 # read by an attorney — the approval form asks for a bar number — but the page
 # sat behind an authenticated route with no way to send it, so the only path
