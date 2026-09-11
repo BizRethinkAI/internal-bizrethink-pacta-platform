@@ -106,7 +106,7 @@ describe('the MCA clause library', () => {
    * because the moment a genuinely shared clause appears this is the test that
    * should be reconsidered, and a count in prose would not be.
    */
-  it('gives every clause exactly one instrument, across all 208', () => {
+  it('gives every clause exactly one instrument, across all 209', () => {
     // 204 until the four `[Reserved]` records were removed — section numbers the
     // document holds open after a clause was taken out, now declared non-clause.
     // 200 until `renewal-positions` split the FRPA's §4.15 and §8.2 into
@@ -120,7 +120,10 @@ describe('the MCA clause library', () => {
     // `full-performance` guaranty records and `frpa.arbitration-7-26`; see
     // `frpa-coverage.test.ts` for which of the five adds a section and which
     // four only add records.
-    expect(ALL_MCA_CLAUSES).toHaveLength(208);
+    // 208 until §6.1 became an exhaustive pair on 2026-09-11. That one adds a
+    // record and no section:  chooses between two §6.1s, so every
+    // assembled document still holds exactly one. Same shape as §4.15 and §8.2.
+    expect(ALL_MCA_CLAUSES).toHaveLength(209);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 

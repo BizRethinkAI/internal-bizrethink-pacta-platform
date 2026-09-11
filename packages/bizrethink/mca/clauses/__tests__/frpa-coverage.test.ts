@@ -88,7 +88,7 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 105 records for 99 sections: 84 the document numbers, 15 it does not', () => {
+  it('holds 106 records for 99 sections: 84 the document numbers, 15 it does not', () => {
     // 101 until the four `[Reserved]` records were removed. They were section
     // numbers the document holds open after a clause was taken out — lines of
     // the document, not clauses of it — and are now declared in
@@ -122,7 +122,15 @@ describe('the FRPA library accounts for the whole document', () => {
     // which DOES add a section: the value `disputeResolution: 'arbitration'`
     // selected no merchant-facing clause at all, and an arbitration agreement
     // cannot share a number with the courts clauses it replaces.
-    expect(clauses).toHaveLength(105);
+    //
+    // 105 records for 99 sections until 2026-09-11, when §6.1 became an
+    // exhaustive pair. `frpa.full-performance-events-of-default-6-1` carries the
+    // same number 6.1 and is selected by `guarantyScope: 'full-performance'`
+    // where the record beside it is selected by every other value, so this adds
+    // a RECORD and no section and every assembled document still holds one §6.1.
+    // The §4.15 shape again, and for the same reason: the ungated §6.1 decided
+    // the guaranty for every template from inside Section 6.
+    expect(clauses).toHaveLength(106);
     expect(clauses.filter((clause) => clause.number !== '').length).toBeGreaterThan(0);
   });
 

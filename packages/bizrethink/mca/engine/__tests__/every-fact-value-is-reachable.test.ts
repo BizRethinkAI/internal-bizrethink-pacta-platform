@@ -89,24 +89,27 @@ const unauthored = (): string[] => {
  * `equipment: 'none'` selects no equipment clauses, and that is the whole
  * content of the answer. Demanding a clause here would be demanding prose that
  * says a thing is absent, which is how documents acquire sentences nobody
- * needs. `guarantyScope: 'none'` joined it on 2026-09-10: no guaranty means no
- * guaranty clauses, and §9.1's grid — which used to be selected anyway, asking
- * a natural person for a Social Security number in support of a guaranty the
- * document did not contain — is now gated with the rest of Section 9.
+ * needs.
  *
  * **`concurrentPositions: false` LEFT this list, and the direction matters.**
  * It used to mean silence: no cascade clause, nothing said. The memo's design
  * does not want silence there, it wants the opposite rule stated, so
  * `frpa.single-active-position-4-15` now says it. A value can stop meaning
  * nothing.
+ *
+ * **`guarantyScope: 'none'` LEFT IT TOO, on 2026-09-11, for the same reason and
+ * by a route worth reading.** It joined on 2026-09-10 on the argument that no
+ * guaranty means no guaranty clauses — true of Section 9 and never true of the
+ * document. §6.1 became an exhaustive pair on `guarantyScope` when the
+ * full-recourse half was authored, and the narrow half is gated `!==
+ * 'full-performance'`, so a no-guaranty template now selects a clause *because*
+ * of that answer: `frpa.events-of-default-6-1`, whose denial of guarantor
+ * liability is trivially true where there is no Guarantor and is the right text
+ * to put in front of a merchant who was never asked for one. The row is deleted
+ * rather than left standing, which is the maintenance this register is for — a
+ * tolerated gap that has been closed is a line that can no longer be red.
  */
-const NO_CLAUSE_OWED = [
-  'brokerChannel:false',
-  'consumerReportPulled:false',
-  'equipment:none',
-  'guarantyScope:none',
-  'renewalModel:none',
-];
+const NO_CLAUSE_OWED = ['brokerChannel:false', 'consumerReportPulled:false', 'equipment:none', 'renewalModel:none'];
 
 /**
  * Values a funder would expect substance behind, and there is none.
