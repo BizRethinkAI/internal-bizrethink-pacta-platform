@@ -5,6 +5,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { encryptSsoString, getProviderConfig, invalidateProviderConfig } from './sso-provider-config';
 
+// 2026-09 incident: SSO is removed from this build by a code-level kill switch
+// (feature-flags.ts → isSsoDisabledByBuild). The tests below that exercise the
+// DB/env merge logic run with the switch OFF so they keep testing that logic;
+// the "build kill switch" block runs with it ON, which is the shipped default
+// (asserted against the real function in regression-tests/sso-kill-switch.test.ts).
+const killSwitch = vi.hoisted(() => ({ disabled: false }));
+
+vi.mock('../feature-flags', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../feature-flags')>()),
+  isSsoDisabledByBuild: () => killSwitch.disabled,
+}));
+
 vi.mock('@documenso/prisma', () => ({
   prisma: {
     bizrethinkSsoProvider: {
@@ -50,7 +62,49 @@ beforeEach(() => {
   mockedFindUnique.mockReset();
   mockedEnv.mockReset();
   mockedEnv.mockReturnValue(undefined);
+  killSwitch.disabled = false;
   invalidateProviderConfig();
+});
+
+describe('getProviderConfig — build kill switch ON (2026-09 incident)', () => {
+  beforeEach(() => {
+    killSwitch.disabled = true;
+  });
+
+  it.each([
+    'google',
+    'microsoft',
+    'oidc',
+  ] as const)('%s: an enabled DB row with credentials cannot turn SSO back on', async (provider) => {
+    mockedFindUnique.mockResolvedValue(
+      dbRow({
+        provider,
+        oidcWellKnownUrl: 'https://idp.example.com/.well-known/openid-configuration',
+      }) as never,
+    );
+    const cfg = await getProviderConfig(provider);
+    expect(cfg.enabled).toBe(false);
+    expect(cfg.clientId).toBe('');
+    expect(cfg.clientSecret).toBe('');
+    expect(cfg.oidcWellKnownUrl).toBe('');
+  });
+
+  it.each(['google', 'microsoft', 'oidc'] as const)('%s: env credentials cannot turn SSO back on', async (provider) => {
+    mockedFindUnique.mockResolvedValue(null);
+    mockedEnv.mockImplementation((key) =>
+      String(key).includes('WELL_KNOWN') ? 'https://idp.test/.well-known/openid-configuration' : 'env-value',
+    );
+    const cfg = await getProviderConfig(provider);
+    expect(cfg.enabled).toBe(false);
+    expect(cfg.clientId).toBe('');
+    expect(cfg.clientSecret).toBe('');
+  });
+
+  it('does not read the DB at all', async () => {
+    mockedFindUnique.mockResolvedValue(dbRow() as never);
+    await getProviderConfig('google');
+    expect(mockedFindUnique).not.toHaveBeenCalled();
+  });
 });
 
 describe('getProviderConfig — google', () => {

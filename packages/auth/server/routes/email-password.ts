@@ -236,8 +236,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     // require-invite-when-domain-gated, signup ALSO requires a pending
     // OrganisationMemberInvite matching this email. Closes the "domain
     // matches but nobody invited me" hole — useful for B2B-team setups.
-    // The auto-claim helper below (in createUser → onCreateUserHook) will
-    // then claim that invite. See packages/bizrethink/server-only/signup-config.ts.
+    // The invite is claimed once the email is VERIFIED (verifyEmail →
+    // claimInvitesOnVerification, overlay 071), never at signup itself.
+    // See packages/bizrethink/server-only/signup-config.ts.
     const { isInviteRequiredForSignup } = await import('@bizrethink/customizations/server-only/signup-config');
     if (await isInviteRequiredForSignup()) {
       const matchingInvite = await prisma.organisationMemberInvite.findFirst({

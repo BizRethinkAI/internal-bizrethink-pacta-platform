@@ -44,6 +44,11 @@ export function ErrorBoundary() {
 }
 
 export async function loader({ request, params }: Route.LoaderArgs) {
+  // MODIFIED for BizRethink (overlay 071): SSO removed from this build (2026-09 incident); the org portal is a 404, not a 500.
+  if ((await import('@bizrethink/customizations/feature-flags')).isSsoDisabledByBuild()) {
+    throw new Response('Not Found', { status: 404 });
+  }
+
   const { isAuthenticated, user } = await getOptionalSession(request);
 
   const orgUrl = params.orgUrl;

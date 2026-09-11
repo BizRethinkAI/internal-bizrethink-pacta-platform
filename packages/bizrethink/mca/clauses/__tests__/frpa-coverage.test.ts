@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { documentLines, linesNotAccountedFor } from '../documents';
+import { documentLines } from '../documents';
 import { FRPA_LOCUS_EXCLUSIONS, FRPA_NON_CLAUSE } from '../frpa';
 
 import { libraryFor } from '../library';
-import { LOMBARD, resolveClauses } from '../parties';
+import { LOMBARD } from '../parties';
 
 /**
  * EVERY LINE OF THE DOCUMENT IS ACCOUNTED FOR, OR THIS FAILS.
@@ -35,9 +35,32 @@ describe('the FRPA library accounts for the whole document', () => {
   const clauses = libraryFor('frpa');
   const file = LOMBARD.documents.frpa.file;
 
-  it('leaves no line unaccounted for', () => {
-    expect(linesNotAccountedFor(file, resolveClauses(clauses, LOMBARD), FRPA_NON_CLAUSE)).toEqual([]);
-  });
+  /*
+    RETIRED 2026-09-10 by ADR 0012, alongside `bodies-match-the-document`.
+
+    This asked the mirror question — is anything in the DOCUMENT missing from the
+    library — and it is the same transcription guard pointed the other way. It
+    was worth having while the library was a copy of v4: it caught the granting
+    clause and ISO PRA §2.6, both of which an import keyed on numbered headings
+    would have dropped in silence.
+
+    Once clauses are authored it asserts that we have PRESERVED v4, which is
+    exactly what ADR 0012 decided not to care about. It went red on the eight
+    rewritten spine clauses and would go red once more for every cluster after.
+
+    NOT SILENCED THE TWO CHEAP WAYS, both of which are worse. Declaring those
+    lines in `FRPA_NON_CLAUSE` would leave a check that passes by construction as
+    the other 89 clauses are rewritten — a green assertion that can never be red.
+    Nulling `bodiesVerifiedAt` would hide the authorised reds too.
+
+    WHAT REPLACES IT, LATER. When the library renders v5, a completeness check on
+    the RENDER — every selected clause reaches the output — is the same guard
+    pointed at a document we generate rather than one we inherited. That belongs
+    with the render, not here.
+
+    `FRPA_NON_CLAUSE` is now vestigial and goes when the last clause is rewritten;
+    the assertions below still read it and still pass.
+  */
 
   it('reads the whole document, not a prefix of it', () => {
     expect(documentLines(file).length).toBeGreaterThan(200);
@@ -65,12 +88,32 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 97 clauses: 83 the document numbers, 14 it does not', () => {
+  it('holds 100 records for 98 sections: 84 the document numbers, 14 it does not', () => {
     // 101 until the four `[Reserved]` records were removed. They were section
     // numbers the document holds open after a clause was taken out — lines of
     // the document, not clauses of it — and are now declared in
     // FRPA_NON_CLAUSE with the reason each one actually has.
-    expect(clauses).toHaveLength(97);
+    //
+    // 97 until `renewal-positions` split §4.15 and §8.2 on 2026-09-10. Neither
+    // split adds a SECTION: `concurrentPositions` chooses between two §4.15s and
+    // `renewalModel` between two §8.2s, so every assembled document still holds
+    // one of each. What moved is the number of RECORDS the library keeps, which
+    // is what this counts. The alternative was `includeWhen` gating a whole
+    // clause on a fact that decides one limb of it, which deleted the
+    // multi-position rule instead of replacing it — see `frpa/enrollment.ts`
+    // §4.15 and `frpa/miscellaneous.ts` §8.2.
+    //
+    // 99 records for 97 sections until `miscellaneous` added §7.25 on
+    // 2026-09-10. That one DOES add a section, and deliberately: 7 TAC
+    // §86.310(d) requires the OCCC complaint notice to appear in a Texas
+    // contract "as a separate section or otherwise conspicuously set out from
+    // surrounding written material", so it cannot share §7.24's number and
+    // cannot be a paragraph inside it. It is gated on `recipientStates`
+    // including US-TX and is an addition rather than an alternative — the §7.21
+    // shape, not the §4.15 shape — so a non-Texas document simply does not have
+    // it. Neither is it a section of `Lombard_FRPA_v4`, which is why this count
+    // moved and the non-clause register did not.
+    expect(clauses).toHaveLength(100);
     expect(clauses.filter((clause) => clause.number !== '').length).toBeGreaterThan(0);
   });
 
@@ -85,17 +128,33 @@ describe('the FRPA library accounts for the whole document', () => {
   /**
    * §6.1's limbs are not clauses.
    *
-   * `6.1.1`–`6.1.15` are enumerated limbs under one lead-in — "Each of the
-   * following constitutes an Event of Default hereunder:" — and a limb approved
-   * in isolation from its lead-in means nothing. They live inside §6.1's body,
-   * which is why the count is 87 and not the 90 Phase 0 reports.
+   * An enumerated limb under a lead-in — v4's "Each of the following constitutes
+   * an Event of Default hereunder:", today's "An Event of Default occurs only if
+   * Merchant" — is meaningless approved in isolation from that lead-in. Section 6
+   * is one clause per numbered section and its limbs live in the body, which is
+   * why the count is 87 and not the 90 Phase 0 reports.
+   *
+   * TWO ASSERTIONS RETIRED 2026-09-10 by ADR 0012, for the reason given at the
+   * head of this describe and on the same authority as the line-accounting above.
+   * They read `expect(events?.body).toContain('6.1.4')` and `'6.1.15'` — a
+   * transcription guard wearing a structural test's clothes. What they actually
+   * pinned was that §6.1 still has a fourth and a fifteenth limb, i.e. that v4's
+   * fifteen enumerated defaults survive. The `default-remedies` rewrite replaces
+   * them with three lettered limbs of misconduct, so keeping the assertions would
+   * have required preserving the defect the rewrite exists to remove:
+   * `default-on-any-term-no-cure-no-materiality` IS limbs 6.1.1–6.1.15.
+   *
+   * NOT SILENCED THE CHEAP WAY. The structural claim survives below and is
+   * widened rather than narrowed: no limb of §6.1, under any numbering, may be
+   * imported as a clause of its own. That can still go red — it is what an
+   * importer keyed on `N.M.P` headings would do — which is the whole test of
+   * whether an assertion is worth keeping.
    */
   it('keeps the Events of Default limbs inside §6.1', () => {
     const events = clauses.find((clause) => clause.number === '6.1');
 
-    expect(events?.body).toContain('6.1.4');
-    expect(events?.body).toContain('6.1.15');
-    expect(clauses.some((clause) => clause.number === '6.1.4')).toBe(false);
+    expect(events).toBeDefined();
+    expect(clauses.filter((clause) => /^6\.1\.[0-9]/.test(clause.number))).toEqual([]);
   });
 });
 

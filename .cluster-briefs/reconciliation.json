@@ -1,0 +1,81 @@
+[
+  {
+    "memo_entry": "014",
+    "slug": "frpa.merchant-s-right-to-reconciliation-3-1",
+    "number": "3.1",
+    "heading": "Merchant’s Right to Reconciliation",
+    "severity": "Critical",
+    "category": "Characterization / servicing",
+    "disposition": "REPLACE IN FULL",
+    "memo_rationale": "A true percentage split needs verification and error correction, not a discretionary payment holiday. Remove unforeseen-change and one-month limitations and prevent catch-up by raising the percentage. These safeguards exceed what every court necessarily requires but materially improve evidence that receipts risk is real. [A1–A4]",
+    "memo_replacement": "Merchant may request reconciliation at any time, including after an alleged default or completion, without showing an unforeseen or sustained change. Buyer shall also reconcile the processor ledger at least monthly. Reconciliation compares amounts collected with the Specified Percentage of actual Card Receipts for the period in question. Buyer shall give Merchant the calculation and refund any overcollection within five Workdays after receiving sufficient information, including information already available to Buyer. Buyer shall not increase the Specified Percentage, impose a minimum remittance, or extend a fixed deadline to recover an estimate shortfall. A documented failure to remit Purchased Receipts actually generated is addressed under Section 7.16; a decline in receipts creates no arrearage.",
+    "current_body": "If at any time during the term of this Agreement Merchant experiences an unforeseen decrease or increase in its Daily Receipts, Merchant shall have the right, at its sole and absolute discretion but subject to the procedure set forth below, to request retroactive reconciliation of the Estimated Daily Holdback for one (1) full calendar month immediately preceding the day when such request for reconciliation is received by Buyer (each such calendar month, a “Reconciliation Month”).\nSuch reconciliation (the “Reconciliation”) shall be performed by Buyer within five (5) Workdays following its receipt of the Merchant’s request by crediting any over-collected difference back to Merchant, or correcting any under-collection prospectively through the Approved Processor split, so that the total amount collected by Buyer during the Reconciliation Month is equal to the Specified Percentage of the Receipts that Merchant collected during that month. One or more Reconciliation procedures may reduce or increase the effective Estimated Daily Holdback and may shorten or extend the term of this Agreement.",
+    "findings": ["defined-term-drift", "undefined-money-terms"],
+    "my_note": "The most important defensive change in the document. Reconciliation as verification-and-correction rather than a discretionary payment holiday. Remove the unforeseen-change gate and the one-month cap, and forbid catch-up by raising the percentage.",
+    "action": "rewrite",
+    "fact": null
+  },
+  {
+    "memo_entry": "015",
+    "slug": "frpa.request-for-reconciliation-procedure-3-2",
+    "number": "3.2",
+    "heading": "Request for Reconciliation Procedure",
+    "severity": "High",
+    "category": "Operational / characterization",
+    "disposition": "REPLACE IN FULL",
+    "memo_rationale": "Merchant-only initiation, repeated documentary conditions, and automatic post-completion extension burden the central protection. Keep electronic access, remove contractual forfeiture, and make calculation disputes resolvable. Missing information need not delay refund of the undisputed portion.",
+    "memo_replacement": "Merchant may request reconciliation by email, the servicing portal, telephone, or another reasonable method. Buyer shall acknowledge the request within one Workday and use processor and account information it already holds. Buyer may request only additional records reasonably necessary for the identified period and shall explain what is missing. Merchant shall reasonably cooperate, and Buyer shall accept equivalent records when standard statements are unavailable. No request is forfeited solely because it is late, informal, or submitted after completion. Buyer shall resolve and refund the undisputed portion while investigating any disputed portion and provide a written calculation and review contact. Applicable statutory limitation periods remain in effect.",
+    "current_body": "It shall be Merchant’s sole responsibility to initiate Reconciliation by sending a written request to Buyer. Each request shall include a copy of Merchant’s bank statement and credit card processing statements for the Reconciliation Month at issue (the “Reconciliation Information”) and shall be received by Buyer within thirty (30) Workdays after the last day of the Reconciliation Month at issue. A request received after that period is not nullified; Buyer shall perform the Reconciliation for the month at issue if the Reconciliation Information supports it. Notwithstanding Section 7.3, a request for Reconciliation or an Adjustment may be sent by email to the address stated in Section 1, and is effective on receipt.\nMerchant shall have the right to request Reconciliation as many times during the term of this Agreement as it deems proper, provided that each request is made in accordance with this section. If a request is made after the expiration of the term of this Agreement and the total amount actually collected by Buyer is less than the Purchased Amount, the term of this Agreement shall automatically be extended until the total amount collected equals the Purchased Amount.\nNothing in this section shall modify the Estimated Daily Holdback for any calendar month other than the Reconciliation Month(s) as the result of the Reconciliation.",
+    "findings": [
+      "acceleration-defeats-indefinite-term",
+      "reconciliation-right-conditioned-into-near-nullity",
+      "reconciliation-switched-off-by-any-breach"
+    ],
+    "my_note": "Adopt with 014. Merchant-only initiation plus documentary preconditions plus automatic post-completion extension makes the central protection practically unavailable, which is precisely the Richmond fact pattern.",
+    "action": "rewrite",
+    "fact": null
+  },
+  {
+    "memo_entry": "016",
+    "slug": "frpa.failure-to-provide-reconciliation-information-3-3",
+    "number": "3.3",
+    "heading": "Failure to Provide Reconciliation Information",
+    "severity": "High",
+    "category": "Characterization / operational",
+    "disposition": "REPLACE IN FULL",
+    "memo_rationale": "The five-day withdrawal/default mechanism conflicts with the broader rights in §§3.1–3.2 and can make reconciliation practically unavailable. It also incorrectly limits requests to before payoff.",
+    "memo_replacement": "An incomplete request remains open. Buyer shall identify missing information, allow at least ten Workdays and a reasonable extension for circumstances outside Merchant’s control, and use the best reliable information available. Missing records or loss of electronic access alone do not authorize an increased percentage, a fixed payment, denial of an otherwise supported refund, or an Event of Default. Buyer may pursue relief only for conduct independently satisfying Section 6.1 and proved to have caused loss; it may not presume fraud or diversion from incomplete information.",
+    "current_body": "If Merchant requests a Reconciliation and fails to provide the Reconciliation Information within five (5) Workdays after the request, Buyer may consider the request withdrawn. If Buyer requests a reconciliation and Merchant fails to provide the Reconciliation Information within five (5) Workdays, Buyer may adjust the Estimated Daily Holdback based on the best information reasonably available. Any request for reconciliation must be initiated prior to the payoff of the Purchased Amount plus any other sums due. Merchant’s refusal to deliver Reconciliation Information pursuant to Buyer’s request may be considered interference with Buyer’s rights and deemed a default of this Agreement.",
+    "findings": [
+      "frpa-undefined-capitalised-terms",
+      "periodic-amount-undefined-fixed-draw-residue",
+      "reconciliation-right-conditioned-into-near-nullity",
+      "reconciliation-switched-off-by-any-breach",
+      "undefined-money-terms"
+    ],
+    "my_note": "The five-day withdrawal-and-default mechanism converts a merchant protection into a default trigger. This is the clause a plaintiff's counsel reads aloud. Delete it.",
+    "action": "rewrite",
+    "fact": null
+  },
+  {
+    "memo_entry": "017",
+    "slug": "frpa.adjustment-of-the-estimated-daily-holdback-3-4",
+    "number": "3.4",
+    "heading": "Adjustment of the Estimated Daily Holdback",
+    "severity": "Moderate",
+    "category": "Operational",
+    "disposition": "REPLACE IN FULL",
+    "memo_rationale": "The mandatory adjustment and survival language are protective. Clarify that adjusting an informational estimate does not change the actual settlement percentage; no sustained decline threshold is necessary.",
+    "memo_replacement": "Merchant may request an updated Estimated Daily Holdback at any time. Buyer shall calculate and communicate a supported update within five Workdays using current available Card Receipts data. The update is informational, applies from the request date for reporting purposes, and does not alter the Specified Percentage or create a payment obligation. Reconciliation and adjustment rights survive an alleged Event of Default and remain available after completion to correct prior collections.",
+    "current_body": "If at any time during the term of this Agreement Merchant experiences a steady decrease in its Receipts, Merchant shall have the right, at its sole and absolute discretion, to request a modification (the “Adjustment”) of the Estimated Daily Holdback. Where the request is supported by the Reconciliation Information, Buyer shall grant the Adjustment; Buyer has no discretion to withhold it. The Adjustment shall become effective as of the date the request is received by Buyer, and the new Adjusted Daily Holdback shall replace and supersede the Estimated Daily Holdback set forth above. The Adjustment shall be performed by Buyer within five (5) Workdays following its receipt of the request. Merchant’s right to request Reconciliation under Section 3.1 and an Adjustment under this Section survives an Event of Default and may be exercised while an Event of Default is continuing. One or more Adjustments may substantially extend the term of this Agreement.",
+    "findings": [
+      "defined-term-drift",
+      "frpa-undefined-capitalised-terms",
+      "periodic-amount-undefined-fixed-draw-residue",
+      "undefined-money-terms"
+    ],
+    "my_note": "Uncontroversial. Adjusting an informational estimate must not silently change the actual settlement percentage — say so.",
+    "action": "rewrite",
+    "fact": null
+  }
+]
