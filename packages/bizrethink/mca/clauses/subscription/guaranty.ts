@@ -65,6 +65,19 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
       { review: 'REVIEW-02', findings: ['el-3-14-was-not-conformed-when-4-2-was-narrowed'] },
     ],
   },
+  /*
+    THE SUBSCRIPTION HALF OF ONE REWRITE, and the reasons are NOT repeated here.
+    They are set out in full above §4.3 in `equipment-lease/guaranty.ts`, because
+    a reason duplicated in two files is the twin problem in comment form:
+    `twins.test.ts` checks that the two bodies agree and nothing checks that two
+    prose explanations still do.
+
+    AND ONE WORD DIFFERS BY DESIGN. The cross-reference reads "reflected in the
+    Subscription" where the Equipment Lease reads "reflected in this Lease" —
+    the gratuitous asymmetry `TWIN_VOCABULARY_EXCEPTIONS` records for §4.3. It is
+    carried through the rewrite rather than tidied, so the recorded finding about
+    these two documents stays true.
+  */
   {
     slug: 'subscription.independent-decision-governing-law',
     version: 1,
@@ -74,8 +87,8 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     number: '4.3',
     section: 'guaranty',
     sortKey: 30,
-    heading: 'Independent Decision; Governing Law',
-    body: 'I REPRESENT AND WARRANT THAT MY DECISION TO ENTER INTO THIS GUARANTY IS NOT BASED ON ANY PROMISE MADE BY ANYONE, WHETHER WRITTEN OR ORAL, THAT IS NOT SET FORTH IN THIS SUBSCRIPTION AND GUARANTY. I agree and acknowledge that this Guaranty is subject to the governing law provision and forum selection clause reflected in the Subscription at Section 3.15 (Governing Law and Venue). If any part of this Guaranty is not enforceable, the remaining provisions will remain valid and enforceable. I understand that the cost of litigating in Florida may be in excess of the amount at stake in the litigation. Nonetheless, I waive any objection that such courts are an inconvenient forum or venue, irrespective of the actual amount at issue. {{equipmentAffiliate}} may properly serve me with legal process via certified mail to my address set forth herein or to my current or last known address, and upon such mailing, service shall be effective irrespective of whether a signed certified mail return receipt is returned to {{equipmentAffiliate}}. I agree to promptly notify {{equipmentAffiliate}} of any change of my address and that of the Subscriber.',
+    heading: 'Governing Law; Service of Legal Process',
+    body: 'I agree and acknowledge that this Guaranty is subject to the governing law and venue provision reflected in the Subscription at Section 3.15 (Governing Law and Venue). If any part of this Guaranty is not enforceable, the remaining provisions will remain valid and enforceable.\nService of a summons, a complaint or other legal process on me must be made in a manner that the procedural law of the court in which the proceeding is brought, and any applicable order of that court, authorizes. A mailing that is returned, refused or undeliverable is not service on me, and neither is a notice given under Section 3.16; neither is evidence that service was made. The time I have to respond to a proceeding is the time that procedural law or an order of the court gives me, and this Guaranty neither shortens it nor starts it running on an event of its own.\nThis Guaranty gives up nothing that applicable law does not permit to be given up. It contains no agreement by me to accept service in advance of a proceeding, no waiver of valid service, no waiver of an objection to jurisdiction or venue, no waiver of a notice, a hearing or a prior court order that applicable law requires before a prejudgment remedy is obtained, and no confession of judgment. I may accept service, or give up service, after a proceeding has begun, in the manner the law then applicable permits.\nThis Guaranty does not waive a claim for fraud or misrepresentation, a right applicable law does not permit to be waived, or a required disclosure. My signature is not a representation about what I was told before signing it, and no recital in this Subscription or this Guaranty is evidence of one.\nI agree to promptly notify {{equipmentAffiliate}} of any change of my address and that of the Subscriber. A failure to do so does not make an otherwise invalid service valid.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -84,6 +97,13 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
       { review: 'REVIEW-02', findings: ['el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt'] },
     ],
   },
+  /*
+    THE SUBSCRIPTION HALF OF ONE REWRITE, and the reasons are NOT repeated here.
+    They are set out in full above §4.4 in `equipment-lease/guaranty.ts`, because
+    a reason duplicated in two files is the twin problem in comment form:
+    `twins.test.ts` checks that the two bodies agree and nothing checks that two
+    prose explanations still do.
+  */
   {
     slug: 'subscription.jury-trial-and-class-action-waiver',
     version: 1,
@@ -93,8 +113,8 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
     number: '4.4',
     section: 'guaranty',
     sortKey: 40,
-    heading: 'Jury Trial and Class Action Waiver',
-    body: 'I VOLUNTARILY AND FREELY WAIVE TRIAL BY JURY IN CONNECTION WITH ANY DISPUTE OVER THIS GUARANTY. I agree, in my personal capacity, not to pursue a claim against {{equipmentAffiliate}}, its assigns, or servicing agents, as a lead plaintiff, class representative, or as part of a class action or other representative action. Any permitted cause of action I may have against {{equipmentAffiliate}}, or its assignee, its servicing agent, or their employees and attorneys, must be commenced within one year from the accrual of that cause of action.',
+    heading: 'Jury Trial, Class Proceedings, and Limitation of Actions',
+    body: '{{equipmentAffiliate}} and I each waive trial by jury in an action arising out of or relating to this Guaranty, to the extent the law of the forum gives effect to a waiver of that right made before a dispute has arisen. Where the law of the forum does not give effect to such a waiver, this Section has no effect and each of us retains the right to trial by jury. This waiver is mutual, it is limited to {{equipmentAffiliate}} and me, and it does not reach a claim applicable law requires to be tried to a jury.\nNo party waives a right to bring, to defend, or to take part in a class, collective, representative or public-enforcement proceeding that applicable law permits. Whether such a proceeding is available, and in what form, is for the court to determine under applicable law and its own rules. I keep whatever share of a recovery such a proceeding awards me and any right to costs or to a fee award that applicable law gives me.\nThe limitation period, the accrual rule, and any tolling or discovery rule that applicable law supplies apply to a claim by each party to this Guaranty alike, whoever brings it and whoever it is brought against. This Guaranty does not shorten any of them, and neither this Guaranty nor Section 3.15 shortens one anywhere else. A claim that applicable law does not permit to be shortened or given up is unaffected by this Guaranty.\nI give up nothing under this Section on behalf of anyone but myself.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

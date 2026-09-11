@@ -55,6 +55,90 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: ['el-3-14-was-not-conformed-when-4-2-was-narrowed'] }],
   },
+  /*
+    THE SENTENCE THAT OUTRANKS EVERYTHING ELSE IN THIS CHANGE.
+
+    WHAT WAS WRONG. Three things, in one paragraph a guarantor reads as
+    boilerplate, on paper signed by a natural person.
+
+    (1) SERVICE EFFECTIVE ON MAILING, WITH THE RECEIPT EXPRESSLY IRRELEVANT.
+        "{{equipmentAffiliate}} may properly serve me with legal process via
+        certified mail to my address set forth herein or to my current or last
+        known address, and upon such mailing, service shall be effective
+        irrespective of whether a signed certified mail return receipt is
+        returned to {{equipmentAffiliate}}." That is how a judgment is entered
+        against somebody who never learned of the case, and it is worse than the
+        v4 §7.12 the 2026-09-09 memo rated Critical: §7.12 at least required the
+        envelope to come back.
+    (2) A WAIVER OF THE OBJECTION, WITH ITS OWN REASON RECITED FIRST. "I
+        understand that the cost of litigating in Florida may be in excess of the
+        amount at stake in the litigation. Nonetheless, I waive any objection
+        that such courts are an inconvenient forum or venue, irrespective of the
+        actual amount at issue." The clause states the ground the objection rests
+        on and takes it away in the next word.
+    (3) THE NONRELIANCE REPRESENTATION FRPA §7.22 DELETED. "MY DECISION TO ENTER
+        INTO THIS GUARANTY IS NOT BASED ON ANY PROMISE MADE BY ANYONE, WHETHER
+        WRITTEN OR ORAL, THAT IS NOT SET FORTH IN THIS LEASE AND GUARANTY."
+        §7.22's reasoning applies here unchanged, and §7.22 deleted rather than
+        narrowed because narrowing leaves a clause that reads as though it works:
+        a blanket nonreliance assertion, obtained at signature, about statements
+        the signer heard before signature, should not waive a claim for fraud or
+        a statutory disclosure claim.
+
+    REVIEW-02 RAISED (1), AND ITS PROPOSED FIX IS NOW SUPERSEDED — WHICH HAS TO
+    BE SAID, BECAUSE THE MANIFEST STILL CARRIES IT.
+    `el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt`
+    proposes: *"Conform 4.3 to FRPA 7.12: service complete on actual receipt or
+    on return as refused or undeliverable, with a stated period to respond."*
+    That is v4's §7.12 verbatim, and the `disputes-service` rewrite deleted it AS
+    the defect — completion on non-delivery and a contractual response period are
+    two of the three mechanisms it removed. Conforming to the fix would have
+    imported into a personal guaranty the thing the FRPA had just got rid of.
+    Nothing was built on it: the manifest records the entry `open`, "No document
+    change made."
+
+    WHAT CHANGED. Service is left to the procedural law of the court and to that
+    court's orders — FRPA §10.1's rule, stated for a document that has no Section
+    10 to point at. The three mechanisms are denied by name: a returned, refused
+    or undeliverable mailing is not service, an operational notice under §3.16 is
+    not service, and neither is evidence that service was made. The time to
+    respond is the time the law or the court gives. The address duty survives,
+    because a guarantor should keep an address current, and loses its
+    consequence. The nonreliance sentence is deleted, and what replaces it is the
+    sentence §7.22 ends on.
+
+    DEPARTURE 1 — THE HEADING CHANGES, for FRPA §7.13's reason and not §7.23's.
+    "Independent Decision" named the nonreliance representation, and that
+    representation is gone. §7.23 kept a misleading heading deliberately so that
+    a reader told about a provision could still find it; that argument does not
+    reach a heading whose subject no longer exists anywhere in either document.
+
+    DEPARTURE 2 — THE CROSS-REFERENCE SENTENCE IS KEPT ALMOST WORD FOR WORD,
+    including the gratuitous "this Lease" / "the Subscription" asymmetry that
+    `TWIN_VOCABULARY_EXCEPTIONS` records as a finding. Rewriting it would delete
+    a recorded observation about the two documents without fixing anything, and
+    the sentence does its job now that §3.15 says something worth pointing at.
+    Only "forum selection clause" becomes "venue provision", because §3.15 no
+    longer selects a forum.
+
+    DEPARTURE 3 — CONNECTICUT IS NOT CITED IN THE BODY, AND NOT ONLY BECAUSE OF
+    THE HOUSE RULE. REVIEW-02 checked Conn. Gen. Stat. §36a-861(6)(E) and
+    concluded the chapter does not reach a lease. VERIFIED that the exclusion
+    exists and says what the review says, in
+    `mca/sources/CT-CGS-36a-861-872.txt`. UNVERIFIED, and pointing the other way
+    for ONE twin: §42a-2A-102 is not vendored anywhere in this repository,
+    Article 2A's definition of "lease" excludes a transaction that creates a
+    security interest, and the Equipment Lease's own §3.6 says it creates one
+    "rather than a true lease" while the Subscription's §3.6 says the transaction
+    "shall be treated as a lease". So the exclusion REVIEW-02 relies on may reach
+    one of these documents and not its twin. The drafting answers the question
+    rather than resolving it: neither document gives up notice, a judicial
+    hearing or a prior court order, so §36a-868 has nothing to bite on either
+    way. Whoever vendors §42a-2A-102 should read §3.6 of both twins beside it.
+
+    NO WIDGET IS TOUCHED, because this clause has none — checked against the
+    vendored body rather than assumed.
+  */
   {
     slug: 'equipment-lease.independent-decision-governing-law',
     version: 1,
@@ -64,8 +148,8 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
     number: '4.3',
     section: 'guaranty',
     sortKey: 30,
-    heading: 'Independent Decision; Governing Law',
-    body: 'I REPRESENT AND WARRANT THAT MY DECISION TO ENTER INTO THIS GUARANTY IS NOT BASED ON ANY PROMISE MADE BY ANYONE, WHETHER WRITTEN OR ORAL, THAT IS NOT SET FORTH IN THIS LEASE AND GUARANTY. I agree and acknowledge that this Guaranty is subject to the governing law provision and forum selection clause reflected in this Lease at Section 3.15 (Governing Law and Venue). If any part of this Guaranty is not enforceable, the remaining provisions will remain valid and enforceable. I understand that the cost of litigating in Florida may be in excess of the amount at stake in the litigation. Nonetheless, I waive any objection that such courts are an inconvenient forum or venue, irrespective of the actual amount at issue. {{equipmentAffiliate}} may properly serve me with legal process via certified mail to my address set forth herein or to my current or last known address, and upon such mailing, service shall be effective irrespective of whether a signed certified mail return receipt is returned to {{equipmentAffiliate}}. I agree to promptly notify {{equipmentAffiliate}} of any change of my address and that of the Lessee.',
+    heading: 'Governing Law; Service of Legal Process',
+    body: 'I agree and acknowledge that this Guaranty is subject to the governing law and venue provision reflected in this Lease at Section 3.15 (Governing Law and Venue). If any part of this Guaranty is not enforceable, the remaining provisions will remain valid and enforceable.\nService of a summons, a complaint or other legal process on me must be made in a manner that the procedural law of the court in which the proceeding is brought, and any applicable order of that court, authorizes. A mailing that is returned, refused or undeliverable is not service on me, and neither is a notice given under Section 3.16; neither is evidence that service was made. The time I have to respond to a proceeding is the time that procedural law or an order of the court gives me, and this Guaranty neither shortens it nor starts it running on an event of its own.\nThis Guaranty gives up nothing that applicable law does not permit to be given up. It contains no agreement by me to accept service in advance of a proceeding, no waiver of valid service, no waiver of an objection to jurisdiction or venue, no waiver of a notice, a hearing or a prior court order that applicable law requires before a prejudgment remedy is obtained, and no confession of judgment. I may accept service, or give up service, after a proceeding has begun, in the manner the law then applicable permits.\nThis Guaranty does not waive a claim for fraud or misrepresentation, a right applicable law does not permit to be waived, or a required disclosure. My signature is not a representation about what I was told before signing it, and no recital in this Lease or this Guaranty is evidence of one.\nI agree to promptly notify {{equipmentAffiliate}} of any change of my address and that of the Lessee. A failure to do so does not make an otherwise invalid service valid.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -73,6 +157,54 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
       { review: 'REVIEW-02', findings: ['el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt'] },
     ],
   },
+  /*
+    THE SAME THREE WAIVERS AGAIN, ONE SECTION LATER AND ONE SIGNER DOWN.
+
+    WHAT WAS WRONG. §3.15A, §3.15B and §3.15C bind the customer. This Section
+    binds the natural person who guarantees the customer, in the same three
+    respects: "I VOLUNTARILY AND FREELY WAIVE TRIAL BY JURY IN CONNECTION WITH
+    ANY DISPUTE OVER THIS GUARANTY"; "I agree, in my personal capacity, not to
+    pursue a claim ... as a lead plaintiff, class representative, or as part of a
+    class action or other representative action"; and "Any permitted cause of
+    action I may have ... must be commenced within one year from the accrual of
+    that cause of action."
+
+    That is four copies of each rule across two live templates, and it is the
+    reason the property in `__tests__/the-twins-cannot-undo-the-frpa.test.ts` is
+    stated over the SET. Read alone this is a short paragraph; read over the
+    corpus it is the same provision the FRPA deleted, written four times in the
+    documents the FRPA's own signer signs next.
+
+    WHAT CHANGED — the same three answers as §3.15, deliberately identical so
+    that the guaranty and the agreement cannot drift apart the way §3.14 and §4.2
+    did: a mutual, self-limiting jury waiver; no class, collective or
+    representative waiver; and the law's limitation periods with nothing
+    shortened anywhere.
+
+    THE ONE-YEAR PERIOD IS NOT REPLACED BY ANOTHER PERIOD, for FRPA §7.19's
+    reason. The two-year figure attributed to the 2026-09-09 memo appears nowhere
+    in `lombard-contracts`, in either review register, or in the memo material
+    this repository holds. Reinstating a mutual period is a one-line owner
+    decision and nothing in this draft resists it.
+
+    THE HEADING CHANGES because the clause no longer contains a class-action
+    waiver, which is FRPA §7.13's rule: a heading naming machinery that is gone
+    tells a reader the opposite of the truth.
+
+    `el-4-4-guarantor-waives-on-the-lessees-behalf-with-no-authority-recital` IS
+    RECORDED `implemented` AND WAS NOT, IN THE SENSE THE FINDING MEANS. The
+    manifest note says it was applied by BROADENING §3.15C's protected-person
+    list to match the list this clause carried — which conforms the two lists and
+    says nothing about authority. The last sentence deals with the authority
+    point directly: nothing in this Section is given up on anybody else's behalf.
+
+    NOT FIXED HERE, AND IT IS THE SAME SHAPE ONE CLAUSE LATER. §4.6 has the
+    guarantor consent "on my behalf and on behalf of Lessee" to recorded calls,
+    automated dialling and prerecorded messages, with no recital of authority to
+    bind the entity. It is a consent rather than a waiver of a protection, it is
+    outside the property this change asserts, and it is reported rather than
+    redrafted.
+  */
   {
     slug: 'equipment-lease.jury-trial-and-class-action-waiver',
     version: 1,
@@ -82,8 +214,8 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
     number: '4.4',
     section: 'guaranty',
     sortKey: 40,
-    heading: 'Jury Trial and Class Action Waiver',
-    body: 'I VOLUNTARILY AND FREELY WAIVE TRIAL BY JURY IN CONNECTION WITH ANY DISPUTE OVER THIS GUARANTY. I agree, in my personal capacity, not to pursue a claim against {{equipmentAffiliate}}, its assigns, or servicing agents, as a lead plaintiff, class representative, or as part of a class action or other representative action. Any permitted cause of action I may have against {{equipmentAffiliate}}, or its assignee, its servicing agent, or their employees and attorneys, must be commenced within one year from the accrual of that cause of action.',
+    heading: 'Jury Trial, Class Proceedings, and Limitation of Actions',
+    body: '{{equipmentAffiliate}} and I each waive trial by jury in an action arising out of or relating to this Guaranty, to the extent the law of the forum gives effect to a waiver of that right made before a dispute has arisen. Where the law of the forum does not give effect to such a waiver, this Section has no effect and each of us retains the right to trial by jury. This waiver is mutual, it is limited to {{equipmentAffiliate}} and me, and it does not reach a claim applicable law requires to be tried to a jury.\nNo party waives a right to bring, to defend, or to take part in a class, collective, representative or public-enforcement proceeding that applicable law permits. Whether such a proceeding is available, and in what form, is for the court to determine under applicable law and its own rules. I keep whatever share of a recovery such a proceeding awards me and any right to costs or to a fee award that applicable law gives me.\nThe limitation period, the accrual rule, and any tolling or discovery rule that applicable law supplies apply to a claim by each party to this Guaranty alike, whoever brings it and whoever it is brought against. This Guaranty does not shorten any of them, and neither this Guaranty nor Section 3.15 shortens one anywhere else. A claim that applicable law does not permit to be shortened or given up is unaffected by this Guaranty.\nI give up nothing under this Section on behalf of anyone but myself.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
