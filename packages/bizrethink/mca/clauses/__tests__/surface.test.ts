@@ -76,7 +76,11 @@ describe('the MCA clause library surface', () => {
     // 136 until §9.3 was removed; it carried the one REVIEW-02 finding about an
     // unbounded cross-collateral grant, and that clause no longer exists.
     expect(surface.totals.findingsCited).toBe(135);
-    expect(surface.totals.outstanding).toBe(38);
+    // 38 → 37 on 2026-09-11: `fair-market-value-recital-self-refuting` became
+    // `rejected` in lombard-contracts, refuted by the 2026-09-09 counsel memo.
+    // A rejection is a disposition, so the finding stops being outstanding
+    // while staying cited — which is why only the second number moved.
+    expect(surface.totals.outstanding).toBe(37);
     expect(surface.totals.outstanding).toBeLessThan(surface.totals.findingsCited);
   });
 

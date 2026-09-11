@@ -1,7 +1,7 @@
 {
   "_what": "The two adversarial reviews of the Lombard negotiated agreements, indexed. Derived from lombard-contracts by scripts/mca/build-review-register.py; regenerate and diff rather than editing this file.",
   "_repository": "https://github.com/lombardpay/lombard-contracts",
-  "_commit": "7b8e61c3c1c9fa02ff4a98f3e4d477132066008d",
+  "_commit": "58974ca1eead7fb6135ed8378475b8b53d5ecca6",
   "_dispositions": "Each finding carries the status from its review manifest (implemented / open / handoff / rejected / wont-fix). A finding absent from its manifest is `unrecorded` -- unknown, which is not the same as open and not the same as done, and which counts as outstanding. REVIEW-02 had no manifest at all until lombard-contracts PR #9.",
   "_whatThisProves": "That a finding id a clause names is a finding that was actually raised, what it was about and where it routed. It does NOT prove the finding says what a clause claims it says -- the argument lives in the source repository and is not reproduced here.",
   "_dropped": ["evidence", "consequence", "fix"],
@@ -12,7 +12,7 @@
       "file": "REVIEW-01-findings.json",
       "sha256": "8b64d7b8330570481d6e4117d39dd0df05de83d4929ec05fa835756658442f29",
       "manifest": "REVIEW-01-manifest.json",
-      "manifestSha256": "1ab1133dc4006c2b89beb14d6b8018645e49a3dcb3ca56ad01bd53b2aa8a371b",
+      "manifestSha256": "eddf1e56ff9469d6f3b70bb1d7e3d49d57d3e994b7c54b529c796877d042cd4a",
       "survived": 201,
       "refuted": 4,
       "coverageGaps": [
@@ -832,7 +832,7 @@
           "decides": "counsel",
           "status": "survived",
           "review": "REVIEW-01",
-          "disposition": "open"
+          "disposition": "rejected"
         },
         {
           "id": "fl-prepayment-discount-not-stated",
