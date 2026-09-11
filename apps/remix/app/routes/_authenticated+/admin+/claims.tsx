@@ -1,17 +1,21 @@
+import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { Input } from '@documenso/ui/primitives/input';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
-
 import { ClaimCreateDialog } from '~/components/dialogs/claim-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminClaimsTable } from '~/components/tables/admin-claims-table';
 
 import type { Route } from './+types/claims';
 
-export async function loader() {
+export async function loader({ request }: Route.LoaderArgs) {
+  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
+  // single-fetch runs it without the admin layout's authorization check.
+  await requireAdminLoader(request);
+
   const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
 
   return {

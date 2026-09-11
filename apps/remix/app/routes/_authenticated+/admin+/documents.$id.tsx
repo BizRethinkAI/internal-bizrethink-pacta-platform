@@ -1,3 +1,4 @@
+import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
 import { base64 } from '@documenso/lib/universal/base64';
@@ -16,7 +17,6 @@ import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 import { DownloadIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
-
 import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { AdminDocumentJobsTable } from '~/components/tables/admin-document-jobs-table';
@@ -25,7 +25,11 @@ import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-docum
 
 import type { Route } from './+types/documents.$id';
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
+  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
+  // single-fetch runs it without the admin layout's authorization check.
+  await requireAdminLoader(request);
+
   const id = params.id;
 
   if (!id || !id.startsWith('envelope_')) {
