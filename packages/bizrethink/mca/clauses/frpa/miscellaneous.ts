@@ -490,8 +490,10 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
 
     DEPARTURE 2 — "DISPUTE-RESOLUTION PROVISIONS" IS WRITTEN WITHOUT A CITATION.
     Which clauses those are is `disputeResolution`'s answer, not this clause's:
-    §§7.10, 7.11, 7.19 and 7.20 are all gated on it, and a citation would dangle
-    in an arbitration template. Described by subject instead.
+    §§7.10, 7.11 and 7.20 are gated on `courts` and §7.26 on `arbitration`, so a
+    citation would dangle in one template or the other. Described by subject
+    instead. (§7.19 left that group on 2026-09-11 and is now ungated, which does
+    not change this reasoning for the other four.)
 
     DEPARTURE 3 — CANCELLATION AND TERMINATION ARE ADDED TO "COMPLETION". §2.2
     and §4.14 both end this Agreement without the Remaining Balance reaching
@@ -889,20 +891,27 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     form, and a reader who finds "Class Action Waiver" and reads a clause that
     waives nothing has been told the opposite of the truth twice.
 
-    NOT DECIDED HERE, AND REPORTED AS A GAP. **Whether this should be an
-    arbitration product at all.** The owner's note is explicit that the memo
-    removes the waiver on a correct ground and then never asks the question, and
-    that for a small-dollar B2B product across eleven states it is a first-order
-    choice with pricing and enforceability consequences. `disputeResolution:
-    'arbitration'` selects no clause today — there is no arbitration clause in
-    the merchant-facing library — and drafting one is not a drafting agent's
-    decision, for the same reason `guarantyScope: 'full-performance'` is a named
-    unauthored gap. One VERIFIED fact for whoever takes it: Va. Code
-    §6.2-2234(B) (vendored) bars a covered contract from requiring face-to-face
-    arbitration outside the jurisdiction of the recipient's principal place of
-    business, and requires the PROVIDER to pay the arbitrators' fees and the
-    administrative fees of the proceeding. An arbitration product carries that
-    cost in Virginia by statute.
+    DECIDED, AND NOT HERE. **Whether this should be an arbitration product at
+    all** was reported as a gap on 2026-09-10 — the owner's note being explicit
+    that the memo removes the waiver on a correct ground and then never asks the
+    question, and that for a small-dollar B2B product across eleven states it is
+    a first-order choice with pricing and enforceability consequences. The owner
+    answered it on 2026-09-11 by offering both: `frpa.arbitration-7-26` is the
+    `arbitration` answer, and this clause remains the `courts` one.
+
+    **THE CLASS RULE IS THEREFORE ONE RULE PER DOCUMENT, IN TWO PLACES.** This
+    clause waives nothing and is selected under `courts`; §7.26 arbitrates on an
+    individual basis and is selected under `arbitration`. They are never in the
+    same document, which is what makes that arrangement safe, and
+    `an-arbitration-clause-is-one-forum-rule.test.ts` asserts the count rather
+    than trusting it. The individual-basis limb lives inside §7.26 rather than in
+    a second §7.11 because it is the SCOPE of the arbitration agreement, not a
+    separate promise. One VERIFIED fact that drove it: Va. Code §6.2-2234(B)
+    (vendored) bars a covered contract from requiring face-to-face arbitration
+    outside the jurisdiction of the recipient's principal place of business, and
+    requires the PROVIDER to pay the arbitrators' fees and the administrative
+    fees of the proceeding. An arbitration product carries that cost in Virginia
+    by statute, and §7.26 carries it nationally.
   */
   {
     slug: 'frpa.class-action-waiver-7-11',
@@ -1358,41 +1367,43 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     clause as probably enforceable in isolation and says the cost is cumulative:
     it is one more provision running one way in a document full of them.
 
-    THE OWNER'S INSTRUCTION, AND THE PART OF IT THIS CLUSTER DID NOT FOLLOW.
-    *"Do not simply delete. A one-sided one-year period covering every claim type
-    is indefensible; a mutual two-year period is ordinarily enforceable and worth
-    keeping. Redraft rather than remove, and carve out non-waivable statutory
-    claims."* Three of those four are done. **The two-year figure is not, and
-    the reason is that it could not be confirmed.**
+    THE TWO-YEAR PERIOD IS THE OWNER'S COMMERCIAL DECISION OF 2026-09-11. IT IS
+    NOT COUNSEL'S RECOMMENDATION AND IT HAS NO VERIFIED SOURCE.
 
-    The brief instructs: *"The two-year limitations period in my §7.19 note is
-    the memo's figure, not an invention — confirm that before using it."*
-    Checked. The 2026-09-09 memo is not vendored in this repository or in
-    `lombard-contracts`; what exists of it are the `memo_rationale` and
-    `memo_replacement` fields in `.cluster-briefs/`. **Memo entry 075's
-    replacement text fixes no period at all** — it says the periods applicable
-    law supplies apply and that "This Agreement does not shorten them" — and the
-    string "two-year" appears in exactly one place across all nine cluster
-    briefs: the owner's own note on this entry. REVIEW-01's fix says "make it
-    mutual" and names no number either. So the premise is unconfirmed, which
-    makes it the fifth memo premise this rewrite has failed to verify.
+    That sentence is the record, and it is written plainly because the previous
+    draft of this clause refused the figure for exactly the right reason and the
+    refusal must not now be quietly forgotten. What was checked, and what the
+    check found:
 
-    WHAT CHANGED, AND WHY NO NUMBER IS IN THE BODY. The standing rule is *"Do
-    not invent commercial values. No percentages, dollar figures or day counts
-    unless the current body or the memo already fixes them"*, and the brief
-    conditioned the two-year figure on a confirmation that failed. A day count
-    written into a merchant-facing form on an unconfirmed premise is exactly the
-    thing that rule exists to stop, and shortening a limitation period is the
-    direction that costs the merchant. So the clause is redrafted rather than
-    removed — it survives as a record and as an operative rule — and the rule it
-    states is the mutual one with no shortening: the law's periods, accrual and
-    tolling apply to every party alike, this Agreement shortens none of them,
-    and no other provision of it does either. The last limb matters: a
-    limitations clause that only disclaims itself leaves the next drafter free
-    to put a period somewhere else.
+      - The 2026-09-09 memo is not vendored in this repository or in
+        `lombard-contracts`. What exists of it are the `memo_rationale` and
+        `memo_replacement` fields in `.cluster-briefs/`.
+      - **Memo entry 075's replacement text fixes no period at all.** It says
+        the periods applicable law supplies apply and that "This Agreement does
+        not shorten them".
+      - The string "two-year" appears in exactly ONE place across all nine
+        cluster briefs: an owner's note on that entry. It was subsequently
+        attributed to the memo by an orchestrator's brief; **that attribution is
+        false**, and an agent verified it by reading the briefs.
+      - REVIEW-01's own fix for `one-year-limitations-one-sided` says "make it
+        mutual" and names no number either.
 
-    **REINSTATING A MUTUAL PERIOD IS A ONE-LINE OWNER DECISION** and is reported
-    as an open item rather than taken. Nothing in this draft resists it.
+    So the figure is adopted as a **commercial term the owner chose**, on
+    2026-09-11, with that provenance stated rather than dressed up as authority.
+    It is the only figure this clause has been given and none was invented
+    around it. **A shortened limitation period is a term counsel has not
+    reviewed and that costs the merchant**, and it is the kind of term a state
+    commercial-financing statute may decline to give effect to — which is what
+    the carve-out in the second paragraph is for.
+
+    WHAT CHANGED. The mutual period is stated, and the three things the previous
+    draft got right survive it unchanged: the period runs against every party
+    alike; the law's accrual, tolling and discovery rules apply to it; and a
+    claim applicable law does not permit to be shortened or given up is
+    unaffected. **The carve-out is not narrowed by the period** — it says in
+    terms that the two years do not apply to such a claim — because a carve-out
+    that merely "survives" a new operative rule is a carve-out arguable both
+    ways.
 
     DEPARTURE FROM THE MEMO — THE CARVE-OUT IS WIDER THAN THE OLD ONE AND IS
     STATED AFFIRMATIVELY. v4's proviso saved a claim only "to the extent such
@@ -1402,19 +1413,44 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     applicable law does not permit to be shortened or given up is unaffected,
     whoever brings it.
 
-    THE GATE IS THE BUNDLE'S AND IS THE WEAKEST OF THE FOUR. `facts.ts` says
-    `disputeResolution` *"decides four clauses as one bundle"*, and
-    `select-clauses.test.ts` pins that this record drops under arbitration. On
-    its own terms the rule this clause now states — the law's periods apply and
-    this Agreement shortens none — is true under arbitration too, so its absence
-    from an arbitration template is a redundancy rather than a hole. It stays in
-    the bundle because the bundle is one product decision and because an
-    arbitration clause, when one is written, is where an arbitration template's
-    limitation rule will live. Recorded rather than quietly relied on.
+    **THE GATE GOES, AND THAT IS THE SECOND CHANGE HERE.** `facts.ts` says
+    `disputeResolution` *"decides four clauses as one bundle"*, and this record
+    used to drop under arbitration with the other three. Tested against ADR
+    0013's diagnostic rather than assumed:
 
-    THE HEADING CHANGES because the clause no longer contains a contractual
-    statute of limitations, which is the §7.13 rule: a heading that names
-    machinery that is gone.
+      - The fact answers WHERE a claim is heard. This Section answers HOW LONG
+        there is to bring it. *"If the two limbs bind different parties or
+        answer different questions, the gate is misattributed rather than too
+        coarse"*, and the fix is `includeWhen: null` plus a cross-reference.
+      - The previous draft's own note conceded the rule was "true under
+        arbitration too" and called its absence there "a redundancy rather than
+        a hole". **That was true of a clause that only disclaimed. It stopped
+        being true the moment this clause states an operative period**: a gated
+        §7.19 would give an arbitration template no period at all, which is the
+        funder losing the term it has just decided to have, in the forum where a
+        stale claim is most likely to land.
+      - The alternative — restating the period inside §7.26 — is a duplicate
+        clause and two rules on one subject, which ADR 0013's diagnostic
+        excludes and which is the defect §7.5 and §7.24 were rewritten out of.
+
+    So this record is ungated and §7.26 cites it. The last sentence of the body
+    — "This Section applies to a claim however it is heard" — is what makes the
+    rule reach arbitration WITHOUT citing §7.26, which is gated and which an
+    ungated clause may not name.
+
+    **THREE OTHER TESTS ENCODE THE OLD FOUR-CLAUSE BUNDLE AND MOVE WITH THIS**:
+    `a-default-judgment-needs-a-served-defendant.test.ts`'s `BUNDLE` inventory,
+    its assertion that this clause shortens nothing, and
+    `select-clauses.test.ts`'s list of what an arbitration funder drops. The
+    first and third are registers of a design decision and the decision changed;
+    the second asserted the previous owner decision and is replaced by an
+    assertion of this one, not deleted. **`clauses/facts.ts` still describes the
+    bundle as four clauses and is not this change's file — reported.**
+
+    THE HEADING IS UNCHANGED FROM THE PREVIOUS DRAFT'S. "Limitation of Actions"
+    is accurate for a clause that now does state a period, and renaming it back
+    to "Contractual Statutes of Limitations" would be the v4 heading for the v4
+    machinery, which is not what this is.
   */
   {
     slug: 'frpa.contractual-statutes-of-limitations-7-19',
@@ -1422,14 +1458,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     instrument: 'frpa',
     kind: 'clause',
     /*
-      Same bundle.
+      NOT THE BUNDLE'S. A limitation period applies in arbitration too, so the
+      `courts` gate was a misattributed fact rather than a coarse one. See the
+      note above.
     */
-    includeWhen: (facts) => facts.disputeResolution === 'courts',
+    includeWhen: null,
     number: '7.19',
     section: 'miscellaneous',
     sortKey: 190,
     heading: 'Limitation of Actions',
-    body: 'The limitation period, the accrual rule, and any tolling or discovery rule that applicable law supplies apply to a claim by every party to this Agreement alike, whoever brings it and whoever it is brought against. This Agreement does not shorten any of them, and no other provision of this Agreement shortens one.\nA claim that applicable law does not permit to be shortened or given up is unaffected by this Agreement. This Section gives no party a period the law does not give it, and gives neither party a longer or a shorter period than the other.',
+    body: 'A claim arising out of or relating to this Agreement shall be brought within two (2) years after the claim accrues. That period runs against every party alike, whoever brings the claim and whoever it is brought against, and neither party has a longer or a shorter period than the other.\nThe accrual rule and any tolling or discovery rule that applicable law supplies apply to that period. A claim that applicable law does not permit to be shortened or given up is unaffected by this Agreement, and the period stated above does not apply to it. This Agreement shortens no other period, and no other provision of this Agreement shortens one.\nThis Section applies to a claim however it is heard.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -1973,6 +2011,140 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
         findings: [
           'frpa-7-24-does-not-name-the-statute-that-actually-bites',
           'frpa-7-24-misstates-what-tex-fin-code-398-055-voids',
+        ],
+      },
+    ],
+  },
+  /*
+    THE CLAUSE FOUR OTHER CLAUSES ALREADY REFERRED TO, AND WHICH DID NOT EXIST.
+
+    `disputeResolution: 'arbitration'` selected NO merchant-facing clause at all
+    until 2026-09-11. It dropped §§7.10, 7.11, 7.19 and 7.20 and put nothing in
+    their place. REVIEW-01 raised the document half of this three times —
+    `frpa-arbitration-clauses-with-no-arbitration-agreement`,
+    `orphan-arbitration-references`, `orphan-arbitration-twenty-day-bar` — v4
+    carried sentences that assumed an arbitration it never contained. This is
+    the owner's decision of 2026-09-11 to contain one.
+
+    **WHY THE OLD POSITION WAS THE WEAKEST OF THE THREE**, in `facts.ts`'s own
+    words: all three MCA forms filed as SEC exhibits in 2024-2026 pair
+    arbitration WITH a class waiver, and this corpus held a bare class waiver and
+    no arbitration. An arbitration clause that then dropped the class waiver
+    would get the worst of both — so the individual-basis limb is inside this
+    clause rather than beside it, and §7.11 (which under `courts` waives nothing)
+    is simply not selected here. One rule per subject per document.
+
+    ─── what Virginia requires, read rather than summarised ───────────────────
+
+    VERIFIED, from `mca/sources/VA-Code-6.2-2228-2238.txt`. Va. Code
+    **§6.2-2234(B)** — "Place for bringing action ...; certain fees paid by
+    provider; confessions of judgment prohibited":
+
+      *"Where a contract between a provider or broker and recipient contains an
+      arbitration provision, such contract shall not require face-to-face
+      arbitration proceedings outside the jurisdiction where the recipient's
+      principal place of business is located."* The statute makes a provision
+      requiring that unenforceable, and continues: *"The provider shall pay any
+      arbitrators' expenses or fees or any other expenses or administrative fees
+      incurred in the conduct of the arbitration proceedings."*
+
+    Both are drafted NATIONALLY, so Virginia is satisfied by construction rather
+    than by a rider — the device §7.5 already uses for §6.2-2234(A), and the
+    reason §7.24's Virginia paragraph is a restatement rather than an override.
+    An arbitration product carries the fee cost in Virginia by statute; carrying
+    it everywhere costs the same in Virginia and removes a state variant.
+
+    **THE VENUE RULE IS §6.2-2234(A), NOT §6.2-2236(A).** The 2026-09-09 memo
+    cites the latter; §6.2-2236 is "Validity of noncompliant sales-based
+    financing", has no subsection (A) and says nothing about forum. The error was
+    copied into four places in this repository before being corrected on
+    2026-09-10. It is not repeated here.
+
+    ─── the partition, tested rather than assumed ─────────────────────────────
+
+    §§7.10, 7.11, 7.19 and 7.20 were the `courts` bundle. ADR 0013's diagnostic
+    was applied to each rather than to the bundle:
+
+      - **§7.10, the jury waiver.** A jury waiver is meaningless once no judge
+        hears the case. Genuinely absent under arbitration — the §7.21/§7.25
+        shape, an absence rather than an alternative. Gate correct, unchanged.
+      - **§7.11, class proceedings.** Same question, opposite answers, so the
+        rule belongs to whichever forum the funder chose. The arbitration answer
+        lives in this clause because an individual-basis limb IS the scope of the
+        arbitration agreement, and splitting it into a second §7.11 would put two
+        clauses in the same document talking about class proceedings the moment
+        anyone misread the gates. Gate correct, unchanged.
+      - **§7.20, defences and counterclaims.** §7.20 defers to "the applicable
+        procedural law of the court"; in arbitration the rules governing the
+        arbitration do that work, and this clause says so. Gate correct,
+        unchanged.
+      - **§7.19, the limitation period. THE GATE WAS WRONG.** See the note above
+        §7.19: a limitation period applies in arbitration too, the fact answers
+        WHERE a claim is heard while §7.19 answers HOW LONG there is to bring it,
+        and ADR 0013's answer to a misattributed fact is `includeWhen: null` plus
+        a cross-reference rather than a duplicate clause. §7.19 is now ungated and
+        the last paragraph of this clause cites it.
+
+    ─── what this clause deliberately does not say ────────────────────────────
+
+    **NO FORUM RULE AND NO GOVERNING-LAW RULE.** §7.5 puts both in the merchant's
+    state; §7.24 claims priority over "any different forum provision of this
+    Agreement, including Section 7.5". A third rule on that subject is the defect
+    §7.5 itself was carrying, and it is the defect REVIEW-01's
+    `counterclaim-waiver-flips-by-forum` measures the cost of. This clause points
+    at both and adds nothing, and
+    `__tests__/an-arbitration-clause-is-one-forum-rule.test.ts` asserts that the
+    set of clauses fixing a law or a court is IDENTICAL under both values of the
+    fact — so a sentence sneaking in here is red even if it agrees with §7.5.
+
+    **NO ADMINISTRATOR AND NO RULE SET ARE NAMED, AND THAT IS A REPORTED GAP
+    RATHER THAN A DRAFTING CHOICE.** Which administrator, on which rules, at
+    what filing fee, is a commercial decision with a price attached, and the
+    standing rule is not to invent one. What the clause does instead is make the
+    agreement self-executing without one: the parties agree in writing, and
+    failing that either may ask a court to appoint the arbitrator, which is the
+    ordinary statutory fallback. **A named administrator and rule set is the
+    single largest thing counsel or the owner still owes this clause.**
+
+    ALSO NOT DRAFTED, for the same reason and reported with it: a small-claims
+    carve-out, an opt-out window, a threshold below which a claim is decided on
+    documents, and any allocation of the party's own legal costs beyond §6.3.
+    Every one of them is a number or a named forum.
+
+    **THE CONSEQUENCE IS STATED, NOT BURIED.** "decided by that arbitrator and
+    not by a judge or a jury, and the grounds on which a court may set an award
+    aside are narrow" is a statement about what the paper does. It is not advice
+    and it draws no conclusion about enforceability — the house rule §7.24
+    settled.
+  */
+  {
+    slug: 'frpa.arbitration-7-26',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    /*
+      The other half of `disputeResolution`. It is the whole clause rather than a
+      limb of one — a funder that litigates has no arbitration agreement at all,
+      which is the §7.21 shape — and it is cited by no ungated clause, which is
+      the direction that would dangle.
+    */
+    includeWhen: (facts) => facts.disputeResolution === 'arbitration',
+    number: '7.26',
+    section: 'miscellaneous',
+    sortKey: 260,
+    heading: 'Arbitration',
+    body: 'A dispute between the parties arising out of or relating to this Agreement, or to its formation, breach or termination, shall be resolved by final and binding arbitration before a single arbitrator. A dispute decided in arbitration is decided by that arbitrator and not by a judge or a jury, and a court reviews an award only on the grounds the law governing arbitration allows. This Section reaches Merchant, Buyer and each Guarantor, and reaches no person who is not a party to this Agreement.\nThe parties shall agree in writing on the arbitration administrator and on the rules that govern the arbitration. Where they have not agreed by the time a demand for arbitration is made, either party may apply to a court of competent jurisdiction to appoint the arbitrator, as the law governing arbitration permits.\nAn arbitration proceeding conducted in person shall take place in the jurisdiction where the principal place of business Merchant gives in Section 1 is located. Merchant is not required to attend a proceeding in person anywhere else, and may agree to a different place only in writing and only after the dispute has arisen. Buyer shall pay the arbitrator’s fees and expenses and the administrative fees of the arbitration, whoever brings the claim. Section 6.3 governs what Buyer may recover from Merchant for enforcement, and this Section adds nothing to it and takes nothing from it.\nAn arbitration under this Section proceeds on an individual basis. A claim may not be arbitrated as a class, a collective or a representative proceeding, and the arbitrator may not consolidate the claims of more than one merchant or award relief to a person who is not a party to the arbitration. Where a court holds that requirement invalid as to a particular claim, that claim shall be decided by a court and this Section does not apply to it.\nThis Section does not waive a right that applicable law does not permit to be waived. It does not reach a public-enforcement proceeding brought by or on behalf of a governmental authority, and it does not prevent a party from complaining to, or giving information to, a governmental or regulatory authority.\nEach party may assert a defence, a setoff, a recoupment and a counterclaim in the arbitration so far as the rules governing it permit, and this Agreement requires no claim to be brought as a separate proceeding.\nSection 7.5 states the law that governs this Agreement and the court an action is brought in, and this Section changes neither. A court in that state hears an application to compel or to stay an arbitration and enters judgment on an award. Section 7.24 states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it. Section 7.19 states the period within which a claim must be brought, and it applies to a claim in arbitration as it does to a claim in a court.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [
+      {
+        review: 'REVIEW-01',
+        findings: [
+          'frpa-arbitration-clauses-with-no-arbitration-agreement',
+          'orphan-arbitration-references',
+          'orphan-arbitration-twenty-day-bar',
+          'class-waiver-forfeits-own-recovery',
         ],
       },
     ],
