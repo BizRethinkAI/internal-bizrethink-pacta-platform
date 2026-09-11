@@ -169,51 +169,37 @@ const SHORTENS_LIMITATIONS =
 const NAMES_A_FORUM = /\bNew York\b|\bPasco County\b|\bAcceptable Forums?\b/i;
 
 /*
-  ─── the register of what this cluster could not fix ─────────────────────────
+  ─── the register of what this cluster could not fix, now empty ──────────────
+
+  IT HELD TWO ENTRIES AND THEY ARE FIXED. `equipment-lease.independent-decision-
+  governing-law` and its Subscription twin were registered here on 2026-09-10
+  with the note *"UNASSIGNED — reported by disputes-service. No cluster
+  follows."* The register's own rule is what removed them: every entry was
+  asserted to be STILL REACHABLE, *"so an entry that gets fixed elsewhere fails
+  this file until it is deleted, rather than sitting as a line that can no longer
+  be red."* The `feat/mca-rewrite-twins` change fixed both, that assertion went
+  red, and deleting the entries is the protocol rather than an evasion of it.
+
+  WHAT THEY SAID, KEPT BECAUSE THE FINDING IS WORTH MORE THAN THE REGISTER.
+  *"{{equipmentAffiliate}} may properly serve me with legal process via certified
+  mail to my address set forth herein or to my current or last known address, and
+  upon such mailing, service shall be effective irrespective of whether a signed
+  certified mail return receipt is returned"* — service effective on mailing,
+  receipt expressly irrelevant, given by a NATURAL PERSON. The Subscription
+  carried the same sentence in its own vocabulary, plus a waiver of any objection
+  that a Florida court is an inconvenient forum.
+
+  **NEITHER REVIEW NOR THE 2026-09-09 COUNSEL MEMO READ THEM IN THIS ROLE**, and
+  the reason is structural: the Equipment Lease and the Subscription entered
+  Lombard's product suite only when `instrumentsFor` began returning them
+  whenever `equipment !== 'none'`, and §7.8's precedence order correctly calls
+  them "different contracts" — which is precisely why the FRPA's protections do
+  not reach them and why the fix had to be made in those documents.
+
+  The sweeps below now run unfiltered over `ALL_MCA_CLAUSES`. The property they
+  state is asserted for the twins in their own vocabulary, over the set of both
+  documents, in `the-twins-cannot-undo-the-frpa.test.ts`.
 */
-
-/**
- * Clauses that still offend, each named, quoted and owned.
- *
- * A register rather than a filter — `select-clauses.test.ts`'s argument, and
- * `twins.test.ts`'s before it. Every entry is asserted below to be STILL
- * REACHABLE, so an entry that gets fixed elsewhere fails this file until it is
- * deleted, rather than sitting as a line that can no longer be red.
- *
- * **EVERY ENTRY HERE IS OUTSIDE THE FRPA, AND NO BRIEF NAMES ONE OF THEM.**
- * That is the finding, not the concession. The Equipment Lease and the
- * Subscription entered Lombard's product suite in this branch — `instrumentsFor`
- * returns them whenever `equipment !== 'none'`, and `LOMBARD_FACTS.equipment` is
- * `merchant-elects` — so the same merchant, in the same envelope, signs the
- * rewritten FRPA and then signs a personal guaranty that says service is
- * effective on mailing whether or not the receipt ever comes back. §7.8's
- * precedence order expressly makes them "different contracts" that this
- * Agreement does not govern, which is right as drafting and is precisely why
- * the FRPA's protections do not reach them.
- *
- * Nobody has been assigned these. The nine-cluster rewrite covered the FRPA
- * only, and it is finished.
- */
-const CONCEDED: { slug: string; quote: string; owner: string }[] = [
-  {
-    slug: 'equipment-lease.independent-decision-governing-law',
-    quote:
-      '{{equipmentAffiliate}} may properly serve me with legal process via certified mail to my address set forth ' +
-      'herein or to my current or last known address, and upon such mailing, service shall be effective ' +
-      'irrespective of whether a signed certified mail return receipt is returned',
-    owner: 'UNASSIGNED — reported by disputes-service, 2026-09-10. No cluster follows.',
-  },
-  {
-    slug: 'subscription.independent-decision-governing-law',
-    quote:
-      'the Subscription twin of the same guaranty paragraph, identical but for the vocabulary swap REVIEW-02 ' +
-      'describes: service effective on mailing, plus a waiver of any objection that a Florida court is an ' +
-      'inconvenient forum',
-    owner: 'UNASSIGNED — reported by disputes-service, 2026-09-10. No cluster follows.',
-  },
-];
-
-const CONCEDED_SLUGS = new Set(CONCEDED.map((entry) => entry.slug));
 
 describe('no provision of any instrument manufactures service of process', () => {
   /**
@@ -225,7 +211,6 @@ describe('no provision of any instrument manufactures service of process', () =>
   it('has no clause that makes an act of the sender into service', () => {
     const offenders = ALL_MCA_CLAUSES.filter((entry) => deemsService(entry.body))
       .map((entry) => entry.slug)
-      .filter((slug) => !CONCEDED_SLUGS.has(slug))
       .sort();
 
     expect(offenders).toEqual([]);
@@ -239,7 +224,6 @@ describe('no provision of any instrument manufactures service of process', () =>
   it('has no clause in which a party waives service or an objection to a forum', () => {
     const offenders = ALL_MCA_CLAUSES.filter((entry) => waivesServiceOrForum(entry.body))
       .map((entry) => entry.slug)
-      .filter((slug) => !CONCEDED_SLUGS.has(slug))
       .sort();
 
     expect(offenders).toEqual([]);
@@ -278,16 +262,16 @@ describe('no provision of any instrument manufactures service of process', () =>
     expect(offenders).toEqual([]);
   });
 
-  it('keeps every conceded offender reachable', () => {
-    for (const { slug, owner } of CONCEDED) {
-      const body = clause(slug).body;
-
-      expect(
-        deemsService(body) || waivesServiceOrForum(body),
-        `${slug} no longer offends; delete it from CONCEDED (owner: ${owner})`,
-      ).toBe(true);
-      expect(owner.length).toBeGreaterThan(40);
-    }
+  /**
+   * The register above is empty, and this is what would refill it honestly. The
+   * two entries it held were the twins' guaranty paragraph; both are rewritten,
+   * so the sweeps run unfiltered and this asserts that nothing has quietly
+   * reintroduced a filter.
+   */
+  it('sweeps every clause, with nothing excused', () => {
+    expect(ALL_MCA_CLAUSES.filter((entry) => deemsService(entry.body)).map((entry) => entry.slug)).toEqual([]);
+    expect(ALL_MCA_CLAUSES.filter((entry) => waivesServiceOrForum(entry.body)).map((entry) => entry.slug)).toEqual([]);
+    expect(ALL_MCA_CLAUSES.length).toBe(203);
   });
 });
 

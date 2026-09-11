@@ -361,6 +361,13 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-01', findings: ['sub-ungrounded-upgrade-assumption-fees'] }],
   },
+  /*
+    THE SUBSCRIPTION HALF OF ONE REWRITE, and the reasons are NOT repeated here.
+    They are set out in full above §3.14 in `equipment-lease/agreement.ts`, because
+    a reason duplicated in two files is the twin problem in comment form:
+    `twins.test.ts` checks that the two bodies agree and nothing checks that two
+    prose explanations still do.
+  */
   {
     slug: 'subscription.subscription-guaranty',
     version: 1,
@@ -371,7 +378,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
     section: 'agreement',
     sortKey: 140,
     heading: 'Subscription Guaranty',
-    body: 'No guarantor shall have any right of subrogation to any of our rights in the Equipment or this Agreement or against you, and any such right of subrogation is hereby waived and released. All indebtedness that exists now or arises after the execution of this Agreement between you and any guarantor is hereby subordinated to all of your present and future obligations, and those of your guarantor, to us, and no payment shall be made or accepted on such indebtedness owed by you to a guarantor until the obligations due to us are paid and satisfied in full.',
+    body: 'Section 4.2 states the whole of what a guarantor guarantees under this Agreement, and this Section adds nothing to it. A guarantor is not liable under this Section for an obligation that Section 4.2 says the guarantor does not owe.\nNo guarantor has a right of subrogation to our rights against you, or to our interest in the Equipment, until the obligations guaranteed by Section 4.2 have been satisfied. A guarantor who has paid us the fair market value of Equipment under Section 4.2(a) is subrogated on that payment to our interest in that Equipment, and we will do what the guarantor reasonably asks to evidence it.\nIndebtedness owed by you to a guarantor is subordinated to the obligations guaranteed by Section 4.2, and no payment may be made or accepted on that indebtedness while any of those obligations is due and unpaid. When those obligations are satisfied this subordination ends, whether or not another amount remains payable to us under this Agreement.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -386,6 +393,24 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
       },
     ],
   },
+  /*
+    THE SUBSCRIPTION HALF OF ONE REWRITE, and the reasons are NOT repeated here.
+    They are set out in full above §3.15 in `equipment-lease/agreement.ts`, because
+    a reason duplicated in two files is the twin problem in comment form:
+    `twins.test.ts` checks that the two bodies agree and nothing checks that two
+    prose explanations still do.
+
+    ONE THING IS TRUE OF THIS TWIN ONLY. The Article 9 sentence points at §3.6,
+    and §3.6 is a declared divergence: the Equipment Lease claims a security
+    interest outright and reserves the right to file a financing statement, while
+    this document says the transaction "shall be treated as a lease" and claims a
+    first lien only if a court finds Article 2A does not govern. The sentence is
+    written to be true of both — it governs "a security interest described in
+    Section 3.6", which is conditional here and unconditional there — so it needs
+    no divergence of its own. If §3.7 ever gains the purchase option
+    `lease-disclosure-assumes-a-purchase-option-the-subscription-does-not-grant`
+    is holding open, read this sentence again.
+  */
   {
     slug: 'subscription.governing-law-and-venue',
     version: 1,
@@ -396,7 +421,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
     section: 'agreement',
     sortKey: 150,
     heading: 'Governing Law and Venue',
-    body: 'This Agreement shall be governed by and construed in accordance with the laws of the State of Florida (without applying its conflicts of laws principles). If any part of this Agreement is not enforceable, the remaining provisions will remain valid and enforceable. The exclusive venue for any actions or claims arising under or related to this Subscription shall be the appropriate state or federal court located in Pasco County, Florida.\n3.15A Jury Trial Waiver\nYOU IRREVOCABLY, VOLUNTARILY, AND FREELY WAIVE TRIAL BY JURY IN CONNECTION WITH ANY DISPUTE OVER THIS SUBSCRIPTION.\n3.15B Class Action Waiver\nYOU AGREE NOT TO PURSUE A CLAIM AGAINST US AS A LEAD PLAINTIFF, CLASS REPRESENTATIVE, OR AS PART OF A CLASS ACTION OR OTHER REPRESENTATIVE ACTION.\n3.15C Limitation of Actions\nANY PERMITTED CAUSE OF ACTION YOU MAY HAVE IN CONNECTION WITH THIS SUBSCRIPTION AGAINST US, OUR ASSIGNEE, OUR SERVICING AGENT, OR OUR EMPLOYEES AND ATTORNEYS MUST BE COMMENCED WITHIN ONE YEAR FROM THE ACCRUAL OF THAT CAUSE OF ACTION.',
+    body: 'This Agreement is governed by the substantive law of the state of your principal place of business stated in Section 1, subject to mandatory federal law and to applicable conflict-of-laws rules. An action arising out of or relating to this Agreement shall be brought in a state court of competent jurisdiction in that state, or in a federal court of competent jurisdiction sitting in that state. Neither you nor we may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction. Where the law of a state fixes where an action under an agreement of this kind must be brought, that rule governs and this Section yields to it.\nPerfection, the effect of perfection or non-perfection, and the priority of a security interest described in Section 3.6 are governed by the mandatory rules of the Uniform Commercial Code that apply to them. This Section does not vary those rules and does not choose the law that decides them.\nIf any part of this Agreement is not enforceable, the remaining provisions will remain valid and enforceable.\nService of a summons, a complaint or other legal process is governed by Section 4.3 and by the procedural law of the court in which the proceeding is brought. Nothing in this Section makes a mailing, an email or any other communication into service of legal process.\n3.15A Jury Trial Waiver\nYou and we each waive trial by jury in an action arising out of or relating to this Agreement, to the extent the law of the forum gives effect to a waiver of that right made before a dispute has arisen. Where the law of the forum does not give effect to such a waiver, this Section has no effect and each of us retains the right to trial by jury. This waiver is mutual, it binds nobody who has not signed this Agreement, and it does not reach a claim applicable law requires to be tried to a jury.\n3.15B Class and Representative Proceedings\nNo party waives a right to bring, to defend, or to take part in a class, collective, representative or public-enforcement proceeding that applicable law permits. Whether such a proceeding is available, and in what form, is for the court to determine under applicable law and its own rules. A party that takes part in one keeps whatever share of a recovery it is awarded and any right to costs or to a fee award that applicable law gives it.\n3.15C Limitation of Actions\nThe limitation period, the accrual rule, and any tolling or discovery rule that applicable law supplies apply to a claim by each party to this Agreement alike, whoever brings it and whoever it is brought against. This Agreement does not shorten any of them, and no other provision of this Agreement shortens one. A claim that applicable law does not permit to be shortened or given up is unaffected by this Agreement.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -411,6 +436,13 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
       },
     ],
   },
+  /*
+    THE SUBSCRIPTION HALF OF ONE REWRITE, and the reasons are NOT repeated here.
+    They are set out in full above §3.16 in `equipment-lease/agreement.ts`, because
+    a reason duplicated in two files is the twin problem in comment form:
+    `twins.test.ts` checks that the two bodies agree and nothing checks that two
+    prose explanations still do.
+  */
   {
     slug: 'subscription.notices',
     version: 1,
@@ -421,7 +453,7 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
     section: 'agreement',
     sortKey: 160,
     heading: 'Notices',
-    body: 'All notices must be in writing, if to you at your address appearing in Section 1 of this Agreement and if to us at _______________«43»_______________, Attn: Equipment Subscription Department, or as may be otherwise directed to you by us or subsequent assignee. Notices shall be deemed to have been given (i) if sent by mail or courier, upon the earlier of five (5) days after mailing or when actually received or, in the case of courier, when delivered, and (ii) if sent by email, upon transmission (provided no bounce-back is received). Notice given in any other manner shall be effective when actually received. Notices sent to the Subscriber’s last known address, as indicated in our records, shall constitute effective notice to the Subscriber under this Agreement.',
+    body: 'All notices under this Agreement must be in writing, if to you at the address you give in Section 1 or at a later address you give us in writing, and if to us at _______________«43»_______________, Attn: Equipment Subscription Department, or at a later address we or a subsequent assignee give you in writing. Each of us will tell the other promptly in writing of a change of address.\nA notice is given (i) if sent by mail or courier, on the earlier of five (5) days after mailing or actual receipt or, in the case of courier, when delivered, and (ii) if sent by email, on transmission, provided no bounce-back or other non-delivery report is received. A notice given in any other manner is effective when actually received.\nSending a notice to an address a party has told the other it no longer uses does not make that notice effective, and a failure to give a change of address does not make an otherwise ineffective notice effective. A notice given under this Section is not service of legal process and is not evidence that service was made; service of a summons, a complaint or other legal process is governed by Section 4.3 and by the procedural law of the court.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
