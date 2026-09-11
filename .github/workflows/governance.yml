@@ -217,6 +217,60 @@ jobs:
     name: Lint (bizrethink)
     runs-on: ubuntu-latest
     steps:
+      # ── Guard 5: an in-flight note is in flight ────────────────────────
+      # `docs/state/inflight/` is half of what a session reads to learn where
+      # things stand. A note whose branch has merged is not in flight; it is an
+      # unfolded note describing settled work as if it were live.
+      #
+      # TWO COMPACTIONS HAVE NOW BEEN DONE BY HAND — 2026-09-09 (21 notes) and
+      # 2026-09-10 (10 notes) — AND BOTH WERE OVERDUE WITH THIS WORKFLOW GREEN.
+      # Guard 4 asks whether a PR TOUCHED a state file. Nothing asked whether
+      # the folder still described live work, so on 2026-09-09 STATE.md said the
+      # clause library "does not exist" three weeks after it was built, and on
+      # 2026-09-10 it said the MCA migrations had "never been applied anywhere"
+      # six days after they were applied. The owner caught the second one.
+      #
+      # A stale note is worse than no note, for the reason Guard 4 gives about
+      # STATE.md: it is believed.
+      #
+      # This fails the NEXT PR after a merge, not the merging one, which is the
+      # intended shape — folding is a one-commit chore and the forcing function
+      # has to land on somebody. The fix is always `git rm` the note and write
+      # its substance into docs/STATE.md.
+      - name: In-flight notes describe work that is in flight
+        run: |
+          STALE=""
+          for f in docs/state/inflight/*.md; do
+            base=$(basename "$f" .md)
+            [ "$base" = "README" ] && continue
+
+            # <branch-slug> is the branch with its first "/" written as "-".
+            branch=$(echo "$base" | sed 's/-/\//')
+
+            if ! git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+              # Deleted after merge, or abandoned. Either way not in flight.
+              STALE="$STALE  $f — origin/$branch does not exist\n"
+            elif git merge-base --is-ancestor "origin/$branch" origin/main 2>/dev/null; then
+              STALE="$STALE  $f — origin/$branch is already merged\n"
+            fi
+          done
+
+          if [ -z "$STALE" ]; then
+            echo "✓ Every in-flight note belongs to a branch that is still open."
+            exit 0
+          fi
+
+          echo "✗ These notes describe work that has already landed:"
+          printf "%b" "$STALE"
+          echo ""
+          echo "  Fold each into docs/STATE.md and delete it. That is the"
+          echo "  convention in CLAUDE.md, and it is the only thing keeping"
+          echo "  the file a session reads first from going stale."
+          echo ""
+          echo "  Synthesis, not concatenation: what is still TRUE and still"
+          echo "  MATTERS, not a transcript of the note."
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@v4
 

@@ -45,8 +45,21 @@ have gone into STATE.md, in a file only this PR touches.
 ## Compaction
 
 When a PR merges, its note has served its purpose. Fold anything durable into
-the narrative in `docs/STATE.md` and delete the file — one small PR, roughly
-weekly. A folder that only grows becomes a second thing nobody reads.
+the narrative in `docs/STATE.md` and delete the file — one small PR. A folder
+that only grows becomes a second thing nobody reads.
+
+**"Roughly weekly" did not work, and this is now enforced.** It was tried twice
+and missed twice: the first compaction on 2026-09-09 was three weeks late and
+folded 21 notes, and the folder had re-filled with 10 by the next day. Both times
+the governance workflow was green throughout, because it asked whether a PR
+*touched* a state file and never whether this folder still described live work.
+**Guard 5 now fails a PR when any note's branch has merged or no longer exists.**
+
+It fails the *next* PR after a merge, not the merging one. That is deliberate —
+folding is a one-commit chore and the forcing function has to land on somebody.
+
+**Synthesis, not concatenation.** Fold what is still true and still matters, not
+a transcript of the note.
 
 ## The guard
 
