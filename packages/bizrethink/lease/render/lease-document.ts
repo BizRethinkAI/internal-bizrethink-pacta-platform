@@ -463,6 +463,22 @@ const coverBlock = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
  */
 type Section = { number: string; name: string; clauses: RenderedClause[] };
 
+/**
+ * The printed section head, as a node rather than inline JSX.
+ *
+ * It is a function because the head is emitted from two places: on its own for
+ * a one-clause section, and INSIDE the first clause's `wrap: false` unit
+ * everywhere else, so a page break cannot separate a section title from the
+ * clause it introduces.
+ */
+const sectionHeadFor = (section: Section) =>
+  h(
+    View,
+    { style: styles.sectionHead, key: `sec-${section.number}` },
+    h(Text, { style: styles.sectionHeadNumber }, section.number),
+    h(Text, { style: styles.sectionHeadName }, section.name.toUpperCase()),
+  );
+
 const groupIntoSections = (clauses: RenderedClause[]): Section[] =>
   clauses.reduce<Section[]>((sections, rendered) => {
     const number = (rendered.number ?? '').split('.')[0];
@@ -753,12 +769,12 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
       asserting a parent the reader was never shown.
     */
     ...groupIntoSections(spec.clauses).flatMap((section) => [
-      h(
-        View,
-        { style: styles.sectionHead, key: `sec-${section.number}` },
-        h(Text, { style: styles.sectionHeadNumber }, section.number),
-        h(Text, { style: styles.sectionHeadName }, section.name.toUpperCase()),
-      ),
+      /*
+        Emitted here only for a one-clause section. Everywhere else it is
+        rendered INSIDE the first clause's bound unit by `sectionHeadFor`, so
+        the two cannot be separated by a page break.
+      */
+      ...(section.clauses.length === 1 ? [sectionHeadFor(section)] : []),
       /*
         A SECTION WITH ONE CLAUSE DOES NOT REPEAT ITSELF. `numberClauses` gives
         a lone clause the bare section number, so the document printed
@@ -766,7 +782,7 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
       */
       ...(section.clauses.length === 1
         ? [text(section.clauses[0].text, styles.bodyText, `b-${section.clauses[0].clause.slug}`)]
-        : section.clauses.flatMap((rendered) => {
+        : section.clauses.flatMap((rendered, at) => {
             const headingRow = h(
               View,
               {
@@ -800,11 +816,53 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
               also where an orphan matters least: a long body fills the page
               under its own heading.
             */
-            const SHORT_ENOUGH = 420;
+            /*
+              HIGH ENOUGH TO BIND EVERY CLAUSE THIS LIBRARY HOLDS.
 
-            return rendered.text.length <= SHORT_ENOUGH
-              ? [h(View, { key: `k-${rendered.clause.slug}`, wrap: false }, headingRow, body)]
-              : [headingRow, body];
+              It was 420, on the reasoning that a long body fills the page
+              under its own heading so an orphan there matters least. The
+              rendered lease disproved that: `hoa.compliance` is 732 characters
+              and printed "11 RULES AND ASSOCIATION" and "11.1 ASSOCIATION
+              RULES" together at a page foot with no body under either.
+
+              THE WHITE SPACE IS THE SAME EITHER WAY, which is what the old
+              reasoning missed. A bound clause that does not fit the remaining
+              space moves whole to the next page and leaves exactly the gap
+              that an unbound one would have left — minus the stranded title
+              sitting in it. So binding is never typographically worse, up to
+              the one hard limit: a unit taller than the text area can never be
+              placed at all.
+
+              That limit is not close. The longest clause in either library is
+              2,238 characters — about 24 lines, some 400pt against 642pt of
+              usable height — so 3,000 binds everything with room to spare, and
+              the guard below fails loudly if a longer one is ever written.
+            */
+            const SHORT_ENOUGH = 800;
+
+            /*
+              AND THE SECTION HEAD TRAVELS WITH ITS FIRST CLAUSE.
+
+              A section head is emitted as a sibling of the clauses beneath it,
+              so it could sit alone at a page foot with even its first heading
+              overleaf — "4 RENT AND CHARGES" did exactly that. Binding it into
+              the first clause's unit is the same mechanism, one level up.
+            */
+            const opensSection = at === 0;
+
+            if (rendered.text.length > SHORT_ENOUGH) {
+              return opensSection ? [headingRow, body] : [headingRow, body];
+            }
+
+            return [
+              h(
+                View,
+                { key: `k-${rendered.clause.slug}`, wrap: false },
+                ...(opensSection ? [sectionHeadFor(section)] : []),
+                headingRow,
+                body,
+              ),
+            ];
           })),
     ]),
     ...signatureBlocks(parties, spec.key, spec.withInitials),
