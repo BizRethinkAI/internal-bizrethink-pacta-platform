@@ -341,9 +341,20 @@ export const admissionBlocks = (clause: McaClause, admission: McaJurisdiction | 
  *
  * WHAT COUNTS AS OUTSTANDING IS NOT DECIDED HERE. `outstandingFindingsFor`
  * already answers it — survived refutation, and disposed of by nobody — and
- * that includes `unrecorded`, which is REVIEW-02's whole register because that
- * review kept its dispositions in prose. Unknown is not done, and a clause held
- * by a bookkeeping gap in another repository is held honestly.
+ * that includes `unrecorded`. Unknown is not done, and a clause held by a
+ * bookkeeping gap in another repository is held honestly.
+ *
+ * THIS USED TO SAY `unrecorded` WAS "REVIEW-02's whole register, because that
+ * review kept its dispositions in prose". It is not, and has not been since
+ * `lombard-contracts` PR #9 derived that review a manifest from the records
+ * that already existed. **5 findings of 254 are `unrecorded` today** — the 4
+ * refuted in REVIEW-01 and the 1 in REVIEW-02, which is what a refuted finding
+ * correctly gets, since no manifest names it.
+ *
+ * `dispositions.test.ts` inverted its assertion when the gap closed and this
+ * comment did not follow, which is the same staleness the register itself is
+ * built to prevent. It is corrected here rather than deleted so the next reader
+ * knows the gap existed and is shut.
  *
  * PASS ONLY THE FINDINGS FOR THE CLAUSE BEING APPROVED. This does not filter,
  * because a filter here and a filter at the caller is two places to get the

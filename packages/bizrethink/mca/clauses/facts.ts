@@ -56,8 +56,48 @@ export type McaFacts = {
    */
   guarantyScope: 'none' | 'limited-conduct' | 'full-performance';
 
-  /** Decides the equipment explainers, the §5.5 insurance clause and §4.11's ranking limb. */
-  equipment: 'none' | 'purchased-at-funding' | 'deferred' | 'separate-lease';
+  /**
+   * Which number the Specified Percentage is taken of.
+   *
+   * `net` is the card settlement actually payable to the merchant, after
+   * refunds, chargebacks, separately identified taxes and gratuities payable to
+   * others, and the processor's own lawful charges and reserves. `gross` is the
+   * settlement before those.
+   *
+   * THIS IS A PRICING DECISION, NOT A DRAFTING ONE, and it is why it is a fact
+   * rather than a sentence in a clause. Five adjustments sit between the two
+   * numbers, and each of them moves the economic percentage. A funder who prices
+   * on one base and defines the other has an agreement that collects a different
+   * amount than it quoted.
+   *
+   * IT REACHES BEYOND THE AGREEMENT. Underwriting, the processor instruction and
+   * **every state disclosure** must be computed on the same base — the finance
+   * charge, the total cost, the estimated periodic payment. A mismatch here is
+   * not a clause defect, it is a disclosure defect on the conformity surface
+   * ([ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md)),
+   * which is a different regulator's problem.
+   */
+  settlementBase: 'net' | 'gross';
+
+  /**
+   * Whether point-of-sale equipment is part of this funder's offering at all.
+   *
+   * Decides the equipment explainers, the §5.5 insurance clause and §4.11's
+   * ranking limb — all four gates read `!== 'none'` and nothing reads more.
+   *
+   * IT IS NOT WHERE BUY-VERSUS-LEASE IS DECIDED. That is the merchant's, made
+   * in Section 1 before signature (owner, 2026-09-10: *"Lease or buy, merchant
+   * decide while signing up"*), and §002 offers both paths with a
+   * no-double-charge rule between them.
+   *
+   * The row used to carry four values naming a funder-side model —
+   * `purchased-at-funding`, `deferred`, `separate-lease`. Three were
+   * indistinguishable to every gate that read them, and `deferred` stopped
+   * having clause text behind it once §2.6 said the Remaining Balance never
+   * includes an equipment charge: a Purchased Amount of `(Purchase Price ×
+   * Factor Rate) + Equipment Cost Deferred` puts one inside it by construction.
+   */
+  equipment: 'none' | 'merchant-elects';
 
   /**
    * Whether a prior balance can be carried into a new purchase.
@@ -85,7 +125,15 @@ export type McaFacts = {
   /**
    * Whose courts hear a dispute.
    *
-   * Not merely a preference: Va. Code §6.2-2236(A) makes any provision
+   * THE CITATION HERE WAS WRONG IN THREE PLACES UNTIL 2026-09-10, copied from
+   * the 2026-09-09 memo. The venue rule is **§6.2-2234(A)**, "Place for bringing
+   * action". §6.2-2236 is "Validity of noncompliant sales-based financing", has
+   * no subsection (A), and says nothing about forum. Both are vendored in
+   * `mca/sources/VA-Code-6.2-2228-2238.txt`, and `statutes/ct-va-obligations.ts`
+   * already carried the correct one, verbatim and digest-checked. REVIEW-02 also
+   * had it right; the memo is the outlier.
+   *
+   * Not merely a preference: Va. Code §6.2-2234(A) makes any provision
    * mandating a forum outside the Commonwealth unenforceable for covered
    * transactions, so `merchant-state` is what removes the need for a Virginia
    * variant rather than merely being conservative.
@@ -98,7 +146,7 @@ export type McaFacts = {
    * ONLY TEXAS ADDS CONTENT. Of the eleven states tracked, 7 TAC §86.310(d) is
    * the sole rule that requires words INSIDE the agreement — the OCCC complaint
    * notice, verbatim, "as a separate section or otherwise conspicuously set out".
-   * Connecticut §36a-868 and Virginia §6.2-2236(A) are prohibitions, satisfied
+   * Connecticut §36a-868 and Virginia §6.2-2234(A) are prohibitions, satisfied
    * by a base form that omits the terms, and the rest are separate disclosure
    * documents on the conformity surface
    * ([ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md)).
@@ -131,14 +179,61 @@ export type McaFacts = {
  * does and, where it matters, why. An interview may override per template; this
  * is the default and the place the reasoning lives.
  *
- * IT DESCRIBES THE PAPER, NOT THE RECOMMENDATION, and the first draft of this
- * row got that wrong in four places — it encoded what the 2026-09-09 memo
- * proposes rather than what v4 ships. A profile that describes a document
- * nobody has signed would make every selection disagree with the document it is
- * supposed to reproduce, and the disagreement would have surfaced as a failing
- * fidelity test with no obvious cause. `equipment`, `renewalModel`,
- * `concurrentPositions` and `venueRule` are all the shipped values, each noted
- * inline with what the memo asks for instead.
+ * IT USED TO DESCRIBE THE PAPER. It no longer does, and that is an owner
+ * decision of 2026-09-10, not a drift.
+ *
+ * The old rule was that `equipment`, `renewalModel`, `concurrentPositions` and
+ * `venueRule` record what v4 ships rather than what the 2026-09-09 memo
+ * recommends, because *"a profile that describes a document nobody has signed
+ * would make every selection disagree with the document it is supposed to
+ * reproduce, and the disagreement would have surfaced as a failing fidelity
+ * test"*.
+ *
+ * **That reason is gone.** [ADR 0012](../../../../docs/adr/0012-the-baseline-document-is-input-not-specification.md)
+ * retired the fidelity tests, so nothing is trying to reproduce v4 any more,
+ * and four rows were left anchored to a document the library has stopped
+ * copying. The owner's instruction is to adopt the memo's recommended design,
+ * which the memo itself states as one coherent set: narrow the purchased asset
+ * to a percentage of net card settlements; remove deferred equipment; separate
+ * fees from the collection cap; eliminate automatic Carry and concurrent Buyer
+ * positions; use merchant-state venue; restrict the guaranty to the
+ * signatory's own covered misconduct.
+ *
+ * **All four have now moved.** `equipment`, `renewalModel` and
+ * `concurrentPositions` moved on 2026-09-10; `venueRule` moved later the same
+ * day, with §7.5.
+ *
+ * The three that moved could only move once the clauses they gate stopped
+ * hiding a second rule inside the one the fact decides. `renewalModel` gated
+ * the whole of §8.2, which held both methods, so `payoff-only` would have
+ * dropped the Deduct method a payoff funder needs along with the Carry method
+ * it does not. `concurrentPositions` gated the whole of §4.15, so `false` would
+ * have deleted the multi-position rule rather than stating the opposite one,
+ * and left §7.1's "Except as expressly provided in Sections 3.3, 3.4 and 4.15"
+ * pointing at nothing. Both are now exhaustive pairs of clauses — see
+ * `frpa/enrollment.ts` §4.15 and `frpa/miscellaneous.ts` §8.2 — so every value
+ * of the fact selects exactly one clause and the fact decides a whole clause.
+ *
+ * `venueRule` moved differently from the other three, and the difference is
+ * worth reading before anyone treats it as closed. `renewal-positions` refused
+ * to flip it while §7.5 still mandated New York law with New York and Pasco
+ * County, Florida forums, because the flip would have left the profile
+ * asserting merchant-state venue while the only venue clause in the library
+ * mandated the funder's — *"a contradiction rather than a gap, and harder to
+ * see than one."* That reason is gone: `disputes-service` rewrote §7.5 to the
+ * merchant's own state in the same change as this row.
+ *
+ * **But §7.5 is still `includeWhen: null`, and this row is still read by
+ * nothing.** The gate was refused rather than forgotten, on three grounds set
+ * out in full above §7.5 in `frpa/miscellaneous.ts`: the fact decides one limb
+ * of a clause that answers three questions; the exhaustive-pair shape fails ADR
+ * 0013's own criterion, because the two answers would share every word but two
+ * sentences and that is a variable rather than two rules; and the `funder-state`
+ * arm cannot be drafted at all, because `McaFacts` has no field naming the
+ * funder's state — the row asks "whose courts" without supplying whose. Closing
+ * it needs a `funderState` field and a variables mechanism, or the row deleted.
+ * Both are owner decisions. What the flip buys today is only that the profile
+ * and the clause agree.
  *
  * `split-only` is the value with no written history anywhere. §2.5 (the gated
  * ACH backstop) and §7.14 (a blanket debit authority) both left the paper
@@ -148,20 +243,52 @@ export type McaFacts = {
  */
 export const LOMBARD_FACTS: McaFacts = {
   collectionMethod: 'split-only',
+  /*
+    UNCONFIRMED, AND THE MOST CONSEQUENTIAL UNKNOWN IN THIS ROW.
+
+    `net` describes the clause as drafted on 2026-09-10 — `frpa.definitions`
+    defines Card Receipts net of the five adjustments. It does NOT describe a
+    confirmed business fact: nobody has established which base Lombard actually
+    prices on.
+
+    If Lombard prices on gross settlement, the definitions clause is wrong for
+    Lombard AND every disclosure figure computed from it is wrong with it. That
+    is the one question in this profile whose answer changes documents on two
+    surfaces at once.
+  */
+  settlementBase: 'net',
   guarantyScope: 'limited-conduct',
-  /* v4 carries "Equipment Cost Deferred" in Section 1.3. The memo proposes
-     removing deferred equipment from the FRPA entirely; that is a proposal, and
-     this row records the paper. */
-  equipment: 'deferred',
-  /* v4's §8.2 offers Carry. Same distinction. */
-  renewalModel: 'carry',
-  /* v4's §4.15 affirmatively authorises concurrent Lombard positions. The memo
-     recommends a single active position; the shipped document does not. */
-  concurrentPositions: true,
+  /* Lombard offers equipment; the merchant elects buy or lease when signing.
+     v4 carried "Equipment Cost Deferred" in Section 1.3 and this row used to
+     record that, on the principle retired above. §§002/003 state it as
+     $0.00, so `deferred` no longer names anything the corpus can build. */
+  equipment: 'merchant-elects',
+  /* The memo's design: a prior balance is settled out of the new Purchase
+     Price and disclosed, never folded into the new Purchased Amount. v4's §8.2
+     offered Carry and this row used to record that, on the principle retired
+     above. Carry survives in the library as `frpa.rollover-carry-method-8-2`,
+     which this value deselects — a fact value with no clause behind it is what
+     `equipment: 'deferred'` was. */
+  renewalModel: 'payoff-only',
+  /* v4's §4.15 affirmatively authorised concurrent Lombard positions while
+     Lombard's own marketing promised no stacking — REVIEW-01's
+     `lombard-multi-position-vs-no-stack`. The memo resolves it by changing the
+     product, and this is that change. `frpa.single-active-position-4-15` is
+     selected in its place; the cascade clause is not. */
+  concurrentPositions: false,
   disputeResolution: 'courts',
-  /* v4 mandates New York or Florida. The memo recommends merchant-state venue,
-     partly because Va. Code §6.2-2236(A) voids a non-Virginia forum. */
-  venueRule: 'funder-state',
+  /* Moved with §7.5 on 2026-09-10, which now puts both the governing law and
+     the forum in the state of Merchant's principal place of business. Va. Code
+     §6.2-2234(A) makes a provision mandating a forum outside the Commonwealth
+     unenforceable for a covered transaction, and §6.2-2228 defines "Recipient"
+     as a person whose principal place of business is in the Commonwealth — so a
+     merchant-state rule satisfies Virginia by construction rather than by a
+     rider. Both sections are vendored in `mca/sources/VA-Code-6.2-2228-2238.txt`
+     and were read, not quoted from the memo, which cites the wrong section.
+
+     STILL INERT: nothing reads this row. See the docblock above for why §7.5
+     could not be gated on it and what closing that would take. */
+  venueRule: 'merchant-state',
   recipientStates: ['US-FL'],
   brokerChannel: true,
   consumerReportPulled: true,
