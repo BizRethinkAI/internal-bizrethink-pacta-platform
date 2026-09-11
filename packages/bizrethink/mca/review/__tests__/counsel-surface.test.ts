@@ -309,6 +309,24 @@ describe('the briefing claims nothing ADR 0012 closed', () => {
   });
 
   /**
+   * NOR THAT THE CLAUSES ARE A QUOTATION OF ANYTHING. *"The text is quoted
+   * exactly as the document publishes it"* is the same retired framing in the
+   * paragraph above the numbering one — *"Is the library a transcription of the
+   * baseline? **No.** It is an authored corpus"*, and *"The rendered documents
+   * follow the library, not the other way round."* There is no document upstream
+   * of these words for them to be quoted from.
+   *
+   * What the paragraph is FOR survives and is asserted: the `«N»` markers are
+   * left in, because where a fill-in field sits changes the sentence it sits in.
+   */
+  it.each(MCA_INSTRUMENTS)('%s does not present the clauses as quoted from a document', (instrument) => {
+    const body = briefingText(instrument);
+
+    expect(body).not.toMatch(/quoted exactly as|as the document publishes|verbatim from the (?!regulation)/i);
+    expect(body).toMatch(/«[Aa]ngle-bracketed numbers» are left in/);
+  });
+
+  /**
    * AND THE COUNT IN IT IS THE REAL ONE. The sentence said "forty clauses across
    * the library carry no number". Twenty-nine do. Forty is the number carrying
    * no HEADING — two different facts, one of them printed to an attorney as the
