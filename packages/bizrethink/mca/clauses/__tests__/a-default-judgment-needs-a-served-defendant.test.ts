@@ -81,8 +81,28 @@ const MERCHANT_ADDRESS = 'frpa.section-10-3';
 const KEEP_CURRENT = 'frpa.section-10-5';
 const SUPERSEDES = 'frpa.section-10-6';
 
-/** The four clauses `disputeResolution` decides as one bundle. */
-const BUNDLE = [JURY, CLASS, LIMITATIONS, COUNTERCLAIM];
+/**
+ * The clauses `disputeResolution` decides as one bundle.
+ *
+ * **IT WAS FOUR AND IS NOW THREE, ON THE OWNER'S DECISION OF 2026-09-11**, and
+ * this list moving is the signal it was written to give rather than a repair to
+ * quiet a red. §7.19 left the bundle because the fact was misattributed to it:
+ * `disputeResolution` answers WHERE a claim is heard, §7.19 answers HOW LONG
+ * there is to bring it, and a limitation period applies in arbitration too. It
+ * was defensible while the clause only disclaimed — its own note called its
+ * absence under arbitration "a redundancy rather than a hole" — and stopped
+ * being defensible when the owner put an operative two-year period in it, which
+ * a gated §7.19 would have withheld from every arbitration template. ADR 0013's
+ * answer to a misattributed fact is `includeWhen: null` plus a cross-reference,
+ * and `frpa.arbitration-7-26` carries the cross-reference.
+ *
+ * `clauses/facts.ts` still describes this as four clauses. That file was not the
+ * 2026-09-11 change's to edit; reported rather than corrected.
+ */
+const BUNDLE = [JURY, CLASS, COUNTERCLAIM];
+
+/** The bundle plus §7.19, which is ungated but is still a clause about litigation. */
+const ABOUT_LITIGATION = [...BUNDLE, LIMITATIONS];
 
 const clause = (slug: string): McaClause => {
   const found = ALL_MCA_CLAUSES.find((entry) => entry.slug === slug);
@@ -161,9 +181,17 @@ const PROCEEDS_WITHOUT_NOTICE =
 const CONFESSES_JUDGMENT =
   /\bconfesses? judgment\b|\bcognovit\b|\bwarrant of attorney\b|\bauthoriz\w+[^.]{0,70}\bto (?:enter|confess) judgment\b/i;
 
-/** A contractual limitations period, shortening whatever the law supplies. */
+/**
+ * A contractual limitations period, shortening whatever the law supplies.
+ *
+ * **WIDENED 2026-09-11 to catch "shall be brought within … years".** It was
+ * written against v4's vocabulary alone, so the mutual two-year period the owner
+ * adopted would have slipped past it and left the assertion below passing
+ * `false` on a clause that shortens a period — a detector excusing the text it
+ * was written for, which is the failure mode this file's controls exist for.
+ */
 const SHORTENS_LIMITATIONS =
-  /\b(?:time-barred|forever waived)\b|must be commenced within[^.]{0,40}\byears?\b|not asserted[^.]{0,60}\byears?\b/i;
+  /\b(?:time-barred|forever waived)\b|(?:must be commenced|shall be brought) within[^.]{0,40}\byears?\b|not asserted[^.]{0,60}\byears?\b/i;
 
 /** A clause that fixes a named forum, rather than describing one. */
 const NAMES_A_FORUM = /\bNew York\b|\bPasco County\b|\bAcceptable Forums?\b/i;
@@ -489,6 +517,9 @@ describe('the dispute-resolution bundle is four clauses and one decision', () =>
 
     const dropped = [...courts].filter((slug) => !underArbitration.has(slug)).sort();
 
+    // `frpa.arbitration-7-26` is ADDED under arbitration rather than dropped, so
+    // it does not appear here; `an-arbitration-clause-is-one-forum-rule.test.ts`
+    // asserts the addition from the other side.
     expect(dropped).toEqual([...BUNDLE].sort());
   });
 
@@ -534,16 +565,41 @@ describe('the dispute-resolution bundle is four clauses and one decision', () =>
   });
 
   /**
+   * **THIS ASSERTION USED TO READ "shortens no limitation period", AND THE
+   * OWNER REVERSED THE PREMISE IT ENCODED ON 2026-09-11.**
+   *
+   * It was written when the clause stated no period, because the two-year
+   * figure attributed to the 2026-09-09 memo could not be confirmed — memo entry
+   * 075 fixes no period, and "two-year" appears in exactly one place across the
+   * nine cluster briefs: an owner's note. That check still holds and is recorded
+   * above §7.19. What changed is that the owner has now adopted the figure **as
+   * a commercial term of their own**, with no claim of authority behind it.
+   *
+   * The assertion is retargeted rather than deleted, and it is retargeted to a
+   * STRICTER property than the one it replaces: the period exists, it is
+   * symmetrical, and the carve-out for a claim the law does not permit to be
+   * shortened is not narrowed by it. `SHORTENS_LIMITATIONS` is widened in the
+   * same change so that it actually detects the new wording — left as it was, it
+   * would have gone on passing `false` on a clause that does shorten a period,
+   * which is the vacuous green this package exists to refuse. The v4 control
+   * below still fires on the one-sided one-year clause.
+   *
    * The one-year period ran only against Merchant and Guarantor and covered
    * every kind of claim. Mutuality is the fix REVIEW-01 proposed; the carve-out
    * for non-waivable statutory claims is the owner's.
    */
-  it('shortens no limitation period and runs against every party alike', () => {
+  it('states one mutual period and shortens nothing the law protects', () => {
     const body = clause(LIMITATIONS).body;
 
-    expect(SHORTENS_LIMITATIONS.test(body)).toBe(false);
+    expect(SHORTENS_LIMITATIONS.test(body)).toBe(true);
+    expect(body).toMatch(/two \(2\) years/);
     expect(body).toMatch(/every party|either party|each party/i);
+    expect(body).toMatch(/neither party has a longer or a shorter period than the other/);
     expect(body).toMatch(/non-waivable|may not be waived|does not permit to be/i);
+    expect(body).toMatch(/does not apply to it/);
+    // v4's vocabulary ran one way and stays gone whatever the period is.
+    expect(body).not.toMatch(/time-barred|forever waived/i);
+    expect(body).not.toMatch(/Merchant and Guarantor/);
   });
 
   /**
@@ -566,7 +622,7 @@ describe('the dispute-resolution bundle is four clauses and one decision', () =>
    * and `a-fee-is-a-debt-not-a-purchase` pins that it is alone. Four clauses
    * about litigation are the obvious place for a second one to appear.
    */
-  it.each(BUNDLE)('%s adds no second fee entitlement and no second ceiling', (slug) => {
+  it.each(ABOUT_LITIGATION)('%s adds no second fee entitlement and no second ceiling', (slug) => {
     const body = clause(slug).body;
 
     expect(body).not.toMatch(/twenty-five percent|25%/);

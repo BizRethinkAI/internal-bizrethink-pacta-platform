@@ -51,6 +51,15 @@ import type { McaClause } from '../types';
  * a personal guaranty. §§9.2, 9.4, 9.5 and 9.6 are gated on it; see the note on
  * §9.4 for why all four went to `limited-conduct` rather than the wider gate
  * the owner's mid-flight instruction suggested for three of them.
+ *
+ * **AND `full-performance` NOW HAS FOUR CLAUSES OF ITS OWN**, authored on the
+ * owner's decision of 2026-09-11. The four sit below §9.6 as an exhaustive pair
+ * at each of §§9.2, 9.4, 9.5 and 9.6 — same number, opposite rule, mutually
+ * exclusive gate. Read the block above `frpa.full-performance-guaranty-9-2` for
+ * why the three supporting clauses could not simply be redrafted true under
+ * both values, and for the §6.1 conflict that still blocks assembling a
+ * `full-performance` template. `__tests__/a-full-recourse-guaranty-is-still-a-
+ * purchase.test.ts` holds the property, over the assembled document.
  */
 export const FRPA_GUARANTY: McaClause[] = [
   {
@@ -71,9 +80,11 @@ export const FRPA_GUARANTY: McaClause[] = [
       Found by the guaranty cluster, which correctly left it alone as outside its
       brief, and closed here.
 
-      `full-performance` is NOT fixed by this gate and is not meant to be: that
-      funder has a guaranty, so the grid belongs, but §§9.2–9.6 are unauthored.
-      A gate cannot close that; only drafting the full-performance guaranty can.
+      `full-performance` is NOT fixed by this gate and was never meant to be:
+      that funder has a guaranty, so the grid belongs. When this was written
+      §§9.2-9.6 were unauthored under that value, which a gate could not close;
+      the owner's decision of 2026-09-11 closed it by drafting them, and the
+      four records sit below §9.6.
     */
     includeWhen: (facts) => facts.guarantyScope !== 'none',
     number: '9.1',
@@ -303,10 +314,12 @@ export const FRPA_GUARANTY: McaClause[] = [
       existed with no reader, which meant a funder could answer `none` and still
       be handed a personal guaranty.
 
-      `full-performance` is a REAL GAP and is deliberately left open. It is what
-      the market actually does, and authoring it is a separate decision with the
-      owner — not something to invent while narrowing the clause that competes
-      with it.
+      `full-performance` WAS a real gap and was deliberately left open — it is
+      what the market actually does, and authoring it was a separate decision
+      with the owner rather than something to invent while narrowing the clause
+      that competes with it. The owner took that decision on 2026-09-11 and
+      `frpa.full-performance-guaranty-9-2` is the other half of this pair. This
+      record is unchanged by it, which is the point of the pair.
     */
     includeWhen: (facts) => facts.guarantyScope === 'limited-conduct',
     number: '9.2',
@@ -401,9 +414,13 @@ export const FRPA_GUARANTY: McaClause[] = [
     would not be in the document. Selecting them for `full-performance` would
     assemble a Section 9 whose waivers point at a guaranty that is not there.
 
-    That leaves `full-performance` with no Section 9 clause but §9.1's identity
-    grid, which is a real and reported gap — not one this cluster may close, and
-    not one it may paper over by writing a guaranty it was told not to write.
+    That left `full-performance` with no Section 9 clause but §9.1's identity
+    grid — a real and reported gap, not one that cluster could close, and not
+    one it could paper over by writing a guaranty it was told not to write.
+    **The reasoning above is why the gap was closed with four NEW records rather
+    than by widening these four gates**: every sentence quoted in this note is
+    still false under a full-performance guaranty, and still true and worth
+    keeping under a limited-conduct one.
   */
   {
     slug: 'frpa.guarantor-waivers-9-4',
@@ -518,6 +535,311 @@ export const FRPA_GUARANTY: McaClause[] = [
     sortKey: 60,
     heading: 'Guarantor Acknowledgement',
     body: 'Each Guarantor acknowledges receiving the whole of Section 9 and the complete Agreement, understanding that Section 9.2 creates limited personal or entity liability for specified conduct, and having a reasonable opportunity to ask questions and to consult independent counsel. A Guarantor may choose not to consult counsel. This acknowledgement does not expand liability and does not waive a defence or a statutory right.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [
+      {
+        review: 'REVIEW-02',
+        findings: [
+          'frpa-4-8-conditions-the-counsel-review-7-22-promises',
+          'frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false',
+        ],
+      },
+    ],
+  },
+  /*
+    ─── the full-performance guaranty ─────────────────────────────────────────
+
+    THE VALUE THAT HAD NO CLAUSE, AUTHORED ON THE OWNER'S DECISION OF 2026-09-11.
+
+    `guarantyScope: 'full-performance'` has existed on `McaFacts` since the fact
+    was derived, and until now it selected §9.1's identity grid and §§10.2 and
+    10.4 — a form asking a natural person for a Social Security number, two
+    service waivers, and **no guaranty between them**. ADR 0013 named the gap,
+    `every-fact-value-is-reachable` measured it, and the note above §9.2 refused
+    to close it because the wide guaranty is a product decision rather than a
+    drafting one. The decision has been made: the guaranty covers every
+    representation, warranty and covenant, which is what all three MCA forms
+    filed as SEC exhibits in 2024-2026 do.
+
+    FOUR RECORDS, NOT A WIDENED GATE, AND THE REASON IS IN THE CLAUSES
+    THEMSELVES. The owner's question was whether §§9.4, 9.5 and 9.6 need their
+    own full-performance analogues or can be redrafted true under both values.
+    Redrafting was tried against each sentence and fails on the load-bearing one
+    in every case:
+
+      - §9.4 says a bankruptcy filing, an insolvency and an avoidance create no
+        liability "without independently proven conduct covered by Section 9.2".
+        Under a guaranty of every covenant there is no conduct requirement to be
+        without, so the sentence is either false or it silently reimposes the
+        narrow scope. Deleting it from the shared text would take the bankruptcy
+        protection away from the `limited-conduct` template, which is the one
+        genuinely better-than-market term in this document.
+      - §9.5 determines each Guarantor's liability "separately under Section
+        9.2". That is the own-conduct apportionment; the wide guaranty's answer
+        is the opposite one — each signer answers for the whole.
+      - §9.6 tells the signer that "Section 9.2 creates limited personal or
+        entity liability for specified conduct". Under the wide guaranty that
+        sentence is false, and a generic substitute ("creates liability") would
+        be honest under neither scope. The acknowledgement's entire value is
+        that it names which liability was signed for.
+
+    So each is ADR 0013's **exhaustive pair**: one section number, two records,
+    opposite rules, mutually exclusive gates. `guarantyScope: 'none'` selects
+    neither, which is the `renewalModel: 'none'` shape — a value that means
+    absence. ADR 0013's own test for when splitting is WRONG asks whether the
+    two limbs "bind different parties or answer different questions": these bind
+    the same parties and answer the same question for different values of one
+    fact, which is exactly where splitting is right.
+
+    **§§9.1, 10.2 AND 10.4 ARE UNTOUCHED AND WERE ALREADY CORRECT.** All three
+    gate on `guarantyScope !== 'none'`, which is true under both scopes, and
+    nothing in any of them depends on which guaranty exists.
+
+    **THE LIMITED-CONDUCT RECORDS ARE UNTOUCHED.** Lombard stays
+    `limited-conduct` and §9.2 keeps every exclusion — insolvency, business
+    failure, bankruptcy, avoidance and clawback.
+
+    AND THE WIDE GUARANTY IS STILL A PURCHASE. This is the half a per-clause
+    reading cannot see, and it is why the new assertions are stated over the
+    assembled document rather than over these four records. §2.1 says Buyer
+    "holds no insurance, guaranty, indemnity or other arrangement that would pay
+    Buyer because Card Receipts have fallen or were not generated"; §6.1 says
+    "Buyer bears the risk that Purchased Receipts may never arise"; §6.2 says
+    the uncollected Purchased Amount "is not automatically due". All three are
+    ungated and are in the full-performance document. A guaranty of "every
+    covenant" is one sentence away from a guaranty of the money, and a guaranty
+    of the money contradicts all three and recharacterises the transaction
+    across the whole product rather than in Section 9 where a reader would look.
+
+    That is not a softening of the decision. It is what the market forms
+    themselves do: they guarantee representations, warranties and covenants and
+    expressly not repayment, because a recourse obligation on non-payment is the
+    factor a court weighs most heavily against a purchase characterisation.
+    UNVERIFIED: the memo rests that reading on Richmond Capital, Apollo Funding,
+    NewCo and LG Funding, and nobody on this project has pulled any of them from
+    an official reporter. No citation appears in any body.
+
+    **THE CONFLICT THIS COULD NOT CLOSE, AND IT IS A BLOCKER.**
+    `frpa.events-of-default-6-1` is ungated, so it is in this document, and it
+    ends *"This Section controls any inconsistent term of this Agreement and of
+    any document incorporated into it"*. Earlier in the same clause: *"A breach
+    that is not an Event of Default … does not create liability for any
+    Guarantor."* An Event of Default is one of three kinds of misconduct. So
+    §6.1 imposes the NARROW guaranty on every template by a sentence in Section
+    6, and a guaranty of every covenant is text §6.1 then overrides.
+
+    `frpa/default.ts` is not this change's file and §6.1 is not its clause. The
+    contradiction is written plainly into §9.2's first paragraph — "whether or
+    not that failure is an Event of Default" — rather than papered over, so that
+    it is a visible disagreement between two clauses instead of a latent one,
+    and it is asserted in
+    `__tests__/a-full-recourse-guaranty-is-still-a-purchase.test.ts` so that it
+    fails the day somebody closes it and forgets to delete the assertion. **A
+    `full-performance` template cannot be assembled coherently until §6.1
+    moves**, and that is an owner decision. Adding a "notwithstanding Section
+    6.1" override here was considered and refused: a second clause claiming to
+    control the same subject is the defect §7.5 and §7.24 were rewritten out of.
+
+    EXAMINED BY. Each record carries the findings raised against the section it
+    replaces, which is the basis on which `frpa.rollover-carry-method-8-2`
+    carries §8.2's and `frpa.texas-occc-notice-7-25` carries §7.24's.
+  */
+  /*
+    WHAT THIS RECORD IS. The wide guaranty, drafted as the owner decided and as
+    the market writes it: performance of every representation, warranty and
+    covenant, with no requirement that the Guarantor personally did anything.
+
+    WHAT IT DELIBERATELY IS NOT. A guaranty of the Purchased Amount, of the
+    Remaining Balance, of future receipts or of the business — see the note
+    above, and §2.1.
+
+    DEPARTURE FROM §9.2's NARROW TEXT — THE PROOF BURDEN STAYS ON BUYER. The
+    market forms shift it, and there is no reason in the owner's decision to
+    shift it: the decision widens WHAT is guaranteed, not WHO proves the loss.
+    §6.2 already makes Buyer "establish the conduct, causation and the amount of
+    its loss" against Merchant, and a guaranty that proved its loss to a lower
+    standard than the primary claim would be the wider of the two obligations.
+
+    DEPARTURE — THE EXCLUSIONS SURVIVE, IN THE SAME WORDS. Insufficient
+    receipts, a slowdown, a good-faith failure, insolvency, a bankruptcy filing,
+    an avoidance or clawback. Two reasons, and the first is the stronger: §6.1's
+    bankruptcy paragraph says these give rise to no "liability of any Guarantor"
+    and is ungated, so a wide guaranty that reached them would contradict it in
+    the one place §6.1 is unambiguous. The second is characterisation.
+
+    NOT DRAFTED, AND IT IS THE MEMO'S GAP AS MUCH AS OURS. A cure period. §6.1
+    gives Merchant ten Workdays to cure conduct capable of cure before a remedy
+    is available; this Guaranty reaches a covenant breach that is not an Event
+    of Default at all, and nothing fixes a period for it. Reported.
+  */
+  {
+    slug: 'frpa.full-performance-guaranty-9-2',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    /* The wide guaranty, and the only value of the fact it belongs to. */
+    includeWhen: (facts) => facts.guarantyScope === 'full-performance',
+    number: '9.2',
+    section: 'guaranty',
+    sortKey: 20,
+    heading: 'Guaranty of Performance',
+    body: 'Each person signing this Agreement as a Guarantor guarantees to Buyer the performance of every representation, warranty and covenant Merchant makes in this Agreement, and is liable for the loss Buyer proves it suffered from Merchant’s failure to perform any of them, whether or not that failure is an Event of Default (the “Guaranteed Obligations”). This Guaranty is not limited to conduct the Guarantor personally committed or directed.\nThis is not a guaranty of the Purchased Amount, of the Remaining Balance, of future receipts, or of Merchant’s business performance. Buyer bears the risk that Purchased Receipts may never arise, and a fall in Card Receipts is not a failure to perform. Insufficient receipts, a slowdown in Card Receipts, a good-faith closure or failure of the business, Merchant’s insolvency, a bankruptcy filing by or against Merchant, and an avoidance or clawback in a bankruptcy proceeding do not themselves create liability under this Guaranty, and Section 6.1 governs each of them.\nBuyer bears the burden of proving the failure to perform, causation and the amount of its loss. Liability under this Guaranty is limited to that proven loss and to the costs Section 6.3 permits, and Buyer shall credit every recovery it makes for the same loss. No other clause or incorporated document expands this Guaranty. Buyer shall give the Guarantor written notice describing the claim and the facts Buyer relies on, and shall enforce this Guaranty only through lawful process or a written settlement.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [
+      {
+        review: 'REVIEW-01',
+        findings: [
+          'default-on-any-term-no-cure-no-materiality',
+          'frpa-buyer-named-by-three-widgets',
+          'guaranty-covers-every-covenant',
+          'guaranty-reaches-business-failure',
+        ],
+      },
+      {
+        review: 'REVIEW-02',
+        findings: [
+          'frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2',
+          'frpa-9-4-creates-guarantor-liability-on-merchant-bankruptcy',
+        ],
+      },
+    ],
+  },
+  /*
+    THE WIDE GUARANTY'S WAIVERS, AND THEY ARE THE NARROW ONE'S ALMOST WORD FOR
+    WORD.
+
+    That is the point rather than an economy. The three defects §9.4 was
+    rewritten to remove — automatic expansion without consent, permanent
+    impairment waivers, and abolition rather than postponement of subrogation —
+    have nothing to do with how wide the guaranty is. They are about a guarantor
+    being bound to a deal they never saw and losing defences that exist because
+    Buyer's own conduct affected the loss. Both are as wrong under a
+    full-performance guaranty as under a limited one, and the market's practice
+    of writing them the other way is not a reason to adopt them.
+
+    THE ONE SENTENCE THAT CHANGES, AND IT IS THE ONE THE GATE EXISTS FOR. The
+    narrow §9.4 says bankruptcy events "create no liability for a Guarantor
+    without independently proven conduct covered by Section 9.2". Here there is
+    no conduct requirement, so the rule is stated directly and is anchored to
+    §6.1, which says the same thing for every template: a bankruptcy filing, an
+    insolvency and a cessation for lack of revenue create no liability at all.
+
+    AND THE CLAWBACK REINSTATEMENT STAYS OUT. REVIEW-02 raised it as
+    `frpa-9-4-creates-guarantor-liability-on-merchant-bankruptcy`, and it is the
+    one term in v4's §9.4 that the market writes and this library refuses under
+    either scope: a payment Buyer must return in a bankruptcy is Buyer's risk of
+    having taken it, not a new obligation of the human who signed.
+  */
+  {
+    slug: 'frpa.full-performance-guarantor-waivers-9-4',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    /* Pairs with the record above. See the note on the full-performance set. */
+    includeWhen: (facts) => facts.guarantyScope === 'full-performance',
+    number: '9.4',
+    section: 'guaranty',
+    sortKey: 40,
+    heading: 'Guarantor Waivers',
+    body: 'Subject to Section 9.2, Buyer need not first obtain judgment against Merchant, or realize upon the Collateral described in Section 4.10, before bringing a valid claim against a Guarantor. No renewal, additional purchase, material amendment, substituted obligation or increase in the Purchased Amount binds a Guarantor without that Guarantor’s separate written consent identifying the resulting obligation.\nA notice of termination or non-renewal given by a Guarantor does not itself create a default or any liability. It prevents this Guaranty from extending to any later transaction, and does not release the Guarantor from liability for Merchant’s performance in this transaction. No future transaction is covered without a fresh signed consent.\nEach Guarantor retains its defences as to validity, scope, causation, amount and payment, and all rights that may not be waived. Subrogation, reimbursement and contribution are postponed only while their exercise would cause a duplicate recovery or would materially impair recovery of a valid unpaid Guaranteed Obligation; they are not waived. A payment returned or avoided in a bankruptcy proceeding does not enlarge or reinstate this Guaranty. Consistently with Section 6.1, a bankruptcy filing by or against Merchant, Merchant’s insolvency, and the cessation of Merchant’s business for lack of revenue create no liability under this Guaranty. Enforcement remains subject to any applicable stay and to applicable law.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [
+      {
+        review: 'REVIEW-02',
+        findings: [
+          'debt-vocabulary-the-language-guard-would-not-catch',
+          'frpa-9-4-creates-guarantor-liability-on-merchant-bankruptcy',
+        ],
+      },
+    ],
+  },
+  /*
+    THE OPPOSITE RULE, AND THE CLEAREST OF THE FOUR PAIRS.
+
+    The narrow §9.5 determines each Guarantor's liability separately, because a
+    guaranty of the guarantor's OWN conduct cannot make one signer answer for
+    another's act. That reasoning is gone here: the wide guaranty makes every
+    signer answerable for Merchant's performance, which is one obligation, so
+    joint and several liability for it is coherent rather than incoherent.
+
+    WHAT DOES NOT CHANGE, AND IT IS THE HALF OF THE FINDING THAT IS ABOUT WORDS.
+    REVIEW-02's `frpa-9-5-refers-to-guarantors-the-form-cannot-collect` has two
+    halves. The first is that joint-and-several language cannot bind somebody
+    the document never identified and who never signed — true under any scope,
+    and answered in the second paragraph, which is §9.1's rule restated as the
+    limit on this one. The second is that the form collects ONE guarantor block,
+    «35»-«40» and a single signature, so a second Guarantor has nowhere to sign.
+    **That is still true and is still not fixable here**: it is a change to the
+    `.docx` and to the Lombard AcroForm pipeline in `lombard-contracts`, and it
+    matters more under this scope than under the narrow one, because joint and
+    several liability for the whole is the term that makes a second signature
+    worth collecting.
+
+    CONTRIBUTION IS EXPRESSLY PRESERVED and points at §9.4's postponement rather
+    than restating it. Under joint and several liability a guarantor who pays
+    more than their share has a contribution claim; v4 waived contribution
+    outright, and §9.4 replaced that waiver with a postponement. Naming it here
+    stops the two clauses from being read as though the waiver survived.
+  */
+  {
+    slug: 'frpa.full-performance-joint-and-several-liability-9-5',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    /* Pairs with the record above. See the note on the full-performance set. */
+    includeWhen: (facts) => facts.guarantyScope === 'full-performance',
+    number: '9.5',
+    section: 'guaranty',
+    sortKey: 50,
+    heading: 'Joint and Several Liability',
+    body: 'Each Guarantor guarantees the whole of the Guaranteed Obligations, and two or more Guarantors are jointly and severally liable for them. Buyer may proceed against any one Guarantor without first proceeding against another, and may recover the same loss only once. A Guarantor who pays more than that Guarantor’s share may seek contribution from another Guarantor, subject to the postponement in Section 9.4.\nA person who is not identified as a Guarantor under Section 9.1, and who has not signed a guarantor signature block, is not a Guarantor and has no liability under this Guaranty. No owner, spouse, officer, employee or affiliate of Merchant becomes a Guarantor by reason of that relationship or by signing this Agreement in any other capacity.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: [],
+    examinedBy: [{ review: 'REVIEW-02', findings: ['frpa-9-5-refers-to-guarantors-the-form-cannot-collect'] }],
+  },
+  /*
+    THE ACKNOWLEDGEMENT IS THE REASON THE OTHER THREE ARE PAIRS.
+
+    A signer can confirm two things: that they received the document, and that
+    they had a real chance to take advice. What makes the sentence worth
+    anything is the clause in the middle — the one that tells them what they
+    just signed. The narrow §9.6 says "limited personal or entity liability for
+    specified conduct". Here that is false, and the honest substitute is the
+    scope itself, in the words §9.2 uses.
+
+    A GENERIC FORM OF WORDS WAS THE ALTERNATIVE AND IS WORSE. "Section 9.2
+    creates personal or entity liability" is true under both scopes and tells a
+    signer nothing they could not have guessed from the heading. An
+    acknowledgement that survives being true of opposite documents is an
+    acknowledgement that has stopped acknowledging anything — which is what v4's
+    "acknowledges the seriousness of the provisions of this Guaranty" already
+    was.
+
+    EVERYTHING ELSE IS THE NARROW CLAUSE'S, INCLUDING BOTH OF ITS DEPARTURES:
+    "the whole of Section 9" rather than the memo's "Sections 9.1 through 9.6",
+    because §9.3 is a reserved line and because numbering is emitted at assembly;
+    and the express permission to decline counsel, because §7.22 is the only
+    place in this document where a statement about counsel can be true.
+  */
+  {
+    slug: 'frpa.full-performance-guarantor-acknowledgement-9-6',
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    /* Pairs with the record above. See the note on the full-performance set. */
+    includeWhen: (facts) => facts.guarantyScope === 'full-performance',
+    number: '9.6',
+    section: 'guaranty',
+    sortKey: 60,
+    heading: 'Guarantor Acknowledgement',
+    body: 'Each Guarantor acknowledges receiving the whole of Section 9 and the complete Agreement, understanding that Section 9.2 creates personal or entity liability for Merchant’s performance of every representation, warranty and covenant in this Agreement, and having a reasonable opportunity to ask questions and to consult independent counsel. A Guarantor may choose not to consult counsel. This acknowledgement does not expand liability and does not waive a defence or a statutory right.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
