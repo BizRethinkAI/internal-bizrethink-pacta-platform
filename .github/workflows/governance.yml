@@ -213,10 +213,6 @@ jobs:
           echo "  per-PR note exists."
           exit 1
 
-  lint:
-    name: Lint (bizrethink)
-    runs-on: ubuntu-latest
-    steps:
       # ── Guard 5: an in-flight note is in flight ────────────────────────
       # `docs/state/inflight/` is half of what a session reads to learn where
       # things stand. A note whose branch has merged is not in flight; it is an
@@ -239,6 +235,7 @@ jobs:
       # its substance into docs/STATE.md.
       - name: In-flight notes describe work that is in flight
         run: |
+          shopt -s nullglob
           STALE=""
           for f in docs/state/inflight/*.md; do
             base=$(basename "$f" .md)
@@ -271,6 +268,10 @@ jobs:
           echo "  MATTERS, not a transcript of the note."
           exit 1
 
+  lint:
+    name: Lint (bizrethink)
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
 
