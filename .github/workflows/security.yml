@@ -47,6 +47,15 @@ jobs:
       # once the 19 are triaged — each either patched, or accepted with a
       # written reason. Until then CLAUDE.md must not describe this as blocking,
       # because it is not.
+      #
+      # 2026-09-10 (overlay 072): triaged. Everything patchable is patched and
+      # guarded by packages/bizrethink/regression-tests/
+      # dependency-security-floors.test.ts. What remains (3 high, 3 moderate)
+      # is two chains, each ACCEPTED with its reason in that file's ACCEPTED
+      # register: deepmerge-ts via @prisma/config and ts-deepmerge via
+      # @anatine/zod-openapi — neither sees request data. The gate stays
+      # advisory only because `npm audit` cannot allowlist an accepted
+      # advisory, so blocking on high+ would fail every PR on deepmerge-ts.
       - name: Audit production dependencies
         continue-on-error: true
         run: |
@@ -55,7 +64,8 @@ jobs:
           echo ""
           echo "─────────────────────────────────────────────────────────"
           echo "This gate is ADVISORY. See the comment in security.yml."
-          echo "Baseline at 2026-08-29: 19 high, 8 moderate, 8 low (prod)."
+          echo "Baseline at 2026-09-10: 3 high, 3 moderate, 0 low (prod),"
+          echo "all accepted (deepmerge-ts + ts-deepmerge chains)."
           echo "A rise above that baseline is a regression worth chasing."
           echo "─────────────────────────────────────────────────────────"
 
