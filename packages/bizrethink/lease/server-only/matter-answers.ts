@@ -5,7 +5,7 @@ import { describeDocuments, hasGoverningDocuments } from '../documents/derive-do
 import { deriveFacts } from '../interview/derive-facts';
 import { propertyTypeLabelFor } from '../interview/property-type';
 import type { LeasePartyInput } from '../parties/derive-parties';
-import { derivePartyValues, toLeaseParties } from '../parties/derive-parties';
+import { derivePartyValues, tenantElectionBox, toLeaseParties } from '../parties/derive-parties';
 import type { InterpolationValue } from '../render/interpolate';
 import type { RenderLeaseInput } from '../render/render-lease';
 import type { LeaseParty } from '../render/signature-blocks';
@@ -173,6 +173,12 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       // Same shape again: the rows are the answer, the numbered list is only
       // their rendering, and the clause interpolates one variable.
       governingDocuments: describeDocuments(documents),
+      /*
+        The §83.595(4) election box. Derived here for the same reason the party
+        names are: it depends on WHERE the tenant sits in the party list, which
+        only this layer knows.
+      */
+      tenantElectionBox: tenantElectionBox(partyInputs),
       conditionReports: describeDocuments(matterDocuments, 'move-in-report'),
       /*
         Also last, and for the reason the party names are. These were SEEDED

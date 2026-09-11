@@ -188,6 +188,9 @@ export const DERIVED_VALUES = [
   // Assembled from the party list rather than typed.
   'landlordNames',
   'tenantNames',
+  // The §83.595(4) election box: a signer placeholder whose recipient index
+  // depends on where the tenant sits in the party list.
+  'tenantElectionBox',
   // §83.505 addresses, one per signer, assembled from the same list.
   'landlordNoticeEmails',
   'tenantNoticeEmails',
