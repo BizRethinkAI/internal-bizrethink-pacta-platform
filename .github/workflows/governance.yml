@@ -245,8 +245,13 @@ jobs:
             branch=$(echo "$base" | sed 's/-/\//')
 
             if ! git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-              # Deleted after merge, or abandoned. Either way not in flight.
-              STALE="$STALE  $f — origin/$branch does not exist\n"
+              # Three ways to get here and the message has to say so, because
+              # "does not exist" sent its own author looking for the wrong
+              # problem once: the branch was merged and deleted, the branch was
+              # abandoned, OR the note is misnamed for the branch it is on —
+              # which happens when work is consolidated onto another PR and the
+              # note is not renamed with it. Only the first two are "landed".
+              STALE="$STALE  $f — no origin/$branch. Merged and deleted, abandoned, or this note is misnamed for its PR's branch.\n"
             elif git merge-base --is-ancestor "origin/$branch" origin/main 2>/dev/null; then
               STALE="$STALE  $f — origin/$branch is already merged\n"
             fi
