@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import { seedSiteSettingsSignup } from '@documenso/prisma/seed/bizrethink';
 import { extractUserVerificationToken, seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 import { expect, type Page, test } from '@playwright/test';
 
@@ -7,6 +8,10 @@ import { signSignaturePad } from '../fixtures/signature';
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test('[USER] can sign up with email and password', async ({ page }: { page: Page }) => {
+  // MODIFIED for BizRethink (overlay 071): signup fails closed in this fork, so a
+  // fresh E2E database has it closed. Open it explicitly for this test.
+  await seedSiteSettingsSignup();
+
   const username = 'Test User';
   const email = seedTestEmail();
   const password = 'Password123#';

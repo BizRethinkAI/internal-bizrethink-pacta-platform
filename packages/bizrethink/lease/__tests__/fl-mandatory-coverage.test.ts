@@ -50,9 +50,18 @@ const MANDATORY: { slug: string; cite: string; when: (f: ClauseFacts) => boolean
       ? (f: ClauseFacts) => f.termMonths >= 12
       : entry.slug === 'disclosure.lead-paint'
         ? (f: ClauseFacts) => f.propertyYearBuilt === null || f.propertyYearBuilt < 1978
-        : entry.slug.startsWith('deposit.')
-          ? (f: ClauseFacts) => f.depositHeldUsd > 0
-          : () => true,
+        : /*
+             §83.49(2) closes with an exemption the compelled-set records in
+             prose — "does not apply to any landlord who rents fewer than five
+             individual dwelling units" — and which the render condition used
+             to flatten away, so the guard demanded a clause Florida does not
+             compel for a one-property landlord.
+           */
+          entry.slug === 'deposit.escrow-notice'
+          ? (f: ClauseFacts) => f.depositHeldUsd > 0 && f.landlordRentsFiveOrMoreUnits
+          : entry.slug.startsWith('deposit.')
+            ? (f: ClauseFacts) => f.depositHeldUsd > 0
+            : () => true,
 }));
 
 describe('every mandatory Florida disclosure reaches the document', () => {

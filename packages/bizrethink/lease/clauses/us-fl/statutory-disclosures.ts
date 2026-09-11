@@ -214,7 +214,18 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
 
   {
     slug: 'deposit.escrow-notice',
-    version: 1,
+    /*
+      v2: THE SUBSECTION EXEMPTS THE LANDLORD THIS BUILDER IS FOR.
+
+      §83.49(2) closes "This subsection does not apply to any landlord who
+      rents fewer than five individual dwelling units." The gate below tested
+      only that money was held, so the clause printed for everyone — handing a
+      single-property owner a 30-day notice duty they do not owe, and which,
+      having written it into their own lease, they can now breach.
+
+      Not deleted: a landlord with five units genuinely owes this. Gated.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'deposit',
@@ -251,7 +262,8 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
       notice. That is precisely the omission §83.49(3)(a) penalises, by
       forfeiting the landlord's right to impose a claim against the money.
     */
-    includeWhen: (facts) => facts.depositHeldUsd > 0 || facts.advanceRentHeldUsd > 0,
+    includeWhen: (facts) =>
+      facts.landlordRentsFiveOrMoreUnits && (facts.depositHeldUsd > 0 || facts.advanceRentHeldUsd > 0),
     variables: [],
     supersedes: [],
     asserts: ['deposit-escrow-notice'],

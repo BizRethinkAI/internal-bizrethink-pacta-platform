@@ -1,84 +1,116 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
+import { prisma } from '@documenso/prisma';
 import {
   resetAllBizRethinkSingletons,
   seedSsoProviderConfig,
 } from '@documenso/prisma/seed/bizrethink';
+import { seedUser } from '@documenso/prisma/seed/users';
+
+import { signedInAsAdmin } from '../fixtures/bizrethink-auth';
 
 /**
- * E2 SKELETON from COVERAGE-PLAN-2026-05-25.md — SSO sign-in (overlay 014).
+ * SSO kill switch (overlay 071, 2026-09 incident).
  *
- * NOT YET IMPLEMENTED. This file documents the intended shape so the next
- * session can fill in the body. The setup work + OAuth-callback interception
- * pattern needs design before the tests can run reliably.
+ * SSO — Google, Microsoft, generic OIDC and the per-organisation
+ * authentication portal — is removed from this build by a code-level switch
+ * (packages/bizrethink/feature-flags.ts → isSsoDisabledByBuild). No DB row or
+ * env var may turn it back on.
  *
- * Plan for each provider (google, microsoft, oidc):
- *
- * 1. Setup phase:
- *    - seedSsoProviderConfig({ provider, enabled: true, clientId, clientSecret,
- *        ...(provider === 'oidc' && { oidcWellKnownUrl: '...' }) })
- *    - Invalidate the provider config cache so the new row takes effect.
- *
- * 2. Disabled-provider variant:
- *    - seedSsoProviderConfig({ provider, enabled: false })
- *    - Navigate to /signin
- *    - Assert the provider's button is NOT visible
- *
- * 3. Enabled-provider variant:
- *    - seedSsoProviderConfig({ provider, enabled: true, clientId+secret })
- *    - Navigate to /signin
- *    - Assert the provider's button IS visible + clickable
- *    - Click the button → assert navigation begins toward OAuth start URL
- *      (don't follow — just verify the redirect attempt)
- *
- * 4. Callback-stub variant (the hardest):
- *    - Use page.route() to intercept the OAuth provider's authorize+callback
- *      and respond with a synthetic callback that contains a valid code/state
- *    - Verify upstream's callback handler creates a session (cookie set)
- *    - Verify the user lands on / after auth
- *
- * Key references:
- *    - apps/remix/app/routes/_unauthenticated+/signin.tsx (provider buttons)
- *    - packages/auth/server/routes/oauth.ts (callback handler)
- *    - packages/auth/server/lib/utils/handle-oauth-{authorize,callback}-url.ts
- *      (these have inline mods per overlay 014 to use sso-provider-config)
- *
- * Why deferred:
- *    - Real OAuth round-trip is brittle in CI (rate limits, account creds).
- *    - Stub-callback approach needs careful page.route() pattern + cookie
- *      surgery that's spec-specific per provider.
- *    - Pure DB-config tests are already covered by V19 (sso-provider-config
- *      unit tests).
+ * This file used to be a skipped skeleton (test.describe.skip) planning tests
+ * that SSO *works*. That behaviour no longer exists, so every test here seeds
+ * a fully configured, ENABLED provider or portal and asserts it stays dead.
+ * Unit coverage: sso-provider-config.test.ts and
+ * regression-tests/sso-kill-switch.test.ts.
  */
-test.describe.skip('BizRethink overlay 014 — SSO sign-in (DB-backed providers)', () => {
+test.describe('BizRethink overlay 071 — SSO is disabled in this build', () => {
   test.beforeEach(async () => {
     await resetAllBizRethinkSingletons();
   });
 
-  test('TODO: google disabled → button hidden', async () => {
-    await seedSsoProviderConfig({ provider: 'google', enabled: false });
-    // ...
+  test.afterEach(async () => {
+    await resetAllBizRethinkSingletons();
   });
 
-  test('TODO: google enabled → button visible + clickable', async () => {
+  const seedAllProvidersEnabled = async () => {
     await seedSsoProviderConfig({
       provider: 'google',
       enabled: true,
       clientId: 'fake-google-client-id',
       clientSecret: 'fake-google-client-secret',
     });
-    // ...
+    await seedSsoProviderConfig({
+      provider: 'microsoft',
+      enabled: true,
+      clientId: 'fake-microsoft-client-id',
+      clientSecret: 'fake-microsoft-client-secret',
+    });
+    await seedSsoProviderConfig({
+      provider: 'oidc',
+      enabled: true,
+      clientId: 'fake-oidc-client-id',
+      clientSecret: 'fake-oidc-client-secret',
+      oidcWellKnownUrl: 'https://idp.example.com/.well-known/openid-configuration',
+      oidcProviderLabel: 'Example IDP',
+    });
+  };
+
+  test('/signin shows no SSO buttons even with every provider enabled in the DB', async ({ page }) => {
+    await seedAllProvidersEnabled();
+
+    await page.goto('/signin');
+    await expect(page.getByLabel('Email')).toBeVisible();
+
+    await expect(page.getByRole('button', { name: 'Google' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Microsoft' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Example IDP' })).toHaveCount(0);
   });
 
-  test('TODO: microsoft enabled → button visible + clickable', async () => {
-    // Same pattern as google.
+  test('OAuth authorize endpoints refuse every provider even with enabled DB rows', async ({ request }) => {
+    await seedAllProvidersEnabled();
+
+    for (const provider of ['google', 'microsoft', 'oidc'] as const) {
+      const res = await request.post(`/api/auth/oauth/authorize/${provider}`, { data: {} });
+      expect(res.ok(), `${provider} authorize must not succeed`).toBe(false);
+    }
   });
 
-  test('TODO: oidc enabled with wellKnownUrl → button visible', async () => {
-    // Same pattern; additionally seed oidcWellKnownUrl + oidcProviderLabel.
+  test('admin SSO providers page shows the disabled notice, not the config form', async ({ page }) => {
+    await signedInAsAdmin({ page, redirectPath: '/admin/sso-providers' });
+
+    await expect(page.getByText('SSO is disabled in this build.')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByLabel('Client secret')).toHaveCount(0);
   });
 
-  test('TODO: stubbed callback creates session', async () => {
-    // page.route('**/oauth/callback*', ...) to inject synthetic response.
+  test('org authentication portal sign-in is a 404 even when fully configured', async ({ page }) => {
+    const { organisation } = await seedUser();
+
+    const claim = await prisma.organisationClaim.findFirstOrThrow({
+      where: { organisation: { id: organisation.id } },
+    });
+
+    await prisma.organisation.update({
+      where: { id: organisation.id },
+      data: {
+        organisationClaim: {
+          update: {
+            flags: { ...(claim.flags as Record<string, unknown>), authenticationPortal: true },
+          },
+        },
+        organisationAuthenticationPortal: {
+          update: {
+            enabled: true,
+            clientId: 'fake-portal-client-id',
+            clientSecret: 'fake-portal-client-secret',
+            wellKnownUrl: 'https://idp.example.com/.well-known/openid-configuration',
+          },
+        },
+      },
+    });
+
+    const response = await page.goto(`/o/${organisation.url}/signin`);
+
+    expect(response?.status()).toBe(404);
+    await expect(page.getByText('Authentication Portal Not Found')).toBeVisible();
   });
 });

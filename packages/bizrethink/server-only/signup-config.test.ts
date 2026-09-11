@@ -32,44 +32,63 @@ beforeEach(() => {
   mockedEnv.mockReturnValue(undefined);
 });
 
+// Fail-closed (2026-09-10 incident): signup is OPEN only when the site.signup
+// row exists, parses, is enabled, and explicitly says signupDisabled=false.
+// Every other state — including every failure — means CLOSED. Before this,
+// every failure fell through to an env var that prod never set, so signup was
+// open for four months while the admin believed it closed.
 describe('isSignupDisabled', () => {
-  it('returns true when DB row is enabled and signupDisabled=true', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ signupDisabled: true, allowedDomains: [], requireInviteWhenDomainGated: false }) as never,
-    );
-    expect(await isSignupDisabled()).toBe(true);
-  });
+  const OPEN = { signupDisabled: false, allowedDomains: [], requireInviteWhenDomainGated: false };
 
-  it('returns false when DB row is enabled and signupDisabled=false', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ signupDisabled: false, allowedDomains: [], requireInviteWhenDomainGated: false }) as never,
-    );
+  it('is open only when the row is enabled and signupDisabled=false', async () => {
+    mockedFindFirst.mockResolvedValueOnce(dbRow(OPEN) as never);
     expect(await isSignupDisabled()).toBe(false);
   });
 
-  it('falls back to env when DB row is disabled', async () => {
-    mockedFindFirst.mockResolvedValueOnce(
-      dbRow({ signupDisabled: true, allowedDomains: [], requireInviteWhenDomainGated: false }, false) as never,
-    );
-    mockedEnv.mockReturnValue('true');
+  it('is closed when the row is enabled and signupDisabled=true', async () => {
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ ...OPEN, signupDisabled: true }) as never);
     expect(await isSignupDisabled()).toBe(true);
   });
 
-  it('falls back to env when no DB row exists', async () => {
-    mockedFindFirst.mockResolvedValueOnce(null);
-    mockedEnv.mockReturnValue('true');
-    expect(await isSignupDisabled()).toBe(true);
-  });
-
-  it('returns false when no DB row and env is not "true"', async () => {
+  it('is closed when no row exists, even with the env var unset', async () => {
     mockedFindFirst.mockResolvedValueOnce(null);
     mockedEnv.mockReturnValue(undefined);
-    expect(await isSignupDisabled()).toBe(false);
+    expect(await isSignupDisabled()).toBe(true);
   });
 
-  it('falls back to env when DB read throws (DB outage)', async () => {
+  it('is closed when the row exists but is not enabled', async () => {
+    mockedFindFirst.mockResolvedValueOnce(dbRow(OPEN, false) as never);
+    expect(await isSignupDisabled()).toBe(true);
+  });
+
+  it('is closed when the DB read throws, and says why', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     mockedFindFirst.mockRejectedValueOnce(new Error('Prisma connection failed'));
+    expect(await isSignupDisabled()).toBe(true);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('closed'), expect.anything());
+    warn.mockRestore();
+  });
+
+  it('is closed when the row does not parse, and says why', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ ...OPEN, signupDisabled: 'no' }) as never);
+    expect(await isSignupDisabled()).toBe(true);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('closed'), expect.anything());
+    warn.mockRestore();
+  });
+
+  it('is closed when the row omits signupDisabled (no implicit open)', async () => {
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ allowedDomains: [] }) as never);
+    expect(await isSignupDisabled()).toBe(true);
+  });
+
+  it('lets NEXT_PUBLIC_DISABLE_SIGNUP=true close an open row, but never open a closed one', async () => {
+    mockedFindFirst.mockResolvedValueOnce(dbRow(OPEN) as never);
     mockedEnv.mockReturnValue('true');
+    expect(await isSignupDisabled()).toBe(true);
+
+    mockedFindFirst.mockResolvedValueOnce(null);
+    mockedEnv.mockReturnValue('false');
     expect(await isSignupDisabled()).toBe(true);
   });
 });

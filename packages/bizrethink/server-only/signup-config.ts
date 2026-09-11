@@ -5,15 +5,17 @@ import { ZSiteSettingsSignupSchema } from './site-settings/schemas/signup';
 
 // Phase D (overlay 012): DB-aware getters for signup-related settings.
 //
-// Replace direct env reads in upstream signup/signin/complete loaders. The
-// DB row (id="site.signup") takes precedence; if absent or disabled, falls
-// back to the env-var path so a fresh instance with no row still respects
-// the bootstrap config.
+// Replace direct env reads in upstream signup/signin/complete loaders.
+//
+// FAIL-CLOSED (2026-09-10 incident): signup is open ONLY when the
+// id="site.signup" row exists, is enabled, parses, and explicitly says
+// signupDisabled=false. A missing row, a disabled row, an unparseable row and
+// a DB error all mean CLOSED. The previous design fell back to
+// NEXT_PUBLIC_DISABLE_SIGNUP in every one of those cases; prod never set it,
+// so signup sat open from launch until an external attacker used it.
+// The env var can still close an open row; it can never open a closed one.
 
 const readDbConfig = async () => {
-  // Defensive: if DB is unreachable (Postgres down, network flap, test env),
-  // return null so callers fall back to env-only behaviour. Better to honor
-  // the env config during an outage than to throw and break signup entirely.
   let row;
   try {
     row = await prisma.siteSettings.findFirst({
@@ -21,7 +23,7 @@ const readDbConfig = async () => {
     });
   } catch (err) {
     console.warn(
-      '[bizrethink/signup-config] DB read failed; falling back to env-only:',
+      '[bizrethink/signup-config] DB read failed; treating signup as closed:',
       err instanceof Error ? err.message : err,
     );
     return null;
@@ -33,6 +35,10 @@ const readDbConfig = async () => {
 
   const parsed = ZSiteSettingsSignupSchema.safeParse(row);
   if (!parsed.success) {
+    console.warn(
+      '[bizrethink/signup-config] site.signup row does not parse; treating signup as closed:',
+      parsed.error.message,
+    );
     return null;
   }
 
@@ -40,15 +46,19 @@ const readDbConfig = async () => {
 };
 
 /**
- * True if signup is disabled instance-wide. DB takes precedence;
- * `NEXT_PUBLIC_DISABLE_SIGNUP === 'true'` is the env fallback.
+ * True if signup is disabled instance-wide. Fails closed: only an enabled,
+ * valid site.signup row with signupDisabled=false opens it, and
+ * `NEXT_PUBLIC_DISABLE_SIGNUP === 'true'` closes it regardless.
  */
 export const isSignupDisabled = async (): Promise<boolean> => {
   const dbConfig = await readDbConfig();
-  if (dbConfig) {
-    return dbConfig.signupDisabled;
+  if (!dbConfig) {
+    return true;
   }
-  return env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true';
+  if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+    return true;
+  }
+  return dbConfig.signupDisabled;
 };
 
 /**

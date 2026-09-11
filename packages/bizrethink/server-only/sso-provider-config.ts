@@ -5,6 +5,8 @@ import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 import { bytesToUtf8 } from '@noble/ciphers/utils';
 
+import { isSsoDisabledByBuild } from '../feature-flags';
+
 // Phase F (overlay 014): DB-backed SSO provider config.
 //
 // Replaces NEXT_PRIVATE_GOOGLE_*/MICROSOFT_*/OIDC_* env vars. One row per
@@ -92,6 +94,22 @@ const envFallback = (provider: Provider): ProviderConfig => {
 };
 
 export const getProviderConfig = async (provider: Provider): Promise<ProviderConfig> => {
+  // 2026-09 incident: SSO is removed from this build. Checked before the DB
+  // and env so neither a configured row nor env credentials can revive it.
+  // Empty credentials also make the OAuth authorize/callback handlers throw
+  // NOT_SETUP (handle-oauth-authorize-url.ts, validateOauth).
+  if (isSsoDisabledByBuild()) {
+    return {
+      enabled: false,
+      clientId: '',
+      clientSecret: '',
+      oidcWellKnownUrl: '',
+      oidcProviderLabel: '',
+      oidcSkipVerify: false,
+      oidcPrompt: '',
+    };
+  }
+
   if (cacheBuiltForAllProviders) {
     const cached = cache.get(provider);
     if (cached) {

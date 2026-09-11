@@ -71,6 +71,9 @@ export const PICANA_FACTS: ClauseFacts = {
     fees; there are, and the lease now says who pays them.
   */
   hasCdd: true,
+  // One rental property. §83.49(2) — and so the 30-day escrow notice — does
+  // not apply to a landlord renting fewer than five individual dwelling units.
+  landlordRentsFiveOrMoreUnits: false,
   // Derived in hydrateMatter; stated here because these fixtures drive clause
   // selection directly rather than going through it.
   hasPetFees: false,
@@ -177,7 +180,12 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   hoaNoticeHours: 24,
   // The association charges to register a tenant and issue access cards.
   // Silence here is an argument during move-in week.
+  // Named, never numbered: the signed lease goes to the association.
+  rentPaymentMethod: 'ACH or bank transfer to the account Landlord notifies to Tenant in writing',
   amenityFeesPaidBy: 'Landlord',
+  // The association's form is the tenant's to complete, so the lease gives
+  // them a deadline instead of promising access on a date nobody controls.
+  amenityRegistrationDays: 5,
   // An owner's obligation under the declaration. The clause used to imply
   // otherwise by binding the tenant to "all of the obligations of the Owner".
   assessmentsPaidBy: 'Landlord',

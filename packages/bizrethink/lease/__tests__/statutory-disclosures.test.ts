@@ -25,6 +25,7 @@ const bySlug = (slug: string) => {
 };
 
 const facts = (overrides: Partial<ClauseFacts> = {}): ClauseFacts => ({
+  landlordRentsFiveOrMoreUnits: false,
   termMonths: 12,
   depositHeldUsd: 6900,
   advanceRentHeldUsd: 6900,
@@ -214,7 +215,18 @@ const allSlugs = (f: ClauseFacts) => {
 };
 
 describe('deposit notices on a lease with advance rent and no deposit', () => {
-  const advanceRentOnly = facts({ depositHeldUsd: 0, advanceRentHeldUsd: 6900 });
+  /*
+    Inside §83.49(2). The escrow notice is owed only by a landlord renting five
+    or more dwelling units — the subsection says so in its closing sentence —
+    so a fixture testing that it IS given has to describe such a landlord.
+    Below five, its absence is the correct answer, and the case just after this
+    one pins that.
+  */
+  const advanceRentOnly = facts({
+    depositHeldUsd: 0,
+    advanceRentHeldUsd: 6900,
+    landlordRentsFiveOrMoreUnits: true,
+  });
 
   it('gives the §83.49(3) disclosure', () => {
     expect(allSlugs(advanceRentOnly)).toContain('deposit.statutory-notice');
@@ -225,10 +237,31 @@ describe('deposit notices on a lease with advance rent and no deposit', () => {
   });
 
   it('still gives both where there is a deposit and no advance rent', () => {
-    const depositOnly = facts({ depositHeldUsd: 6900, advanceRentHeldUsd: 0 });
+    const depositOnly = facts({
+      depositHeldUsd: 6900,
+      advanceRentHeldUsd: 0,
+      landlordRentsFiveOrMoreUnits: true,
+    });
 
     expect(allSlugs(depositOnly)).toContain('deposit.statutory-notice');
     expect(allSlugs(depositOnly)).toContain('deposit.escrow-notice');
+  });
+
+  it('withholds the escrow notice from a landlord below five units', () => {
+    /*
+      §83.49(2): "This subsection does not apply to any landlord who rents
+      fewer than five individual dwelling units." Printing it anyway hands a
+      one-property owner a 30-day duty they do not owe and can then breach.
+      The all-caps §83.49(2)(d) disclosure is a different thing — a statement
+      of law, not a future obligation — and is left alone.
+    */
+    const oneProperty = facts({
+      depositHeldUsd: 6900,
+      advanceRentHeldUsd: 6900,
+      landlordRentsFiveOrMoreUnits: false,
+    });
+
+    expect(allSlugs(oneProperty)).not.toContain('deposit.escrow-notice');
   });
 
   /*
