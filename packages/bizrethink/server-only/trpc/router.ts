@@ -7,7 +7,6 @@ import { instanceStripeRouter } from './instance-stripe-router';
 import { leaseBuilderRouter } from './lease-builder-router';
 import { orgSmtpRouter } from './org-smtp-router';
 import { organisationBillingRouter } from './organisation-billing-router';
-import { signupInviteRouter } from './signup-invite-router';
 import { ssoProviderRouter } from './sso-provider-router';
 
 // Top-level BizRethink TRPC router. Wired into the main `appRouter` via
@@ -34,11 +33,9 @@ export const bizrethinkRouter = router({
   // + product sync. Replaces three env vars (STRIPE_API_KEY,
   // STRIPE_WEBHOOK_SECRET, FEATURE_BILLING_ENABLED) with admin-UI config.
   instanceStripe: instanceStripeRouter,
-  // Phase L (auto-claim-invites) — public procedure for the signup form
-  // to preview which org(s) the entered email will land in once they
-  // complete signup. Pairs with overlay 048 (auto-claim on signup) +
-  // overlay 048b (require-invite-when-gated check).
-  signupInvite: signupInviteRouter,
+  // (`signupInvite` was removed 2026-09-10: its public `lookup` procedure
+  // returned the pending invites for ANY email address, an enumeration
+  // oracle. Guarded by regression-tests/signup-invite-lookup-removed.test.ts.)
   // Lease builder — properties, matters, and the validation the interview
   // blocks on. Every procedure re-checks the access gate: a tRPC procedure is
   // reachable without going through the page that renders it.

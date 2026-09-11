@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { isSsoDisabledByBuild } from '@bizrethink/customizations/feature-flags';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 
@@ -13,6 +14,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
+
+import type { Route } from './+types/sso-providers';
 
 // Phase F (overlay 014): admin UI for SSO providers (Google / Microsoft / OIDC).
 //
@@ -53,7 +56,30 @@ const PROVIDER_LABELS: Record<Provider, string> = {
   oidc: 'OIDC (custom)',
 };
 
-export default function AdminSsoProvidersPage() {
+// 2026-09 incident: SSO is removed from this build (feature-flags.ts). The
+// switch is read on the server; the config form is not rendered while it is on.
+export function loader() {
+  return { ssoDisabledByBuild: isSsoDisabledByBuild() };
+}
+
+export default function AdminSsoProvidersPage({ loaderData }: Route.ComponentProps) {
+  const { t } = useLingui();
+
+  if (loaderData.ssoDisabledByBuild) {
+    return (
+      <div>
+        <SettingsHeader title={t`SSO Providers`} subtitle="" />
+        <p className="mt-6 max-w-2xl text-sm text-muted-foreground">
+          <Trans>SSO is disabled in this build.</Trans>
+        </p>
+      </div>
+    );
+  }
+
+  return <SsoProvidersConfig />;
+}
+
+function SsoProvidersConfig() {
   const { t } = useLingui();
   const { toast } = useToast();
   const utils = trpc.useUtils();

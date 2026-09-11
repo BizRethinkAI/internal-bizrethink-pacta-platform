@@ -1,15 +1,24 @@
 import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
+import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { autoClaimInvitesOnSignup } from './auto-claim-invites-on-signup';
+import {
+  autoClaimInvitesOnSignup,
+  claimInvitesOnVerification,
+  hasPendingInvites,
+} from './auto-claim-invites-on-signup';
 
 vi.mock('@documenso/prisma', () => ({
   prisma: {
     organisationMemberInvite: {
       findMany: vi.fn(),
+      findFirst: vi.fn(),
       update: vi.fn(),
+    },
+    organisationMember: {
+      count: vi.fn(),
     },
   },
 }));
@@ -18,9 +27,16 @@ vi.mock('@documenso/lib/server-only/organisation/accept-organisation-invitation'
   addUserToOrganisation: vi.fn(),
 }));
 
+vi.mock('@documenso/lib/server-only/organisation/create-organisation', () => ({
+  createPersonalOrganisation: vi.fn(),
+}));
+
 const mockedFindMany = vi.mocked(prisma.organisationMemberInvite.findMany);
+const mockedFindFirst = vi.mocked(prisma.organisationMemberInvite.findFirst);
 const mockedUpdate = vi.mocked(prisma.organisationMemberInvite.update);
+const mockedMemberCount = vi.mocked(prisma.organisationMember.count);
 const mockedAddUser = vi.mocked(addUserToOrganisation);
+const mockedCreatePersonalOrg = vi.mocked(createPersonalOrganisation);
 
 const inviteFixture = (overrides: Record<string, unknown> = {}) => ({
   id: 'invite-1',
@@ -37,10 +53,14 @@ const inviteFixture = (overrides: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   mockedFindMany.mockReset();
+  mockedFindFirst.mockReset();
   mockedUpdate.mockReset();
+  mockedMemberCount.mockReset();
   mockedAddUser.mockReset();
+  mockedCreatePersonalOrg.mockReset();
   mockedAddUser.mockResolvedValue({} as never);
   mockedUpdate.mockResolvedValue({} as never);
+  mockedCreatePersonalOrg.mockResolvedValue(undefined);
 });
 
 describe('autoClaimInvitesOnSignup', () => {
@@ -162,5 +182,94 @@ describe('autoClaimInvitesOnSignup', () => {
     // The helper does NOT catch the findMany error — caller (onCreateUserHook
     // in create-user.ts) has its own catch that falls back to Personal Org.
     await expect(autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' })).rejects.toThrow('DB down');
+  });
+});
+
+describe('hasPendingInvites (overlay 071)', () => {
+  it('returns true when a PENDING invite matches the email', async () => {
+    mockedFindFirst.mockResolvedValueOnce({ id: 'invite-1' } as never);
+    await expect(hasPendingInvites('jane@example.com')).resolves.toBe(true);
+  });
+
+  it('returns false when no PENDING invite matches the email', async () => {
+    mockedFindFirst.mockResolvedValueOnce(null);
+    await expect(hasPendingInvites('nobody@example.com')).resolves.toBe(false);
+  });
+
+  it('queries case-insensitively and for PENDING only', async () => {
+    mockedFindFirst.mockResolvedValueOnce(null);
+    await hasPendingInvites('Jane@Example.COM');
+    const query = mockedFindFirst.mock.calls[0][0] as {
+      where: { email: { equals: string; mode: string }; status: string };
+    };
+    expect(query.where.email.equals).toBe('Jane@Example.COM');
+    expect(query.where.email.mode).toBe('insensitive');
+    expect(query.where.status).toBe(OrganisationMemberInviteStatus.PENDING);
+  });
+});
+
+describe('claimInvitesOnVerification (overlay 071)', () => {
+  it('claims pending invites for the verified user and skips the Personal Org', async () => {
+    mockedFindMany.mockResolvedValueOnce([inviteFixture()] as never);
+
+    const result = await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
+
+    expect(mockedAddUser).toHaveBeenCalledOnce();
+    expect(result.map((r) => r.inviteId)).toEqual(['invite-1']);
+    expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
+  });
+
+  it('creates the Personal Org fallback when nothing was accepted and the user has zero memberships', async () => {
+    mockedFindMany.mockResolvedValueOnce([]);
+    mockedMemberCount.mockResolvedValueOnce(0);
+
+    await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
+
+    expect(mockedMemberCount).toHaveBeenCalledWith({ where: { userId: 42 } });
+    expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 42 });
+  });
+
+  it('does NOT create a Personal Org when nothing was accepted but the user already has a membership', async () => {
+    mockedFindMany.mockResolvedValueOnce([]);
+    mockedMemberCount.mockResolvedValueOnce(1);
+
+    await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
+
+    expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
+  });
+
+  it('creates the Personal Org fallback when every invite failed to claim and there are zero memberships', async () => {
+    mockedFindMany.mockResolvedValueOnce([inviteFixture()] as never);
+    mockedAddUser.mockRejectedValueOnce(new Error('addUser failed'));
+    mockedMemberCount.mockResolvedValueOnce(0);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
+
+    expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 42 });
+    errorSpy.mockRestore();
+  });
+
+  it('swallows and logs errors so email verification never fails', async () => {
+    mockedFindMany.mockRejectedValueOnce(new Error('DB down'));
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' })).resolves.toEqual([]);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[claim-invites-on-verification]'),
+      expect.any(Error),
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('swallows a Personal Org fallback failure too', async () => {
+    mockedFindMany.mockResolvedValueOnce([]);
+    mockedMemberCount.mockResolvedValueOnce(0);
+    mockedCreatePersonalOrg.mockRejectedValueOnce(new Error('org create failed'));
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' })).resolves.toEqual([]);
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 });

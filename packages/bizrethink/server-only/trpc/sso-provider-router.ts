@@ -1,7 +1,9 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { adminProcedure, router } from '@documenso/trpc/server/trpc';
 import { z } from 'zod';
 
+import { isSsoDisabledByBuild } from '../../feature-flags';
 import { encryptSsoString, invalidateProviderConfig } from '../sso-provider-config';
 
 // Phase F (overlay 014 prerequisite): TRPC router for SSO provider config.
@@ -58,6 +60,14 @@ export const ssoProviderRouter = router({
     .input(ZUpdateInput)
     .output(z.object({ ok: z.literal(true) }))
     .mutation(async ({ input, ctx }) => {
+      // 2026-09 incident: SSO is removed from this build; refuse to store
+      // provider credentials that could never be used anyway.
+      if (isSsoDisabledByBuild()) {
+        throw new AppError(AppErrorCode.NOT_SETUP, {
+          message: 'SSO is disabled in this build. Provider config cannot be saved.',
+        });
+      }
+
       const existing = await prisma.bizrethinkSsoProvider.findUnique({
         where: { provider: input.provider },
       });

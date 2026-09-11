@@ -43,11 +43,14 @@ export const AdminSignupGatingSection = ({ signup }: AdminSignupGatingSectionPro
 
   const signupForm = useForm<TSiteSettingsSignupSchema>({
     resolver: zodResolver(ZSiteSettingsSignupSchema),
+    // MODIFIED for BizRethink (overlay 071): with no saved row the server treats
+    // signup as CLOSED (fail-closed), so the form must show closed too — it used
+    // to show both switches off, which read as "open" while the server agreed.
     defaultValues: {
       id: SITE_SETTINGS_SIGNUP_ID,
-      enabled: signup?.enabled ?? false,
+      enabled: signup?.enabled ?? true,
       data: {
-        signupDisabled: signup?.data?.signupDisabled ?? false,
+        signupDisabled: signup?.data?.signupDisabled ?? true,
         allowedDomains: signup?.data?.allowedDomains ?? [],
         // Phase L (2026-05-11): require pending invite when domain-gated.
         requireInviteWhenDomainGated: signup?.data?.requireInviteWhenDomainGated ?? false,
@@ -63,9 +66,9 @@ export const AdminSignupGatingSection = ({ signup }: AdminSignupGatingSectionPro
       </h2>
       <p className="mt-2 text-muted-foreground text-sm">
         <Trans>
-          Disable signup entirely or restrict it to a list of email domains. This DB-backed setting overrides
-          NEXT_PUBLIC_DISABLE_SIGNUP and NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS. "Enabled" must be on for the override to
-          take effect.
+          Signup is open only when "Enabled" is on and "Disable signup" is off. Any other state — including no saved
+          setting, or a setting that cannot be read — keeps signup closed. NEXT_PUBLIC_DISABLE_SIGNUP=true also closes
+          it, and can never open it.
         </Trans>
       </p>
 
@@ -95,7 +98,8 @@ export const AdminSignupGatingSection = ({ signup }: AdminSignupGatingSectionPro
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  <Trans>Enabled (override env)</Trans>
+                  {/* MODIFIED for BizRethink (overlay 071): the env no longer opens signup, so "override env" misled. */}
+                  <Trans>Enabled</Trans>
                 </FormLabel>
                 <FormControl>
                   <div>

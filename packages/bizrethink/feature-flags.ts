@@ -19,3 +19,15 @@ export const BIZRETHINK_FLAGS = {
 } as const;
 
 export type BizRethinkFlags = typeof BIZRETHINK_FLAGS;
+
+/**
+ * SSO kill switch: Google, Microsoft, generic OIDC and the per-organisation
+ * authentication portal.
+ *
+ * 2026-09 incident: SSO removed from this build. Not a setting (ADR 0004
+ * governs settings); this is a removal. To re-enable, change code and pass
+ * review. No DB row or env var can turn SSO back on while this returns true.
+ *
+ * A function (not a constant) so tests can vi.mock it.
+ */
+export const isSsoDisabledByBuild = (): boolean => true;
