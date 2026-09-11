@@ -151,6 +151,119 @@ The move was safe only because nothing had been signed — `envelopeId` was NULL
 and the organisation had zero envelopes. **There is no code path to move an
 envelope between teams.** Anything similar must happen before the first send.
 
+## 2026-09-11: an anonymous admin hole, an election nobody could make, and the twins
+
+### #160 — every admin page was readable by anyone, and our own pages happened to dodge it
+
+**A-01, critical, live in the deployed build.** Documenso puts the admin
+authorization check in exactly one place — the admin **layout** loader. Under
+React Router 7 single-fetch, a request for
+
+```
+/admin/<page>.data?_routes=routes/_authenticated+/admin+/<page>
+```
+
+runs **only that leaf route's loader and skips every ancestor**, so the layout's
+check never executes. **Eight upstream admin leaf loaders returned their data to
+anyone, unauthenticated, with no signup, password or token.** The worst is
+`documents.$id` — full envelope detail including recipients, fields, signatures
+and **signing tokens**, across both tenants; `site-settings` leaked the CAPTCHA
+secret in plaintext; `users._index` every user's email and role.
+
+**The fork's own admin pages were already safe** — `mca`, `mca-library` and
+`lease-library` self-gate with `isAdmin`. That is luck, not design: an upstream
+weakness our overlay pages happened to dodge.
+
+Closed by `requireAdminLoader` (owned) plus overlay **073**, one guard line in
+each of the eight. **404, not 403 or a redirect**, so it does not confirm the
+route exists.
+
+### #161 — the §83.595(4) election could not be made, and a green test said it could
+
+The two statutory options printed as the literal characters `[ ]`. No field, no
+widget, nothing clickable. On the addendum's own terms — *"If neither is marked,
+no early termination fee is agreed"* — **the landlord lost the liquidated-damages
+remedy by default, on every lease, silently.** On the first real lease that is
+$13,800.
+
+**`election-form.test.ts` had a case called "gives the tenant something to mark".
+It asserted two `[ ]` literals in the clause TEXT and passed for as long as they
+were there.** A bracket is a typographic character, not a field. The test pinned
+the *appearance* of an election rather than the existence of one.
+
+> **A green test pinning the wrong thing is worse than no test** — it answers a
+> question nobody asked, convincingly.
+
+Found by **opening the rendered addendum and asking what a signer would click**,
+which is the same way the counsel-surface defects were found the day before.
+`CHECKBOX` rather than `RADIO` because a Documenso radio cannot be expressed as a
+placeholder, and §83.595(4)'s own statutory form has two boxes.
+
+### #163 — the twins stopped undoing the FRPA in the same envelope
+
+A merchant signs five of the six instruments. §4.3 of the Equipment Lease and
+Subscription guaranties — **signed by a natural person** — said service was
+effective *"upon such mailing… irrespective of whether a signed certified mail
+return receipt is returned"*, next to a waiver acknowledging the cost of
+litigating may exceed the amount at stake. Beside it, exclusive Pasco County
+venue, a jury waiver, a class waiver, a one-sided one-year limitation, and the
+nonreliance representation FRPA §7.22 had just deleted.
+
+**Those are the four defects §§7.5, 7.10, 7.11 and 7.19 were rewritten to
+remove**, re-imposed on the same person by the documents next to the one we
+fixed. Neither adversarial review nor the counsel memo read them in this role.
+
+**A REVIEW-02 fix was deliberately not followed**: *"Conform 4.3 to FRPA 7.12"* —
+which is the v4 text the FRPA rewrite had deleted as the defect.
+
+**No divergence was declared in `twins.ts`, and that is the result.** All five
+sections are vocabulary-neutral so the bodies are identical; declaring one
+divergent would have let `twins.test.ts` pass with **one** document fixed.
+
+### #162 and #164 — the two-question model, and the decisions that needed making
+
+[ADR 0014](adr/0014-two-questions-every-clause-answers.md): every clause records
+**why it is here** (`compelled` / `implements` / `discretionary`, ported from the
+lease library and rendered to counsel) and **whether the funder chooses**
+(`offered` naming the fact, or `fixed` with a required note). The four `fixed`
+reasons are the ones the rewrite produced — misattributed, no-alternative,
+unwritable, load-bearing — so the six refused gates stop being prose scattered
+through the corpus.
+
+**Decision 3 is a correction of the drafting session.** It proposed a third test,
+*"is Pacta willing to sell both options?"*, and the owner rejected it: *"we are
+not selling options, we are a SaaS provider."* The codebase already said so —
+`governance.yml` bans `you should` / `we recommend` from user-facing strings.
+
+**Counsel stopped seeing the findings**, which ADR 0012 decided on 2026-09-10 and
+nobody implemented. `outstandingFindings` is removed from the payload rather than
+hidden. #164 then authored the full-performance guaranty, an arbitration clause
+and §7.19's two-year period — all previously named gaps.
+
+### The §6.1 pair did not reach main, and the PR says MERGED
+
+**#165's base was `feat/mca-full-recourse-and-arbitration`, not `main`.** The base
+was merged to main first, then #165 was merged into that branch — by then already
+landed. **Its commits went nowhere, and the PR shows green and closed.** Caught
+by `git merge-base --is-ancestor` in post-merge verification; nothing else would
+have. **#166 recovers it**, carrying the same delta with no content change.
+
+> Landing a stacked PR's base first is **not sufficient**. A stacked PR whose
+> `baseRefName` is not the default branch must be retargeted to main after its
+> base lands, or merged into its base *before* that base goes to main. Checking
+> `baseRefName` on every PR — not body text saying "stacked on" — is the guard.
+
+### Owed
+
+**ADR 0012's *"six findings the 2026-09-09 memo refuted"* is wrong**, and ADRs are
+append-only so it needs a superseding line. The memo's paragraph is headed
+*"Earlier findings that should not be repeated as written"* and names those six
+topics accurately — but **one of them refutes a finding.** Two read a document
+already fixed, two deny propositions no finding makes, and one rests on a false
+premise (*"the missing Permission to Release"*, vendored twice). **It matters
+because `rejected` stops blocking approval**: recording all six would have
+unblocked five clauses on a misreading.
+
 ## The day of 2026-09-10: the FRPA was rewritten, and the suite around it was not
 
 **#152.** All **100** FRPA clause records authored, across ten agent runs, each
