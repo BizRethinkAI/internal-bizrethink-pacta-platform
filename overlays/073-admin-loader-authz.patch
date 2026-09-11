@@ -1,0 +1,246 @@
+# Why: A-01 in the 2026-09-10 security audit — an anonymous authorization
+#      bypass. Documenso's admin authorization lives ONLY in the admin layout
+#      loader (`admin+/_layout.tsx`). Under React Router 7 single-fetch, a
+#      request for `/admin/<page>.data?_routes=routes/_authenticated+/admin+/<page>`
+#      runs that leaf loader alone and skips every ancestor loader, so the
+#      layout check never runs and each unguarded admin leaf loader returns
+#      tenant data (documents with recipients/fields/signatures/signing tokens,
+#      user emails, organisation insights, the CAPTCHA secret) to anyone. Eight
+#      upstream admin leaf loaders were unguarded; each now calls
+#      `requireAdminLoader(request)` (packages/bizrethink/server-only/
+#      require-admin-loader.ts), the same isAdmin gate the fork's own admin
+#      pages already use, returning 404 to anonymous and non-admin callers.
+#
+# Why not a new file: these are upstream Documenso route files; the guard has
+#      to run inside each of their loaders. The gate logic itself is a new
+#      owned file in packages/bizrethink; this patch only wires it in.
+#
+# Fragility: MEDIUM. Upstream owns these route files and single-fetch route
+#      filtering is framework behaviour. A future sync that adds a new admin
+#      page, or reformats these, conflicts here — but the failure is loud:
+#      packages/bizrethink/regression-tests/admin-loaders-gated.test.ts scans
+#      the admin route dir and fails on any leaf loader that gates neither via
+#      requireAdminLoader nor isAdmin, and require-admin-loader.test.ts pins the
+#      helper's 404-for-anon/non-admin behaviour.
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/claims.tsx b/apps/remix/app/routes/_authenticated+/admin+/claims.tsx
+index 3a4c13011..abc4dd741 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/claims.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/claims.tsx
+@@ -1,17 +1,21 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+ import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
+ import { Input } from '@documenso/ui/primitives/input';
+ import { useLingui } from '@lingui/react/macro';
+ import { useEffect, useState } from 'react';
+ import { useLocation, useSearchParams } from 'react-router';
+-
+ import { ClaimCreateDialog } from '~/components/dialogs/claim-create-dialog';
+ import { SettingsHeader } from '~/components/general/settings-header';
+ import { AdminClaimsTable } from '~/components/tables/admin-claims-table';
+ 
+ import type { Route } from './+types/claims';
+ 
+-export async function loader() {
++export async function loader({ request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
+ 
+   return {
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx b/apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+index 48324bfa3..8e661d075 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+@@ -1,3 +1,4 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import { downloadFile } from '@documenso/lib/client-only/download-file';
+ import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
+ import { base64 } from '@documenso/lib/universal/base64';
+@@ -16,7 +17,6 @@ import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+ import { DownloadIcon } from 'lucide-react';
+ import { DateTime } from 'luxon';
+ import { Link, redirect } from 'react-router';
+-
+ import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
+ import { DocumentStatus } from '~/components/general/document/document-status';
+ import { AdminDocumentJobsTable } from '~/components/tables/admin-document-jobs-table';
+@@ -25,7 +25,11 @@ import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-docum
+ 
+ import type { Route } from './+types/documents.$id';
+ 
+-export async function loader({ params }: Route.LoaderArgs) {
++export async function loader({ params, request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const id = params.id;
+ 
+   if (!id || !id.startsWith('envelope_')) {
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/organisation-insights.$id.tsx b/apps/remix/app/routes/_authenticated+/admin+/organisation-insights.$id.tsx
+index 2b92e02f9..79a422686 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/organisation-insights.$id.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/organisation-insights.$id.tsx
+@@ -1,15 +1,19 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import { getOrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
+ import type { DateRange } from '@documenso/lib/types/search-params';
+ import { getAdminOrganisation } from '@documenso/trpc/server/admin-router/get-admin-organisation';
+ import { Button } from '@documenso/ui/primitives/button';
+ import { Trans } from '@lingui/react/macro';
+ import { Link } from 'react-router';
+-
+ import { OrganisationInsightsTable } from '~/components/tables/organisation-insights-table';
+ 
+ import type { Route } from './+types/organisation-insights.$id';
+ 
+ export async function loader({ params, request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const { id } = params;
+   const url = new URL(request.url);
+ 
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/organisation-insights._index.tsx b/apps/remix/app/routes/_authenticated+/admin+/organisation-insights._index.tsx
+index 1577cbc24..0912bb30e 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/organisation-insights._index.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/organisation-insights._index.tsx
+@@ -1,7 +1,7 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import { getOrganisationInsights } from '@documenso/lib/server-only/admin/get-signing-volume';
+ import type { DateRange } from '@documenso/lib/types/search-params';
+ import { Trans } from '@lingui/react/macro';
+-
+ import { DateRangeFilter } from '~/components/filters/date-range-filter';
+ import {
+   AdminOrganisationOverviewTable,
+@@ -11,6 +11,10 @@ import {
+ import type { Route } from './+types/organisation-insights._index';
+ 
+ export async function loader({ request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const url = new URL(request.url);
+ 
+   const rawSortBy = url.searchParams.get('sortBy') || 'signingVolume';
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx b/apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+index 9a8fa9cfa..6a42010e5 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+@@ -1,3 +1,4 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+ import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
+ import { AppError } from '@documenso/lib/errors/app-error';
+@@ -38,7 +39,6 @@ import { useForm } from 'react-hook-form';
+ import { Link, useNavigate } from 'react-router';
+ import { match } from 'ts-pattern';
+ import type { z } from 'zod';
+-
+ import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
+ import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
+ import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
+@@ -51,7 +51,11 @@ import { SettingsHeader } from '~/components/general/settings-header';
+ 
+ import type { Route } from './+types/organisations.$id';
+ 
+-export async function loader() {
++export async function loader({ request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
+ 
+   return {
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx b/apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+index e3f5f3551..c504b2104 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
+@@ -1,3 +1,4 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import {
+   SITE_SETTINGS_CAPTCHA_ID,
+   type TSiteSettingsCaptchaSchema,
+@@ -19,7 +20,6 @@ import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-setting
+ import { SITE_SETTINGS_EMAIL_BLOCKLIST_ID } from '@documenso/lib/server-only/site-settings/schemas/email-blocklist';
+ import { msg } from '@lingui/core/macro';
+ import { useLingui } from '@lingui/react';
+-
+ import { AdminCaptchaSection } from '~/components/general/admin-captcha-section';
+ import { AdminEmailBlocklistSection } from '~/components/general/admin-email-blocklist-section';
+ import { AdminSecurityHeadersSection } from '~/components/general/admin-security-headers-section';
+@@ -30,7 +30,11 @@ import { SettingsHeader } from '~/components/general/settings-header';
+ 
+ import type { Route } from './+types/site-settings';
+ 
+-export async function loader() {
++export async function loader({ request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const settings = await getSiteSettings();
+ 
+   const banner = settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID);
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/stats.tsx b/apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+index 036af6aa2..5930261ba 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/stats.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+@@ -1,3 +1,4 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
+ import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
+ import {
+@@ -24,17 +25,20 @@ import {
+   UserSquare2,
+   Users,
+ } from 'lucide-react';
+-
+ import { AdminLicenseCard } from '~/components/general/admin-license-card';
+ import { MonthlyActiveUsersChart } from '~/components/general/admin-monthly-active-user-charts';
+ import { AdminStatsSignerConversionChart } from '~/components/general/admin-stats-signer-conversion-chart';
+ import { AdminStatsUsersWithDocumentsChart } from '~/components/general/admin-stats-users-with-documents';
+ import { CardMetric } from '~/components/general/metric-card';
+-
+ import { version } from '../../../../package.json';
++
+ import type { Route } from './+types/stats';
+ 
+-export async function loader() {
++export async function loader({ request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const [
+     usersCount,
+     organisationsWithSubscriptionsCount,
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/users._index.tsx b/apps/remix/app/routes/_authenticated+/admin+/users._index.tsx
+index f3b76034d..70414f399 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/users._index.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/users._index.tsx
+@@ -1,12 +1,16 @@
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
+ import { findUsers } from '@documenso/lib/server-only/user/get-all-users';
+ import { Trans } from '@lingui/react/macro';
+-
+ import { AdminUserCreateDialog } from '~/components/dialogs/admin-user-create-dialog';
+ import { AdminDashboardUsersTable } from '~/components/tables/admin-dashboard-users-table';
+ 
+ import type { Route } from './+types/users._index';
+ 
+ export async function loader({ request }: Route.LoaderArgs) {
++  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
++  // single-fetch runs it without the admin layout's authorization check.
++  await requireAdminLoader(request);
++
+   const url = new URL(request.url);
+ 
+   const page = Number(url.searchParams.get('page')) || 1;

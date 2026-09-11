@@ -1089,6 +1089,8 @@ export const leaseBuilderRouter = router({
       }
 
       const envelope = await createEnvelopeFromMatter({
+        // Keys the signer-facing links to the governing documents.
+        matterId: matter.id,
         input: {
           facts: answers.facts,
           money: answers.money,

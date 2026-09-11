@@ -6,18 +6,16 @@ import { z } from 'zod';
 
 import {
   approvalBlocks,
-  isMcaApprovalCurrent,
   mcaClauseFingerprint,
   mcaLibraryFingerprint,
   normaliseMcaAdmission,
 } from '../../clauses/approval';
 import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../../clauses/examination';
-import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
+import { MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
 import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import { LOMBARD, resolveClauses } from '../../clauses/parties';
-import { counselBriefing } from '../../review/briefing';
-import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview, reviewIsStale } from '../../review/link';
-import { toReadableAgreement } from '../../review/readable-agreement';
+import { counselReviewView } from '../../review/counsel-view';
+import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview } from '../../review/link';
 import { loadMcaClauseApprovals } from '../clause-approvals';
 
 /**
@@ -294,9 +292,7 @@ export const mcaClauseLibraryRouter = router({
       throw new AppError(AppErrorCode.NOT_FOUND, { message: NO_SUCH_LINK });
     }
 
-    const clauses = libraryFor(review.instrument);
     const approvals = await loadMcaClauseApprovals();
-    const instrument = INSTRUMENTS[review.instrument];
 
     /*
       WHO TO REPLY TO, resolved rather than assumed.
@@ -316,113 +312,27 @@ export const mcaClauseLibraryRouter = router({
       select: { name: true, email: true },
     });
 
-    return {
-      reviewerName: review.reviewerName,
-      instrument: {
-        id: instrument.id,
-        title: instrument.title,
-        counterparty: instrument.counterparty,
-      },
-      /*
-        WHOSE PAPER THE REVIEWER IS READING.
+    /*
+      WHAT COUNSEL IS SENT, BUILT BY A PURE FUNCTION AND NOT BY THIS PROCEDURE.
 
-        This was `instrument.entity` until the clause library was parameterised:
-        "Lombard Capital LLC" was a field on the Future Receivables Purchase
-        Agreement itself, which made the library one client's. It is a tenant
-        fact now, so it comes from the tenant.
+      It was an object literal here, which is why nothing could assert anything
+      about it without a database — and nothing did. `counsel-view.ts` carries
+      the property that is now stated over every string in it, for all six
+      agreements.
 
-        THE SEAM: `BizrethinkMcaLibraryReview` has no tenant column, because it
-        was designed before there was a tenant to name. There is exactly one
-        today, so defaulting is honest rather than convenient — and this is the
-        line that changes when a second client's review link is minted.
-      */
-      parties: LOMBARD.parties,
-      /*
-        True when a clause has changed since the link was sent. The reviewer is
-        told rather than left to discover that the words they are reading are
-        not the words that were meant to reach them.
-      */
-      agreementMoved: reviewIsStale(review, clauses),
-      /*
-        WHETHER THE FINDINGS BELOW CAN BE TRUSTED TO BE COMPLETE.
-
-        `outstandingFindingsFor` reads the review register off disk and returns
-        `[]` when the file is absent, so an empty list means either "nothing
-        outstanding" or "we cannot tell". Telling an attorney nothing was found
-        when we cannot tell is worse on this page than on any other, because
-        she is the one person acting on it. `findingsHold` refuses an approval
-        for the same reason; this is the read-only half of the same honesty.
-      */
-      findingsReadable: REGISTER_AVAILABLE,
-      /*
-        WHAT THE READER IS TOLD BEFORE THE FIRST CLAUSE.
-
-        Derived per agreement rather than written into the page: the six are not
-        interchangeable, and prose typed into a route renders the same sentences
-        for all of them. `briefing.ts` carries the argument in full.
-
-        The counts are computed here from the same lists the page renders, so
-        the briefing cannot claim a number the clauses below contradict.
-      */
-      briefing: counselBriefing({
-        instrument: review.instrument,
-        tenant: LOMBARD,
-        clauseCount: clauses.length,
-        approvedCount: clauses.filter((clause) => isMcaApprovalCurrent(clause, approvals.get(clause.slug) ?? null))
-          .length,
-        outstandingCount: clauses.filter((clause) => outstandingFindingsFor(clause).length > 0).length,
-        findingsReadable: REGISTER_AVAILABLE,
-        sender: sender === null ? null : { name: sender.name ?? sender.email, email: sender.email },
-        expiresAt: row.expiresAt,
-        now: new Date(),
-      }),
-      /*
-        Grouped and in reading order. `openLibrary` on the lease side returned a
-        flat list in module-concatenation order, which is neither document order
-        nor any other order a reader could name.
-      */
-      /*
-        RESOLVED FOR THE TENANT BEFORE IT REACHES COUNSEL.
-
-        Clause bodies carry `{{funder}}`, `{{equipmentAffiliate}}` and
-        `{{processor}}` so the library is not one client's paperwork. An
-        attorney must not be shown those: she is reading to decide whether these
-        words may go to a merchant, and the words that go to a merchant name the
-        parties. Sending the general form would be asking her to approve text no
-        document contains.
-      */
-      sections: toReadableAgreement(resolveClauses(clauses, LOMBARD)).map((section) => ({
-        ...section,
-        clauses: section.clauses.map((readable) => {
-          const clause = clauses.find((candidate) => candidate.slug === readable.slug);
-
-          return {
-            ...readable,
-            /*
-              WHY THE CLAUSE IS IN THE DOCUMENT, where a state's law put it
-              there. Most of this corpus is our own commercial drafting and
-              says nothing here — and saying so is the point: it tells a lawyer
-              where their hour is worth spending.
-            */
-            requiredBy: clause?.requiredBy ?? null,
-            appliesInStates: clause?.appliesInStates ?? [],
-            /*
-              Whether somebody's approval already covers these exact words.
-              Read by an attorney deciding whether the clause still needs her,
-              so it has to mean "current", not "approved once, at some point".
-            */
-            approved: clause === undefined ? false : isMcaApprovalCurrent(clause, approvals.get(clause.slug) ?? null),
-            /*
-              Findings from the two document reviews that nothing has disposed
-              of. Counsel is the person best placed to read a clause knowing
-              what a previous review said about it, and this page is where she
-              is reading it.
-            */
-            outstandingFindings: clause === undefined ? [] : outstandingFindingsFor(clause).map((f) => f.finding),
-          };
-        }),
-      })),
-    };
+      THE SEAM ON `LOMBARD`: `BizrethinkMcaLibraryReview` has no tenant column,
+      because it was designed before there was a tenant to name. There is
+      exactly one today, so defaulting is honest rather than convenient — and
+      this is the line that changes when a second client's review link is
+      minted.
+    */
+    return counselReviewView({
+      review,
+      tenant: LOMBARD,
+      approvals,
+      sender: sender === null ? null : { name: sender.name ?? sender.email, email: sender.email },
+      now: new Date(),
+    });
   }),
 
   /**

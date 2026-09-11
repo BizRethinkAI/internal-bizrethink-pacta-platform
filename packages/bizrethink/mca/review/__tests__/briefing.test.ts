@@ -28,15 +28,19 @@ const base = {
   tenant: LOMBARD,
   clauseCount: 101,
   approvedCount: 0,
-  outstandingCount: 37,
-  findingsReadable: true,
+  unnumberedCount: 9,
   sender: { name: 'Shwet Prabhat', email: 'contracts@pacta.ink' },
   expiresAt: new Date('2026-09-22T00:00:00Z'),
   now: new Date('2026-09-08T00:00:00Z'),
 };
 
 const briefingFor = (instrument: (typeof MCA_INSTRUMENTS)[number]) =>
-  counselBriefing({ ...base, instrument, clauseCount: libraryFor(instrument).length });
+  counselBriefing({
+    ...base,
+    instrument,
+    clauseCount: libraryFor(instrument).length,
+    unnumberedCount: libraryFor(instrument).filter((clause) => clause.number === '').length,
+  });
 
 const text = (instrument: (typeof MCA_INSTRUMENTS)[number]) =>
   briefingFor(instrument)
@@ -254,26 +258,22 @@ describe('the counsel briefing', () => {
     expect(forever.toLowerCase()).toMatch(/until it is revoked|does not expire/);
   });
 
-  /**
-   * AN UNREADABLE REGISTER MUST NOT PRODUCE A CONFIDENT SENTENCE. The router
-   * already refuses to let an empty findings list read as a clean one; the
-   * briefing has to hold the same line, because it is the part of the page that
-   * sets the reader's expectation before they reach a single clause.
-   */
-  it('does not claim earlier findings are accounted for when the register is unreadable', () => {
-    const unreadable = counselBriefing({
-      ...base,
-      instrument: 'frpa',
-      findingsReadable: false,
-      outstandingCount: 0,
-    })
-      .flatMap((s) => s.body)
-      .join('\n')
-      .toLowerCase();
+  /*
+    THE ASSERTION THAT STOOD HERE IS DELETED, NOT WEAKENED, AND THIS RECORDS WHY.
 
-    expect(unreadable).toMatch(/cannot be read|not available|cannot be shown/);
-    expect(unreadable).not.toMatch(/nothing outstanding|no outstanding|all .* disposed/);
-  });
+    It was `does not claim earlier findings are accounted for when the register
+    is unreadable` — that a briefing built with `findingsReadable: false` says
+    so rather than letting an empty findings list read as a clean bill. Its
+    subject no longer exists: ADR 0012 closed *"Do findings render to reviewing
+    counsel? **No.**"*, the `history` section is gone, and `findingsReadable` is
+    no longer an input to this function or a field on the counsel payload.
+
+    The distinction it guarded still has consequences, and they are on the staff
+    side where the decision is taken: `findingsHold` refuses an approval when the
+    register cannot be read, and `approval-is-reachable.test.ts` asserts that.
+    `counsel-surface.test.ts` asserts the other half — that the briefing now
+    describes no register at all.
+  */
 
   /**
    * The count of what already carries an approval is the reader's answer to

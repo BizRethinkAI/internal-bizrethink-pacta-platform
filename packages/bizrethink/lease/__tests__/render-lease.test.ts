@@ -126,7 +126,19 @@ describe('every placeholder survives into the PDF', () => {
       per line with the full measure available. It stops being latent the
       moment they are laid out in columns.
     */
-    expect(new Set(allPlaceholders.map((p) => p.placeholder))).toEqual(new Set(emitted));
+    /*
+      THE SIGNATURE BLOCKS ARE NO LONGER THE ONLY SOURCE OF TOKENS.
+
+      The §83.595(4) election puts two CHECKBOX placeholders in the body of the
+      early-termination addendum — derived from the party order rather than
+      emitted by `buildSignatureBlocks` — so the extracted set is the emitted
+      set PLUS those. Kept as set equality rather than relaxed to a subset: the
+      wrapped-token defect described above is exactly what a subset check stops
+      catching.
+    */
+    const election = PICANA_VALUES.tenantElectionBox;
+
+    expect(new Set(allPlaceholders.map((p) => p.placeholder))).toEqual(new Set([...emitted, election]));
   });
 
   /*

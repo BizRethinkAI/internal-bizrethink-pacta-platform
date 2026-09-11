@@ -1,15 +1,19 @@
+import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
 import { getOrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
 import type { DateRange } from '@documenso/lib/types/search-params';
 import { getAdminOrganisation } from '@documenso/trpc/server/admin-router/get-admin-organisation';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
-
 import { OrganisationInsightsTable } from '~/components/tables/organisation-insights-table';
 
 import type { Route } from './+types/organisation-insights.$id';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
+  // single-fetch runs it without the admin layout's authorization check.
+  await requireAdminLoader(request);
+
   const { id } = params;
   const url = new URL(request.url);
 

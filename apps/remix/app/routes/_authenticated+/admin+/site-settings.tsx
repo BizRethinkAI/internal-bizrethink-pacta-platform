@@ -1,3 +1,4 @@
+import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
 import {
   SITE_SETTINGS_CAPTCHA_ID,
   type TSiteSettingsCaptchaSchema,
@@ -19,7 +20,6 @@ import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-setting
 import { SITE_SETTINGS_EMAIL_BLOCKLIST_ID } from '@documenso/lib/server-only/site-settings/schemas/email-blocklist';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-
 import { AdminCaptchaSection } from '~/components/general/admin-captcha-section';
 import { AdminEmailBlocklistSection } from '~/components/general/admin-email-blocklist-section';
 import { AdminSecurityHeadersSection } from '~/components/general/admin-security-headers-section';
@@ -30,7 +30,11 @@ import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/site-settings';
 
-export async function loader() {
+export async function loader({ request }: Route.LoaderArgs) {
+  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
+  // single-fetch runs it without the admin layout's authorization check.
+  await requireAdminLoader(request);
+
   const settings = await getSiteSettings();
 
   const banner = settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID);
