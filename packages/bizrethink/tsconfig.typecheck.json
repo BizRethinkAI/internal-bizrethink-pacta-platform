@@ -14,6 +14,9 @@
     "server-only/feature-access.ts",
     "server-only/feature-access.test.ts",
     "server-only/trpc/lease-builder-router.ts",
-    "mca/**/*.ts"
+    "mca/**/*.ts",
+    "server-only/require-admin-loader.ts",
+    "server-only/require-admin-loader.test.ts",
+    "regression-tests/admin-loaders-gated.test.ts"
   ]
 }
