@@ -84,12 +84,13 @@ first thing the render path must do is fail closed on it**, test written first.
 pull request.** Reading the current state means this file plus every note in
 that folder. The table below is history and stays until compaction.
 
-**Open right now: #155.** Everything else has merged.
+**Nothing is open.** #152 through #155 all merged on 2026-09-10.
 
-**Ten in-flight notes were folded into this file and deleted on 2026-09-10** —
-the second compaction, and **it had re-accumulated in one day.** Every one of the
-ten belonged to a merged PR: #145, #146, #147, #149, #150, #151, #152, #153, #154
-and the first compaction's own note.
+**Eleven in-flight notes were folded into this file and deleted on 2026-09-10** —
+the second compaction, and **it had re-accumulated in one day.** Every one
+belonged to a merged PR: #145, #146, #147, #149, #150, #151, #152, #153, #154,
+#155, and the first compaction's own note. **The folder is now empty but for its
+README**, which is the first time that has been true.
 
 **The governance gate was green throughout, again**, and this is the second time
 that has been recorded. `governance.yml` checks that a PR *touches* a state file
@@ -248,6 +249,38 @@ than a limb problem: **`venueRule`'s funder-state arm cannot be drafted, because
 **#150** fact coverage, **#151** ADR 0012, **#153** signup hardening, **#154**
 lease association and district, **#145–#149** runbook corrections and the first
 compaction.
+
+### #155 — the Dependabot alerts, and keeping them patched
+
+`npm audit --omit=dev` **20 → 6** (0 critical). Overlay **072**.
+
+**What actually ships was checked in the running production container, not
+assumed.** All six *critical* alerts are `next` RCE advisories, and **`next` is
+absent from the Pacta image** — it belongs to `apps/docs` and `apps/openpage-api`,
+neither of which is deployed. Upstream had fixed none of the 32: its current
+lockfile (v2.18.0) carries the same versions, so waiting for the weekly sync
+would not have helped.
+
+**The durability half is the part that is easy to miss.** The weekly sync takes
+upstream's lockfile wholesale, so a fix living only in the lockfile is reverted
+by the next sync. Direct deps therefore have their ranges raised in
+`package.json`; transitive ones use root `overrides`. **`npm` does not apply an
+override to a package already in the lockfile**, so the runbook now runs
+`npm update qs morgan joi fflate` after `npm install` — simulated both ways, and
+without that line four floors regress. `dependency-security-floors.test.ts` reads
+the root lockfile and fails if any floor drops, so a sync PR that loses one goes
+red instead of shipping.
+
+**Six accepted, with reasons in `ACCEPTED`:** `deepmerge-ts` via `@prisma/config`
+(forcing v8 risks breaking `prisma migrate deploy` at container start) and
+`ts-deepmerge` via `@anatine/zod-openapi`. **Their Dependabot alerts stay open
+until someone dismisses them on GitHub — the owner's call, not done.**
+
+**The npm-audit gate stays advisory**, because `npm audit` cannot allowlist an
+accepted advisory and a blocking gate would fail every PR. **The master
+`~/github/bizrethink/CLAUDE.md` still describes it as "blocks high+", which is
+false** — that file is outside this repo and was not edited. Another instance of
+exactly what this compaction is about.
 
 ### Settled by #154 — do not re-raise
 
