@@ -37,8 +37,23 @@ describe('an addendum that must outrank the body says so', () => {
     expect(found?.body).toMatch(PREVAILS);
   });
 
-  it('leaves the integration clause itself alone', () => {
-    // The default is still body-wins; these are the named exceptions to it.
-    expect(clause('general.entire-agreement')?.body).toMatch(/the body prevails/i);
+  /*
+    AND THE DEFAULT NOW AGREES WITH THEM.
+
+    The two sentences above were written as exceptions to a body-wins rule.
+    That rule was the wrong way round: an addendum is the specific, separately
+    negotiated, separately signed term, and the specific governs the general.
+    Reversing it made every addendum carrying real rights responsible for
+    remembering to claim them back — and the two cases above are what happens
+    when one forgets.
+
+    The explicit sentences stay. They are redundant against this default and
+    that is fine: they are what a reader of the addendum alone sees.
+  */
+  it('makes the addendum prevail by default', () => {
+    const body = clause('general.entire-agreement')?.body ?? '';
+
+    expect(body).toMatch(/the addendum prevails/i);
+    expect(body).not.toMatch(/the body prevails/i);
   });
 });

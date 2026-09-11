@@ -53,6 +53,18 @@ export type ClauseFacts = {
    * property with an HOA.
    */
   hasCdd: boolean;
+  /**
+   * Whether the landlord rents five or more individual dwelling units.
+   *
+   * §83.49(2) — the duty to notify the tenant in writing, within 30 days, of
+   * where the deposit is held — closes with "This subsection does not apply to
+   * any landlord who rents fewer than five individual dwelling units."
+   *
+   * Without this the library printed that duty for every landlord, which for
+   * the single-property owner it is aimed at means volunteering an obligation
+   * they do not owe and can then breach.
+   */
+  landlordRentsFiveOrMoreUnits: boolean;
   /** True when the term does not begin on the rent due day. */
   prorationApplies: boolean;
 

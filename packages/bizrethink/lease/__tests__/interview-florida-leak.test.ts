@@ -52,7 +52,7 @@ describe('questions North Carolina is asked that only Florida can use', () => {
     PINNED, so the list can shrink but never grow unnoticed. A new fact field
     gating a Florida-only clause lands here or the test fails.
   */
-  it('is exactly these four, and no more', () => {
+  it('is exactly these five, and no more', () => {
     const dead = asked('US-NC')
       .filter((field) => field.target !== 'value')
       .filter((field) => {
@@ -74,6 +74,11 @@ describe('questions North Carolina is asked that only Florida can use', () => {
       // Ch. 190 Fla. Stat. — gates `cdd.assessments`. A community development
       // district is a Florida creature.
       'hasCdd',
+      // Fla. Stat. §83.49(2) — gates `deposit.escrow-notice`. The subsection
+      // exempts a landlord renting fewer than five units; North Carolina has
+      // no equivalent threshold, because §42-50 puts every deposit in a trust
+      // account whatever the size of the portfolio. Asked there, dead there.
+      'landlordRentsFiveOrMoreUnits',
       // Fla. Stat. §83.575 — gates `term.non-renewal-notice`. Shows a Florida
       // citation. Its follow-up `nonRenewalNoticeDays` IS correctly marked,
       // because that one is a clause variable — which is exactly the gap.

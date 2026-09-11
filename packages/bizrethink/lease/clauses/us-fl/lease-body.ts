@@ -171,19 +171,34 @@ export const FL_LEASE_BODY: Clause[] = [
 
   {
     slug: 'rent.base',
-    version: 1,
+    /*
+      v2: AMOUNT AND DATE, NEVER METHOD.
+
+      The clause set the rent and the due day and stopped, so every tenancy
+      opened with a call asking where to send it — and rent whose method was
+      never agreed is a poor footing for a §83.56(3) notice.
+
+      THE METHOD IS NAMED; THE CREDENTIALS ARE NOT. A lease is handed to the
+      association under the declaration's leasing section, sits in a management
+      company's file, and is stored in the envelope and the database. A routing
+      and account pair written into it is a disclosure the landlord cannot
+      recall. "The account Landlord notifies to Tenant in writing" binds just
+      as well and travels nowhere.
+    */
+    version: 2,
     jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rent',
     sortKey: 40,
     heading: 'Rent',
-    body: 'Tenant shall pay rent of {{monthlyRentUsd}} per month, in advance, on day {{rentDueDay}} of each month.',
+    body: 'Tenant shall pay rent of {{monthlyRentUsd}} per month, in advance, on day {{rentDueDay}} of each month. Rent is payable by {{rentPaymentMethod}}.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
     variables: [
       { name: 'monthlyRentUsd', type: 'usd', label: 'Monthly rent', required: true },
       { name: 'rentDueDay', type: 'number', label: 'Rent due day', required: true },
+      { name: 'rentPaymentMethod', type: 'string', label: 'How rent is paid', required: true },
     ],
     supersedes: [],
     asserts: ['rent-amount'],
@@ -482,13 +497,36 @@ export const FL_LEASE_BODY: Clause[] = [
   */
   {
     slug: 'cdd.assessments',
-    version: 1,
+    /*
+      v2: COMPLIANCE WITH NO CONSEQUENCE, AND NO WAY TO RECOVER A PENNY.
+
+      `hoa.compliance` makes the tenant reimburse "any fine or charge levied by
+      the association". This clause said only that the tenant "shall comply
+      with any rule the district adopts", which is an obligation with nothing
+      behind it.
+
+      That was survivable while "district" meant assessments on the tax bill.
+      Estancia's district then adopted a fee schedule — administrative
+      reimbursement up to $500 a violation, property damage at actual cost,
+      facility rentals with forfeitable deposits — and a district bills the
+      OWNER. Every one of those landed on the landlord with no route back to
+      the tenant who incurred it.
+
+      Its suspension rule also enforces BY ADDRESS: an unpaid amount lets the
+      district deactivate every access card at the premises, including the
+      landlord's own. Stated by effect rather than by citation, because
+      enforcing against an address is how districts commonly do it.
+
+      A district is a unit of local government under Ch. 190, not the
+      association, so none of this can be borrowed from `hoa.compliance`.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 65,
     heading: 'Community Development District',
-    body: 'The Premises lie within {{cddName}}, a community development district established under Chapter 190, Florida Statutes. The district levies assessments that are separate from any association assessment and are ordinarily collected on the annual property tax bill. Those district assessments are payable by {{cddAssessmentsPaidBy}}. Tenant shall comply with any rule the district adopts for the use of its facilities, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any district notice received at or posted on the Premises.',
+    body: 'The Premises lie within {{cddName}}, a community development district established under Chapter 190, Florida Statutes. The district levies assessments that are separate from any association assessment and are ordinarily collected on the annual property tax bill. Those district assessments are payable by {{cddAssessmentsPaidBy}}. Tenant shall comply with any rule the district adopts for the use of its facilities, and shall forward to Landlord, within {{hoaNoticeHours}} hours and by email or any other means permitted by this Lease, any district notice received at or posted on the Premises. Tenant shall reimburse Landlord as an Other Charge for any fine, administrative reimbursement, property damage reimbursement, facility rental charge or forfeited deposit imposed by the district arising from an act or omission of Tenant, an occupant or a guest. Where the district restricts, suspends or deactivates access associated with the Premises because such an amount remains unpaid, Tenant shall pay that amount and any charge the district makes to restore access.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasCdd,
@@ -533,14 +571,37 @@ export const FL_LEASE_BODY: Clause[] = [
       see. The requirements are now AGREED AS TERMS, so the lease contains them
       by construction rather than by assertion, and the landlord's own words
       become operative instead of decorative.
+
+      v3: AND THEN IT UNDID THE CLAUSE NEXT DOOR.
+
+      `hoa.compliance` binds the tenant only to the owner obligations "that
+      govern the use, occupancy and conduct of the Premises", so that a duty to
+      pay assessments cannot land on a tenant. This clause prints what the
+      declaration demands, and Estancia's demands the words "bound by and
+      subject to ALL of the obligations of the Owner". On the rendered page the
+      two sat two paragraphs apart contradicting each other, and the narrowing
+      that fixed one was undone by the other.
+
+      Dropping the requirement is not open to us — the declaration says each
+      lease "shall have, at a minimum" these terms, so omitting it fails on the
+      document an association manager reads. So the words stay and their EFFECT
+      is bounded: not the money of ownership, and not what the governing law
+      makes non-delegably the landlord's.
+
+      THE SECOND LIMB NAMES NO STATUTE ON PURPOSE. This clause is generic —
+      associations are not a Florida invention and North Carolina selects it
+      too — so citing §83.51(1) here would quietly make it Florida's, which
+      `clause-jurisdictions` pins against. Phrased by effect rather than by
+      citation it reaches §83.51(1) in Florida and §42-42 in North Carolina,
+      and keeps working when a third state arrives.
     */
-    version: 2,
+    version: 3,
     jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 62,
     heading: 'Association Requirements for This Lease',
-    body: 'The governing documents of {{hoaName}} require this Lease to contain the following, and Landlord and Tenant agree to them as terms of this Lease: {{hoaLeaseRequirements}}',
+    body: 'The governing documents of {{hoaName}} require this Lease to contain the following, and Landlord and Tenant agree to them as terms of this Lease: {{hoaLeaseRequirements}}\n\nWhere those requirements bind Tenant to obligations of the Owner, they do not make Tenant liable for assessments, capital contributions or other monetary obligations of ownership, and do not transfer to Tenant any obligation which the law governing this Lease places on Landlord and does not permit to be transferred.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa && facts.hasHoaLeaseRequirements,
@@ -576,18 +637,74 @@ export const FL_LEASE_BODY: Clause[] = [
   */
   {
     slug: 'hoa.amenity-access',
-    version: 1,
+    /*
+      v2: IT PROMISED A RESULT THE LANDLORD CANNOT PRODUCE.
+
+      "Landlord shall register Tenant with the association ... in time for
+      Tenant to have access from the start date" is unqualified, and depends on
+      a third party and on the tenant. The first real lease proved it: the
+      association's manager requires a form completed BY THE TENANT, carrying
+      his signature, his household's dates of birth and his vehicle
+      registrations. None of that is the landlord's to supply.
+
+      It also contradicted itself — sentence one says access "is not guaranteed
+      by this Lease", sentence three guaranteed it by a date.
+
+      Split by who can act. The landlord owes what only an owner can give, on
+      whatever timetable the governing documents set. The tenant owes what only
+      an occupant can give, on a deadline that is an answer rather than a
+      literal. A late start the tenant caused is the tenant's risk.
+
+      THE LANDLORD LIMB STAYS ABSTRACT for the reason the note above records:
+      naming one declaration's filing list or deadline here asserts it of every
+      association.
+
+      v3: AND THE RESIDUAL BELONGED TO NOBODY.
+
+      The allocation sentence is a closed list — application, access card, gate
+      device — so a periodic membership or user fee sat outside it, allocated
+      to no one. Not neutral: an association bills the OWNER and looks to the
+      owner for a renter's unpaid charges, so it landed on the landlord anyway,
+      with an argument attached. Estancia's district then adopted a
+      non-resident annual user fee of $7,106.32, which ought not to reach a
+      landowner's tenant — but "ought not" plus silence is how a five-figure
+      surprise arrives in month six.
+
+      It says where the residual sits and stops there. Inventing an allocation
+      for a fee that should not apply is a question for the district, not for
+      drafting.
+
+      v4: AMENITIES CHANGE HANDS MID-TERM. At the property this was written for
+      the pool and clubhouse were mid-transfer from the master association to
+      the community development district — authorised, not yet conveyed, with
+      two fee schedules disagreeing about the price of an access card. Over
+      eighteen months the operator, the rules and the fees can all move, and
+      silence invites the argument that the tenant is getting less than was
+      let.
+
+      "OF ITSELF" IS LOAD-BEARING. Without it the sentence would also excuse
+      the amenities being withdrawn altogether, which is a different thing from
+      a change of operator and not something to be pre-forgiven for. A change
+      alone is not an abatement; total loss is left to law.
+    */
+    version: 4,
     jurisdiction: 'generic',
     placement: 'lease-body',
     section: 'rules',
     sortKey: 64,
     heading: 'Association Amenities',
-    body: "Use of the association's common areas and recreational facilities by Tenant is subject to the association's approval and to whatever registration process and fees the association requires from time to time. It is not guaranteed by this Lease. Landlord shall register Tenant with the association, and provide whatever the association requires for that purpose, in time for Tenant to have access from the start date. Any application, access card or gate device fees charged by the association are payable by {{amenityFeesPaidBy}}.",
+    body: "Use of the association's common areas and recreational facilities by Tenant is subject to the association's approval and to whatever registration process and fees the association requires from time to time. It is not guaranteed by this Lease.\n\nLandlord shall give the association whatever it requires from the Owner for Tenant's registration, including any copy of this Lease and Tenant's contact details, by any date the governing documents set. Tenant shall give the association whatever it requires from the occupants, including its registration forms, proof of identity or residency, dates of birth and vehicle details, within {{amenityRegistrationDays}} business days of the date of this Lease, and shall pay the association's fees when due. Where access begins later than the start date because Tenant has not done so, that is not a failure by Landlord and does not reduce the rent.\n\nAny application, access card or gate device fees charged by the association are payable by {{amenityFeesPaidBy}}. No other charge for the use of the association's amenities is payable by Tenant unless this Lease says so. If responsibility for the amenities passes to another body, or the rules or fees for their use change during the term, that is not a failure by Landlord and does not of itself reduce the rent.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa,
     variables: [
       { name: 'amenityFeesPaidBy', type: 'string', label: 'Who pays the association amenity fees', required: true },
+      {
+        name: 'amenityRegistrationDays',
+        type: 'number',
+        label: 'Business days for Tenant to file the association registration',
+        required: true,
+      },
     ],
     supersedes: [],
     asserts: ['hoa-amenity-access'],
