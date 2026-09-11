@@ -182,6 +182,10 @@ export const PICANA_VALUES: Record<string, InterpolationValue> = {
   // Silence here is an argument during move-in week.
   // Named, never numbered: the signed lease goes to the association.
   rentPaymentMethod: 'ACH or bank transfer to the account Landlord notifies to Tenant in writing',
+  // Derived in hydrateMatter from the party order; stated here because the
+  // fixtures drive rendering directly rather than going through it. The
+  // fixture lists both landlords first, so the first tenant is r3.
+  tenantElectionBox: '{{CHECKBOX, r3}}',
   amenityFeesPaidBy: 'Landlord',
   // The association's form is the tenant's to complete, so the lease gives
   // them a deadline instead of promising access on a date nobody controls.

@@ -89,24 +89,27 @@ const unauthored = (): string[] => {
  * `equipment: 'none'` selects no equipment clauses, and that is the whole
  * content of the answer. Demanding a clause here would be demanding prose that
  * says a thing is absent, which is how documents acquire sentences nobody
- * needs. `guarantyScope: 'none'` joined it on 2026-09-10: no guaranty means no
- * guaranty clauses, and §9.1's grid — which used to be selected anyway, asking
- * a natural person for a Social Security number in support of a guaranty the
- * document did not contain — is now gated with the rest of Section 9.
+ * needs.
  *
  * **`concurrentPositions: false` LEFT this list, and the direction matters.**
  * It used to mean silence: no cascade clause, nothing said. The memo's design
  * does not want silence there, it wants the opposite rule stated, so
  * `frpa.single-active-position-4-15` now says it. A value can stop meaning
  * nothing.
+ *
+ * **`guarantyScope: 'none'` LEFT IT TOO, on 2026-09-11, for the same reason and
+ * by a route worth reading.** It joined on 2026-09-10 on the argument that no
+ * guaranty means no guaranty clauses — true of Section 9 and never true of the
+ * document. §6.1 became an exhaustive pair on `guarantyScope` when the
+ * full-recourse half was authored, and the narrow half is gated `!==
+ * 'full-performance'`, so a no-guaranty template now selects a clause *because*
+ * of that answer: `frpa.events-of-default-6-1`, whose denial of guarantor
+ * liability is trivially true where there is no Guarantor and is the right text
+ * to put in front of a merchant who was never asked for one. The row is deleted
+ * rather than left standing, which is the maintenance this register is for — a
+ * tolerated gap that has been closed is a line that can no longer be red.
  */
-const NO_CLAUSE_OWED = [
-  'brokerChannel:false',
-  'consumerReportPulled:false',
-  'equipment:none',
-  'guarantyScope:none',
-  'renewalModel:none',
-];
+const NO_CLAUSE_OWED = ['brokerChannel:false', 'consumerReportPulled:false', 'equipment:none', 'renewalModel:none'];
 
 /**
  * Values a funder would expect substance behind, and there is none.
@@ -119,20 +122,21 @@ const NO_CLAUSE_OWED = [
  * remain, for reasons now understood rather than merely observed.
  *
  * **WHAT THIS FILE MEASURES IS DISTINGUISHABILITY, NOT COMPLETENESS**, and the
- * difference matters at exactly one row. `guarantyScope: 'full-performance'`
- * left this list because it now selects a different set — §9.1 and §§10.2/10.4 —
- * from the other two values. It is **not** a funder-ready answer: the
- * full-performance guaranty itself is unauthored, deliberately, so that profile
- * assembles an identity grid and two service waivers with no guaranty between
- * them. That gap is named in ADR 0013 and is an owner decision, not a drafting
- * one — all three market forms filed as SEC exhibits guarantee every
- * representation, warranty and covenant, which is precisely why a drafting agent
- * did not invent our version of it.
+ * difference used to matter at exactly one row. `guarantyScope:
+ * 'full-performance'` left this list on 2026-09-10 because it selected a
+ * different set — §9.1 and §§10.2/10.4 — from the other two values, while being
+ * no kind of funder-ready answer: the full-performance guaranty itself was
+ * unauthored, so that profile assembled an identity grid and two service waivers
+ * with no guaranty between them.
+ *
+ * **The owner authored it on 2026-09-11**, so that row is now distinguishable
+ * AND complete, and the distinction it used to illustrate has to be carried by
+ * the note rather than by an example. It is still the real one: a row can leave
+ * this list while being useless, and nothing here would say so.
  *
  * | gap | what is missing |
  * |---|---|
  * | `venueRule` (both) | Nothing reads it. §7.5 is the only venue clause and the gate was refused because **the `funder-state` arm cannot be drafted at all: `McaFacts` has no field naming the funder's state.** `LOMBARD_FACTS` now says `merchant-state` and §7.5 agrees with it, which removes the contradiction without closing the gap. Needs a `funderState` field plus a variables mechanism, or the row deleted. The legal consequence is real: Va. Code **§6.2-2234(A)** requires an action under a covered contract to be brought in the Commonwealth |
- * | `disputeResolution:arbitration` | the four waivers drop and nothing replaces them. All three market forms filed as SEC exhibits pair arbitration WITH a class waiver. Va. §6.2-2234(B) also bars face-to-face arbitration outside the recipient's principal place of business and puts the arbitrators' fees on the provider |
  * | `collectionMethod:ach-only` | drops the Split Funding Authorization and puts no collection mechanism in its place. It gates no FRPA clause at all — §2.5 and §7.14 are the clauses that would read it if they returned |
  * | `processorSplitAccepted` (both) | nothing reads it, and the gate was refused twice on the same ground: gating §2.3 leaves a template with no collection mechanism, and gating Exhibit A deletes the specification precisely for the funder whose processor has not accepted. **The vendored authorization has no processor acceptance block at all**, so `false` is not a record-keeping gap — it is what the form makes inevitable |
  *
@@ -146,7 +150,17 @@ const NO_CLAUSE_OWED = [
  */
 const GAPS = [
   'collectionMethod:ach-only',
-  'disputeResolution:arbitration',
+  /*
+    `disputeResolution:arbitration` WAS HERE AND IS DELETED, WHICH IS WHAT THIS
+    LIST IS FOR. The row read: "the four waivers drop and nothing replaces them.
+    All three market forms filed as SEC exhibits pair arbitration WITH a class
+    waiver." The owner authored `frpa.arbitration-7-26` on 2026-09-11 — an
+    agreement to arbitrate, an individual-basis limb, an in-person hearing in the
+    merchant's own jurisdiction and the arbitrator's fees on Buyer, the last two
+    being Va. Code §6.2-2234(B) satisfied nationally by construction. The
+    docstring below this list says in terms that adding an arbitration clause
+    makes this test fail and that the fix is to delete a line; this is that.
+  */
   'processorSplitAccepted:false',
   'processorSplitAccepted:true',
   'venueRule:funder-state',

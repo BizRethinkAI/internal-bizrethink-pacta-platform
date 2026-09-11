@@ -3,8 +3,11 @@ import type { CreateEnvelopeOptions } from '@documenso/lib/server-only/envelope/
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
+
+import { attachmentLinks } from '../documents/attachment-links';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { prisma } from '@documenso/prisma';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../../server-only/feature-access';
@@ -124,6 +127,17 @@ export const buildEnvelopeInput = ({
 
 export type CreateEnvelopeFromMatterOptions = {
   input: RenderLeaseInput;
+  /**
+   * The matter the envelope is being created FROM, and its governing
+   * documents.
+   *
+   * Both are here only to build the signer-facing attachment links. The matter
+   * id keys the URL because `EnvelopeAttachment` carries one `data` string for
+   * every recipient — so no per-signer token can go in it — and because
+   * `createEnvelope` makes the envelope and its attachments in one call, so
+   * there is no envelope id yet.
+   */
+  matterId: string;
   parties: LeaseParty[];
   emails: Record<string, string>;
   userId: number;
@@ -145,6 +159,7 @@ export type CreateEnvelopeFromMatterOptions = {
  */
 export const createEnvelopeFromMatter = async ({
   input,
+  matterId,
   parties,
   emails,
   userId,
@@ -233,5 +248,43 @@ export const createEnvelopeFromMatter = async ({
     readyToSend: rendered.readyToSend,
   });
 
-  return await createEnvelope({ ...envelopeInput, requestMetadata });
+  /*
+    The governing documents ride along as LINKS, which is what the receipt
+    addendum needs to be true rather than merely asserted: the signing view
+    renders them beside the lease, so a tenant acknowledging receipt of sixteen
+    instruments can open each one.
+
+    Read here rather than passed in, and ordered exactly as the receipt recites
+    them, so the popover and the addendum cannot drift apart.
+  */
+  const matter = await prisma.bizrethinkLeaseMatter.findUnique({
+    where: { id: matterId },
+    select: { propertyId: true },
+  });
+
+  const governingDocuments = await prisma.bizrethinkDocument.findMany({
+    where: {
+      kind: 'hoa-governing',
+      archivedAt: null,
+      OR: [{ propertyId: matter?.propertyId ?? '' }, { matterId }],
+    },
+    select: { id: true, kind: true, label: true, reference: true, documentDate: true, pageCount: true },
+    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+  });
+
+  return await createEnvelope({
+    ...envelopeInput,
+    attachments: attachmentLinks(
+      matterId,
+      governingDocuments.map((document) => ({
+        id: document.id,
+        kind: 'hoa-governing' as const,
+        label: document.label,
+        reference: document.reference ?? '',
+        documentDate: document.documentDate?.toISOString() ?? '',
+        pageCount: document.pageCount,
+      })),
+    ),
+    requestMetadata,
+  });
 };

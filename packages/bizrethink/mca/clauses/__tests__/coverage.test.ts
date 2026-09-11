@@ -41,12 +41,63 @@ const COVERED: [McaInstrument, { anchor: string; reason: string }[]][] = [
   ['iso-pra', ISO_PRA_NON_CLAUSE],
 ];
 
-describe.each(COVERED)('%s accounts for its whole document', (instrument, nonClause) => {
-  const file = LOMBARD.documents[instrument].file;
+/**
+ * THE LINE-ACCOUNTING RUNS ONLY WHERE THE LIBRARY IS STILL A COPY.
+ *
+ * `linesNotAccountedFor` asks whether the DOCUMENT holds text the library does
+ * not. That is a transcription guard, and it is worth having for exactly as long
+ * as the clauses are a transcription. The ISO PRA's are; the twins' were until
+ * `feat/mca-rewrite-twins`.
+ *
+ * RETIRED FOR THE TWO TWINS ON ADR 0012's AUTHORITY, which is the same
+ * authority and the same shape as `frpa-coverage.test.ts`'s retirement on
+ * 2026-09-10: *"Once clauses are authored it asserts that we have PRESERVED
+ * v4, which is exactly what ADR 0012 decided not to care about."* Ten clause
+ * records were rewritten because a natural-person guarantor was signing a
+ * service-on-mailing provision, an inconvenient-forum waiver, a one-sided
+ * one-year limitation and a class waiver. Requiring those lines to stay
+ * accounted for is requiring the defect.
+ *
+ * NOT SILENCED THE TWO CHEAP WAYS, both of which are worse and both of which
+ * `frpa-coverage.test.ts` names. Declaring the eleven lines in
+ * `EQUIPMENT_NON_CLAUSE` / `SUBSCRIPTION_NON_CLAUSE` would leave an assertion
+ * that passes by construction and can never again be red — and would claim
+ * those lines are "not a clause", which is false: they are the clause.
+ * Nulling `bodiesVerifiedAt` would hide the digest guard with them.
+ *
+ * WHAT WENT UNACCOUNTED, AND IT IS ALSO THE HANDOFF LIST. Exactly eleven lines
+ * in each document, the same eleven in both, and nothing else — which is itself
+ * evidence that the rewrite touched what it meant to:
+ *
+ *   §3.14's subrogation and subordination paragraph; §3.15's Florida-law and
+ *   Pasco-County-venue paragraph; §3.15A's one-sided jury waiver; the heading
+ *   "3.15B Class Action Waiver"; §3.15B's class waiver; §3.15C's one-year
+ *   period; §3.16's notice paragraph; the heading "4.3 Independent Decision;
+ *   Governing Law"; §4.3's nonreliance, inconvenient-forum and
+ *   service-on-mailing paragraph; the heading "4.4 Jury Trial and Class Action
+ *   Waiver"; and §4.4 itself.
+ *
+ * **The `.docx` in `lombard-contracts` still prints all twenty-two of them.**
+ * Changing that is a form change and is handed back, not made here.
+ *
+ * WHAT STILL RUNS FOR ALL THREE. The non-clause declarations, below: a
+ * declaration that never matches is a claim about the document that has stopped
+ * being true, and that check has nothing to do with whether a clause body is a
+ * transcription. The digest in `bodies-match-the-document.test.ts` also still
+ * runs, and still catches the `.docx` being edited underneath us.
+ */
+const STILL_A_TRANSCRIPTION = COVERED.filter(([instrument]) => instrument === 'iso-pra');
 
+describe.each(STILL_A_TRANSCRIPTION)('%s holds every line of its document', (instrument, nonClause) => {
   it('leaves no line unaccounted for', () => {
+    const file = LOMBARD.documents[instrument].file;
+
     expect(linesNotAccountedFor(file, resolveClauses(libraryFor(instrument), LOMBARD), nonClause)).toEqual([]);
   });
+});
+
+describe.each(COVERED)('%s declares what is not a clause of it', (instrument, nonClause) => {
+  const file = LOMBARD.documents[instrument].file;
 
   it('has no non-clause declaration that never matches, and gives each a reason', () => {
     const lines = documentLines(file);

@@ -305,6 +305,51 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
     appliesInStates: [],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
+  /*
+    THE GUARANTY LIMIT IN §4.2, UNDONE TWENTY CLAUSES EARLIER.
+
+    WHAT WAS WRONG. "No guarantor shall have any right of subrogation to any of
+    our rights in the Equipment or this Agreement or against you, and any such
+    right of subrogation is hereby waived and released. All indebtedness ... is
+    hereby subordinated to all of your present and future obligations ... until
+    the obligations due to us are paid and satisfied in full."
+
+    REVIEW-01 narrowed §4.2 to three items and said in terms that the Guarantor
+    is not liable for a monthly payment, for an amount accelerated under
+    §3.12(b)(ii), or for the business failing. This Section was never conformed:
+    it subordinates insider debt until the WHOLE agreement is paid, including the
+    payments §4.2 says the Guarantor does not owe, and it releases subrogation to
+    the very Equipment §4.2(a) may make the Guarantor pay the fair market value
+    of. REVIEW-02 raised it as
+    `el-3-14-was-not-conformed-when-4-2-was-narrowed`, HIGH, and the
+    `lombard-contracts` manifest still records it `open` with "Routed to counsel
+    by REVIEW-02 and not yet put to one. No document change made."
+
+    THE SAME SHAPE AS FRPA §7.21 AND §9.1, AND FOUND THE SAME WAY. The FRPA
+    rewrite found four routes to guarantor liability and every one was found by
+    an assertion stated over the SET rather than by reading a clause — §7.21 made
+    a guarantor indemnify Buyer for "any act or omission by any ISO", which the
+    2026-09-09 memo does not raise. This is the twins' version of that, and it
+    was found by the same method.
+
+    WHAT CHANGED. Both limbs are tied to the obligations §4.2 guarantees.
+    Subordination ends when those obligations are satisfied, whatever else
+    remains payable under the agreement. Subrogation is DEFERRED rather than
+    released, and a guarantor who has paid the fair market value of Equipment
+    under §4.2(a) is subrogated to our interest in that Equipment on payment —
+    which is the interest §4.2(a) makes them buy.
+
+    DEPARTURE FROM REVIEW-02's FIX. It also says "Move 3.14 into Section 4 where
+    the rest of the guaranty lives, so the next person narrowing the guaranty
+    sees it." Not done. A move renumbers two live documents, and `number` is what
+    a reader sees on the page of a document that still prints 3.14. What replaces
+    it is the first sentence, which sends a reader from here to §4.2, and the
+    assertion in `__tests__/the-twins-cannot-undo-the-frpa.test.ts` that EVERY
+    clause outside Section 4 binding a guarantor must cite §4.2 — which a move
+    would not have given, because a move fixes one clause and an assertion covers
+    the next one. Recorded for whoever renumbers: this is the clause to move
+    first.
+  */
   {
     slug: 'equipment-lease.lease-guaranty',
     version: 1,
@@ -315,7 +360,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
     section: 'agreement',
     sortKey: 140,
     heading: 'Lease Guaranty',
-    body: 'No guarantor shall have any right of subrogation to any of our rights in the Equipment or this Agreement or against you, and any such right of subrogation is hereby waived and released. All indebtedness that exists now or arises after the execution of this Agreement between you and any guarantor is hereby subordinated to all of your present and future obligations, and those of your guarantor, to us, and no payment shall be made or accepted on such indebtedness owed by you to a guarantor until the obligations due to us are paid and satisfied in full.',
+    body: 'Section 4.2 states the whole of what a guarantor guarantees under this Agreement, and this Section adds nothing to it. A guarantor is not liable under this Section for an obligation that Section 4.2 says the guarantor does not owe.\nNo guarantor has a right of subrogation to our rights against you, or to our interest in the Equipment, until the obligations guaranteed by Section 4.2 have been satisfied. A guarantor who has paid us the fair market value of Equipment under Section 4.2(a) is subrogated on that payment to our interest in that Equipment, and we will do what the guarantor reasonably asks to evidence it.\nIndebtedness owed by you to a guarantor is subordinated to the obligations guaranteed by Section 4.2, and no payment may be made or accepted on that indebtedness while any of those obligations is due and unpaid. When those obligations are satisfied this subordination ends, whether or not another amount remains payable to us under this Agreement.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -330,6 +375,123 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
       },
     ],
   },
+  /*
+    FOUR PROVISIONS UNDER ONE CAPTION, AND THE CAPTION IS THE LEAST OF IT.
+
+    WHAT WAS WRONG. Florida law, and "The exclusive venue for any actions or
+    claims arising under or related to this Lease shall be the appropriate state
+    or federal court located in Pasco County, Florida" — in a form signed by a
+    merchant and personally guaranteed by a natural person who may be in any of
+    eleven states. Then three more provisions under the same caption: a jury
+    waiver running only against "YOU", a class-action waiver running only against
+    "YOU", and a one-year limitation period running only against "YOU". Those are
+    the four defects FRPA §§7.5, 7.10, 7.11 and 7.19 were rewritten to remove,
+    sitting in the document the same person signs next.
+
+    REVIEW-02 RAISED TWO OF THEM AND NEITHER REVIEW ASKED ABOUT THE VENUE.
+    `el-3-15-hides-three-waivers-under-a-miscellaneous-caption` is recorded
+    implemented — the three got the sub-headings 3.15A, 3.15B and 3.15C this body
+    still prints — and `el-3-15-jury-waiver-is-one-sided-where-the-frpas-is-
+    mutual` is recorded open, "not yet put to" counsel. Neither review read this
+    document as part of Lombard's merchant package, because it only became part
+    of one when `instrumentsFor` began returning both twins on
+    `equipment !== 'none'`.
+
+    WHAT CHANGED, IN FOUR PARTS.
+
+    (1) LAW AND FORUM BOTH MOVE TO THE CUSTOMER'S OWN STATE, matching FRPA §7.5
+        and `LOMBARD_FACTS.venueRule`, which is `merchant-state`. "Exclusive"
+        goes with them: the rule is symmetrical, neither party may require the
+        other to litigate elsewhere, and it yields where a state fixes its own
+        forum for an agreement of this kind.
+    (2) THE JURY WAIVER BECOMES MUTUAL AND LIMITS ITSELF, in FRPA §7.10's shape.
+        It operates only so far as the law of the forum gives effect to a
+        predispute waiver; where that law does not, the Section has no effect and
+        each party keeps the right. The owner's instruction against deleting a
+        jury waiver nationally to answer one state's rule is honoured — the
+        answer a jury waiver needs is per-FORUM at the time of suit, not
+        per-template at the time of drafting, and a customer in one state can be
+        sued in another.
+    (3) THE CLASS WAIVER GOES, in FRPA §7.11's shape, and its sub-heading changes
+        for FRPA §7.13's reason: a reader who finds "Class Action Waiver" and
+        reads a clause that waives nothing has been told the opposite of the
+        truth twice.
+    (4) THE ONE-YEAR PERIOD GOES AND NO PERIOD REPLACES IT. FRPA §7.19 was
+        redrafted mutual with no shortening because the two-year figure
+        attributed to the 2026-09-09 memo exists nowhere but one orchestrator
+        note — checked again here, in `lombard-contracts` and in both review
+        registers, with the same result. A day count written into a form a
+        natural person signs, on an unconfirmed premise, is what the standing
+        rule against inventing commercial values exists to stop, and shortening a
+        limitation period is the direction that costs the signer.
+
+    ARTICLE 9 IS ADDED, AND IT IS NOT COSMETIC. §3.6 claims a security interest
+    in the Equipment and, in the Equipment Lease, the right to file a financing
+    statement to perfect it. A choice-of-law sentence cannot displace the UCC's
+    mandatory perfection and priority rules, and once the governing law follows
+    the customer around the country the point stops being theoretical. FRPA §7.5
+    carries the same sentence; this is the document that actually takes the
+    interest.
+
+    WHY THE JUSTIFICATION IS NOT THE FRPA'S, WHICH MATTERS IF ANYONE REOPENS IT.
+    VERIFIED, `mca/sources/VA-Code-6.2-2228-2238.txt`: Va. Code §6.2-2234(A),
+    "Place for bringing action", makes a provision mandating a forum outside the
+    Commonwealth unenforceable for a covered transaction, and §6.2-2228 defines
+    "Recipient" as a person whose principal place of business is in the
+    Commonwealth — so merchant-state satisfies Virginia by construction for the
+    FRPA. **That statute governs sales-based financing, and an equipment lease is
+    not sales-based financing.** It compels nothing here, and saying it did would
+    be the fifth misattributed citation this vertical has had to correct. The
+    reason here is the narrower one: one envelope should not send one signer to
+    two courts under two laws, and an exclusive out-of-state forum against a
+    natural person decides whether that person appears at all — which is what
+    §4.3's own recital about the cost of litigating conceded before it waived the
+    objection.
+
+    THE GATE WAS REFUSED, ON ADR 0013's TEST AND NOT AS A SHORTCUT. The obvious
+    candidate is `disputeResolution`, which gates FRPA §§7.10, 7.11, 7.19 and
+    7.20 as one bundle. Refused, on three grounds, in the order ADR 0013 asks
+    them.
+
+      - **The fact decides a limb, not the clause.** This Section answers four
+        questions: which law governs, where an action is brought, how perfection
+        and priority are decided, and what happens to a jury, a class and a
+        limitation period. `disputeResolution` answers the last. Gating the whole
+        record on it would take governing law, venue and the Article 9 sentence
+        away from an arbitration template — which is exactly why FRPA §7.5's gate
+        was refused.
+      - **The fact is misattributed here in a way it is not in the FRPA.** ADR
+        0013's diagnostic: *if two limbs bind different parties or answer
+        different questions, the fact is misattributed.* `disputeResolution`
+        describes how disputes under the FUNDER's financing agreement are
+        resolved. This is a different contract with a different entity —
+        {{equipmentAffiliate}}, not {{funder}} — which FRPA §7.8's precedence
+        order states in terms. `instrumentsFor` puts both twins in the envelope
+        on `equipment` alone and reads `disputeResolution` for neither.
+      - **The arbitration arm cannot be drafted.** There is no arbitration clause
+        anywhere in the merchant-facing library. Gating §3.15 or §4.4 out under
+        `arbitration` would leave a guaranty with no dispute-resolution provision
+        and nothing to replace it: a hole, not an alternative. `facts.ts` states
+        the standard for that case.
+
+    So `includeWhen` stays `null` in both twins, and cross-reference does the work
+    a gate would not: §4.3 points here, and §4.4 says neither it nor this Section
+    shortens a period anywhere.
+
+    CAPITALS ARE NOT USED, AND IT IS THE SAME OPEN QUESTION FRPA §7.10 RECORDS.
+    Both baselines set these provisions in capitals; the rewritten FRPA does not,
+    on the rule that capitals are for a disclosure a regulator requires to be
+    conspicuous (7 TAC §86.310(d)) and that spending them elsewhere devalues the
+    one that needs them. A jury waiver is nevertheless the classic place a court
+    asks whether a term was conspicuous, and no vendored authority in this
+    repository fixes what is required. Reported as an open question for counsel,
+    now on three documents rather than one.
+
+    THE FORM CHANGES, AND THE CHANGE IS HANDED BACK. The `.docx` in
+    `lombard-contracts` still prints Florida law, Pasco County, the sub-heading
+    "3.15B Class Action Waiver" and the three all-caps paragraphs. Conforming it
+    is a change in that repository, made there and not here.
+  */
   {
     slug: 'equipment-lease.governing-law-and-venue',
     version: 1,
@@ -340,7 +502,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
     section: 'agreement',
     sortKey: 150,
     heading: 'Governing Law and Venue',
-    body: 'This Agreement shall be governed by and construed in accordance with the laws of the State of Florida (without applying its conflicts of laws principles). If any part of this Agreement is not enforceable, the remaining provisions will remain valid and enforceable. The exclusive venue for any actions or claims arising under or related to this Lease shall be the appropriate state or federal court located in Pasco County, Florida.\n3.15A Jury Trial Waiver\nYOU IRREVOCABLY, VOLUNTARILY, AND FREELY WAIVE TRIAL BY JURY IN CONNECTION WITH ANY DISPUTE OVER THIS LEASE.\n3.15B Class Action Waiver\nYOU AGREE NOT TO PURSUE A CLAIM AGAINST US AS A LEAD PLAINTIFF, CLASS REPRESENTATIVE, OR AS PART OF A CLASS ACTION OR OTHER REPRESENTATIVE ACTION.\n3.15C Limitation of Actions\nANY PERMITTED CAUSE OF ACTION YOU MAY HAVE IN CONNECTION WITH THIS LEASE AGAINST US, OUR ASSIGNEE, OUR SERVICING AGENT, OR OUR EMPLOYEES AND ATTORNEYS MUST BE COMMENCED WITHIN ONE YEAR FROM THE ACCRUAL OF THAT CAUSE OF ACTION.',
+    body: 'This Agreement is governed by the substantive law of the state of your principal place of business stated in Section 1, subject to mandatory federal law and to applicable conflict-of-laws rules. An action arising out of or relating to this Agreement shall be brought in a state court of competent jurisdiction in that state, or in a federal court of competent jurisdiction sitting in that state. Neither you nor we may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction. Where the law of a state fixes where an action under an agreement of this kind must be brought, that rule governs and this Section yields to it.\nPerfection, the effect of perfection or non-perfection, and the priority of a security interest described in Section 3.6 are governed by the mandatory rules of the Uniform Commercial Code that apply to them. This Section does not vary those rules and does not choose the law that decides them.\nIf any part of this Agreement is not enforceable, the remaining provisions will remain valid and enforceable.\nService of a summons, a complaint or other legal process is governed by Section 4.3 and by the procedural law of the court in which the proceeding is brought. Nothing in this Section makes a mailing, an email or any other communication into service of legal process.\n3.15A Jury Trial Waiver\nYou and we each waive trial by jury in an action arising out of or relating to this Agreement, to the extent the law of the forum gives effect to a waiver of that right made before a dispute has arisen. Where the law of the forum does not give effect to such a waiver, this Section has no effect and each of us retains the right to trial by jury. This waiver is mutual, it binds nobody who has not signed this Agreement, and it does not reach a claim applicable law requires to be tried to a jury.\n3.15B Class and Representative Proceedings\nNo party waives a right to bring, to defend, or to take part in a class, collective, representative or public-enforcement proceeding that applicable law permits. Whether such a proceeding is available, and in what form, is for the court to determine under applicable law and its own rules. A party that takes part in one keeps whatever share of a recovery it is awarded and any right to costs or to a fee award that applicable law gives it.\n3.15C Limitation of Actions\nThe limitation period, the accrual rule, and any tolling or discovery rule that applicable law supplies apply to a claim by each party to this Agreement alike, whoever brings it and whoever it is brought against. This Agreement does not shorten any of them, and no other provision of this Agreement shortens one. A claim that applicable law does not permit to be shortened or given up is unaffected by this Agreement.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -354,6 +516,43 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
       },
     ],
   },
+  /*
+    THE QUIET HALF OF THE SAME MACHINE, AND NO REVIEW NAMED IT.
+
+    WHAT WAS WRONG. "Notices sent to the Lessee's last known address, as
+    indicated in our records, shall constitute effective notice to the Lessee
+    under this Agreement." Once §4.3 stops making a mailing into service, this
+    sentence is still making a mailing into notice — at an address the customer
+    may have left, held in our own records, with nothing requiring us to check
+    it. Notice matters here: §3.12 turns on a default, and §3.7 turns on a
+    thirty-day notice before the end of the term.
+
+    THE FRPA CARRIED THE IDENTICAL PRESUMPTION AND DROPPED IT. §10.5's "presumed
+    to be accurate" is the same rule in the same words, and
+    `a-default-judgment-needs-a-served-defendant.test.ts` now asserts it never
+    returns. This clause is the twins' copy of it, and it was found by sweeping
+    the property over both documents rather than by reading the clause — no
+    review, no memo and no brief names it.
+
+    WHAT CHANGED. A notice goes to the address the customer gives in Section 1 or
+    to a later one given in writing, and each party tells the other promptly of a
+    change. The deemed-receipt rules for mail, courier and email are kept exactly
+    as they were: they are ordinary, nothing raised them, and rewriting them
+    would be inventing terms. What goes is the consequence. Sending to an address
+    a party has said it no longer uses does not make the notice good, and failing
+    to give a change of address does not make an otherwise ineffective notice
+    effective — the two-sentence shape FRPA §7.12 uses for the same duty.
+
+    AND THE TWO SUBJECTS ARE SEPARATED BY NAME. This Section governs notices;
+    §4.3 governs legal process; neither is evidence of the other. FRPA §10.6 was
+    rewritten for exactly this reason, having previously made Section 10
+    supersede every notice provision in the Agreement.
+
+    «43» STAYS, CHECKED AGAINST THE VENDORED BODY RATHER THAN ASSUMED. It is the
+    AcroForm anchor the Lombard pipeline injects for our notice address (README
+    rule 2), and a body that stops claiming it is a body the injector fills into
+    nothing.
+  */
   {
     slug: 'equipment-lease.notices',
     version: 1,
@@ -364,7 +563,7 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
     section: 'agreement',
     sortKey: 160,
     heading: 'Notices',
-    body: 'All notices must be in writing, if to you at your address appearing in Section 1 of this Agreement and if to us at _______________«43»_______________, Attn: Equipment Lease Department, or as may be otherwise directed to you by us or subsequent assignee. Notices shall be deemed to have been given (i) if sent by mail or courier, upon the earlier of five (5) days after mailing or when actually received or, in the case of courier, when delivered, and (ii) if sent by email, upon transmission (provided no bounce-back is received). Notice given in any other manner shall be effective when actually received. Notices sent to the Lessee’s last known address, as indicated in our records, shall constitute effective notice to the Lessee under this Agreement.',
+    body: 'All notices under this Agreement must be in writing, if to you at the address you give in Section 1 or at a later address you give us in writing, and if to us at _______________«43»_______________, Attn: Equipment Lease Department, or at a later address we or a subsequent assignee give you in writing. Each of us will tell the other promptly in writing of a change of address.\nA notice is given (i) if sent by mail or courier, on the earlier of five (5) days after mailing or actual receipt or, in the case of courier, when delivered, and (ii) if sent by email, on transmission, provided no bounce-back or other non-delivery report is received. A notice given in any other manner is effective when actually received.\nSending a notice to an address a party has told the other it no longer uses does not make that notice effective, and a failure to give a change of address does not make an otherwise ineffective notice effective. A notice given under this Section is not service of legal process and is not evidence that service was made; service of a summons, a complaint or other legal process is governed by Section 4.3 and by the procedural law of the court.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

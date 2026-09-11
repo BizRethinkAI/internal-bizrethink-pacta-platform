@@ -1,12 +1,16 @@
+import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
 import { findUsers } from '@documenso/lib/server-only/user/get-all-users';
 import { Trans } from '@lingui/react/macro';
-
 import { AdminUserCreateDialog } from '~/components/dialogs/admin-user-create-dialog';
 import { AdminDashboardUsersTable } from '~/components/tables/admin-dashboard-users-table';
 
 import type { Route } from './+types/users._index';
 
 export async function loader({ request }: Route.LoaderArgs) {
+  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
+  // single-fetch runs it without the admin layout's authorization check.
+  await requireAdminLoader(request);
+
   const url = new URL(request.url);
 
   const page = Number(url.searchParams.get('page')) || 1;

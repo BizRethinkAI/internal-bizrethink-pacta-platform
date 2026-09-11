@@ -88,7 +88,7 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 100 records for 98 sections: 84 the document numbers, 14 it does not', () => {
+  it('holds 106 records for 99 sections: 84 the document numbers, 15 it does not', () => {
     // 101 until the four `[Reserved]` records were removed. They were section
     // numbers the document holds open after a clause was taken out — lines of
     // the document, not clauses of it — and are now declared in
@@ -113,7 +113,24 @@ describe('the FRPA library accounts for the whole document', () => {
     // shape, not the §4.15 shape — so a non-Texas document simply does not have
     // it. Neither is it a section of `Lombard_FRPA_v4`, which is why this count
     // moved and the non-clause register did not.
-    expect(clauses).toHaveLength(100);
+    //
+    // 100 records for 98 sections until 2026-09-11, when the owner's decisions
+    // on full recourse and on arbitration added five. Four are the
+    // `full-performance` halves of §§9.2, 9.4, 9.5 and 9.6 — exhaustive pairs in
+    // the §4.15 shape, so they add RECORDS and no sections, and every assembled
+    // document still holds one of each. The fifth is `frpa.arbitration-7-26`,
+    // which DOES add a section: the value `disputeResolution: 'arbitration'`
+    // selected no merchant-facing clause at all, and an arbitration agreement
+    // cannot share a number with the courts clauses it replaces.
+    //
+    // 105 records for 99 sections until 2026-09-11, when §6.1 became an
+    // exhaustive pair. `frpa.full-performance-events-of-default-6-1` carries the
+    // same number 6.1 and is selected by `guarantyScope: 'full-performance'`
+    // where the record beside it is selected by every other value, so this adds
+    // a RECORD and no section and every assembled document still holds one §6.1.
+    // The §4.15 shape again, and for the same reason: the ungated §6.1 decided
+    // the guaranty for every template from inside Section 6.
+    expect(clauses).toHaveLength(106);
     expect(clauses.filter((clause) => clause.number !== '').length).toBeGreaterThan(0);
   });
 

@@ -135,20 +135,22 @@ const KNOWN_GAPS: { to: string; from: string[]; quote: string; owner: string }[]
     /*
       THE GUARANTY GAP, SEEN FROM OUTSIDE SECTION 9.
 
-      §§9.2, 9.4, 9.5 and 9.6 gate on `guarantyScope === 'limited-conduct'`,
-      which is the only guaranty this library has drafted. `full-performance` is
-      a value of the fact with no clause behind it — deliberately, because the
-      wide guaranty is the one all three market forms use and the one the memo
-      argues against — so a full-performance funder selects §9.1's identity grid
-      and §§10.2/10.4's guarantor execution blocks with **no guaranty between
-      them**, and these six clauses go on limiting a Guarantor's liability by
-      reference to a §9.2 the document does not contain. `guarantyScope: 'none'`
-      produces the same six.
+      §§9.2, 9.4, 9.5 and 9.6 gate on `guarantyScope === 'limited-conduct'`, and
+      `full-performance` used to be a value of the fact with no clause behind it,
+      so a full-performance funder selected §9.1's identity grid and §§10.2/10.4's
+      guarantor execution blocks with **no guaranty between them** while these six
+      clauses went on limiting a Guarantor's liability by reference to a §9.2 the
+      document did not contain.
 
-      NOT §9.1'S OWN GATE, which is fixed: `frpa.guarantor-information-9-1` was
-      ungated and is now `guarantyScope !== 'none'`, so a `none` funder collects
-      no Social Security Number for a guaranty it does not have. What is left is
-      the `full-performance` half, and it is real. `guaranty` owns it.
+      **THE `full-performance` HALF IS CLOSED** — the owner authored the wide
+      guaranty on 2026-09-11 and `frpa.full-performance-guaranty-9-2` supplies a
+      §9.2 under that value. **What keeps this entry reachable is
+      `guarantyScope: 'none'`**, where Section 9 is absent by design and these
+      six citations have nothing to land on. That is a real dangle and it is a
+      real gap: §§4.10, 4.12, 5.11, 6.2, 6.3 and 7.9 are all ungated and all
+      reserve a guarantor claim to a Section that a no-guaranty template does not
+      have. Describing it by subject rather than by number is the fix, and it is
+      six other clusters' clauses.
     */
     to: 'Section 9.2',
     from: [
@@ -361,12 +363,29 @@ describe('selection turns a funder profile into a document', () => {
 
     const dropped = excluded.map(({ clause }) => clause.slug).sort();
 
-    // Four clauses, one decision. The memo proposes deleting each of these
+    // Three clauses, one decision. The memo proposes deleting each of these
     // separately; under arbitration they are a single fact's consequence.
     expect(dropped).toContain('frpa.jury-trial-waiver-7-10');
     expect(dropped).toContain('frpa.class-action-waiver-7-11');
-    expect(dropped).toContain('frpa.contractual-statutes-of-limitations-7-19');
     expect(dropped).toContain('frpa.counterclaim-waiver-7-20');
+
+    /*
+      §7.19 WAS THE FOURTH AND LEFT THE BUNDLE ON 2026-09-11, WHICH IS WHY IT IS
+      ASSERTED HERE AS *NOT* DROPPED RATHER THAN QUIETLY REMOVED FROM THE LIST.
+
+      A limitation period applies in arbitration too, so `disputeResolution` was
+      answering a different question from the one §7.19 answers — ADR 0013's
+      misattributed fact, whose fix is `includeWhen: null` plus a
+      cross-reference rather than a duplicate clause. It became load-bearing the
+      day the owner put an operative two-year period in the clause: gated, an
+      arbitration template would have had no period at all.
+    */
+    expect(dropped).not.toContain('frpa.contractual-statutes-of-limitations-7-19');
+
+    // And the converse — the value now ADDS a clause instead of only removing
+    // four, which is what made `disputeResolution: 'arbitration'` a declared gap
+    // in `every-fact-value-is-reachable.test.ts` until it was authored.
+    expect(selected.map(({ slug }) => slug)).toContain('frpa.arbitration-7-26');
 
     // And the cascade goes with concurrentPositions, not with anything textual.
     expect(dropped).toContain('frpa.position-and-cascade-of-collections-4-15');

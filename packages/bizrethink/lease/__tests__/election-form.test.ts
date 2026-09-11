@@ -33,9 +33,24 @@ describe('the early-termination addendum offers a real election', () => {
     expect(addendum()).toMatch(/I do not agree to liquidated damages or an early termination fee/i);
   });
 
+  /*
+    THIS TEST IS WHY THE ELECTION SHIPPED UNMAKEABLE, and it is worth keeping
+    the reason next to the fix.
+
+    It asserted two "[ ]" literals in the clause TEXT and passed for as long as
+    they were there — but a bracket is a typographic character, not a field. The
+    rendered addendum offered a signer nothing to click, so on its own terms no
+    early termination fee was ever agreed. A green test pinning the wrong thing
+    is worse than no test: it answers the question nobody asked again.
+
+    What makes it an election is a FIELD, so that is what is asserted now, and
+    `election-is-markable.test.ts` carries it through to the extracted PDF.
+  */
   it('gives the tenant something to mark', () => {
-    // Two selectable boxes, not prose describing a choice.
-    expect((addendum().match(/\[ \]/g) ?? []).length).toBe(2);
+    const boxes = addendum().match(/\{\{tenantElectionBox\}\}/g) ?? [];
+
+    expect(boxes).toHaveLength(2);
+    expect(addendum(), 'a bracket is a character, not a field').not.toMatch(/\[\s*\]/);
   });
 
   it('states the consequence of declining, as the statute does', () => {

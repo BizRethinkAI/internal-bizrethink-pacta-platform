@@ -1,3 +1,4 @@
+import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -38,7 +39,6 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
-
 import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
@@ -51,7 +51,11 @@ import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/organisations.$id';
 
-export async function loader() {
+export async function loader({ request }: Route.LoaderArgs) {
+  // MODIFIED for BizRethink (overlay 073): gate this leaf loader. React Router
+  // single-fetch runs it without the admin layout's authorization check.
+  await requireAdminLoader(request);
+
   const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
 
   return {
