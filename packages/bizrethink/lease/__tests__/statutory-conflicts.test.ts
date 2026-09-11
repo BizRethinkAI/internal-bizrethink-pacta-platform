@@ -310,9 +310,7 @@ describe('deposit.escrow-notice honours the exemption inside the subsection it c
   });
 
   it('still requires money actually to be held', () => {
-    expect(
-      selects({ depositHeldUsd: 0, advanceRentHeldUsd: 0, landlordRentsFiveOrMoreUnits: true }),
-    ).toBe(false);
+    expect(selects({ depositHeldUsd: 0, advanceRentHeldUsd: 0, landlordRentsFiveOrMoreUnits: true })).toBe(false);
   });
 });
 
