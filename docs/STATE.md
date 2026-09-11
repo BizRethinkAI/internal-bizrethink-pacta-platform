@@ -84,7 +84,7 @@ first thing the render path must do is fail closed on it**, test written first.
 pull request.** Reading the current state means this file plus every note in
 that folder. The table below is history and stays until compaction.
 
-**Nothing is open.** #152 through #155 all merged on 2026-09-10.
+**Nothing is open.** #152 through #158 all merged on 2026-09-10.
 
 **Eleven in-flight notes were folded into this file and deleted on 2026-09-10** —
 the second compaction, and **it had re-accumulated in one day.** Every one
@@ -320,6 +320,72 @@ re-raisable thing in that note, and compaction is how they would have been lost.
 - **`examinedBy` over-claims on every rewritten clause.** A third `ReviewId` would
   **not** fix it — the memo read the same old text. What is missing is provenance
   for the *current body*.
+
+## The same day, in the lease vertical: #157 and #158
+
+### A heading printed at a page foot with its body overleaf, in five places
+
+**Found by looking at the rendered pages. Every unit test passed while the
+document was doing it**, which is the only way this class of defect is ever
+found.
+
+`cfffbd641` bound a heading to its body only where the clause was under **420
+characters**, on the reasoning that a long body fills the page under its own
+heading anyway. The rendered lease disproved it: `hoa.compliance` is 732
+characters, and page 10 ended with **two stacked headings and no body under
+either**. A section head could strand itself the same way, because it was emitted
+as a sibling of the clauses it introduces.
+
+**Threshold 420 → 800, chosen by measurement.** A sweep of
+420/600/700/800/1000/1200/3000 against the real lease; 800 is where orphans reach
+zero with the mildest gap. The section head now renders **inside the first
+clause's bound unit**, so a break cannot separate a section title from the clause
+it introduces.
+
+**Why not simply bind everything — this is the part that will be re-proposed.**
+The first attempt raised the threshold to 3,000, reasoning that the white space
+is identical either way since a bound clause that does not fit moves whole and
+leaves the same gap. **That is wrong for large blocks.** An unbound clause
+*splits* across the break and fills the page; a bound one cannot. At 3,000 the
+all-caps §83.49 disclosure jumped whole and left **page 5 two-thirds empty** —
+trading five orphans for a worse defect.
+
+**Two traps for the next PDF assertion, both of which made the guard pass on
+broken code before they were found:**
+
+- **`pdfjs` joins a heading's number and text with ONE space.** The patterns were
+  written against `pdftotext -layout`, which pads to column position, so `\s{2,}`
+  matched nothing — *including the five real orphans*.
+- **Section heads are tracked**, so they reach `pdfjs` letter-spaced —
+  `"7 U T I L I T I E S"`.
+
+`regression-tests/heading-orphans.test.ts` asserts no page ends with a heading,
+and was verified by reverting the fix: it reports exactly the five real orphans.
+**The renderer is the lease vertical's only; MCA has its own path.**
+
+### `sortOrder` does not default to 0 in practice — a correction
+
+An earlier reading of `BizrethinkDocument.sortOrder Int @default(0)` concluded
+that uploads land at 0 and always need manual reordering. **It is wrong.**
+`attachLeaseDocument` sets `sortOrder: (last?.sortOrder ?? -1) + 1`
+(`attach-document.ts:116`), so **an upload appends and the schema default never
+applies.**
+
+**The belief came from a grep that missed `server-only/`, and was only disproved
+by uploading a file and looking.** Recorded because the same inference is easy to
+make again from the schema alone. `governing-document-editor.tsx` does not expose
+`sortOrder` though `documents.update` accepts it, so a deliberate reshuffle still
+needs a write; gaps are harmless, as `describeDocuments` numbers by position.
+
+### One-offs are committed as what ran
+
+#157 records four guarded `UPDATE`s already applied to production for 29090
+Picana Ln, per the convention `2026-09-06-move-picana-to-personal.sql` set: **an
+applied migration is committed as a record of what ran, not as something to run
+again.** One of the four re-dated a document from 2018-03-26 to 2020-01-31 —
+which matters because **the receipt addendum the tenant signs recites that date**,
+so a wrong date is a wrong recital in an executed document. Nothing was
+destroyed; the archive step set `archivedAt` only.
 
 ## The week of 2026-09-07 → 09-09: the MCA clause library was built
 
