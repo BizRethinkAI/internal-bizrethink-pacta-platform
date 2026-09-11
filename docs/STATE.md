@@ -51,21 +51,32 @@ architecture is recorded in ADRs rather than here:
   track, not a prerequisite. `assertPublishable` gates text reaching a *third
   party*, not text being written. Building the clause library is unblocked.
 
-Where it stands, **2026-09-09**:
+Where it stands, **2026-09-10**:
 
 | | |
 |---|---|
 | Conformity surface | **built** — `/admin/mca`, instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, CT/VA primary text sourced, source strength and reading age on every card (#134) |
-| Clause library | **built** — `packages/bizrethink/mca/clauses/`, **204 clauses across all six instruments**, every one carrying an examination record |
+| Clause library | **built** — `packages/bizrethink/mca/clauses/`, **203 clause records across all six instruments**, every one carrying an examination record |
+| The FRPA | **rewritten in full, 2026-09-10** — all **100** records authored from the counsel memo and the 254 findings, under [ADR 0012](adr/0012-the-baseline-document-is-input-not-specification.md) and [ADR 0013](adr/0013-a-funder-profile-describes-the-funder.md). **Unreviewed:** every record is `status: 'draft'` with `author: null` and zero counsel approvals exist |
+| The other five instruments | **NOT rewritten** — Equipment Lease, Subscription, ISO PRA, Split Funding, Permission to Release. A merchant signs **five of the six**, and two of them undo the FRPA's protections in the same envelope. See *The day of 2026-09-10* |
+| Selection engine | **built** — `selectClauses`, `instrumentsFor`, `McaFacts` with a Lombard profile. Eleven facts; **three still gate nothing** |
 | `/admin/mca-library` | **built** (#132) — per-clause approval (#135), a `From counsel` section (#140) |
 | Counsel review link | **built** — `/mca-clause-review/:token`, scoped by instrument, with a derived briefing (#139) and a findings box (#140) |
 | Agreement builder | **not started — and it is still the deliverable.** [ADR 0011](adr/0011-the-mca-clause-library-is-a-library.md) settles its shape |
 | Interview / Section 1 | **not started.** The merchant and funding grid is captured nowhere in Pacta |
 
-**The library is text with provenance, not an engine.** There is no
-`includeWhen`, no `variables`, no selection. ADR 0011 decides that those arrive
-next and that numbering is emitted at assembly rather than stored — the lease
-builder's model, which is built and proven.
+**That paragraph used to read "the library is text with provenance, not an
+engine — there is no `includeWhen`, no `variables`, no selection."** Two of the
+three arrived on 2026-09-10: `includeWhen` gates clauses on `McaFacts`, and
+`selectClauses` / `instrumentsFor` turn a funder profile into a document.
+**`variables` is still absent**, and its absence is now load-bearing — it is why
+§7.5 could not be split on `venueRule` (see *The day of 2026-09-10*).
+
+**There is still no render or assembly path.** Nothing in `mca/` turns selected
+clauses into a document, which is the only reason unreviewed text cannot reach a
+merchant. `assertPublishable` **reports, it does not refuse** — it returns early
+on anything not `published`, and both surfaces call it on a hypothetical. **The
+first thing the render path must do is fail closed on it**, test written first.
 
 ## In flight
 
@@ -73,13 +84,20 @@ builder's model, which is built and proven.
 pull request.** Reading the current state means this file plus every note in
 that folder. The table below is history and stays until compaction.
 
-**Open right now: one PR.** #145, correcting the runbook claims that misled a
-session into breaking the dev Mac's toolchain.
+**Nothing is open.** #152 through #155 all merged on 2026-09-10.
 
-Everything else has merged. **Twenty in-flight notes were folded into this file
-and deleted on 2026-09-09** — the first compaction since the convention was
-introduced, and it was overdue: every note in that folder belonged to a merged
-PR, while this file still said the clause library did not exist.
+**Eleven in-flight notes were folded into this file and deleted on 2026-09-10** —
+the second compaction, and **it had re-accumulated in one day.** Every one
+belonged to a merged PR: #145, #146, #147, #149, #150, #151, #152, #153, #154,
+#155, and the first compaction's own note. **The folder is now empty but for its
+README**, which is the first time that has been true.
+
+**The governance gate was green throughout, again**, and this is the second time
+that has been recorded. `governance.yml` checks that a PR *touches* a state file
+and that STATE.md carries no conflict markers. It cannot check whether a note's
+PR has merged, or whether a claim in this file is still true. It did not catch
+that this file said the MCA migrations had *"never been applied anywhere"* six
+days after they were applied — the owner did.
 
 | PR | What | State |
 |---|---|---|
@@ -132,6 +150,176 @@ of what ran; when it goes out of date, the correction belongs here, not there.
 The move was safe only because nothing had been signed — `envelopeId` was NULL
 and the organisation had zero envelopes. **There is no code path to move an
 envelope between teams.** Anything similar must happen before the first send.
+
+## The day of 2026-09-10: the FRPA was rewritten, and the suite around it was not
+
+**#152.** All **100** FRPA clause records authored, across ten agent runs, each
+writing its property as a **failing test before any body existed**. 2476 tests.
+
+The premise, settled in [ADR 0012](adr/0012-the-baseline-document-is-input-not-specification.md):
+`Lombard_FRPA_v4` is a rebranded, AI-generated form carrying **254 findings**,
+rated by outside counsel on 2026-09-09 at **18 Critical / 52 High** with REPLACE
+IN FULL on **93 of 101** clauses, and **never signed by any merchant**. It is
+input, not specification. *"If that document were sound there would be no
+vertical to build."*
+
+### The finding that outranks the rewrite
+
+**A merchant signs five of the six instruments. Only the FRPA was rewritten.**
+
+`instrumentsFor(LOMBARD_FACTS)` returns all six. The Equipment Lease and
+Subscription guaranties — signed by a **natural person** — impose exclusive Pasco
+County venue, a jury waiver, a class waiver, a one-sided one-year limitation, the
+nonreliance clause §7.22 deletes, and:
+
+> *"upon such mailing, service shall be effective **irrespective of whether a
+> signed certified mail return receipt is returned**"*
+
+**Service effective on mailing, receipt irrelevant.** Worse than the v4 §7.12 the
+memo rated Critical, and those are the same four defects §§7.5, 7.10, 7.11 and
+7.19 were rewritten to remove. They entered Lombard's suite **on 2026-09-10**,
+through the `equipment` fact fix. **Neither review nor the counsel memo read them
+in this role.** `iso-pra.confidentiality` bars disclosure to any third party with
+**no carve-out for a regulator, a court, or the broker's own lawyer**;
+`iso-pra.governing-law` mandates arbitration in Pasco County.
+
+Found only because the last cluster stated its property over **every instrument**
+rather than the FRPA.
+
+### The Critical, answered on the paper
+
+*Does the product work at all?* `Lombard_Payzli_Split_Funding_Authorization_v2`
+has **one signature widget and one date widget, both Seller's, and no processor
+acceptance block.** §2.3's duty on Buyer to obtain written acceptance before the
+Purchase Date has nowhere on the paper to be discharged, so
+`processorSplitAccepted: false` is not a record-keeping gap — **it is what the
+form makes inevitable.**
+
+### Six memo premises proved false
+
+The memo is drafting input, not authority. **Four of the six were repeated by the
+orchestrator in a cluster brief before an agent checked them.**
+
+| premise | truth |
+|---|---|
+| §8.2 "the memo contradicts itself on Carry" | The text is marked `DELETE — entire current clause` |
+| Permission to Release "is missing" | Vendored twice; eight clauses here. Its §4 sources the FCRA written instructions to a guarantor signature line **the form does not have** |
+| Appendix A "fee table not supplied" | A completed nine-row grid. A bank-account change costs **$75 and is also an Event of Default carrying $5,000**, while §2.4 permits it with approval not unreasonably withheld |
+| Virginia venue is §6.2-2236(A) | **§6.2-2234(A)**. §6.2-2236 has no subsection (A) and is not about forum. The wrong number was in **four** places in this repo |
+| §7.19's "two-year period" | Exists nowhere but the orchestrator's own note |
+| §9.1 "no substantive field block is visible" | The block is there. The record's **body** was empty |
+
+### Four routes to guarantor liability, all closed
+
+§9.2's scope; **§7.21**, which made a guarantor indemnify Buyer for *"any act or
+omission by any ISO"* — unlimited liability for a broker they never chose, **which
+the memo does not raise**; `frpa.execution`'s binding recital; and **§9.1**, where
+the execution grid holds one non-repeating block **with no capacity line** while
+§9.5 makes *"the persons or entities constituting Guarantors"* jointly liable.
+
+**Every one was found by an assertion stated over the SET. None by reading a
+clause.** `«37»` is labelled "Social Security Number" and prints a full SSN into
+the body of the agreement; §9.1 now requires a masked identifier and **the form
+still renders the full number** — the test asserts the disagreement.
+
+### Three fidelity guards retired, one property gained
+
+`bodies-match-the-document`, `frpa-coverage`'s line-accounting, and
+`selectClauses` completeness all asserted fidelity to v4. Replaced by
+**cross-reference coherence** across nine funder profiles, which went red on real
+defects completeness structurally could not see — §7.1 carving out a §4.15 that
+`concurrentPositions: false` had deleted, and §004 citing a deselected §8.2.
+
+**The digest assertion survives all three retirements.**
+
+### The rule that stopped being re-derived
+
+[ADR 0013](adr/0013-a-funder-profile-describes-the-funder.md): **a fact may only
+gate a whole clause, and its values must partition the clauses it gates.**
+Diagnostic — *if two limbs bind different parties or answer different questions,
+the fact is misattributed, not too coarse.*
+
+**Six clusters refused a gate their brief asked for and every refusal was right**
+(§4.11, §5.16, §4.3, §4.1, §7.1, §7.5). The last exposed a missing field rather
+than a limb problem: **`venueRule`'s funder-state arm cannot be drafted, because
+`McaFacts` has no field naming the funder's state.**
+
+### Also landed
+
+**#150** fact coverage, **#151** ADR 0012, **#153** signup hardening, **#154**
+lease association and district, **#145–#149** runbook corrections and the first
+compaction.
+
+### #155 — the Dependabot alerts, and keeping them patched
+
+`npm audit --omit=dev` **20 → 6** (0 critical). Overlay **072**.
+
+**What actually ships was checked in the running production container, not
+assumed.** All six *critical* alerts are `next` RCE advisories, and **`next` is
+absent from the Pacta image** — it belongs to `apps/docs` and `apps/openpage-api`,
+neither of which is deployed. Upstream had fixed none of the 32: its current
+lockfile (v2.18.0) carries the same versions, so waiting for the weekly sync
+would not have helped.
+
+**The durability half is the part that is easy to miss.** The weekly sync takes
+upstream's lockfile wholesale, so a fix living only in the lockfile is reverted
+by the next sync. Direct deps therefore have their ranges raised in
+`package.json`; transitive ones use root `overrides`. **`npm` does not apply an
+override to a package already in the lockfile**, so the runbook now runs
+`npm update qs morgan joi fflate` after `npm install` — simulated both ways, and
+without that line four floors regress. `dependency-security-floors.test.ts` reads
+the root lockfile and fails if any floor drops, so a sync PR that loses one goes
+red instead of shipping.
+
+**Six accepted, with reasons in `ACCEPTED`:** `deepmerge-ts` via `@prisma/config`
+(forcing v8 risks breaking `prisma migrate deploy` at container start) and
+`ts-deepmerge` via `@anatine/zod-openapi`. **Their Dependabot alerts stay open
+until someone dismisses them on GitHub — the owner's call, not done.**
+
+**The npm-audit gate stays advisory**, because `npm audit` cannot allowlist an
+accepted advisory and a blocking gate would fail every PR. **The master
+`~/github/bizrethink/CLAUDE.md` still describes it as "blocks high+", which is
+false** — that file is outside this repo and was not edited. Another instance of
+exactly what this compaction is about.
+
+### Settled by #154 — do not re-raise
+
+Two adversarial-review findings on the lease sources were **withdrawn after
+being tested against the statutes**, and neither is a defect. They are recorded
+here because a withdrawn finding is exactly what gets raised again by the next
+reviewer who reads the register and not the reasoning.
+
+- **The deposit clock.** The review said Fla. Stat. **§83.49(3)(a)** runs from
+  *termination of the rental agreement*. It does not — *"Upon the vacating of
+  the premises for termination of the rental agreement."* **The trigger is
+  vacating.** `deposit.return` was already right, and the proposed change would
+  have **started the clock before a holdover tenant was out**. Unchanged.
+- **The pool alarm.** The review wanted §515.27 restored with an *"all openings /
+  85 dB A"* standard. The 2026-09-03 statutory walk had already ruled **chapter
+  515 imposes no lease disclosure duty**. `requiredBy: 'Ch. 515'` is correct and
+  stays: **`requiredBy` means *implements***, which `why-this-clause.ts` keeps
+  deliberately distinct from *compelled*, exactly as `access.entry` implements
+  §83.53(2). Unchanged.
+
+**This section exists because the first draft of this fold dropped it**, reducing
+#154 to four words in the line above. The two findings above are the single most
+re-raisable thing in that note, and compaction is how they would have been lost.
+
+### Still open, and each is the owner's
+
+- **The five unrewritten instruments.** The largest open exposure in the vertical.
+- **Is this an arbitration product?** All three SEC-filed market forms pair
+  arbitration with a class waiver; this corpus has a bare class waiver and no
+  arbitration clause — the weakest of the three positions. Deliberately undrafted.
+- **`guarantyScope: 'full-performance'`** — deliberately unauthored; that profile
+  assembles an identity grid and two service waivers with no guaranty between them.
+- **`settlementBase`** is `net` and **nobody has established which base Lombard
+  prices on.** It reaches every state disclosure.
+- **Six memo-refuted dispositions** in `lombard-contracts` — **`rejected` already
+  exists in `FindingDisposition`**, so this is a data fix plus a regenerate.
+- **`examinedBy` over-claims on every rewritten clause.** A third `ReviewId` would
+  **not** fix it — the memo read the same old text. What is missing is provenance
+  for the *current body*.
 
 ## The week of 2026-09-07 → 09-09: the MCA clause library was built
 
@@ -241,10 +429,13 @@ acting on it.
   September"*. **One of them is wrong and it has not been resolved.**
 - **The five Pacta templates (100, 102, 119–121) have not been republished** since
   the owner edits of `change-notes/18`.
-- **No local database**, so the MCA migrations have never been applied anywhere
-  and neither `/admin/mca-library` nor the counsel page has ever been rendered
-  locally. Everything in this vertical is verified as pure functions and
-  typechecking. That is a standing choice, not damage.
+- ~~**No local database**, so the MCA migrations have never been applied
+  anywhere and neither `/admin/mca-library` nor the counsel page has ever been
+  rendered locally.~~ **CORRECTED 2026-09-10. This was false when written and was
+  believed.** The migrations were applied on 2026-09-08 and `/admin/mca-library`
+  returns HTTP 200. The owner caught it. Most of this vertical is still verified
+  as pure functions and typechecking, which is a standing choice — but *"has
+  never been rendered"* was a claim about the world that nobody re-checked.
 - **ADR 0011 is decided and unimplemented.** Six phases; 1 and 2 (`kind`,
   `field-group`) close §9.1 and unblock the interview.
 
