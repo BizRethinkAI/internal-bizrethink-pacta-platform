@@ -249,6 +249,29 @@ than a limb problem: **`venueRule`'s funder-state arm cannot be drafted, because
 lease association and district, **#145–#149** runbook corrections and the first
 compaction.
 
+### Settled by #154 — do not re-raise
+
+Two adversarial-review findings on the lease sources were **withdrawn after
+being tested against the statutes**, and neither is a defect. They are recorded
+here because a withdrawn finding is exactly what gets raised again by the next
+reviewer who reads the register and not the reasoning.
+
+- **The deposit clock.** The review said Fla. Stat. **§83.49(3)(a)** runs from
+  *termination of the rental agreement*. It does not — *"Upon the vacating of
+  the premises for termination of the rental agreement."* **The trigger is
+  vacating.** `deposit.return` was already right, and the proposed change would
+  have **started the clock before a holdover tenant was out**. Unchanged.
+- **The pool alarm.** The review wanted §515.27 restored with an *"all openings /
+  85 dB A"* standard. The 2026-09-03 statutory walk had already ruled **chapter
+  515 imposes no lease disclosure duty**. `requiredBy: 'Ch. 515'` is correct and
+  stays: **`requiredBy` means *implements***, which `why-this-clause.ts` keeps
+  deliberately distinct from *compelled*, exactly as `access.entry` implements
+  §83.53(2). Unchanged.
+
+**This section exists because the first draft of this fold dropped it**, reducing
+#154 to four words in the line above. The two findings above are the single most
+re-raisable thing in that note, and compaction is how they would have been lost.
+
 ### Still open, and each is the owner's
 
 - **The five unrewritten instruments.** The largest open exposure in the vertical.
