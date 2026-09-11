@@ -87,6 +87,12 @@ detector-vacuity group and the staleness group — both describe behaviour that
 already worked and both had to be green from the start or the rest would mean
 nothing.
 
+A further **6 went red** when the last assertion was added — *"the briefing does
+not present the clauses as quoted from a document"*, against *"The text is quoted
+exactly as the document publishes it"*, the same retired framing one paragraph
+above the numbering one. **53 red in total**, none of them fixed by editing a
+test.
+
 Three of the six agreements passed *"ships no repository path"* while red, which
 is the argument for stating these over the set: the leaked filename was on the
 FRPA only by accident of which document had been read.
@@ -138,16 +144,18 @@ What the investigation found, and did **not** fix:
 - `npx tsc --noEmit -p packages/bizrethink/tsconfig.typecheck.json` — clean.
 - `npx biome format packages/bizrethink` — clean but for the pre-existing
   `font-data.ts` info.
-- `npx vitest run packages/bizrethink` — **182 files / 3,837 tests green with
-  three files excluded, and the exclusions are not this PR's.** See below; CI on a
-  clean checkout is the gate that counts.
+- `npx vitest run packages/bizrethink` — **181 files / 3,836 tests green with
+  four files excluded, and none of the exclusions is this PR's.** See below; CI on
+  a clean checkout is the gate that counts.
+- `npx tsc --noEmit -p apps/remix/tsconfig.json` — 0 errors, run because the
+  route is a `.tsx` the bizrethink typecheck project does not cover.
 
 ### Another session was writing into this checkout at the same time
 
 Mid-task, `packages/bizrethink/mca/clauses/{equipment-lease,subscription}/*.ts`,
 `clauses/__tests__/a-default-judgment-needs-a-served-defendant.test.ts` and a new
 untracked `clauses/__tests__/the-twins-cannot-undo-the-frpa.test.ts` appeared in
-the working tree. They are red in progress (TDD, presumably ADR 0011 work) and
+the working tree, and `clauses/__tests__/coverage.test.ts` went red with them. They are red in progress (TDD, presumably ADR 0011 work) and
 `trpc-schema-parity.test.ts` fails on `main` too, locally, with
 `msg is not a function`. **Only this PR's files were staged.** A full local suite
 verdict is not available while two sessions share one checkout.
