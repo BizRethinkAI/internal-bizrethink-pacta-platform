@@ -311,8 +311,15 @@ describe('no provision of any instrument manufactures service of process', () =>
       `a-signature-for-merchant-is-not-a-guaranty`. This is the fifth, buried in
       a sweep about service of process, which is why two agents looking for
       "the pinned counts" both found four.
+
+      208 -> 209: the §6.1 exhaustive pair adds one record. This PR is the
+      recovery of #165, which merged into its own base branch rather than into
+      main and delivered nothing, so the count moved on main without this
+      record ever arriving. Caught here by merging main into the branch and
+      running the union BEFORE pushing — which is the whole point of doing it
+      that way, and is what the queue skipped.
     */
-    expect(ALL_MCA_CLAUSES.length).toBe(208);
+    expect(ALL_MCA_CLAUSES.length).toBe(209);
   });
 });
 
