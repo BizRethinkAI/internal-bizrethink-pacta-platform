@@ -81,6 +81,31 @@ reliance on the removed cross-team authority remains unknown. A-03 and other
 audit findings remain separate decisions. Shwet waived the inherited comment
 requesting a second reviewer; the independent review found no blocking defect.
 
+## 2026-09-12 — recipient identity gates merged (#172 / A-05)
+
+PR #172 merged at `0c440a396c9b5f5c9161538358fc08ff120fdc80` after independent
+review and green final checks, including Playwright on integration head
+`ff80cca0e`. Overlay **076** wires the owned recipient policy into signing,
+metadata and PDF routes. Configured ACCOUNT identity is required independently
+of signing ACTION factors; account-backed factors belong to the intended
+recipient. Completion email codes remain bound to recipient and envelope.
+
+The owner chose to preserve downloads after the signing deadline with identity
+checks intact. Drafts and deleted unfinished documents are unavailable;
+sender-hidden finalized copies remain available to their recipients. PDF
+authorization precedes storage and conditional responses; private/no-store is
+enforced. Deliberately link-only documents, QR capabilities and enabled direct
+template previews keep their distinct existing access contracts. Preview
+capabilities do not authorize ordinary document APIs.
+
+Final author validation: **4,334 owned tests**, **287 shared-library tests**,
+both TypeScript gates and **11 HTTP regressions** in the green final CI run.
+No schema or instance-setting change. The A-04 author owns this single fold of
+the now-merged A-05 note; no other PR was open when checked. Production shipping
+remains owned by the separate review-and-ship session; this fold does not assert
+that the merged queue is deployed. Remaining audit findings need separate
+owner decisions.
+
 ## Where things stand
 
 Pacta is an **additive fork of `documenso/documenso`** — a document-signing

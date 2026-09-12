@@ -1,3 +1,4 @@
+import { resolveTemplatePdfSources } from '@bizrethink/customizations/server-only/template-pdf-sources';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
@@ -436,36 +437,20 @@ export const createDocumentFromTemplate = async ({
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
+  // MODIFIED for BizRethink (overlay 077): authorize every replacement before copying any bytes.
+  const documentSources = await resolveTemplatePdfSources({
+    userId,
+    teamId,
+    templateItems: template.envelopeItems,
+    customDocumentData,
+  });
+
   // Duplicate the envelope item data.
   // Note: This is duplicated in createDocumentFromDirectTemplate
   const envelopeItemsToCreate = await Promise.all(
     template.envelopeItems.map(async (item, i) => {
-      let documentDataIdToDuplicate = item.documentDataId;
-
-      const foundCustomDocumentData = customDocumentData.find((customDocumentDataItem) => {
-        // Handle empty envelopeItemId for backwards compatibility reasons.
-        if (customDocumentDataItem.documentDataId && !customDocumentDataItem.envelopeItemId) {
-          return true;
-        }
-
-        return customDocumentDataItem.envelopeItemId === item.id;
-      });
-
-      if (foundCustomDocumentData) {
-        documentDataIdToDuplicate = foundCustomDocumentData.documentDataId;
-      }
-
-      const documentDataToDuplicate = await prisma.documentData.findFirst({
-        where: {
-          id: documentDataIdToDuplicate,
-        },
-      });
-
-      if (!documentDataToDuplicate) {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Document data not found',
-        });
-      }
+      // MODIFIED for BizRethink (overlay 077): use the authorized snapshot, never a global ID re-read.
+      const documentDataToDuplicate = documentSources[i];
 
       let buffer = await getFileServerSide(documentDataToDuplicate);
 

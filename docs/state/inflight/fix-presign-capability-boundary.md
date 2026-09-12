@@ -45,5 +45,19 @@ PDF adapters, revocation, all three create/update variants and edit loaders;
 discovery passed, actual execution is pending CI. Overlay 078 records exactly
 13 upstream adapters/verifier files; reverse-apply check passes. No new schema.
 
+Integration: A-04 / PR #173 head `f1ea41a44b87ce04c1f6159f37d41fcb4d17244c`
+is included as an explicit dependency, without merging that PR to main or editing
+its branch. Its state fold remains the sole source of the #172 cleanup. Merge
+#173 first; A-03's review range starts at that head. Four mechanical conflicts
+combined the imports, overlay index, owned paths and typecheck includes. Overlay
+078 was regenerated against #173 and both overlays replay sequentially from
+main to byte-identical source across all **15** affected upstream files.
+
+Combined validation: **4,488 owned tests**, **287 lib tests**, owned and full Remix
+type checks, owned formatting, and 12-test Playwright discovery pass. Prisma was
+regenerated locally for A-04's additive table; no database was contacted. Discovery
+uses the repo's `NODE_OPTIONS='--import tsx'` loader, like its E2E command. Actual
+HTTP execution and independent review remain pending.
+
 Fresh independent human-started adversarial auth/upstream review is required.
 This author opens the PR and monitors only its own CI; it never merges its PR.
