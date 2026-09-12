@@ -260,6 +260,16 @@ describe('A-05 public recipient operations', () => {
   }
 
   for (const operation of reads) {
+    it.each([
+      DocumentStatus.COMPLETED,
+      DocumentStatus.REJECTED,
+      DocumentStatus.CANCELLED,
+    ])(`keeps ${operation.name} available after the sender hides a %s document`, async (status) => {
+      envelope.status = status;
+      envelope.deletedAt = new Date();
+      await expect(operation.run(7)).resolves.not.toBeNull();
+      await expect(operation.run(8)).rejects.toBeDefined();
+    });
     it.each(['deleted', 'draft'] as const)(`refuses ${operation.name} for a %s envelope`, async (state) => {
       if (state === 'deleted') {
         envelope.deletedAt = new Date();
@@ -286,6 +296,13 @@ describe('A-05 public recipient operations', () => {
   }
 
   it('keeps authenticated document-by-token reads working for the recipient', async () => {
+    await expect(api.createCaller(context(7)).document({ token })).resolves.toMatchObject({
+      documentData: { id: 'data_test' },
+    });
+  });
+  it('keeps authenticated document-by-token reads after the sender hides a completed document', async () => {
+    envelope.status = DocumentStatus.COMPLETED;
+    envelope.deletedAt = new Date();
     await expect(api.createCaller(context(7)).document({ token })).resolves.toMatchObject({
       documentData: { id: 'data_test' },
     });

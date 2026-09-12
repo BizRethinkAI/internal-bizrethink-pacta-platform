@@ -1,5 +1,5 @@
 import { logger } from '@documenso/lib/utils/logger';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -25,6 +25,14 @@ const makeEnvelope = () => ({
   ...envelopeFixture({ status: DocumentStatus.COMPLETED }),
   authOptions: { globalAccessAuth: ['ACCOUNT'], globalActionAuth: [] },
   qrToken: 'qr_test',
+  directLink: {
+    id: 'direct_test',
+    envelopeId: 'envelope_team_a',
+    token: 'direct_test_token',
+    createdAt: new Date(),
+    enabled: true,
+    directTemplateRecipientId: 1,
+  },
 });
 let envelope: ReturnType<typeof makeEnvelope>;
 let recipient: ReturnType<typeof recipientFixture>;
@@ -120,12 +128,79 @@ describe('A-05 recipient file routes', () => {
     it.each(['deleted', 'draft'] as const)(`refuses a %s envelope before storage: ${path(token)}`, async (state) => {
       asRecipient();
       if (state === 'deleted') {
+        envelope.status = DocumentStatus.PENDING;
         envelope.deletedAt = new Date();
       } else {
         envelope.status = DocumentStatus.DRAFT;
       }
       const response = await app.request(path(token));
       expect(response.status).toBe(404);
+      expect(getFile).not.toHaveBeenCalled();
+    });
+    it.each([
+      DocumentStatus.COMPLETED,
+      DocumentStatus.REJECTED,
+      DocumentStatus.CANCELLED,
+    ])(`preserves recipient PDFs after the sender hides a %s document: ${path(token)}`, async (status) => {
+      envelope.status = status;
+      envelope.deletedAt = new Date();
+      asRecipient();
+      const response = await app.request(path(token));
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('%PDF');
+      getFile.mockClear();
+      getSession.mockResolvedValue({ user: null, session: null, isAuthenticated: false });
+      expect((await app.request(path(token))).status).toBe(404);
+      expect(getFile).not.toHaveBeenCalled();
+    });
+    it(`preserves an enabled, link-only direct-template preview: ${path(token)}`, async () => {
+      envelope.type = EnvelopeType.TEMPLATE;
+      envelope.status = DocumentStatus.DRAFT;
+      envelope.authOptions.globalAccessAuth = [];
+      const response = await app.request(path(token));
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe('%PDF');
+      expect(response.headers.get('cache-control')).toContain('no-store');
+    });
+    it(`requires an active login for an ACCOUNT direct-template preview: ${path(token)}`, async () => {
+      envelope.type = EnvelopeType.TEMPLATE;
+      envelope.status = DocumentStatus.DRAFT;
+      recipient.email = 'direct.template@documenso.com';
+      expect((await app.request(path(token))).status).toBe(404);
+      expect(getFile).not.toHaveBeenCalled();
+      asRecipient();
+      expect((await app.request(path(token))).status).toBe(200);
+      expect(db.user.findFirst).toHaveBeenLastCalledWith({
+        where: { id: 7 },
+        select: { id: true, disabled: true },
+      });
+      getFile.mockClear();
+      db.user.findFirst.mockResolvedValue({ id: 7, disabled: true });
+      expect((await app.request(path(token))).status).toBe(404);
+      expect(getFile).not.toHaveBeenCalled();
+      db.user.findFirst.mockResolvedValue(null);
+      expect((await app.request(path(token))).status).toBe(404);
+      expect(getFile).not.toHaveBeenCalled();
+      db.user.findFirst.mockRejectedValue(new Error('Synthetic database outage'));
+      expect((await app.request(path(token))).status).toBe(500);
+      expect(getFile).not.toHaveBeenCalled();
+    });
+    it.each([
+      'disabled link',
+      'different recipient',
+      'deleted template',
+    ] as const)(`refuses a direct-template preview with a %s: ${path(token)}`, async (state) => {
+      envelope.type = EnvelopeType.TEMPLATE;
+      envelope.status = DocumentStatus.DRAFT;
+      envelope.authOptions.globalAccessAuth = [];
+      if (state === 'disabled link') {
+        envelope.directLink.enabled = false;
+      } else if (state === 'different recipient') {
+        envelope.directLink.directTemplateRecipientId = 99;
+      } else {
+        envelope.deletedAt = new Date();
+      }
+      expect((await app.request(path(token))).status).toBe(404);
       expect(getFile).not.toHaveBeenCalled();
     });
     it(`refuses a disabled recipient account before storage: ${path(token)}`, async () => {
