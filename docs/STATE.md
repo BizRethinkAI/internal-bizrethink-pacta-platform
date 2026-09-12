@@ -81,6 +81,33 @@ reliance on the removed cross-team authority remains unknown. A-03 and other
 audit findings remain separate decisions. Shwet waived the inherited comment
 requesting a second reviewer; the independent review found no blocking defect.
 
+## 2026-09-12 — recipient-token identity boundary (#172)
+
+**#172 / A-05** merged at `0c440a396c9b5f5c9161538358fc08ff120fdc80`.
+Recipient ACCOUNT identity applies independently of ACTION authentication to
+token reads, ordinary/signature fields, removal, completion and rejection.
+FREE_SIGNATURE has the same ACTION requirement and prompt as SIGNATURE.
+ACCOUNT and completion 2FA are cumulative; email codes remain bound to the
+recipient email and envelope. Account-backed factors must belong to the
+intended recipient. The CSC/SES/TSP entry points check ACCOUNT before entering
+the existing signing pipeline; this changes no cryptographic verification.
+
+Recipient reads deny drafts and deleted unfinished documents. Sender deletion
+of finalized documents preserves the recipient's copy, and the owner's choice
+keeps downloads available after the signing deadline with configured identity
+checks. Token PDFs authenticate before storage/conditional responses and use
+private/no-store. Direct-template previews retain their distinct enabled-link
+capability and configured ACCOUNT contract; ordinary APIs cannot use that
+preview capability. QR and deliberately anonymous links retain their behavior.
+
+Owned policy/middleware and **overlay 076** hold the implementation; recheck
+token entry points, factor-verifier early returns, three PDF routes and
+signature-kind UI decisions during upstream sync. Initial CI caught preview
+and finalized-copy regressions, which were corrected with focused regressions
+and HTTP coverage before the independent review. The merged PR includes the
+preceding #169/#170/#171 queue. A-03/A-04/A-06 remain separate owner decisions;
+this fold neither changes those findings nor reports deployment status.
+
 ## Where things stand
 
 Pacta is an **additive fork of `documenso/documenso`** — a document-signing

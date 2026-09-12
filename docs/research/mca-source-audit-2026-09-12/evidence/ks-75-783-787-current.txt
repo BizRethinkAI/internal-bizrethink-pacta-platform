@@ -1,0 +1,96 @@
+75-783.
+Citation of act; definitions.
+(a) The provisions of K.S.A. 2025 Supp. 75-783 through 75-787, and amendments thereto, shall be known and may be cited as the commercial financing disclosure act.
+(b) As used in the commercial financing disclosure act:
+(1) (A) "Account" includes:
+(i) A right to payment of a monetary obligation, whether or not earned by performance, for:
+(a) Property that has been or is to be sold, leased, licensed, assigned or otherwise disposed of;
+(b) services rendered or to be rendered;
+(c) a policy of insurance issued or to be issued;
+(d) a secondary obligation incurred or to be incurred;
+(e) energy provided or to be provided;
+(f) the use or hire of a vessel under a charter or other contract;
+(g) arising out of the use of a credit card or charge card or information contained on or for the use with such card; or
+(h) winnings in a lottery or other game of chance operated or sponsored by a state, governmental unit of a state or person licensed or authorized to operate such lottery or game by a state or governmental unit of a state; and
+(ii) healthcare insurance receivables.
+(B) "Account" does not include:
+(i) Rights to payment evidenced by chattel paper or an instrument;
+(ii) commercial tort claims;
+(iii) deposit accounts;
+(iv) investment property;
+(v) letter-of-credit rights or letters of credit; or
+(vi) rights to payment for moneys advanced or sold other than rights arising out of the use of a credit card or charge card or information contained on or for use with such card.
+(2) "Accounts receivable purchase transaction" means any transaction in which a business forwards or otherwise sells to a provider all or a portion of accounts of such business, cash receipts or payment intangibles at a discount to the expected value of such accounts or payment intangibles. The provider's characterization of an accounts receivable purchase transaction as a purchase shall be conclusive that such accounts receivable purchase transaction is not a loan or a transaction for the use, forbearance or detention of money.
+(3) "Act" means the commercial financing disclosure act.
+(4) "Advance fee" means any consideration that is assessed or collected prior to the closing of a commercial financing transaction by a broker.
+(5) (A) "Broker" means any person who, for compensation or the expectation of compensation:
+(i) Arranges a commercial financing product transaction between a third party that, if executed, such transaction would be binding upon such third party; and
+(ii) communicates such transaction to a business in this state.
+(iii)* "Broker" does not include a provider or any individual or entity whose compensation is not based or dependent upon the terms of the specific commercial financing product obtained or offered.
+(6) "Business" means an individual, group of individuals, sole proprietorship, corporation, limited liability company, trust, estate, cooperative, association, limited partnership or general partnership engaged in a business activity.
+(7) "Business purpose transaction" means any transaction in which the proceeds resulting therefrom are provided to a business or are intended to be used to carry on a business and are not for personal, family or household purposes. A provider may rely on any written statement of intended purpose signed by a business to determine whether such transaction is a "business purpose transaction". Such written statement may be a separate statement or may be contained in an application, agreement or other document signed by such business or the owner of such business.
+(8) "Commercial financing facility" means a provider's plan for purchasing multiple accounts receivable from the recipient over a period of time pursuant to an agreement that sets forth the terms and conditions governing the use of the facility.
+(9) "Commercial financing transaction" means any commercial loan, accounts receivable purchase transaction and commercial open-end credit plan when the transaction is a business purpose transaction.
+(10) "Commercial loan" means a loan to a business, whether secured or unsecured.
+(11) "Commercial open-end credit plan" means commercial financing extended by a provider under a plan in which:
+(A) The provider reasonably contemplates repeat transactions; and
+(B) subject to any limit set by the provider, the amount of financing that such provider may extend to the business during the term of the plan is made available to the extent that any outstanding balance is repaid.
+(12) "Depository institution" means a bank, trust company, industrial loan company, savings and loan association, savings bank or credit union doing business under the authority of a license, certificate or charter issued by the United States, this state or any other state and that is authorized to transact business in this state.
+(13) "General intangible" means any personal property, including things in action, other than accounts, chattel paper, commercial tort claims, deposit accounts, documents, goods, instruments, investment property, letter-of-credit rights, letters of credit, money and oil, gas or other minerals before extraction. "General intangible" includes payment intangibles and software.
+(14) "Payment intangible" means a general intangible under which the account debtor's principal obligation is a monetary obligation.
+(15) "Person" means any individual, firm, company, partnership, corporation or association.
+(16) "Provider" means a person who consummates more than five commercial financing transactions to a business located in this state in a calendar year. "Provider" includes a person that enters into a written agreement with a depository institution to arrange for the extension of a commercial financing transaction by such depository institution to a business through an online lending platform administered by such person.
+History:
+L. 2024, ch. 29, § 1; July 1.
+Revisor's Note:
+Subparagraph designated as "(iii)" should have been designated as "(B)" instead.
+
+75-784.
+Commercial financing transactions; required disclosures.
+(a) Before, or at the time of, consummating a commercial financing transaction, a provider shall disclose to the business the terms of such commercial financing transaction in accordance with the provisions of this section. Only one disclosure shall be required for each commercial financing transaction and disclosure shall not be required when modification, forbearance or change to a consummated commercial financing transaction occurs.
+(b) A provider shall disclose with each commercial financing transaction:
+(1) The total amount of funds provided to the business under the terms of such commercial financing transaction. Such disclosure shall be labeled "total amount of funds provided";
+(2) the total amount of funds disbursed to such business under the terms of such commercial financing transaction if less than the total amount of funds provided under paragraph (1). Such disclosure shall be labeled "total amount of funds disbursed";
+(3) the total amount to be paid to such provider pursuant to such commercial financing transaction agreement. Such disclosure shall be labeled "total of payments";
+(4) the total dollar cost of such commercial financing transaction under the terms of the agreement, which shall be determined by subtracting the total amount of funds provided from the total of payments. Such calculation shall include any fees or charges deducted by the provider from the amount under paragraph (1). Such disclosure shall be labeled "total dollar cost of financing";
+(5) the manner, frequency and amount of each payment. Such disclosure shall be labeled "payments". If such payments vary, the provider shall instead disclose the manner, frequency and the estimated amount of the initial payment and shall label such disclosure as "estimated payments." The commercial financing transaction agreement shall include a description of the methodology for calculating any variable payment and the circumstances for when payments may vary; and
+(6) a statement of whether there are any costs or discounts associated with prepayment of such commercial financing transaction, including a reference to the paragraph in such agreement that creates the contractual right to prepayment. Such disclosure shall be labeled "prepayment".
+(c) A provider that consummates a commercial financing facility may provide disclosures required by this act that are based on an example of a transaction that could occur under the agreement. The example shall be based on an account receivable total face amount owed of $10,000. Only one disclosure is required for each commercial financing facility, and a disclosure is not required as result of a modification, forbearance or change to the facility. A new disclosure is not required each time accounts receivables are purchased under the facility.
+History:
+L. 2024, ch. 29, § 2; July 1.
+
+75-785.
+Exceptions to application of act.
+The provisions of this act shall not apply to a:
+(a) Provider that is a depository institution or its parent company or a subsidiary or service corporation that is:
+(1) Owned and controlled by a depository institution; and
+(2) regulated by a federal banking agency;
+(b) provider that is a lender regulated under the federal farm credit act, 12 U.S.C. § 2001 et seq.;
+(c) commercial financing transaction that is:
+(1) Secured by real property;
+(2) a lease; or
+(3) a purchase money obligation that is incurred as all or part of the price of the collateral or for value given to enable the business to acquire rights in or the use of such collateral if such value is so used;
+(d) commercial financing transaction in which the recipient is a motor vehicle dealer or a vehicle rental company, or an affiliate of a motor vehicle dealer or vehicle rental company or an affiliate of such a company pursuant to a commercial loan or commercial open-end credit plan of at least $50,000 or a commercial financing transaction offered by a person in connection with the sale or lease of products or services that such person manufactures, licenses or distributes or whose parent company or any of such parent company's directly or indirectly owned and controlled subsidiaries manufactures, licenses or distributes;
+(e) provider that is licensed as a money transmitter in accordance with the Kansas money transmitter act or the law of any other state, district, territory or commonwealth of the United States;
+(f) provider that consummates not more than five commercial financing transaction transactions in this state in a 12-month period; or
+(g) commercial financing transaction of more than $500,000.
+History:
+L. 2024, ch. 29, § 3; July 1.
+
+75-786.
+Prohibitions on broker.
+No broker shall:
+(a) Assess, collect or solicit an advance fee from a business to provide services as a broker. Nothing in this subsection shall be construed to preclude a broker from soliciting a potential business to pay for, or preclude a potential business from paying for, actual services necessary to apply for a commercial financing transaction. Such actual services may include, but not be limited to, a credit check or an appraisal of security, where such payment is made by check or money order payable to a party independent of the broker;
+(b) make or use any false or misleading representations or omit any material fact in the offer or sale of the services of a broker or engage, directly or indirectly, in any act that operates or would operate as fraud or deception upon any person in connection with the offer or sale of the services of a broker, notwithstanding the absence of reliance by the buyer; or
+(c) make or use any false or deceptive representation in its business dealings.
+History:
+L. 2024, ch. 29, § 4; July 1.
+
+75-787.
+Penalties for violation of act; validity of underlying agreement; enforcement of act by attorney general.
+(a) Violations of the provisions of this act shall be punishable by a civil penalty of $500 per violation, but not to exceed $20,000 for all aggregated violations. Any person who violates the provisions of this act after receiving written notice of a prior violation from the attorney general shall be punishable by a civil penalty of $1,000 per violation, but not to exceed $50,000 for all aggregated violations.
+(b) Violations of this act shall not affect the enforceability or validity of the underlying agreement.
+(c) This act shall not create a private right of action against any person based upon compliance or noncompliance with the provisions of this act.
+(d) Authority to enforce compliance with this act shall be vested exclusively with the attorney general.
+History:
+L. 2024, ch. 29, § 5; July 1.
