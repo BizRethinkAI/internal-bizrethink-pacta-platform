@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import * as fieldAuth from '@documenso/lib/server-only/document/validate-field-auth';
 import { createDocumentFromDirectTemplate } from '@documenso/lib/server-only/template/create-document-from-direct-template';
+import { FIELD_CHECKBOX_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 import type { Field, Prisma, Recipient } from '@prisma/client';
 import { EnvelopeType, FieldType, SendStatus, SigningStatus } from '@prisma/client';
@@ -204,6 +205,12 @@ const rejected: Case[] = [
     value: 'X',
   },
   {
+    name: 'dropdown value without configured choices',
+    type: FieldType.DROPDOWN,
+    meta: { type: 'dropdown' },
+    value: 'Unconfigured choice',
+  },
+  {
     name: 'unknown radio choice',
     type: FieldType.RADIO,
     meta: { type: 'radio', direction: 'vertical', values: options },
@@ -364,6 +371,24 @@ for (const version of [1, 2] as const) {
       addField(FieldType.NUMBER, { type: 'number', minValue: 100 });
       await expect(use([entry(6, '')])).resolves.toMatchObject({ documentId: 100 });
       expect(savedFields()[0].customText).toBe('');
+    });
+    for (const meta of [null, FIELD_CHECKBOX_META_DEFAULT_VALUES]) {
+      for (const selected of [false, true]) {
+        it(`preserves default checkbox settings (${meta ? 'stored' : 'implicit'}, selected=${selected})`, async () => {
+          addField(FieldType.CHECKBOX, meta);
+          const value = version === 1 ? '["empty-value-1"]' : '[0]';
+          await expect(use(selected ? [entry(6, value)] : [])).resolves.toMatchObject({ documentId: 100 });
+          if (selected) {
+            expect(savedFields()[0]).toMatchObject({ customText: value, inserted: true });
+          }
+        });
+      }
+    }
+    it('derives a DATE from the server when the submitted field has no value', async () => {
+      addField(FieldType.DATE, null);
+      await expect(use([entry(6)])).resolves.toMatchObject({ documentId: 100 });
+      expect(savedFields()[0]).toMatchObject({ customText: expect.any(String), inserted: true });
+      expect(savedFields()[0].customText).not.toBe('');
     });
     it('preserves drawn signatures when typed signatures are disabled', async () => {
       template.documentMeta.typedSignatureEnabled = false;
