@@ -1,0 +1,778 @@
+SOURCE: https://occc.texas.gov/wp-content/uploads/2026/06/csbf-rules-adoption-fc-070926.pdf
+FINAL URL: https://occc.texas.gov/wp-content/uploads/2026/06/csbf-rules-adoption-fc-070926.pdf
+RETRIEVED UTC: 2026-09-12T17:09:10.513465+00:00
+RESPONSE SHA256: d03e47a46c3be7e2af3d217dfb90df49ca349d31618944d51b3b9ec75eb0a9f8
+
+PDF PAGE 16
+LEFT COLUMN
+should be aware of the relevant facts: whether
+the provider has established a mechanism for
+automatically debiting the recipient's deposit
+account, and whether the provider has the
+required security interest. This language is
+appropriate to maintain in §86.313 to ensure
+that providers do not circumvent the
+prohibition in Texas Finance Code,
+§398.056.
+Regarding the administrative penalty
+provisions in §86.321, two precomments
+recommend aligning the rule with Texas
+Finance Code, §398.101, which describes a
+penalty of $10,000 for each violation. In
+response to these precomments, adopted
+§86.321(c) explains that there is a maximum
+administrative penalty of $10,000 per
+violation.
+An official comment of consumer and
+business advocates recommends that Texas
+adopt the Responsible Business Lending
+Coalition's Small Business Borrowers' Bill of
+Rights. In general, this bill of rights appears
+to be a set of legislative proposals that goes
+beyond the current requirements of Texas
+Finance Code, Chapter 398. The commission
+and OCCC interpret this comment as a
+proposal for future legislative changes, rather
+than a specific set of recommendations for
+revising the proposed rules.
+Statutory Authority and Affected
+Provisions
+The new rules are adopted under Texas
+Finance Code, §398.005, which authorizes
+the commission to adopt rules applicable to
+commercial sales-based financing providers
+and brokers, and under Section 2(b) of HB
+700 (2025), which authorizes rules regarding
+registration fees and the form of registration.
+The rule provisions related to fees in §86.307
+are also adopted under Texas Finance Code,
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 16 of 25
+§16.003, which authorizes the OCCC to set
+the amounts of fees as necessary for carrying
+out its functions. The provisions relating to
+suspension or revocation based on criminal
+history in §86.322 are also adopted under
+Texas Occupations Code, §53.025, which
+authorizes state licensing agencies to issue
+guidelines describing criminal offenses
+related to a particular occupation.
+The statutory provisions affected by the
+adoption are contained in Texas Finance
+Code, Chapter 398.
+§86.301. Purpose and Scope
+(a) Purpose. The purposes of this
+subchapter are to implement Texas Finance
+Code, Chapter 398, and to assist in the
+administration and enforcement of Chapter
+398.
+(b) Scope. This subchapter applies to any
+person who engages in business as a provider
+or broker of commercial sales-based
+financing, unless specifically exempted by
+Texas Finance Code, Chapter 398.
+§86.302. Definitions
+Words and terms used in this subchapter
+that are defined in Texas Finance Code,
+Chapter 398, have the same meanings as
+defined in Chapter 398. The following words
+and terms, when used in this subchapter, will
+have the following meanings, unless the
+context clearly indicates otherwise.
+(1) Key individual--An individual
+owner, officer, director, or employee with a
+substantial relationship to the business of an
+applicant or registrant. The following are key
+individuals:
+
+PDF PAGE 17
+LEFT COLUMN
+(A) any individual who is a direct
+owner of 10% or more of an applicant or
+registrant; and
+(B) any individual who is a
+control person or executive officer of an
+applicant or registrant, including individual
+who has the power to direct management or
+policies of a company (e.g., president, chief
+executive officer, general partner, managing
+member, vice president, treasurer, secretary,
+chief operating officer, chief financial
+officer); and
+(C) an individual designated as a
+key individual where necessary to show that
+the business will be operated lawfully and
+fairly.
+(2) NMLS--The Nationwide
+Multistate Licensing System.
+(3) OCCC--The Office of Consumer
+Credit Commissioner of the State of Texas.
+(4) Registrant--A person who has
+been issued a commercial sales-based
+financing registration under Texas Finance
+Code, Chapter 398.
+§86.303. Filing of New Application
+(a) NMLS. To submit a commercial
+sales-based financing registration
+application, an applicant must submit a
+complete, accurate, and truthful registration
+application through NMLS (or a successor
+system designated by the OCCC). An
+application is complete when it conforms to
+the written instructions and necessary fees
+have been paid.
+(b) Company registration application. A
+company registration application will include
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 17 of 25
+the following information and any other
+information listed in the written instructions:
+(1) A company form including the
+name of the applicant entity, contact
+information, registered agent, location of
+books and records, legal status, and responses
+to disclosure questions.
+(2) An individual form for each key
+individual, including name, contact
+information, and responses to disclosure
+questions.
+(3) A business operating plan
+describing the source of customers, purpose
+of transactions, anticipated size of
+transactions, and source of working capital.
+(4) A certificate of formation or other
+formation document.
+(5) Any assumed names or other trade
+names that the applicant will use, and an
+assumed name certificate for each assumed
+name or other trade name.
+(6) Franchise tax account information
+showing that the applicant entity is
+authorized to do business in Texas.
+(7) An explanation and supporting
+documents for any judgment, memorandum
+of understanding, enforcement order, or
+conviction against the applicant or a key
+individual, related to a violation of law, act of
+fraud, breach of trust, or money laundering.
+(c) Amendments to pending application.
+An applicant must immediately amend a
+pending application if any information
+changes requiring a materially different
+response from information provided in the
+original application.
+
+PDF PAGE 18
+LEFT COLUMN
+§86.304. Processing of Registration
+Application
+(a) Complete application. A registration
+application is complete when:
+(1) the application conforms to the
+rules and published instructions; and
+(2) all fees have been paid.
+(b) Effectiveness. A registration is
+effective on receipt of a completed
+registration application and required fees.
+§86.305. Required Notifications
+(a) Advance change notice. No later than
+the date of the change (or an earlier date
+specified in the written instructions), a
+registrant must notify the OCCC of a change
+to any of the following information provided
+in the original registration application:
+(1) legal name of entity;
+(2) any assumed names of entity;
+(3) legal status of entity;
+(4) names of direct owners or indirect
+owners;
+(5) names of affiliates or subsidiaries;
+(6) names of any key individuals; or
+(7) main address.
+(b) Other required notifications. No later
+than 30 days after the registrant has
+knowledge of the information, a registrant
+must report the following information to the
+OCCC:
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 18 of 25
+(1) any civil or regulatory actions
+against the registrant or key individuals that
+were not disclosed in the original application
+and would require a different answer than
+that given in the original registration
+application;
+(2) criminal history of the registrant
+or key individuals that was not disclosed in
+the original application;
+(3) any bankruptcy of the registrant or
+a direct owner; or
+(4) any breach of system security
+under Texas Business & Commerce Code,
+§521.053, affecting at least 250 residents of
+this state.
+(c) Contact information. Each applicant
+or registrant is responsible for ensuring that
+all contact information on file with the OCCC
+is current and correct, including all mailing
+addresses, all phone numbers, and all email
+addresses. The OCCC may send notices to
+the mailing address or email address on file.
+It is a best practice for registrants to regularly
+review contact information on file to ensure
+that it is current and correct.
+§86.306. Registration Term, Renewal, and
+Expiration
+(a) Registration term and renewal. A
+registration must be renewed annually during
+a specified renewal period to remain
+effective. After renewal, a registration is
+effective for a term of one year.
+(b) NMLS. To maintain and renew a
+registration, a registrant must maintain an
+active account in NMLS (or a successor
+system designated by the OCCC). The OCCC
+may make renewal unavailable to a registrant
+that fails to maintain an active account.
+
+PDF PAGE 19
+LEFT COLUMN
+(c) Expiration. If a registrant does not pay
+the annual fee during the renewal period, the
+registration will expire.
+§86.307. Fees
+(a) Initial registration. For an initial
+registration, an applicant must pay a $1,000
+initial registration fee.
+(b) Annual renewal. To renew a
+registration, a registrant must pay a $1,000
+annual fee.
+(c) Registration amendment. The OCCC
+may require a registrant to pay a fee up to $75
+to amend registration information.
+(d) Late renewal. The OCCC may allow
+late renewal of a registration for a specified
+period. To renew a registration late, a person
+must pay a late renewal fee up to $1,000 in
+addition to the annual fee.
+(e) Periodic adjustment. Starting July 1,
+2027, and each July 1 thereafter, the OCCC
+may revise the dollar amounts in subsections
+(a) and (b) of this section based on the
+Consumer Price Index for Urban Wage
+Earners and Clerical Workers (or an
+equivalent measure of inflation if this
+measure is unavailable). The OCCC will use
+December 2025 as a base year and adjust fee
+amounts based on the percentage change
+from December 31, 2025, to the December 31
+preceding the year of adjustment, rounding to
+the nearest $5 increment. No later than May
+1, the OCCC will publish the amount of any
+periodic adjustment.
+(f) Discount. The OCCC may discount or
+reduce the amount of a fee described by this
+section. The commissioner is authorized to
+determine the amount of a discount.
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 19 of 25
+(g) Fees nonrefundable and
+nontransferable. Fees described by this
+section are nonrefundable and
+nontransferable.
+§86.310. Disclosures
+(a) Timing. A provider must provide a
+recipient with any disclosures required by
+Texas Finance Code, §398.051, in writing at
+or before the time the provider extends a
+specific offer to the recipient.
+(b) Accuracy. All terms and dollar
+amounts disclosed under Texas Finance
+Code, §398.051, must accurately reflect the
+terms of the provider's specific offer to the
+recipient.
+(c) Revised disclosures in case of
+inaccuracy. At any time after providing
+required disclosures under Texas Finance
+Code, §398.051, if the provider learns that
+any information on the disclosures was
+inaccurate or did not correctly reflect the
+terms of the transaction at closing, then the
+provider must promptly notify the recipient
+of the inaccuracy and must promptly provide
+revised, accurate disclosures to the recipient.
+(d) OCCC notice. A contract for services
+under Texas Finance Code, Chapter 398 must
+contain the following statement as a separate
+section or otherwise conspicuously set out
+from surrounding written material: "The
+Office of Consumer Credit Commissioner
+(OCCC) is a state agency that enforces
+certain laws that apply to this contract. If a
+complaint cannot be resolved by contacting
+the provider, a commercial sales-based
+financing recipient can contact the OCCC to
+file a complaint. OCCC address: 2601 N.
+Lamar Blvd., Austin, Texas 78705. Phone:
+(800) 538-1579. Website: occc.texas.gov."
+
+PDF PAGE 20
+LEFT COLUMN
+§86.311. Recordkeeping
+(a) Generally. A provider or broker must
+maintain records for each transaction entered
+or brokered under Texas Finance Code,
+Chapter 398, and must make those records
+available for investigation. Records may be
+maintained using an electronic system, a
+paper or manual system, or a combination of
+these types of systems, unless otherwise
+specified by statute or rule.
+(b) Provider's transaction file. A provider
+must maintain a transaction file for each
+recipient of a transaction under Texas
+Finance Code, Chapter 398. The transaction
+file must include the following:
+(1) a complete copy of the written
+agreement between the provider and the
+recipient;
+(2) each disclosure made to the
+recipient, including disclosures under Texas
+Finance Code, §398.051;
+(3) each additional document,
+addendum, or authorization signed by the
+recipient;
+(4) any documentation showing
+attachment, perfection, or release of a lien;
+(5) an account history showing the
+application of each payment made by the
+recipient; and
+(6) any written documentation of
+collection, repossession, foreclosure, or
+litigation against the recipient.
+(c) Broker's transaction file. A broker
+must maintain a transaction file for each
+recipient of brokering services under Texas
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 20 of 25
+Finance Code, Chapter 398. The transaction
+file must include any disclosures provided by
+the broker to the recipient and any agreement
+that the broker entered with the recipient.
+(d) Time to maintain transaction file. A
+registrant must maintain the transaction file
+under subsection (b) or (c) of this section
+until the later of:
+(1) four years from the date of the
+transaction; or
+(2) two years from the date of the final
+entry on the account.
+(e) Application and adverse action
+records. If a prospective recipient applies for
+commercial sales-based financing and does
+not enter a commercial sales-based financing
+transaction, then a registrant must maintain
+the application and any written adverse
+action notice for one year from the date of the
+application, or one year from the date of the
+adverse action notice, whichever is later.
+(f) Advertising and solicitation. A
+registrant must maintain each advertisement
+or solicitation for one year from the date of
+the advertisement or solicitation.
+(g) Third-party agreements. A registrant
+must maintain any written agreements with
+third parties that relate to services under
+Texas Finance Code, Chapter 398, including
+any agreement between a provider and a
+broker, until one year after the date the
+agreement terminates.
+(h) Data security policies and procedures.
+A registrant must maintain policies and
+procedures to maintain the security of
+customer information and protect
+information from unauthorized access.
+
+PDF PAGE 21
+LEFT COLUMN
+(i) Data breach notifications. A registrant
+must maintain the following for data breach
+notifications:
+(1) the text of any data breach
+notification provided to recipients, including
+any notification under Texas Business &
+Commerce Code, §521.053, for a period of
+four years from the date of the notification;
+and
+(B) any data breach notification
+provided to a government agency, including
+any notification provided to the Office of the
+Attorney General under Texas Business &
+Commerce Code, §521.053, for a period of
+four years from the date of the notification.
+§86.312. Prohibition of Unfair, Deceptive,
+and Abusive Acts
+(a) Generally. A provider or broker may
+not engage in an unlawful, unfair, deceptive,
+or abusive act or practice related to a
+transaction under Texas Finance Code,
+Chapter 398.
+(b) Acts and practices identified. The
+following are unlawful, unfair, deceptive, or
+abusive acts or practices:
+(1) false, misleading, or inaccurate
+statements in advertisements, solicitations,
+disclosures, contracts, or communications
+with the recipient or other parties, including:
+(A) inaccurate descriptions of
+contracted-for services;
+(B) claiming a legal right to take
+an action that the person does not have the
+authority to take; and
+(C) a statement that there is no
+personal guarantee, if this is inaccurate;
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 21 of 25
+(2) failure to perform contracted-for
+services;
+(3) charging fees or other amounts
+that were not specifically disclosed and
+contracted for;
+(4) failure to make accurate
+disclosures under Texas Finance Code,
+Chapter 398 and this subchapter;
+(5) a confession of judgment in
+violation of Texas Finance Code, §398.055;
+(6) an automatic debit in violation of
+Texas Finance Code, §398.056 and this
+subchapter;
+(7) a waiver of a recipient's statutory
+rights under Texas Finance Code, Chapter
+398;
+(8) filing a lien on a debtor's property
+without first obtaining a security agreement
+authenticated by the debtor under Texas
+Business & Commerce Code, §9.203;
+(9) foreclosure of collateral without
+complying with applicable requirements
+(e.g., Texas Business & Commerce Code,
+Chapter 9);
+(10) debiting amounts from a person's
+account or deposit account without the
+person's authorization;
+(11) failure to maintain records
+required by this subchapter;
+(12) instructing a recipient or a
+recipient's customer to redirect payment
+amounts to the provider, where the amounts
+were previously scheduled to be paid to
+
+PDF PAGE 22
+LEFT COLUMN
+another person (e.g., a creditor or factor),
+unless:
+(A) the other person has
+consented to payment being redirected to the
+provider; or
+(B) the payment is for debt that
+has been validly assigned to the provider.
+(13) a provider's material violation of
+a written intercreditor agreement, if the
+provider is a party to the agreement;
+(14) improperly characterizing a
+transaction as a "business" or "commercial"
+transaction when the advanced funds are
+extended primarily for individual, family, or
+household use; and
+(15) a device or subterfuge to evade
+statutory or regulatory requirements.
+§86.313. Prohibition of Certain Automatic
+Debits
+(a) Generally. As provided by Texas
+Finance Code, §398.056, a provider or broker
+may not establish a mechanism for
+automatically debiting a recipient's deposit
+account unless the provider or broker holds a
+validly perfected security interest in the
+recipient's account under Chapter 9, Business
+& Commerce Code, with a first priority
+against the claims of all other persons.
+(b) Automatic debit. For purposes of this
+section, debits are automatic if they are
+authorized in advance to occur more than one
+time or on a recurring basis. A mechanism for
+automatically debiting a deposit account
+includes a situation in which a recipient
+provides more than one prewritten check to a
+provider in advance for payments under a
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 22 of 25
+commercial sales-based financing
+transaction.
+(c) Security interest in accounts
+receivable. For purposes of this section, in
+order to automatically debit a deposit
+account, a provider or broker must hold a
+validly perfected, first-priority security
+interest in all accounts receivable of the
+recipient.
+(d) Perfection and priority of security
+interest. Texas Business & Commerce Code,
+Chapter 9 governs perfection and priority of
+a security interest in accounts receivable.
+Generally, a UCC-1 financing statement
+must be filed in order to perfect a security
+interest, as provided by Texas Business &
+Commerce Code, §9.310(a). Priority is
+generally determined by the time of filing or
+perfection, as provided by Texas Business &
+Commerce Code, §9.322(a)(1).
+(e) Violation by third party. A provider or
+broker may not accept payment of a debit in
+violation of this section and may not direct a
+third party to complete a debit that violates
+this section.
+§86.320. Complaints and Investigations
+(a) Complaints. The OCCC may accept
+complaints regarding transactions under
+Texas Finance Code, Chapter 398 and this
+subchapter.
+(b) Request for information and
+investigation. On receipt of a written
+complaint or other reasonable cause to
+believe that a person is violating Texas
+Finance Code, Chapter 398 or this
+subchapter, the OCCC may:
+
+PDF PAGE 23
+LEFT COLUMN
+(1) require the person to furnish
+information regarding a specific transaction
+to which the violation relates; and
+(2) conduct an investigation to
+determine whether a violation exists.
+(c) Access to records. In an investigation
+under subsection (b) of this section, a person
+subject to investigation must allow the
+OCCC to:
+(1) access the person's place of
+business;
+(2) investigate the person's
+transactions and records relating to business
+under Texas Finance Code, Chapter 398; and
+(3) make a copy of transactions and
+records relating to business under Texas
+Finance Code, Chapter 398.
+§86.321. Enforcement
+(a) Informal resolution. The OCCC may
+agree to an informal resolution of a
+complaint, investigation, enforcement case,
+or other matter with a provider or broker.
+(b) Injunction. If the OCCC has
+reasonable cause to believe that a person is
+violating Texas Finance Code, Chapter 398
+or this subchapter, then the OCCC may issue
+an injunction to enforce compliance.
+(1) An injunction may include an
+order to cease and desist from a violation, an
+order to take affirmative action, or both.
+(2) An injunction may include an
+order to provide restitution to an identifiable
+person.
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 23 of 25
+(3) If a person against whom an
+injunction is issued under this section
+requests a hearing not later than the 30th day
+after the injunction is served, the OCCC will
+set a hearing under Texas Government Code,
+Chapter 2001. If a hearing is not timely
+requested, the injunction is considered final
+and enforceable.
+(c) Administrative penalty. After notice
+and an opportunity for hearing, the OCCC
+may impose an administrative penalty up to
+$1,000 for each day of violation, with a
+maximum of $10,000 per violation, against a
+person who:
+(1) violates an injunction under
+subsection (a) of this section; or
+(2) knowingly and willfully violates
+Texas Finance Code, Chapter 398 or this
+subchapter.
+(d) Suspension or revocation. After
+notice and an opportunity for hearing, the
+OCCC may suspend or revoke a registration
+if the OCCC finds that:
+(1) the registrant, knowingly or
+without exercise of due care, violated Texas
+Finance Code, Chapter 398, this subchapter,
+or an order issued under this section; or
+(2) a fact or condition warrants the
+belief that the business will not be operated
+lawfully and fairly.
+(e) Administrative Procedure Act. An
+enforcement order under this section is
+subject to Texas Government Code, Chapter
+2001 (the Texas Administrative Procedure
+Act).
+§86.322. Suspension or Revocation Based on
+Criminal History
+
+PDF PAGE 24
+LEFT COLUMN
+(a) Disclosure of criminal history. An
+applicant must disclose all criminal history
+information required to file a complete
+application. Failure to provide information
+described in the disclosure questions or
+written instructions is a violation of this
+subchapter and is grounds for suspending or
+revoking a registration.
+(b) Crimes directly related to registered
+occupation. The OCCC may suspend or
+revoke a registration if the registrant or a key
+individual has been convicted of an offense
+that directly relates to the duties and
+responsibilities of a registrant under Texas
+Finance Code, Chapter 398, as provided by
+Texas Occupations Code, §53.021(a)(1).
+(1) Originating or servicing
+transactions under Texas Finance Code,
+Chapter 398 involves or may involve making
+representations to a recipient regarding
+transaction terms, receiving money from
+recipients, remitting money to third parties,
+maintaining accounts, repossessing property
+without a breach of the peace, maintaining
+repossessed property, collecting due amounts
+in a legal manner, and foreclosing on
+property in compliance with state and federal
+law. Consequently, the following crimes are
+directly related to the duties and
+responsibilities of a registrant and may be
+grounds for suspension or revocation:
+(A) theft;
+(B) assault;
+(C) any offense that involves
+misrepresentation, deceptive practices, or
+making a false or misleading statement
+(including fraud or forgery);
+(D) money laundering;
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 24 of 25
+(E) any offense that involves
+breach of trust or other fiduciary duty;
+(F) any criminal violation of a
+statute governing credit transactions or debt
+collection;
+(G) failure to file a government
+report, filing a false government report, or
+tampering with a government record;
+(H) any greater offense that
+includes an offense described in
+subparagraphs (A) - (G) of this paragraph as
+a lesser included offense;
+(I) any offense that involves
+intent, attempt, aiding, solicitation, or
+conspiracy to commit an offense described in
+subparagraphs (A) - (H) of this paragraph.
+(2) In determining whether a criminal
+offense directly relates to the duties and
+responsibilities of holding a registration, the
+OCCC will consider the following factors, as
+specified in Texas Occupations Code,
+§53.022:
+(A) the nature and seriousness of
+the crime;
+(B) the relationship of the crime
+to the purposes for requiring a registration to
+engage in the occupation;
+(C) the extent to which a
+registration might offer an opportunity to
+engage in further criminal activity of the
+same type as that in which the person
+previously had been involved;
+(D) the relationship of the crime
+to the ability or capacity required to perform
+
+PDF PAGE 25
+LEFT COLUMN
+the duties and discharge the responsibilities
+of a registrant; and
+(E) any correlation between the
+elements of the crime and the duties and
+responsibilities of the registered occupation.
+(3) In determining whether a
+conviction for a crime renders a registrant
+unfit to hold a registration, the OCCC will
+consider the following factors, as specified in
+Texas Occupations Code, §53.023:
+(A) the extent and nature of the
+person's past criminal activity;
+(B) the age of the person when the
+crime was committed;
+(C) the amount of time that has
+elapsed since the person's last criminal
+activity;
+(D) the conduct and work activity
+of the person before and after the criminal
+activity;
+(E) evidence of the person's
+rehabilitation or rehabilitative effort while
+incarcerated or after release, or following the
+criminal activity if no time was served;
+(F) evidence of the person's
+compliance with any conditions of
+community supervision, parole, or
+mandatory supervision; and
+(G) evidence of the person's
+current circumstances relating to fitness to
+hold a registration, which may include letters
+of recommendation.
+(e) Revocation on imprisonment. A
+registration will be revoked on the registrant's
+imprisonment following a felony conviction,
+RIGHT COLUMN
+ADOPTED NEW RULES
+7 TAC CHAPTER 86
+Page 25 of 25
+felony community supervision revocation,
+revocation of parole, or revocation of
+mandatory supervision, as provided by Texas
+Occupations Code, §53.021(b).
+(f) Other grounds for suspension or
+revocation. The OCCC may suspend or
+revoke a registration based on any other
+ground authorized by law, including a
+registrant's or key individual's conviction for
+an offense listed in Texas Code of Criminal
+Procedure, art. 42A.054, or art. 62.001(6), as
+provided by Texas Occupations Code,
+§53.021(a)(2) - (3).
+Certification
+The agency certifies that legal counsel has
+reviewed the adoption and found it to be a
+valid exercise of the agency's legal authority.
+Issued in Austin, Texas on June 19, 2026.
+Matthew J. Nance
+General Counsel
+Office of Consumer Credit Commissioner

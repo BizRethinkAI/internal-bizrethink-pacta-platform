@@ -7,10 +7,11 @@ generation on Node 24.20.0. The shared checkout belongs to the separate
 `research/mca-agreement-requirements` session and is not edited here.
 
 This branch reserves overlay **080**; next unreserved is **081**. Shwet assigned
-this A-07 session ownership of the single #176/#177 note fold. The MCA research
-session must not duplicate it; coordination is relayed through Shwet because
-cross-session messaging is unavailable. #176 already folded #173/#174/#175;
-those notes are not folded again here.
+this A-07 session ownership of the single #176/#177 note fold. Coordination was
+relayed through Shwet because cross-session messaging is unavailable. #179
+reused this session's exact three-file fold as dependency commit `cede1f021`,
+without another synthesis. That shared fold is now on main; it is not duplicated
+here. #176's earlier #173/#174/#175 fold also remains intact.
 
 Approved scope: enforce the direct template's immutable values and field
 constraints before copying files or creating a signed recipient/document.
@@ -56,8 +57,14 @@ app/PostgreSQL execution belongs to CI. No local build or database test was run.
 Overlay 080 is the exact one-file upstream diff, reverse-checks and replays
 byte-for-byte against merged main `7f5ce5684`. No schema or configuration changes.
 
-GitHub still reported main `7f5ce5684` and no open PRs before publishing. The
-#176/#177 fold preserves source qualifications and the unverified independent
+GitHub reported main `7f5ce5684` and no open PRs before publishing #178. While
+CI ran, #179 merged at `42394e5f3ab6c85079a4328b9971fa19a835223b`; its newly stale
+research note then failed #178's Governance Guard 5. This branch integrates
+that latest main, retains the shared #176/#177 fold and owns the single #179
+note fold (#178 was the only open PR at the ownership check). Research evidence
+and application code from #179 are unchanged; the remaining authority, source
+correction, ADR 0014, Virginia form and commercial fact follow-ups are retained.
+The #176/#177 fold preserves source qualifications and the unverified independent
 review/deployment status of #177; A-04's migration prerequisite is retained.
 The shared MCA research checkout was not edited. Current CI evidence belongs
 in the PR description and Checks. No production access, credentials lookup,

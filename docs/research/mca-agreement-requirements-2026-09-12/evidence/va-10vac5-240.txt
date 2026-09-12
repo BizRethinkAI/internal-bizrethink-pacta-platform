@@ -1,0 +1,97 @@
+SOURCE: https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/
+FINAL URL: https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/
+RETRIEVED UTC: 2026-09-12T17:50:53.653439+00:00
+RESPONSE SHA256: 9687fec38c67acea3c5fb4331e1e89c94ada3cc877cdf569436e80a3b98e9479
+
+Forms (10VAC5-240)
+Virginia General Assembly /
+LIS Learning Center /
+Privacy Policy /
+LIS home /
+Register Account /
+Login
+Session Information
+Bills & Resolutions
+State Budget
+Virginia Law
+Reports to the General Assembly
+Virginia Law
+Select Search Type
+All
+Code of Virginia
+Administrative Code
+Constitution
+Charters
+Authorities
+Compacts
+Uncodified Acts
+Administrative Code
+Table of Contents » Title 10. Finance and Financial Institutions » Agency 5. State Corporation Commission » Chapter 240. Sales-Based Financing
+Chapter
+Print
+Virginia Administrative Code
+9/12/2026
+Chapter 240. Sales-Based Financing
+10VAC5-240-10. Definitions.
+A. The following words and terms when used in this chapter shall have the following meanings unless the context clearly indicates otherwise:
+"Chapter 22.1" means Chapter 22.1 (§ 6.2-2228 et seq.) of Title 6.2 of the Code of Virginia.
+"Finance charge" for purposes of Chapter 22.1 and this chapter means the amount of any and all costs of the sales-based financing provided to the recipient, represented as a dollar amount, including all charges that would be included in the finance charge under 12 CFR 1026.4 if the transaction was a consumer credit transaction and the provider was a creditor under Regulation Z (12 CFR Part 1026). This definition is intended to require finance charges to include any charge that would be a finance charge under 12 CFR 1026.4, regardless of whether the transaction would be considered an "extension of credit" or the provider would be considered a "creditor" under Regulation Z.
+"Registrant" means a person registered under Chapter 22.1.
+"Sales-based financing broker" or "broker" has the meaning set forth in § 6.2-2228 of the Code of Virginia, with clarification that the term shall not include a bona fide employee of a provider or broker who is acting on behalf of the provider or broker.
+B. Other terms used in this chapter shall have the meanings set forth in § 6.2-100 or 6.2-2228 of the Code of Virginia.
+Statutory Authority
+§ 6.2-2237 of the Code of Virginia.
+Historical Notes
+Derived from Virginia Register Volume 39, Issue 5, eff. October 1, 2022.
+10VAC5-240-20. Registration; additional requirements; surrender of registration.
+A. A provider or broker shall register with the commission in accordance with procedures established by the commissioner. A completed application for registration shall be accompanied by the initial registration fee prescribed in § 6.2-2230 of the Code of Virginia and any information relating to the application that the commissioner may require.
+B. Every provider or broker shall (i) be organized under the laws of Virginia; or (ii) if not organized under the laws of Virginia, obtain authority to transact business in Virginia as a foreign entity in accordance with the provisions of Title 13.1 of the Code of Virginia unless such provider or broker is not required to obtain such authority. Every provider or broker, either organized under the laws of Virginia or who has obtained authority to transact business in Virginia as a foreign entity, shall continuously remain authorized to transact business in Virginia under Title 13.1 of the Code of Virginia.
+C. A registrant shall notify the bureau in writing within 10 days after any change to either its name or contact information.
+D. A registrant may surrender its registration by providing written notice to the bureau along with the effective date of the surrender.
+Statutory Authority
+§ 6.2-2237 of the Code of Virginia.
+Historical Notes
+Derived from Virginia Register Volume 39, Issue 5, eff. October 1, 2022.
+10VAC5-240-30. Sales-Based Financing Disclosure Form.
+A. A provider shall furnish a completed Sales-Based Financing Disclosure Form to every recipient at the time the provider extends a specific offer of sales-based financing to the recipient. When a provider allows a recipient to choose from multiple sales-based financing options or to customize the terms of the sales-based financing, a provider shall furnish a Sales-Based Financing Disclosure Form only for the specific offer that the recipient selects. The format of the Sales-Based Financing Disclosure Form shall be prescribed by the commission.
+B. If any information required by the Sales-Based Financing Disclosure Form is inapplicable, the provider shall enter "Not Applicable" or "N/A" in the space provided. In order to mark a box that appears on the Sales-Based Financing Disclosure Form, the provider shall insert a check mark or "X" in the applicable box.
+C. If any information required by the Sales-Based Financing Disclosure Form does not fit within the space provided on the first page of the form, the provider shall (i) insert a check mark or "X" in the "SEE PAGE 2" box that appears within the applicable section of the first page, (ii) insert a check mark or "X" in each applicable box on the second page of the form, (iii) disclose the information in the large box on the second page of the form, (iv) furnish a recipient with both pages of the completed form, and (v) require the recipient to sign and date both pages of the completed form. A provider may elect to furnish a recipient with the second page of the form even though all of the required information fits on the first page provided that the provider enters "Not Applicable" or "N/A" in the large box on the second page.
+D. A provider shall not give a recipient a Sales-Based Financing Disclosure Form that contains any false or misleading information. The Sales-Based Financing Disclosure Form shall be furnished to a recipient as a separate document from any other contracts, agreements, papers, notices, or other disclosures provided to the recipient, but it may be mailed or transmitted in a package or electronic file that contains other documents. A provider shall not modify the prescribed format of the Sales-Based Financing Disclosure Form, or either append to or include within it any information that is not required by this form. However, if a provider is not furnishing a recipient with the second page of the Sales-Based Financing Disclosure Form because all of the required information fits within the first page of the form, then the provider may remove all "SEE PAGE 2" references and the corresponding boxes from the form.
+E. A provider shall require a recipient to sign and date the Sales-Based Financing Disclosure Form at the time the recipient accepts the provider's offer. A provider may obtain a recipient’s electronic signature on the Sales-Based Financing Disclosure Form if the provider complies with all applicable provisions of the Uniform Electronic Transactions Act (§ 59.1-479 et seq. of the Code of Virginia), the Electronic Signatures in Global and National Commerce Act (15 USC § 7001 et seq.), and any other applicable laws. A provider is required to obtain only one signature from the recipient on each Sales-Based Financing Disclosure Form.
+F. A provider shall provide a recipient with the Sales-Based Financing Disclosure Form in a format that the recipient may retain. This includes a hard copy or electronic document that the recipient can save for future reference.
+G. If a recipient elects to pay off or refinance the sales-based financing prior to full repayment, a provider shall furnish the recipient with an updated and completed Sales-Based Financing Disclosure Form that contains the information as of the date that the sales-based financing is paid off or refinanced (i.e., immediately prior to the pay off or refinancing). The provider shall comply with subsections B through F of this section in connection with the updated Sales-Based Financing Disclosure Form. The provider shall require a recipient to sign and date the updated Sales-Based Financing Disclosure Form at the time the recipient pays off or refinances the sales-based financing.
+Statutory Authority
+§ 6.2-2237 of the Code of Virginia.
+Historical Notes
+Derived from Virginia Register Volume 39, Issue 5, eff. October 1, 2022.
+10VAC5-240-40. Commission authority.
+The commission may, at its discretion, waive or grant exceptions to any provision of this chapter for good cause shown.
+Statutory Authority
+§ 6.2-2237 of the Code of Virginia.
+Historical Notes
+Derived from Virginia Register Volume 39, Issue 5, eff. October 1, 2022.
+Forms (10VAC5-240)
+Sales-Based Financing Disclosure Form (eff. 10/2022)
+Website addresses provided in the Virginia Administrative Code to documents incorporated by reference are for the reader's convenience only, may not necessarily be active or current, and should not be relied upon. To ensure the information incorporated by reference is accurate, the reader is encouraged to use the source document described in the regulation.
+As a service to the public, the Virginia Administrative Code is provided online by the Virginia General Assembly. We are unable to answer legal questions or respond to requests for legal advice, including application of law to specific fact. To understand and protect your legal rights, you should consult an attorney.
+Code of Virginia
+Administrative Code
+View by Agency
+Emergency Regulations
+VAC# Look Up
+Go
+Constitution of Virginia
+Charters
+Authorities
+Compacts
+Uncodified Acts
+Sign In
+Username:
+Password:
+Cancel
+LIS Home
+Lobbyist-in-a-Box
+Privacy Policy
+© Copyright Commonwealth of Virginia,
+. All rights reserved. Site developed by the Division of Legislative Automated Systems (DLAS).
+Sign In

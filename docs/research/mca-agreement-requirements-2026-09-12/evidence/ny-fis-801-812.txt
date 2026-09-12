@@ -1,0 +1,492 @@
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/801
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 801. Definitions. For the purposes of this article:
+(a) "Factoring transaction" means an accounts receivable purchase
+transaction that includes an agreement to purchase, transfer, or sell a
+legally enforceable claim for payment held by a recipient for goods the
+recipient has supplied or services the recipient has rendered that have
+been ordered but for which payment has not yet been made.
+(b) "Commercial financing" means open-end financing, closed-end
+financing, sales-based financing, factoring transaction, or other form
+of financing, the proceeds of which the recipient does not intend to use
+primarily for personal, family or household purposes. For purposes of
+determining whether a financing is a commercial financing, the provider
+may rely on any statement of intended purposes by the recipient. The
+statement may be a separate statement signed by the recipient; may be
+contained in the financing application, financing agreement, or other
+document signed or consented to by the recipient; or may be provided
+orally by the recipient so long as it is documented in the recipient's
+application file by the provider. Electronic signatures and consents are
+valid for purposes of the foregoing sentence. The provider shall not be
+required to ascertain that the proceeds of a commercial financing are
+used in accordance with the recipient's statement of intended purposes.
+(c) "Open-end financing" means an agreement for one or more extensions
+of open-end credit, secured or unsecured, the proceeds of which the
+recipient does not intend to use primarily for personal, family or
+household purposes. "Open-end financing" includes credit extended by a
+provider under a plan in which: (i) the provider reasonably contemplates
+repeated transactions; (ii) the provider may impose a finance charge
+from time to time on an outstanding unpaid balance; and (iii) the amount
+of credit that may be extended to the recipient during the term of the
+plan (up to any limit set by the provider) is generally made available
+to the extent that any outstanding balance is repaid.
+(d) "Closed-end financing" means a closed-end extension of credit,
+secured or unsecured, including equipment financing that does not meet
+the definition of a lease under section 2-A-103 of the uniform
+commercial code, the proceeds of which the recipient does not intend to
+use primarily for personal, family or household purposes. "Closed-end
+financing" includes financing with an established principal amount and
+duration.
+(e) "Finance charge" means the cost of financing as a dollar amount.
+It includes any charge payable directly or indirectly by the recipient
+and imposed directly or indirectly by the provider as an incident to or
+a condition of the extension of financing. It includes all charges that
+would be included under 12 C.F.R. part 1026.4 as if the transaction were
+subject to 12 C.F.R. part 1026.4. In addition, the finance charge shall
+include any charges as determined by the superintendent. For the
+purposes of an open-end financing, the finance charge shall assume the
+maximum amount of credit available to the recipient, in each case, is
+drawn and held for the duration of the term or draw period. For the
+purposes of a factoring transaction, the finance charge includes the
+discount taken on the face value of the accounts receivable.
+(f) "Financial institution" means any of the following: (i) a bank,
+trust company, or industrial loan company doing business under the
+authority of, or in accordance with, a license, certificate or charter
+issued by the United States, this state or any other state, district,
+territory, or commonwealth of the United States that is authorized to
+transact business in this state; (ii) a federally chartered savings and
+loan association, federal savings bank or federal credit union that is
+authorized to transact business in this state; or (iii) a savings and
+loan association, savings bank or credit union organized under the laws
+of this or any other state that is authorized to transact business in
+this state.
+(g) "Person" means an individual, corporation, partnership, limited
+liability company, joint venture, association, joint stock company,
+trust or unincorporated organization including, but not limited to, a
+sole proprietorship.
+(h) "Provider" means a person who extends a specific offer of
+commercial financing to a recipient. Unless otherwise exempt, "provider"
+also includes a person who solicits and presents specific offers of
+commercial financing on behalf of a third party. For the avoidance of
+doubt, the extension of a specific offer or provision of disclosures for
+a commercial financing, in and of itself, shall not be construed to mean
+that a provider is originating, making, funding or providing commercial
+financing.
+(i) "Recipient" means a person who applies for commercial financing
+and is made a specific offer of commercial financing by a provider. A
+recipient may also be an authorized representative of such person. A
+person acting as a broker cannot be a recipient.
+(j) "Sales-based financing" means a transaction that is repaid by the
+recipient to the provider, over time, as a percentage of sales or
+revenue, in which the payment amount may increase or decrease according
+to the volume of sales made or revenue received by the recipient.
+Sales-based financing also includes a true-up mechanism where the
+financing is repaid as a fixed payment but provides for a reconciliation
+process that adjusts the payment to an amount that is a percentage of
+sales or revenue.
+(k) "Specific offer" means the specific terms of commercial financing,
+including price or amount, that is quoted to a recipient, based on
+information obtained from, or about the recipient, which, if accepted by
+a recipient, shall be binding on the provider, as applicable, subject to
+any specific requirements stated in such terms.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/802
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 802. Exemptions. This article shall not apply to, and shall not
+place any additional requirements or obligations upon, any of the
+following:
+(a) a financial institution;
+(b) a person acting in its capacity as a technology services provider,
+such as licensing software and providing support services, to an entity
+exempt under this section for use as part of the exempt entity's
+commercial financing program, provided such person has no interest, or
+arrangement or agreement to purchase any interest in the commercial
+financing extended by the exempt entity in connection with such program;
+(c) a lender regulated under the federal Farm Credit Act (12 U.S.C.
+Sec. 2001 et seq.);
+(d) a commercial financing transaction secured by real property;
+(e) a lease as defined in section 2-A-103 of the uniform commercial
+code;
+(f) any person or provider who makes no more than five commercial
+financing transactions in this state in a twelve-month period;
+(g) an individual commercial financing transaction in an amount over
+two million five hundred thousand dollars; or
+(h) a commercial financing transaction in which the recipient is a
+dealer as defined in section four hundred fifteen of the vehicle and
+traffic law, or an affiliate of such a dealer, or a rental vehicle
+company as defined in section three hundred ninety-six-z of the general
+business law, or an affiliate of such a company pursuant to a commercial
+financing agreement or commercial open-end credit plan of at least fifty
+thousand dollars, including any commercial loan made pursuant to such a
+commercial financing transaction.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/803
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 803. Sales-based financing disclosure requirements. A provider
+subject to this article shall provide the following disclosures to a
+recipient at the time of extending a specific offer of sales-based
+financing according to formatting prescribed by the superintendent:
+(a) The total amount of the commercial financing, and the disbursement
+amount, if different from the financing amount, after any fees deducted
+or withheld at disbursement.
+(b) The finance charge.
+(c) The estimated annual percentage rate, using the words annual
+percentage rate or the abbreviation "APR", expressed as a yearly rate,
+inclusive of any fees and finance charges, and calculated in accordance
+with the federal Truth in Lending Act, Regulation Z, 12 C.F.R. §
+1026.22, based on the estimated term of repayment and the projected
+periodic payment amounts, regardless of whether such act or such
+regulation would require such a calculation. The estimated term of
+repayment and the projected periodic payment amounts shall be calculated
+based on the projection of the recipient's sales, called the projected
+sales volume. The projected sales volume may be calculated using the
+historical method or the opt-in method. The provider shall provide
+notice to the superintendent on which method they intend to use across
+all instances of sales-based financing offered in calculating estimated
+annual percentage rate pursuant to this section.
+(i) The provider using the historical method shall use an average
+historical volume of sales or revenue by which the financing's payment
+amounts are based and the estimated annual percentage rate is
+calculated. The provider shall fix the historical time period used to
+calculate the average historical volume and use such period for all
+disclosure purposes for all sales-based financing products offered. The
+fixed historical time period shall either be the preceding time period
+from the specific offer or, alternatively, the provider may use average
+sales for the same number of months with the highest sales volume within
+the past twelve months. The fixed historical time period shall be no
+less than one month and not exceed twelve months.
+(ii) The provider using the opt-in method shall determine the
+estimated annual percentage rate, the estimated term, and the projected
+payments, using a projected sales volume that the provider elects for
+each disclosure, provided, that they participate in a review process
+prescribed by the superintendent. A provider shall, on an annual basis,
+report data to the superintendent of estimated annual percentage rates
+disclosed to the recipient and actual retrospective annual percentage
+rates of completed transactions. The report shall contain such
+information as the superintendent, by rule or regulation, may prescribe
+as necessary or appropriate for the purpose of making a determination of
+whether the deviation between the estimated annual percentage rate and
+actual retrospective annual percentage rates of completed transactions
+was reasonable. The superintendent shall establish the method of
+reporting and may, upon a finding that the use of projected sales volume
+by the provider has resulted in an unacceptable deviation between
+estimated and actual annual percentage rate, require the provider to use
+the historical method. The superintendent may consider unusual and
+extraordinary circumstances impacting the provider's deviation between
+estimated and actual annual percentage rate in the determination of such
+finding.
+(d) The total repayment amount, which is the disbursement amount plus
+the finance charge.
+(e) The estimated term is the period of time required for the periodic
+payments, based on the projected sales volume, to equal the total amount
+required to be repaid.
+(f) The payment amounts, based on the projected sales volume:
+(i) for payment amounts that are fixed, the payment amounts and
+frequency (e.g., daily, weekly, monthly), and, if the payment frequency
+is other than monthly, the amount of the average projected payments per
+month; or
+(ii) for payment amounts that are variable, a payment schedule or a
+description of the method used to calculate the amounts and frequency of
+payments, and the amount of the average projected payments per month.
+(g) A description of all other potential fees and charges not included
+in the finance charge, including, but not limited to, draw fees, late
+payment fees, and returned payment fees.
+(h) Were the recipient to elect to pay off or refinance the commercial
+financing prior to full repayment, the provider must disclose:
+(i) whether the recipient would be required to pay any finance charges
+other than interest accrued since their last payment. If so, disclosure
+of the percentage of any unpaid portion of the finance charge and
+maximum dollar amount the recipient could be required to pay; and
+(ii) whether the recipient would be required to pay any additional
+fees not already included in the finance charge.
+(i) A description of collateral requirements or security interests, if
+any.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/804
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 804. Closed-end commercial financing disclosure requirements. A
+provider, subject to this article, shall provide the following
+disclosures to a recipient at the time of extending a specific offer for
+closed-end financing according to formatting prescribed by the
+superintendent:
+(a) The total amount of the commercial financing, and the disbursement
+amount, if different from the financing amount, after any fees deducted
+or withheld at disbursement.
+(b) The finance charge.
+(c) The annual percentage rate, using only the words annual percentage
+rate or the abbreviation "APR", expressed as a yearly rate, inclusive of
+any fees and finance charges that cannot be avoided by a recipient, and
+calculated in accordance with the federal Truth in Lending Act,
+Regulation Z, 12 C.F.R. § 1026.22, regardless of whether such act or
+such regulation would require such a calculation.
+(d) The total repayment amount, which is the disbursement amount plus
+the finance charge.
+(e) The term of the financing.
+(f) The payment amounts:
+(i) for payment amounts that are fixed, the payment amounts and
+frequency (e.g., daily, weekly, monthly), and, if the term is longer
+than one month, the average monthly payment amount; or
+(ii) for payment amounts that are variable, a full payment schedule or
+a description of the method used to calculate the amounts and frequency
+of payments, and, if the term is longer than one month, the estimated
+average monthly payment amount.
+(g) A description of all other potential fees and charges that can be
+avoided by the recipient, including, but not limited to, late payment
+fees and returned payment fees.
+(h) Were the recipient to elect to pay off or refinance the commercial
+financing prior to full repayment, the provider must disclose:
+(i) whether the recipient would be required to pay any finance charges
+other than interest accrued since their last payment. If so, disclosure
+of the percentage of any unpaid portion of the finance charge and
+maximum dollar amount the recipient could be required to pay; and
+(ii) whether the recipient would be required to pay any additional
+fees not already included in the finance charge.
+(i) A description of collateral requirements or security interests, if
+any.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/805
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 805. Open-end commercial financing disclosure requirements. A
+provider, subject to this article, shall provide the following
+disclosures to a recipient at the time of extending a specific offer for
+open-end financing according to formatting prescribed by the
+superintendent:
+(a) The maximum amount of credit available to the recipient (e.g., the
+credit line amount), and the amount scheduled to be drawn by the
+recipient at the time the offer is extended, if any, less any fees
+deducted or withheld at disbursement.
+(b) The finance charge.
+(c) The annual percentage rate, using only the words annual percentage
+rate or the abbreviation "APR", expressed as a nominal yearly rate,
+inclusive of any fees and finance charges that cannot be avoided by a
+recipient, and calculated in accordance with the federal Truth in
+Lending Act, Regulation Z, 12 C.F.R. § 1026.22 and based on the maximum
+amount of credit available to the recipient and the term resulting from
+making the minimum required payments term as disclosed, regardless of
+whether such act or such regulation would require such a calculation.
+(d) The total repayment amount, which is the draw amount, less any
+fees deducted or withheld at disbursement, plus the finance charge. The
+total repayment amount shall assume a draw amount equal to the maximum
+amount of credit available to the recipient if drawn and held for the
+duration of the term or draw period.
+(e) The term of the plan, if applicable, or the period over which a
+draw is amortized.
+(f) The payment frequency and amounts, based on the assumptions used
+in the calculation of the annual percentage rate, including a
+description of payment amount requirements such as a minimum payment
+amount, and if the payment frequency is other than monthly, the amount
+of the average projected payments per month. For payment amounts that
+are variable, the provider should include a payment schedule, or a
+description of the method used to calculate the amounts and frequency of
+payments, and the estimated average monthly payment amount.
+(g) A description of all other potential fees and charges that can be
+avoided by the recipient, including, but not limited to, draw fees, late
+payment fees, and returned payment fees.
+(h) Were the recipient to elect to pay off or refinance the commercial
+financing prior to full repayment, the provider must disclose:
+(i) whether the recipient would be required to pay any finance charges
+other than interest accrued since their last payment. If so, disclosure
+of the percentage of any unpaid portion of the finance charge and
+maximum dollar amount the recipient could be required to pay; and
+(ii) whether the recipient would be required to pay any additional
+fees not already included in the finance charge.
+(i) A description of collateral requirements or security interests, if
+any.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/806
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 806. Factoring transaction disclosure requirements. A provider,
+subject to this article, shall provide the following disclosures to a
+recipient at the time of extending a specific offer for a factoring
+transaction according to formatting prescribed by the superintendent:
+(a) The amount of the receivables purchase price paid to the recipient
+and, if different from the purchase price, the amount disbursed to the
+recipient after any fees deducted or withheld at disbursement.
+(b) The finance charge.
+(c) The estimated annual percentage rate, using that term, calculated
+according to the federal Truth in Lending Act, Regulation Z, 12 C.F.R. §
+1026 Appendix J, as a "single advance, single payment transaction",
+regardless of whether such act or such regulation would require such a
+calculation. To calculate the estimated annual percentage rate, the
+purchase amount is considered the financing amount, the purchase amount
+minus the finance charge is considered the payment amount, and the term
+is established by the payment due date of the receivables. As an
+alternate method of establishing the term, the provider may estimate the
+term for a factoring transaction as the average payment period, its
+historical data over a period not to exceed the previous twelve months,
+concerning payment invoices paid by the party owing the accounts
+receivable in question.
+(d) The total payment amount, which is the purchase amount plus the
+finance charge.
+(e) A description of all other potential fees and charges that can be
+avoided by the recipient.
+(f) A description of the receivables purchased and any additional
+collateral requirements or security interests.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/807
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 807. Other forms of financing disclosure requirements. The
+superintendent may require disclosure by a provider extending a specific
+offer of commercial financing which is not open-end financing,
+closed-end financing, sales-based financing, or factoring transaction
+but otherwise meets the definition of commercial financing as provided
+in this article. Subject to such rules and regulations by the
+superintendent, a provider subject to this article shall provide the
+following disclosures to a recipient at the time of extending a specific
+offer of other forms of financing according to formatting prescribed by
+the superintendent:
+(a) The total amount of the commercial financing, and the disbursement
+amount, if different from the financing amount, after any fees deducted
+or withheld at disbursement.
+(b) The finance charge.
+(c) The annual percentage rate, using only the words annual percentage
+rate or the abbreviation "APR", expressed as a yearly rate, inclusive of
+any fees and finance charges, and calculated in accordance with the
+relevant sections of the federal Truth in Lending Act, Regulation Z or
+this article, regardless of whether such act or such regulation would
+require such a calculation.
+(d) The total repayment amount which is the disbursement amount plus
+the finance charge.
+(e) The term of the financing.
+(f) The payment amounts:
+(i) for payment amounts that are fixed, the payment amounts and
+frequency (e.g., daily, weekly, monthly), and the average monthly
+payment amount; or
+(ii) for payment amounts that are variable, a payment schedule or a
+description of the method used to calculate the amounts and frequency of
+payments, and the estimated average monthly payment amount.
+(g) A description of all other potential fees and charges that can be
+avoided by the recipient, including, but not limited to, late payment
+fees and returned payment fees.
+(h) Were the recipient to elect to pay off or refinance the commercial
+financing prior to full repayment, the provider must disclose:
+(i) whether the recipient would be required to pay any finance charges
+other than interest accrued since their last payment. If so, disclosure
+of the percentage of any unpaid portion of the finance charge and
+maximum dollar amount the recipient could be required to pay; and
+(ii) whether the recipient would be required to pay any additional
+fees not already included in the finance charge.
+(i) A description of collateral requirements or security interests, if
+any.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/808
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 808. Disclosure requirements for renewal financing. If, as a
+condition of obtaining the commercial financing, the provider requires
+the recipient to pay off the balance of an existing commercial financing
+from the same provider, the provider must disclose:
+(a) The amount of the new commercial financing that is used to pay off
+the portion of the existing commercial financing that consists of
+prepayment charges required to be paid and any unpaid interest expense
+that was not forgiven at the time of renewal. For financing for which
+the total repayment amount is calculated as a fixed amount, the
+prepayment charge is equal to the original finance charge multiplied by
+the amount of the renewal used to pay off existing financing as a
+percentage of the total repayment amount, minus any portion of the total
+repayment amount forgiven by the provider at the time of prepayment. If
+the amount is more than zero, such amount shall be the answer to the
+following question:
+"Does the renewal financing include any amount that is used to pay
+unpaid finance charge or fees, also known as double dipping? Yes, {enter
+amount}. If the amount is zero, the answer would be No."
+(b) If the disbursement amount will be reduced to pay down any unpaid
+portion of the outstanding balance, the actual dollar amount by which
+such disbursement amount will be reduced.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/809
+METHOD: browser transcription
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 809. Required signature. The provider shall obtain the recipient's
+signature, which may be fulfilled by an electronic signature, on all
+disclosures required to be presented to the recipient by this article
+before authorizing the recipient to proceed further with the commercial
+financing transaction application.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/810
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 810. Additional information. Nothing in this article shall prevent a
+provider from providing or disclosing additional information on a
+commercial financing being offered to a recipient, provided however,
+that such additional information shall not be disclosed as part of the
+disclosure required by this article. If other metrics of financing cost
+are disclosed or used in the application process of a commercial
+financing, these metrics shall not be presented as a "rate" if they are
+not the annual interest rate or the annual percentage rate. The term
+"interest", when used to describe a percentage rate, shall only be used
+to describe annualized percentage rates, such as the annual interest
+rate. When a provider states a rate of finance charge or a financing
+amount to a recipient during an application process for commercial
+financing, the provider shall also state the rate as an "annual
+percentage rate", using that term or the abbreviation "APR".
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/811
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 811. Rules and regulations. The superintendent is hereby authorized
+and empowered to promulgate such rules and regulations as may in the
+judgment of the superintendent be consistent with the purposes of this
+article, or appropriate for the effective administration of this
+article, including, but not limited to:
+(a) Such rules and regulations in connection with the calculation or
+determination of any metric required to be disclosed to a recipient.
+(b) Such rules and regulations as necessary to develop and prescribe
+disclosure formatting to be used by providers that allows for recipients
+to easily compare financing options in a clear and conspicuous manner.
+Such rules and regulations shall include the designation and method for
+disclosing the information required in this article, or approving
+adequate forms and methods already used by providers.
+(c) Such rules and regulations as may define the terms used in this
+article and as may be necessary and appropriate to interpret and
+implement the provisions of this article.
+(d) Such rules and regulations as may be necessary for the enforcement
+of this article.
+
+SOURCE: https://www.nysenate.gov/legislation/laws/FIS/812
+METHOD: web tool legal-body extraction
+PUBLISHED REVISION: 2022-01-07
+OBSERVED: 2026-09-12
+
+§ 812. Penalties. (a) Upon a finding by the superintendent that a
+provider has violated the provisions of this article or the rules or
+regulations promulgated hereunder, the provider shall be ordered to pay
+to the people of this state a civil penalty for each violation of this
+article or any regulation or policy promulgated hereunder a sum not to
+exceed two thousand dollars for each violation or where such violation
+is willful ten thousand dollars for each violation.
+(b) In addition to any penalty imposed pursuant to subdivision (a) of
+this section, upon a finding by the superintendent that a provider has
+knowingly violated this article, the superintendent may order additional
+relief, including, but not limited to, restitution or a permanent or
+preliminary injunction on behalf of any recipient affected by the
+violation.

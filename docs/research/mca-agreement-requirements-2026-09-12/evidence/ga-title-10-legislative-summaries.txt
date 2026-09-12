@@ -1,0 +1,153 @@
+SOURCE: https://www.legis.ga.gov/api/document/docs/default-source/legislative-counsel-document-library/2024-general-statutes-summary-pdf.pdf?sfvrsn=38862f9_8
+FINAL URL: https://www.legis.ga.gov/api/document/docs/default-source/legislative-counsel-document-library/2024-general-statutes-summary-pdf.pdf?sfvrsn=38862f9_8
+RETRIEVED UTC: 2026-09-12T17:09:11.439319+00:00
+RESPONSE SHA256: 4efa5bc94c3bb7eec9fd56ef0feda89cea7df79582983e9e2f72f69619596e7b
+
+
+TITLE 10
+COMMERCE AND TRADE
+Act 605; SB 73
+This Act revises provisions concerning advertisements for legal services, including provisions
+concerning telephone solicitations and authorizes the State Bar of Georgia to promulgate rules and
+regulations that require certain disclosures regarding advertisements for legal services, and provides
+for penalties for violations of such rules and regulations. The Act further provides that injunctive
+relief and damages may be sought for certain violations of such rules and regulations regarding
+unwanted telephone solicitations.
+The Act amends O.C.G.A. Sections 10-1-424.1 and 46-5-27.
+Effective May 6, 2024.
+Act 403; HB 1018
+This Act establishes the usage of a code by a financial institution which denotes a transaction as
+one with a firearms retailer as an illegal unlawful discriminatory practice. The Act prohibits
+financial institutions from declining lawful payment card transactions based upon the sole fact that
+the transaction was with a firearms retailer. The Act amends the procedure for obtaining a remedy
+against a financial institution alleged to have engaged in discriminatory practices relating to firearms
+retailers by providing notice and right to cure. The Act prohibits the establishment of a
+multijurisdictional data base by a government entity for firearm ownership and applications for
+weapons carry licenses.
+The Act amends O.C.G.A. Sections 10-1-439.1 through 10-1-439.3 and 16-11-129.
+Effective July 1, 2024.
+Act 564; SB 472
+This Act enacts the "Combating Organized Retail Crime Act," which revises the definitions of
+"high-volume third-party seller," "seller," and "third-party seller."
+The Act amends O.C.G.A. Section 10-1-940.
+Effective July 1, 2024.
+Act 577; HB 934
+This Act allows for enforcement of unsigned rental agreements under certain circumstances,
+resulting in the vacating and removal of personal property from self-storage facilities. The Act
+further allows for the execution and delivery of rental agreements electronically.
+The Act amends O.C.G.A. Section 10-4-213 and enacts O.C.G.A. Section 10-4-218.
+Effective July 1, 2024.
+
+4
+
+
+
+SOURCE: https://www.legis.ga.gov/api/document/docs/default-source/legislative-counsel-document-library/25sumdoc.pdf?sfvrsn=95973fc9_4
+FINAL URL: https://www.legis.ga.gov/api/document/docs/default-source/legislative-counsel-document-library/25sumdoc.pdf?sfvrsn=95973fc9_4
+RETRIEVED UTC: 2026-09-12T17:22:29.982643+00:00
+RESPONSE SHA256: 529a4532bd164327b815828b8ef5cf3d50098b25e44bd5dcae9cfc0fd955930d
+
+
+TITLE 10
+COMMERCE AND TRADE
+Act 278; SB 40
+This Act broadens the legal applicability of the term "used, detached catalytic converter" and
+removes an exception applicable to used, detached catalytic converters. The Act prohibits secondary
+metals recyclers from paying to any seller more than $100.00 in cash for any transaction or
+completing more than two transactions per seller, per day, per registered recycler location; or from
+paying cash to any seller for used, detached catalytic converters or coils, used utility wire, used
+communications copper, copper wire, or battery. The Act provides for the use of certain registration
+fees and provides for records and reporting. The Act permits certain caps for secondary metals
+recyclers relative to payments to and the number of transactions with sellers to remain in effect after
+January 1, 2026. The Act further revises provisions relating to the $1.00 surcharge on certain waste.
+The Act amends O.C.G.A. Sections 10-1-350, 10-1-351, 10-1-355, 10-1-358, 10-1-359.1,
+10-1-359.2, 10-1-359.3, 10-1-359.5, and 12-8-39.
+Effective July 1, 2025, and shall apply to all transactions occurring on and after such date.
+Act 300; SB 213
+This Act makes it a violation of the Fair Business Practices Act of 1975 for any person to provide
+scholastic cheating services to any student or examinee. The Act provides that only the Attorney
+General may enforce violations of the Act and that the Act shall not be interpreted to prohibit
+tutorial services or certain other academically supportive services.
+The Act amends O.C.G.A. Sections 10-1-393 and 10-1-399 and enacts O.C.G.A. Section
+10-1-393.20.
+Effective July 1, 2025.
+Act 177; HB 240
+This Act provides that, under certain circumstances, the use of mortgage trigger leads in consumer
+transactions shall be considered an unfair or deceptive act or practice and provides for penalties.
+The Act also provides for definitions.
+
+5
+
+The Act amends O.C.G.A. Section 7-1-1013 and enacts O.C.G.A. Section 10-1-393.20.
+Effective May 13, 2025.
+Act 282; SB 81
+This Act provides that written lists of consumer data obtained from motor vehicles dealers and all
+persons to whom any consumer data has been provided by franchisors, manufacturers, distributors,
+or affiliates thereof shall not be required to include a person to whom consumer data was provided,
+or the specific consumer data provided to such person, if it would require a franchisor, manufacturer,
+distributor, or affiliate thereof to violate any applicable restrictions on reuse or disclosure of the
+consumer data established by law. The Act provides for limitations, procedures, and conditions on
+the use of motor vehicle dealer data and for standards regarding access and integration of data
+collected and possessed by dealers and third parties. The Act creates various unlawful activities by
+franchisors and delineates specific activities which qualify as activity as a new motor vehicle dealer.
+The Act amends O.C.G.A. Sections 10-1-621, 10-1-632, 10-1-641, 10-1-662, and 40-2-39 and
+enacts O.C.G.A. Section 10-1-633.
+Effective July 1, 2025.
+Act 285; SB 112
+This Act provides that any manufacturer's warranty of an HVAC system installed in residential
+property that is in effect at the time such property is sold shall automatically transfer to the new
+owner of such property and shall continue in effect as if the new owner of such property was the
+original purchaser of the HVAC system. The Act further provides that any manufacturer's,
+distributor's, or retailer's warranty of an HVAC system shall be effective on the date such system
+is installed by a licensed contractor and shall not be conditioned upon the registration of such
+system.
+The Act enacts Article 37 of O.C.G.A. Chapter 10-1.
+Effective January 1, 2026, and applicable to any warranty of an HVAC system or component
+thereof that is manufactured and issued, sold, or offered for sale by a manufacturer, distributor, or
+retailer on or after such date and to any modifications or extensions of any such warranty issued,
+sold, or offered for sale on or after such date.
+Act 125; HB 131
+This Act revises the advertisement requirements applicable to nonjudicial enforcement of an
+owner's lien upon personal property located within a self-service storage facility.
+The Act amends O.C.G.A. Section 10-4-213.
+Effective July 1, 2025, and applicable to any actions for lien enforcement without judicial
+intervention initiated on or after such date.
+
+6
+
+
+
+SOURCE: https://www.legis.ga.gov/api/document/docs/default-source/legislative-counsel-document-library/sumdoc2026-edit.pdf?sfvrsn=6257533e_2
+FINAL URL: https://www.legis.ga.gov/api/document/docs/default-source/legislative-counsel-document-library/sumdoc2026-edit.pdf?sfvrsn=6257533e_2
+RETRIEVED UTC: 2026-09-12T17:22:29.494080+00:00
+RESPONSE SHA256: 91ff699f809ee9c78e9c0fe1e99a392624b01e0173f4754bf80a8bd3410cdec8
+
+TITLE 10
+COMMERCE AND TRADE
+Act 377; SB 284
+This Act authorizes the Secretary of State to issue orders requiring violators of certain securities
+laws to repay investors, customers, or clients sums paid in connection with securities purchases.
+The Act provides for the award of low-wealth capital outlay grants to qualifying local school
+systems that award certain contracts for roofing improvements to suppliers that meet certain
+criteria. The Act further provides that certain contracts for roofing improvements be deemed to
+have complied with notice and competitive award requirements for certain public works
+construction contracts.
+The Act amends O.C.G.A. Sections 10-5-73, 20-2-262, 36-91-2, and 36-91-21.
+Effective April 22, 2026, and applicable to all contracts entered into on or after such date.
+Act 445; HB 1112
+This Act provides for methods of rounding procedures for purchases when using legal tender
+following the discontinuation of the penny. The Act requires that where offered, a merchant must
+accept exact change before any rounding. The Act further requires that taxes on such transactions
+be computed before rounding.
+The Act enacts Article 38 of O.C.G.A. Chapter 10-1.
+Effective July 1, 2026.
+Act 510; SB 439
+This Act requires referral agencies making referrals to assisted living communities or personal
+care homes to conspicuously disclose certain information to a prospective resident or their
+authorized representative. The Act requires such referral agencies to obtain acknowledgement of
+receipt of such disclosed information from a prospective resident or their authorized representative.
+The Act prohibits referral agencies from charging or collecting a fee from an assisted living
+community or personal care home unless certain conditions are met. The Act further provides for
+the enforcement of these requirements by the Attorney General.
+The Act enacts O.C.G.A. Section 10-1-393.22.
+Effective July 1, 2026.
