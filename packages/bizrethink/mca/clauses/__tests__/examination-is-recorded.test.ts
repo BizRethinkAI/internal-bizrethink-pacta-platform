@@ -142,10 +142,15 @@ describe('the ISO Partner Referral Agreement, as imported', () => {
   it('names REVIEW-02 for exactly the four clauses REVIEW-01 did not read', () => {
     const reviewedByTwoOnly = clauses
       .filter((clause) => clause.examinedBy.every((examination) => examination.review === 'REVIEW-02'))
-      .map((clause) => clause.number)
+      .map((clause) => clause.slug)
       .sort();
 
-    expect(reviewedByTwoOnly).toEqual(['1.6', '2.6', 'A.2', 'A.6']);
+    expect(reviewedByTwoOnly).toEqual([
+      'iso-pra.commercial-financing-disclosures-california-and-new-york',
+      'iso-pra.representatives',
+      'iso-pra.sole-compensation',
+      'iso-pra.when-commission-is-earned',
+    ]);
   });
 
   it('cites seventeen distinct findings, none of them refuted', () => {

@@ -230,11 +230,17 @@ describe('no review finding reaches counsel', () => {
         expect(Object.keys(clause).sort()).toEqual([
           'appliesInStates',
           'approved',
+          // ADR 0011: fields and variant context are deliberate review content.
+          'fields',
           'heading',
+          'included',
+          'kind',
           'number',
           'requiredBy',
+          'selectionNote',
           'slug',
           'text',
+          'unnumberedReason',
         ]);
       }
     }
@@ -334,18 +340,13 @@ describe('the briefing claims nothing ADR 0012 closed', () => {
    */
   it.each(MCA_INSTRUMENTS)('%s states the true count of clauses it does not number', (instrument) => {
     const clauses = libraryFor(instrument);
-    const unnumbered = clauses.filter((clause) => clause.number === '').length;
+    const unnumbered = clauses.filter((clause) => Boolean(clause.unnumberedReason)).length;
     const body = briefingText(instrument);
 
     expect(body).not.toMatch(/forty clauses/i);
 
-    if (unnumbered === 0) {
-      expect(body).not.toMatch(/carry no number/i);
-
-      return;
-    }
-
-    const claim = body.match(/(\d+) of the (\d+) clauses below carry no number/i);
+    // Zero is also an exact count, rather than an omitted claim.
+    const claim = body.match(/(\d+) of the (\d+) review items below carry no number/i);
 
     expect(claim, 'the briefing states no count of unnumbered clauses').not.toBeNull();
     expect(Number(claim?.[1])).toBe(unnumbered);

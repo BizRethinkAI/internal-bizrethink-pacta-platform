@@ -6,6 +6,7 @@ import { LOMBARD } from '../parties';
 import {
   applyTwinVocabulary,
   EQUIPMENT_TWIN,
+  equipmentTwinKey,
   TWIN_VOCABULARY,
   TWIN_VOCABULARY_EXCEPTIONS,
   twinDivergence,
@@ -39,27 +40,9 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
   const lease = libraryFor('equipment-lease');
   const subscription = libraryFor('subscription');
 
-  /**
-   * THE CHECK THAT MATTERS MOST, AND THE CHEAPEST ONE. A clause added to one
-   * document and not the other is the likeliest form the divergence takes, and
-   * it needs no text comparison to catch.
-   *
-   * PAIRED BY NUMBER WHERE THERE IS ONE, BY SLUG SUFFIX WHERE THERE IS NOT.
-   *
-   * Four clauses in each document carry no number — the parties paragraph, the
-   * total-payments estimate, the billing sentence and the all-caps
-   * read-before-signing legend. They were invisible to the import that keyed on
-   * numbered headings, and the coverage check is what found them.
-   *
-   * Slug suffix cannot be the only key: §3.7 and §3.14 are deliberately named
-   * differently in the two documents ("Purchase, Return or Continuation…"
-   * against "Return or Continuation…", "Lease Guaranty" against "Subscription
-   * Guaranty"), so their suffixes differ while their numbers match. Number
-   * cannot be the only key either, since four clauses have none. Each covers
-   * what the other cannot.
-   */
-  const pairKey = (clause: { number: string; slug: string }) =>
-    clause.number !== '' ? `#${clause.number}` : `@${clause.slug.split('.').slice(1).join('.')}`;
+  // ADR 0011 removes stored numbers. Pair by semantic identity, with the two
+  // differently named twins mapped explicitly; numbers cannot mask a mismatch.
+  const pairKey = (clause: { slug: string }) => equipmentTwinKey(clause.slug);
 
   it('pairs its clauses one to one', () => {
     expect(lease.map(pairKey).sort()).toEqual(subscription.map(pairKey).sort());
@@ -71,7 +54,7 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
     for (const clause of lease) {
       expect(
         subscription.find((twin) => pairKey(twin) === pairKey(clause)),
-        `Equipment Lease ${clause.number || clause.slug} has no twin`,
+        `Equipment Lease ${clause.slug} has no twin`,
       ).toBeDefined();
     }
   });
@@ -82,9 +65,7 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
    * fixes one document and forgets the other.
    */
   it.each(
-    lease
-      .filter((clause) => twinDivergence(clause.number) === null)
-      .map((clause) => [clause.number || clause.slug, clause] as const),
+    lease.filter((clause) => twinDivergence(clause.slug) === null).map((clause) => [clause.slug, clause] as const),
   )('%s agrees word for word with its twin', (key, clause) => {
     const twin = subscription.find((other) => pairKey(other) === pairKey(clause));
 
@@ -101,7 +82,7 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
    */
   it('declares nothing that has stopped being different', () => {
     for (const clause of lease) {
-      const divergence = twinDivergence(clause.number);
+      const divergence = twinDivergence(clause.slug);
 
       if (divergence === null) {
         continue;
@@ -110,15 +91,21 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
       const twin = subscription.find((other) => pairKey(other) === pairKey(clause));
 
       expect(
-        applyTwinVocabulary(clause.heading, clause.number) !== twin?.heading ||
-          applyTwinVocabulary(clause.body, clause.number) !== twin?.body,
-        `${clause.number} is declared divergent but the two documents now agree`,
+        applyTwinVocabulary(clause.heading, clause.slug) !== twin?.heading ||
+          applyTwinVocabulary(clause.body, clause.slug) !== twin?.body,
+        `${clause.slug} is declared divergent but the two documents now agree`,
       ).toBe(true);
     }
   });
 
   it('gives a reason for every divergence, and names the five', () => {
-    expect(EQUIPMENT_TWIN.divergent.map((entry) => entry.number)).toEqual(['3.4', '3.5', '3.6', '3.7', '3.8']);
+    expect(EQUIPMENT_TWIN.divergent.map((entry) => entry.slug)).toEqual([
+      'equipment-lease.payment-of-amounts-due',
+      'equipment-lease.use-return-of-equipment-and-insurance',
+      'equipment-lease.title-to-equipment',
+      'equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term',
+      'equipment-lease.software-license',
+    ]);
 
     for (const entry of EQUIPMENT_TWIN.divergent) {
       expect(entry.reason.length).toBeGreaterThan(0);
@@ -136,14 +123,19 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
    */
   it('traces four of the five to title, and the fifth to collection', () => {
     const byCause = EQUIPMENT_TWIN.divergent.reduce<Record<string, string[]>>((acc, entry) => {
-      acc[entry.cause] = [...(acc[entry.cause] ?? []), entry.number];
+      acc[entry.cause] = [...(acc[entry.cause] ?? []), entry.slug];
 
       return acc;
     }, {});
 
     expect(byCause).toEqual({
-      title: ['3.5', '3.6', '3.7', '3.8'],
-      collection: ['3.4'],
+      title: [
+        'equipment-lease.use-return-of-equipment-and-insurance',
+        'equipment-lease.title-to-equipment',
+        'equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term',
+        'equipment-lease.software-license',
+      ],
+      collection: ['equipment-lease.payment-of-amounts-due'],
     });
   });
 
@@ -156,26 +148,24 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
   it('records the eleven places the swap was applied inconsistently', () => {
     expect(TWIN_VOCABULARY_EXCEPTIONS).toHaveLength(11);
 
-    expect([...new Set(TWIN_VOCABULARY_EXCEPTIONS.map((entry) => entry.number))].sort()).toEqual([
-      '3.1',
-      '3.12',
-      '3.2',
-      '4.2',
-      '4.3',
-      '4.7',
-      // Unnumbered, so keyed by slug. The parties paragraph names the document,
-      // and the two documents do not name themselves symmetrically.
+    expect([...new Set(TWIN_VOCABULARY_EXCEPTIONS.map((entry) => entry.slug))].sort()).toEqual([
+      'equipment-lease.acknowledgment',
+      'equipment-lease.default-remedies',
+      'equipment-lease.effective-date-term-and-interim-rent',
+      'equipment-lease.equipment',
+      'equipment-lease.guaranty-of-payment',
+      'equipment-lease.independent-decision-governing-law',
       'equipment-lease.parties',
     ]);
 
     // Every exception must actually fire. One that does not is a claim about
     // the documents that is no longer true.
     for (const entry of TWIN_VOCABULARY_EXCEPTIONS) {
-      const clause = lease.find((other) => (other.number || other.slug) === entry.number);
+      const clause = lease.find((other) => other.slug === entry.slug);
 
-      expect(clause, `no clause ${entry.number}`).toBeDefined();
+      expect(clause, `no clause ${entry.slug}`).toBeDefined();
       expect(
-        applyTwinVocabulary(clause?.body ?? '', entry.number).includes(entry.to),
+        applyTwinVocabulary(clause?.body ?? '', entry.slug).includes(entry.to),
         `exception never applies: ${entry.from}`,
       ).toBe(true);
     }

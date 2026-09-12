@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { LOMBARD_FACTS, type McaFacts } from '../facts';
@@ -222,8 +223,8 @@ describe('the security interest is the share that was sold, and no more', () => 
   it('releases on completion and keeps its costs inside Section 6.3', () => {
     const body = clause(SECURITY).body;
 
-    expect(body).toContain('Section 2.6');
-    expect(body).toContain('Section 6.3');
+    expect(body).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
+    expect(body).toContain('Section [[clause:frpa.costs-of-collection-6-3]]');
     expect(body).not.toContain('Buyer may use another legal name or D/B/A');
   });
 });
@@ -320,7 +321,7 @@ describe('the power of attorney is ministerial, noticed, and agrees with §6.2',
   it('confers nothing on an Event of Default and points at Section 6.2', () => {
     const body = clause(POWER).body;
 
-    expect(body).toContain('Section 6.2');
+    expect(body).toContain('Section [[clause:frpa.remedies-6-2]]');
     expect(body).toMatch(/Event of Default/);
     expect(body).toMatch(/is not a remedy/);
   });
@@ -331,7 +332,7 @@ describe('the power of attorney is ministerial, noticed, and agrees with §6.2',
   });
 
   it('terminates when the Agreement completes', () => {
-    expect(clause(POWER).body).toContain('Section 2.6');
+    expect(clause(POWER).body).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
   });
 });
 
@@ -376,7 +377,7 @@ describe('funding is committed before the merchant is', () => {
 
     expect(body).toContain('“Purchase Date” means');
     expect(body).toContain('Net Amount Funded');
-    expect(body).toMatch(/Section 1\.4/);
+    expect(body).toMatch(/(?:Section 1\.4|the Itemization of Net Amount Funded grid)/);
   });
 
   it('stops the split instructions and releases the filings if it never funds', () => {
@@ -408,8 +409,8 @@ describe('the liability waiver is reciprocal and does not eat the refund', () =>
   it('caps no refund and no reconciliation right', () => {
     const body = clause(NO_LIABILITY).body;
 
-    expect(body).toContain('Section 2.6');
-    expect(body).toContain('Section 3');
+    expect(body).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
+    expect(body).toContain('Section [[section:reconciliation]]');
     expect(body).toMatch(/wrongfully collected/);
   });
 
@@ -439,7 +440,7 @@ describe('the trade-name clause names the legal owner', () => {
 
     expect(body).not.toContain('{{equipmentAffiliate}}');
     expect(body).toMatch(/lawfully acquired/);
-    expect(body).toContain('Section 7.2');
+    expect(body).toContain('Section [[clause:frpa.assignment-7-2]]');
   });
 });
 
@@ -514,7 +515,7 @@ describe('the parties clause identifies the parties and transfers nothing', () =
     const body = clause(PARTIES).body;
 
     expect(body).toContain('Purchase Date');
-    expect(body).toContain('Section 4.13');
+    expect(body).toContain('Section [[clause:frpa.timing-and-method-of-funding-4-13]]');
   });
 
   it('makes nobody a party by being named', () => {
@@ -542,7 +543,7 @@ describe('§4.2 still means what §2.6 now says', () => {
    */
   it('points at the Completion Threshold Section 2.6 defines', () => {
     expect(clause(TERM).body).toContain('Completion Threshold');
-    expect(clause(TERM).body).toContain('Section 2.6');
+    expect(clause(TERM).body).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
     expect(clause(COMPLETION).body).toContain('(the “Completion Threshold”)');
   });
 

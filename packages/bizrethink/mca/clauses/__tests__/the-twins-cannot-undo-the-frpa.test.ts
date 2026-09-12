@@ -1,8 +1,9 @@
+// ADR 0011: the twin pair keys are semantic identities; historical citation numbers are not record identity.
 import { describe, expect, it } from 'vitest';
 
 import { LOMBARD_FACTS } from '../facts';
 import { ALL_MCA_CLAUSES, libraryFor } from '../library';
-import { applyTwinVocabulary, EQUIPMENT_TWIN, twinDivergence } from '../twins';
+import { applyTwinVocabulary, EQUIPMENT_TWIN, equipmentTwinKey, twinDivergence } from '../twins';
 import type { McaClause } from '../types';
 
 /**
@@ -75,7 +76,13 @@ const SUBSCRIPTION = libraryFor('subscription');
 const TWINS: McaClause[] = [...LEASE, ...SUBSCRIPTION];
 
 /** The five section numbers this rewrite touches, in both documents. */
-const REWRITTEN = ['3.14', '3.15', '3.16', '4.3', '4.4'];
+const REWRITTEN = [
+  'equipment-lease.lease-guaranty',
+  'equipment-lease.governing-law-and-venue',
+  'equipment-lease.notices',
+  'equipment-lease.independent-decision-governing-law',
+  'equipment-lease.jury-trial-and-class-action-waiver',
+];
 
 const clause = (slug: string): McaClause => {
   const found = ALL_MCA_CLAUSES.find((entry) => entry.slug === slug);
@@ -89,7 +96,7 @@ const clause = (slug: string): McaClause => {
 
 /** Both twins' record for a section number, so an assertion cannot name one. */
 const both = (number: string): McaClause[] => {
-  const pair = TWINS.filter((entry) => entry.number === number);
+  const pair = TWINS.filter((entry) => equipmentTwinKey(entry.slug) === number);
 
   if (pair.length !== 2) {
     throw new Error(`§${number} should exist in both twins; found ${pair.length}`);
@@ -246,7 +253,9 @@ describe('neither twin manufactures service of process against a natural person'
    * about how they will learn of a case — which is the shape §7.12 was rewritten
    * into and the shape this follows.
    */
-  it.each(both('4.3'))('$slug sends legal process to the law of the court', (entry) => {
+  it.each(
+    both('equipment-lease.independent-decision-governing-law'),
+  )('$slug sends legal process to the law of the court', (entry) => {
     expect(entry.body).toMatch(/procedural law|law (?:of|that governs) the court|manner (?:the law|that the law)/i);
     expect(entry.body).toMatch(/returned, refused or undeliverable|is not service/i);
     expect(entry.body).toMatch(/notice, (?:a )?(?:judicial )?hearing|prior court order/i);
@@ -296,7 +305,9 @@ describe('one forum rule, and it is the customer’s own state', () => {
     expect(offenders(TWINS, namesAForum)).toEqual([]);
   });
 
-  it.each(both('3.15'))('$slug puts law and forum in the customer’s own state', (entry) => {
+  it.each(
+    both('equipment-lease.governing-law-and-venue'),
+  )('$slug puts law and forum in the customer’s own state', (entry) => {
     expect(entry.body).toMatch(/principal place of business/i);
     expect(entry.body).toMatch(/state court|federal court/i);
     expect(entry.body).not.toMatch(/exclusive venue/i);
@@ -308,7 +319,9 @@ describe('one forum rule, and it is the customer’s own state', () => {
    * 9's mandatory perfection and priority rules. FRPA §7.5 says so; these say it
    * for the document that actually takes the interest.
    */
-  it.each(both('3.15'))('$slug leaves perfection and priority to the mandatory UCC rules', (entry) => {
+  it.each(
+    both('equipment-lease.governing-law-and-venue'),
+  )('$slug leaves perfection and priority to the mandatory UCC rules', (entry) => {
     expect(entry.body).toMatch(/perfection/i);
     expect(entry.body).toMatch(/Uniform Commercial Code/);
   });
@@ -329,8 +342,8 @@ describe('what a natural person gives up is mutual, or is not given up', () => {
   });
 
   it.each([
-    ...both('3.15'),
-    ...both('4.4'),
+    ...both('equipment-lease.governing-law-and-venue'),
+    ...both('equipment-lease.jury-trial-and-class-action-waiver'),
   ])('$slug limits its jury waiver to a forum that gives it effect', (entry) => {
     expect(entry.body).toMatch(/trial by jury/i);
     expect(entry.body).toMatch(/to the extent|law of the forum|does not give effect/i);
@@ -352,7 +365,10 @@ describe('what a natural person gives up is mutual, or is not given up', () => {
     expect(offenders(TWINS, shortensLimitations)).toEqual([]);
   });
 
-  it.each([...both('3.15'), ...both('4.4')])('$slug runs its limitation rule against every party alike', (entry) => {
+  it.each([
+    ...both('equipment-lease.governing-law-and-venue'),
+    ...both('equipment-lease.jury-trial-and-class-action-waiver'),
+  ])('$slug runs its limitation rule against every party alike', (entry) => {
     expect(entry.body).toMatch(/limitation period|period[^.]{0,40}applicable law|accrual/i);
     expect(entry.body).toMatch(/each party|every party|either party|both/i);
     expect(entry.body).toMatch(/does not shorten|shortens? (?:none|no)/i);
@@ -371,8 +387,10 @@ describe('a notice is effective when it can arrive', () => {
     expect(offenders(TWINS, deemsAStaleAddress)).toEqual([]);
   });
 
-  it.each(both('3.16'))('$slug separates a notice from legal process', (entry) => {
-    expect(entry.body).toMatch(/Section 4\.3/);
+  it.each(both('equipment-lease.notices'))('$slug separates a notice from legal process', (entry) => {
+    expect(entry.body).toMatch(
+      /Section (?:4\.3|\[\[clause:(?:equipment-lease|subscription)\.independent-decision-governing-law\]\])/,
+    );
     expect(entry.body).toMatch(/not service|is not legal process/i);
   });
 
@@ -381,7 +399,7 @@ describe('a notice is effective when it can arrive', () => {
    * address. A body that stops claiming it is a body the injector fills into
    * nothing — README rule 2, and the argument FRPA §10.3 makes for «48»/«49».
    */
-  it.each(both('3.16'))('$slug keeps its widget anchor', (entry) => {
+  it.each(both('equipment-lease.notices'))('$slug keeps its widget anchor', (entry) => {
     expect(entry.body).toContain('«43»');
   });
 });
@@ -402,7 +420,7 @@ describe('nothing outside §4.2 enlarges the guaranty §4.2 narrows', () => {
    * This is that assertion, pointed at the twins.
    */
   it('cites §4.2 in every clause outside Section 4 that binds a guarantor', () => {
-    const outside = TWINS.filter((entry) => /\bguarantor\b/i.test(entry.body) && !entry.number.startsWith('4.'));
+    const outside = TWINS.filter((entry) => /\bguarantor\b/i.test(entry.body) && entry.section !== 'guaranty');
 
     expect(outside.map((entry) => entry.slug).sort()).toEqual([
       'equipment-lease.lease-guaranty',
@@ -410,11 +428,13 @@ describe('nothing outside §4.2 enlarges the guaranty §4.2 narrows', () => {
     ]);
 
     for (const entry of outside) {
-      expect(entry.body, `${entry.slug} binds a guarantor without citing Section 4.2`).toContain('Section 4.2');
+      expect(entry.body, `${entry.slug} binds a guarantor without citing Section 4.2`).toContain(
+        `Section [[clause:${entry.instrument}.guaranty-of-payment]]`,
+      );
     }
   });
 
-  it.each(both('3.14'))('$slug subordinates only so far as §4.2 reaches', (entry) => {
+  it.each(both('equipment-lease.lease-guaranty'))('$slug subordinates only so far as §4.2 reaches', (entry) => {
     expect(entry.body).not.toMatch(/paid and satisfied in full/i);
     expect(entry.body).toMatch(/subrogat/i);
   });
@@ -423,7 +443,9 @@ describe('nothing outside §4.2 enlarges the guaranty §4.2 narrows', () => {
    * And §4.2's own limits are unchanged. A rewrite of the clauses around it that
    * quietly relaxed the clause itself would pass every assertion above.
    */
-  it.each(both('4.2'))('$slug still guarantees three things and nothing else', (entry) => {
+  it.each(
+    both('equipment-lease.guaranty-of-payment'),
+  )('$slug still guarantees three things and nothing else', (entry) => {
     expect(entry.body).toMatch(/and nothing else/);
     expect(entry.body).toMatch(/not personally liable/i);
     expect(entry.body).toMatch(/has slowed, ceased, or failed/);
@@ -443,7 +465,9 @@ describe('no instrument in the suite takes a blanket nonreliance representation'
   });
 
   /** What replaces it: the acknowledgement waives nothing it must not. */
-  it.each(both('4.3'))('$slug waives no fraud, disclosure or non-waivable claim', (entry) => {
+  it.each(
+    both('equipment-lease.independent-decision-governing-law'),
+  )('$slug waives no fraud, disclosure or non-waivable claim', (entry) => {
     expect(entry.body).toMatch(/fraud/i);
     expect(entry.body).toMatch(/does not permit to be (?:waived|given up)|non-waivable/i);
   });
@@ -458,7 +482,7 @@ describe('the twins honour what the FRPA now promises about them', () => {
    * each would go red if a rewrite of the clauses around them broke it.
    */
   it('promises in both documents that the same equipment is charged once', () => {
-    for (const entry of both('3.6')) {
+    for (const entry of both('equipment-lease.title-to-equipment')) {
       expect(entry.body).toContain('You will never pay for the same equipment twice');
     }
 
@@ -471,7 +495,7 @@ describe('the twins honour what the FRPA now promises about them', () => {
    * must say the reciprocal, or the firewall runs one way only.
    */
   it('creates no cross-default with the purchase agreement, in either document', () => {
-    for (const entry of both('3.12')) {
+    for (const entry of both('equipment-lease.default-remedies')) {
       expect(entry.body).toMatch(/No default under any other agreement/);
       expect(entry.body).toMatch(/purchase of future receipts/);
     }
@@ -502,10 +526,16 @@ describe('the fix landed in both documents, and declared no new divergence', () 
    * collection mechanism and none of which is about a dispute.
    */
   it('leaves the divergence register at the five it had', () => {
-    expect(EQUIPMENT_TWIN.divergent.map((entry) => entry.number)).toEqual(['3.4', '3.5', '3.6', '3.7', '3.8']);
+    expect(EQUIPMENT_TWIN.divergent.map((entry) => entry.slug)).toEqual([
+      'equipment-lease.payment-of-amounts-due',
+      'equipment-lease.use-return-of-equipment-and-insurance',
+      'equipment-lease.title-to-equipment',
+      'equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term',
+      'equipment-lease.software-license',
+    ]);
 
     for (const number of REWRITTEN) {
-      expect(EQUIPMENT_TWIN.divergent.map((entry) => entry.number)).not.toContain(number);
+      expect(EQUIPMENT_TWIN.divergent.map((entry) => entry.slug)).not.toContain(number);
     }
   });
 

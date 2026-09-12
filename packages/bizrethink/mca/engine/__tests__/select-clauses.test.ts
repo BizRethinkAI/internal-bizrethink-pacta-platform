@@ -39,16 +39,8 @@ const citations = (body: string): string[] => {
 
   for (const match of body.matchAll(SECTION_REFERENCE)) {
     for (const token of match[1].matchAll(/\d+(?:\.\d+)*/g)) {
-      /*
-        Section 1 is the AcroForm grid the Lombard pipeline injects, and no
-        clause in this library holds it — which is why `FRPA_LOCUS_EXCLUSIONS`
-        already declares 1.3, 1.4 and 1.5 as numbers the document has and the
-        library does not. Excluded here for the same reason, not as a
-        convenience.
-      */
-      if (!/^1(\.|$)/.test(token[0])) {
-        found.push(token[0]);
-      }
+      // ADR 0011: the grid is named; Section 1 now contains operative clauses.
+      found.push(token[0]);
     }
   }
 
@@ -77,113 +69,9 @@ const danglingIn = (facts: McaFacts, library?: McaClause[]): string[] => {
   return [...dangling].sort();
 };
 
-/**
- * References that dangle today, each named, quoted and owned.
- *
- * A register rather than a filter. Every entry has to stay reachable — the
- * assertion below fails if one stops dangling — for the reason `twins.test.ts`
- * gives about its divergence list: a tolerated defect that has quietly been
- * fixed is a line of a test that can no longer be red.
- *
- * None of these is `renewal-positions`' to fix, and fixing someone else's
- * clause to quiet a check is how a cluster's blast radius grows.
- */
-const KNOWN_GAPS: { to: string; from: string[]; quote: string; owner: string }[] = [
-  /*
-    CLOSED 2026-09-10 AND DELETED, NOT LEFT STANDING.
-
-    `frpa.electronic-account-monitoring-authorization-plaid-4-16 -> Section
-    6.1.1` was the first entry here. §4.16 no longer makes a lapse a default at
-    all, so the citation has gone rather than moved: the clause now says a lapse,
-    a token expiry, an outage or a good-faith revocation "is not an Event of
-    Default and gives Buyer no remedy", and points at the §6.1 that exists for
-    the reason — a loss of access to information or to a system is in its
-    not-a-default list. `data-and-channel` owned it and removed it in the same
-    change, which is what the assertion below exists to force.
-  */
-  {
-    /*
-      Same cause. §6.3 was rewritten to a single aggregate ceiling with no
-      numbered limbs; §7.9's own comment already records that it "defers to
-      §6.3.1", which now supplies nothing.
-
-      THE OWNER WAS STALE AND IS CORRECTED RATHER THAN LEFT. This entry said
-      `miscellaneous`. That cluster has run: it rewrote §7.9 and wrote the
-      citation of §6.3.1 into the new body deliberately, because §6.3.1 exists as
-      a NUMBERED PARAGRAPH inside `frpa.costs-of-collection-6-3` — the body ends
-      "6.3.1 Prejudgment and Postjudgment Interest" followed by the rule — and a
-      reader of the assembled document finds it. What does not find it is this
-      check, which reads `McaClause.number` and sees only `6.3`.
-
-      So it is not §7.9's defect and it is not §6.3's either. It is the one place
-      in the corpus where a clause record holds two numbered provisions, and the
-      fix is a library change: split §6.3.1 into its own record, which moves the
-      pinned counts in `frpa-coverage`, `library` and `surface` and renumbers
-      nothing. `disputes-service` found this on 2026-09-10 while closing out the
-      rewrite and did not take it: §6.3 is not its clause, and
-      `a-fee-is-a-debt-not-a-purchase.test.ts` pins §6.3's contents in three
-      assertions that a split would have to be checked against.
-
-      **UNOWNED. The nine-cluster rewrite is finished and no cluster follows.**
-    */
-    to: 'Section 6.3.1',
-    from: ['frpa.indemnification-7-9'],
-    quote: 'interest accrues only as Section 6.3.1 permits',
-    owner: 'UNASSIGNED — §6.3.1 is a paragraph inside frpa.costs-of-collection-6-3, not a record',
-  },
-  {
-    /*
-      THE GUARANTY GAP, SEEN FROM OUTSIDE SECTION 9.
-
-      §§9.2, 9.4, 9.5 and 9.6 gate on `guarantyScope === 'limited-conduct'`, and
-      `full-performance` used to be a value of the fact with no clause behind it,
-      so a full-performance funder selected §9.1's identity grid and §§10.2/10.4's
-      guarantor execution blocks with **no guaranty between them** while these six
-      clauses went on limiting a Guarantor's liability by reference to a §9.2 the
-      document did not contain.
-
-      **THE `full-performance` HALF IS CLOSED** — the owner authored the wide
-      guaranty on 2026-09-11 and `frpa.full-performance-guaranty-9-2` supplies a
-      §9.2 under that value. **What keeps this entry reachable is
-      `guarantyScope: 'none'`**, where Section 9 is absent by design and these
-      six citations have nothing to land on. That is a real dangle and it is a
-      real gap: §§4.10, 4.12, 5.11, 6.2, 6.3 and 7.9 are all ungated and all
-      reserve a guarantor claim to a Section that a no-guaranty template does not
-      have. Describing it by subject rather than by number is the fix, and it is
-      six other clusters' clauses.
-    */
-    to: 'Section 9.2',
-    from: [
-      'frpa.security-interest-4-10',
-      'frpa.remedies-4-12',
-      'frpa.unencumbered-receipts-5-11',
-      'frpa.remedies-6-2',
-      'frpa.costs-of-collection-6-3',
-      'frpa.indemnification-7-9',
-    ],
-    quote: 'A claim against a Guarantor may be brought only as Section 9.2 permits.',
-    owner: 'guaranty',
-  },
-  {
-    /*
-      And the whole of Section 9 under `guarantyScope: 'none'`, where four
-      clauses reserve remedies to a section that is now entirely absent. Visible
-      only since §9.1 was gated — while §9.1 was ungated, its number answered a
-      bare "Section 9" and hid these four behind a grid of blanks.
-    */
-    to: 'Section 9',
-    from: [
-      'frpa.sales-of-receipts-not-a-loan-2-1',
-      'frpa.completion-threshold-2-6',
-      'frpa.representations-lead-in',
-      'frpa.civil-criminal-regulatory-matters-5-14',
-    ],
-    quote: 'Buyer’s remedies are limited by Section 6, and the Guaranty is limited by Section 9.',
-    owner: 'guaranty',
-  },
-];
-
-const KNOWN = new Set(KNOWN_GAPS.flatMap(({ from, to }) => from.map((slug) => `${slug} -> ${to}`)));
+// ADR 0011 closes the former allowances: interest is its own record, and
+// ungated guarantor limits name the separately signed guaranty. No dangling
+// reference is tolerated, including when no guaranty is selected.
 
 /**
  * The profiles this property is checked over.
@@ -251,32 +139,39 @@ describe('selection turns a funder profile into a document', () => {
    */
   it('leaves no dangling cross-reference in any funder’s document', () => {
     for (const { name, facts } of PROFILES) {
-      const unexpected = danglingIn(facts).filter((gap) => !KNOWN.has(gap));
+      const unexpected = danglingIn(facts);
 
       expect(unexpected, `${name} assembles a document with a dangling cross-reference`).toEqual([]);
     }
   });
 
-  /**
-   * The register cannot go write-only.
-   *
-   * A tolerated gap that has been fixed elsewhere must be deleted from the list
-   * rather than left as a line that can no longer fail — the argument
-   * `twins.test.ts` makes about its declared divergences, and the argument the
-   * brief makes about the two assertions in this package that filtered on
-   * `Divergence` kinds that do not exist and passed vacuously for a day.
-   */
-  it('keeps every declared gap reachable', () => {
-    const reachable = new Set(PROFILES.flatMap(({ facts }) => danglingIn(facts)));
-
-    for (const { from, to, owner } of KNOWN_GAPS) {
-      for (const slug of from) {
-        expect(
-          reachable.has(`${slug} -> ${to}`),
-          `${slug} -> ${to} no longer dangles; delete it (owner: ${owner})`,
-        ).toBe(true);
-      }
+  it('closes every former guaranty and interest gap without adding liability', () => {
+    const noGuaranty = selectClauses({
+      instrument: 'frpa',
+      facts: { ...LOMBARD_FACTS, guarantyScope: 'none' },
+    }).selected;
+    expect(noGuaranty.some((clause) => clause.section === 'guaranty')).toBe(false);
+    for (const slug of [
+      'frpa.security-interest-4-10',
+      'frpa.remedies-4-12',
+      'frpa.unencumbered-receipts-5-11',
+      'frpa.remedies-6-2',
+      'frpa.costs-of-collection-6-3',
+      'frpa.indemnification-7-9',
+      'frpa.sales-of-receipts-not-a-loan-2-1',
+      'frpa.completion-threshold-2-6',
+      'frpa.representations-lead-in',
+      'frpa.civil-criminal-regulatory-matters-5-14',
+    ]) {
+      expect(noGuaranty.find((clause) => clause.slug === slug)?.body, slug).toMatch(
+        /separately signed (?:Personal )?Guaranty of Performance/,
+      );
     }
+    const interest = noGuaranty.find((clause) => clause.slug === 'frpa.prejudgment-and-postjudgment-interest');
+    expect(interest?.number).toMatch(/^\d+\.\d+$/);
+    expect(noGuaranty.find((clause) => clause.slug === 'frpa.indemnification-7-9')?.body).toContain(
+      `interest accrues only as Section ${interest?.number} permits`,
+    );
   });
 
   /**
@@ -290,13 +185,15 @@ describe('selection turns a funder profile into a document', () => {
       throw new Error('no frpa.definitions');
     }
 
-    const citing: McaClause = { ...anchor, slug: 'test.cites', number: '', body: 'As Section 44.7 provides.' };
-    const cited: McaClause = { ...anchor, slug: 'test.cited', number: '44.7', body: 'Buyer shall do it.' };
+    const citing: McaClause = { ...anchor, slug: 'test.cites', body: 'As Section [[clause:test.cited]] provides.' };
+    const cited: McaClause = { ...anchor, slug: 'test.cited', body: 'Buyer shall do it.' };
 
     // The reference resolves when the clause it names is in the same document…
     expect(danglingIn(LOMBARD_FACTS, [citing, cited])).toEqual([]);
     // …and does not when it is not.
-    expect(danglingIn(LOMBARD_FACTS, [citing])).toEqual(['test.cites -> Section 44.7']);
+    expect(() => danglingIn(LOMBARD_FACTS, [citing])).toThrow(/unresolved clause reference: test.cited/);
+    // Keep the original detector's positive control, now including Section 1.
+    expect(citations('As Section 44.7 provides. Sections 1.1 and 1.2 apply.')).toEqual(['44.7', '1.1', '1.2']);
     // A statute is not an internal reference, whatever the word before it.
     expect(citations('Connecticut General Statutes Section 36a-869 where that section applies')).toEqual([]);
   });

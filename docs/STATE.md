@@ -3026,3 +3026,22 @@ matched rather than reporting success.
   BizRethink Contracts library on the Desktop stays read-only. See *Lombard
   tenancy* above.
 - `infra-gitops` manages the VPS fleet Coolify runs on.
+
+
+## 2026-09-12 — Memo refutation correction (merged #168)
+
+`chore/mca-memo-refutations` merged at `005db8e46`. The register pins
+`lombard-contracts` commit `58974ca`: the memo refutes **one** finding,
+`fair-market-value-recital-self-refuting`, now recorded as rejected. The other
+five topics in its “should not be repeated as written” passage describe stale
+text, a different proposition, or a false premise; their dispositions were not
+changed. The totals are two rejected dispositions and 37 outstanding findings.
+`status: refuted` still describes a review withdrawing its own work and is not
+interchangeable with `disposition: rejected`.
+
+ADR 0012's description of “six findings ... refuted” remains historically
+recorded but incorrect; correct it in a superseding ADR, not by editing that
+ADR. The regulator-complaint finding's “No document change made” note also
+remains inaccurate (change-note 16 did make one); deciding its disposition is
+separate work. The handoff identifies sibling PR #13 as the merge needed to put
+`58974ca` on that repository's main; this Pacta change does not merge it.

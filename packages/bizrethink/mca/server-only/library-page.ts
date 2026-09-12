@@ -216,7 +216,7 @@ export const mcaLibraryPage = async () => {
         author the approval supplies is in the clause handed to it.
       */
       publishProblems: assertPublishable({ ...effective, status: 'published' }),
-      body: clause.body,
+      body: view.body,
       fingerprint: mcaClauseFingerprint(clause),
       appliesInStates: clause.appliesInStates,
       approval: approval === null ? null : approvalView(approval, clause, recorderName(approval.recordedByUserId)),

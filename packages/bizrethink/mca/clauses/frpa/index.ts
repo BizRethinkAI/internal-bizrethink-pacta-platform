@@ -70,6 +70,9 @@ export const FRPA_SECTION_ORDER = [
   'guaranty',
   'service',
   'appendix',
+  'execution',
+  'split-funding-exhibit',
+  'permission-to-release-exhibit',
 ] as const;
 
 /**
@@ -85,11 +88,7 @@ export const FRPA_NON_CLAUSE: NonClauseLine[] = [
   { anchor: 'Purchase of Future Receivables', reason: 'cover page subtitle' },
   { anchor: '[TABLE]  | PREPARED BY', reason: 'cover page metadata block' },
   { anchor: 'Section 1: Merchant and Funding Information', reason: 'section header' },
-  {
-    anchor: '[TABLE] 1.1 MERCHANT INFORMATION',
-    reason:
-      'the Section 1 form grid — AcroForm widgets and labels, not prose. Its fields §1.3–§1.5 ARE named in review loci, which is why they appear in FRPA_LOCUS_EXCLUSIONS rather than being silently ignored',
-  },
+
   { anchor: 'Section 2: Purchase and Sale', reason: 'section header' },
   { anchor: 'Section 3: Reconciliation and Adjustment', reason: 'section header' },
   { anchor: 'Section 4: Terms of Enrollment', reason: 'section header' },

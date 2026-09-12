@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { ALL_MCA_CLAUSES, libraryFor } from '../library';
@@ -98,7 +99,8 @@ describe('the cluster knows which clause it is', () => {
   it('owns §4.8 and nothing else in this file', () => {
     expect(MINE).toHaveLength(1);
     expect(clause(CONFIDENTIALITY).instrument).toBe('frpa');
-    expect(clause(CONFIDENTIALITY).number).toBe('4.8');
+    // ADR 0011: this operative record must remain citable after selection.
+    expect(clause(CONFIDENTIALITY).unnumberedReason).toBeUndefined();
   });
 });
 
@@ -306,7 +308,7 @@ describe('§4.8 protects the complaint, the adviser and the testimony', () => {
   it('runs its clock from completion as well as termination', () => {
     const text = body(CONFIDENTIALITY);
 
-    expect(text).toContain('Section 2.6');
+    expect(text).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
     expect(text).toMatch(/three \(3\) years/);
     expect(text).toMatch(/longer (?:period|duty|duties)/i);
   });
@@ -318,7 +320,7 @@ describe('§4.8 protects the complaint, the adviser and the testimony', () => {
    * otherwise be a second, weaker standard for the same conduct.
    */
   it('does not become a second, softer rule for Buyer’s handling of merchant data', () => {
-    expect(body(CONFIDENTIALITY)).toContain('Section 4.7');
+    expect(body(CONFIDENTIALITY)).toContain('Section [[clause:frpa.protection-of-information-4-7]]');
     expect(body(PROTECTION)).toMatch(/controls any inconsistent information-sharing provision/);
   });
 
@@ -337,9 +339,9 @@ describe('§4.8 protects the complaint, the adviser and the testimony', () => {
  */
 describe('§7.22 and §7.6 still describe §4.8 correctly', () => {
   it('§7.22 keeps its citation', () => {
-    expect(body(COUNSEL)).toContain('Section 4.8');
+    expect(body(COUNSEL)).toContain('Section [[clause:frpa.confidentiality-4-8]]');
     expect(body(COUNSEL)).toMatch(
-      /Section 4\.8 does not restrict a disclosure made to an attorney, an accountant or another professional adviser/,
+      /Section (?:4\.8|\[\[clause:frpa\.confidentiality-4-8\]\]) does not restrict a disclosure made to an attorney, an accountant or another professional adviser/,
     );
   });
 
@@ -351,7 +353,7 @@ describe('§7.22 and §7.6 still describe §4.8 correctly', () => {
   });
 
   it('§7.6 still finds confidentiality duties here to survive', () => {
-    expect(body(SURVIVAL)).toContain('the confidentiality duties in Section 4.8');
+    expect(body(SURVIVAL)).toContain('the confidentiality duties in Section [[clause:frpa.confidentiality-4-8]]');
     expect(body(CONFIDENTIALITY)).toMatch(/continue|end|survive/i);
   });
 });

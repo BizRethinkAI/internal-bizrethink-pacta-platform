@@ -1,3 +1,4 @@
+// ADR 0011 adds the existing funding grid and separates the existing interest paragraph: FRPA 108, corpus 211.
 import { describe, expect, it } from 'vitest';
 
 import { documentLines } from '../documents';
@@ -88,7 +89,7 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 106 records for 99 sections: 84 the document numbers, 15 it does not', () => {
+  it('holds 108 records, including the funding grid and independently citable interest', () => {
     // 101 until the four `[Reserved]` records were removed. They were section
     // numbers the document holds open after a clause was taken out — lines of
     // the document, not clauses of it — and are now declared in
@@ -130,8 +131,8 @@ describe('the FRPA library accounts for the whole document', () => {
     // a RECORD and no section and every assembled document still holds one §6.1.
     // The §4.15 shape again, and for the same reason: the ungated §6.1 decided
     // the guaranty for every template from inside Section 6.
-    expect(clauses).toHaveLength(106);
-    expect(clauses.filter((clause) => clause.number !== '').length).toBeGreaterThan(0);
+    expect(clauses).toHaveLength(108);
+    expect(clauses.filter((clause) => !clause.unnumberedReason).length).toBeGreaterThan(0);
   });
 
   it('imported the granting clause, the definitions and the lead-in', () => {
@@ -168,10 +169,14 @@ describe('the FRPA library accounts for the whole document', () => {
    * whether an assertion is worth keeping.
    */
   it('keeps the Events of Default limbs inside §6.1', () => {
-    const events = clauses.find((clause) => clause.number === '6.1');
+    const events = clauses.find((clause) => clause.slug === 'frpa.events-of-default-6-1');
 
     expect(events).toBeDefined();
-    expect(clauses.filter((clause) => /^6\.1\.[0-9]/.test(clause.number))).toEqual([]);
+    // Limbs remain inside their parent; numbering.test also rejects nested stored numbers.
+    expect(events?.body).toMatch(/\(a\)[\s\S]*\(b\)[\s\S]*\(c\)/);
+    expect(clauses.filter((clause) => /^frpa\.(?:full-performance-)?events-of-default-6-1-/.test(clause.slug))).toEqual(
+      [],
+    );
   });
 });
 
@@ -197,7 +202,11 @@ describe('the FRPA locus exclusions', () => {
   });
 
   it('excludes no number the document actually has', () => {
-    const numbers = new Set(libraryFor('frpa').map((clause) => clause.number));
+    // These loci belong to the historical source, never the new selected document.
+    const numbers = new Set(
+      documentLines(LOMBARD.documents.frpa.file).flatMap((line) => line.match(/^(\d+\.\d+)\s/)?.[1] ?? []),
+    );
+    expect(numbers.has('6.1')).toBe(true);
 
     for (const excluded of Object.keys(FRPA_LOCUS_EXCLUSIONS)) {
       expect(numbers.has(excluded), `${excluded} is excluded but is a real clause`).toBe(false);

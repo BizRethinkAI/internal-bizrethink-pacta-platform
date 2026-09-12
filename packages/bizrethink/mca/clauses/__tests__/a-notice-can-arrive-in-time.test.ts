@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 import { selectClauses } from '../../engine/select-clauses';
 import { containsPrescribedText, readSourceText } from '../../provenance/source-text';
@@ -124,7 +125,10 @@ const timeBound = (body: string): boolean =>
   sentences(body).some((sentence) => COMMUNICATION.test(sentence) && CLOCK.test(sentence) && IMPOSES.test(sentence));
 
 /** A clause that supplies its own channel does not depend on §7.3's. */
-const carvesOut = (body: string): boolean => /Section 7\.3 does not apply|Notwithstanding Section 7\.3/i.test(body);
+const carvesOut = (body: string): boolean =>
+  /Section (?:7\.3|\[\[clause:frpa\.notices-7-3\]\]) does not apply|Notwithstanding Section (?:7\.3|\[\[clause:frpa\.notices-7-3\]\])/i.test(
+    body,
+  );
 
 /**
  * Can §7.3, as written, carry a clock at all?
@@ -220,7 +224,7 @@ describe('an administrative notice is not service of process', () => {
     const body = clause(NOTICES).body;
 
     expect(body).toMatch(/service of process/i);
-    expect(body).toContain('Section 7.12');
+    expect(body).toContain('Section [[clause:frpa.service-of-process-7-12]]');
   });
 
   /**
@@ -271,7 +275,7 @@ describe('the amendment rule stops carving out a cascade that is gone', () => {
     const body = clause(MODIFICATIONS).body;
 
     expect(body).toMatch(/are not amendments|is not an amendment/i);
-    expect(body).toContain('Section 3');
+    expect(body).toContain('Section [[section:reconciliation]]');
   });
 
   /**
@@ -297,7 +301,7 @@ describe('what survives completion, and what stops', () => {
     const body = clause(SURVIVAL).body;
 
     expect(body).not.toMatch(/all amounts then due/i);
-    expect(body).toContain('Section 2.6');
+    expect(body).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
   });
 
   it('keeps an accrued claim without making a funding-date fact a perpetual warranty', () => {
@@ -378,7 +382,7 @@ describe('the assignment survives with the merchant’s rights attached', () => 
     const body = clause(ASSIGNMENT).body;
 
     expect(body).not.toMatch(/sole discretion/i);
-    expect(body).toContain('Section 5.18');
+    expect(body).toContain('Section [[clause:frpa.change-of-name-or-location-or-sale-or-closing-of-business-5-18]]');
   });
 });
 
@@ -435,7 +439,7 @@ describe('the counsel recital says only what is true', () => {
    * points at it so the promise and its condition are read together.
    */
   it('points at the confidentiality clause that used to condition it', () => {
-    expect(clause(COUNSEL).body).toContain('Section 4.8');
+    expect(clause(COUNSEL).body).toContain('Section [[clause:frpa.confidentiality-4-8]]');
   });
 
   it('waives no fraud, misrepresentation or disclosure claim', () => {
@@ -460,7 +464,7 @@ describe('the waiver clause is reciprocal and subordinate', () => {
     const body = clause(WAIVER).body;
 
     expect(body).not.toMatch(/cumulative and not exclusive/i);
-    expect(body).toContain('Section 6');
+    expect(body).toContain('Section [[section:default]]');
   });
 });
 
@@ -657,7 +661,7 @@ describe('the state-law rider is a deployment surface, not a severance clause', 
     const body = clause(RIDERS).body;
 
     expect(body).toMatch(/Virginia/);
-    expect(body).toContain('Section 7.5');
+    expect(body).toContain('Section [[clause:frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5]]');
   });
 
   it('waives no statutory right and claims to cure no prohibited term', () => {
@@ -732,7 +736,7 @@ describe('the Texas notice is the regulator’s words, unaltered', () => {
    * §86.310(d) asks for.
    */
   it('is its own section rather than a second §7.24', () => {
-    expect(clause(TEXAS).number).not.toBe(clause(RIDERS).number);
+    expect(clause(TEXAS).slug).not.toBe(clause(RIDERS).slug);
   });
 });
 

@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { selectClauses } from '../../engine/select-clauses';
@@ -132,7 +133,8 @@ describe('the wide guaranty is four records, and they partition', () => {
 
   /** Two records may share a number only while no document can hold both. */
   it.each(PAIRS)('$key shares one section number between the two records', ({ limited, full }) => {
-    expect(clause(full).number).toBe(clause(limited).number);
+    // ADR 0011: shared semantic target, not a stored print position.
+    expect(clause(full).referenceId).toBe(clause(limited).slug);
     expect(clause(full).section).toBe('guaranty');
   });
 
@@ -374,7 +376,7 @@ describe('the wide joint-liability clause cannot bind somebody who never signed'
   it('reaches nobody who is not identified under Section 9.1 and has not signed', () => {
     const text = body(FULL.joint);
 
-    expect(text).toContain('Section 9.1');
+    expect(text).toContain('Section [[clause:frpa.guarantor-information-9-1]]');
     expect(text).toMatch(/is not a Guarantor/);
   });
 });
@@ -389,7 +391,7 @@ describe('the wide acknowledgement tells the signer which guaranty they signed',
   it('describes the wide guaranty, not the narrow one', () => {
     const text = body(FULL.acknowledgement);
 
-    expect(text).toContain('Section 9.2');
+    expect(text).toContain('Section [[clause:frpa.guaranty-of-performance-9-2]]');
     expect(text).toMatch(/every representation, warranty and covenant/);
     expect(text).not.toMatch(/limited personal or entity liability/);
     expect(body(LIMITED.acknowledgement)).toMatch(/limited personal or entity liability/);
@@ -493,7 +495,9 @@ describe('the conflict this change could not close, and the change that did', ()
   });
 
   it('gives the wide document a §6.1 of its own, and only one', () => {
-    const sixOne = selected('full-performance').filter((entry) => entry.number === '6.1');
+    const sixOne = selected('full-performance').filter(
+      (entry) => (entry.referenceId ?? entry.slug) === 'frpa.events-of-default-6-1',
+    );
 
     expect(sixOne.map((entry) => entry.slug)).toEqual(['frpa.full-performance-events-of-default-6-1']);
     expect(body('frpa.full-performance-events-of-default-6-1')).toContain(
