@@ -3,6 +3,27 @@
 Primary text, committed so that a check can be run without a network and so
 that the words a spec was transcribed from cannot change underneath it.
 
+## Source audit — 2026-09-12
+
+The [source audit and per-file retrieval manifest](../../../../docs/research/mca-source-audit-2026-09-12/README.md)
+record exact official URLs, retrieval times, response hashes, publication
+versions and comparison results for all **16 text files / 11 states** here.
+Fourteen files match identified official publications; both Virginia form
+extractions differ from the official October 2022 form. Original retrievals
+that were not recorded remain unknown; the audit establishes a new retrieval.
+
+**Matching historical text is not proof of current law.** The audit identifies
+Connecticut's missing 2026 supplement, Missouri's 2025 amendment and Florida's
+2024 definition amendment. It also corrects the old “Texas only” inference:
+Utah §7-27-202(3) requires variable-payment information in the agreement.
+The complete eleven-state agreement-requirements walk remains open under
+ADR 0014. Other specific currency/coverage gaps are listed in the report.
+
+All sixteen existing text files, digests and verification dates are unchanged.
+Fresh evidence is retained alongside the audit for explicit source/conformity
+updates. In particular, the older Texas `.txt` preface's broad claim about
+other states is superseded by the correction below; it is not statutory text.
+
 ## The Connecticut and Virginia statutes (added 2026-09-07)
 
 `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` close the gap the
@@ -75,14 +96,14 @@ Commission's responses to comments; those are reasoning about the rules rather
 than the rules, and are not vendored. One response is quoted in the file's
 header because it endorses the deployment structure we had already chosen.
 
-**Why this file settles a question about every other state.** §86.310(d) is the
-only requirement in the eleven states we track that puts words INSIDE the
-agreement. Connecticut §36a-868 and Virginia §6.2-2236(A) are prohibitions — a
-contract may not waive a prejudgment remedy, may not mandate a forum outside
-the Commonwealth — and the rest are satisfied by a separate disclosure. So a
-base form that omits the prohibited terms needs no per-state variant at all, and
-Texas needs one added clause. That is the difference between two templates and
-twenty-two.
+**Correction recorded 2026-09-12.** §86.310(d) requires a specific OCCC notice
+in the agreement. That does not establish that every other state is satisfied
+by a separate disclosure. The [current linked Utah chapter](https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf),
+which matches our saved body, expressly requires the agreement to describe the
+variable-payment calculation methodology and circumstances of variation in
+§7-27-202(3). Agreement-content duties and prescribed exact wording are separate
+questions. The number of templates needed cannot be inferred from the Texas
+notice alone; the eleven-state review required by ADR 0014 remains open.
 
 §86.313 is also here because the FRPA's split-only design turns on it: a
 provider may debit a deposit account only while holding a validly perfected,

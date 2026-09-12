@@ -1,0 +1,1570 @@
+{
+  "audit_date": "2026-09-12",
+  "base_commit": "0c440a396c9b5f5c9161538358fc08ff120fdc80",
+  "scope": "16 existing source text files covering 11 states; source provenance and version audit, not the complete ADR 0014 agreement-requirements walk.",
+  "original_source_bytes_unchanged": true,
+  "currency_meaning": "Limited to identified pages/versions inspected on the recorded retrieval date. An official historical match or a current index link is not proof that all later amendments or implementing authorities were found.",
+  "extraction": {
+    "pdf": "pdftotext reading order or -layout as specified per comparison",
+    "html": "Python HTMLParser; scripts/styles/noscript excluded; block line breaks; HTML entities decoded; horizontal whitespace normalized.",
+    "comparison_hashes": "SHA-256 of UTF-8 normalized selected body, no trailing newline; collapse-whitespace means Python split/join, remove-whitespace removes only whitespace. Publication line-number removal is described in README; substantive numeric tokens are retained.",
+    "raw_responses": "Only the two PDFs listed under archived_response are duplicated here. Other retrieved response hashes identify the downloads inspected, not permanent availability at mutable URLs. Selected text evidence is retained separately."
+  },
+  "files": [
+    {
+      "file": "packages/bizrethink/mca/sources/CA-10CCR-900-956.txt",
+      "state": "CA",
+      "original_sha256": "7584fd3a66eef4424edc59bbbd94765ad75abb69efe70f1acd3d2ca3fddc1a88",
+      "original_bytes": 165791,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "publisher_identification_recorded_on": "2026-09-08"
+      },
+      "identified_version": "Final PRO 01-18 text; rulemaking-index entry dated 2022-06-09, effective 2022-12-09.",
+      "verified_retrieval": {
+        "url": "https://dfpi.ca.gov/wp-content/uploads/sites/337/2022/06/PRO-01-18-Commercial-Financing-Disclosure-Regulation-Final-Text.pdf",
+        "final_url": "https://dfpi.ca.gov/wp-content/uploads/sites/337/2022/06/PRO-01-18-Commercial-Financing-Disclosure-Regulation-Final-Text.pdf",
+        "retrieved_at_utc": "2026-09-12T08:42:04.349280+00:00",
+        "response_sha256": "684f28e0d65438e3520fb52b79b1013bcc04e730b3d65e28ed192e766c731fc0"
+      },
+      "comparison": {
+        "retrieval_id": "ca-final",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "CA-10CCR-900-956.txt",
+        "excluded_prefix": "Publisher: California Department of Financial Protection and Innovation Site: https://dfpi.ca.gov Recorded: 2026-09-08 10 CCR §§900-956 — the DFPI rulemaking adopting Subchapter 3, Commercial Financing Disclosures. The file opens with the Department's own adoption language: \"The Department of Financial Protection and Innovation hereby adopts the following new provisions to be added to Title 10, Chapter 3\". WHY THIS HEADER SAYS \"PUBLISHER\" AND NOT \"RETRIEVED FROM\". The deep link this file was fetched through was not written down at the time and is not recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into 404s, because legislatures reorganise their sites. What IS determinable, from the document itself, is who published it: an enrolled act, a chamber's letterhead and a Superintendent's signed adoption are not things a reproducer manufactures. So this records the publisher and the publisher's site, dated today, as a statement about what the document IS. It is deliberately not a claim that these bytes were served from that host on that date — only a fetch recorded at the moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` have and these do not. THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes the file, so its digest was recomputed. Not one byte of the statutory text changed — the same treatment, and the same reason, as the two headers added in `fix/ga-primary-text`: \"the digest broke, I updated it\" is the move this mechanism exists to make somebody justify, so the justification is written here. --- STATUTORY TEXT BEGINS ---"
+      },
+      "currency": "official-index-linked; consolidated-regulatory-currency-not-established",
+      "retrieval_ids": ["ca-landing", "ca-final"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/CT-CGS-36a-861-872.txt",
+      "state": "CT",
+      "original_sha256": "10f38d304f6e1437d1824c36352934e4898ea3a39e16191eb883096a0cbbcb21",
+      "original_bytes": 14310,
+      "historical_provenance": {
+        "status": "recorded-in-repository; not retroactively re-proven",
+        "retrieved_on": "2026-09-07",
+        "url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+        "record_location": "sources/README.md"
+      },
+      "identified_version": "Base chapter 669, sections 36a-861 through 872; P.A. 23-201.",
+      "verified_retrieval": {
+        "url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+        "final_url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+        "retrieved_at_utc": "2026-09-12T08:42:04.890924+00:00",
+        "response_sha256": "2e249d87b267658dda0f0660b905932de802aa09b85723773d05476399821dc4"
+      },
+      "comparison": {
+        "retrieval_id": "ct-base",
+        "result": "whole-body-match-to-base-volume",
+        "check_id": "CT-CGS-36a-861-872.txt",
+        "extraction": "Complete sections 36a-861 through 872 after navigation removal; excludes the 2026 supplement."
+      },
+      "currency": "incomplete-without-2026-supplement-868-870-872",
+      "retrieval_ids": ["ct-base", "ct-supplement-2026"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/CT-DOB-Guidance.layout.txt",
+      "state": "CT",
+      "original_sha256": "d3da800e5b0e2be207fd11c7bb422652f7548d9b89ee0f8ba032661ad477e57e",
+      "original_bytes": 11077,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "note": "Companion layout extraction; inherited provenance from paired reading-order source, not a separate original fetch record."
+      },
+      "identified_version": "DOB guidance issued 2024-06-10, updated 2024-08-01; includes Appendix A.",
+      "verified_retrieval": {
+        "url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+        "final_url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+        "retrieved_at_utc": "2026-09-12T08:39:57.285840+00:00",
+        "response_sha256": "c11f771ee42f5253669edfe14e58d199c607aba713990544edf988169ab833fc"
+      },
+      "comparison": {
+        "retrieval_id": "ct-guidance",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "CT-DOB-Guidance.layout.txt",
+        "excluded_prefix": null
+      },
+      "currency": "official-guidance-copy-matches; current-index-not-established; registration-prose-predates-2025-amendments",
+      "retrieval_ids": ["ct-guidance", "ct-supplement-2026"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/CT-DOB-Guidance.txt",
+      "state": "CT",
+      "original_sha256": "ed2aaaa9f35cb8bad2eac788a395c0a12219524f09b5a43cc7a0fb47b8521116",
+      "original_bytes": 9584,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "publisher_identification_recorded_on": "2026-09-08"
+      },
+      "identified_version": "DOB guidance issued 2024-06-10, updated 2024-08-01; includes Appendix A.",
+      "verified_retrieval": {
+        "url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+        "final_url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+        "retrieved_at_utc": "2026-09-12T08:39:57.285840+00:00",
+        "response_sha256": "c11f771ee42f5253669edfe14e58d199c607aba713990544edf988169ab833fc"
+      },
+      "comparison": {
+        "retrieval_id": "ct-guidance",
+        "extraction": "pdftotext",
+        "result": "whole-body-match",
+        "check_id": "CT-DOB-Guidance.txt",
+        "excluded_prefix": "Publisher: Connecticut Department of Banking Site: https://portal.ct.gov/DOB Recorded: 2026-09-08 Guidance Regarding Public Act 23-201, issued 10 June 2024 and updated 1 August 2024 — dated and attributed in the file's own opening lines. WHY THIS HEADER SAYS \"PUBLISHER\" AND NOT \"RETRIEVED FROM\". The deep link this file was fetched through was not written down at the time and is not recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into 404s, because legislatures reorganise their sites. What IS determinable, from the document itself, is who published it: an enrolled act, a chamber's letterhead and a Superintendent's signed adoption are not things a reproducer manufactures. So this records the publisher and the publisher's site, dated today, as a statement about what the document IS. It is deliberately not a claim that these bytes were served from that host on that date — only a fetch recorded at the moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` have and these do not. THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes the file, so its digest was recomputed. Not one byte of the statutory text changed — the same treatment, and the same reason, as the two headers added in `fix/ga-primary-text`: \"the digest broke, I updated it\" is the move this mechanism exists to make somebody justify, so the justification is written here. --- STATUTORY TEXT BEGINS ---"
+      },
+      "currency": "official-guidance-copy-matches; current-index-not-established; registration-prose-predates-2025-amendments",
+      "retrieval_ids": ["ct-guidance", "ct-supplement-2026"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/FL-HB-1353.txt",
+      "state": "FL",
+      "original_sha256": "ac951bee3d0987cd9c853acfe5fd7f4e55838a1a92d54399c5c32017fd778fa3",
+      "original_bytes": 21597,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "publisher_identification_recorded_on": "2026-09-08"
+      },
+      "identified_version": "CS/HB 1353 Engrossed 1 (2023), not the enrolled publication; its operative text matches the enrolled bill.",
+      "verified_retrieval": {
+        "url": "https://www.flsenate.gov/Session/Bill/2023/1353/BillText/e1/PDF",
+        "final_url": "https://www.flsenate.gov/Session/Bill/2023/1353/BillText/e1/PDF",
+        "retrieved_at_utc": "2026-09-12T08:42:06.185491+00:00",
+        "response_sha256": "51a5b12e545cd6e72291b7ef37017692f558ad4566a98fd19c5ff007976ef26d"
+      },
+      "comparison": {
+        "retrieval_id": "fl-engrossed",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "FL-HB-1353.txt",
+        "excluded_prefix": "Publisher: Florida House of Representatives Site: https://www.myfloridahouse.gov Recorded: 2026-09-08 HB 1353 — the bill as published by the chamber, whose letterhead opens the file. WHY THIS HEADER SAYS \"PUBLISHER\" AND NOT \"RETRIEVED FROM\". The deep link this file was fetched through was not written down at the time and is not recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into 404s, because legislatures reorganise their sites. What IS determinable, from the document itself, is who published it: an enrolled act, a chamber's letterhead and a Superintendent's signed adoption are not things a reproducer manufactures. So this records the publisher and the publisher's site, dated today, as a statement about what the document IS. It is deliberately not a claim that these bytes were served from that host on that date — only a fetch recorded at the moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` have and these do not. THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes the file, so its digest was recomputed. Not one byte of the statutory text changed — the same treatment, and the same reason, as the two headers added in `fix/ga-primary-text`: \"the digest broke, I updated it\" is the move this mechanism exists to make somebody justify, so the justification is written here. --- STATUTORY TEXT BEGINS ---"
+      },
+      "currency": "superseded-definition-559.9611-9",
+      "retrieval_ids": [
+        "fl-engrossed",
+        "fl-enrolled",
+        "fl-2024-amendment",
+        "fl-code-961",
+        "fl-code-9611",
+        "fl-code-9612",
+        "fl-code-9613",
+        "fl-code-9614",
+        "fl-code-9615"
+      ]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/GA-SB90-enrolled.txt",
+      "state": "GA",
+      "original_sha256": "57cc829fe066147cdd071e6e297d44a6b7d9dcad6360b302c68d2b954351cff5",
+      "original_bytes": 29521,
+      "historical_provenance": {
+        "status": "recorded-in-repository; not retroactively re-proven",
+        "retrieved_on": "2026-09-07",
+        "url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+        "record_location": "file header"
+      },
+      "identified_version": "SB 90 as passed, 2023-2024 session; Ga. L. 2023 p. 255; effective 2024-01-01.",
+      "verified_retrieval": {
+        "url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+        "final_url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+        "retrieved_at_utc": "2026-09-12T08:39:57.942851+00:00",
+        "response_sha256": "48958eed53f81ca6cd784fd71602754884bcc23e16860faf2b7a9279bac3c5bc"
+      },
+      "comparison": {
+        "retrieval_id": "ga-act",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "GA-SB90-enrolled.txt",
+        "excluded_prefix": "O.C.G.A. § 10-1-393.18 — REQUIRED DISCLOSURES FOR COMMERCIAL FINANCING TRANSACTIONS; EXCEPTIONS; LIMITATIONS ON BROKERS; ENFORCEMENT; CIVIL PENALTIES PRIMARY TEXT. Senate Bill 90, 2023-2024 regular session, AS PASSED (enrolled), published by the Georgia General Assembly at https://www.legis.ga.gov/api/legislation/document/20232024/219440 Retrieved 2026-09-07. Enacted Ga. L. 2023, p. 255, § 2/SB 90, effective January 1, 2024. This REPLACES a browser capture of law.justia.com, which was a secondary publisher and was incomplete: subsection (a)'s definitions and the full text of (b)-(k) were not in it, so \"advance fee\" -- a term the broker prohibition in (f)(1) turns on -- was defined nowhere in what we held, while the Georgia content spec nonetheless carried a verification date against it. The earlier note that \"the Georgia legislature's document API returns an unrelated resolution\" was a wrong document id, not a broken API. The enrolled bill is the act as passed. Where a later amendment changes the Code, this file is superseded and the digest will say so. ------------------------------------------------------------------------------"
+      },
+      "currency": "enacted-source-verified; later-code-currency-not-established",
+      "retrieval_ids": ["ga-act"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/KS-SB-345.txt",
+      "state": "KS",
+      "original_sha256": "ab14e3d0c041a2e745d98330ecd85b78998ca9f214b03540946b53bb9f412212",
+      "original_bytes": 15718,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "publisher_identification_recorded_on": "2026-09-08"
+      },
+      "identified_version": "SB 345 as introduced, Session 2024, 1-12; body matches enrolled publication and current K.S.A. 75-783 through 787 after documented codification normalization.",
+      "verified_retrieval": {
+        "url": "https://www.kslegislature.gov/b2023_24/bills/download/?apn=b2023_24/year2/ready_for_publication/sb_345/sb345_00_0000.pdf",
+        "final_url": "https://www.kslegislature.gov/b2023_24/bills/download/?apn=b2023_24/year2/ready_for_publication/sb_345/sb345_00_0000.pdf",
+        "retrieved_at_utc": "2026-09-12T08:51:39.362696+00:00",
+        "response_sha256": "c223a46f592bd49b5cae854e2716bec05ec9e184569c573a41d93591b76b8110"
+      },
+      "comparison": {
+        "retrieval_id": "ks-introduced",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "KS-SB-345.txt",
+        "excluded_prefix": "Publisher: Kansas Legislature Site: https://kslegislature.gov Recorded: 2026-09-08 Senate Bill No. 345, Session of 2024, By Committee on Federal and State Affairs — as the file's own first lines state. WHY THIS HEADER SAYS \"PUBLISHER\" AND NOT \"RETRIEVED FROM\". The deep link this file was fetched through was not written down at the time and is not recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into 404s, because legislatures reorganise their sites. What IS determinable, from the document itself, is who published it: an enrolled act, a chamber's letterhead and a Superintendent's signed adoption are not things a reproducer manufactures. So this records the publisher and the publisher's site, dated today, as a statement about what the document IS. It is deliberately not a claim that these bytes were served from that host on that date — only a fetch recorded at the moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` have and these do not. THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes the file, so its digest was recomputed. Not one byte of the statutory text changed — the same treatment, and the same reason, as the two headers added in `fix/ga-primary-text`: \"the digest broke, I updated it\" is the move this mechanism exists to make somebody justify, so the justification is written here. --- STATUTORY TEXT BEGINS ---"
+      },
+      "currency": "current-code-body-compared",
+      "retrieval_ids": [
+        "ks-bill",
+        "ks-introduced",
+        "ks-enrolled",
+        "ks-code-783",
+        "ks-code-784",
+        "ks-code-785",
+        "ks-code-786",
+        "ks-code-787"
+      ]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/LA-Act-198.txt",
+      "state": "LA",
+      "original_sha256": "a99ea57d7093dd7272a7e3b7c78cd6f43fc4f6582d9c769b732086f0550507a1",
+      "original_bytes": 5861,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "publisher_identification_recorded_on": "2026-09-08"
+      },
+      "identified_version": "HB 470 enrolled, 2025 Regular Session; Act 198 (2025).",
+      "verified_retrieval": {
+        "url": "https://www.legis.la.gov/Legis/ViewDocument.aspx?d=1421306",
+        "final_url": "https://www.legis.la.gov/Legis/ViewDocument.aspx?d=1421306",
+        "retrieved_at_utc": "2026-09-12T08:42:04.707513+00:00",
+        "response_sha256": "4ae8e51fe71757e1d6adb80516245bbee8b426ef554a62b7608eef0a66fc2c0c"
+      },
+      "comparison": {
+        "retrieval_id": "la-enrolled",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "LA-Act-198.txt",
+        "excluded_prefix": "Publisher: Louisiana State Legislature Site: https://legis.la.gov Recorded: 2026-09-08 Act 198, 2025 Regular Session. The file is the ENROLLED text and says so on its first line. WHY THIS HEADER SAYS \"PUBLISHER\" AND NOT \"RETRIEVED FROM\". The deep link this file was fetched through was not written down at the time and is not recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into 404s, because legislatures reorganise their sites. What IS determinable, from the document itself, is who published it: an enrolled act, a chamber's letterhead and a Superintendent's signed adoption are not things a reproducer manufactures. So this records the publisher and the publisher's site, dated today, as a statement about what the document IS. It is deliberately not a claim that these bytes were served from that host on that date — only a fetch recorded at the moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` have and these do not. THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes the file, so its digest was recomputed. Not one byte of the statutory text changed — the same treatment, and the same reason, as the two headers added in `fix/ga-primary-text`: \"the digest broke, I updated it\" is the move this mechanism exists to make somebody justify, so the justification is written here. --- STATUTORY TEXT BEGINS ---"
+      },
+      "currency": "current-code-body-compared",
+      "retrieval_ids": ["la-landing", "la-enrolled", "la-act", "la-code"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/MO-SB-1359.txt",
+      "state": "MO",
+      "original_sha256": "2598422d9f1a561896f483d88ff56fd9f04aff75c0bcbab1ee8f5cf0a6fd5d26",
+      "original_bytes": 340933,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "publisher_identification_recorded_on": "2026-09-08"
+      },
+      "identified_version": "SB 1359 truly agreed to and finally passed (2024), complete omnibus bill.",
+      "verified_retrieval": {
+        "url": "https://www.senate.mo.gov/24info/pdf-bill/tat/SB1359.pdf",
+        "final_url": "https://www.senate.mo.gov/24info/pdf-bill/tat/SB1359.pdf",
+        "retrieved_at_utc": "2026-09-12T08:50:32.738818+00:00",
+        "response_sha256": "702d048c96deecd7d31abe530a9e78f71c275c279a538502acfe2090e903c828"
+      },
+      "comparison": {
+        "retrieval_id": "mo-original",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "MO-SB-1359.txt",
+        "excluded_prefix": "Publisher: Missouri General Assembly Site: https://senate.mo.gov Recorded: 2026-09-08 SB 1359, Second Regular Session — \"TRULY AGREED TO AND FINALLY PASSED\", the enrolled act, as the file's own header states. WHY THIS HEADER SAYS \"PUBLISHER\" AND NOT \"RETRIEVED FROM\". The deep link this file was fetched through was not written down at the time and is not recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into 404s, because legislatures reorganise their sites. What IS determinable, from the document itself, is who published it: an enrolled act, a chamber's letterhead and a Superintendent's signed adoption are not things a reproducer manufactures. So this records the publisher and the publisher's site, dated today, as a statement about what the document IS. It is deliberately not a claim that these bytes were served from that host on that date — only a fetch recorded at the moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` have and these do not. THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes the file, so its digest was recomputed. Not one byte of the statutory text changed — the same treatment, and the same reason, as the two headers added in `fix/ga-primary-text`: \"the digest broke, I updated it\" is the move this mechanism exists to make somebody justify, so the justification is written here. --- STATUTORY TEXT BEGINS ---"
+      },
+      "currency": "superseded-427.300-2025-amendment",
+      "retrieval_ids": ["mo-landing", "mo-bill-texts", "mo-original", "mo-old-code", "mo-current"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/NY-23NYCRR-600.txt",
+      "state": "NY",
+      "original_sha256": "0513b0149056e87c6b125dd711b54e07bc5311bcc523e2fe4a570be66f685119",
+      "original_bytes": 156912,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "publisher_identification_recorded_on": "2026-09-08"
+      },
+      "identified_version": "Part 600 adoption signed 2023-01-12; official index gives effective date 2023-02-01.",
+      "verified_retrieval": {
+        "url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+        "final_url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+        "retrieved_at_utc": "2026-09-12T08:39:56.703594+00:00",
+        "response_sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624"
+      },
+      "comparison": {
+        "retrieval_id": "ny-adopted",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "NY-23NYCRR-600.txt",
+        "excluded_prefix": "Publisher: New York State Department of Financial Services Site: https://dfs.ny.gov Recorded: 2026-09-08 23 NYCRR 600 — Disclosure Requirements for Certain Providers of Commercial Financing Transactions. The file carries the Superintendent's own adoption: \"I, Adrienne A. Harris, Superintendent of Financial Services, pursuant to the authority granted...\". WHY THIS HEADER SAYS \"PUBLISHER\" AND NOT \"RETRIEVED FROM\". The deep link this file was fetched through was not written down at the time and is not recoverable — the Kansas and California paths tried on 2026-09-08 now 301 into 404s, because legislatures reorganise their sites. What IS determinable, from the document itself, is who published it: an enrolled act, a chamber's letterhead and a Superintendent's signed adoption are not things a reproducer manufactures. So this records the publisher and the publisher's site, dated today, as a statement about what the document IS. It is deliberately not a claim that these bytes were served from that host on that date — only a fetch recorded at the moment of fetching can say that, which is what `CT-CGS-36a-861-872.txt` and `VA-Code-6.2-2228-2238.txt` have and these do not. THE DIGEST MOVED AND THE VERIFICATION DATE DID NOT. Adding these lines changes the file, so its digest was recomputed. Not one byte of the statutory text changed — the same treatment, and the same reason, as the two headers added in `fix/ga-primary-text`: \"the digest broke, I updated it\" is the move this mechanism exists to make somebody justify, so the justification is written here. --- STATUTORY TEXT BEGINS ---"
+      },
+      "currency": "official-index-linked; consolidated-regulatory-currency-not-established",
+      "retrieval_ids": ["ny-adopted", "ny-activity", "ny-current-linked"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/TX-7TAC-86-310-313.txt",
+      "state": "TX",
+      "original_sha256": "5e9b462429d733cdfcc670340f7fefcf2a605a0b5943c54ccb190f8071f72a3e",
+      "original_bytes": 11202,
+      "historical_provenance": {
+        "status": "recorded-in-repository; not retroactively re-proven",
+        "retrieved_on": "2026-09-09",
+        "url": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
+        "record_location": "file header"
+      },
+      "identified_version": "Adopted rules 86.310-313, filed 2026-06-19, Texas Register publication 2026-07-03, effective 2026-07-09.",
+      "verified_retrieval": {
+        "url": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
+        "final_url": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
+        "retrieved_at_utc": "2026-09-12T08:39:57.380219+00:00",
+        "response_sha256": "60e9d40fe9902cf4321101db3cf2edaf0dc50825f33531e3bc43037ad3a5b3a1"
+      },
+      "comparison": {
+        "retrieval_id": "tx-adopted",
+        "result": "whole-body-match",
+        "check_id": "TX-7TAC-86-310-313.txt",
+        "extraction": "Select republished adopted rule 86.310 through 86.313 plus certification footer; join section sign to each heading; exclude preamble and repository preface."
+      },
+      "currency": "adopted-publication-matches; current-codified-rule-text-not-retrieved",
+      "retrieval_ids": ["tx-adopted", "tx-regulator-index", "tx-current-rule-portal"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/TX-Fin-Code-Ch-398.txt",
+      "state": "TX",
+      "original_sha256": "46d1b66cf82c317a0cd21070d3780519e85b01bd3bc5ffe5ea8ec5db0ac2bbc5",
+      "original_bytes": 16108,
+      "historical_provenance": {
+        "status": "recorded-in-repository; not retroactively re-proven",
+        "retrieved_on": "2026-09-05",
+        "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
+        "record_location": "file header"
+      },
+      "identified_version": "Enrolled HB 700 (2025), Chapter 723, effective 2025-09-01; current code compared.",
+      "verified_retrieval": {
+        "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
+        "final_url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
+        "retrieved_at_utc": "2026-09-12T08:39:56.849609+00:00",
+        "response_sha256": "3abc28a4b1a7df60d0602dda2eb153a4529d501554e6857efb34182c9d5bfa7d"
+      },
+      "comparison": {
+        "retrieval_id": "tx-act",
+        "result": "whole-body-match",
+        "check_id": "TX-Fin-Code-Ch-398.txt",
+        "extraction": "Exclude repository preface and the one CSS line accidentally included by the historical extraction. All bill text, certifications and enactment provisions compared."
+      },
+      "currency": "current-code-body-compared",
+      "retrieval_ids": ["tx-act", "tx-current-static", "tx-regulator-index"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/UT-Title-7-Ch-27.txt",
+      "state": "UT",
+      "original_sha256": "48dae4c21b6cace842d2c2b7dd65c127fcec7c7336c6451acd4f2f8a2955437d",
+      "original_bytes": 14724,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "local_import_on": "2026-09-06",
+        "local_import_from": "lombard-contracts/state-disclosures/regulatory-source; see source header and sources/README.md for companion extraction provenance"
+      },
+      "identified_version": "Current chapter PDF linked by legislature index; chapter marker Effective 5/4/2022, section 7-27-202 amended by Chapter 114, 2024 General Session.",
+      "verified_retrieval": {
+        "url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf",
+        "final_url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf",
+        "retrieved_at_utc": "2026-09-12T08:39:57.332228+00:00",
+        "response_sha256": "9897aace38c58cabf845a403689fe9809f83e7c5bc3be01608a110bdf32585c0"
+      },
+      "comparison": {
+        "retrieval_id": "ut-original",
+        "extraction": "pdftotext -layout",
+        "result": "whole-body-match",
+        "check_id": "UT-Title-7-Ch-27.txt",
+        "excluded_prefix": "UTAH CODE — TITLE 7, CHAPTER 27 COMMERCIAL FINANCING REGISTRATION AND DISCLOSURE ACT Vendored 2026-09-06 from lombard-contracts state-disclosures/regulatory-source/UT-Title-7-Chapter-27.layout.txt ORIGINAL RETRIEVAL SOURCE UNRECORDED. The text is the Utah Code's own publication format and states \"Effective 5/4/2022\", but nothing in the file says which publisher it came from, and this header does not invent one. le.utah.gov is the official publisher. Re-vendoring from there would make this as strong as the Georgia, Texas, Connecticut and Virginia sources. ------------------------------------------------------------------------------"
+      },
+      "currency": "current-publisher-chapter-linked-and-matched",
+      "retrieval_ids": ["ut-landing", "ut-current-content", "ut-original"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/VA-Code-6.2-2228-2238.txt",
+      "state": "VA",
+      "original_sha256": "2b8bca8b066e14d6af087e89eaa3c7158805c619f6ecc3bb9c13cb72ff4794b5",
+      "original_bytes": 9955,
+      "historical_provenance": {
+        "status": "recorded-in-repository; not retroactively re-proven",
+        "retrieved_on": "2026-09-07",
+        "url": "https://law.lis.virginia.gov/vacode/title6.2/chapter22.1/",
+        "record_location": "sources/README.md; eleven per-section pages"
+      },
+      "identified_version": "Chapter 22.1, all eleven sections; each history cites 2022 c. 516.",
+      "verified_retrieval": {
+        "url": "https://law.lis.virginia.gov/vacodefull/title6.2/chapter22.1/",
+        "final_url": "https://law.lis.virginia.gov/vacodefull/title6.2/chapter22.1/",
+        "retrieved_at_utc": "2026-09-12T08:39:57.836049+00:00",
+        "response_sha256": "4fa6c81ebb58427793b42e138c35c569af942db44dc3600376e7c018e5faabce"
+      },
+      "comparison": {
+        "retrieval_id": "va-code",
+        "result": "whole-body-match",
+        "check_id": "VA-Code-6.2-2228-2238.txt",
+        "extraction": "All eleven sections from the official full-chapter page, including headings and histories."
+      },
+      "currency": "current-code-body-compared",
+      "retrieval_ids": ["va-code"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/VA-Disclosure-Form.layout.txt",
+      "state": "VA",
+      "original_sha256": "b4aa5182844c864df084e75fd19d88fc25aa4d5ba434b2fa4265e66d4f028540",
+      "original_bytes": 3528,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "local_import_on": "2026-09-06",
+        "local_import_from": "lombard-contracts/state-disclosures/regulatory-source; see source header and sources/README.md for companion extraction provenance"
+      },
+      "identified_version": "Unattributed local form; no effective date. Does not match the October 2022 form linked by 10VAC5-240.",
+      "verified_retrieval": {
+        "url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+        "final_url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+        "retrieved_at_utc": "2026-09-12T08:42:05.055077+00:00",
+        "response_sha256": "146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29"
+      },
+      "comparison": {
+        "retrieval_id": "va-form",
+        "result": "different-form",
+        "check_id": "VA-Disclosure-Form.layout.txt",
+        "extraction": "Complete matching pdftotext mode, excluding repository preface in reading-order file. Both pages of both PDFs visually compared; difference is not only extraction order."
+      },
+      "currency": "different-official-form; do-not-reverify-existing-form-as-current",
+      "retrieval_ids": ["va-rules", "va-form"]
+    },
+    {
+      "file": "packages/bizrethink/mca/sources/VA-Disclosure-Form.txt",
+      "state": "VA",
+      "original_sha256": "857c35d9bdaf47940239ad03c4ce2df9bb1d6018dc95ba9d15a4ecc0cd375570",
+      "original_bytes": 2864,
+      "historical_provenance": {
+        "status": "original-retrieval-unrecorded",
+        "retrieved_on": null,
+        "url": null,
+        "local_import_on": "2026-09-06",
+        "local_import_from": "lombard-contracts/state-disclosures/regulatory-source; see source header and sources/README.md for companion extraction provenance"
+      },
+      "identified_version": "Unattributed local form; no effective date. Does not match the October 2022 form linked by 10VAC5-240.",
+      "verified_retrieval": {
+        "url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+        "final_url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+        "retrieved_at_utc": "2026-09-12T08:42:05.055077+00:00",
+        "response_sha256": "146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29"
+      },
+      "comparison": {
+        "retrieval_id": "va-form",
+        "result": "different-form",
+        "check_id": "VA-Disclosure-Form.txt",
+        "extraction": "Complete matching pdftotext mode, excluding repository preface in reading-order file. Both pages of both PDFs visually compared; difference is not only extraction order."
+      },
+      "currency": "different-official-form; do-not-reverify-existing-form-as-current",
+      "retrieval_ids": ["va-rules", "va-form"]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "CA-10CCR-900-956.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "59d9e5701e64c3566f44905f609317e75bb8e9ca8e92ecde9556a7cc688e38fa",
+      "right_normalized_sha256": "59d9e5701e64c3566f44905f609317e75bb8e9ca8e92ecde9556a7cc688e38fa"
+    },
+    {
+      "id": "NY-23NYCRR-600.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "63361824421dafab487381abbad3dfb70dd1634f61378e45677e1b317c4361a5",
+      "right_normalized_sha256": "63361824421dafab487381abbad3dfb70dd1634f61378e45677e1b317c4361a5"
+    },
+    {
+      "id": "CT-DOB-Guidance.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "9769e21c2039e0e728e46363550e03f6c24ab7cf923518afab25ed2bcc09dedb",
+      "right_normalized_sha256": "9769e21c2039e0e728e46363550e03f6c24ab7cf923518afab25ed2bcc09dedb"
+    },
+    {
+      "id": "CT-DOB-Guidance.layout.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "0fb50ac2b796fa767214f8976c073fd7b61a9b3fb9eaa4a07cfe95d307456065",
+      "right_normalized_sha256": "0fb50ac2b796fa767214f8976c073fd7b61a9b3fb9eaa4a07cfe95d307456065"
+    },
+    {
+      "id": "FL-HB-1353.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "b0b74e04621fbf1642b83fa89987fd343e85348b88f9c4b4d554c082b9e90d83",
+      "right_normalized_sha256": "b0b74e04621fbf1642b83fa89987fd343e85348b88f9c4b4d554c082b9e90d83"
+    },
+    {
+      "id": "GA-SB90-enrolled.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "2e27cc59bec243c31da9960dbd2d62a71378ee6affc01c6c8c5cb426faf73ff0",
+      "right_normalized_sha256": "2e27cc59bec243c31da9960dbd2d62a71378ee6affc01c6c8c5cb426faf73ff0"
+    },
+    {
+      "id": "KS-SB-345.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "2e9d48751efe52ae6a29e74bb8f629fae4ba93bcd6c23148620c8ec43b339461",
+      "right_normalized_sha256": "2e9d48751efe52ae6a29e74bb8f629fae4ba93bcd6c23148620c8ec43b339461"
+    },
+    {
+      "id": "LA-Act-198.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "089e31b3518f0960ab4317b29d88e1853c1ff1f42cfeb5ddb8bf9c6bc479a6ac",
+      "right_normalized_sha256": "089e31b3518f0960ab4317b29d88e1853c1ff1f42cfeb5ddb8bf9c6bc479a6ac"
+    },
+    {
+      "id": "MO-SB-1359.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "ac0d2b63b47f37336f4155401ad9dd3c707daaee039b233a2e30c98582a4374f",
+      "right_normalized_sha256": "ac0d2b63b47f37336f4155401ad9dd3c707daaee039b233a2e30c98582a4374f"
+    },
+    {
+      "id": "UT-Title-7-Ch-27.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "060c5bea09bd05a2a76ed42c8dbc2ff8abfb3fd86f2b31a7376d47a53ffb99a5",
+      "right_normalized_sha256": "060c5bea09bd05a2a76ed42c8dbc2ff8abfb3fd86f2b31a7376d47a53ffb99a5"
+    },
+    {
+      "id": "CT-CGS-36a-861-872.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "1ee895d640541eb9cbcc53e6ab091f961b78e187b7cf09ad9abfc0306557e5b2",
+      "right_normalized_sha256": "1ee895d640541eb9cbcc53e6ab091f961b78e187b7cf09ad9abfc0306557e5b2"
+    },
+    {
+      "id": "VA-Code-6.2-2228-2238.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "e490589b266298755757d400d5db5ddf51735c2102c7211d666610c9e1c652c1",
+      "right_normalized_sha256": "e490589b266298755757d400d5db5ddf51735c2102c7211d666610c9e1c652c1"
+    },
+    {
+      "id": "TX-Fin-Code-Ch-398.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "81342e1833488b6f99ad9319f69e18fb844d7c2a1be2853693b1b42e1ce977e9",
+      "right_normalized_sha256": "81342e1833488b6f99ad9319f69e18fb844d7c2a1be2853693b1b42e1ce977e9"
+    },
+    {
+      "id": "TX-7TAC-86-310-313.txt",
+      "normalization": "collapse-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "302dd230de7f79fd6680bf14230a86ee4eae64e502f7f0caa5b9e67528b2997e",
+      "right_normalized_sha256": "302dd230de7f79fd6680bf14230a86ee4eae64e502f7f0caa5b9e67528b2997e"
+    },
+    {
+      "id": "VA-Disclosure-Form.txt",
+      "normalization": "collapse-whitespace",
+      "equal": false,
+      "left_normalized_sha256": "08a778241143f78e6a7f72aeac1f535581123ee1683d2dcfd8c3b6c3ca3fc989",
+      "right_normalized_sha256": "ebb24eaffe97838ef0cfdb6142761205009a1b7d25643a74e32d7cbbf54a9e14"
+    },
+    {
+      "id": "VA-Disclosure-Form.layout.txt",
+      "normalization": "collapse-whitespace",
+      "equal": false,
+      "left_normalized_sha256": "9bf4540d5c9404a544567842b6805784df341ffa69be9b0144c0eac7b1424ceb",
+      "right_normalized_sha256": "2ba33331ca61d06d4dc64e0fdd617d1e1c218bb6c6772cad53d93f727133b753"
+    },
+    {
+      "id": "fl-engrossed-to-enrolled",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "a4d1debabe023231426dea17b49b993b1dc7d6d1c3c1bf8a07f981f5c9aeeada",
+      "right_normalized_sha256": "a4d1debabe023231426dea17b49b993b1dc7d6d1c3c1bf8a07f981f5c9aeeada"
+    },
+    {
+      "id": "fl-enrolled-to-current-559.961",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "09d538ee321e0c3bf86cdc64082427a678542ef1153bd3e77c44abecd87339c6",
+      "right_normalized_sha256": "09d538ee321e0c3bf86cdc64082427a678542ef1153bd3e77c44abecd87339c6"
+    },
+    {
+      "id": "fl-enrolled-to-current-559.9611",
+      "normalization": "remove-whitespace",
+      "equal": false,
+      "left_normalized_sha256": "6e99103d80cc60f902bcebec8aa4d774faae50961a76e6b069f8b96e2877750a",
+      "right_normalized_sha256": "f207c074db58eb042cee48b8d9a60a4f856747c2da2d0050759a3e8b9561bdcf"
+    },
+    {
+      "id": "fl-definitions-except-9",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "7c606e97fe1c03f38fcb6d0f97d145e78fff8981920abe5f0d084d81b5ecc008",
+      "right_normalized_sha256": "7c606e97fe1c03f38fcb6d0f97d145e78fff8981920abe5f0d084d81b5ecc008"
+    },
+    {
+      "id": "fl-enrolled-to-current-559.9612",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "af4e5fdbb6d760de4df84e40290d3ad8c4b3ea6f74c4e8a1898b3588a977f250",
+      "right_normalized_sha256": "af4e5fdbb6d760de4df84e40290d3ad8c4b3ea6f74c4e8a1898b3588a977f250"
+    },
+    {
+      "id": "fl-enrolled-to-current-559.9613",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "f68bcf449f553fbbab3adcbc917d211e3d6c885444a145fffc4f83e786fc94c5",
+      "right_normalized_sha256": "f68bcf449f553fbbab3adcbc917d211e3d6c885444a145fffc4f83e786fc94c5"
+    },
+    {
+      "id": "fl-enrolled-to-current-559.9614",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "3842d0958d32cdfde848da1659a62267428c9eb1ed39f6623d1bd49ed1782cb0",
+      "right_normalized_sha256": "3842d0958d32cdfde848da1659a62267428c9eb1ed39f6623d1bd49ed1782cb0"
+    },
+    {
+      "id": "fl-enrolled-to-current-559.9615",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "c9cbcc03c80e2a750eed499de48631ce301739cc58f9be83e959da562b5488ec",
+      "right_normalized_sha256": "c9cbcc03c80e2a750eed499de48631ce301739cc58f9be83e959da562b5488ec"
+    },
+    {
+      "id": "ks-introduced-to-enrolled",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "a94658c41b1b0efbc661c58d7fda63e818de219c39328dcbdc977e6013c06048",
+      "right_normalized_sha256": "a94658c41b1b0efbc661c58d7fda63e818de219c39328dcbdc977e6013c06048"
+    },
+    {
+      "id": "ks-enacted-to-current-75-783",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "9b7583fa67092576fb62c4c150376aff7dc5da8d6a8c5bec131d6441469db4bb",
+      "right_normalized_sha256": "9b7583fa67092576fb62c4c150376aff7dc5da8d6a8c5bec131d6441469db4bb"
+    },
+    {
+      "id": "ks-enacted-to-current-75-784",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "d08a9d936982ac5740727cb96f83ebeec07e0137dc1e19524a9e1dce7dae00f7",
+      "right_normalized_sha256": "d08a9d936982ac5740727cb96f83ebeec07e0137dc1e19524a9e1dce7dae00f7"
+    },
+    {
+      "id": "ks-enacted-to-current-75-785",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "bd6a3f8ddee04f0bf6575e76261ff484b9a9ef5c22f3af73b47c71e8603fbdd2",
+      "right_normalized_sha256": "bd6a3f8ddee04f0bf6575e76261ff484b9a9ef5c22f3af73b47c71e8603fbdd2"
+    },
+    {
+      "id": "ks-enacted-to-current-75-786",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "204060d94d8a9af90a2dd2b382b1dfeb8e1af4ec6d277c7a4a2561359a67e146",
+      "right_normalized_sha256": "204060d94d8a9af90a2dd2b382b1dfeb8e1af4ec6d277c7a4a2561359a67e146"
+    },
+    {
+      "id": "ks-enacted-to-current-75-787",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "b19b68cd66087b4285ba28588feef8920b2c705c8f7482623b0fa462482c88a4",
+      "right_normalized_sha256": "b19b68cd66087b4285ba28588feef8920b2c705c8f7482623b0fa462482c88a4"
+    },
+    {
+      "id": "tx-enrolled-to-current-chapter-398",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "b51bc586b32fbf11cf75d1fa8ce0c8cef72de7eaa0a998503cd99331c9ea657a",
+      "right_normalized_sha256": "b51bc586b32fbf11cf75d1fa8ce0c8cef72de7eaa0a998503cd99331c9ea657a"
+    },
+    {
+      "id": "la-enrolled-to-act",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "28b3166ee1afe8024e4b1e0e87d99dc4398716187f824f4763e26dbd9c31c2a2",
+      "right_normalized_sha256": "28b3166ee1afe8024e4b1e0e87d99dc4398716187f824f4763e26dbd9c31c2a2"
+    },
+    {
+      "id": "la-enrolled-to-current",
+      "normalization": "remove-whitespace",
+      "equal": true,
+      "left_normalized_sha256": "28b3166ee1afe8024e4b1e0e87d99dc4398716187f824f4763e26dbd9c31c2a2",
+      "right_normalized_sha256": "28b3166ee1afe8024e4b1e0e87d99dc4398716187f824f4763e26dbd9c31c2a2"
+    }
+  ],
+  "retrievals": [
+    {
+      "id": "ca-final",
+      "url": "https://dfpi.ca.gov/wp-content/uploads/sites/337/2022/06/PRO-01-18-Commercial-Financing-Disclosure-Regulation-Final-Text.pdf",
+      "final_url": "https://dfpi.ca.gov/wp-content/uploads/sites/337/2022/06/PRO-01-18-Commercial-Financing-Disclosure-Regulation-Final-Text.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:04.349280+00:00",
+      "content_type": "application/pdf",
+      "bytes": 454316,
+      "sha256": "684f28e0d65438e3520fb52b79b1013bcc04e730b3d65e28ed192e766c731fc0",
+      "redirects": [],
+      "last_modified": "Fri, 05 Apr 2024 18:27:59 GMT",
+      "etag": "\"661042af-6eeac\"",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ca-landing",
+      "url": "https://dfpi.ca.gov/rules-enforcement/laws-and-regulations/california-financing-law-regulations-opinions-releases/",
+      "final_url": "https://dfpi.ca.gov/rules-enforcement/laws-and-regulations/california-financing-law-regulations-opinions-releases/",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:56.593084+00:00",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 189084,
+      "sha256": "21ba256b1143c1f27c6748fcb9ad4b50e5e0fe6eb9477bc958f2f95b1f2f3d10",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ct-base",
+      "url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+      "final_url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:04.890924+00:00",
+      "content_type": "text/html",
+      "bytes": 805547,
+      "sha256": "2e249d87b267658dda0f0660b905932de802aa09b85723773d05476399821dc4",
+      "client": "system curl; TLS verification enabled",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ct-guidance",
+      "url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+      "final_url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:57.285840+00:00",
+      "content_type": "application/pdf",
+      "bytes": 387883,
+      "sha256": "c11f771ee42f5253669edfe14e58d199c607aba713990544edf988169ab833fc",
+      "redirects": [],
+      "last_modified": "Thu, 15 Aug 2024 15:26:18 GMT",
+      "etag": "a23fb983b35443529a31f9ce0d301e3a",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ct-supplement-2026",
+      "url": "https://www.cga.ct.gov/2026/sup/chap_669.htm",
+      "final_url": "https://www.cga.ct.gov/2026/sup/chap_669.htm",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:05.641076+00:00",
+      "content_type": "text/html",
+      "bytes": 254346,
+      "sha256": "e25921a3d622e0863772e54320edcfcdaad51863e5d5f80a15297f2d069946f8",
+      "client": "system curl; TLS verification enabled",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-2024-amendment",
+      "url": "https://laws.flrules.org/2024/139",
+      "final_url": "https://laws.flrules.org/2024/139",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:56:42.441535+00:00",
+      "content_type": "application/pdf",
+      "bytes": 55074,
+      "sha256": "0d502faa576919144b898ee98d6b3f9ce728e40fe397d09c911d35b9236238de",
+      "redirects": [],
+      "last_modified": "Sat, 12 Sep 2026 10:42:43 GMT",
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": "evidence/fl-chapter-2024-139.pdf",
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-code-961",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.961",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.961",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:18.076993+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 42623,
+      "sha256": "58096d66a3100ee0af8491b4b6b1636d3bd962199d07c57ad612ebcd43808a54",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-code-9611",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9611",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9611",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.921648+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 48305,
+      "sha256": "0c7e3cb46517c92e951611d83c5ef2938d31d4903c872baee0374085a53b5804",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-code-9612",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9612",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9612",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.967746+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 45849,
+      "sha256": "11274e79a1f9b165453cab7d96b27061f09e579c7f863898eff787536c1b026c",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-code-9613",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9613",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9613",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.994536+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 46110,
+      "sha256": "688af9b857fc0db370301a5f0396082b20e5980671815e425bb980b0e97f7395",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-code-9614",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9614",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9614",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:15.545591+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 44255,
+      "sha256": "be3f6ce5a295a154c0156ded0bb5a7a89e63341d400e5779d52492d605e1c743",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-code-9615",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9615",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9615",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:15.433918+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 44630,
+      "sha256": "20eafdd0b8d69ecb765c5fa794b8ffdebc98f409996b3ae51fb88ae4189c8839",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-engrossed",
+      "url": "https://www.flsenate.gov/Session/Bill/2023/1353/BillText/e1/PDF",
+      "final_url": "https://www.flsenate.gov/Session/Bill/2023/1353/BillText/e1/PDF",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:06.185491+00:00",
+      "content_type": "application/pdf",
+      "bytes": 130828,
+      "sha256": "51a5b12e545cd6e72291b7ef37017692f558ad4566a98fd19c5ff007976ef26d",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "fl-enrolled",
+      "url": "https://www.flsenate.gov/Session/Bill/2023/1353/BillText/er/PDF",
+      "final_url": "https://www.flsenate.gov/Session/Bill/2023/1353/BillText/er/PDF",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:59.445471+00:00",
+      "content_type": "application/pdf",
+      "bytes": 131339,
+      "sha256": "20f980544e3e76afa4283c55b8f7ebb59c4fbf58353db50d2c374962a34b7656",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ga-act",
+      "url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+      "final_url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:57.942851+00:00",
+      "content_type": null,
+      "bytes": 36586,
+      "sha256": "48958eed53f81ca6cd784fd71602754884bcc23e16860faf2b7a9279bac3c5bc",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-bill",
+      "url": "https://www.kslegislature.gov/b2023_24/bills/sb345/",
+      "final_url": "https://www.kslegislature.gov/b2023_24/bills/sb345/",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:50:32.469617+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 76072,
+      "sha256": "ca9b0991f238fccbf4c33d8e28977e574fbcf983ffca35fe60300ba98a1a696a",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-code-783",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0083.html",
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0083.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.562655+00:00",
+      "content_type": "text/html",
+      "bytes": 20252,
+      "sha256": "1cfe68272bdf5bb7fac1b7250173e79676a010fa8dfe16a8ed00dbb2ea9c24a8",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-code-784",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0084.html",
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0084.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.601756+00:00",
+      "content_type": "text/html",
+      "bytes": 15885,
+      "sha256": "2f491f9256f276afd375e25d2a82c5d15c6cd52fde7864221de69de72cf0e958",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-code-785",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0085.html",
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0085.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.578931+00:00",
+      "content_type": "text/html",
+      "bytes": 14934,
+      "sha256": "5eb520f3bc95f15424b45db92ef4c08f601b7d5c586a355d83c868bdefcdf997",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-code-786",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0086.html",
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0086.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.954371+00:00",
+      "content_type": "text/html",
+      "bytes": 13829,
+      "sha256": "9e43be37380d7e8cb7c3ba52fa764c7e62e1cd7c6aa87b5c454fd8598d8a9d43",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-code-787",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0087.html",
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0087.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:14.521519+00:00",
+      "content_type": "text/html",
+      "bytes": 13681,
+      "sha256": "3b6ff39055dcaa7f99d434a79e78cfff85ccf3903ee0b414b17b809cfde6c865",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-enrolled",
+      "url": "https://kslegislature.gov/b2023_24/bills/download/?apn=b2023_24/year2/ready_for_publication/sb_345/sb345_enrolled.pdf",
+      "final_url": "https://kslegislature.gov/b2023_24/bills/download/?apn=b2023_24/year2/ready_for_publication/sb_345/sb345_enrolled.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:04.442088+00:00",
+      "content_type": "application/pdf",
+      "bytes": 85926,
+      "sha256": "bedf6fc4345f8b12de5531500003984e8d7362e97384edfc7bc1ec8eb8ddcee9",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ks-introduced",
+      "url": "https://www.kslegislature.gov/b2023_24/bills/download/?apn=b2023_24/year2/ready_for_publication/sb_345/sb345_00_0000.pdf",
+      "final_url": "https://www.kslegislature.gov/b2023_24/bills/download/?apn=b2023_24/year2/ready_for_publication/sb_345/sb345_00_0000.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:51:39.362696+00:00",
+      "content_type": "application/pdf",
+      "bytes": 84835,
+      "sha256": "c223a46f592bd49b5cae854e2716bec05ec9e184569c573a41d93591b76b8110",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "la-act",
+      "url": "https://www.legis.la.gov/Legis/ViewDocument.aspx?d=1425126",
+      "final_url": "https://www.legis.la.gov/Legis/ViewDocument.aspx?d=1425126",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:05.996593+00:00",
+      "content_type": "application/pdf",
+      "bytes": 44803,
+      "sha256": "a87210f3ff1b41df2c2352e0483c203e1001e118b58ed1664ef9be154f7238bd",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "la-code",
+      "url": "https://legis.la.gov/Legis/Law.aspx?d=1429292",
+      "final_url": "https://legis.la.gov/Legis/Law.aspx?d=1429292",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:15.448129+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 33637,
+      "sha256": "cd7309ac17ab86b0fb10d5b82e76c2ab12db7467af42d067dc4a6c93079c9601",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "la-enrolled",
+      "url": "https://www.legis.la.gov/Legis/ViewDocument.aspx?d=1421306",
+      "final_url": "https://www.legis.la.gov/Legis/ViewDocument.aspx?d=1421306",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:04.707513+00:00",
+      "content_type": "application/pdf",
+      "bytes": 37830,
+      "sha256": "4ae8e51fe71757e1d6adb80516245bbee8b426ef554a62b7608eef0a66fc2c0c",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "la-landing",
+      "url": "https://www.legis.la.gov/Legis/BillInfo.aspx?i=248484",
+      "final_url": "https://www.legis.la.gov/Legis/BillInfo.aspx?i=248484",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:05.374160+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 68589,
+      "sha256": "cfb02925015142bd4fd0b2380a3ef98c557d539142ef817818e31620f25ce5ea",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "mo-bill-texts",
+      "url": "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?year=2024&billId=2152710&handler=BillText",
+      "final_url": "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?year=2024&billId=2152710&handler=BillText",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:15.396884+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 3243,
+      "sha256": "f95a4db574a4cff3b702e366e6c9fd56edb1f50d10220f44a7ea359421fb9d42",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "mo-current",
+      "url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=427.300",
+      "final_url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=427.300",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:06.069651+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 48921,
+      "sha256": "397ffa0ed7f9bc04b3aa7883a7f82dd174beb9237e2bea50b88b8bb49c61cca3",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "mo-landing",
+      "url": "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?billid=2152710&year=2024",
+      "final_url": "https://www.senate.mo.gov/BillTracking/Bills/BillInformation?billid=2152710&year=2024",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:06.155802+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 54206,
+      "sha256": "8eb0bb46c4d9936968ac58b1e52f8fd55889839a7c8ea9027704880afa1c3054",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "mo-old-code",
+      "url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=427.300&bid=54951",
+      "final_url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=427.300&bid=54951",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:06.063740+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 48687,
+      "sha256": "ae7f2b7a5d858e2f56662f0434a89b9445c9e06544bf4eae5742dafbac9cadad",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "mo-original",
+      "url": "https://www.senate.mo.gov/24info/pdf-bill/tat/SB1359.pdf",
+      "final_url": "https://www.senate.mo.gov/24info/pdf-bill/tat/SB1359.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:50:32.738818+00:00",
+      "content_type": "application/pdf",
+      "bytes": 903217,
+      "sha256": "702d048c96deecd7d31abe530a9e78f71c275c279a538502acfe2090e903c828",
+      "redirects": [],
+      "last_modified": "Mon, 20 May 2024 19:19:55 GMT",
+      "etag": "\"c04394b2eaaada1:0\"",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ny-activity",
+      "url": "https://www.dfs.ny.gov/industry_guidance/regulatory_activity/financial_services",
+      "final_url": "https://www.dfs.ny.gov/industry_guidance/regulatory_activity/financial_services",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:50:32.510009+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 51922,
+      "sha256": "eb0a74c56ca34d041b94282222665477410fe51aeb8701a42b72e6bbe46e430f",
+      "redirects": [],
+      "last_modified": "Sat, 12 Sep 2026 04:09:22 GMT",
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ny-adopted",
+      "url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+      "final_url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:56.703594+00:00",
+      "content_type": "application/pdf",
+      "bytes": 652140,
+      "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624",
+      "redirects": [],
+      "last_modified": "Mon, 30 Jan 2023 17:53:39 GMT",
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ny-current-linked",
+      "url": "https://www.dfs.ny.gov/industry_guidance/regulations/final_financial_services/rf_finservices_23nycrr600_text",
+      "final_url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:51:39.913859+00:00",
+      "content_type": "application/pdf",
+      "bytes": 652140,
+      "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624",
+      "redirects": [
+        {
+          "status": 302,
+          "url": "https://www.dfs.ny.gov/industry_guidance/regulations/final_financial_services/rf_finservices_23nycrr600_text"
+        }
+      ],
+      "last_modified": "Mon, 30 Jan 2023 17:53:39 GMT",
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "tx-act",
+      "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
+      "final_url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:56.849609+00:00",
+      "content_type": "text/html",
+      "bytes": 85849,
+      "sha256": "3abc28a4b1a7df60d0602dda2eb153a4529d501554e6857efb34182c9d5bfa7d",
+      "redirects": [],
+      "last_modified": "Fri, 30 May 2025 00:44:33 GMT",
+      "etag": "\"197603fcd0db1:0\"",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "tx-adopted",
+      "url": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
+      "final_url": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:57.380219+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 70391,
+      "sha256": "60e9d40fe9902cf4321101db3cf2edaf0dc50825f33531e3bc43037ad3a5b3a1",
+      "redirects": [],
+      "last_modified": "Wed, 01 Jul 2026 23:59:27 GMT",
+      "etag": "W/\"0580a930e4337d98fb2188ab8d09aa63\"",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "tx-current-rule-portal",
+      "url": "https://texas-sos.appianportalsgov.com/rules-and-meetings?chapter=86&interface=VIEW_TAC&part=5&subchapter=C&title=7",
+      "final_url": "https://texas-sos.appianportalsgov.com/rules-and-meetings?chapter=86&interface=VIEW_TAC&part=5&subchapter=C&title=7",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:51:39.448937+00:00",
+      "content_type": "text/html",
+      "bytes": 2541,
+      "sha256": "6e01143c7ab1016a326deffcce68238464b38557a7b6a2b4c304f7888ad06fc9",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "JavaScript application shell; no codified rule text retrieved."
+    },
+    {
+      "id": "tx-current-static",
+      "url": "https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm",
+      "final_url": "https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:53:17.262128+00:00",
+      "content_type": "text/html",
+      "bytes": 24614,
+      "sha256": "2906937b90c43fe8d696f466fc78c4520c03ad43a5850970d6ae6f4ab0c1572d",
+      "redirects": [],
+      "last_modified": "Thu, 09 Apr 2026 18:36:14 GMT",
+      "etag": "\"1dcc84fbe998326\"",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "tx-regulator-index",
+      "url": "https://occc.texas.gov/industry/regulated-lenders/commercial-sales-based-finance/",
+      "final_url": "https://occc.texas.gov/industry/regulated-lenders/commercial-sales-based-finance/",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:50:36.422523+00:00",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 110929,
+      "sha256": "84f0d58950785666aff7d691dc267b86e2f7f0da673b21aa1fc6fd78cbb72f76",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ut-current-content",
+      "url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.html",
+      "final_url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:44:15.372744+00:00",
+      "content_type": "text/html",
+      "bytes": 2861,
+      "sha256": "c852bf708cccc332ccae22c9289ebe7780495fd589013b48278fff3ab633b17b",
+      "redirects": [],
+      "last_modified": "Thu, 02 May 2024 20:15:06 GMT",
+      "etag": "W/\"8d5dca6ccd9cda1:0\"",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ut-landing",
+      "url": "https://le.utah.gov/xcode/Title7/Chapter27/7-27.html",
+      "final_url": "https://le.utah.gov/xcode/Title7/Chapter27/7-27.html",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:06.050031+00:00",
+      "content_type": "text/html",
+      "bytes": 26610,
+      "sha256": "ea00b935d67de1f0b285f6797b32806988db52f17dd995def630b9551be87e95",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "ut-original",
+      "url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf",
+      "final_url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:57.332228+00:00",
+      "content_type": "application/pdf",
+      "bytes": 13478,
+      "sha256": "9897aace38c58cabf845a403689fe9809f83e7c5bc3be01608a110bdf32585c0",
+      "redirects": [],
+      "last_modified": "Thu, 02 May 2024 20:15:06 GMT",
+      "etag": "\"566c56ccd9cda1:0\"",
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "va-code",
+      "url": "https://law.lis.virginia.gov/vacodefull/title6.2/chapter22.1/",
+      "final_url": "https://law.lis.virginia.gov/vacodefull/title6.2/chapter22.1/",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:57.836049+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 37108,
+      "sha256": "4fa6c81ebb58427793b42e138c35c569af942db44dc3600376e7c018e5faabce",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "va-form",
+      "url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+      "final_url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:42:05.055077+00:00",
+      "content_type": "application/pdf",
+      "bytes": 127203,
+      "sha256": "146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29",
+      "redirects": [],
+      "last_modified": "Tue, 20 Sep 2022 19:24:55 GMT",
+      "etag": "\"1d8cd26a9e0ad63\"",
+      "tls_verification": "enabled",
+      "archived_response": "evidence/va-official-disclosure-form.pdf",
+      "response_meaning": "Relevant primary document or official source index inspected."
+    },
+    {
+      "id": "va-rules",
+      "url": "https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/",
+      "final_url": "https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/",
+      "status": 200,
+      "retrieved_at": "2026-09-12T08:39:56.759637+00:00",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 34100,
+      "sha256": "9687fec38c67acea3c5fb4331e1e89c94ada3cc877cdf569436e80a3b98e9479",
+      "redirects": [],
+      "last_modified": null,
+      "etag": null,
+      "tls_verification": "enabled",
+      "archived_response": null,
+      "response_meaning": "Relevant primary document or official source index inspected."
+    }
+  ],
+  "evidence": [
+    {
+      "file": "evidence/ct-2026-supplement-36a-868-870-872.txt",
+      "sha256": "52241583dd227aedcc970ab110a85cb554ab65935715092ad8958ffe67aeb076",
+      "bytes": 5060,
+      "retrieval_ids": ["ct-supplement-2026"],
+      "selection": "Complete section bodies and histories for 36a-868, 870 and 872; table of contents and Return to navigation excluded. Not a synthetic consolidation with the base volume."
+    },
+    {
+      "file": "evidence/mo-427.300-2024.txt",
+      "sha256": "5cc5e9240fcce08e4c2facd2a0730f411048cecc3ff36c9924e320491c3d0d41",
+      "bytes": 15829,
+      "retrieval_ids": ["mo-old-code"],
+      "selection": "Complete 427.300 section body and history; navigation and effective-date footer excluded. Historical version effective 2024-08-28."
+    },
+    {
+      "file": "evidence/mo-427.300-2025.txt",
+      "sha256": "42f38dee51c471cdffa063e55bbf47bc7f243613d502646aec4a22f1aa4331c9",
+      "bytes": 16076,
+      "retrieval_ids": ["mo-current"],
+      "selection": "Complete 427.300 section body and history; navigation and effective-date footer excluded. Current page says effective 2025-08-28."
+    },
+    {
+      "file": "evidence/fl-559.961-9615-2026.txt",
+      "sha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "bytes": 11087,
+      "retrieval_ids": ["fl-code-961", "fl-code-9611", "fl-code-9612", "fl-code-9613", "fl-code-9614", "fl-code-9615"],
+      "selection": "Complete section bodies and histories from the six 2026 Florida Statutes pages; navigation excluded. Curly quotes preserved."
+    },
+    {
+      "file": "evidence/fl-chapter-2024-139.pdf",
+      "sha256": "0d502faa576919144b898ee98d6b3f9ce728e40fe397d09c911d35b9236238de",
+      "bytes": 55074,
+      "retrieval_ids": ["fl-2024-amendment"],
+      "selection": "Complete, unmodified HTTP response bytes."
+    },
+    {
+      "file": "evidence/ks-75-783-787-current.txt",
+      "sha256": "ea29ad3b50d77d88bb0e1efc63f6d826a3413f22c0fda5208114e20919514192",
+      "bytes": 12663,
+      "retrieval_ids": ["ks-code-783", "ks-code-784", "ks-code-785", "ks-code-786", "ks-code-787"],
+      "selection": "Section headings, complete operative bodies, history lines and Revisor note from 75-783 through 75-787; navigation excluded. The (iii)* codifier marker and note are preserved."
+    },
+    {
+      "file": "evidence/la-rs-9-3137.10-current.txt",
+      "sha256": "12907b7a35a328fcc85d51bfaf331034fe27526ec33898a5c018273c27db8c61",
+      "bytes": 2570,
+      "retrieval_ids": ["la-code"],
+      "selection": "Complete RS 9:3137.10 body and history; site navigation excluded."
+    },
+    {
+      "file": "evidence/tx-finance-code-398-current.txt",
+      "sha256": "7fae4d42f82e34be8e5e3908684c1e88bd3da0dcf5c3f4de54d7cd055ebe1c15",
+      "bytes": 13951,
+      "retrieval_ids": ["tx-current-static"],
+      "selection": "Entire official static chapter page extracted as text; HTML tags/styles/scripts removed; block whitespace normalized. Section histories retained."
+    },
+    {
+      "file": "evidence/va-code-6.2-2228-2238-current.txt",
+      "sha256": "c19f2dcb3ec78df19f97c6b39b87174d276a53604d733a63dd8e7f4c019f9866",
+      "bytes": 9886,
+      "retrieval_ids": ["va-code"],
+      "selection": "All eleven section bodies, headings and histories from the full-chapter page; site navigation excluded."
+    },
+    {
+      "file": "evidence/va-10vac5-240-current.txt",
+      "sha256": "7fdffbc4e8dd55ddacd15b1942324ae55c4881cc46852208eaaa243a22bc755b",
+      "bytes": 9406,
+      "retrieval_ids": ["va-rules"],
+      "selection": "Full page text, including navigation and the Forms heading; extracted without substantive editing. This is the official link context for the October 2022 form."
+    },
+    {
+      "file": "evidence/va-official-disclosure-form.pdf",
+      "sha256": "146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29",
+      "bytes": 127203,
+      "retrieval_ids": ["va-form"],
+      "selection": "Complete, unmodified HTTP response bytes."
+    },
+    {
+      "file": "evidence/va-official-disclosure-form.txt",
+      "sha256": "ce03ab369b1c10234d6ad0069b0703a036e31fd446d1752755871908578685af",
+      "bytes": 2192,
+      "retrieval_ids": ["va-form"],
+      "selection": "Complete pdftotext reading-order extraction; only outer whitespace trimmed."
+    },
+    {
+      "file": "evidence/va-official-disclosure-form.layout.txt",
+      "sha256": "34732083642ea2863dd68d46f3a9453ec396caba8e53fc124dc1007b1e00cc69",
+      "bytes": 4410,
+      "retrieval_ids": ["va-form"],
+      "selection": "Complete pdftotext -layout extraction; only outer whitespace trimmed."
+    }
+  ],
+  "unsuccessful_or_nontext_routes": [
+    {
+      "id": "ny-finals",
+      "result": "404; replaced by ny-activity and its linked final text."
+    },
+    {
+      "id": "ct-provider-landing",
+      "result": "HTTP 200 redirected to the Connecticut 404error page; rejected as evidence."
+    },
+    {
+      "id": "ut-current",
+      "result": "Guessed 18000101 chapter PDF alias returned 404; use the actual PDF linked by the current chapter index."
+    },
+    {
+      "id": "tx-code",
+      "result": "Old /Docs/FI/htm/FI.398.htm URL returned an application shell, not law; use tx-current-static."
+    },
+    {
+      "id": "tx-code-pdf",
+      "result": "Old .pdf URL returned the same HTML application shell; rejected as a PDF."
+    },
+    {
+      "id": "tx-current-rule-portal",
+      "result": "Official regulator link resolves, but the retrieved shell contains no codified rule text; currency gap remains."
+    }
+  ]
+}
