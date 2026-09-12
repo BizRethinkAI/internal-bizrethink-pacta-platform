@@ -34,6 +34,10 @@ No direct commits to `main`. Branch protection enforces the four required checks
 (`git revert && git push origin main`) still works when production is broken.
 That is an escape hatch for outages, not a shortcut for ordinary work.
 
+Keep each PR to one bounded, coherent outcome. Include the related implementation,
+tests and documentation together; avoid splitting one feature into tiny PRs that
+each repeat integration work and CI. New unrelated work needs its own assignment.
+
 ## 3. The implementing session never merges its own PR
 
 The session that writes a change **opens the PR and stops.** A human merges.
@@ -77,6 +81,11 @@ Runs in a **separate, fresh session started by the human** — never a subagent 
 the implementer's summary. A reviewer given the implementer's framing inherits
 the implementer's blind spots.
 
+One independent review satisfies this requirement. Return substantive fixes to
+that reviewer on the new revision; an additional reviewer needs a specific
+unresolved concern or an explicit owner request. An implementation helper does
+not replace the independent review.
+
 **Mandatory for changes touching:**
 
 | Surface | Why |
@@ -100,6 +109,43 @@ complete-and-wrong, every time, and it is not close.
 If a test is skipped, say which. If a step failed, show the output. If you
 assumed something, name the assumption. "Done" is a claim about reality, and this
 repo's characteristic failure is a change that *looks* finished.
+
+## 7. Efficient use of time and compute
+
+Optimize the total effort to deliver a correct, reviewed change, including CI
+failures and rework. These rules apply to every assistant and model. Provider
+names, model versions, prices and tool configuration belong in separate settings
+or tool-specific guidance. This document does not configure those tools.
+
+- **Keep thorough reading.** Read the required instructions, current state and
+  all PR notes, relevant decisions and source evidence before choosing an approach.
+  Reuse established understanding of unchanged material within the session;
+  refresh affected context when the code, sources or assignment change. Search
+  and read targeted sections instead of repeatedly dumping whole files or logs.
+- **Keep detailed handoffs.** Record behavior, decisions, source locations and
+  retrieval dates where relevant, validation evidence, dependencies and unfinished
+  work. Distinguish implemented, reviewed, merged and deployed. Link lengthy
+  evidence instead of copying it into multiple notes. Use the task/PR for final
+  CI status so recording a verdict does not cause another status-only code push.
+- **Use existing tools for mechanical work.** Prefer searches, formatters and
+  small scripts for deterministic operations. Batch independent reads and keep
+  output focused. Monitor a PR with one watcher; report changed conditions and
+  failures instead of repeatedly collecting the same large status output.
+- **Match capability to complexity and risk.** Use lower-cost options for clear,
+  bounded work whose result can be verified. Reserve stronger reasoning for
+  ambiguity, legal interpretation, money, permissions, signing, migrations and
+  difficult debugging. Honor the owner's explicit model choice; escalate when
+  the task exceeds the selected capability rather than repeatedly retrying it.
+- **Use one lead by default.** When delegation is authorized and supported, use
+  an optional helper for a bounded, independent task while the lead makes useful
+  progress elsewhere. Provide the necessary context and an explicit deliverable;
+  verify the returned work. More helpers need a concrete benefit that outweighs
+  duplicated context, coordination and verification. A cheaper token rate alone
+  does not establish a cheaper completed task.
+- **Keep the same safeguards for every agent.** Model choice and delegation do
+  not relax permissions, tests, source verification, review or completion gates.
+  Separate tool configuration determines which capabilities are available;
+  do not claim a model switch or delegation that did not happen.
 
 ---
 
@@ -141,18 +187,55 @@ no gate could see. Until then this contract existed nowhere.
 
 ### Testing
 
-- **TDD-first.** Every feature and every bugfix gets a failing vitest test first,
-  then the implementation. No untested code lands.
+- **TDD-first.** Every feature and every bugfix gets a meaningful failing vitest
+  test first, then the implementation. The failure must expose the missing or
+  incorrect behavior. No untested behavioral code lands. Documentation-only and
+  formatting-only changes need their relevant validation, not invented tests.
+- **Run focused tests while coding.** Cover the changed behavior and the callers,
+  consumers and invariants it could affect. Scope follows risk and dependencies,
+  not the number of edited lines. Expand for shared behavior, a failure or a
+  specific uncertainty. Repeated CI failures in the same area are a reason to
+  improve that local selection, not to repeat every suite after every edit.
+- **Use CI for the broad final checks.** It runs [unit tests and builds](../.github/workflows/ci.yml),
+  [separate type checking](../.github/workflows/governance.yml) and
+  [Playwright](../.github/workflows/e2e-tests.yml) under the existing gates and
+  exemptions. Before pushing, inspect the diff, check changed-file formatting
+  and run the relevant focused tests after behavioral changes. Do not duplicate
+  a full local build, test suite or typecheck merely to repeat CI; additional local
+  validation needs a specific unresolved concern. The prohibition on local builds
+  without an explicit request still applies. All applicable CI must pass on the
+  actual final PR revision before calling implementation complete.
 - **Run the Playwright suite before and after** any change touching user flows.
   On an upstream merge that means three gates: baseline, post-merge-branch,
   post-deploy.
+  A prior passing run can supply the before gate when it represents the unchanged
+  pre-change application, dependencies and test configuration. Record its revision,
+  run link and why it applies; use current PR CI for the after gate. Neither gate
+  requires a duplicate local run solely because the evidence came from CI.
+- **Browser inspection follows impact.** Text or metadata alone does not require
+  an additional manual browser sweep. Check rendering, interaction or access when
+  the change introduces or leaves uncertainty there. Legal language, consent and
+  signed content can be consequential even when only text changes. Existing
+  Playwright gates and independent-review requirements still apply.
 - **Never skip or `xfail` a failing test to make the suite green.** The curated
   exclusions in `FORK-TESTING.md` are the only sanctioned skips, and each is
   justified there.
 - **A `cancelled` E2E job is not a pass.** It is no verdict. Re-run it.
 - **Typecheck separately from testing.** vitest strips types without checking
   them; a fixture missing required fields runs green while feeding `undefined`
-  into every predicate.
+  into every predicate. CI's separate typecheck satisfies this requirement for
+  the code it covers; a passing vitest run does not.
+
+### Security validation
+
+Green CI establishes only what the configured checks enforce. The production
+dependency audit in [security.yml](../.github/workflows/security.yml) is advisory;
+its success does not mean there are no findings. For dependency or security
+changes, compare findings with the documented accepted baseline. Newly introduced,
+unaccepted findings need a fix or an explicit disposition from the authorized
+reviewer before merge. Preserve existing controls and test the relevant access
+boundaries and failure cases. Making new findings automatically blocking remains
+separate work; this policy does not add that CI enforcement.
 
 ### The fork
 
