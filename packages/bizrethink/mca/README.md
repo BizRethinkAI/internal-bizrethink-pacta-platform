@@ -200,8 +200,9 @@ Two things it deliberately does not claim:
    shipped California's form carrying New York's sentence.
 6. **Scope a source that holds more than one instrument.** If the vendored file
    contains other prescribed tables, other transaction types or — like
-   Missouri's SB 1359 — eighty other sections of an omnibus bill, set `section`.
-   A label found "somewhere in the file" is not evidence.
+   the former Missouri SB 1359 source — other sections of an omnibus bill, set
+   `section`. Missouri's current §427.300 source still narrows the check to its
+   disclosure subsection. A label found "somewhere in the file" is not evidence.
 7. **Our own wording goes in `providerDrafted`, never in `alsoPermitted`.**
    `alsoPermitted` means the regulator supplied these words and they can be
    matched against the source. Where a regulation requires *"a short

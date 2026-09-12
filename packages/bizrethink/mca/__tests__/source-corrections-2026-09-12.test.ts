@@ -48,7 +48,10 @@ describe('the source corrections use the independently captured official version
 
   it('MO cites subsection 3(2), including the correct letter for each disclosure', () => {
     expect(MO_DISCLOSURE.citation).toBe('Mo. Rev. Stat. §427.300.3(2)');
-    expect(MO_DISCLOSURE.source.citation).toBe(MO_DISCLOSURE.citation);
+    expect(MO_DISCLOSURE.source).toMatchObject({
+      kind: 'statute',
+      citation: MO_DISCLOSURE.citation,
+    });
     expect(MO_DISCLOSURE.requirements.map((requirement) => requirement.citation)).toEqual(
       ['a', 'b', 'c', 'd', 'e', 'f'].map((letter) => `Mo. Rev. Stat. §427.300.3(2)(${letter})`),
     );

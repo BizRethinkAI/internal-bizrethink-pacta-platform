@@ -81,10 +81,10 @@ export type ContentStatute = {
    */
   sourceDigest: string;
   /**
-   * The part of `sourceFile` this act occupies, or null when the file is only
-   * this act. Missouri's SB 1359 is a 339,000-character omnibus bill in which
-   * the Commercial Financing Disclosure Law is one section of many, and a
-   * prescribed label found "somewhere in the bill" is not evidence.
+   * The part of `sourceFile` used for verification; null checks the whole file.
+   * A spec may narrow this further than the act's boundaries. Missouri now
+   * vendors §427.300 alone but still limits label checks to subsection 3,
+   * excluding definitions, exemptions and registration duties.
    */
   section: SourceSection | null;
 };
