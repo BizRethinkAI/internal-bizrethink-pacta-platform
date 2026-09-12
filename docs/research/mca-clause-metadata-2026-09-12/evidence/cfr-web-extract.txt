@@ -1,0 +1,185 @@
+Indexed browser-tool extraction read on 2026-09-12. This is a selected text extraction, not the raw publisher download. Source URLs and publisher page/line references follow.
+
+eCFR :: 16 CFR 682.3 -- Proper disposal of consumer information. (https://www.ecfr.gov/current/title-16/chapter-I/subchapter-F/part-682/section-682.3)
+L93: ###### eCFR Content
+L94:
+L95: The Code of Federal Regulations (CFR) is the official legal print publication containing the codification of the general and permanent rules published in the Federal Register by the departments and agencies of the Federal Government. The Electronic Code of Federal Regulations (eCFR) is a continuously updated online version of the CFR. It is not an official legal edition of the CFR.
+L96:
+L97: Learn more about the eCFR, its status, and the editorial process.
+L98: #### § 682.3 Proper disposal of consumer information.
+L99:
+L100: (a) Standard. Any person who maintains or otherwise possesses consumer information for a business purpose must properly dispose of such information by taking reasonable measures to protect against unauthorized access to or use of the information in connection with its disposal.
+L101: (b) Examples. Reasonable measures to protect against unauthorized access to or use of consumer information in connection with its disposal include the following examples. These examples are illustrative only and are not exclusive or exhaustive methods for complying with the rule in this part.
+L102: (1) Implementing and monitoring compliance with policies and procedures that require the burning, pulverizing, or shredding of papers containing consumer information so that the information cannot practicably be read or reconstructed.
+L103:
+L104: (2) Implementing and monitoring compliance with policies and procedures that require the destruction or erasure of electronic media containing consumer information so that the information cannot practicably be read or reconstructed.
+L105: (3) After due diligence, entering into and monitoring compliance with a contract with another party engaged in the business of record destruction to dispose of material, specifically identified as consumer information, in a manner consistent with this rule.
+L106: In this context, due diligence could include reviewing an independent audit of the disposal company's operations and/or its compliance with this rule, obtaining information about the disposal company from several references or other reliable sources, requiring that the disposal company be certified by a recognized trade association or similar third party, reviewing and evaluating the disposal company's information security policies or procedures, or taking other appropriate measures to determine the competency and integrity of the potential disposal company.
+L107: (4) For persons or entities who maintain or otherwise possess consumer information through their provision of services directly to a person subject to this part, implementing and monitoring compliance with policies and procedures that protect against unauthorized or unintentional disposal of consumer information, and disposing of such information in accordance with examples (b)(1) and (2) of this section.
+L108: (5) For persons subject to the Gramm-Leach-Bliley Act, 15 U.S.C. 6081 et seq., and the Federal Trade Commission's Standards for Safeguarding Customer Information, 16 CFR part 314 (“Safeguards Rule”), incorporating the proper disposal of consumer information as required by this rule into the information security program required by the Safeguards Rule.
+L109: ###### eCFR Content
+L110:
+L111: ## Pages
+L112:
+L113:   * Home L114:   * Titles L115:   * Search L116:   * Recent Changes L117:   * Corrections L118:
+L119: ## Reader Aids
+L120:
+L121:   * Using the eCFR Point-in-Time System L122:   * Understanding the eCFR L123:   * Government Policy and OFR Procedures L124:   * Developer Resources L125:   * Recent Site Updates L126: ## Information
+L127:
+L128:   * About This Site L129:   * Legal Status L130:   * Privacy L131:   * Accessibility L132:   * FOIA L133:   * No Fear Act L134:   * Continuity Information L135:
+L136: ## My eCFR
+L137:
+L138:   * My Subscriptions L139:   * Sign In / Sign Up --------------------------------------------------------------------------------
+eCFR :: 47 CFR 64.1200 -- Delivery restrictions. (https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200)
+L98: #### § 64.1200 Delivery restrictions.
+L99:
+L100: (a) No person or entity may:
+L101:
+L102: (1) Except as provided in paragraph (a)(2) of this section, initiate any telephone call (other than a call made for emergency purposes or is made with the prior express consent of the called party) using an automatic telephone dialing system or an artificial or prerecorded voice;
+L103: (i) To any emergency telephone line, including any 911 line and any emergency line of a hospital, medical physician or service office, health care facility, poison control center, or fire protection or law enforcement agency;
+L104:
+L105: (ii) To the telephone line of any guest room or patient room of a hospital, health care facility, elderly home, or similar establishment; or
+L106: (iii) To any telephone number assigned to a paging service, cellular telephone service, specialized mobile radio service, or other radio common carrier service, or any service for which the called party is charged for the call.
+L107: (iv) A person will not be liable for violating the prohibition in paragraph (a)(1)(iii) of this section when the call is placed to a wireless number that has been ported from wireline service and such call is a voice call; not knowingly made to a wireless number; and made within 15 days of the porting of the number from wireline to wireless service, provided the number is not already on the national do-not-call registry or caller's company-specific do-not-call list.
+L108: A person will not be liable for violating the prohibition in paragraph (a)(1)(iii) of this section when making calls exempted by paragraph (a)(9) of this section.
+L109: (2) Initiate, or cause to be initiated, any telephone call that includes or introduces an advertisement or constitutes telemarketing, using an automatic telephone dialing system or an artificial or prerecorded voice, to any of the lines or telephone numbers described in paragraphs (a)(1)(i) through (iii) of this section, other than a call made with the prior express written consent of the called party or the prior express consent of the called party when the call is made by or on behalf of a tax-exempt nonprofit organization, or a call that delivers a “health care” message made by, or on behalf of, a “covered entity” or its “business associate,” as those terms are defined in the HIPAA Privacy Rule, 45 CFR 160.103 .
+L110: (3) Initiate any telephone call to any residential line using an artificial or prerecorded voice to deliver a message that includes or introduces an advertisement or constitutes telemarketing without the prior express written consent of the called party, or that exceeds the applicable numerical limitation on calls identified in paragraphs (a)(3)(ii) through (v) of this section without the prior express consent of the called party.
+L111: A telephone call to any residential line using an artificial or prerecorded voice to deliver a message requires no consent if the call:
+L112: (i) Is made for emergency purposes;
+L113:
+L114: (ii) Is not made for a commercial purpose and the caller makes no more than three calls within any consecutive 30-day period to the residential line and honors the called party's request to opt out of future calls as required in paragraphs (b) and (d) of this section;
+L115: (iii) Is made for a commercial purpose but does not include or introduce an advertisement or constitute telemarketing and the caller makes no more than three calls within any consecutive 30-day period to the residential line and honors the called party's request to opt out of future calls as required in paragraphs (b) and (d) of this section;
+L116: (iv) Is made by or on behalf of a tax-exempt nonprofit organization and the caller makes no more than three calls within any consecutive 30-day period to the residential line and honors the called party's request to opt out of future calls as required in paragraphs (b) and (d) of this section; or
+L117: (v) Delivers a “health care” message made by, or on behalf of, a “covered entity” or its “business associate,” as those terms are defined in the HIPAA Privacy Rule, 45 CFR 160.103 , and the caller makes no more than one call per day to each patient's residential line, up to a maximum of three calls combined per week to each patient's residential line and honors the called party's request to opt out of future calls as required in paragraphs (b) and (d) of this section.
+L118: (4) Use a telephone facsimile machine, computer, or other device to send an unsolicited advertisement to a telephone facsimile machine, unless—
+L119:
+L120: (i) The unsolicited advertisement is from a sender with an established business relationship, as defined in paragraph (f)(6) of this section, with the recipient; and
+L121:
+L122: (ii) The sender obtained the number of the telephone facsimile machine through—
+L123: (A) The voluntary communication of such number by the recipient directly to the sender, within the context of such established business relationship; or
+L124: (B) A directory, advertisement, or site on the Internet to which the recipient voluntarily agreed to make available its facsimile number for public distribution. If a sender obtains the facsimile number from the recipient's own directory, advertisement, or Internet site, it will be presumed that the number was voluntarily made available for public distribution, unless such materials explicitly note that unsolicited advertisements are not accepted at the specified facsimile number.
+L145: (v) A sender that receives a request not to send future unsolicited advertisements that complies with paragraph (a)(4)(v) of this section must honor that request within the shortest reasonable time from the date of such request, not to exceed 30 days, and is prohibited from sending unsolicited advertisements to the recipient unless the recipient subsequently provides prior express invitation or permission to the sender.
+L151: (7) Abandon more than three percent of all telemarketing calls that are answered live by a person, as measured over a 30-day period for a single calling campaign. If a single calling campaign exceeds a 30-day period, the abandonment rate shall be calculated separately for each successive 30-day period or portion thereof that such calling campaign continues. A call is “abandoned” if it is not connected to a live sales representative within two (2) seconds of the called person's completed greeting.
+L152: (i) Whenever a live sales representative is not available to speak with the person answering the call, within two (2) seconds after the called person's completed greeting, the telemarketer or the seller must provide:
+L153: (A) A prerecorded identification and opt-out message that is limited to disclosing that the call was for “telemarketing purposes” and states the name of the business, entity, or individual on whose behalf the call was placed, and a telephone number for such business, entity, or individual that permits the called person to make a do-not-call request during regular business hours for the duration of the telemarketing campaign; provided, that, such telephone number may not be a 900 number or any other number for which charges exceed local or long distance transmission charges, and
+L154: (B) An automated, interactive voice- and/or key press-activated opt-out mechanism that enables the called person to make a do-not-call request prior to terminating the call, including brief explanatory instructions on how to use such mechanism. When the called person elects to opt-out using such mechanism, the mechanism must automatically record the called person's number to the seller's do-not-call list and immediately terminate the call.
+L155: (ii) A call for telemarketing purposes that delivers an artificial or prerecorded voice message to a residential telephone line or to any of the lines or telephone numbers described in paragraphs (a)(1)(i) through (iii) of this section after the subscriber to such line has granted prior express written consent for the call to be made shall not be considered an abandoned call if the message begins within two (2) seconds of the called person's completed greeting.
+L156: (iii) The seller or telemarketer must maintain records establishing compliance with paragraph (a)(7) of this section.
+L157:
+L158: (iv) Calls made by or on behalf of tax-exempt nonprofit organizations are not covered by this paragraph (a)(7) .
+L159:
+L160: (8) Use any technology to dial any telephone number for the purpose of determining whether the line is a facsimile or voice line.
+L161: (9) A person will not be liable for violating the prohibition in paragraph (a)(1)(iii) of this section for making any call exempted in this paragraph (a)(9) , provided that the call is not charged to the called person or counted against the called person's plan limits on minutes or texts. As used in this paragraph (a)(9) , the term “call” includes a text message, including a short message service (SMS) call.
+L162: (i) Calls made by a package delivery company to notify a consumer about a package delivery, provided that all of the following conditions are met:
+L163:
+L164: (A) The notification must be sent only to the telephone number for the package recipient;
+L165:
+L166: (B) The notification must identify the name of the package delivery company and include contact information for the package delivery company;
+L167:
+L168: (C) The notification must not include any telemarketing, solicitation, or advertising content;
+L169: (D) The voice call or text message notification must be concise, generally one minute or less in length for voice calls or 160 characters or less in length for text messages;
+L170: (E) The package delivery company shall send only one notification (whether by voice call or text message) per package, except that one additional notification may be sent for each attempt to deliver the package, up to two attempts, if the recipient's signature is required for the package and the recipient was not available to sign for the package on the previous delivery attempt;
+L171: (F) The package delivery company must offer package recipients the ability to opt out of receiving future delivery notification calls and messages and must honor an opt-out request within a reasonable time from the date such request is made, not to exceed six business days; and,
+L172: (G) Each notification must include information on how to opt out of future delivery notifications; voice call notifications that could be answered by a live person must include an automated, interactive voice- and/or key press-activated opt-out mechanism that enables the called person to make an opt-out request prior to terminating the call; voice call notifications that could be answered by an answering machine or voice mail service must include a toll-free number that the consumer can call to opt out of future package delivery notifications; text notifications must include the ability for the recipient to opt out by replying “STOP.”
+L205: (G) A healthcare provider must offer recipients within each message an easy means to opt out of future such messages; voice calls that could be answered by a live person must include an automated, interactive voice- and/or key press-activated opt-out mechanism that enables the call recipient to make an opt-out request prior to terminating the call; voice calls that could be answered by an answering machine or voice mail service must include a toll-free number that the consumer can call to opt out of future healthcare calls; text messages must inform recipients of the ability to opt out by replying “STOP,” which will be the exclusive means by which consumers may opt out of such messages; and,
+L206: (H) A healthcare provider must honor opt-out requests immediately.
+L207: (10) A called party may revoke prior express consent, including prior express written consent, to receive calls or text messages made pursuant to paragraphs (a)(1) through (3) and (c)(2) of this section by using any reasonable method to clearly express a desire not to receive further calls or text messages from the caller or sender.
+L208: Any revocation request made using an automated, interactive voice or key press-activated opt-out mechanism on a call; using the words “stop,” “quit,” “end,” “revoke,” “opt out,” “cancel,” or “unsubscribe” sent in reply to an incoming text message; or pursuant to a website or telephone number designated by the caller to process opt-out requests constitutes a reasonable means per se to revoke consent.
+L209: If a called party uses any such method to revoke consent, that consent is considered definitively revoked and the caller may not send additional robocalls and robotexts. If a reply to an incoming text message uses words other than “stop,” “quit,” “end,” “revoke,” “opt out,” “cancel,” or “unsubscribe,” the caller must treat that reply text as a valid revocation request if a reasonable person would understand those words to have conveyed a request to revoke consent.
+L210: Should the text initiator choose to use a texting protocol that does not allow reply texts, it must provide a clear and conspicuous disclosure on each text to the consumer that two-way texting is not available due to technical limitations of the texting protocol, and clearly and conspicuously provide on each text reasonable alternative ways to revoke consent.
+L211: All requests to revoke prior express consent or prior express written consent made in any reasonable manner must be honored within a reasonable time not to exceed ten business days from receipt of such request. Callers or senders of text messages covered by paragraphs (a)(1) through (3) and (c)(2) of this section may not designate an exclusive means to request revocation of consent.
+L212: (11) The use of any other means to revoke consent not listed in paragraph (a)(10) of this section, such as a voicemail or email to any telephone number or email address intended to reach the caller, creates a rebuttable presumption that the consumer has revoked consent when the called party satisfies their obligation to produce evidence that such a request has been made, absent evidence to the contrary.
+L213: In those circumstances, a totality of circumstances analysis will determine whether the caller can demonstrate that a request to revoke consent has not been conveyed in a reasonable manner.
+L214: (12) A one-time text message confirming a request to revoke consent from receiving any further calls or text messages does not violate paragraphs (a)(1) and (2) of this section as long as the confirmation text merely confirms the text recipient's revocation request and does not include any marketing or promotional information, and is the only additional message sent to the called party after receipt of the revocation request.
+L215: If the confirmation text is sent within five minutes of receipt, it will be presumed to fall within the consumer's prior express consent. If it takes longer, however, the sender will have to make a showing that such delay was reasonable.
+L216: To the extent that the text recipient has consented to several categories of text messages from the text sender, the confirmation message may request clarification as to whether the revocation request was meant to encompass all such messages; the sender must cease all further texts for which consent is required absent further clarification that the recipient wishes to continue to receive certain text messages.
+L217: (b) All artificial or prerecorded voice telephone messages shall:
+L218:
+L219: (1) At the beginning of the message, state clearly the identity of the business, individual, or other entity that is responsible for initiating the call. If a business is responsible for initiating the call, the name under which the entity is registered to conduct business with the State Corporation Commission (or comparable regulatory authority) must be stated;
+L220: (2) During or after the message, state clearly the telephone number (other than that of the autodialer or prerecorded message player that placed the call) of such business, other entity, or individual. The telephone number provided may not be a 900 number or any other number for which charges exceed local or long distance transmission charges.
+L221: For telemarketing messages and messages made pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section to residential telephone subscribers, such telephone number must permit any individual to make a do-not-call request during regular business hours; and
+L243: (ii) It has obtained the subscriber's prior express invitation or permission. Such permission must be evidenced by a signed, written agreement between the consumer and seller which states that the consumer agrees to be contacted by this seller and includes the telephone number to which the calls may be placed; or
+L244:
+L245: (iii) The telemarketer making the call has a personal relationship with the recipient of the call.
+L253: A person or entity making an artificial or prerecorded-voice telephone call pursuant to an exemption under paragraphs (a)(3)(ii) through (v) or any call for telemarketing purposes must obtain a consumer's prior express permission to share or forward the consumer's request not to be called to a party other than the person or entity on whose behalf a call is made or an affiliated entity.
+L254: (4) Identification of callers and telemarketers. A person or entity making an artificial or prerecorded-voice telephone call pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or any call for telemarketing purposes must provide the called party with the name of the individual caller, the name of the person or entity on whose behalf the call is being made, and a telephone number or address at which the person or entity may be contacted.
+L255: The telephone number provided may not be a 900 number or any other number for which charges exceed local or long distance transmission charges.
+L256: (5) Affiliated persons or entities. In the absence of a specific request by the subscriber to the contrary, a residential subscriber's do-not-call request shall apply to the particular entity making the call (or on whose behalf a call is made), and will not apply to affiliated entities unless the consumer reasonably would expect them to be included given the identification of the caller and (for telemarketing calls) the product being advertised.
+L257: (6) Maintenance of do-not-call lists. A person or entity making artificial or prerecorded-voice telephone calls pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or any call for telemarketing purposes must maintain a record of a consumer's request not to receive further calls. A do-not-call request must be honored for 5 years from the time the request is made.
+L258: (e) The rules set forth in paragraph (c) and (d) of this section are applicable to any person or entity making telephone solicitations or telemarketing calls or text messages to wireless telephone numbers to the extent described in the Commission's Report and Order, CG Docket No. 02-278, FCC 03-153, “Rules and Regulations Implementing the Telephone Consumer Protection Act of 1991.”
+L259:
+L260: (f) As used in this section:
+L261: (1) The term advertisement means any material advertising the commercial availability or quality of any property, goods, or services.
+L262:
+L263: (2) The terms automatic telephone dialing system and autodialer mean equipment which has the capacity to store or produce telephone numbers to be called using a random or sequential number generator and to dial such numbers.
+L264: (3) The term clear and conspicuous means a notice that would be apparent to the reasonable consumer, separate and distinguishable from the advertising copy or other disclosures. With respect to facsimiles and for purposes of paragraph (a)(4)(iii)(A) of this section, the notice must be placed at either the top or bottom of the facsimile.
+L265:
+L266: (4) The term emergency purposes means calls made necessary in any situation affecting the health and safety of consumers.
+L267: (5) The term established business relationship for purposes of telephone solicitations means a prior or existing relationship formed by a voluntary two-way communication between a person or entity and a residential subscriber with or without an exchange of consideration, on the basis of the subscriber's purchase or transaction with the entity within the eighteen (18) months immediately preceding the date of the telephone call or on the basis of the subscriber's inquiry or application regarding products or services offered by the entity within the three months immediately preceding the date of the call, which relationship has not been previously terminated by either party.
+L268: (i) The subscriber's seller-specific do-not-call request, as set forth in paragraph (d)(3) of this section, terminates an established business relationship for purposes of telemarketing and telephone solicitation even if the subscriber continues to do business with the seller.
+L269: (ii) The subscriber's established business relationship with a particular business entity does not extend to affiliated entities unless the subscriber would reasonably expect them to be included given the nature and type of goods or services offered by the affiliate and the identity of the affiliate.
+L270: (6) The term established business relationship for purposes of paragraph (a)(4) of this section on the sending of facsimile advertisements means a prior or existing relationship formed by a voluntary two-way communication between a person or entity and a business or residential subscriber with or without an exchange of consideration, on the basis of an inquiry, application, purchase or transaction by the business or residential subscriber regarding products or services offered by such person or entity, which relationship has not been previously terminated by either party.
+L271: (7) The term facsimile broadcaster means a person or entity that transmits messages to telephone facsimile machines on behalf of another person or entity for a fee.
+L272:
+L273: (8) The term one-ring scam means a scam in which a caller makes a call and allows the call to ring the called party for a short duration, in order to prompt the called party to return the call, thereby subjecting the called party to charges.
+L274: (9) The term prior express written consent means an agreement, in writing, bearing the signature of the person called that clearly authorizes the seller to deliver or cause to be delivered to the person called advertisements or telemarketing messages using an automatic telephone dialing system or an artificial or prerecorded voice, and the telephone number to which the signatory authorizes such advertisements or telemarketing messages to be delivered.
+L275: (i) The written agreement shall include a clear and conspicuous disclosure informing the person signing that:
+L276:
+L277: (A) By executing the agreement, such person authorizes the seller to deliver or cause to be delivered to the signatory telemarketing calls using an automatic telephone dialing system or an artificial or prerecorded voice; and
+L278: (B) The person is not required to sign the agreement (directly or indirectly), or agree to enter into such an agreement as a condition of purchasing any property, goods, or services.
+L279:
+L280: (ii) The term “signature” shall include an electronic or digital form of signature, to the extent that such form of signature is recognized as a valid signature under applicable federal law or state contract law.
+L281: (10) The term seller means the person or entity on whose behalf a telephone call or message is initiated for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person.
+L282:
+L283: (11) The term sender for purposes of paragraph (a)(4) of this section means the person or entity on whose behalf a facsimile unsolicited advertisement is sent or whose goods or services are advertised or promoted in the unsolicited advertisement.
+L284: (12) The term telemarketer means the person or entity that initiates a telephone call or message for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person.
+L285:
+L286: (13) The term telemarketing means the initiation of a telephone call or message for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person.
+L287: (14) The term telephone facsimile machine means equipment which has the capacity to transcribe text or images, or both, from paper into an electronic signal and to transmit that signal over a regular telephone line, or to transcribe text or images (or both) from an electronic signal received over a regular telephone line onto paper.
+L288: (15) The term telephone solicitation means the initiation of a telephone call or message for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person, but such term does not include a call or message:
+L289:
+L290: (i) To any person with that person's prior express invitation or permission;
+L291:
+L292: (ii) To any person with whom the caller has an established business relationship; or
+L293:
+L294: (iii) By or on behalf of a tax-exempt nonprofit organization.
+L295: (16) The term unsolicited advertisement means any material advertising the commercial availability or quality of any property, goods, or services which is transmitted to any person without that person's prior express invitation or permission, in writing or otherwise.
+L296:
+L297: (17) The term personal relationship means any family member, friend, or acquaintance of the telemarketer making the call.
+L298: (18) The term effectively mitigate means identifying the source of the traffic and preventing that source from continuing to originate traffic of the same or similar nature.
+L299:
+L300: (19) The term gateway provider means a U.S.-based intermediate provider that receives a call directly from a foreign originating provider or foreign intermediate provider at its U.S.-based facilities before transmitting the call downstream to another U.S.-based provider. For purposes of this paragraph (f)(19) :
+L301: (i) U.S.-based means that the provider has facilities located in the United States, including a point of presence capable of processing the call; and
+L302:
+L303: (ii) Receives a call directly from a provider means the foreign provider directly upstream of the gateway provider in the call path sent the call to the gateway provider, with no providers in-between.
+L304:
+L305: (g) Beginning January 1, 2004, common carriers shall:
+L306: (1) When providing local exchange service, provide an annual notice, via an insert in the subscriber's bill, of the right to give or revoke a notification of an objection to receiving telephone solicitations pursuant to the national do-not-call database maintained by the federal government and the methods by which such rights may be exercised by the subscriber.
+L307: The notice must be clear and conspicuous and include, at a minimum, the Internet address and toll-free number that residential telephone subscribers may use to register on the national database.
+L308: (2) When providing service to any person or entity for the purpose of making telephone solicitations, make a one-time notification to such person or entity of the national do-not-call requirements, including, at a minimum, citation to 47 CFR 64.1200 and 16 CFR 310 . Failure to receive such notification will not serve as a defense to any person or entity making telephone solicitations from violations of this section.
+L309: (h) The administrator of the national do-not-call registry that is maintained by the federal government shall make the telephone numbers in the database available to the States so that a State may use the telephone numbers that relate to such State as part of any database, list or listing system maintained by such State for the regulation of telephone solicitations.
+L310:
+L311: (i)-(j) [Reserved]
+L312:
+L313: (k) Voice service providers may block calls so that they do not reach a called party as follows:
+L314: (1) A provider may block a voice call when the subscriber to which the originating number is assigned has requested that calls purporting to originate from that number be blocked because the number is used for inbound calls only.
+L315:
+L316: (2) A provider may block a voice call purporting to originate from any of the following:
+L317:
+L318: (i) A North American Numbering Plan number that is not valid;
+L319: (ii) A valid North American Numbering Plan number that is not allocated to a provider by the North American Numbering Plan Administrator or the Pooling Administrator; and
+L320: (iii) A valid North American Numbering Plan number that is allocated to a provider by the North American Numbering Plan Administrator or Pooling Administrator, but is unused, so long as the provider blocking the calls is the allocatee of the number and confirms that the number is unused or has obtained verification from the allocatee that the number is unused at the time of the blocking.
+L321: (iv) A telephone number that the provider identifies, based on reasonable analytics, as highly likely to be associated with a one-ring scam.
+L322:
+L323: (3) A terminating provider may block a voice call without liability under the Communications Act or the Commission's rules where:
+L324:
+L325: (i) Calls are blocked based on the use of reasonable analytics designed to identify unwanted calls;
+L326:
+L327: (ii) Those analytics include consideration of caller ID authentication information where available;
+L370: (m) A person will not be liable for violating the prohibitions in paragraph (a)(1) , (2) , or (3) of this section by making a call to a number for which the person previously had obtained prior express consent of the called party as required in paragraph (a)(1), (2), or (3) but at the time of the call, the number is not assigned to the subscriber to whom it was assigned at the time such prior express consent was obtained if the person, bearing the burden of proof and persuasion, demonstrates that:
+L371: (1) The person, based upon the most recent numbering information reported to the Administrator pursuant to paragraph (l) of this section, by querying the database operated by the Administrator and receiving a response of “no”, has verified that the number has not been permanently disconnected since the date prior express consent was obtained as required in paragraph (a)(1) , (2) , or (3) of this section; and
+L372: (2) The person's call to the number was the result of the database erroneously returning a response of “no” to the person's query consisting of the number for which prior express consent was obtained as required in paragraph (a)(1) , (2) , or (3) of this section and the date on which such prior express consent was obtained.
+L373:
+L374: (n) A voice service provider must:
+L375: (1) Upon receipt of a traceback request from the Commission, civil law enforcement, criminal law enforcement, or the industry traceback consortium, the provider must fully respond to the traceback request within 24 hours of receipt of the request. The 24-hour clock does not start outside of business hours, and requests received during that time are deemed received at 8 a.m. on the next business day.
+L376: If the 24-hour response period would end on a non-business day, either a weekend or a Federal legal holiday, the 24-hour clock does not run for the weekend or holiday in question, and restarts at 12:01 a.m. on the next business day following when the request would otherwise be due. For example, a request received at 3 p.m. on a Friday will be due at 3 p.m. on the following Monday, assuming that Monday is not a Federal legal holiday.

@@ -84,6 +84,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.representations-lead-in',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Every representation needs its stated dates and distinction from a continuing covenant; otherwise later business deterioration could be read as a false representation.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -129,6 +135,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.advances-are-not-loans-5-1',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The representations must preserve the purchase’s non-generation risk allocation and cannot turn Merchant into the guarantor of the transaction’s legal characterization.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -189,6 +201,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.financial-condition-and-financial-information-5-2',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The knowledge standard, record-delivery period and allowance for later financial changes are the only authored representation and records terms.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -238,6 +256,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.governmental-approvals-5-3',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This knowledge-qualified approvals and tax-disclosure representation has no authored alternative; generally applicable permit duties do not prescribe this contractual warranty.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -272,6 +296,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.authorization-5-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The agreement needs Merchant’s authority to enter and perform it; an individual’s separate guaranty does not replace authority to sign for Merchant.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -318,6 +348,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.insurance-5-5',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Equipment insurance belongs to the separate equipment agreement; the funder’s equipment offering does not make insurance against non-generation part of the receivables purchase.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -367,6 +403,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.the-account-5-6',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Account-change duties must lead to the same replacement and diversion rules as collection; no alternate account covenant is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -420,6 +462,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.estoppel-certificate-5-8',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The ledger-supported confirmation process and preserved disputes are the only authored estoppel terms; no funder fact selects a different confirmation procedure.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -469,6 +517,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.no-bankruptcy-5-9',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This is a present-fact disclosure of pending proceedings with no promise against future bankruptcy; no alternative bankruptcy representation is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -524,6 +578,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.no-encumbrance-of-receipts-5-10',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'An equipment charge cannot acquire priority in the purchased receipts by this cross-reference; the merchant’s equipment election does not decide collateral ranking.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -597,6 +657,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.unencumbered-receipts-5-11',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The knowledge-qualified disclosure and Buyer’s independent priority diligence are the only authored lien representation; a first-priority warranty is not an available alternative.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -656,6 +722,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.business-purpose-5-12',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The transaction’s actual purpose, entity and location are needed to determine coverage; selecting recipient states does not establish these deal facts or waive consumer protections.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -723,6 +795,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.defaults-under-other-contracts-improper-transfers-5-13',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This present-fact disclosure of contractual restrictions has no alternate warranty of legal nonavoidability; taking other financing does not select different wording.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -770,6 +848,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.civil-criminal-regulatory-matters-5-14',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The library contains only this material, knowledge-qualified disclosure of proceedings at funding; no broader future-litigation warranty is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -813,6 +897,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.business-closure-5-15',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The representation concerns an existing firm closure decision, not a promise to remain open; no alternative operating-period covenant is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -884,6 +974,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.stacking-prohibited-5-16',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'This clause binds Merchant’s conflicting sales; concurrent positions describes Buyer’s own purchases. A Buyer preference cannot switch off Merchant’s covenant or prohibit unrelated financing.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -959,6 +1055,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.no-diversion-of-receipts-5-17',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The sold receipts need an intentional-diversion covenant with ordinary settlement disruptions excluded; removing it would disconnect collection from the defined default conduct.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1045,6 +1147,12 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
   */
   {
     slug: 'frpa.change-of-name-or-location-or-sale-or-closing-of-business-5-18',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The notice and successor-arrangement duties are the only authored business-change terms; no funder choice supplies a different closure or relocation covenant.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

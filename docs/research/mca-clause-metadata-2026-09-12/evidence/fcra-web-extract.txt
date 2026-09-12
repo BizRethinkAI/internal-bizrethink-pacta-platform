@@ -1,0 +1,421 @@
+Indexed browser-tool extraction read on 2026-09-12. This is a selected text extraction, not the raw publisher download. Source URLs and publisher page/line references follow.
+
+Fair Credit Reporting Act (https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf)
+L416@P11: (B) the communication is made to an employer in connection with
+L417@P11: an investigation of –
+L418@P11: (i) suspected misconduct relating to employment; or
+L419@P11: (ii) compliance with Federal, State, or local laws and
+L420@P11: regulations, the rules of a self-regulatory organization,
+L421@P11: or any preexisting written policies of the employer;
+L422@P11: (C) the communication is not made for the purpose of investigating
+L423@P11: a consumer’s credit worthiness, credit standing, or credit
+L424@P11: capacity; and
+L425@P11: (D) the communication is not provided to any person except –
+L426@P11-12: (i) to the employer or an agent of the employer;10
+L427@P12: 604 - 15 U.S.C. § 1681b
+L428@P12: (ii) to any Federal or State officer, agency, or department,
+L429@P12: or any officer, agency, or department of a unit of general
+L430@P12: local government;
+L431@P12: (iii) to any self-regulatory organization with regulatory
+L432@P12: authority over the activities of the employer or employee;
+L433@P12: (iv) as otherwise required by law; or
+L434@P12: (v) pursuant to section 608.
+L435@P12: (2) Subsequent disclosure. After taking any adverse action based in
+L436@P12: whole or in part on a communication described in paragraph (1), the
+L437@P12: employer shall disclose to the consumer a summary containing the
+L438@P12: nature and substance of the communication upon which the adverse
+L439@P12: action is based, except that the sources of information acquired solely
+L440@P12: for use in preparing what would be but for subsection (d)(2)(D) an
+L441@P12: investigative consumer report need not be disclosed.
+L442@P12: (3) For purposes of this subsection, the term “self-regulatory organization”
+L443@P12: includes any self-regulatory organization (as defined in section 3(a)
+L444@P12: (26) of the Securities Exchange Act of 1934), any entity established
+L445@P12: under title I of the Sarbanes-Oxley Act of 2002, any board of trade
+L446@P12: designated by the Commodity Futures Trading Commission, and any
+L447@P12: futures association registered with such Commission.
+L448@P12: (z) Veteran. The term ‘veteran’ has the meaning given the term in section 101
+L449@P12: of title 38, United States Code.
+L450@P12: (aa) Veteran’s medical debt. The term ‘veteran’s medical debt’
+L451@P12: (1) means a medical collection debt of a veteran owed to a non-Department
+L452@P12: of Veterans Affairs health care provider that was submitted to the
+L453@P12: Department for payment for health care authorized by the
+L454@P12: Department of Veterans Affairs; and
+L455@P12: (2) includes medical collection debt that the Department of Veterans
+L456@P12: Affairs has wrongfully charged a veteran.
+L457@P12: § 604. Permissible purposes of consumer reports
+L458@P12: [15 U.S.C. § 1681b]
+L459@P12: (a) In general. Subject to subsection (c), any consumer reporting agency may
+L460@P12: furnish a consumer report under the following circumstances and no other:
+L461@P12: (1) In response to the order of a court having jurisdiction to issue such
+L462@P12: an order, a subpoena issued in connection with proceedings before
+L463@P12: a Federal grand jury, or a subpoena issued in accordance with
+L464@P12-13: section 5318 of title 31 or section 3486 of title 18.604 - 15 U.S.C. § 1681b
+L465@P13: 11
+L466@P13: (2) In accordance with the written instructions of the consumer to whom
+L467@P13: it relates.
+L468@P13: (3) To a person which it has reason to believe
+L469@P13: (A) intends to use the information in connection with a credit
+L470@P13: transaction involving the consumer on whom the information
+L471@P13: is to be furnished and involving the extension of credit to, or
+L472@P13: review or collection of an account of, the consumer; or
+L473@P13: (B) intends to use the information for employment purposes; or
+L474@P13: (C) intends to use the information in connection with the
+L475@P13: underwriting of insurance involving the consumer; or
+L476@P13: (D) intends to use the information in connection with a determination
+L477@P13: of the consumer’s eligibility for a license or other benefit
+L478@P13: granted by a governmental instrumentality required by law to
+L479@P13: consider an applicant’s financial responsibility or status; or
+L480@P13: (E) intends to use the information, as a potential investor or
+L481@P13: servicer, or current insurer, in connection with a valuation of,
+L482@P13: or an assessment of the credit or prepayment risks associated
+--------------------------------------------------------------------------------
+Fair Credit Reporting Act (https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf)
+L826@P22: consumer, shall
+L827@P22: (i) establish and maintain a notification system, including a
+L828@P22: toll-free telephone number, which permits any consumer
+L829@P22: whose consumer report is maintained by the agency to
+L830@P22: notify the agency, with appropriate identification, of the
+L831@P22: consumer’s election to have the consumer’s name and
+L832@P22: address excluded from any such list of names and addresses
+L833@P22: provided by the agency for such a transaction; and
+L834@P22: (ii) publish by not later than 365 days after the date of enactment
+L835@P22: of the Consumer Credit Reporting Reform Act of 1996,
+L836@P22: and not less than annually thereafter, in a publication of
+L837@P22: general circulation in the area served by the agency
+L838@P22: (I) a notification that information in consumer files
+L839@P22: maintained by the agency may be used in connection
+L840@P22: with such transactions; and
+L841@P22: (II) the address and toll-free telephone number for
+L842@P22: consumers to use to notify the agency of the
+L843@P22: consumer’s election under clause (I).
+L844@P22: (B) Establishment and maintenance as compliance. Establishment
+L845@P22: and maintenance of a notification system (including a toll-free
+L846@P22: telephone number) and publication by a consumer reporting
+L847@P22: agency on the agency’s own behalf and on behalf of any of its
+L848@P22: affiliates in accordance with this paragraph is deemed to be
+L849@P22: compliance with this paragraph by each of those affiliates.
+L850@P22: (6) Notification system by agencies that operate nationwide. Each
+L851@P22: consumer reporting agency that compiles and maintains files on
+L852@P22: consumers on a nationwide basis shall establish and maintain a
+L853@P22: notification system for purposes of paragraph (5) jointly with other
+L854@P22-23: such consumer reporting agencies.604 - 15 U.S.C. § 1681b
+L855@P23: 21
+L856@P23: (f) Certain use or obtaining of information prohibited. A person shall not use
+L857@P23: or obtain a consumer report for any purpose unless
+L858@P23: (1) the consumer report is obtained for a purpose for which the consumer
+L859@P23: report is authorized to be furnished under this section; and
+L860@P23: (2) the purpose is certified in accordance with section 607 [§ 1681e]
+L861@P23: by a prospective user of the report through a general or specific
+L862@P23: certification.
+L863@P23: (g) Protection of Medical Information
+L864@P23: (1) Limitation on consumer reporting agencies. A consumer reporting
+L865@P23: agency shall not furnish for employment purposes, or in connection
+L866@P23: with a credit or insurance transaction, a consumer report that contains
+L867@P23: medical information (other than medical contact information treated
+L868@P23: in the manner required under section 605(a)(6)) about a consumer,
+L869@P23: unless –
+L870@P23: (A) if furnished in connection with an insurance transaction, the
+L871@P23: consumer affirmatively consents to the furnishing of the report;
+L872@P23: (B) if furnished for employment purposes or in connection with a
+L873@P23: credit transaction –
+L874@P23: (i) the information to be furnished is relevant to process or
+L875@P23: effect the employment or credit transaction; and
+L876@P23: (ii) the consumer provides specific written consent for the
+L877@P23: furnishing of the report that describes in clear and
+L878@P23: conspicuous language the use for which the information
+L879@P23: will be furnished; or
+L880@P23: (C) the information to be furnished pertains solely to transactions,
+L881@P23: accounts, or balances relating to debts arising from the receipt
+L882@P23: of medical services, products, or devises, where such
+L883@P23: information, other than account status or amounts, is restricted
+L884@P23: or reported using codes that do not identify, or do not provide
+L885@P23: information sufficient to infer, the specific provider or the
+L886@P23: nature of such services, products, or devices, as provided in
+L887@P23: section 605(a)(6).
+L888@P23: (2) Limitation on creditors. Except as permitted pursuant to paragraph
+L889@P23: (3)(C) or regulations prescribed under paragraph (5)(A), a creditor
+L890@P23: shall not obtain or use medical information (other than medical
+L891@P23: information treated in the manner required under section 605(a)(6))
+L892@P23: pertaining to a consumer in connection with any determination of the
+--------------------------------------------------------------------------------
+Fair Credit Reporting Act (https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf)
+L2799@P73: agency, together with the name and address of the person to whom
+L2800@P73: such information is being reported; or
+L2801@P73: (2) maintain strict procedures designed to insure that whenever public
+L2802@P73: record information which is likely to have an adverse effect on a
+L2803@P73: consumer’s ability to obtain employment is reported it is complete
+L2804@P73: and up to date. For purposes of this paragraph, items of public record
+L2805@P73: relating to arrests, indictments, convictions, suits, tax liens, and
+L2806@P73: outstanding judgments shall be considered up to date if the current
+L2807@P73: public record status of the item at the time of the report is reported.
+L2808@P73: (b) Exemption for national security investigations. Subsection (a) does not
+L2809@P73: apply in the case of an agency or department of the United States
+L2810@P73: Government that seeks to obtain and use a consumer report for
+L2811@P73: employment purposes, if the head of the agency or department makes
+L2812@P73: a written finding as prescribed under section 604(b)(4)(A).
+L2813@P73: § 614. Restrictions on investigative consumer reports
+L2814@P73: [15 U.S.C. § 1681l]
+L2815@P73: Whenever a consumer reporting agency prepares an investigative consumer
+L2816@P73: report, no adverse information in the consumer report (other than information
+L2817@P73: which is a matter of public record) may be included in a subsequent consumer
+L2818@P73: report unless such adverse information has been verified in the process of making
+L2819@P73: such subsequent consumer report, or the adverse information was received within
+L2820@P73: the three-month period preceding the date the subsequent report is furnished.
+L2821@P73: § 615. Requirements on users of consumer reports
+L2822@P73: [15 U.S.C. § 1681m]
+L2823@P73: (a) Duties of users taking adverse actions on the basis of information
+L2824@P73: contained in consumer reports. If any person takes any adverse action
+L2825@P73: with respect to any consumer that is based in whole or in part on any
+L2826@P73: information contained in a consumer report, the person shall
+L2827@P73: (1) provide oral, written, or electronic notice of the adverse action to the
+L2828@P73: consumer;
+L2829@P73: (2) provide to the consumer written or electronic disclosure
+L2830@P73: (A) of a numerical credit score as defined in section 609(f)(2)
+L2831@P73: (A) used by such person in taking any adverse action based in
+L2832@P73-74: whole or in part on any information in a consumer report; and72
+L2833@P74: § 615 - 15 U.S.C. § 1681m
+L2834@P74: (B) of the information set forth in subparagraphs (B) through (E) of
+L2835@P74: section 609(f)(1);
+L2836@P74: (3) provide to the consumer orally, in writing, or electronically
+L2837@P74: (A) the name, address, and telephone number of the consumer
+L2838@P74: reporting agency (including a toll-free telephone number
+L2839@P74: established by the agency if the agency compiles and maintains
+L2840@P74: files on consumers on a nationwide basis) that furnished the
+L2841@P74: report to the person; and
+L2842@P74: (B) a statement that the consumer reporting agency did not make
+L2843@P74: the decision to take the adverse action and is unable to provide
+L2844@P74: the consumer the specific reasons why the adverse action was
+L2845@P74: taken; and
+L2846@P74: (4) provide to the consumer an oral, written, or electronic notice of the
+L2847@P74: consumer’s right
+L2848@P74: (A) to obtain, under section 612 [§ 1681j], a free copy of a
+L2849@P74: consumer report on the consumer from the consumer reporting
+L2850@P74: agency referred to in paragraph (3), which notice shall include
+L2851@P74: an indication of the 60-day period under that section for
+L2852@P74: obtaining such a copy; and
+L2853@P74: (B) to dispute, under section 611 [§ 1681i], with a consumer
+L2854@P74: reporting agency the accuracy or completeness of any
+L2855@P74: information in a consumer report furnished by the agency.
+L2856@P74: (b) Adverse Action Based on Information Obtained from Third Parties Other
+L2857@P74: than Consumer Reporting Agencies
+L2858@P74: (1) In general. Whenever credit for personal, family, or household
+L2859@P74: purposes involving a consumer is denied or the charge for such credit
+L2860@P74: is increased either wholly or partly because of information obtained
+L2861@P74: from a person other than a consumer reporting agency bearing upon
+--------------------------------------------------------------------------------
+Fair Credit Reporting Act (https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf)
+L3547@P92: (bb) 120 days after the date on which the
+L3548@P92: national emergency concerning the novel
+L3549@P92: coronavirus disease (COVID–19) outbreak
+L3550@P92: declared by the President on March 13,
+L3551@P92: 2020 under the National Emergencies Act
+L3552@P92: (50 U.S.C. 1601 et seq.) terminates.
+L3553@P92: (ii) Reporting.—Except as provided in clause if a furnisher
+L3554@P92: makes an accommodation with respect to 1 or more
+L3555@P92: payments on a credit obligation or account of a
+L3556@P92: consumer, and the consumer makes the payments or is
+L3557@P92: not required to make 1 or more payments pursuant to the
+L3558@P92: accommodation, the furnisher shall—
+L3559@P92: (I) report the credit obligation or account as current; or
+L3560@P92: (II) if the credit obligation or account was delinquent
+L3561@P92: before the accommodation—
+L3562@P92: (aa) maintain the delinquent status during the period
+L3563@P92: in which the accommodation is in effect; and
+L3564@P92: (bb) if the consumer brings the credit obligation or
+L3565@P92: account current during the period described in
+L3566@P92: item (aa), report the credit obligation or account
+L3567@P92: as current.
+L3568@P92: (iii) Exception.—Clause (ii) shall not apply with respect to a
+L3569@P92: credit obligation or account of a consumer that has been
+L3570@P92: charged-off.
+L3571@P92-93: (2) Duty to correct and update information. A person who § 623 - 15 U.S.C. § 1681s-2
+L3572@P93: 91
+L3573@P93: (A) regularly and in the ordinary course of business furnishes
+L3574@P93: information to one or more consumer reporting agencies about
+L3575@P93: the person’s transactions or experiences with any consumer; and
+L3576@P93: (B) has furnished to a consumer reporting agency information
+L3577@P93: that the person determines is not complete or accurate,
+L3578@P93: shall promptly notify the consumer reporting agency of that
+L3579@P93: determination and provide to the agency any corrections to that
+L3580@P93: information, or any additional information, that is necessary
+L3581@P93: to make the information provided by the person to the agency
+L3582@P93: complete and accurate, and shall not thereafter furnish to the
+L3583@P93: agency any of the information that remains not complete or
+L3584@P93: accurate.
+L3585@P93: (3) Duty to provide notice of dispute. If the completeness or accuracy of
+L3586@P93: any information furnished by any person to any consumer reporting
+L3587@P93: agency is disputed to such person by a consumer, the person may not
+L3588@P93: furnish the information to any consumer reporting agency without
+L3589@P93: notice that such information is disputed by the consumer.
+L3590@P93: (4) Duty to provide notice of closed accounts. A person who regularly
+L3591@P93: and in the ordinary course of business furnishes information to a
+L3592@P93: consumer reporting agency regarding a consumer who has a credit
+L3593@P93: account with that person shall notify the agency of the voluntary
+L3594@P93: closure of the account by the consumer, in information regularly
+L3595@P93: furnished for the period in which the account is closed.
+L3596@P93: (5) Duty to Provide Notice of Delinquency of Accounts
+L3597@P93: (A) In general. A person who furnishes information to a consumer
+L3598@P93: reporting agency regarding a delinquent account being placed
+L3599@P93: for collection, charged to profit or loss, or subjected to any
+L3600@P93: similar action shall, not later than 90 days after furnishing the
+L3601@P93: information, notify the agency of the date of delinquency on
+L3602@P93: the account, which shall be the month and year of the
+L3603@P93: commencement of the delinquency on the account that
+L3604@P93: immediately preceded the action.
+L3605@P93: (B) Rule of construction. For purposes of this paragraph only, and
+L3606@P93: provided that the consumer does not dispute the information, a
+L3607@P93: person that furnishes information on a delinquent account that is
+L3608@P93: placed for collection, charged for profit or loss, or subjected to
+L3609@P93: any similar action, complies with this paragraph, if –
+L3610@P93: (i) the person reports the same date of delinquency as that
+L3611@P93: provided by the creditor to which the account was owed at
+L3612@P93-94: the time at which the commencement of the delinquency 92
+L3613@P94: § 623 - 15 U.S.C. § 1681s-2
+L3614@P94: occurred, if the creditor previously reported that date of
+L3615@P94: delinquency to a consumer reporting agency;
+L3616@P94: (ii) the creditor did not previously report the date of
+--------------------------------------------------------------------------------
+Fair Credit Reporting Act (https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf)
+L3748@P97: furnisher to substantiate the basis of the dispute.
+L3749@P97: (E) Duty of person after receiving notice of dispute. After receiving a
+L3750@P97: notice of dispute from a consumer pursuant to subparagraph (D),
+L3751@P97: the person that provided the information in dispute to a consumer
+L3752@P97: reporting agency shall –
+L3753@P97: (i) conduct an investigation with respect to the disputed
+L3754@P97: information;
+L3755@P97: (ii) review all relevant information provided by the consumer
+L3756@P97: with the notice;
+L3757@P97: (iii) complete such person’s investigation of the dispute and
+L3758@P97: report the results of the investigation to the consumer
+L3759@P97: before the expiration of the period under section 611(a)
+L3760@P97: (1) within which a consumer reporting agency would be
+L3761@P97: required to complete its action if the consumer had elected
+L3762@P97: to dispute the information under that section; and
+L3763@P97: (iv) if the investigation finds that the information reported was
+L3764@P97: inaccurate, promptly notify each consumer reporting
+L3765@P97: agency to which the person furnished the inaccurate
+L3766@P97: information of that determination and provide to the
+L3767@P97: agency any correction to that information that is necessary
+L3768@P97-98: to make the information provided by the person accurate.96
+L3769@P98: § 623 - 15 U.S.C. § 1681s-2
+L3770@P98: (F) Frivolous or Irrelevant Dispute
+L3771@P98: (i) In general. This paragraph shall not apply if the person
+L3772@P98: receiving a notice of a dispute from a consumer
+L3773@P98: reasonably determines that the dispute is frivolous or
+L3774@P98: irrelevant, including –
+L3775@P98: (I) by reason of the failure of a consumer to provide
+L3776@P98: sufficient information to investigate the disputed
+L3777@P98: information; or
+L3778@P98: (II) the submission by a consumer of a dispute that is
+L3779@P98: substantially the same as a dispute previously
+L3780@P98: submitted by or for the consumer, either directly to
+L3781@P98: the person or through a consumer reporting agency
+L3782@P98: under subsection (b), with respect to which the person
+L3783@P98: has already performed the person’s duties under this
+L3784@P98: paragraph or subsection (b), as applicable.
+L3785@P98: (ii) Notice of determination. Upon making any determination
+L3786@P98: under clause (i) that a dispute is frivolous or irrelevant,
+L3787@P98: the person shall notify the consumer of such determination
+L3788@P98: not later than 5 business days after making such determination,
+L3789@P98: by mail or, if authorized by the consumer for that purpose,
+L3790@P98: by any other means available to the person.
+L3791@P98: (iii) Contents of notice. A notice under clause (ii) shall include –
+L3792@P98: (I) the reasons for the determination under clause (i); and
+L3793@P98: (II) identification of any information required to investigate
+L3794@P98: the disputed information, which may consist of a
+L3795@P98: standardized form describing the general nature of
+L3796@P98: such information.
+L3797@P98: (G) Exclusion of credit repair organizations. This paragraph shall
+L3798@P98: not apply if the notice of the dispute is submitted by, is
+L3799@P98: prepared on behalf of the consumer by, or is submitted on a
+L3800@P98: form supplied to the consumer by, a credit repair organization,
+L3801@P98: as defined in section 403(3), or an entity that would be a credit
+L3802@P98: repair organization, but for section 403(3)(B)(i).
+L3803@P98: (9) Duty to provide notice of status as medical information furnisher.
+L3804@P98: A person whose primary business is providing medical services,
+L3805@P98: products, or devices, or the person’s agent or assignee, who furnishes
+L3806@P98: information to a consumer reporting agency on a consumer shall be
+L3807@P98: considered a medical information furnisher for purposes of this title,
+L3808@P98-99: and shall notify the agency of such status.§ 623 - 15 U.S.C. § 1681s-2
+L3809@P99: 97
+L3810@P99: (b) Duties of Furnishers of Information upon Notice of Dispute
+L3811@P99: (1) In general. After receiving notice pursuant to section 611(a)(2)
+L3812@P99: [§ 1681i] of a dispute with regard to the completeness or accuracy
+L3813@P99: of any information provided by a person to a consumer reporting
+L3814@P99: agency, the person shall
+L3815@P99: (A) conduct an investigation with respect to the disputed information;
+L3816@P99: (B) review all relevant information provided by the consumer
+L3817@P99: reporting agency pursuant to section 611(a)(2) [§ 1681i];
+L3818@P99: (C) report the results of the investigation to the consumer
+L3819@P99: reporting agency;
+--------------------------------------------------------------------------------
+eCFR :: 16 CFR 682.3 -- Proper disposal of consumer information. (https://www.ecfr.gov/current/title-16/chapter-I/subchapter-F/part-682/section-682.3)
+L14: If you would like to comment on the current content, please use the 'Content Feedback' button below for instructions on contacting the issuing agency
+L15:
+L19: # Website Feedback
+L20:
+L21: * (required) Your Name[Input]
+L22:
+L23: * (required) Email[Input]
+L24:
+L25: Attachment[Input]
+L26:
+L27: * (required) How can we help you?
+L28:
+L29: [Input][Input]* (required) I am requesting technical help or providing website feedback
+L30: This contact form is only for website help or website suggestions. If you have questions or comments regarding a published document please contact the publishing agency. Comments or questions about document content can not be answered by OFR staff. Please do not provide confidential information or personal data.
+L31:
+L32: [Input]
+L33:   * ☰ L34:   *     *     * Home L35:     * Browse
+L36:       * Titles L37:       * Agencies L38:       * Incorporation by Reference L39:       * Recent Updates L40:     * Search L41:     * Recent Changes L42:     * Corrections L43:     * Reader Aids
+L44:       * Reader Aids Home L45:       * Using the eCFR Point-in-Time System L46:       * Understanding the eCFR L47:       * Government Policy and OFR Procedures L48:       * Developer Resources L49:       * Recent Site Updates L50:     * My eCFR
+L51:       * Sign In / Sign Up L52:     * [Input] [Input: Search the eCFR]
+L53: # eCFR L54:
+L55: ## The Electronic Code of Federal Regulations
+L56:
+L57: ###### Enhanced Content :: FR Reference
+L58:
+L59: Enhanced content is provided to the user to provide additional context.
+L60:
+L61: ###### Enhanced Content :: FR Reference
+L62: # Title 16
+L63:
+L64: This content is from the eCFR and is authoritative but unofficial.
+L65:
+L66: Displaying title 16, up to date as of 9/09/2026. Title 16 was last amended 8/29/2026.
+L67:
+L68: view historical versions L69:
+L70: A drafting site is available for use when drafting amendatory language
+L71:
+L72: switch to drafting site L73:
+L74: Navigate by entering citations or phrases (eg: 1 CFR 1.1 49 CFR 172.101 Organization and Purpose 1/1.1 Regulation Y FAR).
+L75: Choosing an item from citations and headings will bring you directly to the content. Choosing an item from full text search results will bring you to those results. Pressing enter in the search box will also bring you to search results.
+L76:
+L77: Background and more details are available in the Search & Navigation guide.
+L78:
+L79: [Input] [Input] [Input]
+L80:
+L81: [Input: Enter a search term or CFR reference (eg. fishing or 1 CFR 1.1)]
+L82:
+L83: [Input: Enter a search term or CFR reference (eg. fishing or 1 CFR 1.1)]
+L84:   *   * Table of Contents
+L85:   * Details
+L86:   * Print/PDF
+L87:   * Display Options
+L88:   *   * Timeline
+L89:   * Go to Date
+L90:   * Compare Dates
+L91:   *   * Published Edition
+L92:   *   * Developer Tools
+L93: ###### eCFR Content
+L94:
+L95: The Code of Federal Regulations (CFR) is the official legal print publication containing the codification of the general and permanent rules published in the Federal Register by the departments and agencies of the Federal Government. The Electronic Code of Federal Regulations (eCFR) is a continuously updated online version of the CFR. It is not an official legal edition of the CFR.
+L96:
+L97: Learn more about the eCFR, its status, and the editorial process.
+L98: #### § 682.3 Proper disposal of consumer information.
+L99:
+L100: (a) Standard. Any person who maintains or otherwise possesses consumer information for a business purpose must properly dispose of such information by taking reasonable measures to protect against unauthorized access to or use of the information in connection with its disposal.
+L101: (b) Examples. Reasonable measures to protect against unauthorized access to or use of consumer information in connection with its disposal include the following examples. These examples are illustrative only and are not exclusive or exhaustive methods for complying with the rule in this part.
+L102: (1) Implementing and monitoring compliance with policies and procedures that require the burning, pulverizing, or shredding of papers containing consumer information so that the information cannot practicably be read or reconstructed.
+L103:
+L104: (2) Implementing and monitoring compliance with policies and procedures that require the destruction or erasure of electronic media containing consumer information so that the information cannot practicably be read or reconstructed.

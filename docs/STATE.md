@@ -16,6 +16,50 @@ _Last updated: 2026-09-12_
 
 ---
 
+## 2026-09-12 — eleven-state MCA agreement requirements (#179)
+
+Research PR **#179** merged at `42394e5f3` after all 13 checks passed on
+`4cf12aa5a`. Its E2E jobs used the existing docs-only exemption; they did not
+run the browser suite. The source report and detailed records are in
+[`research/mca-agreement-requirements-2026-09-12/`](research/mca-agreement-requirements-2026-09-12/README.md).
+This is a walk of eleven dedicated commercial-financing schemes, including
+26 California rules, 26 New York rules, fourteen Texas rules, four Virginia
+rules and Connecticut guidance/enforcement cross-references. The manifest
+records 113 HTTP attempts, twenty retained files and 27 unchanged references.
+The historical #174 audit and application-source bytes remain unchanged.
+
+Positive agreement duties: GA §10-1-393.18(e)(4), UT §7-27-202(3), KS
+§75-784(b)(5) and MO §427.300.3(2)(e) require variable-payment methodology
+in covered agreements; Texas §86.310(d) requires its conspicuous OCCC notice
+and §86.312(b)(3) requires disclosed/contracted fees. Duties, prescribed
+wording, prohibited terms and separate disclosures are distinguished.
+California §§22806–22807 derive from 2025 SB 362, effective January 1, 2026.
+CT's later employee-registration memorandum is not a disclosure-grace extension.
+
+Currency limits survive: GA's full current Lexis body was blocked by CAPTCHA;
+MO's declaration/rule history selecting the commencement branch is unclosed.
+California consolidated rules state August 28, 2026 currency; New York states
+October 31, 2023, supplemented by official amendment-index checks through
+September 9, 2026 without a later Part 600 amendment identified. Utah's linked
+FAQ is dated January 1, 2023 despite its 2026 upload path. Texas's current
+portal labels §86.311(i)'s second item `(2)` where the adoption says `(B)`.
+These are documented limits, not invented verification dates or equivalences.
+
+Remaining source/form work: fix Utah application references from §7-27-201 to
+§7-27-202; update California statutory references; correct the Virginia
+prescribed form separately. UCC, federal law, guaranty, bankruptcy and case law
+remain targeted clause dependencies. Research alone approves no clause.
+ADR 0014 backfill is being implemented in
+[`state/inflight/feat-mca-clause-metadata.md`](state/inflight/feat-mca-clause-metadata.md).
+Missing collection/venue alternatives and the processor-acceptance deal-fact
+move remain separate. The research retrieval workspace was
+`/tmp/pacta-mca-requirements/`; durable evidence is committed in the report.
+
+A-07 authored the #176/#177 note cleanup, reused unchanged from #178 head
+`3874700da819d2606eb0198a6458d57b5d72a139` as research dependency `cede1f021`.
+This section folds only this session's now-merged #179 note. No deployment
+status is inferred from the merge.
+
 ## 2026-09-12 — merged signup policy and derived MCA numbering
 
 **#169 / R-01** merged at `bcbec3c3b298ee28265a246e80fa7d2ba8407170`.
@@ -166,7 +210,8 @@ current text was incorporated by #176, recorded below. Virginia needs a separate
 prescribed-form correction covering a label, formula, estimated-payment wording
 and layout; the official PDF and both extractions are retained for that work.
 The August 2024 CT guidance still matches its official PDF but predates the
-registration amendment. Its guidance-index linkage remains qualified.
+registration amendment. #179 later established the guidance-index linkage and
+retained the associated enforcement sections and employee no-action memorandum.
 
 The old “Texas only” inference is superseded: Utah §7-27-202(3) requires
 variable-payment information in the agreement. Its current linked PDF includes
@@ -174,8 +219,8 @@ the 2024 amendment despite the 2022 URL. Kansas's introduced source matches the
 enrolled/current operative text after documented normalization; retain the
 Revisor's `(iii)`/`(B)` annotation. CA/NY consolidated regulatory currency, later
 Georgia code history and Texas codified rules remain qualified. The complete
-eleven-state agreement-requirements review and missing underlying statutes/rules
-remain open before ADR 0014 classification. Current clause count: **211**, not
+eleven-state dedicated-scheme review is now recorded in #179 below; targeted
+clause-specific authorities remain open for ADR 0014 classification. Current clause count: **211**, not
 ADR 0014's historical 219; authored clauses remain draft with null authors.
 
 The agreed workflow keeps full reading and detailed handoffs, one coherent task
@@ -199,7 +244,8 @@ renewal/fee rule, registration sanctions in §36a-872(a) and commissioner action
 in (b). The non-form obligation count is **13**; `ct-penalties` retains its ID
 but cites (b), and `ct-registration-sanctions` records (a). Cross-state notes
 and an FRPA comment no longer repeat the superseded text. Referenced
-§§36a-50, 51 and 52 remain unvendored; no registration/enforcement engine exists.
+§§36a-50, 51 and 52 were later retained as research evidence in #179; no
+registration/enforcement engine exists.
 
 Florida's six current code sections replace the HB 1353 extract and include
 the 2024 amendment to §559.9611(9). Missouri's current §427.300 replaces the
@@ -217,11 +263,11 @@ bytes and qualifications. Seven new regressions failed before correction;
 retained official captures. Source agreement is not legal or publication
 approval. No clause body, authored status, author, schema or upstream file changed.
 
-The eleven-state agreement-requirements matrix, missing underlying/implementing
-authorities and Virginia's October 2022 prescribed-form correction remain open.
-CT guidance predates its registration amendment; CA/NY consolidated currency,
-later GA code history and TX codified rules retain the audit's qualifications.
-Only after that evidence work should ADR 0014 classify the **211** records;
+The eleven-state dedicated-scheme matrix and further implementing authorities
+are now recorded in #179 below, with explicit currency/access limits. Virginia's
+October 2022 prescribed-form correction and clause-specific authority checks
+remain open. CT guidance predates its registration amendment. ADR 0014 must use
+the evidence and its qualifications when classifying the **211** records;
 authored clauses stay draft with null authors. ADR 0011 guaranty placement,
 template/form migration and commercial interview answers remain separate.
 
@@ -251,11 +297,60 @@ review or production deployment; those remain unverified by this author.
 There is no A-06 schema/configuration change. A-04's additive upload-ownership
 migration prerequisite above still applies to shipping the queue.
 
-Shwet assigned the A-07 remediation session the single fold of #176/#177 notes;
-the MCA research session must not repeat it. #176's earlier fold of
+Shwet assigned the A-07 remediation session the single fold of #176/#177 notes.
+The MCA research PR #179 reused A-07's exact three-file fold from #178 head
+`3874700da` as dependency commit `cede1f021`; it did not author a second fold.
+A-07 now includes that merged dependency without repeating it. #176's earlier fold of
 #173/#174/#175 is retained unchanged except for the now-completed follow-ups
 identified above. A-07 is approved and tracked in its own in-flight note;
 later audit findings still require individual owner decisions.
+
+## 2026-09-12 — eleven-state MCA agreement research merged (#179)
+
+**#179** merged at `42394e5f3ab6c85079a4328b9971fa19a835223b`.
+The [report, section register and source ledger](research/mca-agreement-requirements-2026-09-12/README.md)
+separate agreement-content duties, prescribed disclosure wording, conduct and
+prohibited terms. The dedicated schemes for all eleven states were read, with
+26 CA rules, 26 NY rules, 14 TX rules, four VA rules and CT enforcement/guidance.
+The manifest records **113 HTTP attempts / 20 retained evidence files / 27
+unchanged source or evidence inputs**; browser observations are separate from
+HTTP provenance. Original #174 evidence and application source inputs are unchanged.
+
+The report identifies variable-payment agreement-content duties in GA, KS, MO
+and UT, plus TX's prescribed OCCC services-contract notice and contractual
+support for fees/charges. Those findings replace the old "Texas only" premise
+without classifying every clause as required or prescribing our authored words.
+Registration, disclosure delivery, signatures, priority and prohibited conduct
+remain separate from required agreement text. The research changes no clause
+body, approval status, application behavior or schema.
+
+Source limits remain explicit: CA's publisher cutoff is August 28, 2026; NY's
+is October 31, 2023, supplemented by the documented official amendment-index
+search through September 9, 2026, which identified no later Part 600 amendment.
+The current CT index links its 2024 guidance, which cannot override the later
+registration statute. Texas's current portal and complete adoption packet were
+read; §86.311(i)'s `(2)` versus `(B)` publication discrepancy is retained.
+Georgia's full current-code body remains blocked by the publisher CAPTCHA;
+visible section history and 2024–2026 legislative summaries are corroboration.
+Missouri's rule-dependent commencement history remains unestablished: do not
+hardcode an unconditional date. Utah's regulator FAQ is dated January 1, 2023,
+despite its 2026 upload path; that path is not a new legal effective date.
+
+Next MCA work is ADR 0014's two metadata fields and clause-specific backfill of
+the **211 actual records**, using targeted UCC/contract/usury/guaranty/bankruptcy/
+E-SIGN/NACHA/case-law authority where needed. Silence in a dedicated scheme
+does not prove a clause discretionary. Draft/null authors, lawful commercial
+options and the fact partition remain. Queued corrections: UT disclosure
+citations from §201 to §202 and CA's changed statutory references. Virginia's
+prescribed-form mismatch remains a separate PR; the three missing facts and
+`processorSplitAccepted` fact move remain separate owner decisions.
+
+The research author recorded local hash/link/section-count validation; current
+CI evidence belongs to #179's Checks and description. This fold records its
+verified merge, not a new legal approval or application validation. #178 was
+the only open PR when Guard 5 identified #179's merged note, so the A-07 session
+owns its single fold and removal. No research implementation or source evidence
+is changed by the fold.
 
 ## Where things stand
 

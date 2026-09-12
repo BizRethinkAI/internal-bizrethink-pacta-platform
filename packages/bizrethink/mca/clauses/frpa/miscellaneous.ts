@@ -68,6 +68,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.modifications-amendments-7-1',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '10 CCR §900(a)(5); 23 NYCRR §600.1(f)(2) (covered new offers, refinancings and changed terms requiring disclosure)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Priced changes need a common signed-amendment and redisclosure rule; reconciliation must not silently become an amendment or enlarge a guarantor’s obligation.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -78,7 +88,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'A change to the Purchase Price, the Purchased Amount, the Specified Percentage, the Card Receipts on which the Specified Percentage is taken, a fee, or any other substantive term of this Agreement requires a written amendment signed by Merchant and Buyer, together with any disclosure or renewed acceptance applicable law then requires. An amendment that enlarges a Guarantor’s obligation also requires that Guarantor’s own signed consent, and no amendment binds a person who has not signed it.\nA reconciliation, a correction of an amount collected in error, and an updated Estimated Daily Holdback perform terms this Agreement already contains. They are not amendments. Section [[section:reconciliation]] states what each of them does, and none of them changes the Specified Percentage, the Purchased Amount or any other priced term. Updating an informational estimate changes no obligation of either party.\nA subsequent purchase is a separate agreement, separately offered, disclosed, signed and funded. It is not an amendment of this one. This Agreement is not amended by a processor’s form, by an application, by a document an independent sales organization supplies, or by a course of dealing.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CA', 'US-NY'],
     examinedBy: [{ review: 'REVIEW-02', findings: ['frpa-7-1-has-no-except-as-expressly-provided-carve-out'] }],
   },
   /*
@@ -141,6 +151,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.assignment-7-2',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '23 NYCRR §600.23 (authenticated assignment notice and payment discharge for covered New York recipients)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This transfer rule preserves servicing, defenses and a single collection interface; no alternative assignment regime is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -151,7 +171,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'Buyer may assign or transfer its interest in the Purchased Receipts to a person lawfully entitled to hold it. The assignee takes subject to this Agreement, to Merchant’s defenses and claims, to Merchant’s reconciliation, correction and refund rights under Section [[section:reconciliation]], and to applicable law. No transfer increases an amount or a percentage payable by Merchant, adds an obligation, or interrupts servicing.\nBuyer shall give Merchant notice before a transfer where that is practicable, and otherwise promptly after it, identifying the assignee, the effective date, the servicing contact, and any changed payment instruction. Merchant may continue to deal with Buyer until it receives that notice, and is not in breach for having done so.\nBuyer may delegate a duty under this Agreement, and delegation does not discharge Buyer. Buyer remains responsible for its own prior acts and for the performance of every duty it delegates, unless Merchant expressly agrees in writing to a novation that names the substitute and releases Buyer.\nWhere the interest is assigned in part, Buyer and each assignee shall give Merchant a single servicing and collection interface. A partial assignment shall not multiply Merchant’s costs, its points of contact, or the number of persons entitled to collect, and the aggregate cap in Section [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]] continues to apply once across every holder.\nMerchant may assign this Agreement in connection with a transfer of its business of the kind described in Section [[clause:frpa.change-of-name-or-location-or-sale-or-closing-of-business-5-18]], with Buyer’s consent, which Buyer shall not unreasonably withhold, condition or delay.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-NY'],
     examinedBy: [{ review: 'REVIEW-02', findings: ['frpa-7-2-permits-delegation-of-the-reconciliation-duty'] }],
   },
   /*
@@ -254,6 +274,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.notices-7-3',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Administration needs working contacts, delivery methods and a receipt rule distinct from judicial service; those functions are required under either dispute forum.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -299,6 +325,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.waiver-of-remedies-7-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The signed, limited waiver rule is the only authored nonwaiver provision; neither dispute forum provides alternative wording.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -423,6 +455,15 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5',
+    whyThisClause: {
+      kind: 'implements',
+      citation: 'Va. Code §6.2-2234(A) (Virginia forum for covered sales-based financing)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'unwritable',
+      note: 'A funder-state alternative needs the funder’s state, which the facts do not collect. Removing this clause would also remove governing-law and service rules that the venue preference does not decide.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -433,7 +474,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'This Agreement binds the parties and their permitted successors and assigns, and is for their benefit. Section [[clause:frpa.assignment-7-2]] states when an interest under this Agreement may be transferred, by whom, and on what terms, and nothing in this Section permits a transfer that Section does not.\nSubject to mandatory federal law and to applicable conflict-of-laws rules, the substantive law of the state of Merchant’s principal place of business stated in the Merchant and Funding Information grid governs this Agreement. An action arising under this Agreement shall be brought in a state court of competent jurisdiction in that state, or in a federal court of competent jurisdiction sitting in that state. Neither party may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction. Section [[clause:frpa.state-law-riders-7-24]] states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it.\nPerfection, the effect of perfection or non-perfection, and the priority of a security interest are governed by the mandatory rules of the Uniform Commercial Code that apply to them. This Section does not vary those rules and does not choose the law that decides them.\nService of a summons, a complaint or other judicial process is governed by Section [[clause:frpa.section-10-1]]. Nothing in this Section makes a mailing, an email or any other communication into service of process. This Section is not a waiver of valid service, of a jurisdictional objection, of a mandatory rule about where an action must be brought, or of any protection applicable law does not permit to be given up.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-VA'],
     examinedBy: [
       {
         review: 'REVIEW-01',
@@ -497,6 +538,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.survival-of-representations-7-6',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Completion must end collection while preserving correction, refunds and accrued claims; no alternative survival rule is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -570,6 +617,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.severability-7-7',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This limited severability rule cannot save a contract the law makes wholly void; no alternative severability treatment is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -643,6 +696,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.entire-agreement-7-8',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The transaction needs one document set and conflict hierarchy; a separate affiliate or processor agreement cannot silently enlarge its obligations.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -740,6 +799,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.indemnification-7-9',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The third-party indemnity is limited to proved fraud or intentional diversion; no alternative indemnity scope or procedure is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -823,6 +888,8 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.jury-trial-waiver-7-10',
+    whyThisClause: { kind: 'discretionary' },
+    variance: { kind: 'offered', fact: 'disputeResolution' },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -905,6 +972,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.class-action-waiver-7-11',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This is the class-proceeding rule accompanying the courts choice; arbitration carries its own individual-proceeding rule. It is not a separate funder election.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -980,6 +1053,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.service-of-process-7-12',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Every dispute path needs the same separation of operational notices from lawful judicial service; choosing arbitration does not eliminate related court proceedings.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1037,6 +1116,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.sale-of-additional-pool-of-receipts-right-of-first-refusal-7-13',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'When renewals are offered, this rule prevents a later purchase from being treated as an automatic extension; no-renewal templates omit it rather than select competing wording.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1096,6 +1181,15 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.reporting-7-15',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '15 U.S.C. §1681s-2(a), (b) (accuracy and dispute duties when furnishing consumer information)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Furnishing performance information and obtaining a consumer report are different acts; the consumer-report-pulled answer cannot remove accuracy and dispute duties when Buyer furnishes information.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1166,6 +1260,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.return-of-buyer-proceeds-7-16',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The split design needs a route for purchased receipts actually received by Merchant during an interruption, with credit once and no reach beyond the purchased share.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1240,6 +1340,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.electronic-signatures-7-17',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The parties’ agreement to use electronic signatures is the only authored execution-medium provision; legal recognition of electronic records does not compel this clause.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1323,6 +1429,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.communications-recording-and-premises-access-7-18',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '47 CFR §64.1200(a)(1)-(3), (10)-(11), (f)(9) (applicable calling-consent, written-consent and revocation requirements)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Consent belongs to the called person and lawful access belongs to the occupier; collection method does not authorize calls, recording or entry on their behalf.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1437,6 +1553,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.contractual-statutes-of-limitations-7-19',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The same mutual two-year period applies in courts and arbitration, subject to mandatory law; the dispute-resolution fact supplies no alternative limitation period.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1509,6 +1631,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.counterclaim-waiver-7-20',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This is the defense and counterclaim rule for court proceedings; arbitration states its own corresponding rule. Neither is an independent claim-waiver election.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1610,6 +1738,15 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.independent-sales-organizations-and-brokers-7-21',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '10 CCR §952; 23 NYCRR §600.21 (covered provider/broker disclosure duties)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'A broker channel needs identified roles, compensation and responsibility for unauthorized charges; the no-broker answer omits the channel rather than supplies alternate broker terms.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1620,7 +1757,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'the Merchant and Funding Information grid shall identify any independent sales organization, broker or marketing affiliate involved in this transaction (an “ISO”), its role, what it is paid, who pays it, and any disclosure applicable law requires. An ISO may be an independent contractor of Buyer, and that description does not waive any responsibility of Buyer arising from an ISO’s actual or apparent authority, from Buyer’s own conduct, or under applicable law. Buyer is not bound by a promise or representation of an ISO that is not contained in this Agreement and is not otherwise legally attributable to Buyer.\nBuyer shall maintain reasonable controls over the channel it engages, including onboarding, verification of any licensing or registration applicable law requires, training, monitoring, complaint handling, and compensation.\nMerchant and Guarantor do not indemnify Buyer, or any person associated with Buyer, for an act or omission of an ISO. Section [[clause:frpa.indemnification-7-9]] states the only indemnity Merchant gives under this Agreement.\nBuyer shall require by contract that an ISO it engages charge or collect from Merchant no compensation beyond what is expressly permitted, disclosed and agreed under applicable law; the commission Buyer pays is that ISO’s entire compensation for a transaction Buyer funds. Merchant is not required to pay an ISO anything as a condition of this Agreement, and may notify Buyer of a request for such a payment. Buyer shall investigate a reported unauthorized charge promptly, and shall refund a substantiated unauthorized charge collected by an ISO Buyer engaged within ten (10) Workdays after it is substantiated, without requiring Merchant to recover from the ISO first. Buyer may separately pursue the ISO. Nothing in this Section disclaims a representation legally attributable to Buyer, or limits a claim for deception or for an unauthorized fee.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CA', 'US-NY'],
     examinedBy: [
       { review: 'REVIEW-01', findings: ['iso-channel-vs-never-cold-call'] },
       { review: 'REVIEW-02', findings: ['iso-a6-and-frpa-7-21-give-different-answers-about-a-merchant-paid-fee'] },
@@ -1676,6 +1813,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.attorney-review-7-22',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This acknowledgment records an opportunity to consult counsel without asserting that consultation occurred; no alternate counsel acknowledgment is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1752,6 +1895,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.tmf-match-reporting-consent-and-release-7-23',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'Card-network reporting is governed by the network’s criteria and applicable law, not a blanket merchant release; no alternate network-reporting permission is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1866,6 +2015,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.state-law-riders-7-24',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        'Conn. Gen. Stat. §36a-868; Va. Code §6.2-2234; Tex. Fin. Code §398.055; 7 TAC §86.312(b)(7); Cal. Fin. Code §22806 (applicable nonwaiver, forum and pricing-communication duties)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Applicable disclosures, prohibited-term exclusions and mandatory forums must govern every offered template; recipient states determine applicability, not permission to waive those duties.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1876,7 +2035,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'Before Buyer makes a specific offer, Buyer shall determine which state’s law applies to the transaction, shall give the disclosures that law requires in the form and at the time it requires, shall obtain any signature it requires on them, and shall attach the applicable state rider before this Agreement is executed. Buyer shall omit any provision that applicable law forbids this Agreement to contain. No party waives a statutory right, and this Section cures no prohibited term: a provision the law forbids this Agreement to contain is one that must not be written into it, not one to be severed under Section [[clause:frpa.severability-7-7]] afterwards.\nThis Agreement contains no confession of judgment or comparable provision, as Section [[clause:frpa.remedies-6-2]] and Section [[clause:frpa.power-of-attorney-4-6]] state, and it contains no waiver of a right to notice, to a judicial hearing or to a prior court order in connection with a prejudgment remedy. Nothing in Section [[clause:frpa.service-of-process-7-12]] or Section [[section:service]] is such a waiver.\nWhere Merchant’s principal place of business is in Virginia and this Agreement is sales-based financing under Virginia law, a cause of action arising under this Agreement shall be brought in a court in the Commonwealth of Virginia. This paragraph governs over any different forum provision of this Agreement, including Section [[clause:frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5]].\nWhere applicable law requires an annual percentage rate to be stated whenever a charge, a pricing metric or a financing amount is stated for a specific offer, Buyer shall state it, using the words “annual percentage rate” or “APR”, from the time the specific offer is made and throughout the application process.\nThis Agreement authorizes no debit of any deposit account of Merchant. Where a protection applicable law gives Merchant is more favorable to Merchant than a provision of this Agreement, that protection controls.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CA', 'US-CT', 'US-VA', 'US-TX'],
     examinedBy: [
       {
         review: 'REVIEW-02',
@@ -1969,6 +2128,17 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.texas-occc-notice-7-25',
+    whyThisClause: {
+      kind: 'compelled',
+      citation: '7 TAC §86.310(d)',
+      appliesWhen:
+        'This agreement is a contract for services subject to Texas Finance Code Chapter 398; the notice must be a separate section or otherwise conspicuous.',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'compelled',
+      note: 'For a covered Texas contract for services, the OCCC notice must be conspicuous. Selecting other recipient states changes applicability, not the required wording.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1980,7 +2150,6 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: ['US-TX'],
-    requiredBy: '7 TAC §86.310(d)',
     examinedBy: [
       {
         review: 'REVIEW-02',
@@ -2095,6 +2264,11 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.arbitration-7-26',
+    whyThisClause: {
+      kind: 'implements',
+      citation: 'Va. Code §6.2-2234(B) (covered in-person arbitration location and provider-paid expenses)',
+    },
+    variance: { kind: 'offered', fact: 'disputeResolution' },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -2111,7 +2285,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'A dispute between the parties arising out of or relating to this Agreement, or to its formation, breach or termination, shall be resolved by final and binding arbitration before a single arbitrator. A dispute decided in arbitration is decided by that arbitrator and not by a judge or a jury, and a court reviews an award only on the grounds the law governing arbitration allows. This Section reaches Merchant, Buyer and each Guarantor, and reaches no person who is not a party to this Agreement.\nThe parties shall agree in writing on the arbitration administrator and on the rules that govern the arbitration. Where they have not agreed by the time a demand for arbitration is made, either party may apply to a court of competent jurisdiction to appoint the arbitrator, as the law governing arbitration permits.\nAn arbitration proceeding conducted in person shall take place in the jurisdiction where the principal place of business Merchant gives in the Merchant and Funding Information grid is located. Merchant is not required to attend a proceeding in person anywhere else, and may agree to a different place only in writing and only after the dispute has arisen. Buyer shall pay the arbitrator’s fees and expenses and the administrative fees of the arbitration, whoever brings the claim. Section [[clause:frpa.costs-of-collection-6-3]] governs what Buyer may recover from Merchant for enforcement, and this Section adds nothing to it and takes nothing from it.\nAn arbitration under this Section proceeds on an individual basis. A claim may not be arbitrated as a class, a collective or a representative proceeding, and the arbitrator may not consolidate the claims of more than one merchant or award relief to a person who is not a party to the arbitration. Where a court holds that requirement invalid as to a particular claim, that claim shall be decided by a court and this Section does not apply to it.\nThis Section does not waive a right that applicable law does not permit to be waived. It does not reach a public-enforcement proceeding brought by or on behalf of a governmental authority, and it does not prevent a party from complaining to, or giving information to, a governmental or regulatory authority.\nEach party may assert a defence, a setoff, a recoupment and a counterclaim in the arbitration so far as the rules governing it permit, and this Agreement requires no claim to be brought as a separate proceeding.\nSection [[clause:frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5]] states the law that governs this Agreement and the court an action is brought in, and this Section changes neither. A court in that state hears an application to compel or to stay an arbitration and enters judgment on an award. Section [[clause:frpa.state-law-riders-7-24]] states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it. Section [[clause:frpa.contractual-statutes-of-limitations-7-19]] states the period within which a claim must be brought, and it applies to a claim in arbitration as it does to a claim in a court.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-VA'],
     examinedBy: [
       {
         review: 'REVIEW-01',
@@ -2170,6 +2344,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.renewal-eligibility-8-1',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '10 CCR §900(a)(5); 23 NYCRR §600.1(f)(2) (covered new offers, refinancings and changed terms requiring disclosure)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Where renewals are offered, each new purchase needs fresh underwriting, disclosure and acceptance; the no-renewal answer omits this process rather than selects another rule.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -2183,7 +2367,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'Neither party is obliged to enter a subsequent purchase, and no renewal arises automatically from this Agreement.\nA subsequent purchase requires new underwriting on Merchant’s Card Receipts and existing obligations as they stand at that time, a new and complete agreement, every disclosure the law then requires, and Merchant’s fresh acceptance. Before Merchant accepts, Buyer shall state separately the additional cash Merchant will receive and the amount of any existing obligation to be settled out of the new consideration. A payoff is not cash delivered to Merchant.\nThis Agreement is settled or completed as Section [[clause:frpa.rollover-methods-8-2]] provides. Whether Buyer may hold this purchase and a subsequent purchase at the same time is governed by Section [[clause:frpa.single-active-position-4-15]]. No Guarantor’s obligation under this Agreement extends to a subsequent purchase.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CA', 'US-NY'],
     examinedBy: [{ review: 'REVIEW-01', findings: ['lombard-multi-position-vs-no-stack'] }],
   },
   /*
@@ -2229,6 +2413,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.rollover-methods-8-2',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '10 CCR §900(a)(5); 23 NYCRR §600.1(f)(2) (covered new offers, refinancings and changed terms requiring disclosure)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This settlement rule is needed for payoff-only renewals. Carry has its own rule, but no-renewal selects neither, so the three-value fact is not an exhaustive clause group.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -2244,7 +2438,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'No Remaining Balance under a prior transaction is carried into the Purchased Amount stated in the Funding Terms grid. That Purchased Amount is the Purchase Price multiplied by the Factor Rate, and nothing is added to it.\nMerchant may separately authorize a stated part of the Purchase Price to be applied to settle an identified prior transaction, whether it is owed to Buyer or to another person. Before Merchant accepts, Buyer shall state in writing the prior transaction identified, its settlement amount as at the Purchase Date, the amounts already credited to it, any unpaid charge included in that settlement amount, any rebate or discount applied, the part of the Purchase Price to be applied to it, and the cash Merchant will actually receive. Buyer shall make any further disclosure the law requires of a refinancing, and shall not count a payoff as cash delivered to Merchant.\nOn the Purchase Date the authorized settlement fully extinguishes the identified prior transaction. Where that transaction is owed to Buyer, Buyer shall stop every instruction it has given an Approved Processor under it, close its ledger, record the settlement once in the ledger of each transaction, confirm to Merchant that no claim or collection right under it remains, and file or authorize the release of every filing that records its interest under it.\nMerchant is bound only by the offer it accepted, as fully calculated. A change to the settlement amount, to the Purchase Price or to the cash Merchant will receive requires corrected disclosures, and Merchant’s renewed acceptance where the law requires it. No use of the word “renewal” waives a rebate the law requires or permits a charge the law does not.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CA', 'US-NY'],
     examinedBy: [
       {
         review: 'REVIEW-01',
@@ -2300,6 +2494,16 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.rollover-carry-method-8-2',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '10 CCR §900(a)(5); 23 NYCRR §600.1(f)(2) (covered new offers, refinancings and changed terms requiring disclosure)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This rule records the merchant’s Deduct or Carry election when carry renewals are offered. No-renewal selects neither settlement rule, so the three-value fact is not an exhaustive clause group.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -2311,7 +2515,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'If Merchant has an outstanding Remaining Balance with Buyer when a subsequent purchase is made, that balance is dealt with by whichever of the following methods Merchant elects. Under both methods the Remaining Balance is the figure Section [[clause:frpa.completion-threshold-2-6]] gives, and so includes no fee, no equipment charge, no cost of enforcement and no amount owed under any other agreement.\n(a) Deduct. The Remaining Balance is settled out of the Purchase Price and appears as “Less: Prior Balance(s)” in the Itemization of Net Amount Funded grid. The new Purchased Amount is the Purchase Price multiplied by the Factor Rate. Merchant receives a reduced disbursement, because part of the Purchase Price has been applied to retire the existing obligation.\n(b) Carry. The Remaining Balance is carried into the new Purchased Amount instead of being settled out of the Purchase Price, so that the new Purchased Amount is (Purchase Price × Factor Rate) + Remaining Balance. It is carried at face value and no Factor Rate is applied to it. “Less: Prior Balance(s)” in the Itemization of Net Amount Funded grid is $0.00 under this method, and Merchant receives the full Net Amount Funded.\nUnder either method the prior agreement is at an end on the new Purchase Date. Buyer shall stop every instruction it has given an Approved Processor under it, close its ledger, record the amount dealt with once in the ledger of each transaction, confirm to Merchant that no claim or collection right under the prior agreement remains, and file or authorize the release of every filing that records its interest under it. A balance carried under (b) is collected only under the new agreement and only once.\nBefore Merchant accepts, Buyer shall state in writing the prior transaction identified, its Remaining Balance as at the Purchase Date, the amounts already credited to it, any unpaid charge included in that balance, any rebate or discount applied, the Purchased Amount each method produces, and the cash Merchant will actually receive under each. Buyer shall make any further disclosure the law requires of a refinancing, and shall not count a settlement of a prior balance as cash delivered to Merchant.\nThe elected method is recorded in the Merchant and Funding Information grid and the Purchased Amount in the Funding Terms grid is calculated on it. Buyer may propose a method when presenting the offer; Merchant may require the other, in which case Buyer shall re-issue the offer priced on the method Merchant elects. Merchant is not bound by a method it has not elected.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CA', 'US-NY'],
     examinedBy: [
       {
         review: 'REVIEW-01',
@@ -2375,6 +2579,12 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   */
   {
     slug: 'frpa.voluntary-prepayment-8-3',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'Early completion and its discount treatment are contractual choices; no alternative early-completion clause is authored, and disclosure duties do not require charging a fee or giving a discount.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

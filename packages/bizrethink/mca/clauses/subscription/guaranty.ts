@@ -11,6 +11,12 @@ import type { McaClause } from '../types';
 export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {
     slug: 'subscription.guarantor-information',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'These fields identify the equipment provider’s guarantor, not the receivables funder’s; the FRPA guaranty-scope answer cannot decide this separate guaranty.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'field-group',
@@ -40,6 +46,12 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   },
   {
     slug: 'subscription.guaranty-of-payment',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'This is a guaranty to the equipment provider of return and specified conduct; the receivables funder’s guaranty-scope answer does not choose its obligations.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -78,6 +90,12 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   */
   {
     slug: 'subscription.independent-decision-governing-law',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The equipment guaranty needs the same governing-law and lawful-service framework as its own agreement; selecting FRPA arbitration cannot remove those terms.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -103,6 +121,12 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   */
   {
     slug: 'subscription.jury-trial-and-class-action-waiver',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'These procedural choices belong to the equipment guaranty’s parties; the FRPA dispute-resolution answer does not select an alternative for them.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -127,6 +151,15 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   },
   {
     slug: 'subscription.credit-reporting-authorization',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '15 U.S.C. §1681b(a)(2), (f) (individual consumer-report instructions and permissible use)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'This individual authorizes the equipment provider’s report use; the receivables funder’s consumer-report answer cannot grant or withdraw authority for that different provider.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -142,6 +175,16 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   },
   {
     slug: 'subscription.communications-consent',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '47 CFR §64.1200(a)(1)-(3), (10)-(11), (f)(9) (applicable calling-consent, written-consent and revocation requirements)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Consent for equipment-provider contact belongs to the called individual; a funder profile cannot give consent on that person’s or provider’s behalf.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -157,6 +200,12 @@ export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   },
   {
     slug: 'subscription.acknowledgment',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The separate equipment agreement and guaranty need signatures and capacity identified for their own obligations; a signature on the receivables purchase cannot replace them.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',

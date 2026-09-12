@@ -6,6 +6,7 @@ import type {
   SourceState,
 } from '@bizrethink/customizations';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '@bizrethink/customizations/mca/clauses/instruments';
+import { describeClauseVariance, describeWhyThisClause } from '@bizrethink/customizations/mca/clauses/metadata';
 import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
@@ -561,6 +562,8 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageClause; onApp
               {clause.heading}
             </p>
             {clause.selectionNote && <p className="mt-1 text-muted-foreground text-xs">{clause.selectionNote}</p>}
+            <p className="mt-1 text-muted-foreground text-xs">{describeWhyThisClause(clause.whyThisClause)}</p>
+            <p className="mt-1 text-muted-foreground text-xs">{describeClauseVariance(clause.variance)}</p>
             <p className="mt-0.5 font-mono text-muted-foreground text-xs">
               {clause.slug} · {clause.provenance}
             </p>

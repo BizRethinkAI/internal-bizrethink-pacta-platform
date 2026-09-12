@@ -1,3 +1,4 @@
+import { validateDirectTemplateFields } from '@bizrethink/customizations/server-only/direct-template-fields';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
@@ -87,7 +88,7 @@ export const createDocumentFromDirectTemplate = async ({
   directRecipientEmail,
   directTemplateToken,
   directTemplateExternalId,
-  signedFieldValues,
+  signedFieldValues: submittedFieldValues,
   templateUpdatedAt,
   nextSigner,
   requestMetadata,
@@ -221,6 +222,14 @@ export const createDocumentFromDirectTemplate = async ({
   });
 
   const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta, signatureLevel);
+
+  // MODIFIED for BizRethink (overlay 080): validate all values/defaults before factors, file copies or creation writes.
+  const signedFieldValues = validateDirectTemplateFields({
+    fields: directTemplateRecipient.fields,
+    submitted: submittedFieldValues,
+    internalVersion: directTemplateEnvelope.internalVersion,
+    documentMeta: derivedDocumentMeta,
+  });
 
   // The resulting document contains every non-direct template recipient plus the
   // direct recipient that is signing now. A recipientCount of 0 means unlimited.

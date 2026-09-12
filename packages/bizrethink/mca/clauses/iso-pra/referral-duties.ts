@@ -12,6 +12,12 @@ import type { McaClause } from '../types';
 export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   {
     slug: 'iso-pra.appointment',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The agreement must define the nonexclusive referral appointment and its authority limits; no alternate broker appointment is authored.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -39,6 +45,12 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
    */
   {
     slug: 'iso-pra.referral-obligations',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The no-specific-offer communication rule is the chosen referral-only channel model; disclosure law can permit compliant broker communications and does not compel this universal ban.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -62,6 +74,12 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   },
   {
     slug: 'iso-pra.approval-of-applications',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Underwriting approval belongs to Company in this referral-only model; no alternative delegated approval authority is authored.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -77,6 +95,12 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   },
   {
     slug: 'iso-pra.duty-to-notify',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The ISO’s adverse-information reporting covenant is the only authored notification rule; no alternate reporting threshold or period is offered.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -92,6 +116,15 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   },
   {
     slug: 'iso-pra.marketing-materials',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '15 U.S.C. §45(a)(1) (unfair or deceptive acts or practices within FTC jurisdiction)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'Company approval of materials and accurate marketing are the only authored channel controls; no alternative marketing-approval process is authored.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -107,6 +140,12 @@ export const ISO_PRA_REFERRAL_DUTIES: McaClause[] = [
   },
   {
     slug: 'iso-pra.representatives',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The referral model needs responsibility for the ISO’s personnel and a removal mechanism; the broker-channel answer does not select alternate personnel terms.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',

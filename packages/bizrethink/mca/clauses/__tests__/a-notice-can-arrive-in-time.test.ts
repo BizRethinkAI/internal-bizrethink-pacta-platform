@@ -696,7 +696,7 @@ describe('the Texas notice is the regulator’s words, unaltered', () => {
   });
 
   it('names the rule that compels it', () => {
-    expect(clause(TEXAS).requiredBy).toMatch(/86\.310/);
+    expect(clause(TEXAS).whyThisClause).toMatchObject({ kind: 'compelled', citation: '7 TAC §86.310(d)' });
     expect(clause(TEXAS).appliesInStates).toEqual(['US-TX']);
   });
 

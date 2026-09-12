@@ -1,0 +1,206 @@
+{
+  "created_at": "2026-09-12T18:47:25.719835+00:00",
+  "scope": "Targeted primary authority supporting ADR 0014 metadata. Not an eleven-state UCC, case-law, privacy or TCPA opinion.",
+  "raw_http_attempts": [
+    {
+      "file": "fcra-march-2026.pdf",
+      "url": "https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf",
+      "final_url": "https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf",
+      "retrieved_at": "2026-09-12T18:34:02.311095+00:00",
+      "status": 403,
+      "sha256": "300b270814b76ade3d27d0e079fcd618d02ca5a20fa2fda6a44aa3f981922513",
+      "bytes": 453,
+      "content_type": "text/html",
+      "result": "Blocked raw download; indexed browser extraction used instead"
+    },
+    {
+      "file": "fcc-64-1200.html",
+      "url": "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200",
+      "final_url": "https://unblock.federalregister.gov",
+      "retrieved_at": "2026-09-12T18:34:02.311312+00:00",
+      "status": 200,
+      "sha256": "ba894a10824e3179054cfb8aab84eb814225aac55a459df2dc4dfb174d0d2304",
+      "bytes": 10596,
+      "content_type": "text/html; charset=utf-8",
+      "result": "HTTP 200 access challenge, not rule text; indexed browser extraction used instead"
+    },
+    {
+      "file": "disposal-682-3.html",
+      "url": "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-F/part-682/section-682.3",
+      "final_url": "https://unblock.federalregister.gov",
+      "retrieved_at": "2026-09-12T18:34:02.311402+00:00",
+      "status": 200,
+      "sha256": "4d49b9dbbfd1780d4359bba43bc6d4c0eca786be905df28d63970dd09a22f960",
+      "bytes": 10596,
+      "content_type": "text/html; charset=utf-8",
+      "result": "HTTP 200 access challenge, not rule text; indexed browser extraction used instead"
+    },
+    {
+      "file": "fl-679-2031.html",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2025/679.2031",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2025/679.2031",
+      "retrieved_at": "2026-09-12T18:34:02.311469+00:00",
+      "status": 200,
+      "sha256": "a5307837880840cace9e989388d85e61698ecba90e0737d0677ac69d21ba15df",
+      "bytes": 50865,
+      "content_type": "text/html; charset=utf-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/fl-679-2031.txt"
+    },
+    {
+      "file": "fl-679-509.html",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2025/679.509",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2025/679.509",
+      "retrieved_at": "2026-09-12T18:34:02.311507+00:00",
+      "status": 200,
+      "sha256": "da34fe309c69ff1dfe859ba385db57f3e427a994c6b6104dfa753791db78a85b",
+      "bytes": 45593,
+      "content_type": "text/html; charset=utf-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/fl-679-509.txt"
+    },
+    {
+      "file": "fl-679-4061.html",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2025/679.4061",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2025/679.4061",
+      "retrieved_at": "2026-09-12T18:34:02.311538+00:00",
+      "status": 200,
+      "sha256": "6889ae14131b620da540cad93b168d795068e6584023bbed2c17fb0f18c6d810",
+      "bytes": 52364,
+      "content_type": "text/html; charset=utf-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/fl-679-4061.txt"
+    },
+    {
+      "file": "fl-501-171.html",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2025/501.171",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2025/501.171",
+      "retrieved_at": "2026-09-12T18:34:02.641639+00:00",
+      "status": 200,
+      "sha256": "c1665dc7a807c2db21369e6b7f97b89f963992c2b3d1b3e9a905cfd2a91cd4b4",
+      "bytes": 69158,
+      "content_type": "text/html; charset=utf-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/fl-501-171.txt"
+    },
+    {
+      "file": "fl-680-214.html",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2025/680.214",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2025/680.214",
+      "retrieved_at": "2026-09-12T18:34:02.915876+00:00",
+      "status": 200,
+      "sha256": "f44efbad06273096f58e6ac036b662c3648a2723a9d99bf562c764c955ab3519",
+      "bytes": 45203,
+      "content_type": "text/html; charset=utf-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/fl-680-214.txt"
+    },
+    {
+      "file": "fl-672-316.html",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2025/672.316",
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2025/672.316",
+      "retrieved_at": "2026-09-12T18:34:03.024520+00:00",
+      "status": 200,
+      "sha256": "c1c6ae49a29fdbf5990af06a72f06e8119fb78342b392e7b9f62ff3603778035",
+      "bytes": 46919,
+      "content_type": "text/html; charset=utf-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/fl-672-316.txt"
+    },
+    {
+      "file": "esign-7001.html",
+      "url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title15-section7001&num=0&edition=prelim",
+      "final_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title15-section7001&num=0&edition=prelim",
+      "retrieved_at": "2026-09-12T18:34:03.105009+00:00",
+      "status": 200,
+      "sha256": "4bdad9c482c0462a4d5ede38bab7ed35750337576769756579ef855133dff788",
+      "bytes": 162492,
+      "content_type": "text/html;charset=UTF-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/esign-7001.txt"
+    },
+    {
+      "file": "ftca-45.html",
+      "url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title15-section45&num=0&edition=prelim",
+      "final_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title15-section45&num=0&edition=prelim",
+      "retrieved_at": "2026-09-12T18:34:03.126469+00:00",
+      "status": 200,
+      "sha256": "e4f74251912142357282d3c67232537b7a25a179ee1633b5661b1f80f3c2890d",
+      "bytes": 209184,
+      "content_type": "text/html;charset=UTF-8",
+      "result": "Operative statutory text retained",
+      "evidence": "evidence/ftca-45.txt"
+    }
+  ],
+  "web_extractions": [
+    {
+      "file": "evidence/fcra-web-extract.txt",
+      "source_urls": ["https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf"],
+      "read_date": "2026-09-12",
+      "publisher_edition": "FTC March 2026 compilation; not a substitute for the U.S. Code",
+      "sections_read": ["604(a)(2), (f)", "615(a)", "623(a)(1)-(3), (b)"]
+    },
+    {
+      "file": "evidence/cfr-web-extract.txt",
+      "source_urls": [
+        "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200",
+        "https://www.ecfr.gov/current/title-16/chapter-I/subchapter-F/part-682/section-682.3"
+      ],
+      "read_date": "2026-09-12",
+      "publisher_edition": "Title 47 displayed current to 2026-09-10; Title 16 to 2026-09-09",
+      "sections_read": ["64.1200(a)(1)-(3), (10)-(11), (f)(9)", "682.3"]
+    }
+  ],
+  "retained_evidence": [
+    {
+      "file": "evidence/cfr-web-extract.txt",
+      "sha256": "14e00e002de267bec65bfac32981a700e876de4929c4cec8d499d3e010a9a3cd",
+      "bytes": 36618
+    },
+    {
+      "file": "evidence/esign-7001.txt",
+      "sha256": "dd04c01dee4004d25f266cc6dc6c1426298935f9beb114175b6faa2ad4cbd30c",
+      "bytes": 11133
+    },
+    {
+      "file": "evidence/fcra-web-extract.txt",
+      "sha256": "06761765ba3a72b9c3f847dd8ce2d945f7e1ae10e4e34f0ff71bbc40f1b16c4c",
+      "bytes": 28153
+    },
+    {
+      "file": "evidence/fl-501-171.txt",
+      "sha256": "e7ea3a00c795a1c0e619e5f5fd3f58962b6da10faae1ef8a1f4b42a01323081b",
+      "bytes": 16418
+    },
+    {
+      "file": "evidence/fl-672-316.txt",
+      "sha256": "c9dfefa8c6ef5cd1e2eb43f3f9fd77960dc07b9cd0d6a1756cc9539c99960bcc",
+      "bytes": 3616
+    },
+    {
+      "file": "evidence/fl-679-2031.txt",
+      "sha256": "343af144ac03d886acdebffb5aa93351811314ac09fbf594665e3a4e1c761726",
+      "bytes": 5165
+    },
+    {
+      "file": "evidence/fl-679-4061.txt",
+      "sha256": "429774921863275400af11978bd30087bca89233f83ef300358df8de81cbae62",
+      "bytes": 6585
+    },
+    {
+      "file": "evidence/fl-679-509.txt",
+      "sha256": "d877599655282a9d3c1281f6992edb555816d2138d1499853191e288d8e87ccb",
+      "bytes": 2248
+    },
+    {
+      "file": "evidence/fl-680-214.txt",
+      "sha256": "e8a0f49509969553370ad669ea2686d344b4454be9b0b46f755d0da7a098d8f6",
+      "bytes": 2457
+    },
+    {
+      "file": "evidence/ftca-45.txt",
+      "sha256": "60ca41bcbcc799bd8d5324625de5d03fdbb41942e95d00b61bf42b5923b166ec",
+      "bytes": 22317
+    }
+  ]
+}

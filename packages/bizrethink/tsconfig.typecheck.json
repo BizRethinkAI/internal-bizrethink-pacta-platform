@@ -49,6 +49,9 @@
     "server-only/assistant-field-permission.ts",
     "../app-tests/e2e/api/bizrethink/assistant-signature-boundary.spec.ts",
     "regression-tests/state-note-workflow.test.ts",
-    "../../.github/scripts/state-notes.ts"
+    "../../.github/scripts/state-notes.ts",
+    "regression-tests/direct-template-field-validation.test.ts",
+    "server-only/direct-template-fields.ts",
+    "../app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts"
   ]
 }
