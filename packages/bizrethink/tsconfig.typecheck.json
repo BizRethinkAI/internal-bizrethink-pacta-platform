@@ -18,6 +18,8 @@
     "server-only/require-admin-loader.ts",
     "server-only/require-admin-loader.test.ts",
     "regression-tests/admin-loaders-gated.test.ts",
+    "server-only/api-token-team-scope.ts",
+    "server-only/api-token-team-scope.test.ts",
     "regression-tests/api-token-team-boundary.test.ts",
     "regression-tests/api-token-team-downloads.test.ts",
     "regression-tests/api-token-team-fixture.ts",
