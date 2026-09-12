@@ -16,6 +16,50 @@ _Last updated: 2026-09-12_
 
 ---
 
+## 2026-09-12 — eleven-state MCA agreement requirements (#179)
+
+Research PR **#179** merged at `42394e5f3` after all 13 checks passed on
+`4cf12aa5a`. Its E2E jobs used the existing docs-only exemption; they did not
+run the browser suite. The source report and detailed records are in
+[`research/mca-agreement-requirements-2026-09-12/`](research/mca-agreement-requirements-2026-09-12/README.md).
+This is a walk of eleven dedicated commercial-financing schemes, including
+26 California rules, 26 New York rules, fourteen Texas rules, four Virginia
+rules and Connecticut guidance/enforcement cross-references. The manifest
+records 113 HTTP attempts, twenty retained files and 27 unchanged references.
+The historical #174 audit and application-source bytes remain unchanged.
+
+Positive agreement duties: GA §10-1-393.18(e)(4), UT §7-27-202(3), KS
+§75-784(b)(5) and MO §427.300.3(2)(e) require variable-payment methodology
+in covered agreements; Texas §86.310(d) requires its conspicuous OCCC notice
+and §86.312(b)(3) requires disclosed/contracted fees. Duties, prescribed
+wording, prohibited terms and separate disclosures are distinguished.
+California §§22806–22807 derive from 2025 SB 362, effective January 1, 2026.
+CT's later employee-registration memorandum is not a disclosure-grace extension.
+
+Currency limits survive: GA's full current Lexis body was blocked by CAPTCHA;
+MO's declaration/rule history selecting the commencement branch is unclosed.
+California consolidated rules state August 28, 2026 currency; New York states
+October 31, 2023, supplemented by official amendment-index checks through
+September 9, 2026 without a later Part 600 amendment identified. Utah's linked
+FAQ is dated January 1, 2023 despite its 2026 upload path. Texas's current
+portal labels §86.311(i)'s second item `(2)` where the adoption says `(B)`.
+These are documented limits, not invented verification dates or equivalences.
+
+Remaining source/form work: fix Utah application references from §7-27-201 to
+§7-27-202; update California statutory references; correct the Virginia
+prescribed form separately. UCC, federal law, guaranty, bankruptcy and case law
+remain targeted clause dependencies. Research alone approves no clause.
+ADR 0014 backfill is being implemented in
+[`state/inflight/feat-mca-clause-metadata.md`](state/inflight/feat-mca-clause-metadata.md).
+Missing collection/venue alternatives and the processor-acceptance deal-fact
+move remain separate. The research retrieval workspace was
+`/tmp/pacta-mca-requirements/`; durable evidence is committed in the report.
+
+A-07 authored the #176/#177 note cleanup, reused unchanged from #178 head
+`3874700da819d2606eb0198a6458d57b5d72a139` as research dependency `cede1f021`.
+This section folds only this session's now-merged #179 note. No deployment
+status is inferred from the merge.
+
 ## 2026-09-12 — merged signup policy and derived MCA numbering
 
 **#169 / R-01** merged at `bcbec3c3b298ee28265a246e80fa7d2ba8407170`.

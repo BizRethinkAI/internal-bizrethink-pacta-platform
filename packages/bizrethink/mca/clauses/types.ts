@@ -5,6 +5,23 @@ import type { ClauseExamination } from './examination';
 import type { McaFacts } from './facts';
 import type { McaInstrument } from './instruments';
 
+/** Legal purpose of the current wording, not an approval or a finding (ADR 0014). */
+export type WhyThisClause =
+  | { kind: 'compelled'; citation: string; appliesWhen: string }
+  | { kind: 'implements'; citation: string }
+  | { kind: 'discretionary' };
+
+export type FixedBecause = 'compelled' | 'misattributed' | 'no-alternative' | 'unwritable' | 'load-bearing';
+
+/**
+ * A complete alternative group earns `offered`. A conditional inclusion alone
+ * does not: fixed wording can still be inapplicable to a particular template.
+ * This records available wording, not a prohibition on future commercial terms.
+ */
+export type ClauseVariance =
+  | { kind: 'offered'; fact: keyof McaFacts }
+  | { kind: 'fixed'; because: FixedBecause; note: string };
+
 export type { ClauseExamination } from './examination';
 
 /**
@@ -174,8 +191,10 @@ export type McaClause = {
    */
   appliesInStates: McaJurisdiction[];
 
-  /** The statute or regulation that compels the clause, where one does. */
-  requiredBy?: string;
+  /** Explicit assessment of why these words are here; never inferred from a missing citation. */
+  whyThisClause: WhyThisClause;
+  /** Available funder choice, or the specific reason the wording remains fixed. */
+  variance: ClauseVariance;
 
   /**
    * Which review read this clause, and what it found.

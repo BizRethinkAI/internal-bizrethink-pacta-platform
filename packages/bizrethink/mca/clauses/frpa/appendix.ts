@@ -87,6 +87,15 @@ export const FRPA_APPENDIX: McaClause[] = [
   */
   {
     slug: 'frpa.appendix-a-fees-collectible',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '7 TAC §86.312(b)(3) (fees must be disclosed and contracted for in covered Texas transactions)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The purchase needs a complete fee schedule and a rule for blanks, changes and collection; removing the schedule would leave charges unstated.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -97,7 +106,7 @@ export const FRPA_APPENDIX: McaClause[] = [
     body: 'This Appendix is the whole of what Buyer may charge Merchant under this Agreement. Buyer may charge only a fee identified, in the completed Appendix and in every disclosure applicable law requires before Merchant accepts, by its name, its dollar amount or a lawful calculation method, the person to whom it is paid, what it is for, and when it is charged. A fee left blank, or not identified in the completed Appendix, is $0.00 and may not be charged. Buyer may not create a fee, or vary a fee, after Merchant signs.\nA fee is a separate debt and is not part of the purchase. No fee is added to the Purchased Amount or the Remaining Balance, and no fee is collected through a Split Funding Authorization or otherwise out of the settlement of Card Receipts. Section [[clause:frpa.merchant-deposit-agreement-4-1]] states how a fee is charged, demanded and collected.\nNo fee is charged for a reconciliation or an adjustment under Section [[section:reconciliation]]; for a decline in or an absence of Card Receipts; for a business failure, an ordinary loss of the business, or Merchant’s insolvency or bankruptcy; for a loss of or an interruption in access to information or to a system; for a good-faith addition or replacement of an Approved Bank Account or an Approved Processor under Section [[clause:frpa.approved-bank-account-2-4]]; or for Merchant exercising a legal right or a right this Agreement gives Merchant. Section [[clause:frpa.events-of-default-6-1]] lists these among the things that are not an Event of Default, and a fee may not be used to charge for one of them.\nAttorneys’ fees, court costs, collection expenses and interest are not fees. They are costs of enforcement, and Section [[clause:frpa.costs-of-collection-6-3]] governs them, states the only ceiling on them, and requires them to be awarded by a court or agreed in writing before they are payable.\nBuyer may waive a fee. A waived fee is removed from every amount Buyer claims and may not be reinstated; Buyer may keep its record of the waiver.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-TX'],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
   /*
@@ -162,6 +171,15 @@ export const FRPA_APPENDIX: McaClause[] = [
   */
   {
     slug: 'frpa.appendix-a-origination-fee-to-iso',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '23 NYCRR §600.21(f) (written broker-compensation notice for covered New York recipients)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'When an ISO is paid from the origination fee, the same cost must be identified once with its recipient; no-broker templates omit this explanation.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -177,7 +195,7 @@ export const FRPA_APPENDIX: McaClause[] = [
     body: 'Part or all of the Origination Fee itemized in the Itemization of Net Amount Funded grid may be paid by Buyer to an ISO. Buyer shall state in the Merchant and Funding Information grid the amount so paid and the ISO to which it is paid, and shall make every compensation disclosure applicable law requires.\nThat payment is made by Buyer out of an amount with which Merchant has already been charged. It is included in the transaction cost disclosed to Merchant before Merchant accepts, and it authorizes no further charge to Merchant by Buyer or by an ISO. Merchant is not required to pay an ISO anything as a condition of this Agreement.\nWhere an amount charged to Merchant funds an ISO’s compensation, Buyer shall not state that Merchant is charged no ISO fee. What Merchant is charged, and who is paid out of it, are stated in the Itemization of Net Amount Funded grid and in this Appendix.\nSection [[clause:frpa.independent-sales-organizations-and-brokers-7-21]] governs an ISO’s conduct, an unauthorized charge collected by an ISO, and Buyer’s duty to refund one.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-NY'],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
   /*
@@ -222,6 +240,12 @@ export const FRPA_APPENDIX: McaClause[] = [
   */
   {
     slug: 'frpa.appendix-a-attorneys-fees',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The appendix must point to the single enforcement-cost rule rather than price a second recovery; no alternate appendix enforcement charge is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -324,6 +348,12 @@ export const FRPA_APPENDIX: McaClause[] = [
   */
   {
     slug: 'frpa.execution',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Merchant’s authorized signature and a guarantor’s separate capacity must be distinguishable; the agreement cannot operate without execution by its actual parties.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -490,6 +520,12 @@ export const FRPA_APPENDIX: McaClause[] = [
   */
   {
     slug: 'frpa.exhibit-a-split-funding',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The split collection design needs a complete instruction and processor acceptance for each processor; an unaccepted instruction is a deal prerequisite to complete, not a clause to omit.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -570,6 +606,15 @@ export const FRPA_APPENDIX: McaClause[] = [
   */
   {
     slug: 'frpa.exhibit-c-permission-to-release',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '15 U.S.C. §1681b(a)(2), (f) (individual consumer-report instructions and permissible use)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'When an individual consumer report is obtained, separate purpose and signer authority must accompany it; the no-report answer omits the release rather than provides another authorization.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

@@ -128,6 +128,15 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.merchant-deposit-agreement-4-1',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '7 TAC §86.312(b)(3) (fees must be disclosed and contracted for in covered Texas transactions)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'Changing the collection-method answer does not change these information, itemization and fee-separation rules; neither answer supplies different wording for this clause.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -138,7 +147,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     body: 'Merchant shall give Buyer the information and the processor authorizations reasonably necessary to verify Card Receipts and to remit the Purchased Receipts, and shall keep them in place while this Agreement continues. Buyer’s use of that information is governed by Section [[clause:frpa.protection-of-information-4-7]]. This Section authorizes no debit of any deposit account of Merchant.\nEvery amount deducted from the Purchase Price before delivery to Merchant shall appear as a separate dollar item in the Itemization of Net Amount Funded grid before Merchant signs, and shall be disclosed as applicable law requires. The Origination Fee, if any, is the dollar amount so itemized. Buyer may not deduct, retain or collect an amount that is not itemized there, an amount that has not been earned, or an amount greater than the figure itemized.\nA fee is a separate debt and is not part of the purchase. No fee is added to the Purchased Amount or the Remaining Balance, and no fee is collected through a Split Funding Authorization, through the split under Section [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]], or through any other mechanism by which Purchased Receipts reach Buyer. No fee is counted in the aggregate cap in Section [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]]. Buyer’s route to an unpaid fee is an itemized written demand and, failing payment, a claim; and while Merchant disputes a fee in good faith, Buyer shall not collect it. A cost of enforcement is not a fee, and Section [[clause:frpa.costs-of-collection-6-3]] governs it and states the only ceiling on it.\nBuyer owns the Purchased Receipts and the identifiable proceeds of that purchased share, and nothing else. Merchant keeps every other interest in its own card settlements and in every account into which they settle.\nA Bank is not a party to this Agreement. This Agreement does not state, create or alter a Bank’s duties, and it releases no person from liability for an unauthorized instruction, for negligence, for fraud or for a violation of law. Buyer is responsible for the accuracy and scope of the instructions it or its agents issue, and shall send Merchant a copy of each of them when it sends it, as Section [[clause:frpa.power-of-attorney-4-6]] requires. The authorizations given under this Section end when this Agreement reaches the Completion Threshold under Section [[clause:frpa.completion-threshold-2-6]], and Buyer shall then withdraw every instruction it has given.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-TX'],
     examinedBy: [
       {
         review: 'REVIEW-01',
@@ -191,6 +200,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.term-of-agreement-4-2',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The duration must refer to the same completion threshold as collection; no independently priced maturity term is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -290,6 +305,16 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.financial-condition-4-3',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '15 U.S.C. §§1681b(f), 1681m(a) (permissible consumer-report use and applicable adverse-action notices)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'The consumer-report fact concerns an individual’s report; this clause also governs Merchant’s business records. Omitting it would remove those business-record limits even when no consumer report is pulled.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -335,6 +360,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.transaction-history-4-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Collection and reconciliation need access to relevant settlement records subject to the information limits; this business-record authority is not an individual consumer-report choice.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -394,6 +425,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.no-liability-4-5',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The library contains this mutual consequential-loss limitation with preserved remedies; no alternative liability allocation is authored for a funder answer.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -477,6 +514,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.power-of-attorney-4-6',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The split design needs a bounded instruction authority that cannot expand collection or replace judicial process; no alternative agency grant is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -547,6 +590,16 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.protection-of-information-4-7',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '16 CFR §682.3 (disposal of consumer-report information); Fla. Stat. §501.171(2), (4) (security and breach notice for covered personal information)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Every permitted information request needs common purpose, disclosure, security and correction limits; removing them would leave the other authorizations without their controlling restrictions.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -557,7 +610,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     body: 'Buyer shall use Merchant’s and each Guarantor’s information only for underwriting, servicing, reconciliation, fraud prevention, lawful enforcement and legal compliance, and only for the purpose for which it was collected. This Section applies to all information Buyer obtains under this Agreement, including information obtained under Section [[clause:frpa.financial-condition-4-3]], Section [[clause:frpa.transaction-history-4-4]], Section [[clause:frpa.electronic-account-monitoring-authorization-plaid-4-16]] and Section [[clause:frpa.stacking-prohibited-5-16]].\nBuyer may disclose the minimum necessary information to a service provider or an authorized assignee that is bound by confidentiality, security and purpose restrictions; to a credit-reporting recipient or a card network only as Section [[clause:frpa.reporting-7-15]] and Section [[clause:frpa.tmf-match-reporting-consent-and-release-7-23]] permit; and to a governmental authority as applicable law permits or requires. Buyer shall not sell Merchant’s or a Guarantor’s account data, and shall not disclose it for unrelated marketing without a separate lawful consent; Section [[clause:frpa.communications-recording-and-premises-access-7-18]] governs marketing contact.\nBuyer shall maintain written safeguards appropriate to the information, including access controls, encryption, oversight of each service provider, a retention period no longer than the purpose requires, and secure deletion at the end of it. Buyer shall give the incident notices applicable law requires.\nMerchant and each Guarantor may ask Buyer in writing to correct inaccurate information, and Buyer shall respond reasonably and promptly and shall correct what it finds inaccurate.\nThis Section controls any inconsistent information-sharing provision of this Agreement and of any document incorporated into it. It waives no liability and no statutory privacy, reporting, access or dispute right of Merchant or of any Guarantor.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-FL'],
     examinedBy: [{ review: 'REVIEW-01', findings: ['information-sharing-only-vs-any-third-party'] }],
   },
   /*
@@ -662,6 +715,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.confidentiality-4-8',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The mutual confidentiality period and permitted disclosures are the only authored confidentiality terms; a commercial confidentiality alternative has not been defined.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -723,6 +782,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.d-b-a-names-4-9',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Notices and filings must identify the holder of this purchased interest; choosing a trade name cannot substitute an affiliate as the owner.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -820,6 +885,16 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.security-interest-4-10',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        'UCC §§9-203, 9-509, as enacted in the governing jurisdiction (e.g. Fla. Stat. §§679.2031(2)(c), 679.509); 7 TAC §86.312(b)(8) (covered Texas filings)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The sold share needs an identified collateral grant and bounded filing authority; neither a collection preference nor an equipment election can enlarge that collateral.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -898,6 +973,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.negative-pledge-4-11',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Merchant’s conflicting-sale covenant and an equipment provider’s separate charges answer different questions; neither equipment nor Buyer’s concurrent-position preference can remove the covenant.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -953,6 +1034,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.remedies-4-12',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This cross-reference keeps enrollment terms within the single remedies regime and cost ceiling; removing it would permit competing readings of enforcement authority.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1044,6 +1131,15 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.timing-and-method-of-funding-4-13',
+    whyThisClause: {
+      kind: 'implements',
+      citation: 'Conn. Gen. Stat. §36a-869 (three-calendar-day specific-offer hold, subject to its exceptions)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The purchase needs objective funding conditions and a date on which consideration and title actually transfer; no alternate funding trigger is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1054,7 +1150,7 @@ export const FRPA_ENROLLMENT: McaClause[] = [
     body: 'Before Merchant accepts, Buyer shall state in the Merchant and Funding Information grid the time at which its offer expires, every outstanding condition to funding, and the latest date by which Buyer will fund. A condition must be objective and capable of being checked; a condition whose satisfaction is left to Buyer’s judgement alone is not a condition for the purposes of this Section. Buyer shall honor any period during which applicable law forbids it to revoke, withdraw or modify a specific offer, including Connecticut General Statutes Section 36a-869 where that section applies. Buyer shall notify Merchant promptly of any withdrawal of its offer or failure of a condition, and shall give the reason.\nOnce Merchant has accepted and the stated conditions are satisfied, Buyer shall provide the Purchase Price by the latest funding date stated in the Merchant and Funding Information grid, by wire, ACH or another method Merchant has authorized in writing, to the Approved Bank Account.\n“Purchase Date” means the date on which Buyer delivers the Net Amount Funded to Merchant, completes each third-party disbursement and prior-purchase payoff Merchant has expressly authorized, and applies no deduction other than those itemized as dollar figures in the Itemization of Net Amount Funded grid. A deduction Buyer retains for itself need not pass through Merchant’s account, but it must be earned, lawful and itemized there before Merchant signs. No Purchased Receipt is sold, and no Purchased Receipt transfers to Buyer, before the Purchase Date.\nIf Buyer does not fund by that date, Merchant may terminate this Agreement by notice and without charge. On such a termination, or on a withdrawal of the offer, Buyer shall promptly withdraw every instruction it has given an Approved Processor and shall file or authorize the release of every filing it made in anticipation of the purchase.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CT'],
     examinedBy: [
       {
         review: 'REVIEW-02',
@@ -1127,6 +1223,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.right-to-cancel-4-14',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The three-day post-funding cancellation and unwind are contractual terms, distinct from Connecticut’s pre-acceptance offer hold; no different cancellation period or no-cancellation clause is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1205,6 +1307,8 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.position-and-cascade-of-collections-4-15',
+    whyThisClause: { kind: 'discretionary' },
+    variance: { kind: 'offered', fact: 'concurrentPositions' },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1274,6 +1378,8 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.single-active-position-4-15',
+    whyThisClause: { kind: 'discretionary' },
+    variance: { kind: 'offered', fact: 'concurrentPositions' },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1355,6 +1461,12 @@ export const FRPA_ENROLLMENT: McaClause[] = [
   */
   {
     slug: 'frpa.electronic-account-monitoring-authorization-plaid-4-16',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Read-only business-account access and equivalent statements are merchant servicing arrangements; whether Buyer pulls an individual consumer report does not decide them.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

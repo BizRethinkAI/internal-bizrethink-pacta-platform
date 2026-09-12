@@ -143,6 +143,8 @@ export const FRPA_DEFAULT: McaClause[] = [
   */
   {
     slug: 'frpa.events-of-default-6-1',
+    whyThisClause: { kind: 'discretionary' },
+    variance: { kind: 'offered', fact: 'guarantyScope' },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -286,6 +288,8 @@ export const FRPA_DEFAULT: McaClause[] = [
   */
   {
     slug: 'frpa.full-performance-events-of-default-6-1',
+    whyThisClause: { kind: 'discretionary' },
+    variance: { kind: 'offered', fact: 'guarantyScope' },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -442,6 +446,16 @@ export const FRPA_DEFAULT: McaClause[] = [
   */
   {
     slug: 'frpa.remedies-6-2',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '7 TAC §86.312(b)(12) (no redirection of another creditor’s or factor’s scheduled payment without consent or valid assignment)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'All enforcement must use one remedy, proof and recovery regime consistent with the purchased share; removing it would leave defaults and collateral enforcement without their limits.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -452,7 +466,7 @@ export const FRPA_DEFAULT: McaClause[] = [
     body: 'After an Event of Default and the expiry of any cure period given by Section [[clause:frpa.events-of-default-6-1]], Buyer may seek lawful judicial relief to recover the Purchased Receipts actually generated and wrongfully withheld, and proven direct damages caused by the conduct described in Section [[clause:frpa.events-of-default-6-1]]. Buyer must establish the conduct, causation and the amount of its loss. The uncollected Purchased Amount is not automatically due, is not made due by an Event of Default, and is not agreed liquidated damages. No remedy in this Agreement compensates Buyer for Card Receipts that were never generated, and Buyer may not recover the same loss twice. An amount Buyer recovers on account of the Purchased Receipts is credited to the Remaining Balance dollar for dollar under Section [[clause:frpa.completion-threshold-2-6]].\nCollection is unchanged by default. The Specified Percentage does not increase on an Event of Default, and no Event of Default converts this Agreement into an obligation to pay a fixed sum on a fixed date. Buyer’s only means of collection remains the one established by Sections [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]] and [[clause:frpa.approved-bank-account-2-4]] — the Specified Percentage of Card Receipts, through an Approved Processor, subject to the single aggregate cap in Section [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]]. Buyer may give an Approved Processor accurate instructions to continue that remittance, and shall send Merchant a copy of each such instruction at the same time. Buyer may not instruct an Approved Processor to remit all of Merchant’s card settlement proceeds, or any share greater than the Specified Percentage of Card Receipts, and may not redirect funds committed to another creditor or factor without legally sufficient consent or assignment.\nWhat this Agreement does not authorize. This Agreement authorizes no debit of any deposit account of Merchant, no collection of Merchant’s retained share of Card Receipts or of any non-card receipt, no confession of judgment, and no signing of process in Merchant’s name. Buyer holds no power of attorney for the purposes of this Section and may take no self-help remedy. Enforcement of the security interest granted by Section [[clause:frpa.security-interest-4-10]] is confined to that Section and to the requirements of Article 9 of the Uniform Commercial Code, of judicial process, and of applicable bankruptcy law. A claim against a Guarantor may be brought only as the separately signed Guaranty of Performance permits.\nWhat survives enforcement. Merchant’s right to a reconciliation, and to an adjustment of the Estimated Daily Holdback, under Section [[section:reconciliation]], Buyer’s refund and accounting obligations, the Completion Threshold and the aggregate cap in Section [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]], and every defence available to Merchant under applicable law, all remain in effect while an Event of Default is continuing and while Buyer is enforcing. Where Merchant breaches a covenant that is not an Event of Default, Buyer’s only remedy is proportionate judicial relief for proven direct loss, sought after written notice and at least ten (10) Workdays to cure; such a claim does not accelerate Card Receipts that have not been generated, does not expand the Guaranty and does not suspend Section [[section:reconciliation]]. The rights this Section gives Buyer are its only rights on an Event of Default, and no other provision of this Agreement adds to them. Costs of enforcement are governed solely by Section [[clause:frpa.costs-of-collection-6-3]].',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-TX'],
     examinedBy: [
       {
         review: 'REVIEW-01',
@@ -535,6 +549,12 @@ export const FRPA_DEFAULT: McaClause[] = [
   */
   {
     slug: 'frpa.costs-of-collection-6-3',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The documented-cost rule and single twenty-five-percent ceiling are contractual pricing terms; no alternative enforcement-cost formula is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -610,6 +630,12 @@ export const FRPA_DEFAULT: McaClause[] = [
   */
   {
     slug: 'frpa.required-notifications-6-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The practical bankruptcy and planned-sale notice periods are the only authored terms; Buyer’s independent duty to respect a stay does not prescribe these notice periods.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -635,6 +661,12 @@ export const FRPA_DEFAULT: McaClause[] = [
   // Its independent reference can now follow selection, like every other clause.
   {
     slug: 'frpa.prejudgment-and-postjudgment-interest',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The agreement supplies no contractual interest rate and leaves judicial interest to applicable law; no different contractual-rate clause is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

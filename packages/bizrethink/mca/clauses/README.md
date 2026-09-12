@@ -64,6 +64,33 @@ Nothing here is publishable and nothing renders to a merchant. Every clause is
 `attorney-drafted` with a null author, and `library.test.ts` asserts the refusal
 one clause at a time rather than trusting the rule is remembered.
 
+### Clause purpose and funder choice (ADR 0014)
+
+Every source record requires `whyThisClause` and `variance`; `requiredBy` has
+been removed. Counsel and staff see both answers beside the current wording.
+`compelled` identifies prescribed agreement text and its applicability;
+`implements` identifies a legal duty addressed by our own wording;
+`discretionary` identifies commercial drafting. These are drafting assessments,
+not approvals or a statement that the whole clause satisfies its cited law.
+
+A fixed clause has a specific reason and explanation. Fixed describes the
+wording available in this library, not a prohibition on a lawful commercial
+alternative. It can still have a conditional `includeWhen`: applicability and
+an exhaustive wording choice are different. Only a complete group selecting
+exactly one clause for every fact value earns `offered`. The current groups are
+concurrent purchases, the default clause accompanying guaranty scope, and the
+court/arbitration choice. Other clauses accompany those choices without adding
+separate elections. Renewal settlement has payoff and carry text, but `none`
+selects neither; it is not labeled an exhaustive three-value group.
+
+Both answers enter the clause and review-link fingerprints. Previously stored
+approvals lapse, and previously issued review links report changed content.
+No database migration, stored-template rebuild or new interview is performed.
+
+The [backfill assessment and source index](../../../../docs/research/mca-clause-metadata-2026-09-12/README.md)
+records the classification basis, jurisdiction limits and remaining wording
+gaps. The baseline documents remain input, not a specification for this text.
+
 ## The three axes, and why they are three
 
 `jurisdictions.ts` argues at length that folding a second thing into

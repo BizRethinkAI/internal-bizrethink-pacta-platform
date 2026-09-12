@@ -164,7 +164,7 @@ describe('the detectors can go red', () => {
       expect(INTERNAL_PATH.test(clause.body), clause.slug).toBe(false);
       expect(INTERNAL_FILE.test(clause.slug), clause.slug).toBe(false);
       expect(INTERNAL_PATH.test(clause.slug), clause.slug).toBe(false);
-      expect(INTERNAL_FILE.test(clause.requiredBy ?? ''), clause.slug).toBe(false);
+      expect(INTERNAL_FILE.test(JSON.stringify(clause.whyThisClause)), clause.slug).toBe(false);
     }
   });
 
@@ -227,6 +227,9 @@ describe('no review finding reaches counsel', () => {
   it.each(MCA_INSTRUMENTS)('%s ships exactly the clause fields counsel is meant to read', (instrument) => {
     for (const section of viewFor(instrument).sections) {
       for (const clause of section.clauses) {
+        const source = libraryFor(instrument).find((candidate) => candidate.slug === clause.slug)!;
+        expect(clause.whyThisClause).toEqual(source.whyThisClause);
+        expect(clause.variance).toEqual(source.variance);
         expect(Object.keys(clause).sort()).toEqual([
           'appliesInStates',
           'approved',
@@ -236,11 +239,12 @@ describe('no review finding reaches counsel', () => {
           'included',
           'kind',
           'number',
-          'requiredBy',
           'selectionNote',
           'slug',
           'text',
           'unnumberedReason',
+          'variance',
+          'whyThisClause',
         ]);
       }
     }

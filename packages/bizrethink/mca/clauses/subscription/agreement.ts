@@ -11,6 +11,12 @@ import type { McaClause } from '../types';
 export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   {
     slug: 'subscription.parties',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The equipment agreement needs its own provider, customer and effective date; the receivables funder’s profile does not identify these contracting parties.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -27,6 +33,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.total-payments-estimate',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This is the equipment contract’s estimate from its monthly charge and term, not a prescribed commercial-financing disclosure; no alternate estimate text is authored.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -42,6 +54,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.charges-billed',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This billing pointer must lead to the equipment agreement’s own charge schedule; it does not select the receivables purchase’s collection method.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -57,6 +75,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.read-before-signing',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The read-and-complete acknowledgment is the only authored equipment execution legend; no law is identified as requiring this exact warning.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -72,6 +96,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.equipment',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The agreement must identify what equipment the provider supplies and the terms of that supply; no funder fact supplies another equipment description.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -90,6 +120,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.effective-date-term-and-interim-rent',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The equipment commencement, fixed term and capped interim charge are the only authored duration terms; the receivables collection preference does not alter them.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -114,6 +150,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.site-preparation',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The customer’s installation preparations are the only authored site duties; no funder fact selects a different installation allocation.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -129,6 +171,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.payment-of-amounts-due',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'These are the equipment provider’s fixed charges and collection arrangements; the receivables funder’s collection method does not decide a separate provider’s billing terms.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -156,6 +204,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.use-return-of-equipment-and-insurance',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Use, return and insurance concern the provider’s equipment; whether the funder offers equipment does not choose among alternative obligations within this separate agreement.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -174,6 +228,16 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.title-to-equipment',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        'UCC §§9-203, 9-509, as enacted in the governing jurisdiction (e.g. Fla. Stat. §§679.2031(2)(c), 679.509)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'Equipment title and any security interest follow this separate equipment transaction; the funder’s equipment offering and receivables collateral do not decide who owns this equipment.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -198,6 +262,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.return-or-continuation-of-equipment-at-end-of-subscription-term',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'The subscriber chooses return or continuation under this equipment contract, which offers no purchase option; the funder’s equipment-offering answer is not that election.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -222,6 +292,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.software-license',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The equipment needs stated software-use rights and a boundary around manufacturer-owned software; selecting a receivables template cannot supply those license rights.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -240,6 +316,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.limitation-on-liability',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The equipment provider’s liability exclusions and cap have no authored alternative; they are contractual allocations, not a requirement to disclaim liability.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -264,6 +346,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.warranties',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'Disclaiming equipment warranties is a commercial choice subject to statutory effectiveness requirements; no alternative warranty package is authored.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -282,6 +370,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.indemnification',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This equipment indemnity and its aggregate ceiling are the only authored allocation; the receivables funder’s guaranty choice does not decide it.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -306,6 +400,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.default-remedies',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The equipment contract has its own default, present-value acceleration and recovery rules; no alternative remedy package is authored for this provider.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -332,6 +432,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.assignment',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This separate provider’s assignment rights and customer-consent requirement have no authored alternative; a receivables assignment does not transfer this agreement.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -354,6 +460,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   */
   {
     slug: 'subscription.subscription-guaranty',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This cross-reference and subordination rule must stay within the subscription guaranty’s defined obligations; the separate receivables guaranty does not supply them.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -396,6 +508,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   */
   {
     slug: 'subscription.governing-law-and-venue',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'The funder’s venue and dispute facts concern its receivables purchase; this equipment provider’s contract has its own forum and procedural terms with no authored alternative.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -427,6 +545,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   */
   {
     slug: 'subscription.notices',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The separate equipment parties need notice destinations and effective-delivery rules distinct from judicial service; funder contact details do not replace them.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -442,6 +566,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.electronic-signatures',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This records the equipment parties’ agreement to electronic execution; legal recognition of electronic records does not require this particular consent clause.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -457,6 +587,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.entire-agreement',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The equipment bargain needs an identified document set and signed-change rule so another transaction cannot silently amend it.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
@@ -472,6 +608,12 @@ export const SUBSCRIPTION_AGREEMENT: McaClause[] = [
   },
   {
     slug: 'subscription.survival',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The equipment contract needs to say which license, liability and guaranty duties continue after its term; no alternate survival package is authored.',
+    },
     version: 1,
     instrument: 'subscription',
     kind: 'clause',
