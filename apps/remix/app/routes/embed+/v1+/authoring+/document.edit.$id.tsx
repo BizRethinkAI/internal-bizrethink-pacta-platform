@@ -1,3 +1,4 @@
+import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { DEFAULT_DOCUMENT_DATE_FORMAT, isValidDateFormat } from '@documenso/lib/constants/date-formats';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
@@ -36,7 +37,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const token = url.searchParams.get('token') || '';
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token, scope: `documentId:${id}` }).catch(() => null);
+  // MODIFIED for BizRethink (overlay 078): the edit loader uses the same target/team boundary as mutations.
+  const result = await verifyEmbeddingPresignToken({ token, operation: 'update', scope: `documentId:${id}` }).catch(
+    () => null,
+  );
 
   if (!result) {
     throw new Error('Invalid token');
@@ -48,14 +52,16 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
     redirect(`/embed/v1/authoring/error/not-found?documentId=${documentId}`);
   }
 
-  const document = await getDocumentWithDetailsById({
-    id: {
-      type: 'documentId',
-      id: documentId,
-    },
-    userId: result?.userId,
-    teamId: result?.teamId ?? undefined,
-  }).catch(() => null);
+  const document = await withApiTokenTeamScope(result.teamId, () =>
+    getDocumentWithDetailsById({
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
+      userId: result?.userId,
+      teamId: result?.teamId ?? undefined,
+    }),
+  ).catch(() => null);
 
   if (!document) {
     throw redirect(`/embed/v1/authoring/error/not-found?documentId=${documentId}`);

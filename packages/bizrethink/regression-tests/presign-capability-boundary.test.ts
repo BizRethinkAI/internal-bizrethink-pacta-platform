@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { filesRoute } from '../../../apps/remix/server/api/files/files';
 import type { HonoEnv } from '../../../apps/remix/server/router';
+import { getApiTokenEnvelopeScope } from '../server-only/api-token-team-scope';
 import { envelopeFixture, matchesQuery } from './api-token-team-fixture';
 
 const { db, team, session, readFile, uploadFile, createEnvelope, createEnvelopeCaller } = vi.hoisted(() => ({
@@ -52,6 +53,7 @@ const parentFixture = () => ({
   team: { id: 10, organisation: { owner: { id: 7, disabled: false } } },
 });
 let parent: ReturnType<typeof parentFixture>;
+let mutationTeams: Array<{ teamId?: number }>;
 const token = async (scope?: unknown, claims: JWTPayload = {}, alg = 'HS256', secret = key) =>
   new SignJWT({
     sub: '42',
@@ -112,6 +114,7 @@ beforeEach(() => {
   vi.setSystemTime(now);
   logger.level = 'silent';
   parent = parentFixture();
+  mutationTeams = [];
   db.apiToken.findFirst.mockImplementation(async ({ where }: { where: { id: number } }) =>
     where.id === parent.id ? parent : null,
   );
@@ -130,12 +133,18 @@ beforeEach(() => {
     const items = envelopes.flatMap((envelope) => envelope.envelopeItems.map((item) => ({ ...item, envelope })));
     return items.find((row) => matchesQuery(row, where)) ?? null;
   });
-  createEnvelope.mockImplementation(async ({ data }: { data: { type: string } }) => ({
-    id: 'envelope_created',
-    secondaryId: data.type === 'TEMPLATE' ? 'template_5' : 'document_5',
-    envelopeItems: [{ id: 'item_created' }],
-  }));
-  createEnvelopeCaller.mockResolvedValue({ id: 'envelope_created', recipients: [] });
+  createEnvelope.mockImplementation(async ({ data }: { data: { type: string } }) => {
+    mutationTeams.push(getApiTokenEnvelopeScope(10));
+    return {
+      id: 'envelope_created',
+      secondaryId: data.type === 'TEMPLATE' ? 'template_5' : 'document_5',
+      envelopeItems: [{ id: 'item_created' }],
+    };
+  });
+  createEnvelopeCaller.mockImplementation(async () => {
+    mutationTeams.push(getApiTokenEnvelopeScope(10));
+    return { id: 'envelope_created', recipients: [] };
+  });
 });
 afterEach(() => vi.useRealTimers());
 
@@ -227,6 +236,22 @@ describe('A-03 real presign verifier', () => {
 
 describe('A-03 actual file routes', () => {
   for (const path of paths) {
+    it.each(['team', 'resource'])('keeps %s authorization in the query that loads PDF data', async (changed) => {
+      const moved = { ...local, ...(changed === 'team' ? { teamId: 20 } : { secondaryId: 'document_2' }) };
+      db.envelope.findFirst.mockImplementation(
+        async ({ where, include }: { where: Record<string, unknown>; include?: unknown }) => {
+          const row = include ? moved : local;
+          return matchesQuery(row, where) ? row : null;
+        },
+      );
+      db.envelopeItem.findFirst.mockImplementation(async ({ where }: { where: Record<string, unknown> }) => {
+        const row = { ...moved.envelopeItems[0], envelope: moved };
+        return matchesQuery(row, where) ? row : null;
+      });
+      const response = await app.request(path(local, await token('documentId:1')));
+      expect(response.status).toBe(404);
+      expect(readFile).not.toHaveBeenCalled();
+    });
     it(`rejects another team before storage or conditional response: ${path(foreign, 'JWT')}`, async () => {
       const response = await app.request(path(foreign, await token()), { headers: { 'If-None-Match': 'cached' } });
       expect(response.status).toBe(404);
@@ -278,7 +303,8 @@ describe('A-03 actual create adapters', () => {
   ];
   for (const entry of cases) {
     it(`does not turn a document-restricted pass into create authority: ${entry.name}`, async () => {
-      await expect(entry.run(await token('documentId:1'))).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+      // createCaller bypasses the HTTP error formatter, which maps this AppError cause.
+      await expect(entry.run(await token('documentId:1'))).rejects.toMatchObject({ cause: { code: 'UNAUTHORIZED' } });
       expect(createEnvelope).not.toHaveBeenCalled();
       expect(createEnvelopeCaller).not.toHaveBeenCalled();
       expect(db.recipient.create).not.toHaveBeenCalled();
@@ -287,6 +313,8 @@ describe('A-03 actual create adapters', () => {
     it(`preserves explicitly team-wide creation: ${entry.name}`, async () => {
       await expect(entry.run(await token())).resolves.toBeDefined();
       expect(createEnvelope.mock.calls.length + createEnvelopeCaller.mock.calls.length).toBe(1);
+      expect(mutationTeams).toEqual([{ teamId: 10 }]);
+      expect(getApiTokenEnvelopeScope(10)).toEqual({});
     });
   }
 });

@@ -1,3 +1,4 @@
+import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
 import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
@@ -50,7 +51,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token, scope: `envelopeId:${id}` }).catch(() => null);
+  // MODIFIED for BizRethink (overlay 078): the edit loader uses the same target/team boundary as mutations.
+  const result = await verifyEmbeddingPresignToken({ token, operation: 'update', scope: `envelopeId:${id}` }).catch(
+    () => null,
+  );
 
   if (!result) {
     throw new Error('Invalid token');
@@ -61,15 +65,17 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
       userId: result.userId,
       teamId: result.teamId,
     }),
-    getEditorEnvelopeById({
-      id: {
-        type: 'envelopeId',
-        id,
-      },
-      type: null,
-      userId: result.userId,
-      teamId: result.teamId,
-    }).catch(() => null),
+    withApiTokenTeamScope(result.teamId, () =>
+      getEditorEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id,
+        },
+        type: null,
+        userId: result.userId,
+        teamId: result.teamId,
+      }),
+    ).catch(() => null),
   ]);
 
   if (!envelope) {

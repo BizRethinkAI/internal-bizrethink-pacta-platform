@@ -43,7 +43,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   }
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token }).catch(() => null);
+  // MODIFIED for BizRethink (overlay 078): restrict this authoring entry to team-wide create authority.
+  const result = await verifyEmbeddingPresignToken({ token, operation: 'create' }).catch(() => null);
 
   if (!result) {
     throw new Response('Invalid token', { status: 404 });

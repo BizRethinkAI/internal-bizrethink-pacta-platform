@@ -1,5 +1,6 @@
+import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
+import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
@@ -18,13 +19,12 @@ import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import pMap from 'p-map';
 import { match } from 'ts-pattern';
 
-import { procedure } from '../trpc';
 import {
   ZUpdateEmbeddingEnvelopeRequestSchema,
   ZUpdateEmbeddingEnvelopeResponseSchema,
 } from './update-embedding-envelope.types';
 
-export const updateEmbeddingEnvelopeRoute = procedure
+export const updateEmbeddingEnvelopeRoute = presignProcedure
   .input(ZUpdateEmbeddingEnvelopeRequestSchema)
   .output(ZUpdateEmbeddingEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -37,18 +37,9 @@ export const updateEmbeddingEnvelopeRoute = procedure
       },
     });
 
-    const authorizationHeader = ctx.req.headers.get('authorization');
-
-    const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
-
-    if (!presignToken) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'No presign token provided',
-      });
-    }
-
-    const apiToken = await verifyEmbeddingPresignToken({
-      token: presignToken,
+    // MODIFIED for BizRethink (overlay 078): enforce the parent team before any target mutation.
+    const apiToken = await authorizePresignOperation(ctx.presignCapability, {
+      operation: 'update',
       scope: `envelopeId:${envelopeId}`,
     });
 

@@ -21,7 +21,29 @@ JWT verification, both Hono PDF adapters and all three create tRPC handlers run;
 database/storage/mutation boundaries use synthetic doubles. Failures reproduce
 expired/disabled parent acceptance, lost resource/team limits and restricted
 passes gaining create authority. Existing signature, audience, JWT expiry and
-valid team-wide creation controls pass. Test TypeScript gate passes.
+valid team-wide creation controls pass. The initial test TypeScript gate passed.
+
+Implementation retains a minimal verified capability (no parent token hash),
+checks signature/algorithm/expiry plus current parent expiry, disabled issuer or
+organisation owner, and current team membership. Legacy user-ID audiences remain
+compatible within the parent team. Omitted scope retains documented team-wide
+authoring; malformed scope fails closed. All six create/update adapters share a
+verified request context. Edit loaders and nested mutations retain A-02's team
+boundary. Both PDF adapters apply team/resource predicates to the query loading
+the PDF and force private/no-store before conditional cache responses.
+
+Additional TDD: four race scenarios failed before adding the data-query
+predicate; three create-adapter assertions failed before propagating the team
+through the mutation context. All **37 focused regressions** now pass. The three
+tRPC rejection assertions inspect the wrapped AppError cause (createCaller
+bypasses the HTTP error formatter); they still rejected baseline behavior.
+
+Local validation before integrating the A-04 dependency: **4,459 owned tests**,
+the owned TypeScript gate and full Remix route typegen/typecheck pass. The earlier
+lib suite passed **287** tests. Twelve isolated HTTP/PostgreSQL tests cover both
+PDF adapters, revocation, all three create/update variants and edit loaders;
+discovery passed, actual execution is pending CI. Overlay 078 records exactly
+13 upstream adapters/verifier files; reverse-apply check passes. No new schema.
 
 Fresh independent human-started adversarial auth/upstream review is required.
 This author opens the PR and monitors only its own CI; it never merges its PR.
