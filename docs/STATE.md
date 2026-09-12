@@ -139,7 +139,8 @@ responses. Overlay **078** preserves 13 upstream files; the combined overlays
 replayed to identical source across 15 affected files. No further schema change.
 Author validation recorded 37 focused regressions, 4,488 combined owned tests,
 287 shared tests and both type checks; the PR Checks are the execution record
-for the separate HTTP regressions. A-06 reads remain separate work.
+for the separate HTTP regressions. A-06's assistant signature boundary is now
+merged separately in #177, recorded below.
 
 These merges do not establish deployment status. The MCA source-corrections PR
 owns this fold: GitHub reported #173, #174 and #175 merged and no open PRs when
@@ -161,7 +162,7 @@ used the existing documentation-only exemption rather than running browser tests
 
 The audit found missing CT supplement sections 36a-868, 870 and 872, MO's 2025
 premium-finance exemption and FL's 2024 depository-institution amendment. Their
-current text is retained for the focused follow-up. Virginia needs a separate
+current text was incorporated by #176, recorded below. Virginia needs a separate
 prescribed-form correction covering a label, formula, estimated-payment wording
 and layout; the official PDF and both extractions are retained for that work.
 The August 2024 CT guidance still matches its official PDF but predates the
@@ -185,6 +186,76 @@ green, then stop; a human merges or explicitly starts review-and-ship. Fresh
 independent review for sensitive changes is human-started, not an additional
 implementer-spawned review. ADR 0011 guaranty placement, remaining template/form
 migration and commercial interview answers remain separate follow-ups.
+
+## 2026-09-12 — current MCA statutory sources merged (#176)
+
+**#176** merged at `d297c7332626ac144cbaf8e7906d577e4542da15`.
+Connecticut's vendored source now explicitly consolidates the nine unchanged
+base sections with full §§36a-868, 36a-870 and 36a-872 from the 2026 supplement,
+including histories and effective dates. Its header distinguishes the two
+official publications, exact retrievals and hashes; it is an editorial
+consolidation. The obligation quotations now reflect the revised registration
+renewal/fee rule, registration sanctions in §36a-872(a) and commissioner action
+in (b). The non-form obligation count is **13**; `ct-penalties` retains its ID
+but cites (b), and `ct-registration-sanctions` records (a). Cross-state notes
+and an FRPA comment no longer repeat the superseded text. Referenced
+§§36a-50, 51 and 52 remain unvendored; no registration/enforcement engine exists.
+
+Florida's six current code sections replace the HB 1353 extract and include
+the 2024 amendment to §559.9611(9). Missouri's current §427.300 replaces the
+SB 1359 extract, includes the 2025 premium-finance exemption and corrects the
+six disclosure citations to §427.300.3(2)(a)–(f). Missouri verification remains
+bounded to subsection 3; its variable-payment agreement duty in 3(2)(e) remains
+material to the agreement-requirements review. Existing prescribed labels,
+disclosure requirements, evidence, calculations and layouts are unchanged.
+
+Digests and verification dates moved only after comparison with corrected
+sources. There are still **16 active source texts**; retired bills remain in
+Git history. The dated #174 audit, manifest and evidence retain their original
+bytes and qualifications. Seven new regressions failed before correction;
+180 tests across seven focused files then passed against the separately
+retained official captures. Source agreement is not legal or publication
+approval. No clause body, authored status, author, schema or upstream file changed.
+
+The eleven-state agreement-requirements matrix, missing underlying/implementing
+authorities and Virginia's October 2022 prescribed-form correction remain open.
+CT guidance predates its registration amendment; CA/NY consolidated currency,
+later GA code history and TX codified rules retain the audit's qualifications.
+Only after that evidence work should ADR 0014 classify the **211** records;
+authored clauses stay draft with null authors. ADR 0011 guaranty placement,
+template/form migration and commercial interview answers remain separate.
+
+## 2026-09-12 — assistant signature boundary merged (#177 / A-06)
+
+**#177** merged at `7f5ce5684caaa03a59b0fdc702ae6e33b60548f4`.
+An assistant may prefill ordinary fields but cannot insert or remove another
+recipient's SIGNATURE or FREE_SIGNATURE. The owned policy supplies the
+authorized field owner/type/envelope predicates to all four conditional write
+paths, so a concurrent reassignment cannot turn prefill into a signature edit.
+Overlay **079** preserves three upstream hooks: both legacy helpers, including
+their v2 embedded multi-sign callers, and the current v2 insert/uninsert route.
+Legacy insertion checks before ACTION-factor validation. Rightful signing,
+ordinary prefills, INITIALS and the existing v2 error code retain their behavior.
+
+Test-first runs reproduced eight signature bypasses and sixteen concurrent-edit
+failures before their respective fixes. All **45 focused regressions**, 131
+existing recipient-auth tests, **4,541 owned tests / 206 files**, **287 shared
+tests / 19 files**, both TypeScript gates and overlay replay passed. All 13
+distinct CI checks were green for author head `4cf44cebbeb32ad1aabcd2a21ecaff02c328674f`;
+the six new HTTP tests passed on their first attempts. Full E2E reported
+**1,087 passed / 1 flaky / 59 skipped**; the existing pending-envelope order
+test at `api/v2/update-envelope-items.spec.ts:298` passed on retry.
+
+This establishes the merge and CI, not completion of independent adversarial
+review or production deployment; those remain unverified by this author.
+There is no A-06 schema/configuration change. A-04's additive upload-ownership
+migration prerequisite above still applies to shipping the queue.
+
+Shwet assigned the A-07 remediation session the single fold of #176/#177 notes;
+the MCA research session must not repeat it. #176's earlier fold of
+#173/#174/#175 is retained unchanged except for the now-completed follow-ups
+identified above. A-07 is approved and tracked in its own in-flight note;
+later audit findings still require individual owner decisions.
 
 ## Where things stand
 
