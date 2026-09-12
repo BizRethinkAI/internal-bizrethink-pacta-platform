@@ -7,6 +7,7 @@ import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/rem
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { logger } from '@documenso/lib/utils/logger';
 import type { TrpcContext } from '@documenso/trpc/server/context';
+import { getDocumentByTokenRoute } from '@documenso/trpc/server/document-router/get-document-by-token';
 import { getMultiSignDocumentRoute } from '@documenso/trpc/server/embedding-router/get-multi-sign-document';
 import { cscSignEnvelopeRoute } from '@documenso/trpc/server/enterprise-router/csc-sign-envelope';
 import { findAttachmentsRoute } from '@documenso/trpc/server/envelope-router/attachment/find-attachments';
@@ -52,6 +53,7 @@ vi.mock('@documenso/lib/server-only/team/get-team-settings', () => ({
 }));
 
 const api = router({
+  document: getDocumentByTokenRoute,
   csc: cscSignEnvelopeRoute,
   items: getEnvelopeItemsByTokenRoute,
   attachments: findAttachmentsRoute,
@@ -62,7 +64,10 @@ const api = router({
 const accountPolicy = { globalAccessAuth: ['ACCOUNT'], globalActionAuth: [] } as const;
 const makeEnvelope = () => ({
   ...envelopeFixture({ status: DocumentStatus.PENDING }),
-  authOptions: { globalAccessAuth: [...accountPolicy.globalAccessAuth], globalActionAuth: [] },
+  authOptions: {
+    globalAccessAuth: [...accountPolicy.globalAccessAuth] as Array<'ACCOUNT' | 'TWO_FACTOR_AUTH'>,
+    globalActionAuth: [],
+  },
   signatureLevel: 'SES',
   qrToken: null,
   useLegacyFieldInsertion: false,
@@ -234,6 +239,17 @@ describe('A-05 public recipient operations', () => {
       expect(webhook).not.toHaveBeenCalled();
       expect(executeTspSign).not.toHaveBeenCalled();
     });
+    it(`fails closed when ${operation.name} cannot resolve the required account`, async () => {
+      db.user.findFirst.mockRejectedValue(new Error('Synthetic database outage'));
+      await expect(operation.run(7)).rejects.toBeDefined();
+      expect(db.field.update).not.toHaveBeenCalled();
+      expect(db.recipient.update).not.toHaveBeenCalled();
+      expect(db.recipient.updateMany).not.toHaveBeenCalled();
+      expect(db.signature.deleteMany).not.toHaveBeenCalled();
+      expect(job).not.toHaveBeenCalled();
+      expect(webhook).not.toHaveBeenCalled();
+      expect(executeTspSign).not.toHaveBeenCalled();
+    });
     it(`keeps ${operation.name} working for the intended account`, async () => {
       await expect(operation.run(7)).resolves.not.toBeNull();
     });
@@ -268,6 +284,44 @@ describe('A-05 public recipient operations', () => {
       expect(job).not.toHaveBeenCalled();
     });
   }
+
+  it('keeps authenticated document-by-token reads working for the recipient', async () => {
+    await expect(api.createCaller(context(7)).document({ token })).resolves.toMatchObject({
+      documentData: { id: 'data_test' },
+    });
+  });
+  it.each([
+    'deleted',
+    'draft',
+  ] as const)('refuses the authenticated document-by-token route for a %s envelope', async (state) => {
+    envelope.deletedAt = state === 'deleted' ? new Date() : null;
+    envelope.status = state === 'draft' ? DocumentStatus.DRAFT : DocumentStatus.PENDING;
+    await expect(
+      api
+        .createCaller(context(7))
+        .document({ token })
+        .catch((error: { cause?: unknown }) => {
+          throw error.cause ?? error;
+        }),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+  });
+
+  it('requires the completion code as well as ACCOUNT when both access settings are present', async () => {
+    envelope.authOptions.globalAccessAuth.push('TWO_FACTOR_AUTH');
+    await expect(
+      completeDocumentWithToken({ token, id, userId: 7, accessAuthOptions: { type: 'ACCOUNT' } }),
+    ).rejects.toMatchObject({ code: 'TWO_FACTOR_AUTH_FAILED' });
+    expect(db.recipient.updateMany).not.toHaveBeenCalled();
+    expect(job).not.toHaveBeenCalled();
+  });
+
+  it('enforces a recipient ACCOUNT override even when the document itself is link-only', async () => {
+    envelope.authOptions.globalAccessAuth = [];
+    envelope.recipients[0].authOptions = { accessAuth: ['ACCOUNT'], actionAuth: [] };
+    await expect(completeDocumentWithToken({ token, id })).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
+    expect(db.recipient.updateMany).not.toHaveBeenCalled();
+    await expect(completeDocumentWithToken({ token, id, userId: 7 })).resolves.toBeUndefined();
+  });
 
   it('rejects an expired signing attempt even for the correct account', async () => {
     envelope.recipients[0].expiresAt = new Date('2000-01-01T00:00:00Z');

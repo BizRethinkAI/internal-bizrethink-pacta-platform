@@ -663,6 +663,8 @@ export const fieldRouter = router({
         });
 
         return await removeSignedFieldWithToken({
+          // MODIFIED for BizRethink (overlay 076): pass the authenticated identity, never a client userId.
+          userId: ctx.user?.id,
           token,
           fieldId,
           requestMetadata: ctx.metadata.requestMetadata,

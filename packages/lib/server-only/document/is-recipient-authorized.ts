@@ -1,3 +1,4 @@
+import { isRecipientFactorIdentityValid } from '@bizrethink/customizations/server-only/recipient-access';
 import { prisma } from '@documenso/prisma';
 import type { Envelope, Recipient } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
@@ -67,6 +68,13 @@ export const isRecipientAuthorized = async ({
     .with('ACCESS_2FA', () => derivedRecipientAccessAuth)
     .with('ACTION', () => derivedRecipientActionAuth)
     .exhaustive();
+
+  // MODIFIED for BizRethink (overlay 076): bind account factors before any permissive branch.
+  if (
+    !(await isRecipientFactorIdentityValid({ type, authMethods, authOptions, recipientEmail: recipient.email, userId }))
+  ) {
+    return false;
+  }
 
   // Early true return when auth is not required.
   if (authMethods.length === 0 || authMethods.some((method) => method === DocumentAuth.EXPLICIT_NONE)) {

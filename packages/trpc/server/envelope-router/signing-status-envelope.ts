@@ -1,3 +1,4 @@
+import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
@@ -13,7 +14,9 @@ export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
   .input(ZSigningStatusEnvelopeRequestSchema)
   .output(ZSigningStatusEnvelopeResponseSchema)
   .query(async ({ input, ctx }) => {
+    // MODIFIED for BizRethink (overlay 076): apply persisted recipient access to this public token adapter.
     const { token } = input;
+    await assertRecipientTokenAccess({ token, userId: ctx.user?.id });
 
     ctx.logger.info({
       input: {

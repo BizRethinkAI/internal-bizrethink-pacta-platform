@@ -1,5 +1,6 @@
+import { isRecipientSignatureField } from '@bizrethink/customizations/recipient-auth-policy';
+import { assertRecipientAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import type { Envelope, Field, Recipient } from '@prisma/client';
-import { FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TRecipientActionAuth } from '../../types/document-auth';
@@ -25,8 +26,9 @@ export const validateFieldAuth = async ({
   userId,
   authOptions,
 }: ValidateFieldAuthOptions) => {
-  // Override all non-signature fields to not require any auth.
-  if (field.type !== FieldType.SIGNATURE) {
+  // MODIFIED for BizRethink (overlay 076): ACCESS applies to every field; both signature types require ACTION.
+  await assertRecipientAccess({ recipient, documentAuthOptions, userId });
+  if (!isRecipientSignatureField(field.type)) {
     return undefined;
   }
 

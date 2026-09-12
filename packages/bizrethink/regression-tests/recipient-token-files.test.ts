@@ -128,6 +128,20 @@ describe('A-05 recipient file routes', () => {
       expect(response.status).toBe(404);
       expect(getFile).not.toHaveBeenCalled();
     });
+    it(`refuses a disabled recipient account before storage: ${path(token)}`, async () => {
+      asRecipient();
+      db.user.findFirst.mockResolvedValue({ id: 7, email: recipient.email, disabled: true });
+      const response = await app.request(path(token));
+      expect(response.status).toBe(404);
+      expect(getFile).not.toHaveBeenCalled();
+    });
+    it(`does not serve a protected file when account lookup fails: ${path(token)}`, async () => {
+      asRecipient();
+      db.user.findFirst.mockRejectedValue(new Error('Synthetic database outage'));
+      const response = await app.request(path(token));
+      expect(response.status).toBe(500);
+      expect(getFile).not.toHaveBeenCalled();
+    });
     it(`keeps the separate QR capability unchanged: ${path('qr_test')}`, async () => {
       const response = await app.request(path('qr_test'));
       expect(response.status).toBe(200);

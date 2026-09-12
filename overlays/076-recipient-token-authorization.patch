@@ -1,0 +1,429 @@
+# Why: A-05 — recipient ACCOUNT access was omitted by public mutation/read/PDF
+# adapters, and account-backed signing factors could authenticate a different
+# person. Apply ACCOUNT independently of ACTION, bind password/passkey/TOTP to
+# the recipient, require the completion code when configured, and include
+# FREE_SIGNATURE consistently. Reject deleted/draft recipient reads; preserve
+# authorized downloads after the signing deadline (owner decision 2026-09-12).
+# Why-not-additive: all policy lives in packages/bizrethink; upstream owns the
+# token handlers, factor verifier, and signing dialog, so they need small hooks.
+# A single Hono middleware covers all three recipient PDF routes, including the
+# nested router, and overrides their cache headers to private/no-store.
+# Upstream-merge-fragility: high — auth/signing adapters evolve frequently.
+# Reapply hooks before early returns/side effects; retain original crypto,
+# signing status/order/expiry/CAS checks. Access 2FA remains at completion;
+# QR links are a separate capability. New token adapters need the same policy.
+# Verification: recipient-factor-identity, recipient-token-operations and
+# recipient-token-files Vitest suites, plus the owned recipient-token-authorization
+# Playwright HTTP spec. Preserve these behavior tests through every upstream sync.
+
+diff --git a/apps/remix/app/components/general/document-signing/document-signing-auth-provider.tsx b/apps/remix/app/components/general/document-signing/document-signing-auth-provider.tsx
+index dae55d582..2fd9afd87 100644
+--- a/apps/remix/app/components/general/document-signing/document-signing-auth-provider.tsx
++++ b/apps/remix/app/components/general/document-signing/document-signing-auth-provider.tsx
+@@ -1,3 +1,4 @@
++import { isRecipientSignatureField } from '@bizrethink/customizations/recipient-auth-policy';
+ import type { SessionUser } from '@documenso/auth/server/lib/session/session';
+ import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
+ import type {
+@@ -9,7 +10,7 @@ import type {
+ import { DocumentAuth } from '@documenso/lib/types/document-auth';
+ import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+ import { trpc } from '@documenso/trpc/react';
+-import { type Envelope, FieldType, type Passkey, type Recipient } from '@prisma/client';
++import type { Envelope, Passkey, Recipient } from '@prisma/client';
+ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+ 
+ import type { DocumentSigningAuthDialogProps } from './document-signing-auth-dialog';
+@@ -141,7 +142,8 @@ export const DocumentSigningAuthProvider = ({
+ 
+   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
+     // Directly run callback if no auth required.
+-    if (!derivedRecipientActionAuth || options.actionTarget !== FieldType.SIGNATURE) {
++    // MODIFIED for BizRethink (overlay 076): prompt for FREE_SIGNATURE just like SIGNATURE.
++    if (!derivedRecipientActionAuth || !isRecipientSignatureField(options.actionTarget)) {
+       await options.onReauthFormSubmit();
+       return;
+     }
+diff --git a/apps/remix/server/api/files/files.ts b/apps/remix/server/api/files/files.ts
+index bbca38885..3d1591536 100644
+--- a/apps/remix/server/api/files/files.ts
++++ b/apps/remix/server/api/files/files.ts
+@@ -1,3 +1,4 @@
++import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
+ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+ import { AppError } from '@documenso/lib/errors/app-error';
+@@ -22,6 +23,8 @@ import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
+ import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
+ 
+ export const filesRoute = new Hono<HonoEnv>()
++  // MODIFIED for BizRethink (overlay 076): covers all three token PDF adapters, including nested routes.
++  .use('/token/:token/*', recipientTokenFileAccess)
+   /**
+    * Uploads a document file to the appropriate storage location and creates
+    * a document data record.
+diff --git a/packages/lib/server-only/document/complete-document-with-token.ts b/packages/lib/server-only/document/complete-document-with-token.ts
+index f708a6cf4..56af0d626 100644
+--- a/packages/lib/server-only/document/complete-document-with-token.ts
++++ b/packages/lib/server-only/document/complete-document-with-token.ts
+@@ -1,3 +1,7 @@
++import {
++  assertRecipientAccess,
++  assertRecipientEnvelopeNotDeleted,
++} from '@bizrethink/customizations/server-only/recipient-access';
+ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+ import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+ import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '@documenso/lib/types/document-audit-logs';
+@@ -99,6 +103,10 @@ export const completeDocumentWithToken = async ({
+ 
+   const [recipient] = envelope.recipients;
+ 
++  // MODIFIED for BizRethink (overlay 076): ACCOUNT is required independently of the completion 2FA check.
++  assertRecipientEnvelopeNotDeleted(envelope);
++  await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId });
++
+   // A retried or duplicate completion request for an already signed
+   // recipient throws a code the router resolves idempotently. This must be
+   // checked before the envelope status guard since the envelope may have
+diff --git a/packages/lib/server-only/document/get-document-by-token.ts b/packages/lib/server-only/document/get-document-by-token.ts
+index e28aabaef..7e42a71a9 100644
+--- a/packages/lib/server-only/document/get-document-by-token.ts
++++ b/packages/lib/server-only/document/get-document-by-token.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientEnvelopeReadable } from '@bizrethink/customizations/server-only/recipient-access';
+ import { prisma } from '@documenso/prisma';
+ import { EnvelopeType } from '@prisma/client';
+ 
+@@ -115,6 +116,9 @@ export const getDocumentAndSenderByToken = async ({
+     },
+   });
+ 
++  // MODIFIED for BizRethink (overlay 076): state revocation also applies to page loaders doing their own auth.
++  assertRecipientEnvelopeReadable(result);
++
+   const firstDocumentData = result.envelopeItems[0].documentData;
+ 
+   if (!firstDocumentData) {
+diff --git a/packages/lib/server-only/document/is-recipient-authorized.ts b/packages/lib/server-only/document/is-recipient-authorized.ts
+index 9150a6ad0..4e5b0d499 100644
+--- a/packages/lib/server-only/document/is-recipient-authorized.ts
++++ b/packages/lib/server-only/document/is-recipient-authorized.ts
+@@ -1,3 +1,4 @@
++import { isRecipientFactorIdentityValid } from '@bizrethink/customizations/server-only/recipient-access';
+ import { prisma } from '@documenso/prisma';
+ import type { Envelope, Recipient } from '@prisma/client';
+ import { verifyAuthenticationResponse } from '@simplewebauthn/server';
+@@ -68,6 +69,13 @@ export const isRecipientAuthorized = async ({
+     .with('ACTION', () => derivedRecipientActionAuth)
+     .exhaustive();
+ 
++  // MODIFIED for BizRethink (overlay 076): bind account factors before any permissive branch.
++  if (
++    !(await isRecipientFactorIdentityValid({ type, authMethods, authOptions, recipientEmail: recipient.email, userId }))
++  ) {
++    return false;
++  }
++
+   // Early true return when auth is not required.
+   if (authMethods.length === 0 || authMethods.some((method) => method === DocumentAuth.EXPLICIT_NONE)) {
+     return true;
+diff --git a/packages/lib/server-only/document/reject-document-with-token.ts b/packages/lib/server-only/document/reject-document-with-token.ts
+index a8555b42b..710a6a0e2 100644
+--- a/packages/lib/server-only/document/reject-document-with-token.ts
++++ b/packages/lib/server-only/document/reject-document-with-token.ts
+@@ -1,3 +1,7 @@
++import {
++  assertRecipientAccess,
++  assertRecipientEnvelopeNotDeleted,
++} from '@bizrethink/customizations/server-only/recipient-access';
+ // This is closely related to `reject-document-on-behalf-of.ts` but is intentionally
+ // kept as a separate method rather than merged into one. This file focuses on
+ // rejection from a recipient perspective (the recipient rejecting via their token),
+@@ -22,10 +26,17 @@ export type RejectDocumentWithTokenOptions = {
+   token: string;
+   id: EnvelopeIdOptions;
+   reason: string;
++  userId?: number;
+   requestMetadata?: RequestMetadata;
+ };
+ 
+-export async function rejectDocumentWithToken({ token, id, reason, requestMetadata }: RejectDocumentWithTokenOptions) {
++export async function rejectDocumentWithToken({
++  token,
++  id,
++  reason,
++  userId,
++  requestMetadata,
++}: RejectDocumentWithTokenOptions) {
+   // Find the recipient and document in a single query
+   const recipient = await prisma.recipient.findFirst({
+     where: {
+@@ -45,6 +56,10 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
+     });
+   }
+ 
++  // MODIFIED for BizRethink (overlay 076): recipient access also protects removal/rejection.
++  assertRecipientEnvelopeNotDeleted(envelope);
++  await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId });
++
+   if (envelope.status !== DocumentStatus.PENDING) {
+     throw new AppError(AppErrorCode.INVALID_REQUEST, {
+       message: `Document ${envelope.id} must be pending to reject`,
+diff --git a/packages/lib/server-only/document/validate-field-auth.ts b/packages/lib/server-only/document/validate-field-auth.ts
+index abc7c2c73..f94896cb9 100644
+--- a/packages/lib/server-only/document/validate-field-auth.ts
++++ b/packages/lib/server-only/document/validate-field-auth.ts
+@@ -1,5 +1,6 @@
++import { isRecipientSignatureField } from '@bizrethink/customizations/recipient-auth-policy';
++import { assertRecipientAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import type { Envelope, Field, Recipient } from '@prisma/client';
+-import { FieldType } from '@prisma/client';
+ 
+ import { AppError, AppErrorCode } from '../../errors/app-error';
+ import type { TRecipientActionAuth } from '../../types/document-auth';
+@@ -25,8 +26,9 @@ export const validateFieldAuth = async ({
+   userId,
+   authOptions,
+ }: ValidateFieldAuthOptions) => {
+-  // Override all non-signature fields to not require any auth.
+-  if (field.type !== FieldType.SIGNATURE) {
++  // MODIFIED for BizRethink (overlay 076): ACCESS applies to every field; both signature types require ACTION.
++  await assertRecipientAccess({ recipient, documentAuthOptions, userId });
++  if (!isRecipientSignatureField(field.type)) {
+     return undefined;
+   }
+ 
+diff --git a/packages/lib/server-only/envelope/get-envelope-for-recipient-signing.ts b/packages/lib/server-only/envelope/get-envelope-for-recipient-signing.ts
+index 116238f3b..61c7d441a 100644
+--- a/packages/lib/server-only/envelope/get-envelope-for-recipient-signing.ts
++++ b/packages/lib/server-only/envelope/get-envelope-for-recipient-signing.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientEnvelopeReadable } from '@bizrethink/customizations/server-only/recipient-access';
+ import { prisma } from '@documenso/prisma';
+ import DocumentMetaSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
+ import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
+@@ -222,6 +223,9 @@ export const getEnvelopeForRecipientSigning = async ({
+     });
+   }
+ 
++  // MODIFIED for BizRethink (overlay 076): use the same recipient read policy as PDF downloads.
++  assertRecipientEnvelopeReadable(envelope);
++
+   if (envelope.envelopeItems.length === 0) {
+     throw new AppError(AppErrorCode.NOT_FOUND, {
+       message: 'Envelope has no items',
+diff --git a/packages/lib/server-only/field/remove-signed-field-with-token.ts b/packages/lib/server-only/field/remove-signed-field-with-token.ts
+index 5e2c41861..2218dcd7d 100644
+--- a/packages/lib/server-only/field/remove-signed-field-with-token.ts
++++ b/packages/lib/server-only/field/remove-signed-field-with-token.ts
+@@ -1,3 +1,7 @@
++import {
++  assertRecipientAccess,
++  assertRecipientEnvelopeNotDeleted,
++} from '@bizrethink/customizations/server-only/recipient-access';
+ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+@@ -8,12 +12,14 @@ import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+ export type RemovedSignedFieldWithTokenOptions = {
+   token: string;
+   fieldId: number;
++  userId?: number;
+   requestMetadata?: RequestMetadata;
+ };
+ 
+ export const removeSignedFieldWithToken = async ({
+   token,
+   fieldId,
++  userId,
+   requestMetadata,
+ }: RemovedSignedFieldWithTokenOptions) => {
+   const recipient = await prisma.recipient.findFirstOrThrow({
+@@ -53,6 +59,10 @@ export const removeSignedFieldWithToken = async ({
+     throw new Error(`Document not found for field ${field.id}`);
+   }
+ 
++  // MODIFIED for BizRethink (overlay 076): recipient access also protects removal/rejection.
++  assertRecipientEnvelopeNotDeleted(envelope);
++  await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId });
++
+   if (envelope.status !== DocumentStatus.PENDING) {
+     throw new Error(`Document ${envelope.id} must be pending`);
+   }
+diff --git a/packages/trpc/server/document-router/get-document-by-token.ts b/packages/trpc/server/document-router/get-document-by-token.ts
+index f3c34f453..493c6780a 100644
+--- a/packages/trpc/server/document-router/get-document-by-token.ts
++++ b/packages/trpc/server/document-router/get-document-by-token.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientEnvelopeReadable } from '@bizrethink/customizations/server-only/recipient-access';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { prisma } from '@documenso/prisma';
+ import { EnvelopeType } from '@prisma/client';
+@@ -38,6 +39,9 @@ export const getDocumentByTokenRoute = authenticatedProcedure
+       });
+     }
+ 
++    // MODIFIED for BizRethink (overlay 076): recipient reads share deletion/draft policy.
++    assertRecipientEnvelopeReadable(envelope);
++
+     if (envelope.envelopeItems.length !== 1) {
+       throw new AppError(AppErrorCode.INVALID_REQUEST, {
+         message: 'This endpoint does not support multiple items',
+diff --git a/packages/trpc/server/embedding-router/get-multi-sign-document.ts b/packages/trpc/server/embedding-router/get-multi-sign-document.ts
+index c05b73f89..78af8078a 100644
+--- a/packages/trpc/server/embedding-router/get-multi-sign-document.ts
++++ b/packages/trpc/server/embedding-router/get-multi-sign-document.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+ import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
+@@ -14,9 +15,12 @@ import {
+ export const getMultiSignDocumentRoute = procedure
+   .input(ZGetMultiSignDocumentRequestSchema)
+   .output(ZGetMultiSignDocumentResponseSchema)
+-  .query(async ({ input, ctx: { metadata } }) => {
++  .query(async ({ input, ctx }) => {
++    const { metadata } = ctx;
+     try {
++      // MODIFIED for BizRethink (overlay 076): apply persisted recipient access to this public token adapter.
+       const { token } = input;
++      await assertRecipientTokenAccess({ token, userId: ctx.user?.id });
+ 
+       const [document, fields, recipient] = await Promise.all([
+         getDocumentAndSenderByToken({
+diff --git a/packages/trpc/server/enterprise-router/csc-sign-envelope.ts b/packages/trpc/server/enterprise-router/csc-sign-envelope.ts
+index ec64796c5..a2cba0802 100644
+--- a/packages/trpc/server/enterprise-router/csc-sign-envelope.ts
++++ b/packages/trpc/server/enterprise-router/csc-sign-envelope.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { executeTspSign } from '@documenso/ee/server-only/signing/csc/execute-tsp-sign';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ 
+@@ -20,6 +21,9 @@ export const cscSignEnvelopeRoute = procedure
+   .input(ZCscSignEnvelopeRequestSchema)
+   .output(ZCscSignEnvelopeResponseSchema)
+   .mutation(async ({ input, ctx }) => {
++    // MODIFIED for BizRethink (overlay 076): enforce recipient ACCESS before entering the CSC pipeline.
++    await assertRecipientTokenAccess({ token: input.recipientToken, userId: ctx.user?.id });
++
+     const result = await Promise.race([
+       executeTspSign({
+         sessionId: input.sessionId,
+diff --git a/packages/trpc/server/envelope-router/attachment/find-attachments.ts b/packages/trpc/server/envelope-router/attachment/find-attachments.ts
+index 6e8af76a4..6b6a5f5a4 100644
+--- a/packages/trpc/server/envelope-router/attachment/find-attachments.ts
++++ b/packages/trpc/server/envelope-router/attachment/find-attachments.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { findAttachmentsByEnvelopeId } from '@documenso/lib/server-only/envelope-attachment/find-attachments-by-envelope-id';
+ import { findAttachmentsByToken } from '@documenso/lib/server-only/envelope-attachment/find-attachments-by-token';
+@@ -21,6 +22,8 @@ export const findAttachmentsRoute = maybeAuthenticatedProcedure
+     });
+ 
+     if (token) {
++      // MODIFIED for BizRethink (overlay 076): apply persisted recipient access to this public token adapter.
++      await assertRecipientTokenAccess({ token, envelopeId, userId: ctx.session ? ctx.user?.id : undefined });
+       const data = await findAttachmentsByToken({ envelopeId, token });
+ 
+       return {
+diff --git a/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts b/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts
+index d44c063eb..d4b0de344 100644
+--- a/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts
++++ b/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+ import { getOrganisationTemplateWhereInput } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
+@@ -45,6 +46,9 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
+       };
+     }
+ 
++    // MODIFIED for BizRethink (overlay 076): apply persisted recipient access to this public token adapter.
++    await assertRecipientTokenAccess({ token: access.token, envelopeId, userId: user?.id });
++
+     const { envelopeItems: data } = await handleGetEnvelopeItemsByToken({
+       envelopeId,
+       token: access.token,
+diff --git a/packages/trpc/server/envelope-router/sign-envelope-field.ts b/packages/trpc/server/envelope-router/sign-envelope-field.ts
+index 54f4129a5..3b3fa526c 100644
+--- a/packages/trpc/server/envelope-router/sign-envelope-field.ts
++++ b/packages/trpc/server/envelope-router/sign-envelope-field.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { isBase64Image } from '@documenso/lib/constants/signatures';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
+@@ -74,6 +75,9 @@ export const signEnvelopeFieldRoute = procedure
+     const { envelope } = field;
+     const { documentMeta } = envelope;
+ 
++    // MODIFIED for BizRethink (overlay 076): guard ACCESS before the early uninsert path too.
++    await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId: user?.id });
++
+     if (envelope.internalVersion !== 2) {
+       throw new AppError(AppErrorCode.NOT_FOUND, {
+         message: `Envelope ${envelope.id} is not a version 2 envelope`,
+diff --git a/packages/trpc/server/envelope-router/signing-status-envelope.ts b/packages/trpc/server/envelope-router/signing-status-envelope.ts
+index 57fa8ec10..6a5cf7502 100644
+--- a/packages/trpc/server/envelope-router/signing-status-envelope.ts
++++ b/packages/trpc/server/envelope-router/signing-status-envelope.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { prisma } from '@documenso/prisma';
+ import { DocumentStatus, EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
+@@ -13,7 +14,9 @@ export const signingStatusEnvelopeRoute = maybeAuthenticatedProcedure
+   .input(ZSigningStatusEnvelopeRequestSchema)
+   .output(ZSigningStatusEnvelopeResponseSchema)
+   .query(async ({ input, ctx }) => {
++    // MODIFIED for BizRethink (overlay 076): apply persisted recipient access to this public token adapter.
+     const { token } = input;
++    await assertRecipientTokenAccess({ token, userId: ctx.user?.id });
+ 
+     ctx.logger.info({
+       input: {
+diff --git a/packages/trpc/server/field-router/router.ts b/packages/trpc/server/field-router/router.ts
+index 2028c37f6..117d24604 100644
+--- a/packages/trpc/server/field-router/router.ts
++++ b/packages/trpc/server/field-router/router.ts
+@@ -663,6 +663,8 @@ export const fieldRouter = router({
+         });
+ 
+         return await removeSignedFieldWithToken({
++          // MODIFIED for BizRethink (overlay 076): pass the authenticated identity, never a client userId.
++          userId: ctx.user?.id,
+           token,
+           fieldId,
+           requestMetadata: ctx.metadata.requestMetadata,
+diff --git a/packages/trpc/server/recipient-router/router.ts b/packages/trpc/server/recipient-router/router.ts
+index 29fff7d9c..84f3bd0d9 100644
+--- a/packages/trpc/server/recipient-router/router.ts
++++ b/packages/trpc/server/recipient-router/router.ts
+@@ -1,3 +1,4 @@
++import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
+@@ -621,6 +622,9 @@ export const recipientRouter = router({
+           });
+         }
+ 
++        // MODIFIED for BizRethink (overlay 076): gate access before the SES/TSP branch.
++        await assertRecipientTokenAccess({ token, userId: ctx.user?.id });
++
+         if (isTspEnvelope(envelope)) {
+           return await prepareCscRecipientSigning({
+             recipientToken: token,
+@@ -681,6 +685,8 @@ export const recipientRouter = router({
+     });
+ 
+     return await rejectDocumentWithToken({
++      // MODIFIED for BizRethink (overlay 076): carry recipient identity into rejection.
++      userId: ctx.user?.id,
+       token,
+       id: {
+         type: 'documentId',

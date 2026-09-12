@@ -1,3 +1,4 @@
+import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
@@ -14,9 +15,12 @@ import {
 export const getMultiSignDocumentRoute = procedure
   .input(ZGetMultiSignDocumentRequestSchema)
   .output(ZGetMultiSignDocumentResponseSchema)
-  .query(async ({ input, ctx: { metadata } }) => {
+  .query(async ({ input, ctx }) => {
+    const { metadata } = ctx;
     try {
+      // MODIFIED for BizRethink (overlay 076): apply persisted recipient access to this public token adapter.
       const { token } = input;
+      await assertRecipientTokenAccess({ token, userId: ctx.user?.id });
 
       const [document, fields, recipient] = await Promise.all([
         getDocumentAndSenderByToken({

@@ -1,3 +1,4 @@
+import { assertRecipientEnvelopeReadable } from '@bizrethink/customizations/server-only/recipient-access';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
@@ -114,6 +115,9 @@ export const getDocumentAndSenderByToken = async ({
       },
     },
   });
+
+  // MODIFIED for BizRethink (overlay 076): state revocation also applies to page loaders doing their own auth.
+  assertRecipientEnvelopeReadable(result);
 
   const firstDocumentData = result.envelopeItems[0].documentData;
 

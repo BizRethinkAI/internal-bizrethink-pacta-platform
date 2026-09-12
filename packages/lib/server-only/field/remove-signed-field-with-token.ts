@@ -1,3 +1,7 @@
+import {
+  assertRecipientAccess,
+  assertRecipientEnvelopeNotDeleted,
+} from '@bizrethink/customizations/server-only/recipient-access';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -8,12 +12,14 @@ import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 export type RemovedSignedFieldWithTokenOptions = {
   token: string;
   fieldId: number;
+  userId?: number;
   requestMetadata?: RequestMetadata;
 };
 
 export const removeSignedFieldWithToken = async ({
   token,
   fieldId,
+  userId,
   requestMetadata,
 }: RemovedSignedFieldWithTokenOptions) => {
   const recipient = await prisma.recipient.findFirstOrThrow({
@@ -52,6 +58,10 @@ export const removeSignedFieldWithToken = async ({
   if (!envelope) {
     throw new Error(`Document not found for field ${field.id}`);
   }
+
+  // MODIFIED for BizRethink (overlay 076): recipient access also protects removal/rejection.
+  assertRecipientEnvelopeNotDeleted(envelope);
+  await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId });
 
   if (envelope.status !== DocumentStatus.PENDING) {
     throw new Error(`Document ${envelope.id} must be pending`);

@@ -1,3 +1,7 @@
+import {
+  assertRecipientAccess,
+  assertRecipientEnvelopeNotDeleted,
+} from '@bizrethink/customizations/server-only/recipient-access';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -98,6 +102,10 @@ export const completeDocumentWithToken = async ({
   }
 
   const [recipient] = envelope.recipients;
+
+  // MODIFIED for BizRethink (overlay 076): ACCOUNT is required independently of the completion 2FA check.
+  assertRecipientEnvelopeNotDeleted(envelope);
+  await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId });
 
   // A retried or duplicate completion request for an already signed
   // recipient throws a code the router resolves idempotently. This must be

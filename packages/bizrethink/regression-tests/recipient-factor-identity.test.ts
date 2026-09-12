@@ -41,7 +41,10 @@ beforeEach(() => {
     }
     return { id: where.id, email: where.id === 7 ? recipient.email : 'bob@example.invalid', disabled: false };
   });
-  db.user.findUnique.mockResolvedValue({ id: 8, password: passwordHash });
+  db.user.findUnique.mockImplementation(async ({ where }: { where: { id: number } }) => ({
+    id: where.id,
+    password: passwordHash,
+  }));
   db.passkey.findFirst.mockImplementation(async ({ where }: { where: { userId: number } }) => ({
     id: 'passkey_test',
     userId: where.userId,
@@ -90,6 +93,21 @@ describe('A-05 recipient factor identity', () => {
       });
       expect(allowed).toBe(false);
     });
+    it(`rejects an invalid ${label} even for the intended account`, async () => {
+      verifyPasskey.mockResolvedValue({ verified: false });
+      verifyTotp.mockResolvedValue(false);
+      const authOptions =
+        options.type === DocumentAuth.PASSWORD ? { ...options, password: 'incorrect-password' } : options;
+      expect(
+        await isRecipientAuthorized({
+          type: 'ACTION',
+          recipient,
+          userId: 7,
+          authOptions,
+          documentAuthOptions: { globalAccessAuth: [], globalActionAuth: [options.type] },
+        }),
+      ).toBe(false);
+    });
     it(`keeps the intended recipient's valid ${label} working`, async () => {
       const allowed = await isRecipientAuthorized({
         type: 'ACTION',
@@ -101,6 +119,24 @@ describe('A-05 recipient factor identity', () => {
       expect(allowed).toBe(true);
     });
   }
+
+  it.each([
+    undefined,
+    { type: DocumentAuth.ACCOUNT },
+  ])('does not substitute login for a required completion code (%s)', async (authOptions) => {
+    expect(
+      await isRecipientAuthorized({
+        type: 'ACCESS_2FA',
+        recipient,
+        userId: 7,
+        authOptions,
+        documentAuthOptions: {
+          globalAccessAuth: [DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH],
+          globalActionAuth: [],
+        },
+      }),
+    ).toBe(false);
+  });
 
   it('binds access authenticator verification to the recipient too', async () => {
     expect(
@@ -144,6 +180,21 @@ describe('A-05 recipient factor identity', () => {
         authOptions: { type: DocumentAuth.TWO_FACTOR_AUTH, method, token: '123456' },
       }),
     ).toBe(false);
+  });
+
+  it.each([undefined, 7])('keeps ACCOUNT mandatory alongside email completion (caller: %s)', async (userId) => {
+    expect(
+      await isRecipientAuthorized({
+        type: 'ACCESS_2FA',
+        recipient,
+        userId,
+        documentAuthOptions: {
+          globalAccessAuth: [DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH],
+          globalActionAuth: [],
+        },
+        authOptions: { type: DocumentAuth.TWO_FACTOR_AUTH, method: 'email', token: '123456' },
+      }),
+    ).toBe(userId === 7);
   });
 
   it('still rejects another account for ACCOUNT access', async () => {
