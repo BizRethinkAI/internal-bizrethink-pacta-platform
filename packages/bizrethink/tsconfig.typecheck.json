@@ -36,6 +36,9 @@
     "server-only/recipient-token-file-access.ts",
     "../app-tests/e2e/api/bizrethink/recipient-token-authorization.spec.ts",
     "regression-tests/template-pdf-source-authorization.test.ts",
-    "regression-tests/template-pdf-upload-ownership.test.ts"
+    "regression-tests/template-pdf-upload-ownership.test.ts",
+    "server-only/template-pdf-sources.ts",
+    "server-only/pdf-upload-owner.ts",
+    "../app-tests/e2e/api/bizrethink/template-pdf-source-authorization.spec.ts"
   ]
 }

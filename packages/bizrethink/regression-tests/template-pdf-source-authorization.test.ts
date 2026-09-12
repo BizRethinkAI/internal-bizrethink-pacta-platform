@@ -106,8 +106,8 @@ beforeEach(() => {
   role = TeamMemberRole.MEMBER;
   receipt = null;
   template = makeTemplate();
-  const foreign = makeEnvelope('foreign', 20, 8);
-  const local = makeEnvelope('local', 10, 8);
+  const foreign = makeEnvelope('envelope_foreign', 20, 8);
+  const local = makeEnvelope('envelope_local', 10, 8);
   sources = [
     data('data_a'),
     data('foreign_data', { envelopeId: foreign.id, envelope: foreign }),
@@ -195,6 +195,25 @@ describe('A-04 actual template-copy helper', () => {
     source.team.organisationId = 'org_10';
     await expect(use([{ documentDataId: 'foreign_data' }])).resolves.toMatchObject({ id: 'created' });
   });
+  it.each([
+    'foreign organisation',
+    'restricted role',
+    'API team',
+  ])('shared-template permission cannot bypass %s', async (boundary) => {
+    const source = sources[1].envelopeItem!.envelope;
+    source.type = EnvelopeType.TEMPLATE;
+    source.templateType = TemplateType.ORGANISATION;
+    source.team.organisationId = boundary === 'foreign organisation' ? 'org_20' : 'org_10';
+    if (boundary === 'restricted role') {
+      source.visibility = DocumentVisibility.ADMIN;
+    }
+    const result =
+      boundary === 'API team'
+        ? withApiTokenTeamScope(10, () => use([{ documentDataId: 'foreign_data' }]))
+        : use([{ documentDataId: 'foreign_data' }]);
+    await expect(result).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    assertNoCopy();
+  });
   it('does not accept a deleted source even from the caller team', async () => {
     sources[2].envelopeItem!.envelope.deletedAt = new Date();
     await expect(use([{ documentDataId: 'local_data' }])).rejects.toMatchObject({ code: 'NOT_FOUND' });
@@ -233,6 +252,20 @@ describe('A-04 actual template-copy helper', () => {
     receipt = { documentDataId: 'foreign_data', userId: 7, teamId: 10, fingerprint: fingerprint(sources[1]) };
     await expect(use([{ documentDataId: 'foreign_data' }])).rejects.toMatchObject({ code: 'NOT_FOUND' });
     assertNoCopy();
+  });
+  it('rechecks that an uploaded file is still unattached when loading its data', async () => {
+    receipt = { documentDataId: 'staged_data', userId: 7, teamId: null, fingerprint: fingerprint(sources[3]) };
+    db.bizrethinkPdfUpload.findUnique.mockImplementation(async () => {
+      sources[3].envelopeItem = sources[1].envelopeItem;
+      return receipt;
+    });
+    await expect(use([{ documentDataId: 'staged_data' }])).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    assertNoCopy();
+  });
+  it('does not globally reload data after an attached source passes authorization', async () => {
+    await expect(use([{ documentDataId: 'local_data' }])).resolves.toMatchObject({ id: 'created' });
+    expect(db.documentData.findFirst).toHaveBeenCalledTimes(1);
+    expect(db.documentData.findFirst.mock.calls[0][0].where.envelopeItem).toBeDefined();
   });
   it('fails closed if the upload ownership lookup fails', async () => {
     db.bizrethinkPdfUpload.findUnique.mockRejectedValue(new Error('Synthetic DB failure'));

@@ -153,3 +153,5 @@ packages/app-tests/e2e/api/bizrethink/api-token-team-boundary.spec.ts
 # A-05 recipient authorization HTTP regression. Playwright discovers API specs
 # here; the BizRethink namespace and exact path distinguish it from upstream.
 packages/app-tests/e2e/api/bizrethink/recipient-token-authorization.spec.ts
+# A-04 template replacement authorization and upload provenance HTTP regression.
+packages/app-tests/e2e/api/bizrethink/template-pdf-source-authorization.spec.ts

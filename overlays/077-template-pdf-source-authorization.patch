@@ -1,0 +1,125 @@
+# Why: A-04 allowed an authenticated template user to copy arbitrary DocumentData by ID. Resolve every PDF through current envelope permissions or a server-recorded fresh-upload owner before copying any bytes.
+# Why-not-additive: The authorization policy and upload receipts live in packages/bizrethink; these three existing upstream entry points must call them. The schema is generated from the owned Prisma extension and its additive migration.
+# Upstream-merge-fragility: high
+# On sync: retain all three calls and the pre-copy ordering. Re-run owned helper/Hono and HTTP regressions; inspect new template-use/upload entry points. Preserve overlays 074/075/076. No change to presign lifecycle (A-03) or unrelated file reads (A-06).
+
+diff --git a/apps/remix/server/api/files/files.ts b/apps/remix/server/api/files/files.ts
+index 3d1591536..dda28e27e 100644
+--- a/apps/remix/server/api/files/files.ts
++++ b/apps/remix/server/api/files/files.ts
+@@ -1,4 +1,6 @@
++import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
+ import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
++import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
+ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+ import { AppError } from '@documenso/lib/errors/app-error';
+@@ -10,7 +12,7 @@ import type { Prisma } from '@prisma/client';
+ import { Hono } from 'hono';
+ 
+ import type { HonoEnv } from '../../router';
+-import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest, resolveFileUploadUserId } from './files.helpers';
++import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest } from './files.helpers';
+ import {
+   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
+   ZGetEnvelopeItemFileRequestParamsSchema,
+@@ -31,9 +33,10 @@ export const filesRoute = new Hono<HonoEnv>()
+    */
+   .post('/upload-pdf', sValidator('form', ZUploadPdfRequestSchema), async (c) => {
+     try {
+-      const userId = await resolveFileUploadUserId(c);
++      // MODIFIED for BizRethink (overlay 077): retain verified ownership for staged PDF replacements.
++      const owner = await resolvePdfUploadOwner(c);
+ 
+-      if (!userId) {
++      if (!owner) {
+         return c.json({ error: 'Unauthorized' }, 401);
+       }
+ 
+@@ -53,6 +56,7 @@ export const filesRoute = new Hono<HonoEnv>()
+       }
+ 
+       const result = await putNormalizedPdfFileServerSide(file);
++      await recordPdfUpload(result, owner);
+ 
+       return c.json(result);
+     } catch (error) {
+diff --git a/packages/lib/server-only/template/create-document-from-template.ts b/packages/lib/server-only/template/create-document-from-template.ts
+index 213ae8568..167995666 100644
+--- a/packages/lib/server-only/template/create-document-from-template.ts
++++ b/packages/lib/server-only/template/create-document-from-template.ts
+@@ -1,3 +1,4 @@
++import { resolveTemplatePdfSources } from '@bizrethink/customizations/server-only/template-pdf-sources';
+ import { nanoid, prefixedId } from '@documenso/lib/universal/id';
+ import { prisma } from '@documenso/prisma';
+ import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+@@ -436,36 +437,20 @@ export const createDocumentFromTemplate = async ({
+   // Value = duplicated envelope item ID.
+   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
+ 
++  // MODIFIED for BizRethink (overlay 077): authorize every replacement before copying any bytes.
++  const documentSources = await resolveTemplatePdfSources({
++    userId,
++    teamId,
++    templateItems: template.envelopeItems,
++    customDocumentData,
++  });
++
+   // Duplicate the envelope item data.
+   // Note: This is duplicated in createDocumentFromDirectTemplate
+   const envelopeItemsToCreate = await Promise.all(
+     template.envelopeItems.map(async (item, i) => {
+-      let documentDataIdToDuplicate = item.documentDataId;
+-
+-      const foundCustomDocumentData = customDocumentData.find((customDocumentDataItem) => {
+-        // Handle empty envelopeItemId for backwards compatibility reasons.
+-        if (customDocumentDataItem.documentDataId && !customDocumentDataItem.envelopeItemId) {
+-          return true;
+-        }
+-
+-        return customDocumentDataItem.envelopeItemId === item.id;
+-      });
+-
+-      if (foundCustomDocumentData) {
+-        documentDataIdToDuplicate = foundCustomDocumentData.documentDataId;
+-      }
+-
+-      const documentDataToDuplicate = await prisma.documentData.findFirst({
+-        where: {
+-          id: documentDataIdToDuplicate,
+-        },
+-      });
+-
+-      if (!documentDataToDuplicate) {
+-        throw new AppError(AppErrorCode.NOT_FOUND, {
+-          message: 'Document data not found',
+-        });
+-      }
++      // MODIFIED for BizRethink (overlay 077): use the authorized snapshot, never a global ID re-read.
++      const documentDataToDuplicate = documentSources[i];
+ 
+       let buffer = await getFileServerSide(documentDataToDuplicate);
+ 
+diff --git a/packages/trpc/server/envelope-router/use-envelope.ts b/packages/trpc/server/envelope-router/use-envelope.ts
+index 608b430d9..2662db7d3 100644
+--- a/packages/trpc/server/envelope-router/use-envelope.ts
++++ b/packages/trpc/server/envelope-router/use-envelope.ts
+@@ -1,3 +1,4 @@
++import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
+ import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+@@ -75,9 +76,12 @@ export const useEnvelopeRoute = authenticatedProcedure
+     const uploadedFiles = await Promise.all(
+       filesToUpload.map(async (file) => {
+         // We disable flattening here since `createDocumentFromTemplate` will handle it.
+-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file, {
++        const uploaded = await putNormalizedPdfFileServerSide(file, {
+           flattenForm: false,
+         });
++        // MODIFIED for BizRethink (overlay 077): multipart replacements carry their authenticated owner/team.
++        await recordPdfUpload(uploaded, { userId: user.id, teamId });
++        const documentDataId = uploaded.id;
+ 
+         return {
+           name: file.name,

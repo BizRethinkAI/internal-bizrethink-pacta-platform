@@ -1,4 +1,6 @@
+import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
 import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
+import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -10,7 +12,7 @@ import type { Prisma } from '@prisma/client';
 import { Hono } from 'hono';
 
 import type { HonoEnv } from '../../router';
-import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest, resolveFileUploadUserId } from './files.helpers';
+import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest } from './files.helpers';
 import {
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileRequestParamsSchema,
@@ -31,9 +33,10 @@ export const filesRoute = new Hono<HonoEnv>()
    */
   .post('/upload-pdf', sValidator('form', ZUploadPdfRequestSchema), async (c) => {
     try {
-      const userId = await resolveFileUploadUserId(c);
+      // MODIFIED for BizRethink (overlay 077): retain verified ownership for staged PDF replacements.
+      const owner = await resolvePdfUploadOwner(c);
 
-      if (!userId) {
+      if (!owner) {
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
@@ -53,6 +56,7 @@ export const filesRoute = new Hono<HonoEnv>()
       }
 
       const result = await putNormalizedPdfFileServerSide(file);
+      await recordPdfUpload(result, owner);
 
       return c.json(result);
     } catch (error) {
