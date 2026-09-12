@@ -60,10 +60,10 @@ describe('a spec is checked against its own section, not the whole file', () => 
   });
 
   /*
-    The seven that need it, and why. Missouri is the extreme case: SB 1359 is
-    an omnibus bill of eighty-odd sections, of which the Commercial Financing
-    Disclosure Law is one, so a prescribed label found "somewhere in the bill"
-    would be worth nothing at all.
+    The seven that use it, and why. Missouri now vendors the current §427.300
+    rather than the SB 1359 omnibus bill. It still bounds label verification to
+    subsection 3, keeping definitions, exemptions and registration outside the
+    disclosure check.
 
     The four added on 2026-09-07 are the sharpest test of the mechanism so far,
     because they live in the SAME two files as the offer summaries they must not
@@ -72,7 +72,7 @@ describe('a spec is checked against its own section, not the whole file', () => 
     §900 defined terms that appear throughout the file. Unscoped, each of the
     four would verify against the other's words.
   */
-  it('scopes exactly the files that hold more than one instrument', () => {
+  it('keeps the seven disclosure scopes explicit', () => {
     expect(
       MCA_DISCLOSURES.filter((d) => d.section !== null)
         .map((d) => d.slug)

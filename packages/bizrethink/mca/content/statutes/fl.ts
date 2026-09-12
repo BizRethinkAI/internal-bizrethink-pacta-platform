@@ -11,7 +11,7 @@ import type { ContentStatute } from '../types';
 export const FL_DISCLOSURE: ContentStatute = {
   slug: 'fl-disclosure',
   citation: 'Fla. Stat. §559.9613(2)',
-  sourceFile: 'FL-HB-1353.txt',
+  sourceFile: 'FL-Stat-559.961-9615.txt',
   jurisdiction: 'US-FL',
   status: 'published',
   source: {
@@ -20,10 +20,10 @@ export const FL_DISCLOSURE: ContentStatute = {
     // Florida prescribes no sentence and no label. There is nothing of ours
     // that must reproduce its words.
     verbatimRequired: false,
-    verbatimVerifiedAt: '2026-09-06',
+    verbatimVerifiedAt: '2026-09-12',
   },
-  sourceDigest: '5d534783a6c8b480e3b09a933c1d351f8a3b2fbd402df4cf8d0efcae93b5109a',
-  // CS/HB 1353 enacts part XIII of ch. 559 and nothing else.
+  sourceDigest: '5275a78ed86f90f09aaf25dd71b87d4e11aa5c7e2f25ee620c2e349262a0dc67',
+  // The six current code sections contain only part XIII of ch. 559.
   section: null,
   requirements: [
     {

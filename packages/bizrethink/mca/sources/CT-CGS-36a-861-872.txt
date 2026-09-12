@@ -1,3 +1,28 @@
+Publisher: Connecticut General Assembly
+Site: https://www.cga.ct.gov
+Prepared: 2026-09-12 from the separately committed source audit evidence.
+Conn. Gen. Stat. §§36a-861 to 36a-872, chapter 669, Part XVI.
+EDITORIAL CONSOLIDATION, not a single document published by the CGA:
+Base chapter: §§36a-861–867, 36a-869 and 36a-871 (P.A. 23-201).
+2026 supplement: §§36a-868, 36a-870 and 36a-872 (P.A. 25-115 §§21–23,
+effective July 1, 2025). The nine base sections retain their original wording;
+the three supplement sections replace the superseded base sections in full.
+
+Retrieved from: https://www.cga.ct.gov/current/pub/chap_669.htm
+Retrieved at (UTC): 2026-09-12T08:42:04.890924+00:00
+Response SHA-256: 2e249d87b267658dda0f0660b905932de802aa09b85723773d05476399821dc4
+Retrieved from: https://www.cga.ct.gov/2026/sup/chap_669.htm
+Retrieved at (UTC): 2026-09-12T08:42:05.641076+00:00
+Response SHA-256: e25921a3d622e0863772e54320edcfcdaad51863e5d5f80a15297f2d069946f8
+
+Retrieval records and extraction details:
+docs/research/mca-source-audit-2026-09-12/manifest.json
+HTML navigation removed; whitespace normalized in the audit extracts;
+statutory wording and legislative histories retained. This header is editorial.
+These identified versions do not establish completeness of implementing authorities.
+
+--- STATUTORY TEXT BEGINS ---
+
 Sec. 36a-861. Definitions. As used in this section and sections 36a-862 to 36a-872, inclusive:
 
 (1) “Commercial financing” means any extension of sales-based financing by a provider in an amount not exceeding two hundred fifty thousand dollars, the proceeds of which the recipient does not intend to use primarily for personal, family or household purposes;
@@ -88,11 +113,9 @@ Sec. 36a-867. Use of commercial financing disclosure form approved by another st
 
 History: P.A. 23-201 effective July 1, 2024.
 
-Sec. 36a-868. Waiver provisions re provider obtaining prejudgment remedy. Unenforceable provisions. No commercial financing contract entered into on or after July 1, 2024, shall contain any provision waiving a recipient's right to notice, judicial hearing or prior court order under chapter 903a in connection with the provider obtaining any prejudgment remedy, including, but not limited to, attachment, execution, garnishment or replevin, upon commencing any litigation against the recipient. Any such provision in a commercial financing contract entered into on or after July 1, 2024, shall be unenforceable.
-
-(P.A. 23-201, S. 8.)
-
-History: P.A. 23-201 effective July 1, 2024.
+Sec. 36a-868. Waiver provisions re provider obtaining prejudgment remedy. Unenforceable provisions. No commercial financing contract entered into on or after July 1, 2024, shall contain any provision waiving a recipient's right to notice, judicial hearing or prior court order under chapter 903a in connection with the provider obtaining any prejudgment remedy, including, but not limited to, attachment, execution, garnishment or replevin upon commencing any litigation against the recipient. Any such provision in a commercial financing contract entered into on or after July 1, 2024, shall be unenforceable.
+(P.A. 23-201, S. 8; P.A. 25-115, S. 21.)
+History: P.A. 23-201 effective July 1, 2024; P.A. 25-115 made a technical change, effective July 1, 2025.
 
 Sec. 36a-869. Revocation, withdrawal or modification of specific offer based on preliminary review. (a) A provider shall not revoke, withdraw or modify a specific offer made on or after July 1, 2024, until midnight of the third calendar day after the date of the specific offer. A specific offer may be revoked, withdrawn or modified (1) based on information obtained in the underwriting process, including, but not limited to, verification of any information provided by the recipient, or (2) at the request of the recipient.
 
@@ -102,15 +125,11 @@ Sec. 36a-869. Revocation, withdrawal or modification of specific offer based on 
 
 History: P.A. 23-201 effective July 1, 2024.
 
-Sec. 36a-870. Registration. Authority to transact business. Application. Fees. (a) Not later than October 1, 2024, each provider and commercial financing broker shall: (1) Register with the Banking Commissioner in a manner prescribed by the commissioner; and (2) unless such provider or broker is organized under the laws of this state or is otherwise not required to obtain authority to transact business in this state as a foreign entity, shall obtain authority to transact business in this state.
-
+Sec. 36a-870. Registration. Authority to transact business. Application. Expiration and renewal of registration. Fee. (a) Not later than October 1, 2024, each provider and commercial financing broker shall: (1) Register with the Banking Commissioner in a manner prescribed by the commissioner; and (2) unless such provider or broker is organized under the laws of this state or is otherwise not required to obtain authority to transact business in this state as a foreign entity, shall obtain authority to transact business in this state.
 (b) An application for registration by a provider or commercial financing broker shall disclose any judgment, memorandum of understanding, cease and desist order or conviction that involves a crime or an act of fraud, breach of trust or money laundering with respect to such provider or broker or any officer, director, manager, operator or individual who otherwise controls the operations of such provider or broker.
-
-(c) Each provider and commercial financing broker shall pay an initial registration fee of one thousand dollars and an annual registration fee of five hundred dollars by the fifteenth of September each year thereafter. If a provider or commercial financing broker fails to timely pay any such annual registration fee, its registration shall automatically expire by operation of law.
-
-(P.A. 23-201, S. 10.)
-
-History: P.A. 23-201 effective July 1, 2024.
+(c) Each provider and commercial financing broker registration shall expire at the close of business on December thirty-first of the year in which such registration was approved, unless such registration is renewed or, if such registration is approved on or after November first, such registration shall expire at the close of business on December thirty-first of the year following the year in which such registration was approved. An application for renewal of a registration shall be filed with the commissioner between November first and December thirty-first of the year in which the registration expires. Each applicant for an initial registration or renewal of a registration shall pay to the system a registration fee of one thousand dollars and any other required fees or charges. All fees paid pursuant to this subsection shall be nonrefundable.
+(P.A. 23-201, S. 10; P.A. 25-115, S. 22.)
+History: P.A. 23-201 effective July 1, 2024; P.A. 25-115 amended Subsec. (c) to replace provisions re initial registration fee, annual registration fee and automatic expiration of registration if provider or commercial financing broker fails to timely pay annual registration fee with provisions re expiration of registration on December 31, requirement that application for renewal of registration be filed between November 1 and December 31, requirement that applicant pay $1,000 registration fee and any other required fees or charges and nonrefundable fees, effective July 1, 2025.
 
 Sec. 36a-871. Regulations. The Banking Commissioner may adopt regulations, in accordance with the provisions of chapter 54, to carry out the provisions of sections 36a-861 to 36a-872, inclusive.
 
@@ -118,10 +137,7 @@ Sec. 36a-871. Regulations. The Banking Commissioner may adopt regulations, in ac
 
 History: P.A. 23-201 effective July 1, 2024.
 
-Sec. 36a-872. Penalties. (a) Any provider who violates any provision of sections 36a-861 to 36a-870, inclusive, or any regulation adopted pursuant to section 36a-871 shall be liable for a civil penalty pursuant to section 36a-50.
-
-(b) In addition to any civil penalty imposed under subsection (a) of this section, if the Banking Commissioner finds that a provider has knowingly violated any provision of sections 36a-861 to 36a-870, inclusive, or any regulation adopted pursuant to section 36a-871, the commissioner may seek an injunction in a court of competent jurisdiction, and may exercise the powers granted to the commissioner under section 36a-50, on behalf of any recipient affected by the violation.
-
-(P.A. 23-201, S. 12.)
-
-History: P.A. 23-201 effective July 1, 2024.
+Sec. 36a-872. Suspension, revocation or refusal to renew registration. Action by commissioner. (a) The commissioner may suspend, revoke or refuse to renew any registration issued pursuant to section 36a-870, or take any other action in accordance with the provisions of section 36a-51, if the commissioner finds that the registrant or any control person, trustee, employee or agent of such registrant has done any of the following: (1) Made any material misstatement in the application; (2) committed any fraud or misappropriated funds; or (3) violated (A) any provision of this title or any regulation or order adopted or issued pursuant thereto pertaining to such registrant or any control person, trustee, employee or agent of such registrant, or (B) any other law or regulation applicable to the conduct of such registrant's business.
+(b) Whenever it appears to the commissioner that any person has violated, is violating or is about to violate the provisions of sections 36a-861 to 36a-870, inclusive, the commissioner may take action against such person in accordance with sections 36a-50 and 36a-52.
+(P.A. 23-201, S. 12; P.A. 25-115, S. 23.)
+History: P.A. 23-201 effective July 1, 2024; P.A. 25-115 amended Subsec. (a) to replace provisions re provider who violates provision of Secs. 36a-861 to 36a-870 liable for civil penalty pursuant to Sec. 36a-50 with provisions re commissioner may suspend, revoke or refuse to renew registration or take other action in accordance with Sec. 36a-51 and amended Subsec. (b) to replace provisions re commissioner may seek injunction and exercise powers under Sec. 36a-50 if commissioner finds that provider knowingly violated Secs. 36a-861 to 36a-870 or regulation adopted pursuant to Sec. 36a-871 with provisions re commissioner may take action in accordance with Secs. 36a-50 and 36a-52, effective July 1, 2025.

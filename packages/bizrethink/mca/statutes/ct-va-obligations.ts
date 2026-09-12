@@ -72,17 +72,18 @@ export type StatutoryObligation = {
 export const VENDORED_STATUTES = [
   {
     sourceFile: 'CT-CGS-36a-861-872.txt',
-    citation: 'Conn. Gen. Stat. §§36a-861 to 36a-872 (P.A. 23-201)',
-    sourceDigest: 'fe57e328f6d38cb6f0643e3d6238242cbe86b97d41ed51299eac4e709b8e2011',
+    citation: 'Conn. Gen. Stat. §§36a-861 to 36a-872 (P.A. 23-201; P.A. 25-115 §§21–23)',
+    sourceDigest: 'a6a1c9a27fa316ffe25a31db63699bfd78316cc1775b92cc855418998922c8d5',
     publisher: 'Connecticut General Assembly',
     /*
-      The CGA publishes Title 36a section text at CHAPTER granularity only —
-      there are no per-section URLs — so the whole of chapter 669 was fetched
-      and Part V sliced out of it. Tag-stripped; the publisher's own "(Return
-      to …)" navigation lines are the only thing removed.
+      Editorial consolidation of chapter 669, Part XVI: nine base sections plus
+      §§36a-868, 36a-870 and 36a-872 from the 2026 supplement. The file header
+      records both retrievals, exact times and response hashes from the audit;
+      no single official page contains this consolidated file.
     */
     retrievedFrom: 'https://www.cga.ct.gov/current/pub/chap_669.htm',
-    retrievedOn: '2026-09-07',
+    supplementRetrievedFrom: 'https://www.cga.ct.gov/2026/sup/chap_669.htm',
+    retrievedOn: '2026-09-12',
   },
   {
     sourceFile: 'VA-Code-6.2-2228-2238.txt',
@@ -262,7 +263,7 @@ export const CT_VA_OBLIGATIONS: StatutoryObligation[] = [
     citation: 'Conn. Gen. Stat. §36a-868',
     jurisdiction: 'US-CT',
     sourceFile: CT,
-    text: "No commercial financing contract entered into on or after July 1, 2024, shall contain any provision waiving a recipient's right to notice, judicial hearing or prior court order under chapter 903a in connection with the provider obtaining any prejudgment remedy, including, but not limited to, attachment, execution, garnishment or replevin, upon commencing any litigation against the recipient.",
+    text: "No commercial financing contract entered into on or after July 1, 2024, shall contain any provision waiving a recipient's right to notice, judicial hearing or prior court order under chapter 903a in connection with the provider obtaining any prejudgment remedy, including, but not limited to, attachment, execution, garnishment or replevin upon commencing any litigation against the recipient.",
     bearsOn: 'the contract',
     satisfiedBy: null,
     note: "A PREJUDGMENT-REMEDY waiver ban. It is NOT a confession-of-judgment ban and the Act contains none — the two are routinely conflated, and Virginia's §6.2-2234(C) is the confession-of-judgment one. FRPA §7.24 relies on this section; nothing in this package reads the FRPA.",
@@ -282,20 +283,30 @@ export const CT_VA_OBLIGATIONS: StatutoryObligation[] = [
     citation: 'Conn. Gen. Stat. §36a-870(c)',
     jurisdiction: 'US-CT',
     sourceFile: CT,
-    text: 'Each provider and commercial financing broker shall pay an initial registration fee of one thousand dollars and an annual registration fee of five hundred dollars by the fifteenth of September each year thereafter. If a provider or commercial financing broker fails to timely pay any such annual registration fee, its registration shall automatically expire by operation of law.',
+    text: 'Each provider and commercial financing broker registration shall expire at the close of business on December thirty-first of the year in which such registration was approved, unless such registration is renewed or, if such registration is approved on or after November first, such registration shall expire at the close of business on December thirty-first of the year following the year in which such registration was approved. An application for renewal of a registration shall be filed with the commissioner between November first and December thirty-first of the year in which the registration expires. Each applicant for an initial registration or renewal of a registration shall pay to the system a registration fee of one thousand dollars and any other required fees or charges. All fees paid pursuant to this subsection shall be nonrefundable.',
     bearsOn: 'registration',
     satisfiedBy: null,
-    note: "Automatic expiry by operation of law on a missed annual fee, with the same $1,000 / $500 / 15 September figures as Va. Code §6.2-2230. An unregistered provider's disclosure is conforming and unlawful at once, and nothing here can tell.",
+    note: 'Effective July 1, 2025: December 31 expiration, with approvals on or after November 1 expiring the following year; renewal applications November 1–December 31. Initial and renewal registration cost $1,000 plus other required fees, all nonrefundable. This replaces the old $500 annual fee due September 15. Nothing here checks registration status or pays fees.',
   },
   {
-    id: 'ct-penalties',
+    id: 'ct-registration-sanctions',
     citation: 'Conn. Gen. Stat. §36a-872(a)',
     jurisdiction: 'US-CT',
     sourceFile: CT,
-    text: 'Any provider who violates any provision of sections 36a-861 to 36a-870, inclusive, or any regulation adopted pursuant to section 36a-871 shall be liable for a civil penalty pursuant to section 36a-50.',
+    text: "The commissioner may suspend, revoke or refuse to renew any registration issued pursuant to section 36a-870, or take any other action in accordance with the provisions of section 36a-51, if the commissioner finds that the registrant or any control person, trustee, employee or agent of such registrant has done any of the following: (1) Made any material misstatement in the application; (2) committed any fraud or misappropriated funds; or (3) violated (A) any provision of this title or any regulation or order adopted or issued pursuant thereto pertaining to such registrant or any control person, trustee, employee or agent of such registrant, or (B) any other law or regulation applicable to the conduct of such registrant's business.",
     bearsOn: 'enforcement',
     satisfiedBy: null,
-    note: "The Banking Commissioner enforces, via §36a-50. Virginia's enforcer is the Attorney General — see `va-attorney-general-enforcement`. §36a-50 itself is not vendored.",
+    note: 'The 2025 amendment expressly provides for suspension, revocation, refusal to renew and other action under §36a-51, with the grounds listed in this quotation. §36a-51 itself is not vendored.',
+  },
+  {
+    id: 'ct-penalties',
+    citation: 'Conn. Gen. Stat. §36a-872(b)',
+    jurisdiction: 'US-CT',
+    sourceFile: CT,
+    text: 'Whenever it appears to the commissioner that any person has violated, is violating or is about to violate the provisions of sections 36a-861 to 36a-870, inclusive, the commissioner may take action against such person in accordance with sections 36a-50 and 36a-52.',
+    bearsOn: 'enforcement',
+    satisfiedBy: null,
+    note: 'The Banking Commissioner may act against any person for past, ongoing or impending violations, through §§36a-50 and 36a-52. The old provider-only civil-penalty sentence in subsection (a) was replaced in 2025. Neither referenced section is vendored; this quotation does not enumerate their remedies. Virginia gives enforcement to the Attorney General.',
   },
 
   /* ------------------------------------------------------------------ Virginia */
@@ -457,7 +468,7 @@ export const CT_VA_OBLIGATIONS: StatutoryObligation[] = [
     text: 'If any provision of a sales-based financing agreement violates this chapter, such provision shall be unenforceable against the recipient.',
     bearsOn: 'the contract',
     satisfiedBy: null,
-    note: 'Provision-level, not agreement-level: a violation voids the offending term rather than the deal. Connecticut has no equivalent and reaches the same ground through civil penalties instead.',
+    note: 'Provision-level, not agreement-level: a violation voids the offending term rather than the deal. Connecticut separately makes prejudgment-remedy waivers unenforceable under §36a-868 and provides for commissioner action under §36a-872.',
   },
   {
     id: 'va-registration',
@@ -467,7 +478,7 @@ export const CT_VA_OBLIGATIONS: StatutoryObligation[] = [
     text: 'Each sales-based financing provider and sales-based financing broker shall pay an initial registration fee of $1,000 and an annual registration fee of $500 by September 15 every year thereafter. If the provider or broker fails to pay the annual registration fee by September 15, its registrations shall automatically expire by operation of law.',
     bearsOn: 'registration',
     satisfiedBy: null,
-    note: 'Identical figures and date to Conn. Gen. Stat. §36a-870(c), which is not a coincidence worth relying on: they are separate registrations with separate regulators.',
+    note: 'Virginia retains the $1,000 initial fee and $500 annual fee due September 15. Connecticut changed its fee and renewal schedule effective July 1, 2025; these are separate registrations with separate regulators.',
   },
   {
     id: 'va-attorney-general-enforcement',
