@@ -6,6 +6,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 
@@ -237,15 +238,15 @@ export default function McaClauseReviewPage() {
       <p className="text-muted-foreground text-sm">For {reviewerName}</p>
       <h1 className="mt-1 font-semibold text-3xl">{instrument.title}</h1>
       <p className="mt-1 text-muted-foreground text-sm">
-        {parties.funder} · {clauses.length} clauses · {approved} carry a current approval
+        {parties.funder} · {clauses.length} review items · {approved} carry a current approval
       </p>
 
       {agreementMoved && (
         <Alert className="mt-6" variant="warning">
           <AlertTitle>This agreement has changed since the link was sent</AlertTitle>
           <AlertDescription>
-            At least one clause below is not in the words it was in when this link was created. Ask for a fresh link
-            before recording anything against what you read here.
+            The library’s text, selection or citation context has changed since this link was created. Ask for a fresh
+            link before recording anything against what you read here.
           </AlertDescription>
         </Alert>
       )}
@@ -301,35 +302,19 @@ export default function McaClauseReviewPage() {
             {section.clauses.map((clause) => (
               <li key={clause.slug}>
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  {/*
-                    The number the document prints. Fourteen FRPA clauses carry
-                    none — the granting clause among them — and this shows
-                    nothing rather than inventing one.
-                  */}
                   {clause.number !== '' && (
                     <span className="font-mono text-muted-foreground text-xs">{clause.number}</span>
                   )}
-                  {/*
-                    THE SLUG IS A REFERENCE, NOT A HEADING.
-
-                    Forty of the 204 clauses carry no heading in the document —
-                    the FRPA's holdback explainer, its §§10.3–10.6, every
-                    recital in the set — and `clause.heading || clause.slug`
-                    put `frpa.holdback-explainer` where a heading goes. An
-                    attorney was being shown an internal identifier formatted as
-                    if the contract printed it.
-
-                    The slug still has to be visible: it is how counsel cites a
-                    clause back to us, and it is the only stable handle an
-                    unnumbered clause has. So it is shown on every clause, in
-                    the margin, looking like the reference it is — and a clause
-                    the document does not head simply has no heading, which is
-                    the honest render.
-                  */}
-                  {clause.heading !== '' && <h3 className="font-medium">{clause.heading}</h3>}
-                  <span className="font-mono text-muted-foreground/70 text-xs">{clause.slug}</span>
+                  <h3 className="font-medium">{clause.heading}</h3>
+                  {clause.kind === 'explainer' && (
+                    <Badge variant="neutral">
+                      <Trans>Funding terms note</Trans>
+                    </Badge>
+                  )}
                   {clause.approved ? <Badge>Approved</Badge> : <Badge variant="neutral">No current approval</Badge>}
                 </div>
+
+                {clause.selectionNote && <p className="mt-1 text-muted-foreground text-sm">{clause.selectionNote}</p>}
 
                 {(clause.requiredBy !== null || clause.appliesInStates.length > 0) && (
                   <p className="mt-1 text-muted-foreground text-xs">
@@ -341,7 +326,17 @@ export default function McaClauseReviewPage() {
                   </p>
                 )}
 
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>
+                {clause.text && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>}
+                {clause.fields && (
+                  <dl className="mt-3 grid gap-3 rounded-md border border-border p-4 sm:grid-cols-2">
+                    {clause.fields.map((field) => (
+                      <div key={field.widget}>
+                        <dt className="text-muted-foreground text-xs">{field.label}</dt>
+                        <dd className="mt-1 font-mono text-sm">{field.widget}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
 
                 {/*
                   THE EARLIER REVIEWS' FINDINGS WERE PRINTED HERE, under the

@@ -4,6 +4,7 @@ import { mcaLibraryFingerprint } from '../../clauses/approval';
 import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import type { McaClause } from '../../clauses/types';
 import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview, reviewIsStale } from '../link';
+import { numberedLibraryForReview } from '../numbered-library';
 import { readableSlugs, toReadableAgreement } from '../readable-agreement';
 
 /**
@@ -81,7 +82,7 @@ describe('whether the words moved under the reviewer', () => {
 });
 
 describe('what counsel actually reads', () => {
-  const sections = toReadableAgreement(libraryFor('iso-pra'));
+  const sections = toReadableAgreement(numberedLibraryForReview('iso-pra'));
 
   it('serves every clause of the agreement and nothing from any other', () => {
     const slugs = readableSlugs(sections);
@@ -103,15 +104,15 @@ describe('what counsel actually reads', () => {
     sentence. Stripping them would show counsel a document we do not publish.
   */
   it('quotes the document verbatim, markers and all', () => {
-    const withMarkers = libraryFor('frpa').filter((clause) => clause.body.includes('«'));
+    const withMarkers = numberedLibraryForReview('frpa').filter((clause) => clause.body.includes('«'));
     const readable = toReadableAgreement(withMarkers);
 
     expect(withMarkers.length).toBeGreaterThan(0);
     expect(readable.flatMap((section) => section.clauses).every((clause) => clause.text.includes('«'))).toBe(true);
   });
 
-  it('prints the number the document prints, and nothing where it prints none', () => {
-    const unnumbered = libraryFor('frpa').filter((clause) => clause.number === '');
+  it('leaves a record unnumbered only by an explicit structural decision', () => {
+    const unnumbered = numberedLibraryForReview('frpa').filter((clause) => clause.unnumberedReason);
     const readable = toReadableAgreement(unnumbered);
 
     expect(unnumbered.length).toBeGreaterThan(0);

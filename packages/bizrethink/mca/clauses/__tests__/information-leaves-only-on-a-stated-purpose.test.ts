@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { selectClauses } from '../../engine/select-clauses';
@@ -319,8 +320,8 @@ describe('§4.3 authorises information, and stops being an investigation', () =>
   it('sends the information itself to §4.7 and the record mechanics to §5.2', () => {
     const text = body(FINANCIAL);
 
-    expect(text).toContain('Section 4.7');
-    expect(text).toContain('Section 5.2');
+    expect(text).toContain('Section [[clause:frpa.protection-of-information-4-7]]');
+    expect(text).toContain('Section [[clause:frpa.financial-condition-and-financial-information-5-2]]');
   });
 });
 
@@ -341,9 +342,9 @@ describe('§4.4 is a servicing authority, not a second underwriting', () => {
   it('is subject to the three clauses that limit it', () => {
     const text = body(HISTORY);
 
-    expect(text).toContain('Section 4.3');
-    expect(text).toContain('Section 4.7');
-    expect(text).toContain('Section 4.16');
+    expect(text).toContain('Section [[clause:frpa.financial-condition-4-3]]');
+    expect(text).toContain('Section [[clause:frpa.protection-of-information-4-7]]');
+    expect(text).toContain('Section [[clause:frpa.electronic-account-monitoring-authorization-plaid-4-16]]');
   });
 });
 
@@ -367,8 +368,8 @@ describe('§4.7 is the one information policy the others point at', () => {
   it('names where a wider disclosure is allowed to come from', () => {
     const text = body(PROTECTION);
 
-    expect(text).toContain('Section 7.15');
-    expect(text).toContain('Section 7.23');
+    expect(text).toContain('Section [[clause:frpa.reporting-7-15]]');
+    expect(text).toContain('Section [[clause:frpa.tmf-match-reporting-consent-and-release-7-23]]');
   });
 
   it('carries the safeguards, the retention rule and the correction right', () => {
@@ -400,7 +401,7 @@ describe('§4.16 is read-only access, and nothing else', () => {
 
     expect(text).toMatch(/read-only/);
     expect(text).toMatch(/never permits a debit, transfer(?:,)? or withdrawal/i);
-    expect(text).toContain('Section 2.3');
+    expect(text).toContain('Section [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]]');
   });
 
   it('drops the ongoing creditworthiness review', () => {
@@ -425,7 +426,7 @@ describe('§4.16 is read-only access, and nothing else', () => {
     const text = body(MONITORING);
 
     expect(text).not.toContain('Section 6.1.1');
-    expect(text).toContain('Section 6.1');
+    expect(text).toContain('Section [[clause:frpa.events-of-default-6-1]]');
     expect(text).toMatch(/is not an Event of Default/);
   });
 
@@ -436,7 +437,7 @@ describe('§4.16 is read-only access, and nothing else', () => {
   it('separates revoking access from intentional diversion', () => {
     const text = body(MONITORING);
 
-    expect(text).toContain('Section 6.1(b)');
+    expect(text).toContain('Section [[clause:frpa.events-of-default-6-1]](b)');
     expect(text).toMatch(/good-faith revocation/);
   });
 
@@ -444,14 +445,14 @@ describe('§4.16 is read-only access, and nothing else', () => {
     const text = body(MONITORING);
 
     expect(text).toMatch(/shall end active access/);
-    expect(text).toContain('Section 4.7');
-    expect(text).toContain('Section 2.6');
+    expect(text).toContain('Section [[clause:frpa.protection-of-information-4-7]]');
+    expect(text).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
   });
 
   it('keeps credentials and raw transaction data out of §7.15', () => {
     const text = body(MONITORING);
 
-    expect(text).toContain('Section 7.15');
+    expect(text).toContain('Section [[clause:frpa.reporting-7-15]]');
     expect(text).toMatch(/no bank credentials/i);
   });
 });
@@ -481,7 +482,7 @@ describe('§7.15 reports performance, not a delinquency', () => {
   it('requires lawful authority before a personal report and leaves §4.7 in charge', () => {
     const text = body(REPORTING);
 
-    expect(text).toContain('Section 4.7');
+    expect(text).toContain('Section [[clause:frpa.protection-of-information-4-7]]');
     expect(text).toMatch(/accuracy, adverse-action(?:,)? and dispute/);
     expect(text).toMatch(/No raw account data/i);
   });
@@ -524,7 +525,7 @@ describe('§7.18 contacts a person the law lets Buyer contact', () => {
     expect(text).toMatch(/reasonable advance notice/);
     expect(text).toMatch(/contemporaneous consent/);
     expect(text).toMatch(/breach of the peace/);
-    expect(text).toContain('Section 6.2');
+    expect(text).toContain('Section [[clause:frpa.remedies-6-2]]');
   });
 });
 
@@ -542,7 +543,7 @@ describe('§7.21 stops making the merchant answer for the broker', () => {
 
     expect(text).toMatch(/do not indemnify Buyer/);
     expect(text).not.toMatch(/act or omission by any ISO/);
-    expect(text).toContain('Section 7.9');
+    expect(text).toContain('Section [[clause:frpa.indemnification-7-9]]');
   });
 
   it('does not let an "independent" label decide agency', () => {
@@ -578,7 +579,7 @@ describe('§7.23 reports to a network only on the network’s own criteria', () 
 
     expect(text).toMatch(/authorized under the applicable card-network rules/);
     expect(text).toMatch(/documented facts/);
-    expect(text).toContain('Section 4.7');
+    expect(text).toContain('Section [[clause:frpa.protection-of-information-4-7]]');
   });
 
   it('forbids a report, or a threat of one, as payment pressure', () => {
@@ -626,7 +627,7 @@ describe('Exhibit C establishes the release instead of assuming it', () => {
     const text = body(RELEASE);
 
     expect(text).toMatch(/signed by that individual|the individual whose report/);
-    expect(text).toContain('Section 4.3');
+    expect(text).toContain('Section [[clause:frpa.financial-condition-4-3]]');
   });
 
   it('expands nothing', () => {

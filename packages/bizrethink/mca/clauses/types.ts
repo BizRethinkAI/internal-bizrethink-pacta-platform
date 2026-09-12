@@ -8,26 +8,6 @@ import type { McaInstrument } from './instruments';
 export type { ClauseExamination } from './examination';
 
 /**
- * One numbered clause of one of the negotiated agreements.
- *
- * HOW THIS DIFFERS FROM THE LEASE'S `Clause`, AND WHY. The lease library's
- * clause is organised by jurisdiction, because a residential lease is one
- * document whose contents a state decides. Nothing here works that way. An MCA
- * deal is a SET of documents — a purchase agreement, a state disclosure, a
- * processor authorisation, sometimes an equipment lease — and the question that
- * organises a clause is which of them it is in. So `instruments` sits where the
- * lease has `jurisdiction`, and state law arrives on a narrower field below.
- *
- * WHAT IS DELIBERATELY ABSENT. There is no `includeWhen` and no `variables`
- * yet. Both belong to the engine, which is not built, and this package has
- * already paid for forward scaffolding once: the AI config asked for a GCP
- * project id, a location and an API key for four months before anything read
- * any of them, and shaped a UI around the wrong product. A clause here is text
- * with provenance. When the builder needs to select between clauses it will
- * need a facts type, and that type should be derived from what the clauses
- * actually branch on rather than guessed at now.
- */
-/**
  * What a library entry actually is.
  *
  * THE DISCRIMINATOR THAT DID NOT EXIST, AND WHAT ITS ABSENCE COST. Three
@@ -52,7 +32,7 @@ export type { ClauseExamination } from './examination';
  * [ADR 0011](../../../../docs/adr/0011-the-mca-clause-library-is-a-library.md).
  */
 export type McaClauseKind =
-  /** Operative contract text. The default, and all but three of the corpus. */
+  /** Operative contract text, including definitions. */
   | 'clause'
   /** A grid the parties complete. Holds `fields`, never a body. */
   | 'field-group'
@@ -146,16 +126,18 @@ export type McaClause = {
   fields?: ClauseField[];
 
   /**
-   * The number the document itself prints — `A.4`, `2.6`, `3.12`.
-   *
-   * A LABEL, NOT AN IDENTITY. REVIEW-01's finding loci name numbers that have
-   * since moved: its `§A.5 Clawback Provision` is the shipped v2's A.4, because
-   * the fixes that review produced removed a section above it. The stable
-   * identity is `slug`; this is what a reader is looking at on the page.
+   * An explicit reason this structural block has no clause number. Otherwise
+   * selection numbers it automatically. Never infer this from an empty heading.
    */
-  number: string;
+  unnumberedReason?: string;
 
-  /** Logical group within the instrument. Drives reading order, not numbering. */
+  /**
+   * Shared reference identity for mutually exclusive alternatives. Defaults to
+   * `slug`. Exactly one selected clause may answer a reference identity.
+   */
+  referenceId?: string;
+
+  /** Logical group within the instrument. Selection numbers surviving groups. */
   section: string;
   sortKey: number;
 

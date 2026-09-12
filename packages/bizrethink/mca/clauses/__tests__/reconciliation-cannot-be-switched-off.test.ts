@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { libraryFor } from '../library';
@@ -145,7 +146,7 @@ describe('reconciliation is verification and correction, not a payment holiday',
   });
 
   it('sends an actual failure to remit to the clause that deals with it', () => {
-    expect(clause(RIGHT).body).toContain('Section 7.16');
+    expect(clause(RIGHT).body).toContain('Section [[clause:frpa.return-of-buyer-proceeds-7-16]]');
   });
 
   /**
@@ -155,7 +156,7 @@ describe('reconciliation is verification and correction, not a payment holiday',
    * points at nothing.
    */
   it('feeds its correction into the Remaining Balance §2.6 measures', () => {
-    expect(clause(COMPLETION).body).toContain('correction made under Section 3');
+    expect(clause(COMPLETION).body).toContain('correction made under Section [[section:reconciliation]]');
     expect(clause(RIGHT).body).toContain('Remaining Balance');
   });
 });
@@ -167,7 +168,7 @@ describe('the request cannot be conditioned away', () => {
     expect(body).toMatch(/email/);
     expect(body).toMatch(/portal/);
     expect(body).toMatch(/telephone/);
-    expect(body).toContain('Section 7.3');
+    expect(body).toContain('Section [[clause:frpa.notices-7-3]]');
   });
 
   it('puts the first move on Buyer rather than on the merchant’s filing cabinet', () => {
@@ -274,7 +275,7 @@ describe('incomplete information is not a default and not a withdrawal', () => {
   it('leaves a remedy available only for conduct that stands on its own', () => {
     const body = clause(INFORMATION).body;
 
-    expect(body).toMatch(/independently satisfies Section 6\.1/);
+    expect(body).toMatch(/independently satisfies Section (?:6\.1|\[\[clause:frpa\.events-of-default-6-1\]\])/);
     expect(body).toMatch(/caused Buyer loss/);
     expect(body).toMatch(/shall not presume fraud/);
   });

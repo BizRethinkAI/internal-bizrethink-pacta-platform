@@ -1,3 +1,5 @@
+// ADR 0011 adds the existing funding grid and separates the existing interest paragraph: FRPA 108, corpus 211.
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { selectClauses } from '../../engine/select-clauses';
@@ -319,7 +321,7 @@ describe('no provision of any instrument manufactures service of process', () =>
       running the union BEFORE pushing — which is the whole point of doing it
       that way, and is what the queue skipped.
     */
-    expect(ALL_MCA_CLAUSES.length).toBe(209);
+    expect(ALL_MCA_CLAUSES.length).toBe(211);
   });
 });
 
@@ -332,7 +334,7 @@ describe('judicial service is consolidated in Section 10.1 and answered where it
   it('leaves Section 7.12 pointing at Section 10.1 rather than stating its own rule', () => {
     const body = clause(PROCESS).body;
 
-    expect(body).toContain('Section 10.1');
+    expect(body).toContain('Section [[clause:frpa.section-10-1]]');
     expect(deemsService(body)).toBe(false);
     expect(body).toMatch(/undeliverable|returned/i);
   });
@@ -348,7 +350,7 @@ describe('judicial service is consolidated in Section 10.1 and answered where it
     const body = clause(SERVICE).body;
 
     expect(body).toMatch(/Guarantor/);
-    expect(clause(GUARANTOR_SERVICE).body).toContain('Section 10.1');
+    expect(clause(GUARANTOR_SERVICE).body).toContain('Section [[clause:frpa.section-10-1]]');
   });
 
   it('makes Section 10.1 require lawful process rather than excuse it', () => {
@@ -371,7 +373,7 @@ describe('judicial service is consolidated in Section 10.1 and answered where it
     expect(body).toContain('«48»');
     expect(body).toContain('«49»');
     expect(body).not.toMatch(/AGREES TO ACCEPT SERVICE/i);
-    expect(body).toMatch(/Section 10\.1/);
+    expect(body).toMatch(/Section (?:10\.1|\[\[clause:frpa\.section-10-1\]\])/);
   });
 
   /**
@@ -395,13 +397,13 @@ describe('judicial service is consolidated in Section 10.1 and answered where it
     const body = clause(SUPERSEDES).body;
 
     expect(body).not.toMatch(/supersede/i);
-    expect(body).toContain('Section 10.1');
-    expect(body).toContain('Section 7.3');
+    expect(body).toContain('Section [[clause:frpa.section-10-1]]');
+    expect(body).toContain('Section [[clause:frpa.notices-7-3]]');
   });
 
   /** And §7.3's route out is still intact, because both ends now exist. */
   it('keeps Section 7.3 sending judicial process to Section 7.12 and Section 10', () => {
-    expect(clause(NOTICES).body).toContain('Section 7.12');
+    expect(clause(NOTICES).body).toContain('Section [[clause:frpa.service-of-process-7-12]]');
   });
 });
 
@@ -440,7 +442,7 @@ describe('one forum rule, and it is the merchant’s own state', () => {
   it('states the assignment rule once, in Section 7.2', () => {
     const body = clause(FORUM).body;
 
-    expect(body).toContain('Section 7.2');
+    expect(body).toContain('Section [[clause:frpa.assignment-7-2]]');
     expect(body).not.toMatch(/sole discretion/i);
   });
 
@@ -452,14 +454,14 @@ describe('one forum rule, and it is the merchant’s own state', () => {
   it('leaves the precedence claim with Section 7.24 alone', () => {
     expect(clause(RIDERS).body).toMatch(/governs over any different forum provision/i);
     expect(clause(FORUM).body).not.toMatch(/governs over|controls over|notwithstanding any other/i);
-    expect(clause(FORUM).body).toContain('Section 7.24');
+    expect(clause(FORUM).body).toContain('Section [[clause:frpa.state-law-riders-7-24]]');
   });
 
   /** And §7.5 hands judicial process to Section 10.1 rather than supplying it. */
   it('sends judicial process out of the governing-law clause', () => {
     const body = clause(FORUM).body;
 
-    expect(body).toContain('Section 10.1');
+    expect(body).toContain('Section [[clause:frpa.section-10-1]]');
     expect(deemsService(body)).toBe(false);
   });
 
@@ -499,7 +501,7 @@ describe('severability stops promising what a statute can take away', () => {
 
   /** §7.24 already points here for that rule; the two have to agree. */
   it('agrees with the rider clause that already cites it', () => {
-    expect(clause(RIDERS).body).toContain('Section 7.7');
+    expect(clause(RIDERS).body).toContain('Section [[clause:frpa.severability-7-7]]');
     expect(clause(SEVERABILITY).body).toMatch(/prohibited/i);
   });
 });

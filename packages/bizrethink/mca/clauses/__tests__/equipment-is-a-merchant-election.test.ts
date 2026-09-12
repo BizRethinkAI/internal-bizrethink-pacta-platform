@@ -90,7 +90,9 @@ describe('equipment is a merchant election, not a funder fact', () => {
     const equipmentCost = body('frpa.equipment-cost-explainer');
 
     expect(equipmentCost).toMatch(/itemized deduction from the Purchase Price/);
-    expect(equipmentCost).toMatch(/in Section 1\.4 before Merchant signs/);
+    expect(equipmentCost).toMatch(
+      /in (?:Section 1\.4|the Itemization of Net Amount Funded grid) before Merchant signs/,
+    );
   });
 
   /**

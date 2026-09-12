@@ -33,7 +33,6 @@ const clause = (overrides: Partial<McaClause> = {}): McaClause => ({
   instrument: 'frpa',
   kind: 'clause',
   includeWhen: null,
-  number: '2.1',
   section: 'purchase',
   sortKey: 10,
   heading: 'Purchase and Sale',
@@ -75,7 +74,8 @@ describe('the fingerprint an approval is pinned to', () => {
     for (const changed of [
       clause({ body: `${base.body} Amended.` }),
       clause({ heading: 'Purchase and Sale of Receivables' }),
-      clause({ number: '2.2' }),
+      // ADR 0011: a changed reference target lapses approval; a printed number is no longer stored.
+      clause({ referenceId: 'another-obligation' }),
       clause({ version: 2 }),
       clause({ requiredBy: '10 CCR §952' }),
     ]) {

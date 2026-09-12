@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { LOMBARD_FACTS } from '../facts';
@@ -139,7 +140,7 @@ describe('the cluster is the whole of Section 5, minus what is named', () => {
    * there is nothing in this cluster to deduplicate against.
    */
   it('has no §5.7 to retain, because the document reserves it', () => {
-    expect(clauses.some((entry) => entry.number === '5.7')).toBe(false);
+    expect(clauses.some((entry) => entry.slug === 'frpa.no-diversion-of-receipts-5-7')).toBe(false);
   });
 });
 
@@ -255,7 +256,7 @@ describe('each clause that could be read as a promise says it is not', () => {
   it('§5.6 sends account changes to §2.4 and makes none of them a default', () => {
     const text = body(ACCOUNT);
 
-    expect(text).toContain('Section 2.4');
+    expect(text).toContain('Section [[clause:frpa.approved-bank-account-2-4]]');
     expect(text).toMatch(/No account change/);
     expect(text).toMatch(/Event of Default/);
   });
@@ -328,7 +329,7 @@ describe('§5.17 reconciles with §2.4 rather than contradicting it', () => {
 
     expect(text).not.toMatch(/Approved Bank Account on a daily basis/);
     expect(text).not.toMatch(/close the Approved Bank Account/);
-    expect(text).toContain('Section 2.4');
+    expect(text).toContain('Section [[clause:frpa.approved-bank-account-2-4]]');
   });
 
   it('leaves non-card receipts and the merchant’s own share alone', () => {
@@ -365,9 +366,11 @@ describe('§5.17 reconciles with §2.4 rather than contradicting it', () => {
 
     expect(text).toMatch(/intentionally (conceal|divert)/);
 
-    const citing = clauses.filter((entry) => entry.body.includes('Section 5.17')).map((entry) => entry.number);
+    const citing = clauses
+      .filter((entry) => entry.body.includes('[[clause:frpa.no-diversion-of-receipts-5-17]]'))
+      .map((entry) => entry.slug);
 
-    expect(citing).toContain('9.2');
+    expect(citing).toContain('frpa.guaranty-of-performance-9-2');
   });
 });
 
@@ -384,7 +387,7 @@ describe('the collateral clauses stop pretending the collateral is property', ()
   it('§5.10 states the negative pledge once, in §4.11', () => {
     const text = body(ENCUMBRANCE);
 
-    expect(text).toContain('Section 4.11');
+    expect(text).toContain('Section [[clause:frpa.negative-pledge-4-11]]');
     expect(text).not.toMatch(/ranking after the Specified Percentage/);
     expect(text).toMatch(/obtains no security interest and no priority/);
   });

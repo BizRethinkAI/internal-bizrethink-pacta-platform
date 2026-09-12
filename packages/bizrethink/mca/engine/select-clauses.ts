@@ -1,7 +1,8 @@
 import type { McaFacts } from '../clauses/facts';
 import { INSTRUMENTS, type McaInstrument } from '../clauses/instruments';
-import { inReviewOrder, libraryFor } from '../clauses/library';
+import { libraryFor } from '../clauses/library';
 import type { McaClause } from '../clauses/types';
+import { numberClauses, referencedInstruments, resolveReferences, type SelectedMcaClause } from './number-clauses';
 
 /**
  * Turn a funder's answers into the clauses their agreement actually contains.
@@ -22,12 +23,10 @@ import type { McaClause } from '../clauses/types';
  * not: the clause is simply not selected, and nothing downstream knows it could
  * have been.
  *
- * WHAT THIS DELIBERATELY DOES NOT DO YET. It does not number. `McaClause.number`
- * is still the number the document prints, and removing it is
- * [ADR 0011](../../../../docs/adr/0011-the-mca-clause-library-is-a-library.md)
- * phase 4 — a change that has to reproduce v4's numbering exactly or break every
- * review locus and all five live Pacta templates. Selecting and numbering are
- * separable, and shipping the half that is provable beats claiming both.
+ * Numbering follows selection (ADR 0011); ADR 0012 explicitly retired fidelity
+ * to v4. Historical review loci remain attached to their source documents and
+ * findings stay linked by slug. Existing templates require a separate rebuild;
+ * selecting clauses here neither republishes them nor authorizes merchant use.
  *
  * It also has no `supersedes` and no `asserts`. The lease has both; this corpus
  * has no member for either yet, and a mechanism with no user is the forward
@@ -43,7 +42,7 @@ export type SelectClausesOptions = {
 
 export type SelectClausesResult = {
   /** The clauses this funder's answers put in the document, in reading order. */
-  selected: McaClause[];
+  selected: SelectedMcaClause[];
   /**
    * The clauses the library holds for this instrument and these answers exclude.
    *
@@ -79,7 +78,17 @@ export const selectClauses = ({ facts, instrument, library }: SelectClausesOptio
     );
   }
 
-  const selected = inReviewOrder(candidates.filter((clause) => applies(clause, facts)));
+  const numbered = numberClauses(candidates.filter((clause) => applies(clause, facts)));
+  // The ISO's commission rule cites cancellation in the FRPA. Resolve that
+  // citation against the same fact row, never against a cached/default number.
+  const otherInstruments = referencedInstruments(numbered).filter((id) => id !== instrument);
+  const context = [
+    ...numbered,
+    ...otherInstruments.flatMap((id) =>
+      numberClauses(libraryFor(id as McaInstrument).filter((clause) => applies(clause, facts))),
+    ),
+  ];
+  const selected = resolveReferences(numbered, context);
 
   const excluded = candidates
     .filter((clause) => !applies(clause, facts))

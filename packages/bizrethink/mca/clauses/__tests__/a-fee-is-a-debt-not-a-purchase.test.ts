@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 import { selectClauses } from '../../engine/select-clauses';
 import { LOMBARD_FACTS, type McaFacts } from '../facts';
@@ -197,7 +198,7 @@ describe('a fee never rides on the purchase', () => {
    * happens when three clauses each state their own.
    */
   it.each([DEPOSIT, SCHEDULE, ENFORCEMENT_COSTS])('%s sends enforcement expense to Section 6.3', (slug) => {
-    expect(clause(slug).body).toContain('Section 6.3');
+    expect(clause(slug).body).toContain('Section [[clause:frpa.costs-of-collection-6-3]]');
   });
 });
 
@@ -246,7 +247,7 @@ describe('completion is described where it is defined', () => {
    * when this stops, whatever route the money took.
    */
   it('sends early completion to Section 2.6', () => {
-    expect(clause(EARLY).body).toContain('Section 2.6');
+    expect(clause(EARLY).body).toContain('Section [[clause:frpa.completion-threshold-2-6]]');
     expect(clause(EARLY).body).toContain('Remaining Balance');
   });
 });
@@ -398,7 +399,7 @@ describe('cancellation unwinds rather than forfeits', () => {
   it('gives the three-day right a channel that can carry it', () => {
     const body = clause(CANCEL).body;
 
-    expect(body).toMatch(/Notwithstanding Section 7\.3/);
+    expect(body).toMatch(/Notwithstanding Section (?:7\.3|\[\[clause:frpa\.notices-7-3\]\])/);
     expect(body).toMatch(/when sent/i);
   });
 });
