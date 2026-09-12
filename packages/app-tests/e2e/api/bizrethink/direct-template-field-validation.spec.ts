@@ -309,12 +309,14 @@ for (const version of [1, 2] as const) {
     const f = await fixture(version);
     const text = await f.add(FieldType.TEXT, { type: 'text', text: 'Default', characterLimit: 30 });
     await f.add(FieldType.NUMBER, { type: 'number', minValue: 1000 });
+    const fraction = await f.add(FieldType.NUMBER, { type: 'number', minValue: 0.1, maxValue: 0.9 });
     const checkbox = await f.add(FieldType.CHECKBOX, FIELD_CHECKBOX_META_DEFAULT_VALUES);
     const date = await f.add(FieldType.DATE, null);
     const checked = version === 1 ? '["empty-value-1"]' : '[0]';
     await expectOk(
       await create(request, f, [
         entry(text.id, 'Signer choice'),
+        entry(fraction.id, '.5'),
         entry(checkbox.id, checked),
         entry(date.id),
         entry(0),
@@ -322,7 +324,10 @@ for (const version of [1, 2] as const) {
     );
     const fields = (await createdRecipient(f)).fields;
     expect(fields.find((field) => field.type === FieldType.TEXT)?.customText).toBe('Signer choice');
-    expect(fields.find((field) => field.type === FieldType.NUMBER)?.customText ?? '').toBe('');
+    // v1 omits the untouched optional number; v2 retains it as an empty field.
+    expect(fields.filter((field) => field.type === FieldType.NUMBER).map((field) => field.customText)).toEqual(
+      version === 1 ? ['.5'] : expect.arrayContaining(['', '.5']),
+    );
     expect(fields.find((field) => field.type === FieldType.CHECKBOX)?.customText).toBe(checked);
     expect(fields.find((field) => field.type === FieldType.DATE)?.customText).toMatch(/\d/);
   });

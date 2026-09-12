@@ -1,3 +1,4 @@
+import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import * as fieldAuth from '@documenso/lib/server-only/document/validate-field-auth';
 import { createDocumentFromDirectTemplate } from '@documenso/lib/server-only/template/create-document-from-direct-template';
@@ -315,6 +316,18 @@ for (const version of [1, 2] as const) {
       it(`preserves valid formatted numbers and their limits: ${numberFormat}`, async () => {
         addField(FieldType.NUMBER, { type: 'number', numberFormat, minValue: 1000, maxValue: 2000 });
         await use([entry(6, value)]);
+        expect(savedFields()[0]).toMatchObject({ customText: value, inserted: true });
+      });
+    }
+    for (const [value, minValue, maxValue] of [
+      ['.5', 0.1, 0.9],
+      ['1000.', 1000, 1000],
+    ] as const) {
+      it(`preserves ordinary unformatted numeric input ${value}`, async () => {
+        const meta = { type: 'number' as const, minValue, maxValue };
+        expect(validateNumberField(value, meta, true)).toEqual([]);
+        addField(FieldType.NUMBER, meta);
+        await expect(use([entry(6, value)])).resolves.toMatchObject({ documentId: 100 });
         expect(savedFields()[0]).toMatchObject({ customText: value, inserted: true });
       });
     }
