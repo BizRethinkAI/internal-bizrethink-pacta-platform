@@ -74,9 +74,10 @@ describe('what the letters actually contain', () => {
    * instrument Phase 0 had recorded as empty.
    */
   it('carries the credit-bureau authorisations the FRPA depends on', () => {
-    const numbers = libraryFor('permission-to-release').map((clause) => clause.number);
+    // ADR 0011: identify the authorizations, not their historical print positions.
+    const slugs = libraryFor('permission-to-release').map((clause) => clause.slug);
 
-    expect(numbers).toContain('3');
-    expect(numbers).toContain('4');
+    expect(slugs).toContain('permission-to-release.credit-bureau-authorization');
+    expect(slugs).toContain('permission-to-release.fair-credit-reporting-act-acknowledgment');
   });
 });

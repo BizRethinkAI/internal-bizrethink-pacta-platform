@@ -1,3 +1,4 @@
+import { getApiTokenEnvelopeScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { prisma } from '@documenso/prisma';
 import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, RecipientRole, SendStatus, WebhookTriggerEvents } from '@prisma/client';
@@ -40,7 +41,11 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
   // self-hide path below. The authoritative delete authorization is performed
   // via the visibility-aware `getEnvelopeWhereInput` helper.
   const envelope = await prisma.envelope.findUnique({
-    where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
+    where: {
+      ...unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
+      // MODIFIED for BizRethink (overlay 075): recipient self-hide also requires the API key's team.
+      ...getApiTokenEnvelopeScope(teamId),
+    },
     include: {
       recipients: true,
       documentMeta: true,

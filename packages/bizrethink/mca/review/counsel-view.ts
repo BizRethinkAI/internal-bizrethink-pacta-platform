@@ -5,6 +5,7 @@ import { type McaTenant, resolveClauses } from '../clauses/parties';
 import type { McaJurisdiction } from '../jurisdictions';
 import { type BriefingSection, counselBriefing } from './briefing';
 import { type McaLibraryReview, reviewIsStale } from './link';
+import { numberedLibraryForReview } from './numbered-library';
 import { type ReadableMcaClause, toReadableAgreement } from './readable-agreement';
 
 /**
@@ -124,23 +125,25 @@ export const counselReviewView = (input: CounselReviewInput): CounselReviewView 
       tenant,
       clauseCount: clauses.length,
       approvedCount: clauses.filter((clause) => isMcaApprovalCurrent(clause, approvalFor(clause.slug))).length,
-      unnumberedCount: clauses.filter((clause) => clause.number === '').length,
+      unnumberedCount: clauses.filter((clause) => clause.unnumberedReason).length,
       sender,
       expiresAt: review.expiresAt,
       now,
     }),
-    sections: toReadableAgreement(resolveClauses(clauses, tenant)).map((section) => ({
-      ...section,
-      clauses: section.clauses.map((readable) => {
-        const clause = clauses.find((candidate) => candidate.slug === readable.slug);
+    sections: toReadableAgreement(resolveClauses(numberedLibraryForReview(review.instrument), tenant)).map(
+      (section) => ({
+        ...section,
+        clauses: section.clauses.map((readable) => {
+          const clause = clauses.find((candidate) => candidate.slug === readable.slug);
 
-        return {
-          ...readable,
-          requiredBy: clause?.requiredBy ?? null,
-          appliesInStates: clause?.appliesInStates ?? [],
-          approved: clause === undefined ? false : isMcaApprovalCurrent(clause, approvalFor(clause.slug)),
-        };
+          return {
+            ...readable,
+            requiredBy: clause?.requiredBy ?? null,
+            appliesInStates: clause?.appliesInStates ?? [],
+            approved: clause === undefined ? false : isMcaApprovalCurrent(clause, approvalFor(clause.slug)),
+          };
+        }),
       }),
-    })),
+    ),
   };
 };

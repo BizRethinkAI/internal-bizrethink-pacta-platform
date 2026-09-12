@@ -147,6 +147,9 @@ apps/remix/app/routes/_authenticated+/admin+/sso-providers.tsx
 # upstream file cannot silently land at this path.
 apps/remix/app/routes/api+/bizrethink.lease-document.ts
 
+# Pacta's A-02 security regression. Playwright discovers API specs under this
+# directory; this new BizRethink-namespaced test has never existed upstream.
+packages/app-tests/e2e/api/bizrethink/api-token-team-boundary.spec.ts
 # A-05 recipient authorization HTTP regression. Playwright discovers API specs
 # here; the BizRethink namespace and exact path distinguish it from upstream.
 packages/app-tests/e2e/api/bizrethink/recipient-token-authorization.spec.ts

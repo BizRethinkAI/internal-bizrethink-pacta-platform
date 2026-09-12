@@ -39,7 +39,7 @@ const briefingFor = (instrument: (typeof MCA_INSTRUMENTS)[number]) =>
     ...base,
     instrument,
     clauseCount: libraryFor(instrument).length,
-    unnumberedCount: libraryFor(instrument).filter((clause) => clause.number === '').length,
+    unnumberedCount: libraryFor(instrument).filter((clause) => Boolean(clause.unnumberedReason)).length,
   });
 
 const text = (instrument: (typeof MCA_INSTRUMENTS)[number]) =>
@@ -236,7 +236,9 @@ describe('the counsel briefing', () => {
     const body = text(instrument);
 
     expect(body).not.toMatch(/in the margin/i);
-    expect(body).toMatch(/beside/i);
+    // ADR 0011 removes the visible slug; the briefing names the actual heading and comment box.
+    expect(body).not.toMatch(/internal handle|reference in grey/i);
+    expect(body).toMatch(/heading, number where shown, and any alternative label/);
   });
 
   /**

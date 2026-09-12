@@ -2,8 +2,7 @@
 
 The second half of the MCA vertical. `content/` and `prescribed/` are the first
 half and are not clauses: they are rule packs, describing what a state demands
-of a *disclosure*. This directory holds **our own contract text** — the 140
-numbered clauses of the negotiated agreements — and it is what the agreement
+of a *disclosure*. This directory holds **our own contract text** — the selectable records of six negotiated agreements — and it is what the agreement
 builder will select from.
 
 [ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md) explains
@@ -21,15 +20,45 @@ text being written down.
 
 | | |
 |---|---|
-| FRPA | **101 clauses** — 87 numbered, 14 the document leaves unnumbered |
-| ISO Partner Referral Agreement | **24 clauses** |
-| Equipment Lease | **26 clauses** |
-| Subscription | **26 clauses** — the Equipment Lease's twin |
-| Payzli Split Funding Authorization | **7 clauses** — a letter, no numbering at all |
-| Permission to Release | **8 clauses** — Phase 0 recorded it as having none |
-| **Total** | **192 clauses, all six instruments imported** |
-| Approvals, review links, an admin surface | not built |
-| Interview, engine, assembly | not built — and it lives here, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
+| FRPA | **108 records**, including four funding notes and two field groups |
+| ISO Partner Referral Agreement | **28 records** |
+| Equipment Lease | **30 records** |
+| Subscription | **30 records** — the Equipment Lease's twin |
+| Split Funding Authorization | **7 records** |
+| Permission to Release | **8 records** |
+| **Total** | **211 records**; a selection contains only applicable alternatives |
+| Approvals, review links, admin surface | implemented; all authored source records remain drafts |
+| Selection and numbering | implemented; no merchant rendering or sending path |
+| Interview and assembly | future work in Pacta, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
+
+### Citation contract (ADR 0011 phases 1–4)
+
+A source record has **no `number`**. `selectClauses` filters first, sorts by the
+instrument's section order and each record's `sortKey`, then derives consecutive
+section and clause numbers. An `unnumberedReason` explicitly identifies a form
+grid, preamble, funding note, lead-in or execution block. All other records are
+citable. Separate guaranty numbering is still ADR 0011 phase 5.
+
+Use `[[clause:frpa.definitions]]` for a clause reference and
+`[[section:reconciliation]]` for a whole section. Opposite rules share the
+canonical clause identity through `referenceId`; only one may be selected.
+Lettered limbs follow the token, for example `…]](b)`. A cross-instrument
+section reference includes its instrument, `[[section:frpa#default]]`.
+Missing, duplicate and malformed references fail selection rather than printing
+a guessed number. Name the separately signed guaranty when an ungated limit
+must also make sense for a funder that selects no guaranty.
+
+Counsel and staff see numbers for a clearly labelled example profile. Every
+excluded alternative is shown once with its own example context. Internal slugs
+still attach findings and approvals; counsel does not see them as citations.
+Clause fingerprints cover source words, fields, semantic targets and conditions;
+review-link fingerprints also cover order, the example profile and referenced
+instruments. Existing reviews become stale after this migration.
+
+Historical review loci belong to the vendored document, not the new numbering.
+Existing Pacta templates require a separate rebuild; selecting this corpus does
+not change them. Source documents, review registers and prescribed disclosures
+are unchanged.
 
 Nothing here is publishable and nothing renders to a merchant. Every clause is
 `attorney-drafted` with a null author, and `library.test.ts` asserts the refusal

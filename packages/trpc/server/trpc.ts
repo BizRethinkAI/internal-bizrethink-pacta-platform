@@ -1,3 +1,4 @@
+import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import { assertUserNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
@@ -112,30 +113,33 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path, me
       position: 'trpcProcedure',
     });
 
-    return await next({
-      ctx: {
-        ...ctx,
-        logger: trpcApiV2Logger,
-        user: apiToken.user,
-        teamId: apiToken.teamId,
-        session: null,
-        metadata: {
-          ...ctx.metadata,
-          auditUser: apiToken.team
-            ? {
-                id: null,
-                email: null,
-                name: apiToken.team.name,
-              }
-            : {
-                id: apiToken.user.id,
-                email: apiToken.user.email,
-                name: apiToken.user.name,
-              },
-          auth: 'api',
-        } satisfies ApiRequestMetadata,
-      },
-    });
+    // MODIFIED for BizRethink (overlay 075): carry the authenticated key's team through every handler.
+    return await withApiTokenTeamScope(apiToken.teamId, () =>
+      next({
+        ctx: {
+          ...ctx,
+          logger: trpcApiV2Logger,
+          user: apiToken.user,
+          teamId: apiToken.teamId,
+          session: null,
+          metadata: {
+            ...ctx.metadata,
+            auditUser: apiToken.team
+              ? {
+                  id: null,
+                  email: null,
+                  name: apiToken.team.name,
+                }
+              : {
+                  id: apiToken.user.id,
+                  email: apiToken.user.email,
+                  name: apiToken.user.name,
+                },
+            auth: 'api',
+          } satisfies ApiRequestMetadata,
+        },
+      }),
+    );
   }
 
   if (!ctx.session) {
@@ -227,30 +231,33 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
       position: 'trpcProcedure',
     });
 
-    return await next({
-      ctx: {
-        ...ctx,
-        logger: trpcApiV2Logger,
-        user: apiToken.user,
-        teamId: apiToken.teamId,
-        session: null,
-        metadata: {
-          ...ctx.metadata,
-          auditUser: apiToken.team
-            ? {
-                id: null,
-                email: null,
-                name: apiToken.team.name,
-              }
-            : {
-                id: apiToken.user.id,
-                email: apiToken.user.email,
-                name: apiToken.user.name,
-              },
-          auth: 'api',
-        } satisfies ApiRequestMetadata,
-      },
-    });
+    // MODIFIED for BizRethink (overlay 075): carry the authenticated key's team through every handler.
+    return await withApiTokenTeamScope(apiToken.teamId, () =>
+      next({
+        ctx: {
+          ...ctx,
+          logger: trpcApiV2Logger,
+          user: apiToken.user,
+          teamId: apiToken.teamId,
+          session: null,
+          metadata: {
+            ...ctx.metadata,
+            auditUser: apiToken.team
+              ? {
+                  id: null,
+                  email: null,
+                  name: apiToken.team.name,
+                }
+              : {
+                  id: apiToken.user.id,
+                  email: apiToken.user.email,
+                  name: apiToken.user.name,
+                },
+            auth: 'api',
+          } satisfies ApiRequestMetadata,
+        },
+      }),
+    );
   }
 
   // Treat a disabled session as anonymous. Most routes wired through

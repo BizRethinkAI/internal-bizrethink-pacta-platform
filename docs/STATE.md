@@ -12,14 +12,79 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-09_
+_Last updated: 2026-09-12_
 
 ---
+
+## 2026-09-12 — merged signup policy and derived MCA numbering
+
+**#169 / R-01** merged at `bcbec3c3b298ee28265a246e80fa7d2ba8407170`.
+Signup reads one validated policy per request for the disabled, domain and
+invitation gates. Unavailable/invalid/closed policy fails closed; a valid open
+policy retains the existing env-domain fallback and DB-domain invitation rule.
+Provider switches, invitation verification, rate limits and CAPTCHA are retained.
+Overlay **074** records the upstream wiring. No schema, instance setting or
+consumer change; a concurrent admin edit affects the next signup request.
+The independent review found no blocking defect and all final PR checks passed.
+#169 already folded #168; the duplicate #168 summary from #171 is consolidated
+below without changing any finding disposition or dropping source/ADR follow-ups.
+
+**#171 / ADR 0011 phases 1–4** merged at `8715848c25ba791e0fb4262840d069588bfcad97`.
+The clause library stores identities rather than printed numbers. Selection
+applies the existing gates, then derives consecutive section/clause numbers
+and resolves same-profile clause/group references. Missing, duplicate and
+malformed targets fail closed. Explicit structural reasons leave some records
+unnumbered; seven alternative pairs share canonical reference identities.
+The source funding grid contributes 30 existing widgets, and the existing
+interest paragraph is separately citable: **FRPA 108 / entire library 211**.
+All 209 original records, existing fields, provenance, examination links and
+selection rules are retained. Ten ungated limitations name the separately
+signed guaranty so a no-guaranty selection has no dangling reference.
+
+Staff and counsel see the same compiled citations, visible field content and
+labelled alternative examples. The default profile remains an example, with
+the net settlement base unconfirmed. Slugs still identify findings and approvals.
+Approval fingerprints include classification, fields, reference targets and gate
+source; review fingerprints also cover ordering, example facts and referenced
+instruments. Existing links/fingerprints become stale; no approvals are
+migrated. Gate-source hashing can conservatively invalidate reviews across
+compilation representations; create review links through the app runtime.
+
+All authored clauses remain draft with null authors. This introduced no merchant
+rendering, PDF assembly, publishing, sending or prescribed-disclosure change.
+Separate work remains: guaranty numbering/placement (phase 5), templates
+100/102/119–121 and sibling form migration, remaining labels, commercial
+interview answers and counsel review. Future compound gates need explicit
+review examples, and future merchant output must enforce publication approval.
+
+No deploy has been requested for this queue. The review-and-ship session owns
+this consolidation and the single final deployment after the remaining PRs
+and final-main CI pass.
+
+## 2026-09-12 — API-token team boundary (#170)
+
+The integrated A-02 implementation keeps API credentials within their issuing
+team. Owned `api-token-team-scope.ts` carries the token team through async work;
+common single/bulk predicates AND that team outside creator/team-email access.
+Invalid or conflicting scopes fail before dispatch. Human-session and same-team
+permissions retain their existing behavior, including raw/Bearer compatibility
+and legacy-token validation. Three Hono PDF paths establish the same scope.
+The first delete lookup returns 404 for a foreign team before document deletion
+or recipient self-hide, audit and webhook writes. Overlay **075** preserves
+six production hooks and the two upstream tests' exact 404 expectations.
+
+The original defect was independently reproduced; reviewed author head
+`cf38530144d436c3d73c8ba82c631477908e8079` passed application CI. The combined
+queue is validated by GitHub CI. No rate limits, token issuance changes,
+consumer-repository edits or production queries were made. CircularPay's actual
+reliance on the removed cross-team authority remains unknown. A-03 and other
+audit findings remain separate decisions. Shwet waived the inherited comment
+requesting a second reviewer; the independent review found no blocking defect.
 
 ## Where things stand
 
 Pacta is an **additive fork of `documenso/documenso`** — a document-signing
-platform running at `sign.pacta.ink` on Coolify, auto-deploying from `main`.
+platform running at `sign.pacta.ink` on Coolify, manually deployed from `main` (auto-deploy verified off on 2026-09-12).
 Production holds **450 documents and 34 templates**: real, signed, customer
 contracts. Treat every production action accordingly.
 
@@ -305,6 +370,21 @@ agents searched for "the pinned counts" and three found four. The reasoning is
 left in that file so the next reader does not re-derive why a test about service
 knows how many clauses exist.
 
+### #168 — the register records one memo rejection
+
+The review register now pins `lombard-contracts`
+`58974ca1eead7fb6135ed8378475b8b53d5ecca6`. PR #168 changed only
+`fair-market-value-recital-self-refuting` from `open` to `rejected`;
+REVIEW-01 now has 30 open and 2 rejected entries, and the library surface
+reports 37 outstanding findings. The tests identify both rejected findings
+and keep four other memo-mentioned findings from being silently rejected.
+A rejected disposition removes a finding's approval hold; it is distinct
+from a review's own `refuted` status, whose five entries remain unrecorded.
+No cancellation-fee disposition was recorded.
+
+PR #168 also folded the notes from #164 and #166. Their durable content is
+already above; the fold of #168's own note does not repeat those folds.
+
 ### Owed
 
 **ADR 0012's *"six findings the 2026-09-09 memo refuted"* is wrong**, and ADRs are
@@ -315,6 +395,17 @@ already fixed, two deny propositions no finding makes, and one rests on a false
 premise (*"the missing Permission to Release"*, vendored twice). **It matters
 because `rejected` stops blocking approval**: recording all six would have
 unblocked five clauses on a misreading.
+
+The source manifest note for
+`frpa-4-8-may-impede-a-merchant-complaint-to-a-regulator` still says
+"No document change made." PR #168 records that change-note 16 changed the
+text under a sibling finding. Correcting that note and deciding the remaining
+counsel question are still owed to the source-owning session; no disposition
+is changed by this state fold.
+
+The #168 source handoff also identifies sibling `lombard-contracts` PR #13
+as the merge needed to put `58974ca` on that repository's main. This Pacta
+queue does not perform or certify that sibling merge.
 
 ## The day of 2026-09-10: the FRPA was rewritten, and the suite around it was not
 
@@ -480,8 +571,9 @@ re-raisable thing in that note, and compaction is how they would have been lost.
   assembles an identity grid and two service waivers with no guaranty between them.
 - **`settlementBase`** is `net` and **nobody has established which base Lombard
   prices on.** It reaches every state disclosure.
-- **Six memo-refuted dispositions** in `lombard-contracts` — **`rejected` already
-  exists in `FindingDisposition`**, so this is a data fix plus a regenerate.
+- **The memo characterization needs a superseding ADR.** #168 records the one
+  rejection described above; the earlier proposal to reject six findings is
+  superseded, and must not be treated as authorization for five more.
 - **`examinedBy` over-claims on every rewritten clause.** A third `ReviewId` would
   **not** fix it — the memo read the same old text. What is missing is provenance
   for the *current body*.

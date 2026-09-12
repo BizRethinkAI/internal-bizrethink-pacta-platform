@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { libraryFor } from '../library';
@@ -101,7 +102,7 @@ describe('an Event of Default is misconduct, and only misconduct', () => {
       'Notwithstanding anything in this Agreement to the contrary, neither the filing of a voluntary or involuntary ' +
         'petition under Title 11 of the United States Code, nor Merchant’s insolvency, nor the cessation of ' +
         'Merchant’s business for lack of revenue, shall constitute an Event of Default or give rise to any remedy ' +
-        'under this Section 6 or to any liability of any Guarantor.',
+        'under this Section [[section:default]] or to any liability of any Guarantor.',
     );
   });
 
@@ -126,7 +127,7 @@ describe('an Event of Default is misconduct, and only misconduct', () => {
       reconciliation request is not an Event of Default. Only the string through
       which it is asserted moved.
     */
-    'a reconciliation request under Section 3',
+    'a reconciliation request under Section [[section:reconciliation]]',
     /*
       §3.3 WAS REWRITTEN TO DEPEND ON THIS CLAUSE, so this assertion is holding
       up somebody else's deletion. The reconciliation cluster removed §3.3's
@@ -248,7 +249,9 @@ describe('the parallel sweep is closed, not just the visible one', () => {
   it('leaves the agreed split as the only collection mechanism after a default', () => {
     const body = clause(REMEDIES).body;
 
-    expect(body).toContain('Sections 2.3 and 2.4');
+    expect(body).toContain(
+      'Sections [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]] and [[clause:frpa.approved-bank-account-2-4]]',
+    );
     expect(body).toContain('may not instruct an Approved Processor to remit all');
   });
 
@@ -280,7 +283,7 @@ describe('the parallel sweep is closed, not just the visible one', () => {
   it('confines collateral enforcement to Section 4.10 and judicial process', () => {
     const body = clause(REMEDIES).body;
 
-    expect(body).toContain('Section 4.10');
+    expect(body).toContain('Section [[clause:frpa.security-interest-4-10]]');
     expect(body).toMatch(/judicial process/);
   });
 
@@ -348,7 +351,8 @@ describe('costs of collection stay actual, capped and outside the sweep', () => 
   });
 
   it('keeps the refusal of any contractual rate of interest', () => {
-    const body = clause(COSTS).body;
+    // ADR 0011 separates the existing interest paragraph; its limits still hold.
+    const body = clause('frpa.prejudgment-and-postjudgment-interest').body;
 
     expect(body).toContain('This Agreement is not a loan and Buyer does not charge interest on it.');
     expect(body).toMatch(/[Nn]o contractual/);
@@ -377,7 +381,7 @@ describe('costs of collection stay actual, capped and outside the sweep', () => 
   });
 
   it('reaches a Guarantor only for a valid claim against that Guarantor', () => {
-    expect(clause(COSTS).body).toContain('Section 9.2');
+    expect(clause(COSTS).body).toContain('the separately signed Guaranty of Performance');
   });
 });
 
@@ -425,7 +429,7 @@ describe('nothing outside Section 6 reopens what Section 6 closed', () => {
     const body = clause(UCC_REMEDIES).body;
 
     expect(body).not.toContain('any remedy available at law');
-    expect(body).toContain('Section 6.2');
+    expect(body).toContain('Section [[clause:frpa.remedies-6-2]]');
     expect(body).toMatch(/only the rights and remedies/);
   });
 
@@ -453,7 +457,9 @@ describe('nothing outside Section 6 reopens what Section 6 closed', () => {
 
       if (body.includes('Guarant')) {
         expect(
-          body.includes('Section 9.2') || body.includes('liability of any Guarantor') || body.includes('not create'),
+          body.includes('the separately signed Guaranty of Performance') ||
+            body.includes('liability of any Guarantor') ||
+            body.includes('not create'),
           slug,
         ).toBe(true);
       }

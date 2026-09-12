@@ -31,8 +31,8 @@ import type { McaInstrument } from './instruments';
 export type TwinCause = 'title' | 'collection';
 
 export type TwinDivergence = {
-  /** The clause number, identical in both documents. */
-  number: string;
+  /** The Equipment Lease clause slug, used as the canonical pair identity. */
+  slug: string;
   cause: TwinCause;
   reason: string;
 };
@@ -100,12 +100,8 @@ export const TWIN_VOCABULARY: readonly (readonly [string, string])[] = [
  * difference of substance belongs in `divergent` below, with a cause.
  */
 export type TwinVocabularyException = {
-  /**
-   * The clause this exception applies to: its NUMBER where the document gives
-   * one, and its SLUG where it does not. Four clauses in each twin are
-   * unnumbered, so a number-only key could not reach them.
-   */
-  number: string;
+  /** Canonical Equipment Lease clause identity; independent of numbering. */
+  slug: string;
   /** The Equipment Lease's words, after `TWIN_VOCABULARY` has been applied. */
   from: string;
   /** What the Subscription actually says. */
@@ -113,39 +109,63 @@ export type TwinVocabularyException = {
 };
 
 export const TWIN_VOCABULARY_EXCEPTIONS: readonly TwinVocabularyException[] = [
-  { number: '3.1', from: 'you agree to subscription from us', to: 'you agree to subscribe from us' },
   {
-    number: '3.2',
+    slug: 'equipment-lease.equipment',
+    from: 'you agree to subscription from us',
+    to: 'you agree to subscribe from us',
+  },
+  {
+    slug: 'equipment-lease.effective-date-term-and-interim-rent',
     from: 'by you to subscription the Equipment identified',
     to: 'by you to subscribe for the Equipment identified',
   },
   {
-    number: '3.2',
+    slug: 'equipment-lease.effective-date-term-and-interim-rent',
     from: 'Equipment and software leased under this Agreement',
     to: 'Equipment and software you subscribe for under this Agreement',
   },
   {
-    number: '3.2',
+    slug: 'equipment-lease.effective-date-term-and-interim-rent',
     from: 'Equipment or software leased under this Agreement',
     to: 'Equipment or software subscribed for under this Agreement',
   },
   {
-    number: '3.12',
+    slug: 'equipment-lease.default-remedies',
     from: 'terminate this Subscription and our future',
     to: 'terminate this subscription and our future',
   },
-  { number: '4.2', from: 'under this Subscription, and nothing', to: 'under the Subscription, and nothing' },
-  { number: '4.2', from: 'in connection with this Subscription; and', to: 'in connection with the Subscription; and' },
-  { number: '4.2', from: 'a defense to this Subscription and/or', to: 'a defense to the Subscription and/or' },
-  { number: '4.3', from: 'reflected in this Subscription at Section', to: 'reflected in the Subscription at Section' },
-  { number: '4.7', from: 'executed this Equipment Subscription Agreement', to: 'executed this Subscription Agreement' },
   {
-    // The parties paragraph carries no number, so it is keyed by slug — the
+    slug: 'equipment-lease.guaranty-of-payment',
+    from: 'under this Subscription, and nothing',
+    to: 'under the Subscription, and nothing',
+  },
+  {
+    slug: 'equipment-lease.guaranty-of-payment',
+    from: 'in connection with this Subscription; and',
+    to: 'in connection with the Subscription; and',
+  },
+  {
+    slug: 'equipment-lease.guaranty-of-payment',
+    from: 'a defense to this Subscription and/or',
+    to: 'a defense to the Subscription and/or',
+  },
+  {
+    slug: 'equipment-lease.independent-decision-governing-law',
+    from: 'reflected in this Subscription at Section',
+    to: 'reflected in the Subscription at Section',
+  },
+  {
+    slug: 'equipment-lease.acknowledgment',
+    from: 'executed this Equipment Subscription Agreement',
+    to: 'executed this Subscription Agreement',
+  },
+  {
+    // The parties paragraph remains unnumbered and uses its slug — the
     // same key `twins.test.ts` pairs unnumbered clauses on. Same asymmetry as
     // §4.7: the Equipment Lease calls itself "Equipment Lease Agreement" and
     // the Subscription calls itself "Subscription Agreement", not "Equipment
     // Subscription Agreement".
-    number: 'equipment-lease.parties',
+    slug: 'equipment-lease.parties',
     from: 'This Equipment Subscription Agreement',
     to: 'This Subscription Agreement',
   },
@@ -159,13 +179,16 @@ export const TWIN_VOCABULARY_EXCEPTIONS: readonly TwinVocabularyException[] = [
  * produced — that text is stored, because it was written by hand and cannot be
  * computed.
  */
-export const applyTwinVocabulary = (text: string, number: string): string => {
+export const applyTwinVocabulary = (text: string, slug: string): string => {
   const swapped = TWIN_VOCABULARY.reduce(
     (out, [from, to]) => out.replace(new RegExp(`\\b${from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'g'), to),
-    text,
+    text.replace(
+      /\[\[clause:equipment-lease\.([^\]]+)\]\]/g,
+      (_token, suffix: string) => `[[clause:subscription.${TWIN_SUFFIXES[suffix] ?? suffix}]]`,
+    ),
   );
 
-  return TWIN_VOCABULARY_EXCEPTIONS.filter((exception) => exception.number === number).reduce(
+  return TWIN_VOCABULARY_EXCEPTIONS.filter((exception) => exception.slug === slug).reduce(
     (out, exception) => out.replace(exception.from, exception.to),
     swapped,
   );
@@ -192,7 +215,7 @@ export const EQUIPMENT_TWIN: {
   subscription: 'subscription',
   divergent: [
     {
-      number: '3.4',
+      slug: 'equipment-lease.payment-of-amounts-due',
       cause: 'collection',
       reason:
         'Different collection mechanisms, not different words. The Equipment Lease bills a fixed amount to the ' +
@@ -202,14 +225,14 @@ export const EQUIPMENT_TWIN: {
         'separate written authorisation the customer may withdraw, and says nothing about the FRPA at all.',
     },
     {
-      number: '3.5',
+      slug: 'equipment-lease.use-return-of-equipment-and-insurance',
       cause: 'title',
       reason:
         'The Equipment Lease conditions the use and insurance obligations on "Until title passes to you under ' +
         'Section 3.7". The Subscription has no such section and states the obligation unconditionally.',
     },
     {
-      number: '3.6',
+      slug: 'equipment-lease.title-to-equipment',
       cause: 'title',
       reason:
         'The characterisation clause, and the sharpest of the five. The Equipment Lease says the option to acquire ' +
@@ -218,7 +241,7 @@ export const EQUIPMENT_TWIN: {
         'first-lien only conditionally, if a court finds Article 2A does not govern.',
     },
     {
-      number: '3.7',
+      slug: 'equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term',
       cause: 'title',
       reason:
         'The purchase option itself. The Equipment Lease offers purchase for one dollar with title passing, makes ' +
@@ -226,7 +249,7 @@ export const EQUIPMENT_TWIN: {
         'Subscription has none of it and its heading drops the word "Purchase".',
     },
     {
-      number: '3.8',
+      slug: 'equipment-lease.software-license',
       cause: 'title',
       reason:
         'The Equipment Lease makes the software licence perpetual as to equipment whose title passes, surviving the ' +
@@ -237,6 +260,21 @@ export const EQUIPMENT_TWIN: {
   ],
 };
 
-/** The declared divergence for a clause number, or null when the twins agree. */
-export const twinDivergence = (number: string): TwinDivergence | null =>
-  EQUIPMENT_TWIN.divergent.find((entry) => entry.number === number) ?? null;
+/** The declared divergence for a clause slug, or null when the twins agree. */
+export const twinDivergence = (slug: string): TwinDivergence | null =>
+  EQUIPMENT_TWIN.divergent.find((entry) => entry.slug === slug) ?? null;
+
+// These two obligations have different names in the two instruments. All
+// others share their suffix. Used to check identities and reference targets,
+// never to generate contract text.
+const TWIN_SUFFIXES: Record<string, string> = {
+  'purchase-return-or-continuation-of-equipment-at-end-of-lease-term':
+    'return-or-continuation-of-equipment-at-end-of-subscription-term',
+  'lease-guaranty': 'subscription-guaranty',
+};
+
+export const equipmentTwinKey = (slug: string): string => {
+  const suffix = slug.split('.').slice(1).join('.');
+  const leaseSuffix = Object.entries(TWIN_SUFFIXES).find(([, subscription]) => subscription === suffix)?.[0] ?? suffix;
+  return `equipment-lease.${leaseSuffix}`;
+};

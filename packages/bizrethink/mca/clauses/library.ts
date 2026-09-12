@@ -83,7 +83,7 @@ const SECTION_ORDER: Partial<Record<McaInstrument, readonly string[]>> = {
  * twenty-three.
  *
  */
-export const inReviewOrder = (clauses: McaClause[]): McaClause[] => {
+export const inReviewOrder = <T extends McaClause>(clauses: T[]): T[] => {
   const instrument = (clause: McaClause) => {
     const index = MCA_INSTRUMENTS.indexOf(clause.instrument);
 

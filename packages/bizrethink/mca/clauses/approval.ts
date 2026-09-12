@@ -1,9 +1,12 @@
 import { createHash } from 'node:crypto';
 
 import type { ClauseSource } from '../../provenance/types';
+import { referencedInstruments } from '../engine/number-clauses';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS, type McaJurisdiction } from '../jurisdictions';
 import type { ReviewFinding } from './examination';
+import { LOMBARD_FACTS } from './facts';
 import type { McaInstrument } from './instruments';
+import { inReviewOrder, libraryFor } from './library';
 import type { McaClause } from './types';
 
 /**
@@ -86,14 +89,10 @@ export type McaClauseApproval = {
 /**
  * What was approved, reduced to a hash.
  *
- * COVERS EVERYTHING THAT CHANGES WHAT A MERCHANT READS, OR WHICH DOCUMENT THEY
- * READ IT IN: the words, the heading above them, the number the document
- * prints, the version, the agreement it is published in, the section it is read
- * under, the statute that compels it, and the states whose law scopes it. The
- * lease library calls the last of those "the condition that decides whether the
- * clause appears at all" — an attorney approved this text FOR these
- * circumstances — and `appliesInStates` plus `instrument` are that condition
- * here, because this library has no `includeWhen` and no engine yet.
+ * Covers the words, fields, classification, semantic targets, gate, version,
+ * instrument, logical section and legal scope. A derived print position is not
+ * clause identity. The library fingerprint below separately tracks order and
+ * citation context so a moved page is disclosed to counsel.
  *
  * `sortKey` IS DELIBERATELY EXCLUDED, and this is the one exclusion worth
  * arguing. It moves a clause within its section without changing a word anybody
@@ -121,7 +120,11 @@ export const mcaClauseFingerprint = (clause: McaClause): string =>
         slug: clause.slug,
         version: clause.version,
         instrument: clause.instrument,
-        number: clause.number,
+        kind: clause.kind,
+        fields: clause.fields ?? null,
+        includeWhen: clause.includeWhen?.toString() ?? null,
+        referenceId: clause.referenceId ?? null,
+        unnumberedReason: clause.unnumberedReason ?? null,
         section: clause.section,
         heading: clause.heading,
         body: clause.body,
@@ -215,10 +218,17 @@ export const approvedMcaClause = (clause: McaClause, approval: McaClauseApproval
 export const mcaLibraryFingerprint = (clauses: McaClause[]): string =>
   createHash('sha256')
     .update(
-      clauses
-        .map((clause) => mcaClauseFingerprint(clause))
-        .sort()
-        .join('\n'),
+      JSON.stringify({
+        // The counsel page identifies this profile as its numbering context.
+        // Reordering changes citations on that page, but not clause approval.
+        facts: LOMBARD_FACTS,
+        clauses: inReviewOrder(clauses).map((clause) => mcaClauseFingerprint(clause)),
+        // The ISO cites FRPA cancellation. Its review must move when that
+        // external citation's context changes, even if the ISO words do not.
+        referenceContext: referencedInstruments(clauses)
+          .filter((instrument) => !clauses.some((clause) => clause.instrument === instrument))
+          .map((instrument) => inReviewOrder(libraryFor(instrument)).map(mcaClauseFingerprint)),
+      }),
     )
     .digest('hex');
 

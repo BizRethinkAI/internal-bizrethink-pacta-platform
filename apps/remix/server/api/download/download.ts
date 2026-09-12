@@ -1,3 +1,4 @@
+import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { PDF_SIZE_A4_72PPI } from '@documenso/lib/constants/pdf';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById, getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
@@ -165,15 +166,18 @@ export const downloadRoute = new Hono<HonoEnv>()
           envelopeId,
         });
 
-        const envelope = await getEnvelopeById({
-          id: {
-            type: 'envelopeId',
-            id: envelopeId,
-          },
-          type: EnvelopeType.DOCUMENT,
-          userId: apiToken.user.id,
-          teamId: apiToken.teamId,
-        }).catch(() => null);
+        // MODIFIED for BizRethink (overlay 075): Hono downloads bypass the tRPC auth middleware.
+        const envelope = await withApiTokenTeamScope(apiToken.teamId, () =>
+          getEnvelopeById({
+            id: {
+              type: 'envelopeId',
+              id: envelopeId,
+            },
+            type: EnvelopeType.DOCUMENT,
+            userId: apiToken.user.id,
+            teamId: apiToken.teamId,
+          }),
+        ).catch(() => null);
 
         if (!envelope) {
           return c.json({ error: 'Document not found' }, 404);
@@ -239,15 +243,18 @@ export const downloadRoute = new Hono<HonoEnv>()
           envelopeId,
         });
 
-        const { envelopeWhereInput } = await getEnvelopeWhereInput({
-          id: {
-            type: 'envelopeId',
-            id: envelopeId,
-          },
-          type: EnvelopeType.DOCUMENT,
-          userId: apiToken.user.id,
-          teamId: apiToken.teamId,
-        });
+        // MODIFIED for BizRethink (overlay 075): scope before rendering the certificate.
+        const { envelopeWhereInput } = await withApiTokenTeamScope(apiToken.teamId, () =>
+          getEnvelopeWhereInput({
+            id: {
+              type: 'envelopeId',
+              id: envelopeId,
+            },
+            type: EnvelopeType.DOCUMENT,
+            userId: apiToken.user.id,
+            teamId: apiToken.teamId,
+          }),
+        );
 
         const envelope = await prisma.envelope.findFirst({
           where: envelopeWhereInput,
@@ -337,15 +344,18 @@ export const downloadRoute = new Hono<HonoEnv>()
         version,
       });
 
-      const envelope = await getEnvelopeById({
-        id: {
-          type: 'documentId',
-          id: documentId,
-        },
-        type: EnvelopeType.DOCUMENT,
-        userId: apiToken.user.id,
-        teamId: apiToken.teamId,
-      }).catch(() => null);
+      // MODIFIED for BizRethink (overlay 075): scope before reading PDF storage.
+      const envelope = await withApiTokenTeamScope(apiToken.teamId, () =>
+        getEnvelopeById({
+          id: {
+            type: 'documentId',
+            id: documentId,
+          },
+          type: EnvelopeType.DOCUMENT,
+          userId: apiToken.user.id,
+          teamId: apiToken.teamId,
+        }),
+      ).catch(() => null);
 
       if (!envelope) {
         return c.json({ error: 'Document not found' }, 404);

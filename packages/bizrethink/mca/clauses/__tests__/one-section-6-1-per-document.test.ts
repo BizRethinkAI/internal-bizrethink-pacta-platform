@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -115,15 +116,15 @@ const slugsUnder = (facts: McaFacts): string[] => selectedUnder(facts).map((entr
  */
 const LIMITED_SENTENCE =
   'A breach that is not an Event of Default may support proportionate lawful relief for proven direct loss under ' +
-  'Section 6.2; it does not make the uncollected Purchased Amount payable, does not suspend Merchant’s rights ' +
-  'under Section 3, and does not create liability for any Guarantor.';
+  'Section [[clause:frpa.remedies-6-2]]; it does not make the uncollected Purchased Amount payable, does not suspend Merchant’s rights ' +
+  'under Section [[section:reconciliation]], and does not create liability for any Guarantor.';
 
 const FULL_SENTENCE =
   'A breach that is not an Event of Default may support proportionate lawful relief for proven direct loss under ' +
-  'Section 6.2; it does not make the uncollected Purchased Amount payable and does not suspend Merchant’s rights ' +
-  'under Section 3. Where Section 9.2 guarantees the covenant breached, a claim against a Guarantor is limited to ' +
+  'Section [[clause:frpa.remedies-6-2]]; it does not make the uncollected Purchased Amount payable and does not suspend Merchant’s rights ' +
+  'under Section [[section:reconciliation]]. Where Section [[clause:frpa.guaranty-of-performance-9-2]] guarantees the covenant breached, a claim against a Guarantor is limited to ' +
   'that same proportionate lawful relief for that same proven direct loss, on the same proof, and is brought only ' +
-  'as Section 9.2 permits; no breach of this Agreement, and no Event of Default, makes the uncollected Purchased ' +
+  'as Section [[clause:frpa.guaranty-of-performance-9-2]] permits; no breach of this Agreement, and no Event of Default, makes the uncollected Purchased ' +
   'Amount payable by a Guarantor.';
 
 /**
@@ -162,7 +163,9 @@ describe('§6.1 is an exhaustive pair, and the fact decides a whole clause', () 
    * two the split was drafted for.
    */
   it.each(SCOPES)('gives a %s template exactly one Section 6.1', (guarantyScope) => {
-    const selected = selectedUnder(scope(guarantyScope)).filter((entry) => entry.number === '6.1');
+    const selected = selectedUnder(scope(guarantyScope)).filter(
+      (entry) => (entry.referenceId ?? entry.slug) === 'frpa.events-of-default-6-1',
+    );
 
     expect(selected.map((entry) => entry.slug)).toHaveLength(1);
     expect(PAIR).toContain(selected[0]?.slug);
@@ -218,7 +221,9 @@ describe('§6.1 is an exhaustive pair, and the fact decides a whole clause', () 
     for (const guarantyScope of SCOPES) {
       for (const variation of variations) {
         const facts = { ...LOMBARD_FACTS, ...variation, guarantyScope };
-        const selected = selectedUnder(facts).filter((entry) => entry.number === '6.1');
+        const selected = selectedUnder(facts).filter(
+          (entry) => (entry.referenceId ?? entry.slug) === 'frpa.events-of-default-6-1',
+        );
 
         expect(
           selected.map((entry) => entry.slug),
@@ -230,7 +235,7 @@ describe('§6.1 is an exhaustive pair, and the fact decides a whole clause', () 
 
   /** Two records may share a number only while no document can hold both. */
   it('shares one section number, heading and place in the reading order', () => {
-    expect(clause(FULL).number).toBe(clause(LIMITED).number);
+    expect(clause(FULL).referenceId).toBe(clause(LIMITED).slug);
     expect(clause(FULL).heading).toBe(clause(LIMITED).heading);
     expect(clause(FULL).section).toBe(clause(LIMITED).section);
     expect(clause(FULL).sortKey).toBe(clause(LIMITED).sortKey);
@@ -242,10 +247,10 @@ describe('§6.1 is an exhaustive pair, and the fact decides a whole clause', () 
    * all satisfy every other assertion in this file and would put a number in
    * the corpus that no document prints.
    */
-  it('numbers the new record 6.1, not a number the document does not have', () => {
-    expect(clause(FULL).number).toBe('6.1');
+  it('gives both alternatives the same semantic reference target, independent of print numbering', () => {
+    expect(clause(FULL).referenceId).toBe(LIMITED);
     expect(
-      FRPA.filter((entry) => entry.number === '6.1')
+      FRPA.filter((entry) => (entry.referenceId ?? entry.slug) === 'frpa.events-of-default-6-1')
         .map((entry) => entry.slug)
         .sort(),
     ).toEqual([...PAIR].sort());
@@ -293,7 +298,8 @@ describe('the carve-out that keeps the wide guaranty from being a loan', () => {
    * vendored document rather than against a copy of itself.
    */
   it.each(PAIR)('%s keeps the Bankruptcy and Business Failure paragraph verbatim', (slug) => {
-    expect(body(slug)).toContain(CARVE_OUT);
+    // Only the source citation changes; every word of the protection remains.
+    expect(body(slug)).toContain(CARVE_OUT.replace('under this Section 6', 'under this Section [[section:default]]'));
   });
 
   it('quotes a paragraph that actually reaches a guarantor', () => {
@@ -446,10 +452,12 @@ describe('neither Section 6.1 makes a guarantor answer for the money', () => {
   it('lets a non-default covenant breach reach a guarantor, capped at Section 6.2 relief', () => {
     const text = body(FULL);
 
-    expect(text).toContain('Where Section 9.2 guarantees the covenant breached');
+    expect(text).toContain(
+      'Where Section [[clause:frpa.guaranty-of-performance-9-2]] guarantees the covenant breached',
+    );
     expect(text).toMatch(/a claim against a Guarantor is limited to that same proportionate lawful relief/);
     expect(text).toContain('for that same proven direct loss, on the same proof');
-    expect(text).toContain('is brought only as Section 9.2 permits');
+    expect(text).toContain('is brought only as Section [[clause:frpa.guaranty-of-performance-9-2]] permits');
   });
 });
 
@@ -499,7 +507,9 @@ describe('the wide §6.1 stops contradicting the wide §9.2', () => {
     // The premise: something really does cite it, so a green here is a fact
     // about the corpus rather than an empty filter.
     expect(citing.length).toBeGreaterThan(5);
-    expect(selected.filter((entry) => entry.number === '6.1')).toHaveLength(1);
+    expect(selected.filter((entry) => (entry.referenceId ?? entry.slug) === 'frpa.events-of-default-6-1')).toHaveLength(
+      1,
+    );
   });
 });
 

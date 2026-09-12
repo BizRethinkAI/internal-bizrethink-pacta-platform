@@ -1,3 +1,5 @@
+import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
+import { AppError } from '@documenso/lib/errors/app-error';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
@@ -45,56 +47,74 @@ const readDbConfig = async () => {
   return parsed.data.data;
 };
 
+export type SignupPolicy =
+  | Readonly<{ signupDisabled: true }>
+  | Readonly<{
+      signupDisabled: false;
+      allowedDomains: readonly string[];
+      requiresInvite: boolean;
+    }>;
+
 /**
- * True if signup is disabled instance-wide. Fails closed: only an enabled,
- * valid site.signup row with signupDisabled=false opens it, and
- * `NEXT_PUBLIC_DISABLE_SIGNUP === 'true'` closes it regardless.
+ * Read once per signup request, then retain this policy through every gate.
+ * No cross-request cache: the next request observes the next admin change.
+ * A closed/unavailable policy exposes no domain or invitation permissions.
  */
-export const isSignupDisabled = async (): Promise<boolean> => {
+export const getSignupPolicy = async (): Promise<SignupPolicy> => {
   const dbConfig = await readDbConfig();
-  if (!dbConfig) {
-    return true;
+  if (!dbConfig || dbConfig.signupDisabled || env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
+    return { signupDisabled: true };
   }
-  if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
-    return true;
-  }
-  return dbConfig.signupDisabled;
+
+  // Preserve env bootstrap only after a valid DB policy explicitly opens
+  // signup. A failed read can never replace restrictions with an empty list.
+  const allowedDomains =
+    dbConfig.allowedDomains.length > 0
+      ? dbConfig.allowedDomains
+      : (env('NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS') ?? '')
+          .split(',')
+          .map((domain) => domain.trim())
+          .filter(Boolean);
+
+  return {
+    signupDisabled: false,
+    allowedDomains: allowedDomains.map((domain) => domain.toLowerCase()),
+    // Existing semantics: the invitation toggle applies to the DB allowlist.
+    requiresInvite: dbConfig.requireInviteWhenDomainGated && dbConfig.allowedDomains.length > 0,
+  };
 };
 
 /**
- * True if signup requires a pending OrganisationMemberInvite to succeed.
- * Only meaningful when allowedSignupDomains is non-empty (domain-gated
- * mode) — when no domain gating exists, this returns false even if the
- * setting is on (we don't want to surprise-block self-host single-user
- * deployments). Phase L (2026-05-11): closes the "domain matches but no
- * invite" hole.
+ * Evaluate the supplied policy without a second DB lookup. A closed policy
+ * never means "all domains allowed".
  */
-export const isInviteRequiredForSignup = async (): Promise<boolean> => {
-  const dbConfig = await readDbConfig();
-  if (!dbConfig) {
+export const isEmailDomainAllowedForSignup = (email: string, policy: SignupPolicy): boolean => {
+  if (policy.signupDisabled) {
     return false;
   }
-  return dbConfig.requireInviteWhenDomainGated && dbConfig.allowedDomains.length > 0;
+  if (policy.allowedDomains.length === 0) {
+    return true;
+  }
+  const emailDomain = email.toLowerCase().split('@').pop();
+  return Boolean(emailDomain && policy.allowedDomains.includes(emailDomain));
 };
 
-/**
- * List of email domains permitted to sign up. Empty array means all
- * domains allowed. DB takes precedence; `NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS`
- * (CSV) is the env fallback.
- */
+/** Safe for loaders that only need to know whether signup is open. */
+export const isSignupDisabled = async (): Promise<boolean> => (await getSignupPolicy()).signupDisabled;
+
+const getOpenSignupPolicy = async () => {
+  const policy = await getSignupPolicy();
+  if (policy.signupDisabled) {
+    throw new AppError(AuthenticationErrorCode.SignupDisabled, { statusCode: 400 });
+  }
+  return policy;
+};
+
+// Compatibility getters for individual callers. Closed/unavailable policy
+// rejects instead of silently returning a permissive value. Multi-gate signup
+// handlers must use getSignupPolicy once, not call these independently.
+export const isInviteRequiredForSignup = async (): Promise<boolean> => (await getOpenSignupPolicy()).requiresInvite;
+
 export const getAllowedSignupDomains = async (): Promise<string[]> => {
-  const dbConfig = await readDbConfig();
-  if (dbConfig && dbConfig.allowedDomains.length > 0) {
-    return dbConfig.allowedDomains;
-  }
-
-  const envDomains = env('NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS');
-  if (!envDomains) {
-    return [];
-  }
-
-  return envDomains
-    .split(',')
-    .map((d) => d.trim())
-    .filter(Boolean);
+  return [...(await getOpenSignupPolicy()).allowedDomains];
 };

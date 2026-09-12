@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { selectClauses } from '../../engine/select-clauses';
@@ -350,7 +351,7 @@ describe('the guaranty reaches only the guarantor’s own proved conduct', () =>
   it('§9.6 ties the acknowledgement to the limited guaranty and stops implying counsel was consulted', () => {
     const text = body(ACKNOWLEDGEMENT);
 
-    expect(text).toContain('Section 9.2');
+    expect(text).toContain('Section [[clause:frpa.guaranty-of-performance-9-2]]');
     expect(text).toMatch(/may choose not to consult/);
     expect(text).toMatch(/does not expand liability/);
     expect(text).not.toMatch(/seriousness of the provisions/);
@@ -370,7 +371,7 @@ describe('the guaranty cites clauses that exist', () => {
     const text = body(GUARANTY);
 
     expect(text).not.toContain('Section 6.1.8');
-    expect(text).toContain('Section 6.1(b)');
+    expect(text).toContain('Section [[clause:frpa.events-of-default-6-1]](b)');
   });
 
   /**
@@ -381,7 +382,7 @@ describe('the guaranty cites clauses that exist', () => {
    * published commitment #3 expressly keeps.
    */
   it('keeps §9.2’s citation of §5.17 by number', () => {
-    expect(body(GUARANTY)).toContain('Section 5.17');
+    expect(body(GUARANTY)).toContain('Section [[clause:frpa.no-diversion-of-receipts-5-17]]');
   });
 
   /**
@@ -409,8 +410,8 @@ describe('the indemnity is a third-party indemnity', () => {
   it('leaves first-party collection in Section 6', () => {
     const text = body(INDEMNITY);
 
-    expect(text).toContain('Section 6.2');
-    expect(text).toContain('Section 6.3');
+    expect(text).toContain('Section [[clause:frpa.remedies-6-2]]');
+    expect(text).toContain('Section [[clause:frpa.costs-of-collection-6-3]]');
     expect(text).toMatch(/creates no independent Guarantor liability/);
   });
 
@@ -432,7 +433,7 @@ describe('the representations stop warranting the unknowable', () => {
     expect(text).toMatch(/disclosed to Buyer all known prior assignments/);
     expect(text).toMatch(/does not warrant the absence of unknown statutory interests/);
     expect(text).toMatch(/Buyer shall independently verify priority/);
-    expect(text).toContain('Section 9.2');
+    expect(text).toContain('the separately signed Guaranty of Performance');
   });
 
   it('§5.13 becomes disclosure of known restrictions, and preserves bankruptcy defences', () => {
@@ -478,7 +479,7 @@ describe('the duplicated service waivers stop being a second rule', () => {
     const text = body(SERVICE_WAIVER);
 
     expect(text).not.toMatch(/irrevocably and unconditionally waives/);
-    expect(text).toContain('Section 10.1');
+    expect(text).toContain('Section [[clause:frpa.section-10-1]]');
     expect(text).toMatch(/no separate waiver/);
   });
 
@@ -486,7 +487,7 @@ describe('the duplicated service waivers stop being a second rule', () => {
     const text = body(SERVICE_ADDRESS);
 
     expect(text).not.toMatch(/HEREBY AGREES TO ACCEPT SERVICE/);
-    expect(text).toContain('Section 9.1');
+    expect(text).toContain('Section [[clause:frpa.guarantor-information-9-1]]');
     // The AcroForm anchors the Lombard pipeline injects. README rule 2 keeps
     // them even where the surrounding words are rewritten.
     expect(text).toContain('«50»');

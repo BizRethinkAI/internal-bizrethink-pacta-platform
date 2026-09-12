@@ -130,3 +130,25 @@ Guard 5 still depends on #169's single-owner fold of the inherited #168 note;
 this PR does not duplicate it. #170 is separate: its corrected delete tests and
 five security E2Es passed before an interrupted run, for which one retry was
 requested. Neither PR has been merged or deployed by this session.
+
+## Independent review and combined queue — 2026-09-12
+
+Shwet directed the review-and-ship session to finish normal merges and one
+deploy using GitHub CI, without further local test reruns. Independent review
+found no blocking substantive issue in author head
+`23991e1490d83ae709ac8ec2a403ad0a609a6eb1`; its application checks pass.
+
+This mechanical integration includes #170 refresh
+`64078198c7f1067af3be5fdfb3a51cb3b2680e74`, which already includes merged
+#169/#171. Keep the PR target on main and merge #170 there first. The two
+additive conflicts retain all TypeScript entries and both exact E2E ownership
+paths; overlays 074/075/076 and all reviewed implementations are preserved.
+This PR alone consolidates A-02's durable state and removes its in-flight note
+so #170's required preceding merge does not create another stale-note cycle.
+It does not claim #170 has already landed: it is a dependency, and its reviewed
+head must be proven on main before this PR can merge.
+
+The owner-directed queue preparation is complete in one refresh per remaining
+branch. Final refreshed GitHub checks, then final-main checks, are required.
+No deployment has been requested. Substantive fixes remain the creating
+session's responsibility.

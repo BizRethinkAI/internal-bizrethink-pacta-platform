@@ -98,7 +98,8 @@ const COUNTERPARTY_LABEL: Record<string, string> = {
 };
 
 export default function AdminMcaLibraryPage() {
-  const { instruments, clauses, reviews, counselFindings, totals, evidence } = useLoaderData<typeof loader>();
+  const { instruments, clauses, reviews, counselFindings, totals, evidence, reviewProfile } =
+    useLoaderData<typeof loader>();
 
   /*
     ONE SOURCE OF DATA, REVALIDATED. Every mutation on this page re-runs the
@@ -122,6 +123,14 @@ export default function AdminMcaLibraryPage() {
           funder{'}}'}, {'{{'}processor{'}}'}), and the documents below are one client's copy of them. Conformity for
           the prescribed disclosure forms is a separate page.
         </Trans>
+      </p>
+
+      <p className="mt-3 text-muted-foreground text-sm">
+        <Trans>
+          Numbers follow an example selection; alternatives show their own citation context. These are review examples,
+          not confirmed commercial instructions.
+        </Trans>{' '}
+        {reviewProfile}
       </p>
 
       {/*
@@ -547,16 +556,11 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageClause; onApp
             <ChevronRight className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
           )}
           <div>
-            {/*
-              The number the DOCUMENT prints, and an em dash where it prints
-              none. Fourteen FRPA clauses are unnumbered — the granting clause
-              among them — and inventing numbers for them here would put text on
-              the page that is not in the contract.
-            */}
             <p className="text-foreground">
               <span className="mr-2 font-mono text-muted-foreground text-xs">{clause.number || '—'}</span>
-              {clause.heading || clause.slug}
+              {clause.heading}
             </p>
+            {clause.selectionNote && <p className="mt-1 text-muted-foreground text-xs">{clause.selectionNote}</p>}
             <p className="mt-0.5 font-mono text-muted-foreground text-xs">
               {clause.slug} · {clause.provenance}
             </p>
@@ -599,7 +603,19 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageClause; onApp
             a merchant signs. Tidying them out of the display would show a
             reviewer a document we do not publish.
           */}
-          <p className="whitespace-pre-wrap rounded-md bg-muted/40 p-4 text-sm leading-relaxed">{clause.body}</p>
+          {clause.body && (
+            <p className="whitespace-pre-wrap rounded-md bg-muted/40 p-4 text-sm leading-relaxed">{clause.body}</p>
+          )}
+          {clause.fields && (
+            <dl className="mt-3 grid gap-3 rounded-md border border-border p-4 sm:grid-cols-2">
+              {clause.fields.map((field) => (
+                <div key={field.widget}>
+                  <dt className="text-muted-foreground text-xs">{field.label}</dt>
+                  <dd className="mt-1 font-mono text-sm">{field.widget}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
 
           {clause.findings.length > 0 && (
             <ul className="mt-4 space-y-2">

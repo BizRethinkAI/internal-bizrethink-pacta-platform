@@ -89,6 +89,20 @@ const COVERED: [McaInstrument, { anchor: string; reason: string }[]][] = [
 const STILL_A_TRANSCRIPTION = COVERED.filter(([instrument]) => instrument === 'iso-pra');
 
 describe.each(STILL_A_TRANSCRIPTION)('%s holds every line of its document', (instrument, nonClause) => {
+  // ADR 0011: coverage follows words and fields, independent of source or
+  // selected numbering. It must still catch the originally missed ISO clause.
+  it('detects the originally omitted commercial disclosure clause', () => {
+    const withoutDisclosure = libraryFor(instrument).filter(
+      (clause) => clause.slug !== 'iso-pra.commercial-financing-disclosures-california-and-new-york',
+    );
+    const missing = linesNotAccountedFor(
+      LOMBARD.documents[instrument].file,
+      resolveClauses(withoutDisclosure, LOMBARD),
+      nonClause,
+    );
+    expect(missing.some((line) => line.includes('delivering a merchant’s application documentation'))).toBe(true);
+  });
+
   it('leaves no line unaccounted for', () => {
     const file = LOMBARD.documents[instrument].file;
 
