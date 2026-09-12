@@ -1,0 +1,4 @@
+interface:
+  display_name: "Author PR"
+  short_description: "Implement an assigned task and own its PR through CI"
+  default_prompt: "Use $author-pr to implement my assigned task, open its PR and fix its CI through green, leaving independent review and shipping to another session."

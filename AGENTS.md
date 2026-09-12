@@ -1,5 +1,10 @@
 # Agent Guidelines for Documenso
 
+<!-- MODIFIED for BizRethink (overlay 081): discover shared session rules. -->
+Before editing, read [CLAUDE.md](CLAUDE.md) and
+[the session workflow](docs/session-workflow.md). They define task ownership,
+per-PR notes and independent shipping. Preserve the upstream guidelines below.
+
 ## Build/Test/Lint Commands
 
 - `npm run build` - Build all packages

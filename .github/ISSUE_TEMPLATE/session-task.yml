@@ -1,0 +1,68 @@
+# MODIFIED for BizRethink: separate records for concurrent session assignments.
+name: Session task
+description: Assign one approved piece of work to one session.
+title: '[Task] '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The coordinator owns this assignment body. Authors and reviewers add
+        progress/findings as comments with their session label. Read other open
+        task cards before assigning overlapping work or reserving an overlay.
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Approved outcome and scope
+      description: Include approval context, affected areas and completion criteria.
+    validations:
+      required: true
+  - type: input
+    id: coordinator
+    attributes:
+      label: Coordinator and authority
+      placeholder: Shwet, or the one session explicitly appointed by Shwet
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owning session
+      description: Use a unique session label; a shared GitHub account is insufficient.
+    validations:
+      required: true
+  - type: input
+    id: branch
+    attributes:
+      label: Branch and PR
+      placeholder: Unique branch; add PR URL when opened
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and reservations
+      description: Related task/PR links, overlapping files, overlay or migration identifiers; write None if absent.
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      options:
+        - Queued
+        - Assigned
+        - Implementing
+        - Review
+        - Blocked
+        - Merged awaiting shipping
+        - Done
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: next-action
+    attributes:
+      label: Next action and responsible session
+      description: Include handoff or shipping requirements. A merge is not a deployment.
+    validations:
+      required: true

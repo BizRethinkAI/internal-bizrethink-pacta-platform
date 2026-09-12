@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coordinate Work"
+  short_description: "Assign task cards and coordinate session handoffs"
+  default_prompt: "Use $coordinate-work as the appointed coordinator for this repository to assign approved tasks and maintain separate GitHub task cards."

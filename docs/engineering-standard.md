@@ -42,6 +42,24 @@ The implementer is the worst-placed reader of their own change: they know what
 they meant, so they see it. This is the rule most easily rationalised away and
 the one worth keeping when everything else is dropped.
 
+### Concurrent sessions and state
+
+Follow [the session workflow](session-workflow.md). Shwet or one explicitly
+appointed coordinator assigns separate GitHub task issues. Each author owns one
+branch/worktree, its PR and its CI fixes. Live assignments do not require a Git
+registry commit. Read open task cards/comments and PRs before taking work.
+
+Author PRs update only their own state note. One assigned consolidation author
+updates STATE.md and deletes merged notes in a pure consolidation PR at the end
+of a shipping batch; that PR creates no note of its own. A different session or
+Shwet reviews and merges it. Governance enforces per-PR note scope; **State ready
+to ship** must pass on the final main revision before an authorized deployment.
+This replaces Guard 5's requirement that the next author fold prior merges.
+
+A fresh review-and-ship session may merge other sessions' cleared PRs when Shwet
+explicitly delegates that work. It never merges a PR it implemented. Setup or
+review-only requests do not authorize shipping.
+
 ## 4. The PR description is the review surface
 
 Two sections are **mandatory**:
