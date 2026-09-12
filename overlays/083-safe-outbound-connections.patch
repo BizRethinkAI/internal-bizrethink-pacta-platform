@@ -1,0 +1,328 @@
+# Why: Prevent unchecked outbound connections and unbounded webhook response consumption; authorize SMTP tests for the selected organisation.
+# Why-not-additive: Policy and transports are additive in packages/bizrethink; upstream webhook exports/test expectations and the SMTP form must delegate/pass organisationId.
+# Upstream-merge-fragility: medium — recheck both webhook delegates, fail-closed expectations and the SMTP form after sync.
+# Base: 1813b1d72fb231593ddcb2cb0b2a55054ac7f040 (existing overlays applied).
+
+diff --git a/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx b/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+index b56cf7e26..3c7d4ca1e 100644
+--- a/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
++++ b/apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.smtp.tsx
+@@ -1,8 +1,3 @@
+-import { useEffect, useState } from 'react';
+-
+-import { msg } from '@lingui/core/macro';
+-import { Trans, useLingui } from '@lingui/react/macro';
+-
+ import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+ import { trpc } from '@documenso/trpc/react';
+ import { Button } from '@documenso/ui/primitives/button';
+@@ -11,6 +6,9 @@ import { Label } from '@documenso/ui/primitives/label';
+ import { SpinnerBox } from '@documenso/ui/primitives/spinner';
+ import { Switch } from '@documenso/ui/primitives/switch';
+ import { useToast } from '@documenso/ui/primitives/use-toast';
++import { msg } from '@lingui/core/macro';
++import { Trans, useLingui } from '@lingui/react/macro';
++import { useEffect, useState } from 'react';
+ 
+ import { SettingsHeader } from '~/components/general/settings-header';
+ import { appMetaTags } from '~/utils/meta';
+@@ -112,19 +110,20 @@ export default function OrganisationSettingsSmtp() {
+     }
+ 
+     setTestResult(null);
+-    const result = await testMutation.mutateAsync({
+-      host: form.host,
+-      port: form.port,
+-      secure: form.secure,
+-      username: form.username,
+-      password: form.password,
+-    });
+-
+-    setTestResult(
+-      result.ok
+-        ? { ok: true, message: t`Connection succeeded.` }
+-        : { ok: false, message: result.error },
+-    );
++    try {
++      // MODIFIED for BizRethink (overlay 083): the test checks this org's manage permission.
++      const result = await testMutation.mutateAsync({
++        organisationId: organisation.id,
++        host: form.host,
++        port: form.port,
++        secure: form.secure,
++        username: form.username,
++        password: form.password,
++      });
++      setTestResult(result.ok ? { ok: true, message: t`Connection succeeded.` } : { ok: false, message: result.error });
++    } catch {
++      setTestResult({ ok: false, message: t`Connection test unavailable. Check your permissions or try again later.` });
++    }
+   };
+ 
+   const handleDelete = async () => {
+@@ -197,11 +196,7 @@ export default function OrganisationSettingsSmtp() {
+               <Trans>Secure (implicit TLS)</Trans>
+             </Label>
+             <div className="flex items-center gap-2">
+-              <Switch
+-                id="secure"
+-                checked={form.secure}
+-                onCheckedChange={(v) => setForm({ ...form, secure: v })}
+-              />
++              <Switch id="secure" checked={form.secure} onCheckedChange={(v) => setForm({ ...form, secure: v })} />
+               <span className="text-muted-foreground text-xs">
+                 {form.secure ? t`Port 465 / TLS` : t`Port 587 / STARTTLS`}
+               </span>
+@@ -232,10 +227,8 @@ export default function OrganisationSettingsSmtp() {
+             onChange={(e) => setForm({ ...form, password: e.target.value })}
+             placeholder={hasExistingConfig ? t`(leave empty to keep existing)` : t`Required`}
+           />
+-          <p className="text-muted-foreground mt-1 text-xs">
+-            <Trans>
+-              Stored encrypted using the instance encryption key. Never returned to the client.
+-            </Trans>
++          <p className="mt-1 text-muted-foreground text-xs">
++            <Trans>Stored encrypted using the instance encryption key. Never returned to the client.</Trans>
+           </p>
+         </div>
+ 
+@@ -300,12 +293,7 @@ export default function OrganisationSettingsSmtp() {
+           </Button>
+ 
+           {hasExistingConfig && (
+-            <Button
+-              variant="destructive"
+-              onClick={handleDelete}
+-              loading={deleteMutation.isPending}
+-              className="ml-auto"
+-            >
++            <Button variant="destructive" onClick={handleDelete} loading={deleteMutation.isPending} className="ml-auto">
+               <Trans>Delete config</Trans>
+             </Button>
+           )}
+diff --git a/packages/lib/server-only/webhooks/assert-webhook-url.test.ts b/packages/lib/server-only/webhooks/assert-webhook-url.test.ts
+index 2b96cef22..9e8ba42ca 100644
+--- a/packages/lib/server-only/webhooks/assert-webhook-url.test.ts
++++ b/packages/lib/server-only/webhooks/assert-webhook-url.test.ts
+@@ -88,10 +88,11 @@ describe('assertNotPrivateUrl', () => {
+   });
+ 
+   describe('DNS failure handling', () => {
+-    it('should silently allow when DNS lookup throws', async () => {
++    // MODIFIED for BizRethink (overlay 083): DNS failures must fail closed.
++    it('should reject when DNS lookup throws', async () => {
+       const lookup = vi.fn().mockRejectedValue(new Error('ENOTFOUND'));
+ 
+-      await expect(assertNotPrivateUrl('https://nonexistent.example.com', { lookup })).resolves.toBeUndefined();
++      await expect(assertNotPrivateUrl('https://nonexistent.example.com', { lookup })).rejects.toThrow(AppError);
+     });
+ 
+     it('should re-throw AppError even within the catch block', async () => {
+@@ -100,12 +101,10 @@ describe('assertNotPrivateUrl', () => {
+       await expect(assertNotPrivateUrl('https://evil.example.com', { lookup })).rejects.toThrow(AppError);
+     });
+ 
+-    it('should silently allow when DNS lookup times out (returns null)', async () => {
++    it('should reject when DNS lookup times out', async () => {
+       const lookup = vi.fn().mockReturnValue(new Promise(() => {}));
+ 
+-      // withTimeout races the lookup against a 250ms timer and returns null
+-      // if the lookup doesn't settle in time, so the function returns early.
+-      await expect(assertNotPrivateUrl('https://slow.example.com', { lookup })).resolves.toBeUndefined();
++      await expect(assertNotPrivateUrl('https://slow.example.com', { lookup })).rejects.toThrow(AppError);
+     }, 10_000);
+   });
+ });
+diff --git a/packages/lib/server-only/webhooks/assert-webhook-url.ts b/packages/lib/server-only/webhooks/assert-webhook-url.ts
+index dc3de369d..648a9e2ca 100644
+--- a/packages/lib/server-only/webhooks/assert-webhook-url.ts
++++ b/packages/lib/server-only/webhooks/assert-webhook-url.ts
+@@ -1,114 +1,3 @@
+-import { lookup } from 'node:dns/promises';
+-import { z } from 'zod';
+-
+-import { AppError, AppErrorCode } from '../../errors/app-error';
+-import { withTimeout } from '../../utils/timeout';
+-import { isPrivateUrl } from './is-private-url';
+-
+-const ZIpSchema = z.string().ip();
+-
+-const WEBHOOK_DNS_LOOKUP_TIMEOUT_MS = 250;
+-
+-type TLookupAddress = {
+-  address: string;
+-  family: number;
+-};
+-
+-type TLookupFn = (
+-  hostname: string,
+-  options: {
+-    all: true;
+-    verbatim: true;
+-  },
+-) => Promise<TLookupAddress[] | TLookupAddress>;
+-
+-const normalizeHostname = (hostname: string) => hostname.toLowerCase().replace(/\.+$/, '');
+-
+-const toAddressUrl = (address: string) => (address.includes(':') ? `http://[${address}]` : `http://${address}`);
+-
+-// MODIFIED for BizRethink (overlay 017): bypass hosts come from the
+-// DB-backed site.webhook SiteSettings row merged with env. The async
+-// loader is dynamic-imported here to break a build-time circular dep.
+-//
+-// Empty or unset = no bypasses (safe default).
+-const isBypassedHost = async (url: string): Promise<boolean> => {
+-  const { getWebhookSsrfBypassHosts } = await import('@bizrethink/customizations/server-only/webhook-config');
+-  const bypass = await getWebhookSsrfBypassHosts();
+-
+-  if (bypass.size === 0) {
+-    return false;
+-  }
+-
+-  try {
+-    const hostname = normalizeHostname(new URL(url).hostname);
+-    return bypass.has(hostname);
+-  } catch {
+-    return false;
+-  }
+-};
+-
+-/**
+- * Assert that a webhook URL does not point at a private/loopback address,
+- * checking both the literal host and its resolved DNS records. Throws an
+- * AppError with WEBHOOK_INVALID_REQUEST if it does. Hosts listed in
+- * NEXT_PRIVATE_WEBHOOK_SSRF_BYPASS_HOSTS skip all checks.
+- *
+- * This is best-effort, non-exhaustive SSRF defence, NOT a complete mitigation.
+- * It does not cover DNS rebinding (the resolved address can change between this
+- * check and the actual request), obscure IP encodings, or every IPv6 form, and
+- * it fails open on lookup errors/timeouts (see the catch below). Network-level
+- * SSRF protection (firewall/egress rules, blocking internal services and cloud
+- * metadata endpoints) remains the responsibility of the deployment.
+- */
+-export const assertNotPrivateUrl = async (
+-  url: string,
+-  options?: {
+-    lookup?: TLookupFn;
+-  },
+-) => {
+-  if (await isBypassedHost(url)) {
+-    return;
+-  }
+-
+-  if (isPrivateUrl(url)) {
+-    throw new AppError(AppErrorCode.WEBHOOK_INVALID_REQUEST, {
+-      message: 'Webhook URL resolves to a private or loopback address',
+-    });
+-  }
+-
+-  try {
+-    const hostname = normalizeHostname(new URL(url).hostname);
+-
+-    if (hostname.length === 0 || ZIpSchema.safeParse(hostname).success) {
+-      return;
+-    }
+-
+-    const resolveHostname = options?.lookup ?? lookup;
+-
+-    const lookupResult = await withTimeout(
+-      resolveHostname(hostname, {
+-        all: true,
+-        verbatim: true,
+-      }),
+-      WEBHOOK_DNS_LOOKUP_TIMEOUT_MS,
+-    );
+-
+-    if (!lookupResult) {
+-      return;
+-    }
+-
+-    const addresses = Array.isArray(lookupResult) ? lookupResult : [lookupResult];
+-
+-    if (addresses.some(({ address }) => isPrivateUrl(toAddressUrl(address)))) {
+-      throw new AppError(AppErrorCode.WEBHOOK_INVALID_REQUEST, {
+-        message: 'Webhook URL resolves to a private or loopback address',
+-      });
+-    }
+-  } catch (err) {
+-    if (err instanceof AppError) {
+-      throw err;
+-    }
+-
+-    return;
+-  }
+-};
++// MODIFIED for BizRethink (overlay 083): fail-closed destination validation is
++// owned by BizRethink. Delivery also pins the checked address at connection time.
++export { assertSafeWebhookUrl as assertNotPrivateUrl } from '@bizrethink/customizations/server-only/outbound/webhook';
+diff --git a/packages/lib/server-only/webhooks/execute-webhook-call.ts b/packages/lib/server-only/webhooks/execute-webhook-call.ts
+index c0c505f79..c3bbd1bc3 100644
+--- a/packages/lib/server-only/webhooks/execute-webhook-call.ts
++++ b/packages/lib/server-only/webhooks/execute-webhook-call.ts
+@@ -1,60 +1,6 @@
+-import type { Prisma } from '@prisma/client';
+-
+-import { fetchWithTimeout } from '../../utils/timeout';
+-import { assertNotPrivateUrl } from './assert-webhook-url';
+-
+-const WEBHOOK_TIMEOUT_MS = 10_000;
+-
+-export type WebhookCallResult = {
+-  success: boolean;
+-  responseCode: number;
+-  responseBody: Prisma.InputJsonValue | Prisma.JsonNullValueInput;
+-  responseHeaders: Record<string, string>;
+-};
+-
+-const parseBody = (text: string): Prisma.InputJsonValue => {
+-  try {
+-    return JSON.parse(text);
+-  } catch {
+-    return text;
+-  }
+-};
+-
+-export const executeWebhookCall = async (options: {
+-  url: string;
+-  body: unknown;
+-  secret: string | null;
+-}): Promise<WebhookCallResult> => {
+-  const { url, body, secret } = options;
+-
+-  try {
+-    await assertNotPrivateUrl(url);
+-
+-    const response = await fetchWithTimeout(url, {
+-      method: 'POST',
+-      body: JSON.stringify(body),
+-      redirect: 'manual',
+-      timeoutMs: WEBHOOK_TIMEOUT_MS,
+-      headers: {
+-        'Content-Type': 'application/json',
+-        'X-Documenso-Secret': secret ?? '',
+-      },
+-    });
+-
+-    const text = await response.text();
+-
+-    return {
+-      success: response.ok,
+-      responseCode: response.status,
+-      responseBody: parseBody(text),
+-      responseHeaders: Object.fromEntries(response.headers.entries()),
+-    };
+-  } catch (err) {
+-    return {
+-      success: false,
+-      responseCode: 0,
+-      responseBody: err instanceof Error ? err.message : 'Unknown error',
+-      responseHeaders: {},
+-    };
+-  }
+-};
++// MODIFIED for BizRethink (overlay 083): checked-address connections and bounded
++// response consumption share one full-operation deadline in the owned transport.
++export {
++  executeSafeWebhookCall as executeWebhookCall,
++  type WebhookCallResult,
++} from '@bizrethink/customizations/server-only/outbound/webhook';

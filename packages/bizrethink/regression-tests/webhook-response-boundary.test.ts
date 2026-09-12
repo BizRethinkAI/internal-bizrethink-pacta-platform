@@ -1,7 +1,7 @@
 import { createServer, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { setImmediate } from 'node:timers/promises';
-import { gzipSync } from 'node:zlib';
+import { brotliCompressSync, deflateSync, gzipSync } from 'node:zlib';
 
 import { executeWebhookCall } from '@documenso/lib/server-only/webhooks/execute-webhook-call';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -39,6 +39,28 @@ const call = (url: string) =>
   executeWebhookCall({ url, body: { event: 'synthetic.test' }, secret: 'synthetic-test-secret' });
 
 describe('webhook execution and response boundaries', () => {
+  it('does not start DNS or a connection after a timed-out settings read finishes late', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    let resolveSettings: (hosts: Set<string>) => void = () => {};
+    bypassHosts.mockReturnValue(
+      new Promise<Set<string>>((resolve) => {
+        resolveSettings = resolve;
+      }),
+    );
+    let result: Awaited<ReturnType<typeof call>> | undefined;
+    const pending = call('https://receiver.invalid').then((value) => {
+      result = value;
+    });
+    await vi.advanceTimersByTimeAsync(10_001);
+    expect(result).toMatchObject({ success: false, responseCode: 0 });
+    resolveSettings(new Set(['receiver.invalid']));
+    for (let i = 0; i < 10; i += 1) {
+      await setImmediate();
+    }
+    expect(lookup).not.toHaveBeenCalled();
+    await pending;
+  });
+
   it('does not dispatch after a failed DNS check', async () => {
     bypassHosts.mockResolvedValue(new Set());
     lookup.mockRejectedValue(new Error('ENOTFOUND'));
@@ -65,12 +87,31 @@ describe('webhook execution and response boundaries', () => {
     expect(await call(url)).toMatchObject({ success: true, responseCode: 200, responseBody: { received: true } });
   });
 
-  it('retains small compressed responses', async () => {
+  it.each([
+    { encoding: 'gzip', compress: gzipSync },
+    { encoding: 'deflate', compress: deflateSync },
+    { encoding: 'br', compress: brotliCompressSync },
+  ])('retains small $encoding responses', async ({ encoding, compress }) => {
     const url = await listen((res) => {
-      res.setHeader('Content-Encoding', 'gzip');
-      res.end(gzipSync('{"received":true}'));
+      res.setHeader('Content-Encoding', encoding);
+      res.end(compress('{"received":true}'));
     });
     expect(await call(url)).toMatchObject({ success: true, responseBody: { received: true } });
+  });
+
+  it('retains a response exactly at the byte limit', async () => {
+    const url = await listen((res) => res.end(Buffer.alloc(64 * 1024, 'x')));
+    const result = await call(url);
+    expect(result.success).toBe(true);
+    expect(result.responseBody).toBe('x'.repeat(64 * 1024));
+  });
+
+  it('rejects an unsupported encoding without retaining its response', async () => {
+    const url = await listen((res) => {
+      res.setHeader('Content-Encoding', 'synthetic-unknown');
+      res.end('x');
+    });
+    expect(await call(url)).toMatchObject({ success: false, responseCode: 0, responseHeaders: {} });
   });
 
   it.each([false, true])('rejects an oversized response (compressed=%s)', async (compressed) => {
@@ -106,18 +147,21 @@ describe('webhook execution and response boundaries', () => {
   });
 
   it('keeps the deadline active after response headers arrive', async () => {
-    const headersSent = Promise.withResolvers<void>();
+    let signalHeadersSent: () => void = () => {};
+    const headersSent = new Promise<void>((resolve) => {
+      signalHeadersSent = resolve;
+    });
     const url = await listen((res) => {
       res.writeHead(200);
       res.flushHeaders();
-      headersSent.resolve();
+      signalHeadersSent();
     });
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     let result: Awaited<ReturnType<typeof call>> | undefined;
     const pending = call(url).then((value) => {
       result = value;
     });
-    await headersSent.promise;
+    await headersSent;
     for (let i = 0; i < 10; i += 1) {
       await setImmediate();
     }

@@ -66,6 +66,26 @@ describe('outbound destination validation through the real webhook guard', () =>
     await expect(assertNotPrivateUrl('https://receiver.invalid', { lookup })).resolves.toBeUndefined();
   });
 
+  it('permits ordinary public IPv6 without using a translation prefix', async () => {
+    const lookup = vi.fn().mockResolvedValue([{ address: '2001:4860:4860::8888', family: 6 }]);
+    await expect(assertNotPrivateUrl('https://receiver.invalid', { lookup })).resolves.toBeUndefined();
+  });
+
+  it.each([
+    [{ address: 'not-an-ip', family: 4 }],
+    [{ address: '8.8.8.8', family: 6 }],
+    [{ address: '2001:4860:4860::8888%eth0', family: 6 }],
+  ])('rejects malformed resolver output', async (...addresses) => {
+    const lookup = vi.fn().mockResolvedValue(addresses);
+    await expect(assertNotPrivateUrl('https://receiver.invalid', { lookup })).rejects.toBeInstanceOf(AppError);
+  });
+
+  it('does not apply an exact admin exception to a subdomain', async () => {
+    bypassHosts.mockResolvedValue(new Set(['internal.invalid']));
+    const lookup = vi.fn().mockResolvedValue([{ address: '10.0.0.1', family: 4 }]);
+    await expect(assertNotPrivateUrl('http://child.internal.invalid', { lookup })).rejects.toBeInstanceOf(AppError);
+  });
+
   it('keeps an exact admin exception without exempting it from DNS failure', async () => {
     bypassHosts.mockResolvedValue(new Set(['internal.invalid']));
     const lookup = vi.fn().mockRejectedValue(new Error('ENOTFOUND'));

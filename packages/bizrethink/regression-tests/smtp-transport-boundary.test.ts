@@ -27,6 +27,16 @@ afterEach(() => vi.useRealTimers());
 
 describe('SMTP transport destination and lifecycle', () => {
   it.each([
+    '8.8.8.8/path',
+    'smtp.example.invalid?query',
+    'smtp.example.invalid#fragment',
+    'smtp.example.invalid\\path',
+  ])('rejects non-host syntax without silently truncating it: %s', async (host) => {
+    expect(await testOrgSmtp({ ...config, host })).toMatchObject({ ok: false });
+    expect(createTransport).not.toHaveBeenCalled();
+  });
+
+  it.each([
     '127.0.0.1',
     '10.0.0.1',
     '169.254.169.254',
