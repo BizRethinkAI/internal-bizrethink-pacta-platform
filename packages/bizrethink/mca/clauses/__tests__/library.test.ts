@@ -1,3 +1,4 @@
+// ADR 0011 adds the existing funding grid and separates the existing interest paragraph: FRPA 108, corpus 211.
 import { describe, expect, it } from 'vitest';
 import { assertPublishable } from '../../../provenance/types';
 import { MCA_JURISDICTIONS } from '../../jurisdictions';
@@ -30,52 +31,17 @@ describe('the MCA clause library', () => {
     }
   });
 
-  /**
-   * Uniqueness applies to the document's own CLAUSE numbering — `N.M` — and to
-   * nothing else, because nothing else is a number.
-   *
-   * The FRPA made the distinction necessary. Fourteen of its clauses carry no
-   * number at all: the granting clause, the definitions, Section 5's lead-in.
-   * Three more carry "Appendix A", which is the document's designation for a
-   * section holding three separate paragraphs, not an identifier for one of
-   * them. Requiring those to be unique would force an invented number onto text
-   * the document deliberately leaves unnumbered, and an invented number is
-   * exactly the kind of thing a later reader would try to "fix" against the
-   * document. `slug` is the identity; this is what a reader sees on the page.
-   *
-   * NARROWED 2026-09-10, BY THE SAME REVERSAL THAT RETIRED
-   * `engine/__tests__/select-clauses.test.ts`'s completeness assertion, and
-   * inverted here rather than deleted. This read `new Set(numbers).size ===
-   * numbers.length` over the whole instrument, which is true only while the
-   * library is a LIST of one document's clauses. It is a library: §4.15 is now
-   * two clauses, one for each value of `concurrentPositions`, and §8.2 is two,
-   * one for `payoff-only` and one for `carry`. Both alternatives print the same
-   * section number, because both ARE that section on the page of the document
-   * that contains them, and inventing a second number for one of them would put
-   * a number in the corpus no document has — the exact thing the paragraph above
-   * refuses to do for the unnumbered clauses.
-   *
-   * WHAT SURVIVES IS THE HALF THAT CATCHES THE ACCIDENT. A number carried by
-   * more than one record must be carried by CONDITIONAL records only. A clause
-   * copied with an existing number and left ungated still fails here, which is
-   * the collision worth catching. That at most one of a shared number is ever
-   * selected is a property of an assembled document rather than of the library,
-   * and it is asserted where documents are assembled — `select-clauses.test.ts`,
-   * *"gives an assembled document one clause per section number"*.
-   */
-  it('shares a clause number only between conditional clauses', () => {
+  // ADR 0011 deliberately replaces shared printed-number checks with shared
+  // reference identities. Gating tests prove only one alternative is selected.
+  it('shares a reference identity only between conditional clauses', () => {
     for (const id of MCA_INSTRUMENTS) {
-      const numbered = libraryFor(id).filter((clause) => /^\d+\.\d+$/.test(clause.number));
-
-      for (const number of new Set(numbered.map((clause) => clause.number))) {
-        const sharing = numbered.filter((clause) => clause.number === number);
-
+      const clauses = libraryFor(id);
+      for (const reference of new Set(clauses.map((clause) => clause.referenceId ?? clause.slug))) {
+        const sharing = clauses.filter((clause) => (clause.referenceId ?? clause.slug) === reference);
         if (sharing.length > 1) {
           expect(
             sharing.every((clause) => clause.includeWhen !== null),
-            `${id} §${number} is carried by ${sharing.length} clauses and at least one is unconditional: ${sharing
-              .map((clause) => clause.slug)
-              .join(', ')}`,
+            reference,
           ).toBe(true);
         }
       }
@@ -123,7 +89,7 @@ describe('the MCA clause library', () => {
     // 208 until §6.1 became an exhaustive pair on 2026-09-11. That one adds a
     // record and no section:  chooses between two §6.1s, so every
     // assembled document still holds exactly one. Same shape as §4.15 and §8.2.
-    expect(ALL_MCA_CLAUSES).toHaveLength(209);
+    expect(ALL_MCA_CLAUSES).toHaveLength(211);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 

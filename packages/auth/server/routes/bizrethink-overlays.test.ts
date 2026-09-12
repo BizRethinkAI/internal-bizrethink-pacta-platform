@@ -6,13 +6,11 @@ import { describe, expect, it } from 'vitest';
 /**
  * Regression guards for the auth/routes/* inline modifications:
  *   - callback.ts (overlay 014): async SSO provider getters
- *   - email-password.ts (overlay 012 + 028 + 048b): signup-disabled,
+ *   - email-password.ts (overlay 012 + 028 + 048b + 074): signup-disabled,
  *     domain-allowlist, invite-required gates
  *
- * Source-presence guards. Behavioural tests deferred — auth-route tests
- * need a full TRPC context + session middleware fixture, which is the
- * scope of Task #14 in the project tracker. These guards ensure the
- * inline-mod imports + key call sites survive the merge.
+ * Source-presence guards for upstream merges. The signup route also has
+ * behavioural coverage in bizrethink/regression-tests/signup-policy-request.test.ts.
  */
 const read = (rel: string) => readFileSync(join(__dirname, rel), 'utf-8');
 
@@ -28,21 +26,22 @@ describe('auth/routes/callback.ts — overlay 014 SSO async regression guard', (
   });
 });
 
-describe('auth/routes/email-password.ts — overlays 012 + 028 + 048b guards', () => {
+// MODIFIED for BizRethink (overlay 074): guard the shared policy wiring.
+describe('auth/routes/email-password.ts — overlays 012 + 028 + 048b + 074 guards', () => {
   const source = read('email-password.ts');
 
-  it('imports isSignupDisabled from bizrethink (overlay 028)', () => {
-    expect(source).toMatch(
-      /@bizrethink\/customizations\/server-only\/signup-config/,
-    );
+  it('imports the signup policy from bizrethink (overlay 074)', () => {
+    expect(source).toMatch(/@bizrethink\/customizations\/server-only\/signup-config/);
   });
 
-  it('overlay 012 — uses async isEmailDomainAllowedForSignup', () => {
-    expect(source).toMatch(/await isEmailDomainAllowedForSignup/);
+  it('overlay 074 — shares the policy between the disabled and domain gates', () => {
+    expect(source).toMatch(/const signupPolicy = await getSignupPolicy\(\)/);
+    expect(source).toMatch(/signupPolicy\.signupDisabled/);
+    expect(source).toMatch(/isEmailDomainAllowedForSignup\(email, signupPolicy\)/);
   });
 
-  it('overlay 048b — uses isInviteRequiredForSignup gate', () => {
-    expect(source).toMatch(/isInviteRequiredForSignup/);
+  it('overlay 074 — uses the same policy for the invitation gate', () => {
+    expect(source).toMatch(/if \(signupPolicy\.requiresInvite\)/);
   });
 
   it('overlay 048b — checks for pending OrganisationMemberInvite when gated', () => {

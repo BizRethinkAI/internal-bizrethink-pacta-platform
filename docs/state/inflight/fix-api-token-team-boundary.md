@@ -36,8 +36,8 @@ The owner acknowledged a coordination relay to the separate review session.
 This session cannot directly message the live Claude/other Codex sessions.
 Do not edit #169's branch or duplicate another PR's state-note folds.
 
-Fresh independent adversarial review is required. The common predicate files
-also explicitly call for at least two reviewers when those functions change.
+Fresh independent adversarial review is required. The owner explicitly waived
+the inherited source comment requesting a second reviewer for this queue.
 The implementing session opens the PR and never merges it. CI green remains
 the definition of done. Shwet authorized background CI monitoring on 2026-09-12;
 deployment watching remains prohibited.
@@ -114,3 +114,17 @@ signature fixtures missing `overflow`, byte-for-byte identical diagnostics
 (after path/line normalization) on the pre-edit file. They are not introduced
 by this test-only correction. The overlay now covers six production files and
 one upstream test file. Fresh full CI will validate the new head.
+
+## Independent review and mechanical integration — 2026-09-12
+
+Shwet directed the independent review-and-ship session to merge the remaining
+queue and deploy once, using GitHub CI without further local test reruns.
+This session found no blocking substantive A-02 defect. The reviewed author
+head is `cf38530144d436c3d73c8ba82c631477908e8079`; its application checks pass.
+Current main `8715848c25ba791e0fb4262840d069588bfcad97` contains #169 and #171.
+The mechanical refresh retains both signup and API-team TypeScript entries
+and overlays 074/075. This PR alone folds the now-merged #169/#171 notes and
+consolidates their duplicate #168 summary, preserving outstanding source work.
+The code, tests and overlays are unchanged from the reviewed implementations.
+Fresh GitHub CI validates this integration. #172 follows this refreshed head
+and owns the next fold of this A-02 note; no other session should duplicate it.

@@ -1,3 +1,4 @@
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { selectClauses } from '../../engine/select-clauses';
@@ -268,7 +269,7 @@ describe('Va. Code §6.2-2234(B), read rather than summarised', () => {
     expect(text).toMatch(/Buyer shall pay the arbitrator’s fees/);
     expect(text).toMatch(/administrative fees/);
     // §6.3 holds the only enforcement-cost entitlement and the only ceiling.
-    expect(text).toContain('Section 6.3');
+    expect(text).toContain('Section [[clause:frpa.costs-of-collection-6-3]]');
     expect(text).not.toMatch(/twenty-five percent|25%/);
   });
 });
@@ -356,9 +357,9 @@ describe('the limitation period is one rule, in both forums', () => {
 
   /** The rule reaches both forums without citing a clause that is not always there. */
   it('reaches arbitration without citing a gated clause', () => {
-    expect(body(LIMITATIONS)).not.toContain('Section 7.26');
+    expect(body(LIMITATIONS)).not.toContain('Section [[clause:frpa.arbitration-7-26]]');
     expect(body(LIMITATIONS)).toMatch(/however it is heard/);
-    expect(body(ARBITRATION)).toContain('Section 7.19');
+    expect(body(ARBITRATION)).toContain('Section [[clause:frpa.contractual-statutes-of-limitations-7-19]]');
   });
 });
 
@@ -390,20 +391,11 @@ describe('nothing ungated reaches for the arbitration clause', () => {
 
   /** And the converse: everything §7.26 cites is in an arbitration document. */
   it('§7.26 cites only clauses an arbitration document contains', () => {
-    const numbers = new Set(
-      under('arbitration')
-        .map((entry) => entry.number)
-        .filter((number) => number !== ''),
-    );
-    const cited = [...body(ARBITRATION).matchAll(/\bSection\s+(\d+(?:\.\d+)*)/g)]
-      .map((match) => match[1])
-      // Section 1 is the AcroForm grid the Lombard pipeline injects and no
-      // clause in this library holds it, which is why `select-clauses.test.ts`
-      // excludes it too. Excluded for that reason, not as a convenience.
-      .filter((number) => !/^1(\.|$)/.test(number));
-
+    // ADR 0011: verify intended identities, including aliases for full recourse.
+    const references = new Set(under('arbitration').map((entry) => entry.referenceId ?? entry.slug));
+    const cited = [...body(ARBITRATION).matchAll(/\[\[clause:([^\]]+)\]\]/g)].map((match) => match[1]);
     expect(cited.length).toBeGreaterThan(0);
-    expect(cited.filter((number) => !numbers.has(number))).toEqual([]);
+    expect(cited.filter((reference) => !references.has(reference))).toEqual([]);
   });
 });
 
@@ -435,6 +427,8 @@ describe('§7.26 exists only where the funder chose it, and carries the same pro
 
   /** Nobody has a second §7.26, and §7.25 keeps its own number. */
   it('takes a section number no other record holds', () => {
-    expect(FRPA.filter((entry) => entry.number === '7.26').map((entry) => entry.slug)).toEqual([ARBITRATION]);
+    expect(
+      FRPA.filter((entry) => (entry.referenceId ?? entry.slug) === ARBITRATION).map((entry) => entry.slug),
+    ).toEqual([ARBITRATION]);
   });
 });

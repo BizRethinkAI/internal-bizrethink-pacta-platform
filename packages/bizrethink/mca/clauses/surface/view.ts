@@ -1,8 +1,12 @@
 import { assertPublishable } from '../../../provenance/types';
+import {
+  numberedLibraryForReview,
+  type ReviewMcaClause,
+  reviewProfileDescription,
+} from '../../review/numbered-library';
 import { agreementDigest, agreementExists, MissingAgreementError } from '../documents';
 import { findingsFor, outstandingFindingsFor, REGISTER_AVAILABLE } from '../examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
-import { ALL_MCA_CLAUSES, inReviewOrder } from '../library';
 import { LOMBARD, type McaTenant } from '../parties';
 
 /**
@@ -61,6 +65,10 @@ export type McaLibraryClauseView = {
   slug: string;
   instrument: McaInstrument;
   number: string;
+  body: string;
+  fields: ReviewMcaClause['fields'];
+  included: boolean;
+  selectionNote: string | null;
   heading: string;
   section: string;
   status: string;
@@ -115,13 +123,19 @@ const sourceState = (id: McaInstrument, tenant: McaTenant): SourceState => {
 };
 
 export const mcaLibrarySurface = (tenant: McaTenant = LOMBARD) => {
-  const clauses: McaLibraryClauseView[] = inReviewOrder(ALL_MCA_CLAUSES).map((clause) => {
+  const clauses: McaLibraryClauseView[] = MCA_INSTRUMENTS.flatMap((instrument) =>
+    numberedLibraryForReview(instrument),
+  ).map((clause) => {
     const outstanding = new Set(outstandingFindingsFor(clause).map((finding) => finding.id));
 
     return {
       slug: clause.slug,
       instrument: clause.instrument,
       number: clause.number,
+      body: clause.body,
+      fields: clause.fields,
+      included: clause.included,
+      selectionNote: clause.selectionNote,
       heading: clause.heading,
       section: clause.section,
       status: clause.status,
@@ -166,6 +180,7 @@ export const mcaLibrarySurface = (tenant: McaTenant = LOMBARD) => {
   });
 
   return {
+    reviewProfile: reviewProfileDescription(),
     instruments,
     clauses,
     totals: {

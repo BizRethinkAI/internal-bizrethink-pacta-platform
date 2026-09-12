@@ -1,3 +1,5 @@
+// ADR 0011 adds the existing funding grid and separates the existing interest paragraph: FRPA 108, corpus 211.
+// ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
 
 import { selectClauses } from '../../engine/select-clauses';
@@ -85,7 +87,8 @@ describe('the cluster knows which clause it is', () => {
   it('owns §9.1 and nothing else in this file', () => {
     expect(MINE).toHaveLength(1);
     expect(clause(IDENTITY).instrument).toBe('frpa');
-    expect(clause(IDENTITY).number).toBe('9.1');
+    // ADR 0011: this operative record must remain citable after selection.
+    expect(clause(IDENTITY).unnumberedReason).toBeUndefined();
     expect(clause(IDENTITY).kind).toBe('field-group');
   });
 });
@@ -215,7 +218,7 @@ describe('the capacity rule is stated wherever a human signs', () => {
  */
 describe('§10.4 and §9.5 still describe §9.1 correctly', () => {
   it('§10.4 keeps its citation and §9.1 collects what it points at', () => {
-    expect(body(SERVICE_ADDRESS)).toContain('Section 9.1');
+    expect(body(SERVICE_ADDRESS)).toContain('Section [[clause:frpa.guarantor-information-9-1]]');
 
     const labels = (clause(IDENTITY).fields ?? []).map((field) => field.label);
 
@@ -324,9 +327,9 @@ describe('the gate and the provenance are unchanged', () => {
    * of the last two changes rather than found again each time.
    */
   it('adds no record to the library', () => {
-    expect(libraryFor('frpa')).toHaveLength(106);
-    expect(ALL_MCA_CLAUSES).toHaveLength(209);
-    expect(ALL_MCA_CLAUSES.filter((entry) => entry.number === '9.1' && entry.instrument === 'frpa')).toHaveLength(1);
+    expect(libraryFor('frpa')).toHaveLength(108);
+    expect(ALL_MCA_CLAUSES).toHaveLength(211);
+    expect(ALL_MCA_CLAUSES.filter((entry) => entry.slug === IDENTITY && entry.instrument === 'frpa')).toHaveLength(1);
   });
 
   /**

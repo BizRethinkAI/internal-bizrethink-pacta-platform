@@ -1,6 +1,7 @@
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../clauses/instruments';
 import type { McaTenant } from '../clauses/parties';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS } from '../jurisdictions';
+import { reviewProfileDescription } from './numbered-library';
 
 /**
  * What an attorney is told before the first clause.
@@ -179,7 +180,7 @@ export const counselBriefing = (input: BriefingInput): BriefingSection[] => {
       id: 'document',
       title: `What you are holding: the ${record.title}`,
       body: [
-        `This link carries the ${record.title} and nothing else — ${clauseCount} clauses, in the order the document prints them. It is one of six agreements that make up a funding transaction; the other five are listed further down and are not in front of you.`,
+        `This link carries the library for the ${record.title} — ${clauseCount} review items in reading order, including alternative clauses, notes and field groups. Alternatives do not appear together in a selected agreement. It is one of six agreements that make up a funding transaction; the other five are listed further down and are not in front of you.`,
         ...counterpartyNote(instrument, tenant),
         ...twinNote(instrument),
       ],
@@ -193,7 +194,7 @@ export const counselBriefing = (input: BriefingInput): BriefingSection[] => {
         `That record is a gate, not a formality. **No clause in this library may be sent to a counterparty until an approval names the attorney who read it** — the software refuses to publish it. Nothing you see here has been sent to anyone.`,
         approvedCount === 0
           ? `As of today, **no clause in this agreement has been approved by anybody.** You are the first reader.`
-          : `${approvedCount} of ${clauseCount} clauses already carry a current approval; the rest do not, and are marked.`,
+          : `${approvedCount} of ${clauseCount} review items already carry a current approval; the rest do not, and are marked.`,
       ],
     },
     {
@@ -231,7 +232,8 @@ export const counselBriefing = (input: BriefingInput): BriefingSection[] => {
       title: 'How to read what follows',
       body: [
         `Each clause is shown in full — nothing is summarised, excerpted or tidied. **«Angle-bracketed numbers» are left in.** They are the fill-in fields the executed contract carries, and where one sits changes the sentence it sits in — "«7»% of daily receipts" is a different obligation depending on which side of the percentage the field falls. Stripping them would show you a document we do not publish.`,
-        `**A clause is shown with the number it carries, and ${unnumberedCount} of the ${clauseCount} clauses below carry no number.** Those are shown without one rather than given one here. The numbering is not what we are asking you about — the words are — though a cross-reference inside a clause that points at the wrong section is worth telling us about. Each clause also carries a short reference in grey beside its heading — “frpa.holdback-explainer” and the like. It is our internal handle, not part of the contract, and on a clause that is neither numbered nor headed it is the only stable way to name it. Cite it back to us and we will know exactly which words you mean.`,
+        `**Numbers and cross-references are derived after selecting clauses.** This page shows the full library: the example selection and clearly marked alternatives. Alternative citations apply to their own example selection, so alternatives may repeat a number. ${unnumberedCount} of the ${clauseCount} review items below carry no number by an explicit structural decision; each has a heading. Cite the heading, number where shown, and any alternative label, or use the comment box beneath that clause.`,
+        `**Example profile, not confirmed commercial instructions:** ${reviewProfileDescription()}. The final agreement depends on the funder's answers.`,
         `Where a clause is in the document because a particular state's law puts it there, that is noted under the heading. Most of this corpus is commercial drafting and says nothing there, which is itself information about where your hour is best spent.`,
       ],
     },

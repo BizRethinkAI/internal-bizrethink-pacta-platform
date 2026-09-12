@@ -78,7 +78,10 @@ describe('every clause has content for its kind', () => {
 
     expect(groups.length, 'no field groups exist — this test would pass vacuously').toBeGreaterThan(0);
 
-    for (const group of groups) {
+    // ADR 0011 adds a merchant grid; it must not inherit the guarantor SSN assertion.
+    const funding = groups.find((group) => group.slug === 'frpa.merchant-and-funding-information');
+    expect(funding?.fields?.some((field) => field.kind === 'ssn')).toBe(false);
+    for (const group of groups.filter((entry) => entry !== funding)) {
       for (const field of group.fields ?? []) {
         expect(field.widget, `${group.slug}: field "${field.label}" has no widget anchor`).toMatch(/^«\d+»$/);
       }
@@ -96,16 +99,20 @@ describe('every clause has content for its kind', () => {
    * that is not a guarantor block, this fails and the assumption gets re-read
    * rather than inherited.
    */
-  it('knows that every field group today is a guarantor identity block', () => {
+  it('distinguishes the funding grid from the three guarantor identity blocks', () => {
     const groups = ALL_MCA_CLAUSES.filter((clause) => clause.kind === 'field-group');
 
     expect(groups.map((group) => group.slug).sort()).toEqual([
       'equipment-lease.guarantor-information',
       'frpa.guarantor-information-9-1',
+      'frpa.merchant-and-funding-information',
       'subscription.guarantor-information',
     ]);
 
-    for (const group of groups) {
+    // ADR 0011 adds a merchant grid; it must not inherit the guarantor SSN assertion.
+    const funding = groups.find((group) => group.slug === 'frpa.merchant-and-funding-information');
+    expect(funding?.fields?.some((field) => field.kind === 'ssn')).toBe(false);
+    for (const group of groups.filter((entry) => entry !== funding)) {
       expect(
         (group.fields ?? []).some((field) => field.kind === 'ssn'),
         `${group.slug} collects no SSN — is it still a guarantor block?`,
