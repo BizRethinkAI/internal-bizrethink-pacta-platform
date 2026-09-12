@@ -39,7 +39,8 @@ Do not edit #169's branch or duplicate another PR's state-note folds.
 Fresh independent adversarial review is required. The common predicate files
 also explicitly call for at least two reviewers when those functions change.
 The implementing session opens the PR and never merges it. CI green remains
-the definition of done; no CI/deployment watcher is authorized.
+the definition of done. Shwet authorized background CI monitoring on 2026-09-12;
+deployment watching remains prohibited.
 
 ## Implemented boundary and validation
 
@@ -88,3 +89,28 @@ retaining overlays 074+075 and both sets of type-gate entries. The resulting
 stale #169 note needs exactly one coordinated fold; this session does not own
 it. Revalidate the resulting final head before merging A-02. Until refreshed,
 Guard 5 will still see the inherited #168 note on this branch.
+
+## CI follow-up — 2026-09-12
+
+First full HTTP run 34675051098: all five new A-02 E2Es passed. Two existing
+unauthorized-delete tests failed because their exact expectation was 401 and
+A-02 deliberately now returns 404 before resolving a foreign API-team record.
+Updated only those two expectations through overlay 075, adding assertions that
+the denied documents still exist with their original team/status and no deletion.
+Same-team success tests remain in place. No production-code change or relaxed
+assertion (401 is not accepted as an alternative); the new scope regressions
+already assert NOT_FOUND and no audit/webhook/destructive writes.
+
+That run also reported one admin-search ECONNRESET which passed on retry
+(1 flaky), 1,050 passed and 59 existing skips. No new skips were added.
+Governance failed solely on the inherited #168 note; #169 is fully green and
+contains its coordinated cleanup. Do not duplicate the fold here. Final refreshed
+queue heads still require green checks and independent review before merging.
+
+Follow-up checks: 34 relevant handler/context Vitest cases and the required
+owned type gate pass; four denied/allowed delete E2Es are discovered. The added
+supplemental typecheck of the whole upstream test file reports four pre-existing
+signature fixtures missing `overflow`, byte-for-byte identical diagnostics
+(after path/line normalization) on the pre-edit file. They are not introduced
+by this test-only correction. The overlay now covers six production files and
+one upstream test file. Fresh full CI will validate the new head.

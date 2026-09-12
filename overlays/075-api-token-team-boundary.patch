@@ -148,6 +148,44 @@ index 1215d7b18..f4bc92a36 100644
        );
      } catch (err) {
        apiLogger.info({
+diff --git a/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts b/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
+index 3d05ef297..b45f5f18f 100644
+--- a/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
++++ b/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
+@@ -169,7 +169,15 @@ test.describe('Document API V2', () => {
+       });
+ 
+       expect(res.ok()).toBeFalsy();
+-      expect(res.status()).toBe(401);
++      // MODIFIED for BizRethink (overlay 075): foreign API-team records are hidden as 404.
++      expect(res.status()).toBe(404);
++      expect(await res.text()).toContain('Document not found');
++      expect(await prisma.envelope.findUnique({ where: { id: doc.id } })).toMatchObject({
++        id: doc.id,
++        teamId: teamA.id,
++        deletedAt: null,
++        status: doc.status,
++      });
+     });
+ 
+     test('should allow authorized access to document delete endpoint', async ({ request }) => {
+@@ -3468,7 +3476,15 @@ test.describe('Document API V2', () => {
+         });
+ 
+         expect(res.ok()).toBeFalsy();
+-        expect(res.status()).toBe(401);
++        // MODIFIED for BizRethink (overlay 075): foreign API-team records are hidden as 404.
++        expect(res.status()).toBe(404);
++        expect(await res.text()).toContain('Document not found');
++        expect(await prisma.envelope.findUnique({ where: { id: doc.id } })).toMatchObject({
++          id: doc.id,
++          teamId: teamA.id,
++          deletedAt: null,
++          status: doc.status,
++        });
+       });
+ 
+       test('should allow authorized access to envelope delete endpoint', async ({ request }) => {
 diff --git a/packages/lib/server-only/document/delete-document.ts b/packages/lib/server-only/document/delete-document.ts
 index 8dd0b69de..51047571a 100644
 --- a/packages/lib/server-only/document/delete-document.ts

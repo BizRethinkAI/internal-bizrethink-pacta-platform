@@ -169,7 +169,15 @@ test.describe('Document API V2', () => {
       });
 
       expect(res.ok()).toBeFalsy();
-      expect(res.status()).toBe(401);
+      // MODIFIED for BizRethink (overlay 075): foreign API-team records are hidden as 404.
+      expect(res.status()).toBe(404);
+      expect(await res.text()).toContain('Document not found');
+      expect(await prisma.envelope.findUnique({ where: { id: doc.id } })).toMatchObject({
+        id: doc.id,
+        teamId: teamA.id,
+        deletedAt: null,
+        status: doc.status,
+      });
     });
 
     test('should allow authorized access to document delete endpoint', async ({ request }) => {
@@ -3468,7 +3476,15 @@ test.describe('Document API V2', () => {
         });
 
         expect(res.ok()).toBeFalsy();
-        expect(res.status()).toBe(401);
+        // MODIFIED for BizRethink (overlay 075): foreign API-team records are hidden as 404.
+        expect(res.status()).toBe(404);
+        expect(await res.text()).toContain('Document not found');
+        expect(await prisma.envelope.findUnique({ where: { id: doc.id } })).toMatchObject({
+          id: doc.id,
+          teamId: teamA.id,
+          deletedAt: null,
+          status: doc.status,
+        });
       });
 
       test('should allow authorized access to envelope delete endpoint', async ({ request }) => {
