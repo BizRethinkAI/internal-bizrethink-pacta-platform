@@ -1,3 +1,4 @@
+import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -75,9 +76,12 @@ export const useEnvelopeRoute = authenticatedProcedure
     const uploadedFiles = await Promise.all(
       filesToUpload.map(async (file) => {
         // We disable flattening here since `createDocumentFromTemplate` will handle it.
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file, {
+        const uploaded = await putNormalizedPdfFileServerSide(file, {
           flattenForm: false,
         });
+        // MODIFIED for BizRethink (overlay 077): multipart replacements carry their authenticated owner/team.
+        await recordPdfUpload(uploaded, { userId: user.id, teamId });
+        const documentDataId = uploaded.id;
 
         return {
           name: file.name,

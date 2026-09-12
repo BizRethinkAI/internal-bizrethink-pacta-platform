@@ -1015,3 +1015,15 @@ model BizrethinkMcaLibraryFinding {
   @@index([reviewId])
   @@index([clauseSlug])
 }
+
+
+// A-04: provenance for PDFs uploaded before they belong to an envelope.
+// Scalar IDs deliberately avoid reverse relations in upstream models. Attached
+// sources always use current envelope authorization instead of this receipt.
+model BizrethinkPdfUpload {
+  documentDataId String   @id
+  userId         Int
+  teamId         Int?
+  fingerprint    String
+  createdAt      DateTime @default(now())
+}
