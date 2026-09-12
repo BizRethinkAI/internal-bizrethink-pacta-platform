@@ -104,7 +104,10 @@ beforeEach(() => {
     }
     return row;
   });
-  db.field.update.mockImplementation(async ({ data }: { data: Partial<typeof field> }) => {
+  db.field.update.mockImplementation(async ({ where, data }: Query & { data: Partial<typeof field> }) => {
+    if (!matchesQuery(field, where)) {
+      throw new Error('Synthetic conditional field update found no row');
+    }
     field = { ...field, ...data };
     return { ...field, signature: null };
   });
@@ -119,6 +122,47 @@ beforeEach(() => {
   db.documentMeta.findFirst.mockImplementation(async () => envelope.documentMeta);
   db.documentAuditLog.create.mockResolvedValue({});
   db.$transaction.mockImplementation(async (operation: (tx: typeof db) => unknown) => operation(db));
+});
+
+describe('A-06 authorization remains bound to the field when it is written', () => {
+  for (const adapter of ['legacy insert', 'legacy remove', 'current insert', 'current remove'] as const) {
+    for (const change of ['SIGNATURE', 'FREE_SIGNATURE', 'recipient', 'envelope'] as const) {
+      it(`refuses ${adapter} if the authorized field changes its ${change} before the transaction`, async () => {
+        const isRemoval = adapter.endsWith('remove');
+        if (change === 'recipient') {
+          target = { ...actor };
+          field.recipientId = actor.id;
+        } else {
+          field = { ...fieldFixture(), recipientId: target.id };
+        }
+        field.inserted = isRemoval;
+        let concurrentField: typeof field | undefined;
+        db.$transaction.mockImplementationOnce(async (operation: (tx: typeof db) => unknown) => {
+          field = {
+            ...field,
+            ...(change === 'recipient'
+              ? { recipientId: 99 }
+              : change === 'envelope'
+                ? { envelopeId: 'envelope_other' }
+                : { type: change }),
+          };
+          concurrentField = { ...field };
+          return operation(db);
+        });
+        const run = adapter.startsWith('current')
+          ? () => current(isRemoval ? null : 'Synthetic value')
+          : isRemoval
+            ? legacyRemove
+            : legacyInsert;
+        await expect(run()).rejects.toBeDefined();
+        expect(concurrentField).toBeDefined();
+        expect(field).toEqual(concurrentField);
+        expect(db.signature.upsert).not.toHaveBeenCalled();
+        expect(db.signature.deleteMany).not.toHaveBeenCalled();
+        expect(db.documentAuditLog.create).not.toHaveBeenCalled();
+      });
+    }
+  }
 });
 
 describe('A-06 legacy signing helpers on both envelope versions', () => {
