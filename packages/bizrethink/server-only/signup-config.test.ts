@@ -127,14 +127,14 @@ describe('isInviteRequiredForSignup', () => {
     expect(await isInviteRequiredForSignup()).toBe(false);
   });
 
-  it('returns false when no DB row exists (no env equivalent for this flag)', async () => {
+  it('refuses an invitation decision when no DB row exists', async () => {
     mockedFindFirst.mockResolvedValueOnce(null);
-    expect(await isInviteRequiredForSignup()).toBe(false);
+    await expect(isInviteRequiredForSignup()).rejects.toMatchObject({ code: 'SIGNUP_DISABLED', statusCode: 400 });
   });
 
-  it('returns false when DB read throws (safe default)', async () => {
+  it('refuses an invitation decision when the policy read fails', async () => {
     mockedFindFirst.mockRejectedValueOnce(new Error('Prisma connection failed'));
-    expect(await isInviteRequiredForSignup()).toBe(false);
+    await expect(isInviteRequiredForSignup()).rejects.toMatchObject({ code: 'SIGNUP_DISABLED', statusCode: 400 });
   });
 });
 
@@ -162,27 +162,27 @@ describe('getAllowedSignupDomains', () => {
     expect(await getAllowedSignupDomains()).toEqual(['foo.com', 'bar.com', 'baz.com']);
   });
 
-  it('falls back to env CSV when no DB row', async () => {
+  it('refuses a domain decision when no DB row exists, even with an env fallback', async () => {
     mockedFindFirst.mockResolvedValueOnce(null);
     mockedEnv.mockReturnValue('example.com');
-    expect(await getAllowedSignupDomains()).toEqual(['example.com']);
+    await expect(getAllowedSignupDomains()).rejects.toMatchObject({ code: 'SIGNUP_DISABLED', statusCode: 400 });
   });
 
-  it('returns empty array when no DB row and no env', async () => {
+  it('never substitutes an unrestricted domain list for a missing policy', async () => {
     mockedFindFirst.mockResolvedValueOnce(null);
     mockedEnv.mockReturnValue(undefined);
-    expect(await getAllowedSignupDomains()).toEqual([]);
+    await expect(getAllowedSignupDomains()).rejects.toMatchObject({ code: 'SIGNUP_DISABLED', statusCode: 400 });
   });
 
   it('trims whitespace and filters empty entries from env CSV', async () => {
-    mockedFindFirst.mockResolvedValueOnce(null);
+    mockedFindFirst.mockResolvedValueOnce(dbRow({ signupDisabled: false, allowedDomains: [] }) as never);
     mockedEnv.mockReturnValue('  foo.com ,, bar.com ,');
     expect(await getAllowedSignupDomains()).toEqual(['foo.com', 'bar.com']);
   });
 
-  it('falls back to env when DB read throws (DB outage)', async () => {
+  it('refuses a domain decision when the policy read fails, even with an env fallback', async () => {
     mockedFindFirst.mockRejectedValueOnce(new Error('Prisma connection failed'));
     mockedEnv.mockReturnValue('fallback.example.com');
-    expect(await getAllowedSignupDomains()).toEqual(['fallback.example.com']);
+    await expect(getAllowedSignupDomains()).rejects.toMatchObject({ code: 'SIGNUP_DISABLED', statusCode: 400 });
   });
 });
