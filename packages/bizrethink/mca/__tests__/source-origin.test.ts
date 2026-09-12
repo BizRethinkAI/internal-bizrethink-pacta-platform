@@ -192,38 +192,11 @@ describe('the vendored sources, classified as they actually stand', () => {
     expect(originOfSource('TX-Fin-Code-Ch-398.txt').origin).toBe('official-publisher');
   });
 
-  /*
-    NINE OF ELEVEN FILES RECORD NO RETRIEVAL, INCLUDING CALIFORNIA'S AND NEW
-    YORK'S.
-
-    Both are the promulgating department's own document and both are almost
-    certainly the official text — that is a belief, and the file gives a reader
-    nothing to re-check it against. Utah's header says so in as many words:
-    "ORIGINAL RETRIEVAL SOURCE UNRECORDED".
-
-    Pinned as an exact list rather than a count. A count moves for two reasons —
-    a file was re-vendored with a proper header, or a new source arrived without
-    one — and they call for opposite responses.
-  */
-  /**
-   * TWO, AND THEY ARE THE HONEST TWO.
-   *
-   * This list was nine until seven sources were given `Publisher:` / `Site:`
-   * headers. What remains is not an oversight: Utah's and Virginia's headers
-   * say "Vendored 2026-09-06 from lombard-contracts", which records where OUR
-   * COPY came from and not where the text was published. A copy of a copy is
-   * exactly the state Georgia's source was in, and the classifier is right to
-   * keep saying so.
-   *
-   * Closing these two means fetching from `le.utah.gov` and Virginia's
-   * publisher and recording it at the moment of fetching, which breaks their
-   * digests deliberately and needs a human to re-read.
-   */
+  // Virginia now uses the independently captured official form. Utah's
+  // separate retrieval-header correction is pending on this branch's base.
+  // Pin names, not just the count, so a new anonymous source cannot replace one.
   it('names the files whose origin is not recorded', () => {
-    expect(files.filter((f) => originOfSource(f).origin === 'origin-not-recorded')).toEqual([
-      'UT-Title-7-Ch-27.txt',
-      'VA-Disclosure-Form.txt',
-    ]);
+    expect(files.filter((f) => originOfSource(f).origin === 'origin-not-recorded')).toEqual(['UT-Title-7-Ch-27.txt']);
   });
 
   it('holds no source from a secondary publisher, and the Georgia file’s own history does not make it one', () => {

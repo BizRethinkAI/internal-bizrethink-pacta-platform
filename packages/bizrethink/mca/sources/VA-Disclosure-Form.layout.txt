@@ -1,79 +1,108 @@
-                               SALES-BASED FINANCING DISCLOSURE FORM
-Disclosure Date                                                      Recipient’s Name:
+VIRGINIA SCC — SALES-BASED FINANCING DISCLOSURE FORM
+Official version: Eff. 10/2022, two pages
 
-Total Amount Financed                             $                  Recipient’s Address:
-Fees Deducted or Withheld                         $
-at Disbursement
-Disbursement Amount                               $                  Provider’s Name:
-[Total Amount Financed minus (-) Fees
-Deducted or Withheld at Disbursement]
-                                                                     Provider’s Address:
-Finance Charge                                    $
-Total Repayment Amount                            $
-[Disbursement Amount plus (+) Finance Charge]
-                                                                     Provider’s Phone Number:
-Estimated Number of Payments
-[Number of payments expected, based                                  Provider’s E-mail Address:
-on the projected sales volume, to equal
-the Total Repayment Amount]
+Publisher: Virginia State Corporation Commission, Bureau of Financial Institutions
+Site: https://ris.dls.virginia.gov
+Retrieved from: https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf
+Retrieved at (UTC): 2026-09-12T08:42:05.055077+00:00
+PDF response SHA-256: 146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29
+Official link context: https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/
+Active layout authority: VA-Disclosure-Form.pdf (unmodified official PDF)
 
+Republished from the source audit's independently retained official PDF and
+extractions. Both pages were visually inspected again on September 12, 2026.
+This replaces the mismatched local copy imported September 6 from
+lombard-contracts; its unknown original retrieval is not retroactively verified.
+The previous copy remains in Git history and the unchanged audit record.
 
-Payment              ☐ Amount of each fixed payment: $
-Schedule             ☐ Frequency of fixed payments:
+Retrieval and evidence hashes:
+docs/research/mca-source-audit-2026-09-12/manifest.json (va-form)
+Correction, layout observations and limits:
+docs/research/mca-virginia-form-correction-2026-09-12/README.md
+Extraction: pdftotext -layout; complete two-page text, only outer whitespace trimmed.
+This header is editorial. The source body below is not rewritten.
 
-☐ Fixed              ☐ Variable payment schedule, or ☐ Description of the method used to calculate the amount
-                     and frequency of each variable payment:
+--- OFFICIAL FORM TEXT BEGINS ---
 
-☐ Variable
+Eff. 10/2022
 
+                                               SALES-BASED FINANCING DISCLOSURE FORM
+               Total Amount of the                                    $                  Disclosure Date:
+               Sales-Based Financing
+                                                                                         Recipient’s Name:
+               Fees Deducted or Withheld                              $
+               at Disbursement                                                           Recipient’s Address:
+               Disbursement Amount                                    $
+               [Total Amount of the Sales-Based Financing minus (-)
+               Fees Deducted or Withheld at Disbursement]
 
+               Finance Charge                                         $                  Provider’s Name:
 
+               Total Repayment Amount                                 $                  Provider’s Address:
+               [Disbursement Amount plus (+) Finance Charge]
 
-                     Method of payment:
-                                                                                                       ☐ SEE PAGE 2
-Description of All Other
-Potential Fees and
-Charges NOT Included
-in the Finance Charge
-                                                                                                        ☐ SEE PAGE 2
-Description of Collateral
-Requirements or
-Security Interests
+               Estimated Number of Payments
+               [Number of payments expected, based on the projected
+               sales volume, to equal the Total Repayment Amount]                        Provider’s Phone Number:
 
-                                                                                                         ☐ SEE PAGE 2
-Broker Compensation                       Is provider paying compensation     If Yes, amount of compensation
-                                          directly to a broker?               being paid directly to broker: $
-                                               ☐ Yes ☐ No
-Description of
-Prepayment Policies
-
-                                                                                                        ☐ SEE PAGE 2
-
-        I acknowledge that I have received a copy of this disclosure form.
+               A reasonable range may be provided ONLY for                               Provider’s E-mail Address:
+               transactions with a variable payment schedule.
 
 
-                              _____________________                                               _______________
-                                 Signature                                                        Date
-                 SALES-BASED FINANCING DISCLOSURE FORM - PAGE 2
-Recipient’s Name:                                        Disclosure Date:
-
-Recipient’s Address:                                     Provider’s Name:
-
-
-The information provided below relates to the following checked item(s):
-   ☐ Variable payment schedule
-   ☐ Description of the method used to calculate the amount and frequency of each variable payment
-   ☐ Method of payment
-   ☐ Description of all other potential fees and charges not included in the finance charge
-   ☐ Description of collateral requirements or security interests
-   ☐ Description of prepayment policies
+               Payment Schedule
+               ☐ Amount of each fixed payment: $
+               ☐ Frequency of fixed payments:
+               ☐ Variable payment schedule, or ☐ Description of the method used to calculate the amount and frequency of
+               each variable payment:
 
 
 
 
-       I acknowledge that I have received a copy of this disclosure form.
+               Method of payment:
+                                                                                                                      ☐ SEE PAGE 2
+               Description of All Other
+               Potential Fees and
+               Charges NOT Included
+               in the Finance Charge
+                                                                                                                      ☐ SEE PAGE 2
+               Description of Collateral
+               Requirements or
+               Security Interests
+                                                                                                                        ☐ SEE PAGE 2
+               Broker Compensation                     Is provider paying compensation       If Yes, amount of compensation
+                                                       directly to a broker?                 being paid directly to broker: $
+                                                            ☐ Yes ☐ No
+               Description of
+               Prepayment Policies
+
+                                                                                                                      ☐ SEE PAGE 2
+
+                        I acknowledge that I have received a copy of this disclosure form.
 
 
-                       _____________________                                       _______________
-                          Signature                                                Date
-
+                                             _____________________                                              _______________
+                                                Signature                                                       Date
+Eff. 10/2022
+
+                                SALES-BASED FINANCING DISCLOSURE FORM - PAGE 2
+               Recipient’s Name:                                        Disclosure Date:
+
+               Recipient’s Address:                                     Provider’s Name:
+
+
+               The information provided below relates to the following checked item(s):
+                  ☐ Variable payment schedule
+                  ☐ Description of the method used to calculate the amount and frequency of each variable payment
+                  ☐ Method of payment
+                  ☐ Description of all other potential fees and charges not included in the finance charge
+                  ☐ Description of collateral requirements or security interests
+                  ☐ Description of prepayment policies
+
+
+
+
+                      I acknowledge that I have received a copy of this disclosure form.
+
+
+                                      _____________________                                       _______________
+                                         Signature                                                Date

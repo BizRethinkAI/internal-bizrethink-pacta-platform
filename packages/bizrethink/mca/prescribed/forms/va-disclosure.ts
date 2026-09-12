@@ -9,8 +9,9 @@ import type { PrescribedForm } from '../types';
  * CA and NY prescribe sentences: exact words, in closed rows, which the checker
  * pins character by character. Virginia prescribes a *form* — a fixed set of
  * labelled fields in a fixed order, with the provider's own text in the answers.
- * There is almost nothing to quote. What can be checked is that every prescribed
- * label is present, spelled as the Commonwealth spells it, and in order.
+ * The fixed labels include bracketed formulas and a payment-range instruction.
+ * They can be checked literally; the recipient-specific answers remain outside
+ * that text check. The complete official PDF is retained for layout inspection.
  *
  * That is a weaker check, and it is the check the regulation actually supports.
  * Writing a `verbatim` for these rows would be inventing an obligation Virginia
@@ -25,16 +26,15 @@ import type { PrescribedForm } from '../types';
  * §6.2-2239/§6.2-2240 belong to an unrelated chapter on virtual currency kiosk
  * operators.
  *
- * TWO THINGS THE CODE STILL DOES NOT GIVE US. It never defines "finance
- * charge", where Conn. Gen. Stat. §36a-861(3) does by reference to 12 CFR
- * 1026.4 — so the figure in that row rests on a reading nobody has written
- * down. And §6.2-2231(7)(a) requires items 1-6 to be RE-disclosed as of the day
- * of any prepayment or refinance, which is an event-triggered obligation no
- * blank form can carry.
+ * The implementing definition in 10VAC5-240-10 includes Regulation Z finance
+ * charges; the Code alone was not the complete authority. The current rules
+ * are retained in `sources/VA-10VAC5-240.txt`. Section 240-30 governs completion,
+ * page-two use, unmodified format, signatures and updated disclosures at early
+ * payoff/refinance. A row-text check does not enforce those workflow duties.
  */
 export const VA_DISCLOSURE: PrescribedForm = {
   slug: 'va-disclosure',
-  citation: 'Va. sales-based financing disclosure form',
+  citation: 'Virginia SCC Sales-Based Financing Disclosure Form (Eff. 10/2022); 10VAC5-240-30',
   sourceFile: 'VA-Disclosure-Form.txt',
   jurisdiction: 'US-VA',
   // Read out of the Code: chapter 22.1 is "Sales-Based Financing Providers" and
@@ -44,30 +44,44 @@ export const VA_DISCLOSURE: PrescribedForm = {
   status: 'published',
   source: {
     kind: 'regulator-prescribed-form',
-    citation: 'Va. sales-based financing disclosure form',
+    citation: 'Virginia SCC Sales-Based Financing Disclosure Form (Eff. 10/2022); 10VAC5-240-30',
     sourceFile: 'VA-Disclosure-Form.txt',
-    verbatimVerifiedAt: '2026-09-06',
-    structureVerifiedAt: '2026-09-06',
+    verbatimVerifiedAt: '2026-09-12',
+    structureVerifiedAt: '2026-09-12',
   },
-  // Digest re-computed 2026-09-07 after a vendoring header was added to the
-  // source file recording where it came from. The STATUTORY TEXT is byte-identical;
-  // only the header above it changed, so `verbatimVerifiedAt` stands rather than
-  // being re-stamped. Saying that out loud because "the digest broke, I updated
-  // it" is exactly the move this mechanism exists to make someone justify.
-  sourceDigest: 'f8efa84abd2db5bbe82e50bae3695e29d2db608c359df09adb264b48a35e3a93',
+  // Replaced the mismatched local form with the independently captured official
+  // October 2022 form; both PDF pages and extractions were re-read 2026-09-12.
+  // This is a different document, not a header-only digest refresh. The old
+  // rendered specimen remains unchanged and must fail its four label checks.
+  sourceDigest: '2994065ce53189a1726e34dfeee0ed943d61db3684a87073ad989a75775227ea',
   // The file is the form itself.
   section: null,
   structureEvidence: 'source-order',
-  // Virginia's first column carries the label plus tick-boxes and, under
-  // several labels, the printed formula. See `labelMatch` in types.ts.
-  labelMatch: 'contains',
+  // The official label cells are fixed text, including the formulas/instruction.
+  labelMatch: 'exact',
   rows: [
-    { label: 'Total Amount Financed', verbatim: null, onlyPrescribedContent: false },
+    { label: 'Total Amount of the Sales-Based Financing', verbatim: null, onlyPrescribedContent: false },
     { label: 'Fees Deducted or Withheld at Disbursement', verbatim: null, onlyPrescribedContent: false },
-    { label: 'Disbursement Amount', verbatim: null, onlyPrescribedContent: false },
+    {
+      label: 'Disbursement Amount',
+      labelSuffix: '[Total Amount of the Sales-Based Financing minus (-) Fees Deducted or Withheld at Disbursement]',
+      verbatim: null,
+      onlyPrescribedContent: false,
+    },
     { label: 'Finance Charge', verbatim: null, onlyPrescribedContent: false },
-    { label: 'Total Repayment Amount', verbatim: null, onlyPrescribedContent: false },
-    { label: 'Estimated Number of Payments', verbatim: null, onlyPrescribedContent: false },
+    {
+      label: 'Total Repayment Amount',
+      labelSuffix: '[Disbursement Amount plus (+) Finance Charge]',
+      verbatim: null,
+      onlyPrescribedContent: false,
+    },
+    {
+      label: 'Estimated Number of Payments',
+      labelSuffix:
+        '[Number of payments expected, based on the projected sales volume, to equal the Total Repayment Amount] A reasonable range may be provided ONLY for transactions with a variable payment schedule.',
+      verbatim: null,
+      onlyPrescribedContent: false,
+    },
     { label: 'Payment Schedule', verbatim: null, onlyPrescribedContent: false },
     {
       label: 'Description of All Other Potential Fees and Charges NOT Included in the Finance Charge',
