@@ -23,9 +23,9 @@ const storedCitation = /\bSections?\s+(?:\d+|[A-Z])(?:\.\d+)*(?![\w-]|\.\d)/i;
 
 describe('numbering belongs to a selected MCA document (ADR 0011)', () => {
   it('stores no printed number anywhere in the corpus', () => {
-    expect(ALL_MCA_CLAUSES.filter((clause) => Object.hasOwn(clause, 'number')).map((clause) => clause.slug)).toEqual(
-      [],
-    );
+    expect(
+      ALL_MCA_CLAUSES.filter((clause) => Reflect.ownKeys(clause).includes('number')).map((clause) => clause.slug),
+    ).toEqual([]);
   });
 
   it('stores internal cross-references by identity and still detects the original broken spellings', () => {
