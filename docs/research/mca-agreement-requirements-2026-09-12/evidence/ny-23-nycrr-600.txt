@@ -1,0 +1,980 @@
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0112366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0112366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:43.262286+00:00
+RESPONSE SHA256: 2377f3f858efde595619367353afe3654a8c2ec53732effdee5dcb6b32a77c0d
+
+600.0 Introduction.
+(a) Financial Services Law sections 801, 802, 803, 804, 805, 806, 807, 808, 809, 810, and 811 (defined in section 600.1[l] as the Commercial Finance Disclosure Law [CFDL]) require providers of commercial financing that are subject to the CFDL to provide disclosures to potential recipients of commercial financing, at the time a specific offer of financing is extended to a recipient.
+(b) Pursuant to the CFDL, the superintendent has the power to promulgate regulations that:
+(1) include in the definition of finance charge set forth in Financial Services Law section 801(e) “any charges as determined by the superintendent”;
+(2) prescribe the formatting of sales-based financing disclosure requirements, pursuant to Financial Services Law section 803;
+(3) prescribe a review process under which providers utilizing the opt-in method of calculating estimated annual percentage rate (APR) report data to the superintendent of estimated annual percentage rates disclosed to the recipient and actual retrospective annual percentage rates of completed transactions, pursuant to Financial Services Law section 803(c)(ii); and also:
+(i) prescribe the information to be contained in such report as necessary or appropriate for the purpose of making a determination of whether the deviation between the estimated annual percentage rate and actual retrospective annual percentage rates of completed transactions was reasonable; and
+(ii) establish a method of such reporting;
+(4) prescribe the formatting of closed-end financing disclosure requirements pursuant to Financial Services Law section 804;
+(5) prescribe the formatting of open-end commercial financing disclosure requirements pursuant to Financial Services Law section 805;
+(6) prescribe the formatting of factoring transaction disclosure requirements pursuant to Financial Services Law section 806;
+(7) require disclosure by a provider extending a specific offer of commercial financing that is not open-end financing, closed-end financing, sales-based financing, or factoring transaction but otherwise meets the definition of commercial financing, and prescribe the formatting of such disclosures, pursuant to Financial Services Law section 807; and
+(8) pursuant to Financial Services Law section 811, promulgate any other rules and regulations as may be consistent with the purposes of the CFDL, or appropriate for the effective administration of the CFDL, including such rules and regulations:
+(i) in connection with the calculation or determination of any metric required to be disclosed to a recipient;
+(ii) as necessary to develop and prescribe disclosure formatting to be used by providers that allows for recipients to easily compare financing options in a clear and conspicuous manner;
+(iii) as may define the terms used in the CFDL and as may be necessary and appropriate to interpret and implement the provisions of the CFDL; and
+(iv) as may be necessary for the enforcement of the CFDL.
+23 CRR-NY 600.0
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0115366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0115366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:43.159749+00:00
+RESPONSE SHA256: 613fbe7f93a0d4bf2e8b28d7045aa741200343af94ee6624f7994ba4850c0b55
+
+600.1 Definitions.
+For purposes of this Part, the following definitions apply:
+(a) Amount financed means, with respect to:
+(1) sales-based financing, the amount of funds to be provided by the financer to the recipient or on the recipient’s behalf, minus any prepaid finance charge;
+(2) a closed-end financing, the principal amount, plus any other amounts that are financed by the financer and are not part of the finance charge, minus any prepaid finance charge;
+(3) a commercial open-end financing, the approved credit limit, minus any prepaid finance charge;
+(4) a factoring transaction disclosure made pursuant to Financial Services Law section 806, the receivables purchase price, minus any prepaid finance charge;
+(5) an asset-based lending transaction, the approved credit limit; and
+(6) a lease financing transaction, if the financer:
+(i) does not select, manufacture or supply the goods to be leased, the net cost to the financer to acquire the property to be leased, including any related costs and charges financed as a part of such transaction, which may include installation charges, delivery costs, software license fees, sales and use taxes, minus any prepaid finance charge; or
+(ii) selects, manufactures or supplies the goods to be leased, the price that the financer would sell the goods in a cash transaction, including any related costs and charges financed as a part of such transaction, which may include installation charges, delivery costs, software license fees, sales and use taxes, minus any prepaid finance charge and any down payment or other deposit to be paid by the recipient.
+(iii) In either case, if the recipient is approved for a lease financing in a stated dollar amount that may be funded over multiple leases or lease schedules, then the aggregate net cost or price for the goods under such approval may be used to determine the amount financed.
+(b) An individual commercial financing transaction in an amount over $2,500,000, as such term appears in Financial Services Law section 802(g), means the aggregate amount that a recipient may receive under a commercial financing agreement and not the amount of any particular advance under such agreement.
+(c) Approved advance limit means the maximum advance that a financer may provide to a recipient or on the recipient’s behalf in exchange for assignment of outstanding, unpaid legally enforceable claims under a factoring agreement, not including any previous distributions advanced to a recipient or on the recipient’s behalf under a factoring agreement, to the extent those distributions have been repaid. The approved advance limit does not include reserve amounts or any other amount not advanced to the recipient at the time of assignment. If a factoring agreement provides that the financer pays different maximum advances for different types of legally enforceable claims, then approved advance limit means the total maximum advance that a financer may provide to a recipient or on a recipient’s behalf in exchange for assignment of the different types of legally enforceable claims, not including any previous distributions advanced to a recipient or on the recipient’s behalf under the agreement, to the extent those distributions have been repaid.
+(d) Approved credit limit means the maximum advance that a financer may provide to a recipient or on the recipient’s behalf under the open-end commercial financing agreement, a lease financing agreement, or asset-based lending transaction agreement, not including any previous distributions advanced to a recipient or on a recipient’s behalf under the agreement, to the extent those distributions have been repaid. Where the commercial open-ended financing agreement or asset-based lending transaction agreement requires the financer to pay different maximum advances for different categories of advance (such as advances secured by inventory, accounts receivable, or others), approved credit limit means the total maximum advance that a financer may provide to a recipient for all categories of advance, not including any previous distributions advanced to a recipient or on the recipient’s behalf under the agreement, to the extent those distributions have been repaid.
+(e) Asset-based lending transaction means a transaction in which advances are made from time to time contingent on a recipient forwarding payments (defined in subdivision [s] of this section) received from one or more third parties for goods that the recipient has supplied or services the recipient has rendered to that third party or parties.
+(f) At the time of extending a specific offer for financing under the CFDL means:
+(1) any time a specific commercial financing offer is quoted to a recipient. If a provider simultaneously presents multiple periodic payment amounts, irregular payment amounts, or financing amounts, and rates, prices, or costs of financing (including, without limitation, any total repayment amounts) to the recipient representing differing specific commercial financing offers and allows the recipient to select from among those options, then at the time of extending a specific offer occurs at the time that the recipient selects an option. The requirement of section 810 of the CFDL that “[i]f other metrics of financing cost are disclosed or used in the application process of a commercial financing, these metrics shall not be presented as a ‘rate’ if they are not the annual interest rate or the annual percentage rate” shall apply at all times during the application process.; however, the requirement of section 810 of the CDFL that “[w]hen a provider states a rate of finance charge or a financing amount to a recipient during an application for commercial financing, the provider shall also state the rate as an annual percentage rate, using that term or the abbreviation APR, shall be in effect only upon the quotation of a specific commercial financing offer;
+(2) any time when a specific offer is quoted in writing to a recipient to change the terms of an existing consummated commercial financing contract, prior to the recipient agreeing to the changes, if the resulting changes to the contract would result in an increase to the finance charge or annual percentage rate, regardless of whether those terms were previously disclosed to the recipient (this requirement does not apply to proposed terms for resolving a recipient’s default on a financing contract); or
+(3) notwithstanding paragraphs (1) and (2) of this subdivision, any time a specific offer of commercial financing is quoted to a recipient in writing in connection with each draw on an open-end financing agreement if:
+(i) draws occur at the time that a recipient purchases products or services from a retailer or supplier;
+(ii) the rate or price varies based upon the retailer or supplier the recipient selects, or the products or services the recipient purchases; and
+(iii) the provider chooses to provide disclosures under section 600.10 of this Part rather than a disclosure under section 600.11 of this Part;
+(4) notwithstanding paragraphs (1) through (3) of this subdivision, where a provider allows a recipient to select from multiple offer options or customize a financing offer, a provider must only provide the disclosure(s) for the specific offer of commercial financing that the recipient elects to pursue.
+(g) Average means the arithmetic mean unless otherwise stated in this Part.
+(h) Average monthly cost means the average total amount paid by the recipient (periodic and irregular payments) over the term of the contract, divided by the number of months in the term of the contract. To calculate the number of months in the contract term, a provider may divide the number of days in the contract term by 30.4.
+(i) Benchmark rate means a rate index (such as the prime rate, Wall Street journal prime rate, 1, 3, or 5 year treasury constant maturity, secured overnight financing rate [SOFR], etc.), based upon general market conditions, that is commonly used to calculate the interest rate in adjustable-rate transactions in the credit industry.
+(j) Broker means any person other than a financer, recipient, or recipient’s agent, who, for a fee, commission, or other consideration, participates in any financing negotiation; counsels or advises the recipient about financing options; participates in the preparation of any financing documents, including financing applications; or contacts the financer on behalf of the recipient other than to refer the recipient, gathers financing application documentation or delivers the documentation to the financer; communicates financing decisions or inquiries from the financer to the recipient; or obtains the recipient’s signature on financing documents.
+(k) Closed-end financing, as that term is used in Financial Services Law section 801(d), means a transaction in which credit is extended only once over a specific term, including contracts that include an option in which the recipient may extend the term, and is repaid:
+(1) in regular predetermined payments of a specified amount over a fixed period of time; or
+(2) in the case of sales-based financing, in payments calculated as a percentage of sales or income but with a minimum required payment or payments such that the recipient is eventually required to repay the amount advanced regardless of the sales or income the recipient collects.
+(l) Commercial Finance Disclosure Law (CFDL) means Financial Services Law sections 801, 802, 803, 804, 805, 806, 807, 808, 809, 810, and 811.
+(m) Commercial financing, as defined in Financial Services Law section 801(b) does not include any transaction that is subject to the Truth in Lending Act, 15 U.S.C. section 1601 et seq., for which a disclosure is provided that is compliant with such act.
+(n) During an application process for commercial financing, as that term is used in Financial Services Law section 810, means after the provider has received information about the recipient. Information about the recipient includes information about the recipient that informs the provider’s quote to the recipient, such as the recipient’s financial or credit information, but not the recipient’s name, address, or general interest in financing.
+(o) Draw period means the length of time during which a recipient may make draws under an open-end financing or general factoring or asset-based lending transaction.
+(p) Estimated monthly cost means the estimated average total amount paid by the recipient (periodic and irregular payments) over the estimated term of the contract, divided by the number of months in the estimated term of the contract. To calculate the number of months in the estimated term, a provider may divide the number of days in the estimated contract term by 30.4.
+(q) Financer means the person who provides or will provide the commercial financing to the recipient.
+(r) Financial institution, as defined in Financial Services Law section 801(f), includes any corporation, limited liability company, partnership, joint venture, trust or other entity of which a majority of the voting power of the voting equity securities or equity interest is owned, directly or indirectly, by a financial institution.
+(s) Forwarding payments includes:
+(1) arrangements in which a recipient and financer create an account wherein third party obligors deposit payments;
+(2) arrangements in which a recipient repays advances with the proceeds the recipient collects from the sale or disposition of goods or services financed with such advances; or
+(3) arrangements in which the recipient directs third party obligors to make payments directly to the financer.
+(t) Initial interest rate means, in a credit transaction with an interest rate that changes over time and that cannot be calculated in advance for the entire term of the transaction, the rate that would be in effect at the time a disclosure is made, assuming the recipient accepted the financing offer.
+(u) Interest rate means the periodic rate at which interest accrues on the outstanding principal balance and (if interest is compounded) on accrued but unpaid interest in a commercial financing. The term interest, when used by brokers or providers to describe a percentage rate, shall only be used to describe annualized percentage rates, such as the annual interest rate.
+(v) Irregular payment means any payment made to the financer that is not a periodic payment.
+(w) Lease financing means providing a lease for goods if the lease creates a security interest in the goods leased. Lease financing does not include a lease as defined in Uniform Commercial Code section 2-A-103.
+(x) Margin means, in a commercial financing with an adjustable interest rate, the adjustment amount added to or subtracted from the benchmark rate used to calculate the interest rate.
+(y) Maximum non-interest finance charge means, for:
+(1) all commercial financing except factoring, the maximum amount of the finance charge other than interest accrued and unpaid that a recipient may be required to pay if the recipient chooses to prepay the outstanding balance due under a commercial financing agreement; and
+(2) factoring, the maximum amount of the finance charge, other than interest accrued and unpaid since the time the financer purchased the legally enforceable claim, that the recipient may be required to pay if the recipient repurchases the account receivable before the account receivable is due for payment by the account debtor.
+(z) Particular payment channel or mechanism means, with respect to sales-based financing, the payment channel(s) or mechanism(s) that will be used to determine the amount of a recipient’s payment or a true-up. This may include, for example, income flowing through a deposit account or accounts, or payments received through a recipient’s payment processor.
+(aa) Periodic payment means any payment scheduled to be made to the financer at regular intervals.
+(ab) Person who applies for commercial financing means the expected primary borrower or borrowers on a commercial financing transaction, open-ended financing, or asset-based lending transaction; sellers in accounts receivable purchase transactions, including factoring; and lessees in lease financing transactions.
+(ac) Prepaid finance charge means any finance charge paid separately to the financer in cash, check, or electronic funds transfer before or at consummation of a transaction, or withheld from the proceeds of the financing at any time.
+(ad) Provider has the meaning ascribed in Financial Services Law section 801(h) and includes a financer who communicates a specific offer of commercial financing, either directly to a recipient or to a recipient’s agent or broker, with the expectation that the information will be shared with a recipient.
+(ae) Recipient means, pursuant to Financial Services Law section 801(i), a person who applies for commercial financing and is made a specific offer of commercial financing by a provider. A recipient may also be an authorized representative of such person. A person acting as a broker cannot be a recipient. A recipient, for the purpose of a single specific offer of commercial financing, includes all other recipients that control, are controlled by, or are subject to the common control of the recipient, if all such recipients receive the single offer of commercial financing simultaneously. Simultaneously means that the single offer of commercial financing is conveyed as part of the same writing, conveyed at the same moment, to the potential recipient. A person who is made a specific offer of commercial financing by a provider means the expected primary borrower on a commercial loan, open-ended credit plan, or asset-based lending transaction, seller in accounts receivable purchase transactions (including factoring), and lessee in lease financing transactions.
+(af) Recipient funds means the net amount to be given directly to the recipient in the form of cash, check, or electronic funds transfer to an account the recipient controls. Recipient funds excludes, without limitation, funds paid to third parties (including brokers). Recipient funds also excludes any part of the amount financed used to pay off or pay down other amounts owed by the recipient, if known by the provider at the time the disclosure is provided. For the purpose of calculating recipient funds, where part of the amount financed will be used to pay off other amounts owed by the recipient that may change over time, a provider may assume that the amounts due under the recipient’s other obligations are the amounts due at the time the disclosure is provided.
+(ag) Retrospective annual percentage rate means the actual annual percentage rate, determined after the specific financing contract has been fully repaid to the financer, when the dates and amounts of all payments and fees are known.
+(ah) Sales-based financing has the meaning ascribed in Financial Services Law section 801(j).
+(ai) Specific offer of commercial financing or specific commercial financing offer means a written communication to a recipient, based upon information from, or about, the recipient, of a:
+(1) periodic payment amount, irregular payment amount, or financing amount; and
+(2) any rate, price, or cost of financing (including, without limitation, any total repayment amount), in connection with a commercial financing, which offer, if accepted by a recipient, shall be binding upon a provider. Information about the recipient includes information about the recipient that informs the provider’s quote to the recipient, such as the recipient’s financial or credit information, but not the recipient’s name, address, or general interest in financing.
+(aj) Specified payment amount means the periodic pre-set amount stated in the contract described in paragraph (ap)(1) of this section.
+(ak) Split rate means, with respect to sales-based financing, the percentage used by the financer to calculate the payment amounts to be paid to the financer or true-ups.
+(al) Term means, with respect to:
+(1) disclosures made pursuant to Financial Services Law section 806, the length of time between when the recipient receives payment from the financer for the legally enforceable claim and the date the legally enforceable claim becomes due and payable, or, if such factoring transaction involves the purchase of more than one legally enforceable claim and the dates the legally enforceable claims become due and payable varies, a sample term reasonably estimated to be within the range of the terms expected to be applicable to legally enforceable claims purchased;
+(2) closed-end financing and open-end financing, as those terms are defined in the CFDL, the contracted length of time necessary for the recipient to fulfill its obligations under the financing agreement with respect to a particular financing advance;
+(3) asset-based lending disclosures made in accordance with section 600.15 of this Part, the length of time necessary for the recipient to fulfill its obligations under the financing contract based upon the following assumptions:
+(i) the recipient maintains a balance equal to the approved credit limit by reborrowing up to the approved credit amount for a time equal to the draw period or one year, whichever is less; and
+(ii) at the end of the time equal to the draw period or one year, whichever is less, the financer is repaid according to the terms specified in the contract; and
+(4) for all other types of commercial financing, the length of time that it is anticipated will be necessary for the recipient to fulfill its obligations under a financing agreement.
+(am) Transactions, as that word is used in Financial Services Law section 801(c)(1), means advances of financing.
+(an) True-up means any payment made to a recipient, any charge assessed to a recipient, and any adjustment to a recipient’s periodic payments pursuant to a true-up mechanism.
+(ao) Reasonably anticipated true-up means any true-up that the financing provider has a reasonable basis to expect will be made during the term of the contract, accounting for past performance of similar contracts (both those made to the recipient and other similar recipients) and the policies and procedures of the financer.
+(ap) True-up mechanism means:
+(1) with respect to sales-based financing, a contractual arrangement with all the following elements:
+(i) the financer receives periodic payments based upon a pre-set amount (or amounts) stated in the contract; and
+(ii) the contract allows the recipient to request, or the financer to initiate, adjustments to the payment amount, credits to the recipient, or charges to the recipient after execution of the contract, so that the total amount paid by the recipient more closely reflects a split rate listed in the contract;
+(2) with respect to factoring transactions:
+(i) account debtor means the debtor with the primary obligation to pay the legally enforceable claim assigned by the recipient;
+(ii) purchase price means the amount that the financer agrees to pay the recipient for assignment of a legally enforceable claim;
+(iii) factoring fee means any fee charged by the financer to process the transaction plus the difference between the face value of a legally enforceable claim and the purchase price that the financer agrees to pay the recipient for assignment of that legally enforceable claim;
+(iv) original advance amount means the amount that a financer issues to a recipient or on the recipient’s behalf upon receipt of a legally enforceable claim for payment;
+(v) reserve amount means, in a reserve factoring transaction, the difference between the purchase price for a legally enforceable claim and the original advance amount that is held in reserve to secure the financer in the event of non-payment of the legally enforceable claim, or to secure the financer in the event of non-payment of other legally enforceable claims assigned or to be assigned by the recipient to the financer;
+(vi) reserve factoring transaction means a factoring transaction where, upon receipt of a legally enforceable claim for payment, a financer pays an original advance amount to the recipient that is less than the purchase price and holds the difference between the original advance amount and the purchase price to secure the financer against deficiencies on amounts paid by the account debtor on the legally enforceable claim or other legally enforceable claims assigned or to be assigned by the recipient to the financer.
+23 CRR-NY 600.1
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0118366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0118366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:43.346485+00:00
+RESPONSE SHA256: 9781d30368fec88259ca94305be5da2565e67844859956ace038c3a8339426d3
+
+600.2 Definition of finance charge.
+(a) Finance charge means the cost of financing as a dollar amount and equals the sum of:
+(1) for all commercial financing transactions, all charges that would be included in the finance charge under the Federal Truth in Lending Act, Regulation Z, 12 C.F.R. section 1026.4 (as amended), and only such charges, if the transaction were a consumer credit transaction and the financer were a creditor according to the definition set forth in 15 U.S.C. section 1602(g);
+(2) in any accounts receivable purchase transaction that is not a factoring transaction, the discount taken on the face value of the accounts receivable;
+(3) in a factoring transaction, the difference between the face value on the invoice and the amount paid directly to the recipient upon assignment of the legally enforceable claim to the financer, inclusive of any factoring fee. For the purpose of the calculation described in the preceding sentence, if the transaction involves a reserve amount, the reserve amount shall also be subtracted from the face value on the invoice only if the financer reasonably anticipates that it will return all reserve amounts to the recipient once it has been paid for the legally enforceable claim or claims assigned by the recipient or upon termination of the contractual relationship between the financer and the recipient, properly crediting payments made by account debtors and previous collections by the financer from the recipient, all amounts held in reserve, and payments by insurers on defaulted accounts. In determining what the financer can reasonably anticipate, the financer shall consider past performance of similar contracts (both those made to the recipient and other similar recipients) and the policies and procedures of the financer; and
+(4) in any lease financing transaction, the sum of lease payments (including any regular periodic payments and irregular payments) and price of the purchase option that the lessee may pay to acquire the leased goods at the end of the lease, less the amount financed.
+(b) For products where any part of the finance charge is based upon interest that accrues on the outstanding principal balance owed by the recipient, the interest charge adjusts over time, and it is not possible to calculate the interest charges in advance for the entire term of the transaction because the charge adjusts based upon a benchmark rate plus a margin, the provider shall calculate the interest charges for periods of time when the interest charge cannot be calculated in advance based upon the benchmark rate in effect at the time of disclosure and the margin.
+(c) For the purpose of the calculation required by subdivision (a) of this section, a charge or amount that meets the requirements of paragraphs (a)(1) and (2), paragraph (3) or (4) of this section shall not be counted twice.
+(d) For purposes of the calculation required by subdivision (a) of this section, avoidable fees and charges that are not imposed as an incident to credit are excluded from the finance charge.
+23 CRR-NY 600.2
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf011b366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf011b366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:44.056046+00:00
+RESPONSE SHA256: d1a24cd28acfcaa6a8013148fbe93afb15d3874d257430246917c1dc4db6aa24
+
+600.3 Annual percentage rate disclosure.
+(a) Any provider who extends a specific offer of commercial financing to a recipient shall, at the time of extending the specific offer of commercial financing, disclose to the recipient the annual percentage rate.
+(b) The annual percentage rate is a measure of the cost of credit, expressed as a yearly rate, that relates the amount and timing of value received by the recipient to the amount and timing of payments made to the provider. For purposes of this section, the annual percentage rate shall be determined in accordance with either the United States rule method or the actuarial method, as both are set forth in appendix J, 12 C.F.R. part 1026 (as amended). When a provider states a rate of finance charge or a financing amount to a recipient during an application process for commercial financing and after the quotation of a specific commercial financing offer, the provider shall also state the rate as an “annual percentage rate”, using that term or the abbreviation “APR”.
+(c) The annual percentage rate calculation shall include all finance charges.
+(d) When calculating the required disclosures for commercial open-end financing, the provider shall assume that the recipient borrows the approved credit limit at origination and makes no subsequent draws and that minimum on-time payments are made pursuant to the contract.
+23 CRR-NY 600.3
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf011e366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf011e366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:45.146474+00:00
+RESPONSE SHA256: be0ae510d1118dd0d6e27a4712bf2068f085ff9f30f5ae3b6cec357e864957d3
+
+600.4 Allowed tolerances.
+(a) An annual percentage rate disclosed pursuant to section 600.3 of this Part shall be considered accurate if:
+(1) it is not more than one-eighth of one percentage point above or below the annual percentage rate determined in accordance with section 600.3(b) of this Part; or
+(2) in an irregular transaction, it is not more than one-fourth of one percentage point above or below the annual percentage rate determined in accordance with section 600.3(b) of this Part. For purposes of this paragraph, an irregular transaction is one that includes one or more of the following features: multiple advances, irregular payment periods, or irregular payment amounts (other than an irregular first period or an irregular first or final payment); or
+(3) the percentage difference between the annual percentage rate determined in accordance with section 600.3(b) of this Part and the annual percentage rate disclosed pursuant to section 600.3(a) of this Part is 2.5 percent or less. The percentage difference shall be calculated as follows: The annual percentage rate disclosed pursuant to section 600.3(a) of this Part shall be subtracted from the annual percentage rate determined in accordance with section 600.3(b) of this Part, and the resulting difference shall be divided by rate disclosed pursuant to section 600.3(a) of this Part and multiplied by 100.
+(b) A provider and financer shall have no liability under this section for any bona fide error in a disclosure to a recipient that does not comply with this section, if within 60 days after discovering the error through the provider’s or financer’s own procedures, and prior to the institution of an action against the provider or financer for such error, the financer or its assignee notifies the recipient of the error and makes whatever adjustments in the appropriate account are necessary to assure that the recipient will not be required to pay an amount in excess of the finance charge actually disclosed, or the dollar equivalent of the annual percentage rate actually disclosed, whichever is lower.
+(c) A provider or financer shall have no liability for inadvertently disclosing a finance charge, annual percentage rate, periodic payment or irregular payment, average monthly cost, maximum non-interest finance charge, or prepayment fee or charge that exceeds the amount that the provider is required to disclose under this section.
+23 CRR-NY 600.4
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0121366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0121366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:45.505077+00:00
+RESPONSE SHA256: bcdb004241dc81ec557f3f4605502907002ee0ae74d37d0eefb495c2b6fc4ada
+
+600.5 General formatting requirements and contents.
+Disclosures provided in accordance with the CFDL shall comply with the requirements of this section.
+(a) At the top of the disclosure, centered on the page or other display medium, the provider shall print “OFFER SUMMARY” in bold font, followed by a one-to-five-word description of the type of product offered (e.g. “Merchant Cash Advance”), which may include the financer’s branding terminology.
+(b) For any disclosure required to comply with section 600.18(a) of this Part, at the bottom of the disclosure, below any other information required by the CFDL, the provider shall print the following statement: “Applicable law requires this information to be provided to you to help you make an informed decision. By signing below, you are confirming that you received this information.” Below the statement, the provider shall include a space for the recipient to sign the form labeled “Recipient Signature” and a space for the recipient to write the date of the recipient’s signature, labeled “Date.” In the case of electronically transmitted disclosures, such statement may be placed below the attachment or link to the disclosures and shall direct the recipient to the space for signature. A recipient may sign the disclosure with a physical signature or a digital signature. A digital signature may be affixed by the recipient by any means that is compliant with the New York Electronic Signatures and Records Act, State Technology Law sections 103-109 (“ESRA”), including an “Accept” button or checking a digital box acknowledging agreement, provided the financer provides to the recipient the date stamp and receipt required by subdivision (j) of this section. For any disclosure not required to comply with section 600.18(a) of this Part, at the bottom of the disclosure, below any other information required by this Part, the provider shall print the following statement: “Applicable law requires this information to be provided to you to help you make an informed decision.”
+(c) If the term or estimated term of a transaction is:
+(1) one year or less, the term or estimated term shall be disclosed in days, starting with the day after the transaction is consummated and including the day of the final payment; or
+(2) greater than one year, the term or estimated term shall be disclosed in units of years and months, with any remaining days expressed as a portion of a month to the nearest two decimal points.
+(d) The annual percentage rate shall be expressed to the nearest two decimal points. For example: “10.45%.”.
+(e) The disclosures shall be presented to the recipient as a separate document from any other contract, agreement, or other disclosure document provided to the recipient, but may be mailed or transmitted in a package that contains other documents. In the case of electronically transmitted disclosures, a separate document may appear in the same attachment or link, but shall be separated by page breaks from other documents.
+(f) Fonts.
+(1) The provider may present the required disclosure in fonts and colors that are clear, complete, conspicuous, easy to compare with other disclosures, and consistent with the requirements of this Part.
+(2) A provider shall use fonts for the disclosures substantially similar in size to:
+(i) Times New Roman 12-point to 14-point font, for information appearing in the first and second columns where those columns are not combined with other columns;
+(ii) Times New Roman 10-point to 12-point font, for information appearing in the third column, information appearing in cells where the second and third columns are combined, and information appearing in cells where the first, second, and third columns are combined; and
+(iii) Times New Roman 16-point font for the content required by subdivision (a) of this section.
+(3) Notwithstanding paragraph (2) of this subdivision, a provider may use a font substantially similar in size to Times New Roman 16-point font for “OFFER SUMMARY FOR” and content appearing in the first and second columns of the disclosure where those columns are not combined with other columns.
+(4) A provider may deviate from the font requirements described in paragraphs (g)(2) and (3) of this section if the provider makes a good faith determination that deviating from the standards is necessary:
+(i) to comply with the Americans with Disabilities Act (42 U.S.C. section 12101 et seq.); or
+(ii) for clarity based upon the medium (e.g. mobile device) in which the disclosure will be presented.
+(g) A provider shall ensure that the width of the columns in the required disclosure is such that the disclosure does not unnecessarily extend onto multiple pages. A provider that formats the columns in the required disclosure such that the ratio between the first, second and third columns is 3:3:7 complies with the requirements of this section.
+(h) Where a provider is required or permitted to provide a short explanation under this section, the provider shall provide an explanation of not more than 60 words.
+(i) Each of the cells in the required disclosures shall be outlined.
+(j) If disclosures are provided to a recipient electronically, then to comply with subdivision (b) of this section the provider shall include a method for the recipient to submit an electronic signature that complies with ERSA, receive an automatic date stamp upon submission of such signature, and obtain a copy of the signed disclosure in a format that the recipient may save indefinitely for future reference. A format that the recipient may save indefinitely includes hard copy disclosures, and electronic documents containing the required disclosures that the customer can save indefinitely for future reference.
+(k) Except with respect to sales-based financing, if a provider must make estimates or assumptions to provide any disclosure required by this section, then the provider shall:
+(1) base those estimates or assumptions on the best information reasonably available to the provider at the time of the disclosure;
+(2) state clearly that any disclosure based upon an estimate or assumption is an “estimate” by adding the word “estimate” to the descriptive language of any required disclosure under this section; and
+(3) state clearly any assumptions or estimates used as the basis for the disclosure in any explanation or description associated with the disclosure (even if such statement of assumptions or estimates requires the addition of an additional row in the applicable table prescribed by this Part).
+(l) When making the disclosures required by this section, for transactions where the applicable interest rate adjusts over time and the interest rate applicable for the entire term of the transaction cannot be calculated in advance, the provider shall assume that the applicable interest rate is the initial interest rate for any period of time when the interest rate cannot be calculated in advance.
+(m) Numerical values, including but not limited to percentages, dates, and dollar amounts, shall be expressed numerically, (e.g., 23), and not alphabetically, (e.g., twenty-three).
+(n) If a provider issues a disclosure where the amount financed includes funds used to pay down or pay off other amounts owed by the recipient that may change over time, and the amount due in connection with those amounts owed changes prior to consummation of the agreement between the financer and the recipient, the provider need not provide a new disclosure to the recipient solely because the amount due in connection with those amounts owed has changed.
+(o) A provider may disregard the effects of the following in making calculations and disclosures:
+(1) that payments must be collected in whole cents;
+(2) that dates of scheduled payments and advances may be changed because the scheduled date is not a business day;
+(3) that months have different numbers of days; and
+(4) the occurrence of leap years.
+(p) Notwithstanding paragraph (o)(1) of this section, any dollar amount disclosed to a recipient shall not be disclosed using fractions of a cent (e.g. “$4.025” or “$4.02 and ½ cents.”)
+23 CRR-NY 600.5
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0124366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0124366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:45.460796+00:00
+RESPONSE SHA256: de33a8b0a30944615fd4bd76497bb02556ce4a21c81031a144d19765beafad88
+
+600.6 Sales-based financing disclosure formatting and contents.
+Disclosures for all sales-based financing provided in accordance with Financial Services Law section 803, except for asset-based lending that meets the definition of sales-based financing, shall comply with the requirements of this section.
+(a) The provider shall present the required disclosures in a table consisting of 10 rows and 3 columns.
+(b) The first row of the table shall include only the following information:
+(1) in the first column, the following language: “Funding Provided.”;
+(2) in the second column, the amount financed; and
+(3) in the third column, in the order listed and in one paragraph:
+(i) “This is how much funding [name of financer] will provide.”
+(ii) If the amount financed is greater than the recipient funds: “Due to deductions or payments to others, the total funds that will be provided to you directly is [recipient funds]. For more information on the amounts that will be deducted, please review the attached document ‘Itemization of Amount Financed.’”;
+(iii) If any portion of the amount financed will be used to pay down or pay off other amounts owed by the recipient that may change over time, and the amounts owed are known to the provider, the provider shall include a short explanation that the amount paid directly to the recipient may change if the amount owed for the recipient’s other obligations changes.
+(iv) If, as a condition of financing, a recipient’s amounts owed to third parties must be paid down or paid off using funds from the amount financed, and the amount is not known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change based upon the required disbursements to satisfy other obligations.
+(v) If any portion of the amount financed will be used to satisfy obligations under another financing with the provider, in the third column, in a second paragraph: “Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? [Yes, enter amount]. If the amount is zero, the answer would be “No.” If the financing being satisfied featured a fixed finance fee that did not vary based on the repayment period, the provider shall consider the amount that is used to pay unpaid finance charges or fees to be the pro rata portion of such finance fee based upon the fraction of the original total amount financed of the previous financing already repaid by the recipient.
+(c) The second row of the table shall include only the following information:
+(1) in the first column, the following language: “Estimated Annual Percentage Rate (APR)”;
+(2) in the second column, the annual percentage rate calculated in accordance with section 600.3 of this Part;
+(3) in the third column, the following language: “APR is the estimated cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, finance charges you pay, and the periodic payments you make. This calculation assumes your estimated average monthly income through [description of particular payment channel or mechanism] will be [average monthly income estimate determined in accordance with 23 NYCRR section 600.8 or 600.9 ]. Since your actual income may vary from our estimate, your effective APR may also vary.”; and
+(4) if no part of the finance charge is based upon an interest rate, the following language in addition to the language required by paragraph (3) of this subdivision: “APR is not an interest rate. The cost of this financing is based upon fees charged by [financer] rather than interest that accrues over time.”
+(d) The third row of the table shall include only the following information:
+(1) in the first column, the following language: “Finance Charge”;
+(2) in the second column, the finance charge calculated in accordance with section 600.2 of this Part; and
+(3) in the third column, the following language: “This is the dollar cost of your financing.” In addition, if the finance charge will not increase under any circumstance if repayment takes longer than estimated, the provider may include the following statement: “Your finance charge will not increase if you take longer to pay off what you owe.”
+(e) The fourth row of the table shall include only the following information:
+(1) in the first column: “Estimated Total Payment Amount”;
+(2) in the second column: The total dollar amount of estimated payments the recipient will make during the term of the contract; and
+(3) in the third column: “This is the total dollar amount of payments we estimate you will make under the contract.”
+(f) The fifth row of the table shall include only the following information:
+(1) in the first column, the following language: “Estimated Payment”; and
+(2) the second and third columns shall be combined, and contain the following information:
+(i) the average amount of estimated periodic payments calculated in accordance with section 600.7 of this Part, followed by a forward slash (/) and the frequency of periodic payments;
+(ii) the date and amount of any irregular payments listed in chronological order;
+(iii) the date and amount of any reasonably anticipated true-ups; and
+(iv) if necessary, a short explanation of why the estimated payments may differ from the actual obligations of the recipient.
+(g) The sixth row of the table shall include only the following information:
+(1) in the first column, the following language: “Payment Terms”; and
+(2) the second and third columns shall be combined, and contain the following information:
+(i) if the contract provides for daily periodic payments, a short explanation of when daily payments will be required (e.g., on weekdays or every calendar day);
+(ii) if applicable, a short explanation of how the financer will use the split rate to calculate the recipient’s required payments and/or that the financing does not have a fixed payment schedule or minimum payments (e.g., “Each business day, your credit card processer will remit 15% of your gross receipts to us and send any remaining amounts to you. This financing does not have a fixed payment schedule and there is no minimum payment amount.”); and
+(iii) if the contract contains a true-up mechanism, a short explanation of:
+(a) how the provider calculated the pre-set periodic payment(s) described in section 600.1(ap)(1) of this Part. For example: “We based your preset daily payment of $75 upon our estimate of 15% of your total income, based upon average monthly income of $15,000 for the last three months.”;
+(b) the true-up mechanism, and a reference to the part of the contract that describes the terms of the true-up mechanism, if available. For example: “You have the right to receive refunds of all or part of your payments if you demonstrate that your payments have exceeded 15% of your total income during any given month. For more details on your rights, see paragraph 5 of your contract.”; and
+(c) any minimum payment terms under the contract. For example: “You must pay us a minimum of $2,000 per month under the contract.”
+(h) The seventh row of the table shall include only the following information:
+(1) in the first column, the following language: “Estimated Term”;
+(2) in the second column, the estimated term of the transaction, calculated in accordance with section 600.7 of this Part; and
+(3) in the third column, a short explanation stating that the estimated term is based upon assumptions about the recipient’s income (e.g., “This is our estimate of how long it will take to collect amounts due to us under the contract based upon the assumption that you will receive $6,000 in monthly income through your account.”).
+(i) In the first column, the eighth and ninth rows shall be combined and shall include the following language: “Prepayment.”
+(j) In the eighth row, the second and third columns shall be combined and shall include only the following information:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay finance charges other than interest accrued and unpaid, the following statement, “If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $[maximum non-interest finance charge] based upon our estimates.”; and
+(2) in all other cases, the following statement: “If you pay off the financing faster than required, you will not be required to pay any portion of the finance charge other than unpaid interest accrued.”
+(k) In the ninth row, the second and third columns shall be combined and shall include only the following information:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay additional fees and charges not included in the finance charge relating to the prepayment, the following statement: “If you pay off the financing faster than required, you must pay additional fees of [amount and description of fees].”; and
+(2) in all other cases, the following statement: “If you pay off the financing faster than required, you will not be required to pay additional fees.”
+(l) The 10th row of the table shall include only the following information:
+(1) in the first column, the following language: “Collateral Requirements”;
+(2) the second and third columns shall be combined and shall include only a description of the collateral requirements or security interests of the transaction, if any.
+(m) If the contract provides for periodic payments that are not monthly, the provider shall insert one additional row below the fourth row, and the additional row shall include only the following information:
+(1) in the first column, the following language: “Estimated Monthly Cost”;
+(2) in the second column, the estimated monthly cost that the recipient will pay over the term of the transaction calculated in accordance with section 600.7 of this Part. If the provider anticipates that the estimated monthly cost will vary over the term of the transaction, either due to changes in the recipient’s income through the particular payment channel, a change in the split rate, or some other reason provided for in the contract, the provider shall list the estimated monthly costs and the time periods when those estimates apply (e.g., months 1-2: $600/month; months 3-6: $1200/month; month 7: $1000/month); and
+(3) in the third column, a short explanation of how the provider calculated the estimated monthly cost (e.g., “Although you do not make payments on a monthly basis, this is our calculation of your average monthly cost based upon the payment amounts disclosed below.”).
+23 CRR-NY 600.6
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0127366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0127366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:45.700754+00:00
+RESPONSE SHA256: b17808f2d679ac183a1f76558e09ff90ffaf200b1e3671420e2985b1d476f6eb
+
+600.7 Sales-based financing – estimated annual percentage rate.
+(a) When calculating the estimated payments and reasonably anticipated true-ups for sales-based financing, a provider shall use the estimated monthly sales, income or receipts projection described in section 600.8(b) of this Part or the internal estimated sales projection described in section 600.9(a)(3) of this Part, accounting for:
+(1) specified payment amounts;
+(2) changes to the split rate over time;
+(3) contractual provisions requiring a minimum payment amount;
+(4) payments required when the recipient’s timely payment or series of payments falls below a contracted threshold, exclusive of fees incurred as a result of default; and
+(5) any other finance charges that may be reasonably anticipated based upon the estimated monthly sales projection or the provider’s internal estimated sales projection.
+(b) When calculating estimated monthly cost, finance charge, term, and annual percentage rate for the sales-based financing, a provider shall use the estimated monthly, income or receipts sales projection described in section 600.8(b) of this Part, or internal estimated sales projection described in section 600.9(a)(3) of this Part, accounting for the following:
+(1) specified payment amounts;
+(2) changes to the split rate over time;
+(3) contractual provisions requiring a minimum payment amount;
+(4) payments required when the recipient’s timely payment or series of payments falls below a contracted threshold, exclusive of fees incurred as a result of default;
+(5) reasonably anticipated true-ups; and
+(6) any other finance charges that may be reasonably anticipated based upon the estimated monthly sales projection.
+23 CRR-NY 600.7
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf012a366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf012a366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:45.566791+00:00
+RESPONSE SHA256: 8e13c096ef4aeb1f0a9118cac10a10067696383ac0398606ecca441c75d3da69
+
+600.8 Sales-based financing – historical method.
+(a) This section shall apply only to sales-based financing utilizing the historical method as described in Financial Services Law section 803.
+(b) With respect to any assumptions about a recipient’s future monthly sales necessary to calculate the disclosures required by this Part, a provider shall use the estimated monthly sales projection described below:
+(1) the estimated monthly sales projection shall be calculated as the recipient’s historical average of:
+(i) the monthly sales, income or receipts volume received through the particular payment channel or mechanism; and
+(ii) the monthly sales received through any other payment channel or mechanism that the financing contract would have required recipients to redirect to the particular payment channel or mechanism had the financing contract been operative previously;
+(2) for all transactions, or by recipient industry or financing amount (or both), a provider shall fix the historical time period used to calculate the average historical sales, income, or receipts and use such period for all disclosure purposes for all sales-based financing products offered. The fixed historical time period shall either be the preceding time period from the specific offer or, alternatively, the provider may use average sales for the same number of months with the highest sales volume within the past 12 months. The fixed historical time period shall be no less than 4 months and no more than 12 months;
+(3) when a recipient has not been in operation for 12 months, the provider may calculate the recipient’s historical average sales volume, income, or receipts using an average from the months the recipient has been in operation;
+(4) a provider may exclude from the average calculation required by paragraph (1) of this subdivision:
+(i) the monthly sales from any month that is less than the average monthly sales of the months required to be considered under paragraphs (2) and (3) of this subdivision if the provider determines that the decreased monthly sales in that month arose from a cause that is unlikely to recur (such as a natural disaster or uncommon business interruption) during performance of the contract. A provider shall have no liability if it declines to make this optional exclusion;
+(ii) the monthly sales from any month for which the recipient has failed to provide documentation of average monthly sales following the provider’s request; and
+(iii) the monthly sales from any number of months at the beginning of the period (starting with the oldest month) set by the provider under paragraph (2) of this subdivision, if the provider does not require and receive monthly sales documentation from those months from the recipient;
+(5) in addition to the months considered pursuant to paragraph (2) of this subdivision, a provider may include in its average calculation all or none of the additional months for which the recipient has provided sales documentation, excluding any months in which the recipient was not in operation; and
+(6) when a provider fixes the number of months it will consider pursuant to paragraph (2) or (3) of this subdivision, the provider shall record this decision in an internal document that includes the effective date of the provider’s decision. If the provider modifies the months fixed pursuant to paragraph (2) or (3) of this subdivision, the provider shall create a new version of the document required by section 600.6 of this Part. The provider shall maintain a copy of every version of the document while it is in effect and for a period of four years thereafter.
+(c) If a provider must make additional estimates or assumptions other than a recipient’s estimated monthly sales projection to provide disclosures required by this Part, the provider shall:
+(1) base those estimates or assumptions on the best information reasonably available to the provider at the time of the disclosure;
+(2) state clearly that any disclosure based upon an estimate or assumption is an “estimate” by adding the word “estimate” to the descriptive language of any required disclosure under this Part; and
+(3) state clearly any assumptions or estimates used as the basis for the disclosure in any description associated with the disclosure.
+23 CRR-NY 600.8
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf012d366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf012d366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:46.351021+00:00
+RESPONSE SHA256: cc6dc5419bba32d3133839acdf0d1a66331919e704d30ed2b7bbe7c71404fa21
+
+600.9 Sales-based financing – opt-in method.
+(a) This section shall apply only to sales-based financing utilizing the opt-in method as described in Financial Services Law section 803.
+(b) With respect to any assumptions about a recipient’s future sales, income or receipts, and as an alternative to the methods described in section 600.8 of this Part for calculating disclosures required by this Part, a provider may elect to calculate the required disclosures in accordance with this section.
+(c) A provider shall calculate the disclosures using an internal estimated sales projection through the particular payment channel or mechanism designated in the contract.
+(d) The internal estimated sales projection through the particular payment channel or mechanism shall be calculated using the best information reasonably available to the provider.
+(e) Once every 12 months, a provider who makes disclosures based upon internal estimated sales projections shall conduct an internal audit of its commercial financings. The audit shall cover all sales-based financings paid off during the previous 12-month period where the provider made disclosures based upon internal estimated sales projections, including transactions with contractually required true-up payments, but excluding transactions where:
+(1) the provider or financer initiated legal action against the recipient in court or arbitration for breach of the contract or to collect amounts due under the contract;
+(2) the provider or financer stopped collection of amounts due under a contract after determining that the recipient had violated the terms of the contract; or
+(3) the provider modified the contract terms pursuant to an agreement with a recipient.
+(f) The provider shall calculate the retrospective annual percentage rate for each sales-based financing in the audit. With respect to financing where a lump sum payment is used to pay off the financing faster than required by the contract, a provider may calculate the retrospective annual percentage rate by ignoring the lump sum payment and assuming that the contract would have been repaid in periodic payments that are an average of the past periodic payments under the contract.
+(g) The provider shall calculate the percentage of the difference between the disclosed annual percentage rate and the retrospective annual percentage rate for each sales-based financing in the audit. The provider shall subtract the disclosed annual percentage rate from the retrospective annual percentage rate for each sales-based financing in the audit, divide the resulting amount by the disclosed annual percentage rate, and multiply that number by 100. The percentage resulting from this calculation shall be called the “APR spread.”
+(h) The provider shall find the median APR spread for all sales-based financings in the audit. The median shall be called the “audited APR spread.”
+(i) After completing its audit, the provider shall calculate the weighted average of the audited APR spreads for the last three audits, the last five audits, and the last seven audits using the total number of transactions used to calculate the audited APR spreads for each audit period. A provider is not required to calculate a weighted average for the last three audits if the provider has not conducted three audits, the weighted average for the last five audits if the provider has not conducted five audits, or the weighted average for the last seven audits if the provider has not conducted seven audits.
+(1) If the weighted average for the last three audits is greater than 15 percent, the provider shall not utilize the method described in this subdivision to calculate the required disclosure terms for 24 months, but shall instead employ the methods described in section 600.8 of this Part unless the provider determines that the method described in section 600.8 of this Part would have yielded a higher weighted average.
+(2) If the weighted average for the last five audits is greater than 10 percent, the provider shall not utilize the method described in this subdivision to calculate the required disclosure terms for 24 months, but shall instead employ the method described in section 600.8 of this Part unless the provider determines that the method described in section 600.8 of this Part would have yielded a higher weighted average.
+(3) If the weighted average for the last seven audits is greater than five percent, the provider shall not utilize the method described in this subdivision to calculate the required disclosure terms for 24 months, but shall instead employ the method described in section 600.8 of this Part unless the provider determines that the method described in section 600.8 of this Part would have yielded a higher weighted average.
+(j) Following the end of the 24-month period described in subdivision (i) of this section, the provider may begin calculating estimated payments, and term and annual percentage rates in accordance with this section only if the provider has made a good-faith effort to modify its method for calculating internal estimated sales projections to make its disclosures more accurate.
+(k) If a provider must make additional estimates or assumptions other than an estimate of a recipient’s future sales, income or receipts in order to provide disclosures required by this Part, the provider shall:
+(1) base those estimates or assumptions on the best information reasonably available to the provider at the time of the disclosure;
+(2) state clearly that any disclosure based upon an estimate or assumption is an estimate by adding the word “estimate” to the descriptive language of any required disclosure under this Part; and
+(3) state clearly any assumptions or estimates used as the basis for the disclosure in any description associated with the disclosure.
+23 CRR-NY 600.9
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0130366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0130366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:47.388230+00:00
+RESPONSE SHA256: c02f133043f787fe1384b339d782cff5ea14e38ed2f53cd510beb09ee24f2182
+
+600.10 Closed-end financing disclosure formatting and contents.
+Disclosures for closed-end financing transactions provided in accordance with Financial Services Law section 804 shall comply with the requirements of this section unless the closed-end financing transaction meets the definition of sales-based financing or lease financing.
+(a) The provider shall present the disclosures in a table consisting of 10 rows and 3 columns.
+(b) The first row of the table shall include only the following information:
+(1) in the first column, the following language: “Funding Provided”;
+(2) in the second column, the amount financed;
+(3) in the third column, the following in the order listed and in one paragraph:
+(i) “This is how much funding [name of financer] will provide.”;
+(ii) if the amount financed is greater than the recipient funds: “Due to deductions or payments to others, the total funds that will be provided to you directly is [recipient funds]. For more information on the amounts that will be deducted, please review the attached document ‘Itemization of Amount Financed.’”;
+(iii) If any portion of the amount financed will be used to pay down or pay off other amounts owed by the recipient that may change over time, and the amounts owed are known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change if the amount owed for the recipient’s other obligations changes.
+(iv) If, as a condition of the financing, a recipient’s amounts owed to third parties must be paid down or paid off using funds from the amount financed, and the amount owed is not known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change based upon the required disbursements to satisfy other obligations.
+(v) If any portion of the amount financed will be used to satisfy obligations under another financing with the provider, in the third column, in a second paragraph: “Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? {Yes, enter amount}. If the amount is zero, the answer would be No.” If the financing being satisfied featured a fixed finance fee that did not vary based on the repayment period, the provider shall consider the amount that is used to pay unpaid finance charges or fees to be the pro rata portion of such finance fee based upon the fraction of the original total amount financed of the previous financing already repaid by the recipient.
+(c) The second row of the table shall include only the following information:
+(1) in the first column:
+(i) if the contract provides for a fixed interest rate or rates that are predetermined by the contract, or no interest rate, the following language: “Annual Percentage Rate (APR)”;
+(ii) if the contract provides for an adjustable interest rate or rates that are not predetermined by the contract, the following language: “Estimated Annual Percentage Rate (APR)”;
+(2) in the second column, the annual percentage rate calculated in accordance with section 600.3 of this Part;
+(3) in the third column:
+(i) the following language, if the contract provides for a single, fixed interest rate:
+APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, interest and other finance charges you pay and the payments you make;
+Your APR is not an interest rate. Your interest rate is [interest rate]. Your APR may be higher than your interest rate because APR incorporates interest costs and other finance charges;
+(ii) the following language, if the contract provides for a multiple pre-determined interest rates that change over time:
+APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, interest and other finance charges you pay and the payments you make;
+Your APR is not an interest rate. Your initial interest rate is [initial interest rate]. Your APR may be higher than your interest rate because APR incorporates interest costs and other finance charges;
+(iii) the following language, if the contract provides for an adjustable interest rate or rates that are not predetermined by the contract:
+APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, interest and other finance charges you pay and the payments you make;
+APR is not an interest rate. Your initial interest rate is [initial interest rate]. Although your interest rate will adjust over time, for the purposes of calculating this APR estimate, we have used the initial interest rate for future periods where the interest rate is not preset by the contract. Your APR may be higher than your interest rate because APR incorporates interest costs and other finance charges; or
+(iv) the following language, if no part of the finance charge is based upon an interest rate:
+APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, finance charges you pay and the payments you make;
+Your APR is not an interest rate. The cost of this financing is based upon fees charged rather than interest that accrues over time.”
+(d) The third row of the table shall include only the following information:
+(1) in the first column:
+(i) if the contract provides for a fixed interest rate or rates that are predetermined by the contract, or no part of the finance charge is based upon an interest rate, the following language: “Finance Charge”; or
+(ii) if the contract provides for an adjustable interest rate or rates that are not predetermined by the contract, the following language: “Estimated Finance Charge”;
+(2) in the second column, the total finance charge, calculated in accordance with section 600.2 of this Part;
+(3) in the third column:
+(i) “This is the dollar cost of your financing.”; or
+(ii) if the contract provides for an adjustable interest rate or rates that are not predetermined by the contract: “The interest rate under your contract will adjust over time, so your actual finance charge may vary.”
+(e) The fourth row of the table shall include only the following information:
+(1) in the first column:
+(i) if, assuming the recipient makes minimum required payments under the contract, it is possible to calculate with certainty the total payments the recipient will make during the contract’s term: “Total Payments Amount”; or
+(ii) if, assuming the recipient makes minimum required payments under the contract, it is not possible to calculate with certainty the total payments the recipient will make during the contract’s term: “Estimated Total Payment Amount”;
+(2) in the second column: The total dollar amount of payments or total estimated dollar amount of payments the recipient will make during the term of the contract if the recipient makes minimum required payments;
+(3) in the third column:
+(i) if, assuming the recipient makes minimum required payments under the contract, it is possible to calculate with certainty the total dollar amount of payments the recipient will make during the term of the contract: “This is the total dollar amount of payments you will make during the term of the contract”; or
+(ii) if, assuming the recipient makes minimum required payments under the contract, it is not possible to calculate with certainty the total dollar amount of payments the recipient will make during the term of the contract: “This is our estimate of the total dollar amount of payments you will make during the term of the contract.”
+(f) The fifth row of the table shall include only the following information:
+(1) in the first column:
+(i) if the periodic payments will not vary over the term of the transaction or the periodic payments during the term of the transaction will vary and it is possible to calculate the payment amounts in advance, the following language: “Payment”; or
+(ii) if the periodic payment amounts will vary over the term of the transaction and it is not possible to calculate the payment amounts in advance (e.g., due to an adjustable interest rate using a benchmark rate and a margin), the following language: “Initial Payment”;
+(2) if periodic payments during the term of the transaction will not vary:
+(i) in the second column, the amount of each periodic payment followed by a forward slash (/) and the frequency of each periodic payment (e.g. month, day, or other period) followed by the date and amount of any irregular payments listed in chronological order; and
+(ii) in the third column, a short explanation of the payment frequency and any irregular payments. The provider may also include a short explanation when payment will become due;
+(3) if periodic payments during the term of the transaction vary and it is possible to calculate the payment amounts in advance, the second and third columns in the fourth row shall be combined and the provider shall list the periodic payment amounts and when each amount will become due followed by the date and amount of any irregular payments listed in chronological order. For example:
+Months 1-12: $600/monthMonths 13-24: $1200/month
+Maintenance Fee Due 2/1/2021: $500Maintenance Fee Due 8/1/2022: $300
+or
+Payments 1-23: $600/monthPayment 24: $2000
+Maintenance Fee Due 2/1/2021: $500Maintenance Fee Due 8/1/2022: $300
+A provider may provide such list of periodic payment amounts and when amount will become due in a separate schedule such list cannot be reasonably contained within the second and third columns in the fourth row;
+(4) if periodic payments during the term of the transaction vary and it is not possible to calculate all payment amounts in advance:
+(i) in the second column, the initial periodic payment amount followed by a forward slash (/) and the frequency of each periodic payment followed by the date, followed by the date and amount of any irregular payments listed in chronological order; and
+(ii) in the third column: “This is your initial periodic payment. Your periodic payment may adjust over time.”
+(g) The sixth row of the table shall include no information in the third column, and the remaining columns shall include only the following information:
+(1) in the first column, the following language: “Term”; and
+(2) in the second column, the term of the transaction.
+(h) In the first column, the seventh and eight rows shall be combined and shall include only the following language: “Prepayment.”
+(i) In the seventh row, the second and third columns shall be combined and include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay charges other than interest accrued and unpaid, the following statement: “If you pay off the financing early , you will still need to pay all or portion of the finance charge, up to $[maximum non-interest finance charge]”; and
+(2) in all other cases, “If you pay off the financing early, you will not need to pay any portion of the finance charge other than unpaid interest accrued (if applicable).”
+(j) In the eighth row, the second and third columns shall be combined and shall include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay additional fees and charges not included in the finance charge relating to the prepayment, the following statement: “If you pay off the financing early you must also pay the following additional fees:” followed by the amounts and descriptions of each additional fee and charge; and
+(2) in all other cases, the following statement: “If you pay off the financing early you will not pay additional fees.”
+(k) The ninth row of the table shall include only the following information:
+(1) in the first column, the following language: “Collateral Requirements”; and
+(2) the second and third columns shall be combined and shall include only a description of the collateral requirements or security interests of the transaction, if any.
+(l) The 10th row of the table shall include only the following information:
+(1) in the first column, the following language: “Avoidable Fees and Charges”; and
+(2) the second and third columns shall be combined and shall include only a description of all potential fees and charges that can be avoided by the recipient, if any, including, but not limited to, late payment fees and returned payment fees.
+(m) If the contract provides for periodic payments that are not monthly, the provider shall insert one additional row below the fourth row, and the additional row shall include only the following information:
+(1) in the first column: “Average Monthly Cost”;
+(2) in the second column, the average monthly cost that the recipient will pay over the term of the transaction; and
+(3) in the third column: “Although this financing does not have monthly payments, this is our calculation of your average monthly cost for comparison purposes.”
+(n) If the contract provides for multiple payment options, then the provider shall insert one additional row above the first row, and in that row, all three columns shall be combined, resulting in a single cell. In that cell, the provider shall include the following: “This financing has multiple payment options. This disclosure assumes you will make the minimum payments permitted under the contract.”
+23 CRR-NY 600.10
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0133366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0133366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:47.488643+00:00
+RESPONSE SHA256: 80e36563a3354c9cb7684e842f314920e08b4d5265488fcda41a5969a8000c99
+
+600.11 Open-end commercial financing disclosure formatting and contents.
+Disclosures for commercial open-end financings, provided in accordance with Financial Services Law section 805 shall comply with the requirements of this section.
+(a) The provider shall present the disclosures in a table consisting of 12 rows and 3 columns.
+(b) In the first row, the first, second and third columns shall be combined, and the resulting cell shall have only the following language, in italics:
+(1) If the contract allows only for a single payment option: “The calculations below are based on an initial draw of your full Approved Credit Limit of [approved credit limit] and assume that you will pay off the draw entirely according to the agreed payment schedule, that you miss no payments, and that you do not re-draw on this line. Actual costs may differ substantially.”
+(2) If the contract allows for multiple payment options: “The calculations below are based on an initial draw of your full Approved Credit Limit of [approved credit limit] and assume that you will choose to make minimum payments, that you miss no payments, and that you do not re-draw on this line. Actual costs may differ substantially.”
+(3) If the amount borrowed is payable on demand, the provider shall include a short explanation that amounts borrowed are payable on demand and that the estimate assumes a term of one year.
+(4) If an alternate maturity date is stated in the legal obligation between the parties, then the provider shall include a short explanation that the disclosure is based upon that maturity date.
+(c) The second row of the table shall include only the following information:
+(1) in the first column, the following language: “Funding Provided”;
+(2) in the second column, the amount financed;
+(3) in the third column, in the order listed and in one paragraph:
+(i) “This is the maximum amount of funding [name of financer] may provide.”
+(ii) “If the amount financed is greater than the recipient funds: “Due to deductions or payments to others, the total funds that will be provided to you directly if you request the maximum amount is [recipient funds]. For more information on what amounts will be deducted, please review the attached document ‘Itemization of Amount Financed.’”
+(iii) If any portion of the amount financed will be used to pay down or pay off other amounts owed by the recipient that may change over time, and the amounts owed are known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change if the amount owed for the recipient’s other obligations changes.
+(iv) If, as a condition of financing, a recipient’s amounts owed to third parties must be paid down or paid off using funds from the amount financed, and the amount owed is not known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change based upon the required disbursements to satisfy other obligations.
+(v) If any portion of the amount financed will be used to satisfy obligations under another financing with the provider, in the third column, in a second paragraph: “Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? [Yes, enter amount]. If the amount is zero, the answer would be No.” If the financing being satisfied featured a fixed finance fee that did not vary based on the repayment period, the provider shall consider the amount that is used to pay unpaid finance charges or fees to be the pro rata portion of such finance fee based upon the fraction of the original total amount financed of the previous financing already repaid by the recipient.
+(d) The third row of the table shall include only the following information:
+(1) in the first column:
+(i) if the contract provides for a fixed interest rate or rates that are predetermined by the contract, the following language: “Annual Percentage Rate (APR)”; or
+(ii) if the contract provides for an adjustable interest rate and it is not possible to calculate the interest rates throughout the term of the transaction in advance, the following language: “Initial Annual Percentage Rate (APR)”;
+(2) in the second column, the provider’s calculation of the annual percentage rate calculated in accordance with section 600.3 of this Part;
+(3) in the third column:
+(i) if the contract provides for a single, fixed interest rate, the following language:
+“APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, interest and other finance charges you pay and the payments you make.
+APR is not an interest rate. Your interest rate is [interest rate]. Your APR may be higher than your interest rate because APR incorporates interest costs and other finance charges.
+(ii) if the contract provides for multiple pre-determined interest rates that change over time, the following language:
+“APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, interest and other finance charges you pay and the payments you make.
+Your APR is not an interest rate. Your initial interest rate is [initial interest rate]. Your APR may be higher than your interest rate because APR incorporates interest costs and other finance charges.”; or
+(iii) if the contract provides for an adjustable interest rate and it is not possible to calculate the interest rates throughout the term of the transaction in advance, the following language:
+“APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, interest and other finance charges you pay and the payments you make.
+APR is not an interest rate. Your initial interest rate is [initial interest rate]. Although your interest rate will adjust over time, for the purposes of calculating this APR estimate, we have used the initial interest rate for future periods where the interest rate is not preset by the contract. Your APR may be higher than your interest rate because APR incorporates interest costs and other finance charges.”
+(iv) If no part of the finance charge is based upon an interest rate, the following language:
+“APR is the cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, and the payments you make.
+APR is not an interest rate. The cost of this financing is based upon fees charged rather than interest that accrues over time.”
+(e) The fourth row of the table shall include only the following information:
+(1) in the first column the following language: “Estimated Finance Charge”;
+(2) in the second column, the total finance charge calculated in accordance with section 600.2 of this Part; and
+(3) in the third column:
+(i) “This is the dollar cost of our financing based upon the assumptions described at the top of this disclosure.”; and
+(ii) if the contract provides for an adjustable interest rate or rates that are not predetermined by the contract: “The interest rate under your contract will adjust over time, so your actual finance charge may vary.”
+(f) The fifth row of the table shall include only the following information:
+(1) in the first column: “Estimated Total Payments”;
+(2) in the second column, the total estimated payments the recipient will make during the term of the contract if the recipient makes minimum required payments; and
+(3) in the third column: “This is the total dollar amount of payments you will make during the term of the contract based upon the assumptions described at the top of this disclosure.”
+(g) The sixth row of the table shall include only the following information:
+(1) in the first column “Estimated Payment”;
+(2) if periodic payments during the term of the transaction will not vary over the term of the transaction:
+(i) in the second column, the amount of the periodic payment followed by a forward slash (/) and the frequency of each periodic payment followed by the date and amount of any irregular payments listed in chronological order; and
+(ii) in the third column, a short explanation of when each payment will become due;
+(3) if periodic payments during the term of the transaction vary and it is possible to calculate the payment amounts in advance, the second and third columns in the fifth row shall be combined and the provider shall list the periodic payment and when each amount will become due followed by the date and amount of any irregular payments listed in chronological order and any assumptions made when calculating the payment amounts. For example:
+Months 1-12: $600/monthMonths 13-24: $1200/month
+Maintenance Fee Due 2/1/2021: $500Maintenance Fee Due 8/1/2022: $300
+(4) if periodic payments during the term of the transaction vary and it is not possible to calculate all payment amounts in advance because the transaction has an adjustable interest rate that cannot be calculated in advance:
+(i) in the second column, a periodic payment amount calculated using the initial interest rate followed by the date and amount of any reasonably anticipated irregular payments listed in chronological order; and
+(ii) in the third column, a short explanation that the periodic payment amount disclosed is based upon the initial interest rate, and that the actual rate may change over time. The provider may also include a short explanation describing when the payment will adjust and how it will be calculated; and
+(5) if periodic payments of principal during the term of the transaction do not vary but periodic payments of interest during the term of the transaction vary, and it is not possible to calculate all interest payment amounts in advance, because the transaction has an adjustable interest rate that cannot be calculated in advance:
+(i) in the second column, the phrase “Initial Interest Payment:” followed by an interest payment amount calculated using the initial interest rate, followed by a forward slash (/) and the frequency of each periodic interest payment;
+(ii) in the second column, beneath the disclosure required by subparagraph (i) of this paragraph, the phrase “Principal Payment Amount:” followed by the amount of each periodic principal payment, followed by a forward slash (/) and the frequency of each periodic principal payment;
+(iii) in the third column, a short explanation that the initial interest payment amount disclosed is based upon the initial interest rate, and that the actual rate may change over time; and
+(iv) in the third column, beneath the statement explaining the initial interest payment amount and at the same height as the disclosure required under subparagraph (ii) of this paragraph, a short explanation of the principal payment amount and frequency.
+(h) The seventh row of the table shall include only the following information:
+(1) in the first column, the following language: “Draw Period”;
+(2) in the second column, the draw period for the transaction; and
+(3) in the third column, a short explanation of the draw period for the transaction;
+(i) The eighth row of the table shall include no information in the third column, and the remaining columns shall include only the following information:
+(1) in the first column, the following language: “Term”; and
+(2) in the second column, the term of the transaction.
+(j) In the first column, the 9th and 10th rows shall be combined and shall include only the following language: “Prepayment”.
+(k) In the ninth row, the second and third columns shall be combined and shall include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay finance charges other than interest accrued and unpaid, the following statement: “If you pay off the financing early you will need to pay all or a portion of the finance charge, up to $[maximum non-interest finance charge];” or
+(2) in all other cases, “If you pay off the financing early, you will not need to pay any portion of the finance charge other than unpaid interest accrued (if applicable).”
+(l) In the 10th row, the second and third columns shall be combined and shall include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay additional fees and charges not included in the finance charge relating to the prepayment, the following statement: “If you pay off the financing early you must also pay the following additional fees:” followed by the amounts and descriptions of the additional fees and charges; or
+(2) in all other cases, the following statement, “If you pay off the financing early you will not pay additional fees.”
+(m) The 11th row of the table shall include only the following information:
+(1) in the first column, the following language: “Collateral Requirements”; and
+(2) the second and third columns shall be combined and shall include only a description of the collateral requirements or security interests of the transaction, if any.
+(n) The 12th row of the table shall include only the following information:
+(1) in the first column, the following language: “Avoidable Fees and Charges”; and
+(2) the second and third columns shall be combined and shall include only a description of all potential fees and charges that can be avoided by the recipient, if any, including, but not limited to, late payment fees and returned payment fees.
+(o) If the contract provides for periodic payments that are not monthly, the provider shall insert one additional row below the fifth row, and the additional row shall include only the following information:
+(1) in the first column, the following language: “Average Monthly Cost”;
+(2) in the second column, the average monthly cost that the recipient will pay over the term of the transaction; and
+(3) in the third column: “Although this financing does not have monthly payments, this is our calculation of your average monthly cost for comparison purposes.”
+23 CRR-NY 600.11
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0136366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0136366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:47.965844+00:00
+RESPONSE SHA256: 8b9258eb32aaa156b6e29fff8bc1cd52979c2c5dec14d8363b891a098ac0bce6
+
+600.12 Factoring transaction disclosure formatting.
+Disclosures for factoring transactions provided in accordance with Financial Services Law section 806 shall comply with the requirements of this section.
+(a) The provider shall present the required disclosures in a table consisting of eight rows and three columns.
+(b) The first row of the table shall include only the following information:
+(1) in the first column, the following language: “Funding Provided”;
+(2) in the second column, the amount financed; and
+(3) in the third column, and in the order listed and in one paragraph: “This is how much [name of financer] will pay when you assign [description of legally enforceable claim, e.g., “the invoice”] to [name of financer].”;
+(i) if the amount financed is greater than the recipient funds: “Due to deductions or payments to others, the total funds that will be provided to you directly is [recipient funds]. For more information on what amounts will be deducted, please review the attached document ‘Itemization of Amount Financed.’”;
+(ii) if any portion of the amount financed will be used to pay down or pay off other amounts owed by the recipient that may change over time, and the amounts owed are known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change if the amount owed for the recipient’s other obligations changes;
+(iii) if, as a condition of financing, a recipient’s amounts owed to third parties must be paid down or paid off using funds from the amount financed, and the amount owed is not known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change based upon the required disbursements to satisfy other obligations; and
+(iv) if any portion of the amount financed will be used to satisfy obligations under another financing with the provider, in the third column, in a second paragraph: “Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? [Yes, enter amount]. If the amount is zero, the answer would be No.” If the financing being satisfied featured a fixed finance fee that did not vary based on the repayment period, the provider shall consider the amount that is used to pay unpaid finance charges or fees to be the pro rata portion of such finance fee based upon the fraction of the original total amount financed of the previous financing already repaid by the recipient.
+(c) The second row of the table shall include only the following information:
+(1) in the first column, the following language: “Estimated Annual Percentage Rate (APR)”;
+(2) in the second column, the estimated annual percentage rate calculated in accordance with sections 600.3 and 600.13 of this Part; and
+(3) in the third column, the following language:
+(i) “APR is the estimated cost of your financing expressed as a yearly rate. APR includes the amount and timing of the funding you receive, finance charges you pay, and payments made to [name of financer];”
+(ii) a short explanation of the assumptions relating to payment timing that the provider used to calculate the estimate. For example: “This estimate assumes the account debtor will pay the invoice on the invoice due date;” and
+(iii) if no part of the finance charge is based upon an interest rate, the following language in addition to the language required by subdivision (c)(3)(i) of this section: “APR is not an interest rate and the amount of the factoring fee we charge is not based upon an interest rate.”
+(d) The third row of the table shall include the following information:
+(1) in the first column, the following language: “Finance Charge”;
+(2) in the second column, the total finance charge calculated in accordance with section 600.2 of this Part; and
+(3) in the third column, the provider’s calculation of the finance charge, with the amount and description of each expense that is included in the finance charge.
+(e) The fourth row of the table shall include only the following information:
+(1) in the first column, the following language: “Payment”;
+(2) in the second column, the following language: “NA” “N/A” or “Not applicable”; and
+(3) in the third column, a short explanation describing why the recipient is not ordinarily required to make payments under the contract. For example: “You are selling an invoice to us, so you will not be required to make any payments to us unless your customer fails to pay the invoice and we find that you breached your warranty to us by failing to deliver the invoiced goods to your customer.”
+(f) The fifth row of the table shall include only the following information:
+(1) in the first column, the following language: “Estimated Term”;
+(2) in the second column, the term of the transaction; and
+(3) in the third column, a short explanation describing how the provider calculated the term. For example: “The invoice is due for payment 30 days from today, so we have estimated a term of 1 month. The invoice may be paid sooner or later than the due date.”
+(g) The sixth row of the table shall include only the following information:
+(1) in the first column, the following language: “Repurchase Costs”; and
+(2) the second and third columns shall be combined; and
+(i) if the recipient is permitted to repurchase the legally enforceable claim for payment before the legally enforceable claim is due and payable, the resulting combined cell shall be divided vertically into two cells by a horizontal line; and
+(a) if at any time during the term of the transaction, repurchase of the legally enforceable claim will result in the recipient paying finance charges other than interest since the advance was made, the top cell shall include the following statement: “If you repurchase the [description of legally enforceable claim] before the due date you still must pay all or a portion of the finance charge, which could be as high as $[maximum non-interest finance charge].”;
+(b) in all other cases, the top cell shall include the following statement: “If you repurchase the [description of legally enforceable claim] before the due date you will not pay any portion of the finance charge other than unpaid interest accrued since disbursement.”;
+(c) if, at any time during the term of the transaction, repurchase of the legally enforceable claim will require the recipient to pay additional fees and charges not included in the finance charge relating to the prepayment, the bottom cell shall include the following statement: “If you repurchase the [description of legally enforceable claim] before the due date, you must pay additional fees and charges that are not part of the finance charge, including [amount and description of fees].”; and
+(d) in all other cases, the bottom cell shall state: “If you repurchase the [description of legally enforceable claim] before the due date, you will not be required to pay any additional fees and charges.”; and
+(ii) if the recipient is not permitted to repurchase the legally enforceable claim for payment before the legally enforceable claim is due and payable, the resulting cell shall include the following statements:
+(a) “You are not permitted to pay the amount due on the [description of legally enforceable claim] before your customer’s due date.”;
+(b) if applicable: “The finance charge will not decrease if your customer pays the [description of legally enforceable claim] before the due date.”; and
+(c) when calculating the required disclosures for factoring transactions, in order to provide a disclosure based upon a single transaction, the provider shall assume that it will receive full payment of the legally enforceable claim upon the date that legally enforceable claim becomes due and payable.
+(h) The seventh row of the table shall include only the following information:
+(1) in the first column, the following language: “Collateral Requirements”; and
+(2) the second and third columns shall be combined and shall include only a description of the receivables purchased and any additional collateral requirements or security interests.
+(i) The eighth row of the table shall include only the following information:
+(1) in the first column, the following language: “Avoidable Fees and Charges”; and
+(2) the second and third columns shall be combined and shall include only a description of all potential fees and charges that can be avoided by the recipient, if any, including, but not limited to, late payment fees and returned payment fees.
+23 CRR-NY 600.12
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0139366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0139366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:47.658318+00:00
+RESPONSE SHA256: ac56f83261b44c8de02d3e0be99fcf0f4cbeaf7349b33da13b889a9aa8cc1ffc
+
+600.13 Additional assumptions for factoring transactions.
+When calculating the required disclosures in accordance with section 600.3 of this Part for factoring transactions, to provide a disclosure based upon a single transaction as described by Financial Services Law section 806, the provider shall assume that it will receive full payment of the legally enforceable claim upon the date that legally enforceable claim becomes due and payable.
+23 CRR-NY 600.13
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf013c366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf013c366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:47.978907+00:00
+RESPONSE SHA256: 47699dad9dd50893a2174340b4353de7fdcc753dbd50cb26586b6959f62d7d61
+
+600.14 Lease financing transaction disclosure formatting and contents.
+Disclosures for lease financing, as defined in section 600.1(w) of this Part, shall comply with the requirements of this section.
+(a) The provider shall present the disclosures in a table consisting of 10 rows and 3 columns.
+(b) The first row of the table shall include only the following information:
+(1) in the first column, the following language: “Funding Provided”;
+(2) in the second column, the amount financed; and
+(3) in the third column:
+(i) “This is how much funding [name of financer] will provide”;
+(ii) if any portion of the amount financed will be used to satisfy obligations under another financing with the provider, in a second paragraph: “Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? [Yes, enter amount]. If the amount is zero, the answer would be No.” If the financing being satisfied featured a fixed finance fee that did not vary based on the repayment period, the provider shall consider the amount that is used to pay unpaid finance charges or fees to be the pro rata portion of such finance fee based upon the fraction of the original total amount financed of the previous financing already repaid by the recipient.
+(c) The second row of the table shall include only the following information:
+(1) in first column the following language: “Annual Percentage Rate (APR)”;
+(2) in second column, the annual percentage rate calculated in accordance with section 600.3 of this Part; and
+(3)
+in the third column, the following language: “APR is the cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, finance charges you pay, and the periodic payments you make, and the anticipated cost for you to acquire the property at the end of the lease term.
+Your APR is not an interest rate.”
+(d) The third row of the table shall include only the following information:
+(1) in first column the following language: “Finance Charge”;
+(2) in second column, the total finance charge, calculated in accordance with section 600.2 of this Part; and
+(3) in the third column, the provider’s calculation of the finance charge, with the amount and description of each expense included in the finance charge.
+(e) The fourth row of the table shall include only the following information:
+(1) in the first column: “Total Payment Amount”;
+(2) in the second column, the total dollar amount of payments the recipient will make during the term of the contract if the recipient makes minimum required payments and exercises the purchase option under the agreement; and
+(3) in the third column: “This is the total dollar amount of payments you will make during the term of the contract (including the cost of the purchase option).”
+(f) The fifth row of the table shall include only the following information:
+(1) in the first column the following language: “Payment”;
+(2) if periodic payments during the term of the transaction will not vary then:
+(i) in the second column, the amount of each periodic payment followed by a forward slash (/) and the frequency of each periodic payment (e.g., month, day, or other period), followed by the date and amount of any irregular payments listed in chronological order, followed by the price of the purchase option; and
+(ii) in the third column, a short explanation of the payment and purchase option. For example: “This is how much you will pay each month, the $300 maintenance fee due 12 months after you receive funding, and the purchase price you may pay at the end of the lease to acquire the property.” The provider may also include a short explanation describing when each payment will become due. For example: “Your monthly payments are due on the 1st day of every month”; and
+(3) if periodic payments during the term of the transaction vary, the second and third column in the fourth row shall be combined and the provider shall list the periodic payment amounts and when each amount will become due, followed by the date and amount of any irregular payments listed in chronological order, followed by the price of the purchase option. For example:
+Months 1-12: $600/monthMonths 13-24: $1200/month
+Maintenance Fee Due 2/1/2021: $500Maintenance Fee Due 8/1/2022: $300
+Purchase Price: $1000
+or
+Payments 1-23: $600/monthPayment 24: $2000
+Maintenance Fee Due 2/1/2021: $500Maintenance Fee Due 8/1/2022: $300
+Purchase Price: $1000
+(g) The sixth row of the table shall include no information in the third column, and the remaining columns shall include only the following information:
+(1) in the first column, the following language: “Term”; and
+(2) in the second column, the term of the transaction.
+(h) In the first column, the seventh and eighth rows shall be combined and shall include the following language: “Prepayment”.
+(i) In the seventh row, the second and third columns shall be combined and include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay finance charges other than interest accrued and unpaid, then the following statement: “If you pay off the financing before the end of the term, you will be required to pay all or a portion of the finance charge other than accrued and unpaid interest, up to $[maximum non-interest finance charge]”; and
+(2) in all other cases, the following statement: “If you pay off the financing before the end of the term, then you will not be required to pay any portion of the finance charge other than unpaid interest accrued.”
+(j) In the eighth row, the second and third columns shall be combined and shall include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay additional fees and charges not included in the finance charge relating to the prepayment, then the following statement: “If you pay off the financing before the end of the term, then you must pay additional fees or charges, including” followed by a description of any prepayment charges; and
+(2) in all other cases, the following statement: “If you pay off the financing before the end of the term, then you will not be required to pay additional fees or charges.”
+(k) The ninth row of the table shall include only the following information:
+(1) in the first column, the following language: “Collateral Requirements”; and
+(2) the second and third columns shall be combined and shall include only a description of the collateral requirements or security interests of the transaction, if any.
+(l) The 10th row of the table shall include only the following information:
+(1) in the first column, the following language: “Avoidable Fees and Charges”; and
+(2) the second and third columns shall be combined and shall include only a description of all potential fees and charges that can be avoided by the recipient, if any, including, but not limited to, late payment fees and returned payment fees.
+(m) If the contract provides for periodic payments that are not monthly, then the provider shall insert one additional row below the fourth row, and the additional row shall include only the following information:
+(1) in the first column, the following language: “Average Monthly Cost”;
+(2) in the second column, the average monthly cost that the recipient will pay over the term of the transaction; and
+(3) in the third column, language explaining that the recipient will not be required to make monthly payments and explaining how the provider has calculated the monthly cost. For example: “Although you do not make payments on a monthly basis, this is our calculation of your average monthly cost based upon the payment amounts disclosed below.”
+23 CRR-NY 600.14
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf013f366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf013f366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:48.561264+00:00
+RESPONSE SHA256: c17ca0d3cade32f8c5fbbf7309cfda9029687add0e320bb1963a71384df29428
+
+600.15 General asset-based lending transaction disclosure formatting and contents.
+Disclosures for asset-based lending transactions, provided in accordance with Financial Services Law section 807, shall comply with the formatting requirements of this section.
+(a) The provider shall present the required disclosures in a table consisting of 12 rows and 3 columns.
+(b) All three columns of the first row of the table shall be combined, and within the cell created, the provider shall provide an explanation, in italics, of all assumptions used to calculate the disclosures, and a notice, if applicable, that actual costs may differ substantially from those disclosed. For example: “The calculations below assume you draw [the approved credit limit] at origination, you maintain an outstanding balance of that amount for [length of draw period or “one year”, whichever is less], and that the amount owed us is paid off thereafter according to the terms of the contract. Actual costs may differ substantially.”
+(c) The second row of the table shall include only the following information:
+(1) in the first column, the following language: “Funding Provided”;
+(2) in the second column, the amount financed; and
+(3) in the third column, in the order listed and in the same paragraph:
+(i) “This is the maximum amount of funding [name of financer] will provide.”
+(ii) If the amount financed is greater than the recipient funds: “Due to deductions or payments to others, the total funds that will be provided to you directly if you request the maximum amount is [recipient funds]. For more information on the amounts that will be deducted, please review the attached document, ‘Itemization of Amount Financed’.”
+(iii) If any portion of the amount financed will be used to pay down or pay off other amounts owed by the recipient that may change over time, and the amounts owed are known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change if the owed for the recipient’s other obligations changes.
+(iv) If, as a condition of financing, a recipient’s amounts owed to third parties must be paid down or paid off using funds from the amount financed, and the amount owed is not known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change based upon the required disbursements to satisfy other obligations.
+(v) If any portion of the amount financed will be used to satisfy obligations under another financing with the provider, in the third column, in a second paragraph: “Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? [Yes, enter amount]. If the amount is zero, the answer would be No.” If the financing being satisfied featured a fixed finance fee that did not vary based on the repayment period, the provider shall consider the amount that is used to pay unpaid finance charges or fees to be the pro rata portion of such finance fee based upon the fraction of the original total amount financed of the previous financing already repaid by the recipient.
+(d) The third row of the table shall include only the following information:
+(1) in the first column, the following language: “Estimated Annual Percentage Rate (APR)”;
+(2) in the second column, the annual percentage rate calculated in accordance with section 600.3 of this Part;
+(3) in the third column, the following language in the order listed:
+(i) “APR is the estimated cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, finance charges you pay, and the payments we collect. APR is not an interest rate”; and
+(ii) a short explanation of the applicable interest rate or rates for the transaction, if applicable.
+(e) The fourth row of the table shall include only the following information:
+(1) in the first column, the following language: “Estimated Finance Charge”;
+(2) in the second column, the finance charge calculated in accordance with section 600.2 of this Part; and
+(3) in the third column:
+(i) “This is the dollar cost of your financing.”; and
+(ii) if the contract provides for an adjustable interest rate or rates that are not predetermined by the contract, then: “The interest rate under your contract will adjust over time, so your actual finance charge may vary.”
+(f) The fifth row of the table shall include only the following information:
+(1) in the first column: “Estimated Total Payments”;
+(2) in the second column, the total estimated payments the recipient will make during the term of the contract if the recipient makes minimum required payments; and
+(3) in the third column: “This is the total amount of payments you will make during the term of the contract based upon the assumptions described above.”
+(g) The sixth row of the table shall include only the following information:
+(1) in the first column, the following language: “Payment”; and
+(2) the second and third columns shall be combined, and in the resulting cell, the provider shall provide a short explanation of how balances on the account are repaid.
+(h) The seventh row of the table shall include only the following information:
+(1) in the first column, the following language: “Draw Period”;
+(2) in the second column, the draw period for the transaction; and
+(3) in the third column, a short explanation of the draw period for the transaction.
+(i) The eighth row of the table shall include no information in the third column, and the remaining columns shall include only the following information:
+(1) in the first column, the following language: “Term”;
+(2) in the second column, the term of the transaction; and
+(3) in the first column, the eighth and ninth rows shall be combined and shall include the following language: “Prepayment”.
+(j) In the ninth row, the second and third columns shall be combined and shall include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay finance charges other than interest accrued and unpaid, then the following statement: “If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $[maximum non-interest finance charge] based upon our estimates”; and
+(2) in all other cases, the following statement: “If you pay off the financing faster than required, you will not be required to pay any portion of the finance charge other than unpaid interest accrued.”
+(k) In the 10th row, the 2nd and 3rd columns shall be combined and shall include:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay additional fees and charges not included in the finance charge relating to the prepayment, then the following statement: “If you pay off the financing faster than required, you must pay additional fees of [amount and description of fees]”; and
+(2) in all other cases, the following statement: “If you pay off the financing faster than required, you will not be required to pay additional fees.”
+(l) The 11th row of the table shall include only the following information:
+(1) in the first column, the following language: “Collateral Requirements”; and
+(2) the second and third columns shall be combined and shall include only a description of the collateral requirements or security interests of the transaction, if any.
+(m) The 12th row of the table shall include only the following information:
+(1) in the first column, the following language: “Avoidable Fees and Charges”; and
+(2) the second and third columns shall be combined and shall include only a description of all potential fees and charges that can be avoided by the recipient, if any, including, but not limited to, late payment fees and returned payment fees.
+23 CRR-NY 600.15
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0142366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0142366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:49.634314+00:00
+RESPONSE SHA256: d290eccb5efec6aa3b545cc5c8964924ca95468a3581fa9889954b5677a9d78b
+
+600.16 Disclosure formatting for all other commercial financing transactions.
+Disclosure for commercial financing that does not meet the definition of a closed-end financing transaction, sales-based financing, commercial open-end financing, factoring transaction, lease financing, or asset-based lending transaction, provided in accordance with Financial Services Law section 807, shall comply with the formatting requirements of this section.
+(a) The provider shall present the required disclosures in a table consisting of 10 rows and 3 columns.
+(b) The first row of the table shall include only the following information:
+(1) in the first column, the following language: “Funding”;
+(2) in the second column, the amount financed; and
+(3) in the third column, the following in the order listed and in one paragraph:
+(i) “This is how much funding [name of financer] will provide”;
+(ii) if the amount financed is greater than the recipient funds: “Due to deductions or payments to others, the total funds that will be provided to you directly is [recipient funds]. For more information on the amounts that will be deducted, please review the attached document ‘Itemization of Amount Financed’”;
+(iii) if any portion of the amount owed will be used to pay down or pay off other amounts owed by the recipient that may change over time, and the amounts owed are known to the provider, the provider shall include a short explanation that the amount paid directly to the recipient may change if the amounts owed for the recipient’s other obligations changes;
+(iv) if, as a condition of financing, a recipient’s amounts owed to third parties must be paid down or paid off using funds from the amount financed, and the amount owed is not known to the provider, the provider shall also include a short explanation that the amount paid directly to the recipient may change based upon the required disbursements to satisfy other obligations; and
+(v) if any portion of the amount financed will be used to satisfy obligations under another financing with the provider, in the third column, in a second paragraph: “Does the renewal financing include any amount that is used to pay unpaid finance charges or fees, also known as double dipping? [Yes, enter amount]. If the amount is zero, the answer would be No.” If the financing being satisfied featured a fixed finance fee that did not vary based on the repayment period, the provider shall consider the amount that is used to pay unpaid finance charges or fees to be the pro rata portion of such finance fee based upon the fraction of the original total amount financed of the previous financing already repaid by the recipient.
+(c) The second row of the table shall include only the following information:
+(1) in the first column, the following language: “Annual Percentage Rate (APR)”;
+(2) in the second column, the annual percentage rate calculated in accordance with section 600.3 of this Part; and
+(3) in the third column, the following, in order:
+(i) “APR is the cost of your financing expressed as a yearly rate. APR incorporates the amount and timing of the funding you receive, and payments paid by you or on your behalf to [financer]. APR is not an interest rate”; and
+(ii) a short explanation of any assumptions made by the provider to calculate APR.
+(d) The third row of the table shall include only the following information:
+(1) in the first column, the following language: “Finance Charge”;
+(2) in the second column, the finance charge calculated in accordance with section 600.2 of this Part; and
+(3) in the third column, the provider’s calculation of the finance charge, with the amount and description of each expense that is included in the finance charge.
+(e) The fourth row of the table shall include only the following information:
+(1) in the first column:
+(i) if, assuming the recipient makes minimum required payments under the contract, it is possible to calculate with certainty the total payments the recipient will make during the contract’s term, then: “Total Payment Amount”; and
+(ii) if, assuming the recipient makes minimum required payments under the contract, it is not possible to calculate with certainty the total payments the recipient will make during the contract’s term, then: “Total Estimated Payment Amount”;
+(2) in the second column, the total dollar amount of payments or total dollar amount of estimated payments the recipient will make during the term of the contract if the recipient makes minimum required payments; and
+(3) in the third column:
+(i) if, assuming the recipient makes minimum required payments under the contract, it is possible to calculate with certainty the total dollar amount of payments the recipient will make during the term of the contract, then: “This is the total dollar amount of payments you will make during the term of the contract”; or
+(ii) if, assuming the recipient makes minimum required payments under the contract, it is not possible to calculate with certainty the total dollar amount of payments the recipient will make during the term of the contract, then: “This is our estimate of the total dollar amount of payments you will make during the term of the contract.”
+(f) The fifth row of the table shall include only the following information:
+(1) in the first column, the following language: “Payment”; and
+(2) the second and third columns shall be combined, and shall contain the following information in order:
+(i) the amount of each periodic payment, followed by a forward slash (/) and the frequency of each periodic payment. If the provider anticipates that the periodic payment amount will vary over the term of the transaction, then the provider shall list all periodic payment amounts and the time periods when those payments apply. For example:
+Months 1-2: $20/dayMonths 3-7: $40/day
+and
+(ii) the date and amount of any irregular payments listed in chronological order.
+(g) The sixth row of the table shall include no information in the third column, and the remaining columns shall include only the following information:
+(1) in the first column, the following language: “Term”; and
+(2) in the second column, the term of the transaction.
+(h) In the first column, the seventh and eighth rows shall be combined and shall include the following language: “Prepayment.”
+(i) In the seventh row, the second and third column shall be combined and shall include only:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay finance charges other than interest accrued and unpaid, then the following statement, “If you pay off the financing faster than required, you still must pay all or a portion of the finance charge, up to $[maximum non-interest finance charge]”; and
+(2) in all other cases, the following statement: “If you pay off the financing faster than required, you will not be required to pay any portion of the finance charge other than unpaid interest accrued.”
+(j) In the eighth row, the second and third columns shall be combined and shall include:
+(1) if, at any time during the term of the transaction, prepayment of the outstanding balance due will require the recipient to pay additional fees and charges not included in the finance charge relating to the prepayment, then the following statement: “If you pay off the financing faster than required, you must pay additional fees of [amount and description of fees]”; and
+(2) in all other cases, the following statement: “If you pay off the financing faster than required, you will not be required to pay additional fees.”
+(k) The ninth row of the table shall include only the following information:
+(1) in the first column, the following language: “Collateral Requirements”; and
+(2) the second and third columns shall be combined and shall include only a description of the collateral requirements or security interests of the transaction, if any.
+(l) The 10th row of the table shall include only the following information:
+(1) in the first column, the following language: “Avoidable Fees and Charges”; and
+(2) the second and third columns shall be combined and shall include only a description of all potential fees and charges that can be avoided by the recipient, if any, including, but not limited to, late payment fees and returned payment fees.
+(m) If the contract provides for periodic payments that are not monthly, then the provider shall insert one additional row below the third row, and the additional row shall include only the following information:
+(1) in the first column, the following language: “Monthly Cost”;
+(2) in the second column, the monthly cost that the recipient will pay over the term of the transaction. If the provider anticipates that the estimated monthly cost will vary over the term of the transaction, then the provider shall list the estimated monthly costs and the time periods when those estimates apply. For example:
+Months 1-2: $600/monthMonths 3-6: $1200/monthMonth 7: $1000/month
+and
+(3) in the third column, a short explanation of how the provider calculated the monthly cost. For example: “Although you do not make payments on a monthly basis, this is our calculation of your average monthly cost based upon the payment amounts disclosed below.”
+(n) If the contract provides for multiple payment options, then the provider shall insert one additional row above the first row, and in that row, all three columns shall be combined, resulting in a single cell. In that cell, the provider shall include a short explanation of how the provider has based the disclosure on the minimum payment permitted under the contract.
+23 CRR-NY 600.16
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0145366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0145366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:49.866373+00:00
+RESPONSE SHA256: 8f5b3a515b5e3b4051fcc76587d243c27279225636aecf08e21296d30c283bc1
+
+600.17 Funding recipient will receive.
+(a) When a provider provides a disclosure (either directly to the recipient or to a broker) under sections 600.6 through 600.16 of this Part, and the amount financed is greater than the recipient funds, the provider shall also provide a disclosure entitled “Itemization of Amount Financed.” The disclosure shall be substantially similar in form to the example disclosure provided in subdivision (b) of this section, including at a minimum:
+(1) the recipient funds described as “Amount Given Directly to You.”;
+(2) the amount credited to the recipient’s account with the financer, described as “Amount Paid on your Account with Us,” followed by the account number, if applicable. Where the amount to be credited to the recipient’s account may vary based upon changes to the outstanding balance due on a recipient’s account, a disclosure shall be considered accurate if it is accurate the time disclosure is provided;
+(3) any amounts paid to other persons by the financer on the recipient’s behalf, each listed on a separate line. The disclosure shall identify those persons. The following payees maybe described using generic or other general terms and need not be further identified: a recipient’s supplier or retailer; public officials or government agencies; credit reporting agencies; appraisers; and insurance companies. Where an amount disclosed pursuant to this section may change based upon changes to the outstanding balance due under the recipient’s other obligations, a provider’s disclosure of a payoff amount shall be considered accurate if it is accurate at the time the disclosure is provided;
+(4) the sum of the amounts described in paragraphs (1), (2), and (3) of this subdivision, described as “Amount Provided to You or on Your Behalf,” followed by a reference to how the amount was calculated (e.g. “Sum of Items 1-7.”);
+(5) the prepaid finance charge, described as “Prepaid Finance Charge” or “prepaid Finance Charges,” as applicable, followed by a description of the purpose of the charge or charges (e.g. “Brokerage Fee”); and
+(6) the amount financed, described as “Amount Financed,” followed by a reference to how the amount was calculated (e.g. “Item 5 minus Item 4.”)
+(b) Examples:
+(1) for transactions where no part of the amount financed is credited to the recipient’s account with the financer:
+ITEMIZATION OF AMOUNT FINANCED
+1. Amount Given Directly to You$8,900
+2. Property Valuation Fee paid to [____]$100
+3. Property Insurance$1,000
+4. Amount Provided to You or on Your Behalf (1+2+3)$10,000
+5. Prepaid Finance Charges: Brokerage Fee$1,000
+6. Amount Financed (4 minus 5)$9,000
+(2) where part of the amount financed is credited to the recipient’s account with the financers:
+ITEMIZATION OF AMOUNT FINANCED
+1. Amount Given Directly to You$8,900
+2. Property Valuation Fee paid to [____]$100
+3. Property Insurance$1,000
+4. Amount Paid on your Account with Us (#XXXXX)$2,000
+5. Amount Provided to You or on Your Behalf (1+2+3+4) $12,000
+6. Prepaid Finance Charges: Brokerage Fee$1,000
+7. Amount Financed (5 minus 6)$11,000
+(c) The disclosure required by subdivision (a) of this section:
+(1) shall appear as a separate document from the disclosures required by sections 600.6 through 600.16 of this Part;
+(2) shall appear immediately following the disclosures required by sections 600.6 through 600.16 of this Part;
+(3) need not be signed by the recipient; and
+(4) may include an explanation of any assumptions the provider used to make the disclosure required by subdivision (a) of this section.
+23 CRR-NY 600.17
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0148366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0148366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:50.143648+00:00
+RESPONSE SHA256: e079683e4c7158f258c8222f82940af43b6277cd03bc754c7b89412cce82adba
+
+600.18 Signatures.
+(a) Pursuant to Financial Services Law section 809, prior to consummating a commercial financing, a provider shall obtain the recipient’s signature, which may be fulfilled by an electronic signature, on all disclosures required to be presented to the recipient pursuant to the CFDL. Where the recipient is not a natural person, a natural person authorized to sign on behalf of the legal entity may sign the disclosure, provided that the natural person is not a broker. Such disclosures may be transmitted between the recipient and the provider via electronic transmission and utilizing electronic signatures, regardless of whether subsequent financing agreements, amendments and supplements are provided to the recipient in person, by mail or electronically.
+(b) If a commercial financing transaction is consummated electronically, then a provider may obtain a recipient’s signature on the required disclosures electronically or by facsimile.
+(c) A provider is not required to obtain the recipient’s signature on any disclosure for a commercial financing transaction that is not consummated. When a provider provides multiple disclosures to a recipient during the negotiation of a commercial financing transaction that is ultimately consummated, the provider need only obtain the recipient’s signature on the final disclosure that corresponds to the consummated transaction.
+23 CRR-NY 600.18
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf014b366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf014b366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:50.426266+00:00
+RESPONSE SHA256: cf477df19d67d04a71c4348f3ac0c0d2f81617aadb08bed92cb11b0bd2cb7b8c
+
+600.19 Thresholds for disclosure.
+For the purpose of determining whether the amount of a commercial financing offer is equal to or less than $2,500,000, a provider shall comply with the requirements of this section.
+(a) For open-end financing, use the approved credit limit.
+(b) For asset-based lending transactions:
+(1) use the approved credit limit if the transaction meets all of the following requirements:
+(i) the provider offers the recipient an agreement that describes the general terms and conditions of the commercial financing transaction that will occur under the agreement;
+(ii) the approved credit limit exceeds $2,500,000; and
+(iii) the parties to the asset-based lending transaction agree in writing that an amount exceeding $2,500,000 is reasonably expected to be advanced to the recipient and outstanding at some point during the agreement, and such agreement is made in writing before the execution of the financing agreement, before any amendment to an agreement entered into before the effective date of the CFDL, or before any amendment increasing the approved credit limit for a consummated financing agreement to an amount exceeding $2,500,000; and
+(2) if the asset-based lending transaction does not meet all of the requirements listed in paragraph (1) of this subdivision, then the commercial financing offer shall be considered less than or equal to $2,500,000.
+(c) For a factoring transaction:
+(1) use the approved advance limit if the transaction meets all of the following requirements:
+(i) the provider offers the recipient an agreement that describes the general terms and conditions of the commercial financing transaction that will occur under the agreement;
+(ii) the approved advance limit exceeds $2,500,000; and
+(iii) the parties to the factoring transaction agree in writing that at some point during the agreement, an amount exceeding $2,500,000 is reasonably expected to be advanced to the recipient and outstanding for legally enforceable claims that have not yet been paid at some point during the agreement and such agreement is made in writing before the execution of the financing agreement, before any amendment to an agreement enter into before the effective date of this Part, or before any amendment increasing the approved credit limit for a consummated financing agreement to an amount exceeding $2,500,000; and
+(2) if the factoring transaction does not meet all of the requirements listed in paragraph (1) of this subdivision, then the commercial financing offer shall be considered less than or equal to $2,500,000.
+(d) In all other transactions, use the amount financed.
+23 CRR-NY 600.19
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf014e366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf014e366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:50.294583+00:00
+RESPONSE SHA256: 719ed342fe752fbe69520bcdc40479b85da21b3e9c3bf9064675661fd7cee8ef
+
+600.20 Commercial financings with multiple payment options/balances payable on demand.
+(a) For commercial financings that offer multiple payment options to the recipient, the provider shall calculate required disclosures based upon the minimum payments allowed under the contract.
+(b) For commercial financings where the balance due is payable on demand, the provider shall calculate required disclosures based upon an assumed term of one year unless the provider reasonably anticipates that the balance will be repaid more quickly. If an alternate maturity date is stated in the legal obligation between the parties, then the disclosures shall be based on that date.
+23 CRR-NY 600.20
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0151366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0151366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:50.854741+00:00
+RESPONSE SHA256: 92e37c585bbae09bf4d43ab1786be78e1cc982b40965be281f6299b0f839dce2
+
+600.21 Duties of financers and brokers, and additional duties of providers.
+(a) A financer shall:
+(1) provide a copy of compliant disclosures to a broker, whenever a financer provides a broker with specific commercial financing offer;
+(2) maintain a copy of the evidence of transmission of the disclosures provided by a broker to the financer in compliance with subdivision (b) of this section for a period of at least four years following the date that the disclosure is presented to the recipient; and
+(3) develop procedures reasonably designed to ensure that recipients receive the disclosures required pursuant to paragraph (1) of this subdivision at the time that a broker provides a specific commercial financing offer to a recipient. These procedures may include:
+(i) contractual requirements that brokers timely provide to the financer documentation of transmission of the disclosure (including timing of transmission) to the recipient;
+(ii) timely investigation of facts that would give a financer reasonable notice that a broker has not provided disclosures to recipients as required by subdivision (b) of this section; and
+(iii) discontinuation of relationships with any broker who the financer has found to have engaged in a pattern of noncompliance with subdivision (b) of this section.
+(b) Following receipt of the disclosures required by paragraph (a)(1) of this section, and before communicating a specific commercial financing offer to a recipient, a broker shall transmit the unaltered disclosures received from the financer to the recipient. After a broker transmits disclosures to the recipient, the broker shall provide evidence of transmission of the disclosures to the financer, including the time of transmission.
+(c) A broker shall not provide a specific offer of commercial financing to a recipient without:
+(1) complying with subdivision (b) of this section; or
+(2) obtaining confirmation from the financer that the disclosures required by this section have been provided to the recipient.
+(d) A provider shall maintain a copy of each disclosure that it generates pursuant to this section for a period of at least four years following the date that the disclosure is presented to the recipient or provided to a broker.
+(e) A financer may, in lieu of compliance with subdivision (a) of this section, provide a copy of compliant disclosures directly to a recipient any time the financer provides a broker with a specific commercial financing offer for the recipient.
+(f) If the commercial financing involves a broker, the provider must inform the recipient, in writing, of how, and by whom, the broker will be compensated for the broker’s role in the transaction.
+(g) This section shall not be construed to:
+(1) require a broker to evaluate the accuracy of the disclosures provided by the financer;
+(2) create any liability for a broker if the disclosures that the financer provides do not comply with this Part; or
+(3) limit any liability that may arise when a broker makes representations concerning the commercial financing.
+23 CRR-NY 600.21
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0154366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0154366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:51.766449+00:00
+RESPONSE SHA256: 4e7507ad7d4615777a560c4a8308785d1fe8fd1aaa082a62afbb7e0283f11fcd
+
+600.22 Reporting.
+(a) On or before the 30th day of April each year, beginning in 2025, each provider subject to the CFDL that, during the preceding calendar year, has utilized the opt-in method of calculating estimated APR, as described in section 600.9 of this Part, shall report to the superintendent, in a statement subscribed and affirmed as true under penalties of perjury, the information requested by the superintendent covering the period of the preceding calendar year.
+(b) The report shall include:
+(1) for each commercial financing transaction undertaken as defined by the CFDL, the estimated annual percentage rates disclosed to the recipient and actual retrospective annual percentage rates of completed transactions;
+(2) the annual mean of all differences between the estimated annual percentage rates disclosed to the recipient and actual retrospective annual percentage rates of completed transactions, which mean shall be reported both weighted by financing amount, and unweighted;
+(3) a statement of any unusual and extraordinary circumstances impacting the provider's deviation between estimated and actual annual percentage rate; and
+(4) such other information prescribed by the superintendent as necessary or appropriate for the purpose of making a determination of whether the deviation between the estimated annual percentage rate and actual retrospective annual percentage rates of completed transactions was reasonable.
+(c) Upon request of the superintendent, each provider described in subdivision (a) of this section shall provide any other documents and/or information prescribed by the superintendent as necessary or appropriate for the superintendent’s review and consideration of the report(s) submitted pursuant to subdivision (b) of this section.
+(d) In addition to any reports expressly required by the CFDL and subdivisions (a)-(c) of this section, the superintendent may require any provider to make special reports to the department at such times as the superintendent prescribes, as may be necessary for the enforcement of the CFDL.
+23 CRR-NY 600.22
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf0157366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf0157366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:52.108596+00:00
+RESPONSE SHA256: d320c9f29e54456638181670482c11f304de06a9ba537104c34f9d8906637a88
+
+600.23 Assignment of commercial financing agreements.
+Each recipient may discharge its payment obligations under any commercial financing by paying the original obligee under such financing until, but not after, the recipient receives a notification, authenticated by the original obligee or the obligee’s assignee, that the amount due or to become due has been assigned and the payment is to be made to the assignee.
+23 CRR-NY 600.23
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf015a366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf015a366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:52.213026+00:00
+RESPONSE SHA256: 30df65a7be9ad851574d20dd3d96087e0ddfd9d5fa6f6a68065437581191fc19
+
+600.24 Applicability of the CFDL.
+(a) The obligation to provide any disclosures under the CFDL applies if the recipient’s business is principally directed or managed from the State of New York, or, in the case of a natural person, the recipient is a legal resident of the state of New York.
+(b) For the purpose of determining whether a recipient’s business is “principally directed or managed from New York,” a provider may rely upon any written representation by the recipient as to whether it is principally directed or managed from the state of New York, or may rely upon the business address provided by the recipient to the provider in the application for financing or any other financing documents. If the recipient is a natural person, then the provider may rely upon the recipient’s address as shown on recipient’s current driver’s license or other government-issued identification document, or recipient’s written representation as to recipient’s current legal address.
+23 CRR-NY 600.24
+Current through October 31, 2023
+
+
+SOURCE: https://govt.westlaw.com/nycrr/Document/I8bdf015d366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+FINAL URL: https://govt.westlaw.com/nycrr/Document/I8bdf015d366511f085fee08d50b7f070?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)
+RETRIEVED UTC: 2026-09-12T17:16:52.637564+00:00
+RESPONSE SHA256: 634bd6b02ab7b14c51a29a918642173d32ca8550512b259df9ff7ee353ad2816
+
+600.25 Effective date and compliance date.
+(a) This Part takes effect upon publication of the Notice of Adoption in the State Register.
+(b) The compliance date for this Part is six months after the date of publication of the Notice of Adoption in the State Register.
+23 CRR-NY 600.25
+Current through October 31, 2023

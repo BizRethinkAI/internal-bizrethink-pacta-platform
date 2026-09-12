@@ -1,0 +1,490 @@
+SOURCE: https://dos.ny.gov/system/files/documents/2024/01/013124qi.pdf
+FINAL URL: https://dos.ny.gov/system/files/documents/2024/01/013124qi.pdf
+RETRIEVED UTC: 2026-09-12T17:50:53.689278+00:00
+RESPONSE SHA256: 6ce6439bf284ffe3b44a62345fb407b93fdf2745cff3d35e8863e529541563dd
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-17-16-00003      Plan of Conversion by Commercial Travelers Mutual Insurance Company
+                     To convert a mutual accident and health insurance company to a stock accident and health insurance company
+                     04-27-16 Proposed
+
+DFS-25-18-00006      Plan of Conversion by Medical Liabilty Mutual Insurance Company
+                     To convert a mutual property and casualty insurance company to a stock property and casualty insurance company
+                     06-20-18 Proposed
+
+DFS-42-21-00011      Disclosure requirements for certain providers of commercial fiancing transactions
+                     To provide new disclosure rules for small business financings
+                     10-20-21 Proposed
+                     09-14-22 Revised
+                     02-01-23 Finalized
+
+DFS-44-21-00015      Compliance With Community Reinvestment Act Requirements
+                     To provide new rules concerning data collection on extension of credit to women-owned and minority-owned businesses
+                     11-03-21 Proposed
+                     10-26-22 Revised
+                     02-08-23 Finalized
+
+DFS-50-21-00016      Debt Collection by Third-Party Debt Collectors and Debt Buyers
+                     To clarify and modify standards for debt collection practices in New York
+                     12-15-21 Proposed
+                     12-28-22 Revised
+                     04-05-23 Expired
+
+DFS-24-22-00010      Licensed Cashers of Checks; Fees
+                     To change the maximum fee that may be charged by licensed check cashers and remove an automatic inflation adjust-
+                     ment
+                     06-15-22 Proposed
+                     01-18-23 Finalized
+
+
+
+                                                                                                                                           35
+ID Number         Issue Date     Action                                                                             QUARTERLY INDEX
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-41-22-00021      Charges for Professional Health Services
+                     To establish schedules of maximum permissible charges for professional health services payable as no-fault insurance
+                     benefits
+                     10-12-22 Proposed
+                     01-11-23 Emergency
+                     02-15-23 Finalized
+
+DFS-45-22-00023      Consolidated rulemaking regarding peer-to-peer car sharing
+                     To ensure consumers have appropriate insurance protection when using or operating a vehicle through a car sharing
+                     program.
+                     11-09-22 Proposed
+                     12-28-22 Emergency
+                     02-08-23 Finalized
+
+DFS-45-22-00025      Cybersecurity Requirements for Financial Services Companies
+                     To ensure that DFS-regulated entities most effectively address new and evolving cybersecurity threats.
+                     11-09-22 Proposed
+                     06-28-23 Revised
+                     11-01-23 Finalized
+
+DFS-47-22-00003      Fees (the maximum fee that may be charged by licensed check cashers for cashing checks for retail consumers.)
+                     To freeze the automatic increase to the maximum fee currently contemplated by Section 400.11.
+                     11-23-22 Emergency
+
+DFS-49-22-00001      Principle-Based Reserving
+                     To adopt the 2022 Valuation Manual and amend the scope of section 103.4 to include certain group term life insurance.
+                     12-07-22 Proposed
+                     03-01-23 Finalized
+
+DFS-52-22-00001      Minimum Standards for Form, Content, and Sale of Health Insurance, Including Standards of Full and Fair Disclosure
+                     To waive cost-sharing for in-network visits and laboratory tests necessary to diagnose the novel coronavirus (COVID-19).
+                     12-28-22 Emergency
+
+DFS-52-22-00002      Minimum Standards for Form, Content, and Sale of Health Insurance, Including Standards of Full and Fair Disclosure
+                     To require immediate coverage, without cost-sharing, for COVID-19 immunizations and the administration thereof.
+                     12-28-22 Emergency
+
+DFS-01-23-00004      indices which may be used for variable rate loans subject to the requirements of Parts 33, 80, 90, 91 and 97 of 3
+                     NYCRR.
+                     To permit the use of Secured Overnight Financing Rate as a replacement benchmark for London Inter-Bank Offered
+                     Rate.
+                     01-04-23 Emergency
+
+DFS-03-23-00001      Registration of Pharmacy Benefit Managers
+                     To maintain status quo while the Department promulgates permanent regulations under Public Health Law section 280-a.
+                     01-18-23 Emergency
+
+DFS-03-23-00002      Virtual Currency Licensee Assessments
+                     To set forth the basis for allocating costs and expenses attributable to virtual currency businesses for FSL assessments
+                     01-18-23 Proposed
+                     04-19-23 Finalized
+
+DFS-07-23-00003      General Duties, Accountability, and Transparency Provisions for Pharmacy Benefit Managers; Electronic Filings
+                     To define and clarify the provisions of PHL 280-a(2) and to require electronic filings for PBMs
+                     02-15-23 Proposed
+                     07-12-23 Finalized
+
+
+
+
+36
+ID Number         Issue Date     Action                                                                            QUARTERLY INDEX
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-08-23-00001      Original issuance of license or change of control of a licensee
+                     To eliminate existing language in the regulation that requires every licensed check cashing location to have a minimum
+                     dimension
+                     02-22-23 Proposed
+                     06-21-23 Finalized
+
+DFS-12-23-00002      Minimum Standards for Form, Content, and Sale of Health Insurance, Including Standards of Full and Fair Disclosure
+                     To waive cost-sharing for in-network visits and laboratory tests necessary to diagnose the novel coronavirus (COVID-19).
+                     03-22-23 Emergency
+
+DFS-12-23-00003      Minimum Standards for Form, Content, and Sale of Health Insurance, Including Standards of Full and Fair Disclosure
+                     To require immediate coverage, without cost-sharing, for COVID-19 immunizations and the administration thereof.
+                     03-22-23 Emergency
+
+DFS-14-23-00001      indices which may be used for variable rate loans subject to the requirements of Parts 33, 80, 90, 91 and 97 of 3
+                     NYCRR.
+                     To permit the use of CME Term SOFR as a replacement benchmark for LIBOR and to eliminate an obsolete index.
+                     04-05-23 Emergency
+
+DFS-14-23-00004      Permissible indices for variable rate loans.
+                     To permit the use of CME Term SOFR as a replacement benchmark for LIBOR and to eliminate an obsolete index for
+                     savings & loans.
+                     04-05-23 Proposed
+                     07-05-23 Finalized
+                     07-05-23 Emergency
+
+DFS-15-23-00001      Registration of Pharmacy Benefit Managers
+                     To maintain status quo while the Department promulgates permanent regulations under Public Health Law section 280-a.
+                     04-12-23 Emergency
+
+DFS-16-23-00002      Excess Line Placements Governing Standards
+                     To conform to changes made by Chapter 833 of the Laws of 2022 and Chapter 93 of the Laws of 2023 and prior
+                     amendments.
+                     04-19-23 Proposed
+                     07-12-23 Finalized
+
+DFS-21-23-00002      Pharmacy Benefits Bureau; Pharmacy Benefit Manager Assessments; Filings and Other Requirements for Issuance et al.
+                     To establish rules for PBMs re: assessments, license requirements, and reporting and record keeping, and to clarify
+                     definitions.
+                     05-24-23 Proposed
+                     11-15-23 Finalized
+
+DFS-27-23-00017      Minimum Provisions for Automobile Liability Insurance Policies
+                     To conform to changes to the Insurance Law regarding supplemental spousal liability insurance
+                     07-05-23 Emergency/Proposed
+                     10-04-23 Finalized
+                     10-04-23 Emergency
+
+DFS-28-23-00021      Registration of Pharmacy Benefit Managers
+                     To maintain status quo while the Department promulgates permanent regulations under Public Health Law section 280-a.
+                     07-12-23 Emergency
+
+DFS-31-23-00004      Financial Statement Filings and Accounting Practices and Procedures
+                     To update reference to NAIC AP&P Manual as of date from March 2021 to March 2023, and other non-substantive
+                     changes.
+                     08-02-23 Proposed
+                     11-01-23 Finalized
+
+
+
+                                                                                                                                          37
+ID Number         Issue Date      Action                                                                             QUARTERLY INDEX
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-33-23-00009      Definitions, licensing of PBMs, contracting with network pharmacies, acquisition of PBMs, consumer protections, and
+                     audits
+                     Establish definitions, licensing, contracting with pharmacies, acquisition of PBMs, consumer protections, and audit regula-
+                     tions
+                     08-16-23 Proposed
+                     11-15-23 Withdrawn
+
+DFS-36-23-00021      Principle-Based Reserving
+                     To adopt the 2023 Valuation Manual
+                     09-06-23 Proposed
+                     12-06-23 Finalized
+
+DFS-41-23-00002      Minimum Standards for the New York State Partnership for Long-Term Care Program
+                     To update the current minimum daily benefit amounts for partnership long term care coverage for the period 1/1/2024-1/
+                     1/2033
+                     10-11-23 Proposed
+
+
+
+
+
+SOURCE: https://dos.ny.gov/system/files/documents/2025/01/012925qi.pdf
+FINAL URL: https://dos.ny.gov/system/files/documents/2025/01/012925qi.pdf
+RETRIEVED UTC: 2026-09-12T17:50:53.692267+00:00
+RESPONSE SHA256: dc77c7e9552df0e84547525204af5faaaa2a7e1378e33909feab400a801b08c9
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-17-16-00003      Plan of Conversion by Commercial Travelers Mutual Insurance Company
+                     To convert a mutual accident and health insurance company to a stock accident and health insurance company
+                     04-27-16 Proposed
+
+DFS-25-18-00006      Plan of Conversion by Medical Liabilty Mutual Insurance Company
+                     To convert a mutual property and casualty insurance company to a stock property and casualty insurance company
+                     06-20-18 Proposed
+
+DFS-41-23-00002      Minimum Standards for the New York State Partnership for Long-Term Care Program
+                     To update the current minimum daily benefit amounts for partnership long term care coverage for the period 1/1/2024-1/
+                     1/2033
+                     10-11-23 Proposed
+                     01-03-24 Finalized
+
+DFS-05-24-00001      Minimum Standards for Form, Content, and Sale of Health Insurance, Including Standards for Full and Fair Disclosure, et
+                     al.
+                     To ensure that accident, hospital indemnity, and travel insurance are not misleading and provide substantial economic
+                     value
+                     01-31-24 Proposed
+
+DFS-08-24-00001      Network Adequacy and Access Standards
+                     To establish network adequacy and access standards and other protections to improve access to behavioral health ser-
+                     vices
+                     02-21-24 Proposed
+                     11-20-24 Revised
+
+                                                                                                                                              35
+ID Number         Issue Date      Action                                                                             QUARTERLY INDEX
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-08-24-00002      Supplementary Uninsured/Underinsured Motorist Coverage
+                     To comport with changes made to Insurance Law section 3420(f) by Chapter 751 of the Laws of 2023
+                     02-21-24 Proposed
+                     05-15-24 Finalized
+
+DFS-08-24-00003      Supplementary Uninsured/Underinsured Motorist Coverage
+                     To comport with changes made to Insurance Law section 3420(f) by Chapter 751 of the Laws of 2023.
+                     02-21-24 Emergency
+
+DFS-12-24-00008      Minimum Standards for Form, Content and Sale of Health Insurance, Including Standards of Full and Fair Disclosure
+                     To comport with changes made to Insurance Law section 1117 by Chapter 655 of the Laws of 2023.
+                     03-20-24 Emergency
+
+DFS-12-24-00009      Minimum Standards for Form, Content and Sale of Health Insurance, Including Standards of Full and Fair Disclosure
+                     To comport with changes made to Insurance Law section 1117 by Chapter 655 of the Laws of 2023
+                     03-20-24 Proposed
+                     06-18-24 Finalized
+
+DFS-13-24-00003      Definitions, licensing of PBMs, contracting with network pharmacies, acquisition of PBMs, consumer protections, and
+                     audits
+                     Establish definitions, licensing, contracting with pharmacies, acquisition of PBMs, consumer protections, and audit regula-
+                     tions
+                     03-27-24 Proposed
+                     11-27-24 Finalized
+
+DFS-14-24-00001      Mandatory Underwriting Inspection Requirement for Private Passenger Automobiles
+                     To conform to Laws of 2023, Ch 638 permitting an insurer to waive inspection of some or all private passenger autos.
+                     04-03-24 Proposed
+                     06-18-24 Finalized
+
+DFS-14-24-00002      Enterprise Risk Management and Own Risk and Solvency Assessment; Group-Wide Supervision
+                     To implement Chapter 344 of the Laws of 2023, which imposed an annual GCC filing requirement.
+                     04-03-24 Proposed
+                     06-18-24 Finalized
+
+DFS-17-24-00001      Credit For Reinsurance
+                     To prescribe the collateral requirements for reinsurance reserve credit
+                     04-24-24 Proposed
+                     07-17-24 Finalized
+
+DFS-21-24-00003      Supplementary Uninsured/Underinsured Motorist Coverage
+                     To comport with changes made to Insurance Law section 3420(f) by Chapter 751 of the Laws of 2023.
+                     05-22-24 Emergency
+
+DFS-29-24-00007      Principle-Based Reserving
+                     To adopt the 2024 Valuation Manual.
+                     07-17-24 Proposed
+                     10-09-24 Finalized
+
+DFS-32-24-00028      Charges for Professional Health Services
+                     To update the website link to the Official New York Workers’ Compensation DME Fee Schedule.
+                     08-07-24 Proposed
+                     10-23-24 Finalized
+
+DFS-43-24-00003      Financial Statement Filings and Accounting Practices and Procedures
+                     To update reference to NAIC AP&P Manual as of date from March 2023 to March 2024
+                     10-23-24 Proposed
+                     01-08-25 Finalized
+
+36
+ID Number         Issue Date      Action                                                                                QUARTERLY INDEX
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-49-24-00014      MINIMUM STANDARDS FOR THE FORM, CONTENT AND SALE OF HEALTH INSURANCE, INCLUDING STANDARDS
+                     OF FULL AND FAIR DISCLOSURE
+                     To identify disparities in quality and utilization of care experienced by underrepresented populations
+                     12-04-24 Proposed
+
+DFS-50-24-00003      Statement of Actuarial Opinion and Actuarial Opinion Summary for Property/Casualty Insurers
+                     To revise reference to the 2016 NAIC property/casualty annual statement instructions to the current 2024 edition.
+                     12-11-24 Proposed
+
+DFS-51-24-00003      Unfair Claims Settlement Practices and Claim Cost Control Measures
+                     To clarify or amend provisions re: right-of-recourse, total loss efficacy review, and valuation manual titles.
+                     12-18-24 Proposed
+
+DFS-53-24-00002      Minimum Provisions for Automobile Liability Insurance Policies
+                     To conform to statutory amendment regarding supplemental spousal liability insurance, and make technical fixes.
+                     12-31-24 Proposed
+
+
+
+
+
+
+SOURCE: https://dos.ny.gov/system/files/documents/2026/01/012826qi.pdf
+FINAL URL: https://dos.ny.gov/system/files/documents/2026/01/012826qi.pdf
+RETRIEVED UTC: 2026-09-12T17:50:53.669086+00:00
+RESPONSE SHA256: ca4ecf5ba26dc3bb7916ce621d0935b1f7c83497edfdbadde96747e3555a3cfa
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-17-16-00003      Plan of Conversion by Commercial Travelers Mutual Insurance Company
+                     To convert a mutual accident and health insurance company to a stock accident and health insurance company
+                     04-27-16 Proposed
+
+DFS-25-18-00006      Plan of Conversion by Medical Liabilty Mutual Insurance Company
+                     To convert a mutual property and casualty insurance company to a stock property and casualty insurance company
+                     06-20-18 Proposed
+
+DFS-05-24-00001      Minimum Standards for Form, Content, and Sale of Health Insurance, Including Standards for Full and Fair Disclosure, et
+                     al.
+                     To ensure that accident, hospital indemnity, and travel insurance are not misleading and provide substantial economic
+                     value
+                     01-31-24 Proposed
+                     02-19-25 Expired
+
+DFS-08-24-00001      Network Adequacy and Access Standards
+                     To establish network adequacy and access standards and other protections to improve access to behavioral health ser-
+                     vices
+                     02-21-24 Proposed
+                     11-20-24 Revised
+                     02-19-25 Finalized
+
+DFS-43-24-00003      Financial Statement Filings and Accounting Practices and Procedures
+                     To update reference to NAIC AP&P Manual as of date from March 2023 to March 2024
+                     10-23-24 Proposed
+                     01-08-25 Finalized
+
+DFS-49-24-00014      Minimum standards for the form, content and sale of health insurance, including standards of full and fair disclosure
+                     To identify disparities in quality and utilization of care experienced by underrepresented populations
+                     12-04-24 Proposed
+                     04-02-25 Finalized
+
+DFS-50-24-00003      Statement of Actuarial Opinion and Actuarial Opinion Summary for Property/Casualty Insurers
+                     To revise reference to the 2016 NAIC property/casualty annual statement instructions to the current 2024 edition
+                     12-11-24 Proposed
+                     03-12-25 Finalized
+
+                                                                                                                                              27
+ID Number         Issue Date      Action                                                                                  QUARTERLY INDEX
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-51-24-00003      Unfair Claims Settlement Practices and Claim Cost Control Measures
+                     To clarify or amend provisions re: right-of-recourse, total loss efficacy review, and valuation manual titles
+                     12-18-24 Proposed
+
+DFS-53-24-00002      Minimum Provisions for Automobile Liability Insurance Policies
+                     To conform to statutory amendment regarding supplemental spousal liability insurance, and make technical fixes
+                     12-31-24 Proposed
+                     04-16-25 Finalized
+
+DFS-05-25-00002      Compliance with Banking Law Section 28-bb
+                     This rule implements the mandate of Banking Law Section 28-bb.
+                     02-05-25 Proposed
+                     09-03-25 Revised
+
+DFS-18-25-00001      Hurricane Deductible Requirements and Disclosure Information and Other Notices
+                     To establish standards for hurricane deductibles that create operational uniformity with respect to the triggering event.
+                     05-07-25 Proposed
+                     08-06-25 Finalized
+
+DFS-22-25-00001      Electronic Filings and Submissions
+                     To require the electronic submission of filings.
+                     06-04-25 Proposed
+                     08-20-25 Finalized
+
+DFS-24-25-00002      Reports of Suspected Insurance Frauds to Criminal Investigations Unit; Required Warning Statements
+                     To change the month to file a required annual report from January to March to be consistent with statute.
+                     06-18-25 Proposed
+                     09-17-25 Finalized
+
+DFS-27-25-00001      Flexible Rating for Insurance For For-Hire Motor Vehicles
+                     To implement flexible rating for insurance for for-hire motor vehicles
+                     07-09-25 Proposed
+                     10-01-25 Finalized
+
+DFS-41-25-00026      Private Passenger Automobile and Commercial Automobile Statistical Plans Implementation of Private Passenger
+                     Automobile Ins
+                     To repeal Part 145 obsolete requirements and reference section 2 of NAIC’s 2012 statistical handbook in Part 140.
+                     10-15-25 Proposed
+
+DFS-43-25-00001      Principle-Based Reserving
+                     To adopt the 2025 Valuation Manual.
+                     10-29-25 Proposed
+
+DFS-49-25-00014      Anti-Arson Application
+                     To repeal 11 NYCRR Subpart 62-4 in compliance with Chapter 439 of the Laws of 2025
+                     12-10-25 Proposed
+
+
+
+
+
+
+SOURCE: https://dos.ny.gov/july-29-2026vol-xlviii-issue-30-quarterly-index
+FINAL URL: https://dos.ny.gov/system/files/documents/2026/07/072926qi.pdf
+RETRIEVED UTC: 2026-09-12T17:50:54.001449+00:00
+RESPONSE SHA256: d77e84f12ce81d4e4f9d850e14e018f8ccbce168540f15b6092ec15935627e48
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-17-16-00003      Plan of Conversion by Commercial Travelers Mutual Insurance Company
+                     To convert a mutual accident and health insurance company to a stock accident and health insurance company
+                     04-27-16 Proposed
+
+DFS-25-18-00006      Plan of Conversion by Medical Liabilty Mutual Insurance Company
+                     To convert a mutual property and casualty insurance company to a stock property and casualty insurance company
+                     06-20-18 Proposed
+
+DFS-51-24-00003      Unfair Claims Settlement Practices and Claim Cost Control Measures
+                     To clarify or amend provisions re: right-of-recourse, total loss efficacy review, and valuation manual titles
+                     12-18-24 Proposed
+                     01-07-26 Expired
+
+DFS-05-25-00002      Compliance with Banking Law Section 28-bb
+                     This rule implements the mandate of Banking Law Section 28-bb.
+                     02-05-25 Proposed
+                     09-03-25 Revised
+                     01-07-26 Finalized
+
+DFS-18-25-00001      Hurricane Deductible Requirements and Disclosure Information and Other Notices
+                     To establish standards for hurricane deductibles that create operational uniformity with respect to the triggering event.
+                     05-07-25 Proposed
+                     08-06-25 Finalized
+
+DFS-41-25-00026      Private Passenger Automobile and Commercial Automobile Statistical Plans Implementation of Private Passenger
+                     Automobile Ins
+                     To repeal Part 145 obsolete requirements and reference section 2 of NAIC’s 2012 statistical handbook in Part 140.
+                     10-15-25 Proposed
+                     01-14-26 Finalized
+
+DFS-43-25-00001      Principle-Based Reserving
+                     To adopt the 2025 Valuation Manual.
+                     10-29-25 Proposed
+                     01-21-26 Finalized
+
+DFS-49-25-00014      Anti-Arson Application
+                     To repeal 11 NYCRR Subpart 62-4 in compliance with Chapter 439 of the Laws of 2025
+                     12-10-25 Proposed
+                     03-04-26 Finalized
+
+DFS-09-26-00017      Consolidated rulemaking regarding peer-to-peer car sharing
+                     To ensure consumers have appropriate insurance protection when using or operating a vehicle through a car sharing
+                     program.
+                     03-04-26 Proposed
+                     05-27-26 Finalized
+
+                                                                                                                                                 17
+ID Number         Issue Date      Action                                                                                QUARTERLY INDEX
+
+FINANCIAL SERVICES, DEPARTMENT OF
+DFS-14-26-00022      Agent Training Allowance Subsidies for Certain Life Insurance and Annuity Business
+                     To liberalize agent eligibility requirements and adjust for inflation.
+                     04-08-26 Proposed
+
+DFS-14-26-00023      Regulations Implementing the Comprehensive Motor Vehicle Insurance Reparation Act–Claims for Personal Injury Protec-
+                     tion Benefits
+                     Updates the prescribed No-Fault Denial of Claim NF-10 Form.
+                     04-08-26 Proposed
+
+DFS-21-26-00009      Principle-Based Reserving
+                     To adopt the 2026 Valuation Manual.
+                     05-27-26 Proposed
+
+DFS-23-26-00013      Risk-Based Capital
+                     To eliminate the 1/1/27 sunset date to make permanent the treatment of shares of an eligible exchange traded fund as
+                     bonds.
+                     06-10-26 Proposed
+
+DFS-24-26-00002      Confidentiality Protocols for Victims of Domestic Violence and Endangered Individuals
+                     To ensure that insurers have confidentiality protocols in place for domestic violence victims and endangered individuals
+                     06-17-26 Proposed

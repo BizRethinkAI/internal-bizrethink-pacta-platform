@@ -1,0 +1,127 @@
+SOURCE: https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB362
+FINAL URL: https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB362
+RETRIEVED UTC: 2026-09-12T17:06:55.745333+00:00
+RESPONSE SHA256: 2fc2b296d14cf6ed7701be721b9064a7b35f0ee2b2ba4467296281b2fe36f33d
+
+Bill Text - SB-362 Commercial financing: disclosures.
+skip to content
+home
+accessibility
+FAQ
+feedback
+sitemap
+login
+x
+Quick Search:
+Bill Number
+Bill Keyword
+Home
+Bill Information
+California Law
+Publications
+Other Resources
+My Subscriptions
+My Favorites
+Bill Information
+>>
+Bill Search
+>>
+Text
+Bill Text
+Bill Information
+PDF2
+Bill PDF
+|Add To My Favorites |Track Bill | Version: 10/06/25 - Chaptered
+09/10/25 - Enrolled
+08/28/25 - Amended Assembly
+07/10/25 - Amended Assembly
+05/23/25 - Amended Senate
+03/17/25 - Amended Senate
+02/13/25 - Introduced
+SB-362 Commercial financing: disclosures.(2025-2026)
+Text
+>>
+Votes
+>>
+History
+>>
+Bill Analysis
+>>
+Today's Law As Amended
+>>
+Compare Versions
+>>
+Status
+>>
+Comments To Author
+>>
+Track Bill
+>>
+Add To My Favorites
+>>
+SHARE THIS:
+Date Published: 10/07/2025 09:00 PM
+SB362:v93#DOCUMENT
+Bill Start
+Senate Bill
+No. 362
+CHAPTER 352
+An act to amend, renumber, and add Section 22806 of, to add Section 22807 to, and to repeal Section 22805 of, the Financial Code, relating to commercial financing.
+[
+Approved by
+Governor
+October 06, 2025.
+Filed with
+Secretary of State
+October 06, 2025.
+]
+LEGISLATIVE COUNSEL'S DIGEST
+SB 362, Grayson.
+Commercial financing: disclosures.
+Existing law requires a provider of commercial financing to disclose certain information, as specified. Existing law provides that a provider of commercial financing licensed under the California Financing Law (CFL) is subject to examination and enforcement by the Commissioner of Financial Protection and Innovation under the CFL for any violation of those disclosure provisions, as specified. Certain violations of the CFL are a crime.
+This bill would prohibit a provider of commercial financing from using the term “interest” or “rate” in a deceptive way that could reasonably result in the recipient being misled and would require those
+providers to use the term “annual percentage rate” or the acronym “APR” in specified circumstances. The bill would repeal the provision subjecting those providers to the CFL described above and would instead provide that a violation of the disclosure provisions described above and the provisions of the bill is a violation of the CFL if the violation relates to a commercial financing transaction subject to the CFL, or a violation of the California Consumer Financial Protection Law if the violation relates to a commercial financing transaction that is not subject to the CFL. By expanding the scope of a crime, this bill would impose a state-mandated local program.
+The California Constitution requires the state to reimburse local agencies and school districts
+for certain costs mandated by the state. Statutory provisions establish procedures for making that reimbursement.
+This bill would provide that no reimbursement is required by this act for a specified reason.
+Digest Key
+Vote:
+MAJORITY
+Appropriation:
+NO
+Fiscal Committee:
+YES
+Local Program:
+YES
+Bill Text
+The people of the State of California do enact as follows:
+SECTION 1.
+The Legislature finds and declares all of the following:
+(a) Markets serve an important social function in allocating finite resources across the economy. Efficient resource allocation relies on market participants acting on information that accurately reflects the costs and benefits of their decisions.
+(b) Some markets for commercial financing products offered to small businesses allocate capital inefficiently due to a lack of transparency related to the costs of financing.
+(c) In 2018, California enacted a first-in-the-nation requirement for commercial financing providers to disclose the annualized cost of financing to applicants, which is implemented as a requirement to disclose the annualized percentage rate (APR) of specific financing offers.
+(d) The one-time disclosure of APR can help small businesses evaluate offers and shop around for the best deal, but deceptive, unscrupulous, or confusing marketing tactics can interfere with the small business owner’s understanding of the costs of an offer.
+(e) Examples of confusing representations related to the cost of financing include all of the following:
+(1) Describing the price of credit as “simple interest” when referring to a nonannual rate as opposed to a noncompounding
+annual rate that a reasonable person would understand “simple interest” to mean.
+(2) Describing the price of credit as an “interest rate” when describing a daily, weekly, or monthly rate and not an annual rate.
+(3) Describing the price of credit as “X% fee rate” or “Y% factor rate,” particularly when those “rates” diverge materially from the APR.
+(f) In order to strengthen the effect of existing law, this act seeks to provide further clarity to market participants and to the Department of Financial Protection and Innovation (DFPI) related to deceptive marketing and the authority of DFPI to enforce the law.
+SEC. 2.
+Section 22805 of the Financial Code is repealed.
+SEC. 3.
+Section 22806 of the Financial Code is amended and renumbered to read:
+22805. No provision of this division imposes any liability on a provider as a result of the actual Annual Percentage Rate (APR) charged by a provider differing from the Estimated APR disclosed in conformity with any regulation, order, or written interpretive opinion of the commissioner or any such opinion of the Attorney General, whether or not such regulation, order, or written interpretive opinion is later amended, rescinded, or repealed or determined by judicial or other authority to be invalid for any reason.
+SEC. 4.
+Section 22806 is added to the Financial Code, to read:
+22806. (a) A provider shall not use the term “interest” or “rate” in a deceptive way that could reasonably result in the recipient being misled.
+(b) After extending a specific offer to a potential recipient, whenever a provider states a charge, pricing metric, or financing amount to the potential recipient for that specific offer during an application process for commercial financing, the provider shall also state the annual percentage rate of that commercial financing offer by using the term “annual percentage rate” or the acronym
+“APR.”
+(c) Use of the term “interest” or “rate” is not deceptive or likely to mislead for purposes of this division if the metric of financing cost is an annual interest rate or annual percentage rate that is either fixed or floating for the period of the financing and that is expressed as a margin over an index rate.
+SEC. 5.
+Section 22807 is added to the Financial Code, to read:
+22807. (a) A violation of this division by a person licensed under the California Financing Law (Division 9 (commencing with Section 22000)) shall be deemed a violation of the California Financing Law if the violation relates to a commercial financing transaction that is subject to the California Financing Law.
+(b) A violation of this provision shall be deemed an unfair, deceptive, or abusive act or practice under the California Consumer Financial Protection Law (Division 24 (commencing with Section 90000)) if the violation relates to a commercial financing transaction that is not subject to the California Financing Law (Division 9 (commencing with Section
+22000)).
+SEC. 6.
+No reimbursement is required by this act pursuant to Section 6 of Article XIII B of the California Constitution because the only costs that may be incurred by a local agency or school district will be incurred because this act creates a new crime or infraction, eliminates a crime or infraction, or changes the penalty for a crime or infraction, within the meaning of Section 17556 of the Government Code, or changes the definition of a crime within the meaning of Section 6 of Article XIII B of the California Constitution.
