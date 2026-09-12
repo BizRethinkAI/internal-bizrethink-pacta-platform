@@ -1,9 +1,10 @@
 # STATE.md — where this repo actually is
 
-**Every session reads this first and updates it last.** It is the only memory that
-survives between sessions. It replaced a user-local `~/.claude/.../memory/`
-directory on 2026-08-29 — that directory was invisible to anyone but one machine,
-unversioned, and absent from PRs. This file is none of those things.
+**Every session reads this first, together with any unprocessed notes and open
+task records.** This is the settled memory that survives between sessions. It
+replaced a user-local `~/.claude/.../memory/` directory on 2026-08-29 — that
+directory was invisible to anyone but one machine, unversioned, and absent from
+PRs. This file is none of those things.
 
 Record **current reality, not intent**. A stale STATE.md is worse than none,
 because it is believed.
@@ -16,49 +17,96 @@ _Last updated: 2026-09-12_
 
 ---
 
-## 2026-09-12 — eleven-state MCA agreement requirements (#179)
+## 2026-09-12 — direct-template field enforcement (#178 / A-07)
 
-Research PR **#179** merged at `42394e5f3` after all 13 checks passed on
-`4cf12aa5a`. Its E2E jobs used the existing docs-only exemption; they did not
-run the browser suite. The source report and detailed records are in
-[`research/mca-agreement-requirements-2026-09-12/`](research/mca-agreement-requirements-2026-09-12/README.md).
-This is a walk of eleven dedicated commercial-financing schemes, including
-26 California rules, 26 New York rules, fourteen Texas rules, four Virginia
-rules and Connecticut guidance/enforcement cross-references. The manifest
-records 113 HTTP attempts, twenty retained files and 27 unchanged references.
-The historical #174 audit and application-source bytes remain unchanged.
+PR **#178** merged at `fae29ec3126838c6e807a9b90021a9e2d90a37db` after
+independent adversarial review and all 13 exact-head checks passed on
+`ccb8df923b231b8777b147e1bb8681a0ccd7c346`. Direct-template submissions now
+validate the complete direct recipient field set before ACTION factors, quota
+use, file copies or document writes. Foreign and duplicate IDs, changed locked
+values, malformed metadata, missing required values, invalid choices/counts,
+text/number constraint failures and disallowed typed signatures fail closed.
 
-Positive agreement duties: GA §10-1-393.18(e)(4), UT §7-27-202(3), KS
-§75-784(b)(5) and MO §427.300.3(2)(e) require variable-payment methodology
-in covered agreements; Texas §86.310(d) requires its conspicuous OCCC notice
-and §86.312(b)(3) requires disclosed/contracted fees. Duties, prescribed
-wording, prohibited terms and separate disclosures are distinguished.
-California §§22806–22807 derive from 2025 SB 362, effective January 1, 2026.
-CT's later employee-registration memorandum is not a disclosure-grace extension.
+Publisher defaults remain canonical for locked text, number and choice fields,
+including older clients that omit them. Editable prefills, v1 labels and empty
+labels, v2 indexes, optional omissions, ordinary unformatted numbers, server-
+derived dates, identity/timestamp gates and drawn signatures retain their
+existing behavior. Both SIGNATURE and FREE_SIGNATURE use the effective typed-
+signature setting; the request's image flag cannot disguise plain text.
+Overlay **080** records the one upstream creation hook; the policy and tests are
+BizRethink-owned. No schema, dependency, setting or public API shape changed.
 
-Currency limits survive: GA's full current Lexis body was blocked by CAPTCHA;
-MO's declaration/rule history selecting the commencement branch is unclosed.
-California consolidated rules state August 28, 2026 currency; New York states
-October 31, 2023, supplemented by official amendment-index checks through
-September 9, 2026 without a later Part 600 amendment identified. Utah's linked
-FAQ is dated January 1, 2023 despite its 2026 upload path. Texas's current
-portal labels §86.311(i)'s second item `(2)` where the adoption says `(B)`.
-These are documented limits, not invented verification dates or equivalences.
+The earlier A-04 upload-ownership migration
+`20260912130000_bizrethink_pdf_upload_ownership` is still a deployment
+prerequisite. The production container runs `prisma migrate deploy` before the
+app starts. This merge and review do not establish that a deployment occurred.
 
-Remaining source/form work: fix Utah application references from §7-27-201 to
-§7-27-202; update California statutory references; correct the Virginia
-prescribed form separately. UCC, federal law, guaranty, bankruptcy and case law
-remain targeted clause dependencies. Research alone approves no clause.
-ADR 0014 backfill is being implemented in
-[`state/inflight/feat-mca-clause-metadata.md`](state/inflight/feat-mca-clause-metadata.md).
-Missing collection/venue alternatives and the processor-acceptance deal-fact
-move remain separate. The research retrieval workspace was
-`/tmp/pacta-mca-requirements/`; durable evidence is committed in the report.
+## 2026-09-12 — MCA requirements and clause metadata (#179 / #180)
 
-A-07 authored the #176/#177 note cleanup, reused unchanged from #178 head
-`3874700da819d2606eb0198a6458d57b5d72a139` as research dependency `cede1f021`.
-This section folds only this session's now-merged #179 note. No deployment
-status is inferred from the merge.
+Research PR **#179** merged at `42394e5f3ab6c85079a4328b9971fa19a835223b`.
+Its eleven-state report, section register and source ledger distinguish required
+agreement content, prescribed disclosures, conduct rules and prohibited terms.
+The manifest records 113 HTTP attempts, twenty retained evidence files and 27
+unchanged inputs. It identified variable-payment methodology duties in Georgia,
+Utah, Kansas and Missouri, Texas's prescribed OCCC notice and Texas contracted-
+fee requirements without treating silence in a dedicated scheme as proof that a
+clause is discretionary.
+
+PR **#180** merged at `7449244935fbd522b903396d4b903a05d65adb5b` after
+independent legal-metadata review and all 13 exact-head checks passed on
+`ac491ae3db7e09b7c3ed95cf6133e0a1db61346d`. Every one of the **211** live
+clause records now explicitly states `whyThisClause` and `variance`: 1 compelled,
+35 implementing a legal duty in Pacta's wording and 175 discretionary; 6 offered
+alternatives and 205 fixed records. The six offered records form complete
+concurrent-position, guaranty-scope and court/arbitration groups. Clause bodies,
+fields, slugs, versions, gates, references, order, provenance, draft/null-author
+status and examination records are unchanged.
+
+Staff and counsel surfaces display both assessments. Both values participate in
+approval and review-link fingerprints, so old approvals lapse and old links
+report moved content; no approval row or stored template is rewritten. Expanded
+positive state scopes feed the existing attorney-admission checks but introduce
+no new selection gate. Ten retained targeted-authority files independently match
+their manifest hashes and byte counts. These assessments explain purpose and
+available wording; they do not approve a clause or prove compliance.
+
+The research limits remain: Georgia's full current body was blocked by CAPTCHA;
+Missouri's rule-dependent commencement history remains unclosed; the documented
+California/New York publisher dates remain qualified. Utah and California source
+references, Virginia's prescribed form, the ancillary split/equipment/release
+mismatches, missing collection/gross-settlement/funder-state alternatives,
+`processorSplitAccepted` move, interview, guaranty placement and stored-template
+rebuild remain separate work. No deployment status is inferred from either merge.
+
+## 2026-09-12 — session coordination and efficient validation (#182 / #183)
+
+PR **#182** merged at `7ae9b8ecef8566ede02713abe547ef58a936014b` after an
+independent governance/upstream review. Its final integration head
+`949a3759b3e275d275eda1f94fec617286eac5c3` passed all 13 checks after current
+main was merged and the sole conflict was resolved by retaining both sets of
+owned typecheck entries. Separate GitHub task issues now hold live assignments;
+authors own one branch-named note, and ordinary PRs cannot edit STATE.md or
+another branch's note. Overlay **081** adds the root startup pointer.
+
+The shipping session now prepares one pure final consolidation PR per selected
+batch. It updates only this file and deletes merged notes, creates no note of its
+own and cannot be self-merged. The `State ready to ship` workflow fails main while
+any note remains and must pass on the exact final revision before deployment.
+This changes neither branch protection nor Coolify; auto-deploy remains off.
+
+PR **#183** merged at `8b7c940adbbb3671412f5119d16b72451c572c06` after it was
+retargeted from #182 to main, marked ready and close/reopened once to trigger the
+main-only workflows without a status-only commit. All nine applicable docs-only
+checks passed on `347b8999744e6e2fd27002005387b9ec7d0acb43`, including both
+builds, the separate typecheck, Governance and Playwright. The engineering
+standard now records focused TDD during implementation, comprehensive final CI,
+impact-based browser inspection, one fresh independent review and bounded
+optional delegation without changing any safeguard.
+
+The selected #178/#180/#182/#183 batch has been reviewed and merged. This
+consolidation is its final human-reviewed dependency; one non-forced Coolify
+deploy request remains pending final-main CI. A deploy receipt will record a
+request, not verified live status.
 
 ## 2026-09-12 — merged signup policy and derived MCA numbering
 
@@ -264,12 +312,12 @@ retained official captures. Source agreement is not legal or publication
 approval. No clause body, authored status, author, schema or upstream file changed.
 
 The eleven-state dedicated-scheme matrix and further implementing authorities
-are now recorded in #179 below, with explicit currency/access limits. Virginia's
-October 2022 prescribed-form correction and clause-specific authority checks
-remain open. CT guidance predates its registration amendment. ADR 0014 must use
-the evidence and its qualifications when classifying the **211** records;
-authored clauses stay draft with null authors. ADR 0011 guaranty placement,
-template/form migration and commercial interview answers remain separate.
+are recorded in #179, with explicit currency/access limits. Virginia's October
+2022 prescribed-form correction remains open, and CT guidance predates its
+registration amendment. ADR 0014's metadata classification of the **211**
+records is now complete in #180; authored clauses remain draft with null authors.
+ADR 0011 guaranty placement, template/form migration and commercial interview
+answers remain separate.
 
 ## 2026-09-12 — assistant signature boundary merged (#177 / A-06)
 
@@ -292,65 +340,11 @@ the six new HTTP tests passed on their first attempts. Full E2E reported
 **1,087 passed / 1 flaky / 59 skipped**; the existing pending-envelope order
 test at `api/v2/update-envelope-items.spec.ts:298` passed on retry.
 
-This establishes the merge and CI, not completion of independent adversarial
-review or production deployment; those remain unverified by this author.
-There is no A-06 schema/configuration change. A-04's additive upload-ownership
-migration prerequisite above still applies to shipping the queue.
-
-Shwet assigned the A-07 remediation session the single fold of #176/#177 notes.
-The MCA research PR #179 reused A-07's exact three-file fold from #178 head
-`3874700da` as dependency commit `cede1f021`; it did not author a second fold.
-A-07 now includes that merged dependency without repeating it. #176's earlier fold of
-#173/#174/#175 is retained unchanged except for the now-completed follow-ups
-identified above. A-07 is approved and tracked in its own in-flight note;
+This establishes the A-06 merge and author CI, not production deployment. A-07
+has since received independent adversarial review and merged as #178, recorded
+above. There is no A-06 schema/configuration change. A-04's additive upload-
+ownership migration prerequisite still applies to the pending batch deployment;
 later audit findings still require individual owner decisions.
-
-## 2026-09-12 — eleven-state MCA agreement research merged (#179)
-
-**#179** merged at `42394e5f3ab6c85079a4328b9971fa19a835223b`.
-The [report, section register and source ledger](research/mca-agreement-requirements-2026-09-12/README.md)
-separate agreement-content duties, prescribed disclosure wording, conduct and
-prohibited terms. The dedicated schemes for all eleven states were read, with
-26 CA rules, 26 NY rules, 14 TX rules, four VA rules and CT enforcement/guidance.
-The manifest records **113 HTTP attempts / 20 retained evidence files / 27
-unchanged source or evidence inputs**; browser observations are separate from
-HTTP provenance. Original #174 evidence and application source inputs are unchanged.
-
-The report identifies variable-payment agreement-content duties in GA, KS, MO
-and UT, plus TX's prescribed OCCC services-contract notice and contractual
-support for fees/charges. Those findings replace the old "Texas only" premise
-without classifying every clause as required or prescribing our authored words.
-Registration, disclosure delivery, signatures, priority and prohibited conduct
-remain separate from required agreement text. The research changes no clause
-body, approval status, application behavior or schema.
-
-Source limits remain explicit: CA's publisher cutoff is August 28, 2026; NY's
-is October 31, 2023, supplemented by the documented official amendment-index
-search through September 9, 2026, which identified no later Part 600 amendment.
-The current CT index links its 2024 guidance, which cannot override the later
-registration statute. Texas's current portal and complete adoption packet were
-read; §86.311(i)'s `(2)` versus `(B)` publication discrepancy is retained.
-Georgia's full current-code body remains blocked by the publisher CAPTCHA;
-visible section history and 2024–2026 legislative summaries are corroboration.
-Missouri's rule-dependent commencement history remains unestablished: do not
-hardcode an unconditional date. Utah's regulator FAQ is dated January 1, 2023,
-despite its 2026 upload path; that path is not a new legal effective date.
-
-Next MCA work is ADR 0014's two metadata fields and clause-specific backfill of
-the **211 actual records**, using targeted UCC/contract/usury/guaranty/bankruptcy/
-E-SIGN/NACHA/case-law authority where needed. Silence in a dedicated scheme
-does not prove a clause discretionary. Draft/null authors, lawful commercial
-options and the fact partition remain. Queued corrections: UT disclosure
-citations from §201 to §202 and CA's changed statutory references. Virginia's
-prescribed-form mismatch remains a separate PR; the three missing facts and
-`processorSplitAccepted` fact move remain separate owner decisions.
-
-The research author recorded local hash/link/section-count validation; current
-CI evidence belongs to #179's Checks and description. This fold records its
-verified merge, not a new legal approval or application validation. #178 was
-the only open PR when Guard 5 identified #179's merged note, so the A-07 session
-owns its single fold and removal. No research implementation or source evidence
-is changed by the fold.
 
 ## Where things stand
 
@@ -363,7 +357,7 @@ contracts. Treat every production action accordingly.
 organisation was BizRethink's own; `lombard` is the first outside one. That
 changes the blast radius of instance-wide changes — see *Lombard tenancy* below.
 
-All customisation lives in `packages/bizrethink/` plus **42 overlay patches**,
+All customisation lives in `packages/bizrethink/` plus **57 overlay patches**,
 which are the only sanctioned way to modify upstream files (plus the paths declared in `overlays/BIZRETHINK-OWNED.txt`, which were never upstream). Upstream is merged
 weekly by `.github/workflows/upstream-sync.yml`. See
 [ADR 0002](adr/0002-additive-fork-over-hard-fork.md).
@@ -387,15 +381,15 @@ architecture is recorded in ADRs rather than here:
   track, not a prerequisite. `assertPublishable` gates text reaching a *third
   party*, not text being written. Building the clause library is unblocked.
 
-Where it stands, **2026-09-10**:
+Where it stands, **2026-09-12**:
 
 | | |
 |---|---|
 | Conformity surface | **built** — `/admin/mca`, instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, CT/VA primary text sourced, source strength and reading age on every card (#134) |
-| Clause library | **built** — `packages/bizrethink/mca/clauses/`, **203 clause records across all six instruments**, every one carrying an examination record |
+| Clause library | **built** — `packages/bizrethink/mca/clauses/`, **211 clause records across all six instruments**, every one carrying an examination record plus explicit purpose and variance metadata; every record remains draft/null-author |
 | The FRPA | **rewritten in full, 2026-09-10** — all **100** records authored from the counsel memo and the 254 findings, under [ADR 0012](adr/0012-the-baseline-document-is-input-not-specification.md) and [ADR 0013](adr/0013-a-funder-profile-describes-the-funder.md). **Unreviewed:** every record is `status: 'draft'` with `author: null` and zero counsel approvals exist |
 | The other five instruments | **NOT rewritten** — Equipment Lease, Subscription, ISO PRA, Split Funding, Permission to Release. A merchant signs **five of the six**, and two of them undo the FRPA's protections in the same envelope. See *The day of 2026-09-10* |
-| Selection engine | **built** — `selectClauses`, `instrumentsFor`, `McaFacts` with a Lombard profile. Eleven facts; **three still gate nothing** |
+| Selection engine | **built** — `selectClauses`, `instrumentsFor`, `McaFacts` with a Lombard profile. Twelve facts; **three still gate nothing** (`settlementBase`, `venueRule`, `processorSplitAccepted`) |
 | `/admin/mca-library` | **built** (#132) — per-clause approval (#135), a `From counsel` section (#140) |
 | Counsel review link | **built** — `/mca-clause-review/:token`, scoped by instrument, with a derived briefing (#139) and a findings box (#140) |
 | Agreement builder | **not started — and it is still the deliverable.** [ADR 0011](adr/0011-the-mca-clause-library-is-a-library.md) settles its shape |
@@ -414,33 +408,25 @@ merchant. `assertPublishable` **reports, it does not refuse** — it returns ear
 on anything not `published`, and both surfaces call it on a hypothetical. **The
 first thing the render path must do is fail closed on it**, test written first.
 
-## In flight
+## Session state and in-flight work
 
-**Live work now lives in [`docs/state/inflight/`](state/inflight/), one file per
-pull request.** Reading the current state means this file plus every note in
-that folder. The table below is history and stays until compaction.
+Live assignments are separate `[Task]` GitHub issues owned by Shwet or one
+explicitly appointed coordinator. Each author records durable PR context only in
+`docs/state/inflight/<branch-slug>.md`; a note on main means merged work awaiting
+the shipping batch's final consolidation, not necessarily an open PR.
 
-**Nothing is open.** #152 through #158 all merged on 2026-09-10.
+Governance now requires an ordinary PR's own nonempty note and rejects direct
+STATE.md edits or changes to another note. A pure
+`chore/state-consolidation-<batch>` PR is the only exception: it updates this file
+and deletes all processed merged notes without creating a note of its own. The
+separate `State ready to ship` workflow blocks deployment while any note remains.
+Read [`session-workflow.md`](session-workflow.md) for assignment, handoff,
+independent-review and shipping rules.
 
-**Eleven in-flight notes were folded into this file and deleted on 2026-09-10** —
-the second compaction, and **it had re-accumulated in one day.** Every one
-belonged to a merged PR: #145, #146, #147, #149, #150, #151, #152, #153, #154,
-#155, and the first compaction's own note. **The folder is now empty but for its
-README**, which is the first time that has been true.
-
-**The governance gate was green throughout, again**, and this is the second time
-that has been recorded. `governance.yml` checks that a PR *touches* a state file
-and that STATE.md carries no conflict markers. It cannot check whether a note's
-PR has merged, or whether a claim in this file is still true. It did not catch
-that this file said the MCA migrations had *"never been applied anywhere"* six
-days after they were applied — the owner did.
-
-| PR | What | State |
-|---|---|---|
-| #26 | Lease party list + sending wired | Open. Base of the lease stack. |
-| #27 | Property form, Census address lookup, market-fact suggestions | Open, stacked on #26. |
-| #3 | `default-deny GITHUB_TOKEN` scope in CI workflows | Rebased 2026-08-29 |
-| #4 | AATL signing setup plan (DigiCert + GCP Cloud HSM) | Rebased 2026-08-29. AATL confirmed still live. |
+The #178/#180/#182/#183 notes are folded by this consolidation. There were no
+other open PRs and no competing consolidation assignment when it began. After
+these deletions the folder is empty except for its README; future work creates
+its own branch note rather than editing this settled account directly.
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
 **#21** (route), **#22** (preview link), **#23** (custom clauses + interview
