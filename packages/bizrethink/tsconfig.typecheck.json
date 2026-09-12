@@ -44,6 +44,7 @@
     "server-only/presign-capability.ts",
     "server-only/presign-file-access.ts",
     "../app-tests/e2e/api/bizrethink/presign-capability-boundary.spec.ts",
-    "server-only/presign-procedure.ts"
+    "server-only/presign-procedure.ts",
+    "regression-tests/assistant-signature-boundary.test.ts"
   ]
 }
