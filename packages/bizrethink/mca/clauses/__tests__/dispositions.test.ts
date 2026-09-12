@@ -119,9 +119,69 @@ describe('a finding that was acted on is not outstanding', () => {
     // 205 REVIEW-01 entries: 201 that survived, carrying the manifest's
     // status, plus the 4 refuted ones, which carry none.
     expect(byDisposition.implemented).toBe(166);
-    expect(byDisposition.open).toBe(31);
+    // 31 → 30 and rejected 1 → 2 on 2026-09-11: the 2026-09-09 counsel memo
+    // refuted `fair-market-value-recital-self-refuting` on UNCHANGED §2.1 text,
+    // and lombard-contracts recorded that as `rejected`. See the test below,
+    // which names the finding, and the manifest note, which quotes the memo.
+    expect(byDisposition.open).toBe(30);
     expect(byDisposition.handoff).toBe(2);
     expect(byDisposition.unrecorded).toBe(4);
+    // Never asserted before, which is why the count could drift silently. Two
+    // now: the owner's Frontload re-pricing reversal, and the memo refutation.
+    expect(byDisposition.rejected).toBe(2);
+  });
+
+  /**
+   * REJECTED IS NOT REFUTED, AND THE DIFFERENCE DECIDES WHO IS ALLOWED TO BE
+   * WRONG.
+   *
+   * `status: 'refuted'` means the REVIEW ITSELF withdrew the finding — five
+   * such findings exist across the two reviews and none of them appears in a
+   * manifest, which is why they read `unrecorded`.
+   *
+   * `disposition: 'rejected'` is the opposite case: a finding that SURVIVED its
+   * own review and was disposed of afterwards. There are two, and neither was
+   * disposed of by this session's judgement. The first is the owner reversing a
+   * pricing change. The second is the 2026-09-09 counsel memo, which lists
+   * §2.1's fair-market-value recital under "Earlier findings that should not be
+   * repeated as written": "A discounted purchase can have a fair market value
+   * below its face Purchased Amount; factor rate alone is not a contradiction."
+   *
+   * WHY ONLY THIS ONE, when that section of the memo names six. Four of the six
+   * do not reach a live finding: two of them (§4.8's regulator carve-out,
+   * §6.1.3's link to §6.2.1) read a document that had ALREADY been fixed after
+   * the review that raised them, so the finding was right when written; one
+   * (FCRA authority "in the missing Permission to Release") rests on the memo's
+   * premise that the Permission to Release is missing, and it is vendored twice
+   * in lombard-contracts/sources/; and two (the secured-party DBA, email service
+   * as a confession of judgment) deny a claim no finding in either review makes.
+   * This one is the only one where the memo contradicts a surviving finding
+   * about text that did not change.
+   */
+  it('rejects only the finding the memo contradicts on unchanged text', () => {
+    const rejected = [...FINDINGS_BY_ID.values()]
+      .flat()
+      .filter((finding) => finding.disposition === 'rejected')
+      .map((finding) => finding.id)
+      .sort();
+
+    expect(rejected).toEqual(['fair-market-value-recital-self-refuting', 'frontload-refactors-old-balance']);
+
+    // The four the memo also names, still outstanding and still blocking.
+    const byId = (id: string) => [...FINDINGS_BY_ID.values()].flat().filter((finding) => finding.id === id);
+
+    for (const id of [
+      'frpa-4-8-may-impede-a-merchant-complaint-to-a-regulator',
+      'guarantor-termination-notice-is-default',
+      'frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument',
+      'service-without-notice-vs-commitment-9',
+    ]) {
+      expect(byId(id).length, `${id} is not in the register`).toBeGreaterThan(0);
+
+      for (const finding of byId(id)) {
+        expect(finding.disposition, `${id} was rejected without a verified mapping`).not.toBe('rejected');
+      }
+    }
   });
 
   /**
@@ -170,10 +230,14 @@ describe('a finding that was acted on is not outstanding', () => {
 
     // 136 until §9.3 was removed with its one REVIEW-02 finding.
     expect(distinct.size).toBe(135);
-    expect(stillOpen.size).toBe(38);
+    // 38 → 37 on 2026-09-11. One finding moved from `open` to `rejected` in
+    // lombard-contracts' REVIEW-01 manifest — the 2026-09-09 counsel memo's
+    // refutation of the §2.1 fair-market-value recital. The gap this test pins
+    // widened by exactly one, in the direction a disposition always moves it.
+    expect(stillOpen.size).toBe(37);
     // 98 until §9.3 was removed. Its finding was `implemented` — the clause was
     // deleted by owner decision 6 — so the resolved count fell and the still-open
     // count did not, which is the arithmetic confirming which side it was on.
-    expect(distinct.size - stillOpen.size).toBe(97);
+    expect(distinct.size - stillOpen.size).toBe(98);
   });
 });

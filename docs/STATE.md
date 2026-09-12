@@ -253,6 +253,58 @@ have. **#166 recovers it**, carrying the same delta with no content change.
 > base lands, or merged into its base *before* that base goes to main. Checking
 > `baseRefName` on every PR — not body text saying "stacked on" — is the guard.
 
+### #164 and #166 — full recourse, arbitration, and §6.1 becomes a pair
+
+**§§9.4–9.6 got their own records rather than a redraft.** Each has one sentence
+that is false under a wide guaranty and is exactly what makes the narrow one
+better than market — §9.6 literally tells the signer *"Section 9.2 creates
+limited personal or entity liability"*. Redrafting them true-under-both means
+deleting them, which strips the `limited-conduct` template of its protections.
+
+**§7.19's gate was misattributed and went.** `disputeResolution` answers *where*
+a claim is heard; §7.19 answers *how long there is to bring it*, which is the
+same in both forums. **That changed because of the owner's decision**: while the
+clause merely disclaimed, its absence under arbitration was a redundancy; the
+moment it states an operative two-year period, a gated §7.19 hands the
+arbitration template **no period at all**.
+
+**§7.26 points rather than restates.** It fixes no governing law and no court
+venue, and a test asserts the set of clauses fixing either is *identical* under
+both values of the fact — so a sentence sneaking in later goes red even if it
+agrees with §7.5 today. **Va. Code §6.2-2234(B)** was read from the vendored file
+and both its sentences are re-matched against those bytes on every run.
+
+**§6.1 is now an exhaustive pair on `guarantyScope`** (#166). It was ungated, so
+it was in every template and decided the guaranty from inside Section 6 — a wide
+§9.2 was text the document then overrode. The bankruptcy / insolvency /
+business-failure carve-out is **word-identical in both records**: a guaranty that
+pays when the business simply fails is the strongest single argument that the
+transaction was a loan. Under full recourse a guarantor can be reached for a
+non-default covenant breach, but **only for §6.2's proportionate relief for
+proven direct loss, never the uncollected Purchased Amount.**
+
+### Two merge hazards that cost real time, both now guarded
+
+**A stacked PR's base landing first is not sufficient.** #165 was merged into
+`feat/mca-full-recourse-and-arbitration` *after* that branch was already on main.
+**Its commits went nowhere and the PR shows green and closed.** Caught only by
+`git merge-base --is-ancestor` in post-merge verification. **Check `baseRefName`,
+not body text saying "stacked on"** — retarget to main once the base lands.
+
+**Two PRs green alone can be red together, and `main` was red for it.**
+`strict_required_status_checks_policy` is `false`, so a branch need not be
+current. #163 and #164 edited the same test file on different lines; git merged
+them silently and **no CI run ever executed their union**. The casualty was a
+count pin at 203 after five records had been added.
+
+**There are FIVE count pins, not four.** `frpa-coverage`, `library`, `surface`
+and `a-signature-for-merchant-is-not-a-guaranty` are where you would look — that
+fourth was itself found by an agent and reported as one nobody had listed. **The
+fifth is buried inside a service-of-process sweep**, which is why three separate
+agents searched for "the pinned counts" and three found four. The reasoning is
+left in that file so the next reader does not re-derive why a test about service
+knows how many clauses exist.
+
 ### Owed
 
 **ADR 0012's *"six findings the 2026-09-09 memo refuted"* is wrong**, and ADRs are
