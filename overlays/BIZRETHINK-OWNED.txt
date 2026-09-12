@@ -158,3 +158,6 @@ packages/app-tests/e2e/api/bizrethink/template-pdf-source-authorization.spec.ts
 
 # A-03 delegated presign capability HTTP regression, newly owned and never upstream.
 packages/app-tests/e2e/api/bizrethink/presign-capability-boundary.spec.ts
+
+# A-06 assistant signature-boundary HTTP regression, newly owned and never upstream.
+packages/app-tests/e2e/api/bizrethink/assistant-signature-boundary.spec.ts

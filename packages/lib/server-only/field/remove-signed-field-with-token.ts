@@ -1,3 +1,4 @@
+import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
 import {
   assertRecipientAccess,
   assertRecipientEnvelopeNotDeleted,
@@ -63,6 +64,9 @@ export const removeSignedFieldWithToken = async ({
   assertRecipientEnvelopeNotDeleted(envelope);
   await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId });
 
+  // MODIFIED for BizRethink (overlay 079): prefilling does not grant removal of another recipient's signature.
+  const assistantFieldWhere = authorizeAssistantFieldMutation({ recipient, field });
+
   if (envelope.status !== DocumentStatus.PENDING) {
     throw new Error(`Document ${envelope.id} must be pending`);
   }
@@ -82,6 +86,7 @@ export const removeSignedFieldWithToken = async ({
     await tx.field.update({
       where: {
         id: field.id,
+        ...assistantFieldWhere,
       },
       data: {
         customText: '',
