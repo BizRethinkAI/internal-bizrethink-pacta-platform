@@ -3,6 +3,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
+import { seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { test as base, expect } from '@playwright/test';
@@ -75,7 +76,13 @@ const expectError = async (response: APIResponse, code: string) => {
 const expectOk = async (response: APIResponse) => {
   expect(response.ok(), await response.text()).toBe(true);
 };
-const pdfPaths = ({ envelope, recipient }: Document) => {
+const pdfPaths = ({
+  envelope,
+  recipient,
+}: {
+  envelope: { id: string; envelopeItems: Array<{ id: string; documentDataId: string }> };
+  recipient: { token: string };
+}) => {
   const item = envelope.envelopeItems[0];
   return [
     `/api/files/token/${recipient.token}/envelopeItem/${item.id}`,
@@ -140,8 +147,18 @@ test('ACCOUNT gates legacy/v2 mutations and CSC entry before any signing side ef
     ['enterprise.csc.signEnvelope', { recipientToken: recipient.token, sessionId: 'invalid-test-session' }],
   ];
   for (const [name, input] of mutationCases) {
+    // Exercise valid insert/remove preconditions, so these requests reach the
+    // access gate rather than failing because an insert targets a filled field.
+    const isInsertion =
+      name === 'field.signFieldWithToken' ||
+      (name === 'envelope.field.sign' && (input.fieldValue as { value: string | null }).value !== null);
+    await prisma.field.update({ where: { id: field.id }, data: { inserted: !isInsertion } });
     for (const request of [auth.anonymous, auth.unrelated]) {
       await expectError(await trpc(request, name, input, true), 'UNAUTHORIZED');
+      expect(await prisma.field.findUnique({ where: { id: field.id } })).toMatchObject({
+        inserted: !isInsertion,
+        customText: field.customText,
+      });
     }
   }
   expect(await prisma.field.findUnique({ where: { id: field.id } })).toMatchObject({
@@ -239,6 +256,68 @@ test('a signing deadline preserves authenticated downloads; deletion and draft s
     }
   }
 });
+
+test('sender deletion preserves the completed recipient copy with ACCOUNT still required', async ({ auth }) => {
+  const document = await seed(auth);
+  await prisma.envelope.update({
+    where: { id: document.envelope.id },
+    data: { status: DocumentStatus.COMPLETED, completedAt: new Date(), deletedAt: new Date() },
+  });
+  for (const path of pdfPaths(document)) {
+    await expectPdf(auth.intended, path);
+    expect((await auth.anonymous.get(path)).status()).toBe(404);
+    expect((await auth.unrelated.get(path)).status()).toBe(404);
+  }
+  await expectOk(await trpc(auth.intended, 'document.getDocumentByToken', { token: document.recipient.token }));
+  for (const [name, input] of reads(document)) {
+    await expectOk(await trpc(auth.intended, name, input));
+    await expectError(await trpc(auth.anonymous, name, input), 'UNAUTHORIZED');
+    await expectError(await trpc(auth.unrelated, name, input), 'UNAUTHORIZED');
+  }
+});
+
+for (const internalVersion of [1, 2] as const) {
+  test(`V${internalVersion} direct-template PDFs retain their published-preview access contract`, async ({ auth }) => {
+    const template = await seedDirectTemplate({
+      userId: auth.sender.user.id,
+      teamId: auth.sender.team.id,
+      internalVersion,
+      createTemplateOptions: { authOptions: { globalAccessAuth: [], globalActionAuth: [] } },
+    });
+    const items = await prisma.envelopeItem.findMany({ where: { envelopeId: template.id } });
+    const recipient = template.recipients.find((entry) => entry.id === template.directLink?.directTemplateRecipientId);
+    expect(recipient).toBeDefined();
+    if (!recipient) {
+      throw new Error('Seeded direct template is missing its placeholder recipient');
+    }
+    const paths = pdfPaths({ envelope: { ...template, envelopeItems: items }, recipient });
+    for (const path of paths) {
+      await expectPdf(auth.anonymous, path);
+    }
+    // A preview capability cannot read a document-only recipient API.
+    await expectError(
+      await trpc(auth.anonymous, 'envelope.item.getManyByToken', {
+        envelopeId: template.id,
+        access: { type: 'recipient', token: recipient.token },
+      }),
+      'NOT_FOUND',
+    );
+    await prisma.envelope.update({
+      where: { id: template.id },
+      data: { authOptions: { globalAccessAuth: ['ACCOUNT'], globalActionAuth: [] } },
+    });
+    for (const path of paths) {
+      expect((await auth.anonymous.get(path)).status()).toBe(404);
+      // Direct templates are forms for future recipients: ACCOUNT means a login.
+      await expectPdf(auth.intended, path);
+      await expectPdf(auth.unrelated, path);
+    }
+    await prisma.templateDirectLink.update({ where: { envelopeId: template.id }, data: { enabled: false } });
+    for (const path of paths) {
+      expect((await auth.intended.get(path)).status()).toBe(404);
+    }
+  });
+}
 
 test('ACCOUNT cannot substitute for a required completion code', async ({ auth }) => {
   const document = await seed(auth);

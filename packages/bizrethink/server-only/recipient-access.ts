@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TDocumentAuth, TDocumentAuthMethods } from '@documenso/lib/types/document-auth';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 import type { Envelope, Recipient } from '@prisma/client';
@@ -90,9 +91,11 @@ export const assertRecipientEnvelopeNotDeleted = (envelope: Pick<Envelope, 'dele
   }
 };
 
-/** A draft or deleted envelope is not a recipient document download. */
+/** Sender deletion only hides finalized documents; recipients retain their copy. */
 export const assertRecipientEnvelopeReadable = (envelope: Pick<Envelope, 'deletedAt' | 'status'>) => {
-  assertRecipientEnvelopeNotDeleted(envelope);
+  if (!isDocumentCompleted(envelope.status)) {
+    assertRecipientEnvelopeNotDeleted(envelope);
+  }
   if (envelope.status === DocumentStatus.DRAFT) {
     throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
   }
@@ -103,20 +106,57 @@ export const assertRecipientTokenAccess = async ({
   token,
   userId,
   envelopeId,
+  allowDirectTemplatePreview = false,
 }: {
   token: string;
   userId?: number;
   envelopeId?: string;
+  /** Only the PDF adapter can render a published direct template before signing. */
+  allowDirectTemplatePreview?: boolean;
 }) => {
   if (!token) {
     throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
   }
   const recipient = await prisma.recipient.findFirst({
-    where: { token, envelope: { type: EnvelopeType.DOCUMENT, ...(envelopeId ? { id: envelopeId } : {}) } },
-    include: { envelope: true },
+    where: {
+      token,
+      envelope: {
+        type: allowDirectTemplatePreview
+          ? { in: [EnvelopeType.DOCUMENT, EnvelopeType.TEMPLATE] }
+          : EnvelopeType.DOCUMENT,
+        ...(envelopeId ? { id: envelopeId } : {}),
+      },
+    },
+    include: { envelope: { include: { directLink: true } } },
   });
   if (!recipient) {
     throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
+  }
+  if (recipient.envelope.type === EnvelopeType.TEMPLATE) {
+    const { envelope } = recipient;
+    // Direct pages use the placeholder recipient token for PDF rendering. An
+    // arbitrary template recipient token must not become a public preview.
+    if (
+      !allowDirectTemplatePreview ||
+      envelope.deletedAt ||
+      envelope.status !== DocumentStatus.DRAFT ||
+      !envelope.directLink?.enabled ||
+      envelope.directLink.directTemplateRecipientId !== recipient.id
+    ) {
+      throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
+    }
+    // In a direct template the recipient has not supplied their email yet.
+    // Match its page's ACCOUNT contract: an active login, not that placeholder.
+    const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({ documentAuth: envelope.authOptions });
+    if (derivedRecipientAccessAuth.includes(DocumentAuth.ACCOUNT)) {
+      const account = userId
+        ? await prisma.user.findFirst({ where: { id: userId }, select: { id: true, disabled: true } })
+        : null;
+      if (!account || account.id !== userId || account.disabled) {
+        throw new AppError(AppErrorCode.UNAUTHORIZED, { message: 'Account authentication required' });
+      }
+    }
+    return recipient;
   }
   assertRecipientEnvelopeReadable(recipient.envelope);
   await assertRecipientAccess({ recipient, documentAuthOptions: recipient.envelope.authOptions, userId });

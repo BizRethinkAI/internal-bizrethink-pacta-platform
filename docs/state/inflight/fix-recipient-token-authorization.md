@@ -28,14 +28,20 @@ prompt as SIGNATURE. The CSC adapter and completion's SES/TSP branch check
 ACCOUNT before entering the existing TSP pipeline; this is not a claim of a
 TSP cryptographic bypass or a change to its cryptographic verification.
 
-Recipient reads reject draft/deleted envelopes, including the authenticated
-legacy document-by-token read and the legacy/v2 signing-page helpers. Deleted
-mutation gaps in legacy removal/completion/rejection also close. Existing
+Recipient reads reject drafts and deleted unfinished documents, including the
+authenticated legacy document-by-token read and legacy/v2 signing-page helpers.
+Upstream sender deletion hides finalized documents (COMPLETED/REJECTED/CANCELLED)
+only from the sender; recipients retain their copy with ACCOUNT still enforced.
+Deleted mutation gaps in legacy removal/completion/rejection also close. Existing
 signing status/order/expiry/CAS behavior is retained. Other existing read states
 (completed, rejected, cancelled) are unchanged. PDF responses use private/no-store,
 including after the legacy renderer writes cache headers; authentication happens
 before conditional requests or storage. QR links are a separate capability and
 retain their existing behavior. Deliberately link-only signing stays anonymous.
+Direct-template PDF previews require an enabled link bound to that placeholder
+recipient. Their existing ACCOUNT contract requires an active login before a
+future recipient supplies their identity; ordinary document APIs do not accept
+that preview capability. Disabled/unpublished/deleted templates are refused.
 
 ## Implementation and upstream sync
 
@@ -84,7 +90,8 @@ owner decisions; none is claimed fixed here.
 
 The implementing session opens the PR and stops. **Fresh independent adversarial
 review started by Shwet is mandatory**, followed by green CI on the reviewed
-head. No own merge, deployment, CI watcher or deploy watcher.
+head. No own merge or deployment. Shwet subsequently authorized background CI
+monitoring of this session's PRs only; deployment watching remains prohibited.
 
 Queue this after **#169 and #170**. #169's review session owns the inherited
 merged-#168 note cleanup (`chore-mca-memo-refutations.md`); this branch deliberately
@@ -92,4 +99,34 @@ has not duplicated that fold. Guard 5 can therefore remain red until that cleanu
 is merged and the queue is refreshed. Coordinate a single owner for newly stale
 #169/#170 notes; never union-merge two independent folds. README/type-gate/owned
 path additions may need routine integration. Rerun checks on any refreshed head;
-Shwet will report E2E completion. This branch does not trigger production deploys.
+the authorized background CI monitor follows our PRs. This branch does not
+trigger production deploys.
+
+
+## CI correction — 2026-09-12
+
+Initial E2E run `34677428030` reported 10 failed, 2 flaky (passed retries),
+1,039 passed, 59 curated skips and 5 not run. Eight direct-template/UI failures
+came from the new PDF guard excluding template previews; one deletion test
+caught the sender-only soft-delete semantics above. The owned mutation test
+attempted insertion into an already filled field, so it saw the pre-existing
+validation error before reaching the access gate. Its fixture now meets each
+operation's preconditions and verifies the field is unchanged after each denial.
+No upstream E2E assertion was relaxed and no production mutation gate changed.
+
+- Committed regression tests first in `e051c3946`: **34 failed / 128 passed** on
+  the existing implementation. These exercise real signing-page/read helpers,
+  tRPC routes and all three real Hono PDF handlers.
+- The correction changes owned policy/middleware only. Overlay 076 still has
+  the same **18 upstream hooks**; patch/source equality and reverse apply pass.
+- Corrected full owned suite: **4,334 passing**; shared lib: **287 passing**.
+  Both the owned TypeScript gate and full Remix typecheck pass.
+- **11 HTTP tests discovered**; coverage now includes retained completed copies and both V1/V2 direct
+  preview capabilities, with anonymous denial under ACCOUNT and disabled-link
+  revocation. Playwright discovery is not an execution verdict; fresh CI must
+  pass on the pushed correction before independent review/merge.
+
+Guard 5 still depends on #169's single-owner fold of the inherited #168 note;
+this PR does not duplicate it. #170 is separate: its corrected delete tests and
+five security E2Es passed before an interrupted run, for which one retry was
+requested. Neither PR has been merged or deployed by this session.

@@ -2,8 +2,10 @@
 # adapters, and account-backed signing factors could authenticate a different
 # person. Apply ACCOUNT independently of ACTION, bind password/passkey/TOTP to
 # the recipient, require the completion code when configured, and include
-# FREE_SIGNATURE consistently. Reject deleted/draft recipient reads; preserve
-# authorized downloads after the signing deadline (owner decision 2026-09-12).
+# FREE_SIGNATURE consistently. Reject draft/deleted unfinished document reads;
+# preserve finalized recipient copies after sender deletion and enabled direct
+# template PDF previews under their existing login contract. Keep authorized
+# downloads after the signing deadline (owner decision 2026-09-12).
 # Why-not-additive: all policy lives in packages/bizrethink; upstream owns the
 # token handlers, factor verifier, and signing dialog, so they need small hooks.
 # A single Hono middleware covers all three recipient PDF routes, including the

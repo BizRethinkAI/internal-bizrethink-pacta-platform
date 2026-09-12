@@ -14,7 +14,7 @@ export const recipientTokenFileAccess: MiddlewareHandler = async (c, next) => {
   c.header('Cache-Control', 'private, no-store, max-age=0');
   try {
     const { user } = await getOptionalSession(c);
-    await assertRecipientTokenAccess({ token: token ?? '', userId: user?.id });
+    await assertRecipientTokenAccess({ token: token ?? '', userId: user?.id, allowDirectTemplatePreview: true });
   } catch (error) {
     if (
       error instanceof AppError &&

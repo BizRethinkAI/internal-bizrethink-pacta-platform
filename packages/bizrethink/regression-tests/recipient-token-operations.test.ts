@@ -15,7 +15,7 @@ import { getEnvelopeItemsByTokenRoute } from '@documenso/trpc/server/envelope-ro
 import { signEnvelopeFieldRoute } from '@documenso/trpc/server/envelope-router/sign-envelope-field';
 import { signingStatusEnvelopeRoute } from '@documenso/trpc/server/envelope-router/signing-status-envelope';
 import { router } from '@documenso/trpc/server/trpc';
-import { DocumentStatus, FieldType, Role } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, FieldType, Role } from '@prisma/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { envelopeFixture, fieldFixture, recipientFixture } from './recipient-auth-fixture';
@@ -294,6 +294,18 @@ describe('A-05 public recipient operations', () => {
       expect(job).not.toHaveBeenCalled();
     });
   }
+
+  it('does not grant document API access with a direct-template preview recipient token', async () => {
+    envelope.type = EnvelopeType.TEMPLATE;
+    envelope.status = DocumentStatus.DRAFT;
+    envelope.authOptions.globalAccessAuth = [];
+    await expect(
+      api.createCaller(context()).items({
+        envelopeId: envelope.id,
+        access: { type: 'recipient', token },
+      }),
+    ).rejects.toBeDefined();
+  });
 
   it('keeps authenticated document-by-token reads working for the recipient', async () => {
     await expect(api.createCaller(context(7)).document({ token })).resolves.toMatchObject({

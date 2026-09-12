@@ -185,6 +185,15 @@ describe('A-05 recipient file routes', () => {
       expect((await app.request(path(token))).status).toBe(500);
       expect(getFile).not.toHaveBeenCalled();
     });
+    it(`refuses an unpublished template before storage: ${path(token)}`, async () => {
+      db.recipient.findFirst.mockResolvedValue({
+        ...recipient,
+        envelope: { ...envelope, type: EnvelopeType.TEMPLATE, status: DocumentStatus.DRAFT, directLink: null },
+      });
+      asRecipient();
+      expect((await app.request(path(token))).status).toBe(404);
+      expect(getFile).not.toHaveBeenCalled();
+    });
     it.each([
       'disabled link',
       'different recipient',
