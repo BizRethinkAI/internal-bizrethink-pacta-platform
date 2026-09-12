@@ -249,7 +249,9 @@ const validateNumber = (value: string, meta: TNumberFieldMeta) => {
   if (meta.numberFormat && !format) {
     return invalid('Invalid number format');
   }
-  if (!format && !/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(value)) {
+  // With no selected format, ordinary signing also accepts .5 and 1000.
+  // Match the whole value while retaining those nonnegative numeric forms.
+  if (!format && !/^(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d*)?|\.\d+)$/.test(value)) {
     return invalid('Invalid number');
   }
   const normalized =

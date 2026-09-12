@@ -44,8 +44,12 @@ against the intermediate working-tree guard (4 failed / 76 passed); `707ee1b0d`
 adds default-checkbox/date compatibility and missing-dropdown-choice cases
 (12 failed / 80 passed against that intermediate guard). The latter two red
 counts describe the intermediate worktree, not their test-only commits alone.
-All **92 focused regressions** now pass. Final local validation also passed
-**4,633 owned tests / 207 files**, **287 shared tests / 19 files**, the owned
+Follow-up test-first commit `17755b8c1` reproduced four compatibility failures:
+the initial guard rejected `.5` and `1000.` although ordinary signing accepts
+them with no selected number format. Whole-value parsing now preserves those
+forms without relaxing configured formats, exact bounds or malformed-number
+rejection. All **96 focused regressions** now pass. Final local validation passed
+**4,637 owned tests / 207 files**, **287 shared tests / 19 files**, the owned
 TypeScript gate including the new HTTP spec, full Remix types and changed-file
 format/lint checks. The **12 HTTP tests** were discovered locally; their actual
 app/PostgreSQL execution belongs to CI. No local build or database test was run.
