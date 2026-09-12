@@ -1,22 +1,25 @@
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
+import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
+import { getEnvelopeForRecipientSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
 import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { logger } from '@documenso/lib/utils/logger';
 import type { TrpcContext } from '@documenso/trpc/server/context';
 import { getMultiSignDocumentRoute } from '@documenso/trpc/server/embedding-router/get-multi-sign-document';
+import { cscSignEnvelopeRoute } from '@documenso/trpc/server/enterprise-router/csc-sign-envelope';
 import { findAttachmentsRoute } from '@documenso/trpc/server/envelope-router/attachment/find-attachments';
 import { getEnvelopeItemsByTokenRoute } from '@documenso/trpc/server/envelope-router/get-envelope-items-by-token';
 import { signEnvelopeFieldRoute } from '@documenso/trpc/server/envelope-router/sign-envelope-field';
 import { signingStatusEnvelopeRoute } from '@documenso/trpc/server/envelope-router/signing-status-envelope';
 import { router } from '@documenso/trpc/server/trpc';
 import { DocumentStatus, FieldType, Role } from '@prisma/client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { envelopeFixture, fieldFixture, recipientFixture } from './recipient-auth-fixture';
 
-const { db, job, webhook } = vi.hoisted(() => ({
+const { db, job, webhook, executeTspSign } = vi.hoisted(() => ({
   db: {
     user: { findFirst: vi.fn() },
     recipient: {
@@ -28,12 +31,13 @@ const { db, job, webhook } = vi.hoisted(() => ({
     },
     envelope: { findFirst: vi.fn(), findFirstOrThrow: vi.fn(), findUniqueOrThrow: vi.fn() },
     field: { findFirst: vi.fn(), findFirstOrThrow: vi.fn(), findMany: vi.fn(), update: vi.fn(), updateMany: vi.fn() },
-    signature: { deleteMany: vi.fn(), upsert: vi.fn() },
+    signature: { deleteMany: vi.fn(), upsert: vi.fn(), findFirst: vi.fn() },
     documentMeta: { findFirst: vi.fn() },
     documentAuditLog: { create: vi.fn(), createMany: vi.fn() },
     envelopeAttachment: { findMany: vi.fn() },
     $transaction: vi.fn(),
   },
+  executeTspSign: vi.fn(),
   job: vi.fn(),
   webhook: vi.fn(),
 }));
@@ -42,7 +46,13 @@ vi.mock('@documenso/lib/jobs/client', () => ({ jobs: { triggerJob: job } }));
 vi.mock('@documenso/lib/server-only/webhooks/trigger/trigger-webhook', () => ({ triggerWebhook: webhook }));
 vi.mock('@documenso/lib/server-only/document/viewed-document', () => ({ viewedDocument: vi.fn() }));
 
+vi.mock('@documenso/ee/server-only/signing/csc/execute-tsp-sign', () => ({ executeTspSign }));
+vi.mock('@documenso/lib/server-only/team/get-team-settings', () => ({
+  getTeamSettings: async () => ({ includeSenderDetails: true, brandingEnabled: false, brandingLogo: '' }),
+}));
+
 const api = router({
+  csc: cscSignEnvelopeRoute,
   items: getEnvelopeItemsByTokenRoute,
   attachments: findAttachmentsRoute,
   sign: signEnvelopeFieldRoute,
@@ -56,7 +66,7 @@ const makeEnvelope = () => ({
   signatureLevel: 'SES',
   qrToken: null,
   useLegacyFieldInsertion: false,
-  recipients: [recipientFixture('envelope_team_a')],
+  recipients: [{ ...recipientFixture('envelope_team_a'), fields: [] }],
   envelopeItems: [
     {
       id: 'item_test',
@@ -112,6 +122,7 @@ const context = (userId?: number): TrpcContext => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.useFakeTimers();
   logger.level = 'silent';
   envelope = makeEnvelope();
   field = fieldFixture();
@@ -133,6 +144,8 @@ beforeEach(() => {
   db.documentAuditLog.create.mockResolvedValue({});
   db.documentAuditLog.createMany.mockResolvedValue({ count: 0 });
   db.signature.deleteMany.mockResolvedValue({ count: 1 });
+  db.signature.findFirst.mockResolvedValue(null);
+  executeTspSign.mockResolvedValue({ outcome: 'signed' });
   db.envelopeAttachment.findMany.mockResolvedValue([
     { id: 'attachment_test', type: 'link', label: 'Private attachment', data: 'https://example.invalid/private' },
   ]);
@@ -143,9 +156,18 @@ beforeEach(() => {
   webhook.mockResolvedValue(undefined);
 });
 
+afterEach(() => {
+  vi.clearAllTimers();
+  vi.useRealTimers();
+});
+
 const token = 'synthetic-recipient-token';
 const id = { type: 'documentId', id: 1 } as const;
 const mutations = [
+  {
+    name: 'CSC sign adapter',
+    run: (userId?: number) => api.createCaller(context(userId)).csc({ recipientToken: token, sessionId: 'csc_test' }),
+  },
   {
     name: 'legacy field insertion',
     run: (userId?: number) => signFieldWithToken({ token, fieldId: 5, value: 'Test value', userId }),
@@ -180,6 +202,8 @@ const mutations = [
 ];
 
 const reads = [
+  { name: 'legacy signing details', run: (userId?: number) => getDocumentAndSenderByToken({ token, userId }) },
+  { name: 'v2 signing details', run: (userId?: number) => getEnvelopeForRecipientSigning({ token, userId }) },
   {
     name: 'item metadata',
     run: (userId?: number) =>
@@ -208,6 +232,7 @@ describe('A-05 public recipient operations', () => {
       expect(db.documentAuditLog.create).not.toHaveBeenCalled();
       expect(job).not.toHaveBeenCalled();
       expect(webhook).not.toHaveBeenCalled();
+      expect(executeTspSign).not.toHaveBeenCalled();
     });
     it(`keeps ${operation.name} working for the intended account`, async () => {
       await expect(operation.run(7)).resolves.not.toBeNull();
@@ -215,6 +240,32 @@ describe('A-05 public recipient operations', () => {
     it(`keeps link-only ${operation.name} working without an account`, async () => {
       envelope.authOptions.globalAccessAuth = [];
       await expect(operation.run()).resolves.not.toBeNull();
+    });
+  }
+
+  for (const operation of reads) {
+    it.each(['deleted', 'draft'] as const)(`refuses ${operation.name} for a %s envelope`, async (state) => {
+      if (state === 'deleted') {
+        envelope.deletedAt = new Date();
+      } else {
+        envelope.status = DocumentStatus.DRAFT;
+      }
+      await expect(
+        operation.run(7).catch((error: { cause?: unknown }) => {
+          throw error.cause ?? error;
+        }),
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    });
+  }
+  for (const operation of mutations.filter(({ name }) =>
+    ['completion', 'rejection', 'legacy field removal'].includes(name),
+  )) {
+    it(`refuses ${operation.name} on a deleted envelope`, async () => {
+      envelope.deletedAt = new Date();
+      await expect(operation.run(7)).rejects.toMatchObject({ code: 'NOT_FOUND' });
+      expect(db.recipient.updateMany).not.toHaveBeenCalled();
+      expect(db.field.update).not.toHaveBeenCalled();
+      expect(job).not.toHaveBeenCalled();
     });
   }
 
