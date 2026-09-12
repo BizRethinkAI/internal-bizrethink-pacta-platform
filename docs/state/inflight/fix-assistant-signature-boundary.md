@@ -23,7 +23,24 @@ boundaries. Both signature types are wrongly insertable/removable by an assistan
 on v1 and v2; rightful signing, ordinary prefilling, the existing v2 prohibition,
 and field-selection restrictions pass. The test TypeScript gate passes.
 
-Implementation is in progress. Current CI evidence
+The owned policy rejects another recipient's two signature types, then returns
+the authorized field's owner/type/envelope predicates for assistant writes.
+Three upstream adapters consume that policy; all four transaction update paths
+retain those predicates. A concurrent reassignment/type change cannot turn a
+permitted prefill into a signature change. The existing v2 INVALID_REQUEST code
+is retained. Non-assistant behavior and ordinary field types, including INITIALS,
+retain the upstream policy; an assistant's own assigned signature stays allowed.
+
+Additional TDD: **16 race tests failed / 29 passed** before conditional writes.
+All **45 A-06 regressions** plus **131 existing recipient-auth tests** now pass;
+the owned TypeScript gate passes including the six new HTTP tests. Before the
+conditional-write addition, the full owned suite (**4,517**) and lib suite
+(**287**), full Remix types, formatting and six-case discovery passed. Final
+combined checks follow dependency integration. Overlay 079 contains only three
+upstream files; all policy lives in the owned module. There is no A-06 schema or
+configuration change. HTTP execution is performed by CI, not the local database.
+
+Current CI evidence
 will be recorded in the PR description and Checks, rather than treating this
 committed snapshot as live CI state. No schema, configuration, production access,
 credential lookup, merge or deployment is part of A-06. Independent auth/upstream

@@ -1,3 +1,4 @@
+import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
 import { assertRecipientAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -84,15 +85,8 @@ export const signEnvelopeFieldRoute = procedure
       });
     }
 
-    if (
-      field.type === FieldType.SIGNATURE &&
-      recipient.id !== field.recipientId &&
-      recipient.role === RecipientRole.ASSISTANT
-    ) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Assistant recipients cannot sign signature fields`,
-      });
-    }
+    // MODIFIED for BizRethink (overlay 079): one policy covers insertion and the early removal path.
+    const assistantFieldWhere = authorizeAssistantFieldMutation({ recipient, field });
 
     if (fieldValue.type !== field.type) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -143,6 +137,7 @@ export const signEnvelopeFieldRoute = procedure
         const updatedField = await tx.field.update({
           where: {
             id: field.id,
+            ...assistantFieldWhere,
           },
           data: {
             customText: '',
@@ -212,6 +207,7 @@ export const signEnvelopeFieldRoute = procedure
       const updatedField = await tx.field.update({
         where: {
           id: field.id,
+          ...assistantFieldWhere,
         },
         data: {
           customText: insertionValues.customText,

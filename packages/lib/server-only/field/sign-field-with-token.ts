@@ -1,3 +1,4 @@
+import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -171,6 +172,9 @@ export const signFieldWithToken = async ({
     }
   }
 
+  // MODIFIED for BizRethink (overlay 079): legacy and v2 callers share the signature boundary, before ACTION factors or writes.
+  const assistantFieldWhere = authorizeAssistantFieldMutation({ recipient, field });
+
   const derivedRecipientActionAuth = await validateFieldAuth({
     documentAuthOptions: envelope.authOptions,
     recipient,
@@ -237,6 +241,7 @@ export const signFieldWithToken = async ({
     const updatedField = await tx.field.update({
       where: {
         id: field.id,
+        ...assistantFieldWhere,
       },
       data: {
         customText,
