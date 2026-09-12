@@ -15,7 +15,13 @@ review-and-ship skills define the handoffs without a shared Git registry.
 Governance checks the author's own nonempty note and rejects changes to another
 note or STATE.md. It permits a pure `chore/state-consolidation-<batch>` PR that
 updates STATE.md, deletes all merged notes and introduces no code or new note.
-An assigned consolidator owns that PR; another session/human reviews and merges.
+The shipping session automatically owns one consolidation PR per selected batch,
+without another reminder or assignment to an implementation session. Existing
+explicit fold ownership still requires a coordinated handoff. Shwet reviews and
+merges the shipper's ready PR unless another independent reviewer/merger is
+already assigned. The shipper never self-merges; it resumes the same ledger for
+final-main checks and the single deploy request. Correct state with no pending
+notes gets a recorded no-op; repos without this convention get no new state file.
 The separate read-only `State ready to ship` check fails main until its notes
 are consolidated. Shipping requires this check on the final main SHA, alongside
 existing CI. This does not install a Coolify hook or change branch protection.

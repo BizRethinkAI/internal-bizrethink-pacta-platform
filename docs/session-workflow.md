@@ -71,8 +71,11 @@ with the notes on the current branch and the task/PR records. A note present on
 `main` describes merged work awaiting consolidation; its folder name does not
 prove that its PR is still open. An old note cannot establish production status.
 
-After all application PRs in the agreed batch merge, one assigned **consolidation
-author** prepares `chore/state-consolidation-<unique-batch>` from latest main:
+The review-and-ship session is the default **consolidation author** for every
+batch, without another reminder or assignment from Shwet. Preserve an existing
+explicit fold assignment until the coordinator records a handoff. After all
+implementation PRs in the agreed batch merge, the consolidator prepares one
+`chore/state-consolidation-<unique-batch>` PR from latest main for the whole batch:
 
 1. Verify what actually merged and identify every note now on main. Preserve
    unresolved limitations and distinguish code merged, reviewed and deployed.
@@ -81,9 +84,13 @@ author** prepares `chore/state-consolidation-<unique-batch>` from latest main:
    belonging only to still-open PR branches.
 3. This PR changes only STATE.md and deletes notes. **It creates no note of its
    own.** Its review surface is the STATE diff, PR body and linked task card.
-4. A different session or Shwet reviews and merges it. If the ship session writes
-   the consolidation, it must hand that PR to another reviewer/merger. The ban
-   on merging one's own PR still applies.
+4. Finish its applicable checks, then give Shwet the PR for review and merge,
+   unless another independent reviewer/merger is already assigned. The ban on
+   merging one's own PR still applies. The ship session resumes the same run
+   after that merge, verifies final-main checks and continues to deployment.
+
+If settled state is already correct and no merged notes remain, record a no-op
+in the shipping ledger; do not create an empty or duplicate consolidation PR.
 
 Governance checks each author's own note and rejects edits to another note or
 to STATE.md outside a pure consolidation PR. It no longer makes the next author
@@ -102,8 +109,9 @@ must enforce it. A missing check is not a pass.
 
 Use a fresh, human-started review-and-ship session. It freezes the selected PR
 queue, reviews independently, sends substantive fixes to their authors and
-merges only cleared PRs. It includes the assigned state-consolidation PR as the
-last dependency. Later work needs explicit inclusion or a later batch.
+merges only cleared PRs. Final consolidation is an automatic last dependency,
+even before its PR exists. Later unrelated work needs explicit inclusion or a
+later batch.
 
 Verify auto-deploy is off before merging for a batch deployment. After the batch,
 consolidation and final-main gates pass, request one non-forced, non-waiting

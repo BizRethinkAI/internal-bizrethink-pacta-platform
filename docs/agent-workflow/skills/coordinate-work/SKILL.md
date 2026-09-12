@@ -47,11 +47,13 @@ human-started review-and-ship session independently reviews, diagnoses failures
 and routes substantive fixes back. It does not merge its own implementation.
 Owner authorization to coordinate alone does not authorize shipping.
 
-Where the repo uses state consolidation, assign exactly one author and one
-cleanup PR for the selected batch. Preserve earlier assignments during adoption.
-The consolidator writes settled state after the implementation PRs merge; a
-different session/human reviews and merges that PR. Do not introduce a state
-file or this convention into a repo that lacks it.
+Where the repo uses state consolidation, the shipping session automatically
+owns one final cleanup PR for the selected batch; record that default without
+requiring Shwet to assign it again. Preserve earlier explicit assignments until
+a coordinated handoff. The consolidator writes settled state after the
+implementation PRs merge. Shwet reviews and merges the shipper's own PR unless
+another independent reviewer/merger is already assigned; never self-merge.
+Do not introduce a state file or this convention into a repo that lacks it.
 
 Record the selected shipping batch on its own task card, including the final
 consolidation dependency, review/CI blockers and deploy-request receipt. The

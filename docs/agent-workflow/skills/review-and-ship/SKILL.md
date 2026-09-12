@@ -1,14 +1,15 @@
 ---
 name: review-and-ship
-description: "Independently review a repository's PR queue, diagnose failures and coordinate author fixes, merge PRs that pass the repo's gates, then request one Coolify deploy per selected app. Use for review-and-ship requests across BizRethink and Lombard repos; adapt to each repo's rules and stack. Review-only requests do not authorize shipping."
+description: "Independently review a repository's PR queue, coordinate author fixes, merge cleared PRs, prepare any required final state-consolidation PR, then request one Coolify deploy per selected app. Use for review-and-ship requests across BizRethink and Lombard repos; adapt to each repo's rules and stack. Review-only requests do not authorize shipping."
 ---
 
 # Review and ship
 
-Independently review the agreed PR queue, land it through GitHub, then request
-one deployment of the final reviewed default-branch revision for each selected
-Coolify application. Monitor long-running CI in the background and resume the
-queue automatically when it reaches a terminal result.
+Independently review the agreed PR queue, land it through GitHub, and own the
+final state consolidation wherever the repo requires it. After its independent
+merge and final checks, request one deployment of the reviewed default-branch
+revision for each selected Coolify application. Monitor long-running CI in the
+background and resume the queue automatically when it reaches a terminal result.
 
 ## Scope and authority
 
@@ -21,9 +22,11 @@ queue automatically when it reaches a terminal result.
   each repo's session-ownership rules. A request covering several Lombard repos
   normally requires separate owning sessions; generic scope does not waive that.
 - Freeze the initial queue of all open PRs, including pagination, or the user's
-  requested subset. Later arrivals do not silently join it. For multiple repos,
-  maintain separate queues, rules and app mappings; one deploy means **one per
-  selected app**, not one API request capable of deploying unrelated apps.
+  requested subset, with any required final state consolidation as an automatic
+  batch dependency even before its PR exists. Later unrelated arrivals do not
+  silently join it. For multiple repos, maintain separate queues, rules and app
+  mappings; one deploy means **one per selected app**, not one API request
+  capable of deploying unrelated apps.
 - An explicit request to run this review-and-ship workflow authorizes ordinary
   coordination, mechanical preparation, conditional merges and one final
   deployment per selected app. Preserve that permission across pauses; do not
@@ -133,14 +136,17 @@ demonstrated transient failure; do not repeatedly rerun an unchanged failure.
 
 Where a repo uses state-note folding, exactly one PR owns each fold. Follow its
 current gate placement: with batch consolidation, author PRs retain their own
-notes and the final shipping dependency is one pure consolidation PR. Assign
-that PR to another author, or hand your own consolidation to a different
-reviewer/merger. Never merge your own cleanup PR. Require the repo's state
-readiness gate on the exact final default-branch revision before deployment.
-Compare latest default-branch state and all open PRs before edits. Synthesize durable
-content, delete the stale note and check for lost/duplicated claims. A merged
-cleanup PR can introduce its own stale note. A clean union merge is not proof
-of a correct document. Do not add this convention to repos that lack it.
+notes and this shipping session automatically prepares one pure consolidation
+PR per repo/batch, covering all its landed PRs. Do not wait for a reminder or
+send that authoring task back to an implementation session. Honor an existing
+explicit fold assignment; coordinate a handoff instead of creating a competing
+PR. Once your consolidation is ready and its applicable checks pass, give Shwet
+the PR for review and merge, unless another independent reviewer/merger is
+already assigned. **Never merge your own cleanup PR.** Resume the same shipping
+run after its merge and require final default-branch checks, including the repo's
+state readiness gate, before deployment. See the execution reference for the
+consolidation lifecycle, existing-owner and no-op handling. Do not add a state
+convention to repos that lack it.
 
 ## Land, pause and deploy
 

@@ -36,12 +36,15 @@ authorize remediation of undecided findings or changes to consumer repos.
   of that fix.
 - Read `docs/session-workflow.md` when present. Under batch consolidation,
   Governance checks each author's own note; **State ready to ship** rejects
-  main while any merged note remains. One assigned author prepares a pure
-  `chore/state-consolidation-<batch>` PR after the implementation queue merges.
+  main while any merged note remains. The shipping session automatically
+  prepares one pure `chore/state-consolidation-<batch>` PR after the selected
+  implementation queue merges; no reminder or new author assignment is needed.
   It updates STATE.md and deletes processed notes, creating no new note.
-  A different session/human reviews and merges it. Require the state check on
-  the exact final main SHA before deployment. Do not add this push-only check
-  to author PR requirements. Until these rules are merged/adopted, retain
+  Shwet reviews and merges it unless a different independent reviewer/merger is
+  already assigned. Never self-merge. Honor existing fold ownership and resume
+  the same shipping ledger after the handoff. Require the state check on the
+  exact final main SHA before deployment. Do not add this push-only check to
+  author PR requirements. Until these rules are merged/adopted, retain
   legacy Guard 5 and existing fold assignments; never silently bypass it.
   Inspect union merges for duplicate/conflicting claims and preserve limitations.
 - Coordinate with live Claude sessions before landing. If `SendMessage` is

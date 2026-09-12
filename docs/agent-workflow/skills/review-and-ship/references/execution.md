@@ -15,6 +15,9 @@ or explicitly hand it off. Record:
   apply; do not use a shared ledger to bypass those boundaries.
 - Per PR: authoring session, fetched/reviewed head, tested base/integration SHA,
   verdict/open findings, checks and links, state-fold owner, merge strategy/SHA.
+- Final consolidation: owner, branch/PR, covered merge SHAs, reviewed head,
+  checks and merge SHA, or a verified no-op/not-applicable reason. Record phase
+  `awaiting_owner_merge` when handing your own ready PR to Shwet.
 - Per app: verified repo/branch/environment, auto-deploy setting, intended
   final default-branch SHA, `deploy_attempted: false`, request time and receipt.
 
@@ -90,10 +93,38 @@ the next PR; a new push requires checks on that revised integration.
 
 ## Final state consolidation where the repo requires it
 
-Include the assigned consolidation PR as the final batch dependency. After the
-implementation queue merges, its author synthesizes settled state and removes
-the completed notes according to repo rules. If this session writes that PR,
-another independent session or the human must review/merge it; never self-merge.
+Final consolidation is part of every shipping batch in a repo that uses this
+convention, including a batch with one implementation PR. Reserve that final
+dependency in the ledger when selecting the queue; it need not have a PR yet.
+The shipping session is its default author without another owner instruction.
+
+1. After the implementation queue merges, fetch the latest default branch and
+   verify the landed changes. Read settled state, all merged notes, open PRs and
+   task records. Reuse the batch's existing consolidation PR/assignment; an
+   explicitly assigned different author retains ownership until the coordinator
+   records a handoff. Do not create a competing cleanup PR.
+2. Prepare the consolidation in your own isolated worktree under the repo's
+   branch/file rules. Synthesize current facts, correct stale or duplicated
+   claims, preserve unresolved limitations, and delete processed merged notes.
+   Verify source evidence; do not turn an author's claim into verified review or
+   deployment status. Leave notes belonging only to still-open branches alone.
+   Keep the PR pure; add no new note where the repo exempts consolidation PRs.
+3. Open/update that one PR with the covered PRs, state diff and validation
+   evidence. Complete applicable documentation/governance/CI checks and fix
+   failures in your own consolidation before asking for its review and merge.
+   Do not rerun app tests locally merely to validate prose. If settled state is
+   already correct and no completed notes remain, record the verified no-op
+   instead of creating an empty or duplicate PR. Repos without this convention
+   get a not-applicable record, not a new state system.
+4. Hand your ready PR to Shwet for review and merge, or to an already assigned
+   independent reviewer/merger. Explain the existing no-self-merge rule, link the
+   PR and record `awaiting_owner_merge`. Never merge your own cleanup PR. This is
+   the final human handoff, not a request to assign its authoring elsewhere.
+5. On resume, reuse the same ledger, verify the consolidation actually landed on
+   the default branch, and check the exact final revision for intervening work.
+   Obtain its applicable final checks, then continue the one-deployment phase.
+   Do not start a new batch, recreate the cleanup or reset deployment receipts.
+
 Once Pacta has adopted `docs/session-workflow.md` and its release workflow,
 `State ready to ship` must pass on the exact final main SHA. It is expected to
 fail on intermediate main revisions with unprocessed notes. Before adoption,
