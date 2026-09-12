@@ -1,0 +1,43 @@
+# Why: A-07 direct-template creation accepted changed read-only values and
+# bypassed ordinary field constraints before recording the direct recipient signed.
+# Why-not-additive: Validation and canonicalization live in the owned
+# direct-template-fields module. This existing creation helper needs one hook
+# before ACTION factors, file copies, quota use and creation writes; a new module
+# alone cannot intercept the public direct-template flow.
+# Upstream-merge-fragility: medium — preserve this hook after derived settings
+# and before field-auth/materialization when upstream refactors template creation.
+# Re-run the v1/v2 direct-template field unit and HTTP regressions after syncing.
+
+diff --git a/packages/lib/server-only/template/create-document-from-direct-template.ts b/packages/lib/server-only/template/create-document-from-direct-template.ts
+index e767170b7..5d2c8832b 100644
+--- a/packages/lib/server-only/template/create-document-from-direct-template.ts
++++ b/packages/lib/server-only/template/create-document-from-direct-template.ts
+@@ -1,3 +1,4 @@
++import { validateDirectTemplateFields } from '@bizrethink/customizations/server-only/direct-template-fields';
+ import { nanoid, prefixedId } from '@documenso/lib/universal/id';
+ import { prisma } from '@documenso/prisma';
+ import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
+@@ -87,7 +88,7 @@ export const createDocumentFromDirectTemplate = async ({
+   directRecipientEmail,
+   directTemplateToken,
+   directTemplateExternalId,
+-  signedFieldValues,
++  signedFieldValues: submittedFieldValues,
+   templateUpdatedAt,
+   nextSigner,
+   requestMetadata,
+@@ -222,6 +223,14 @@ export const createDocumentFromDirectTemplate = async ({
+ 
+   const derivedDocumentMeta = extractDerivedDocumentMeta(settings, directTemplateEnvelope.documentMeta, signatureLevel);
+ 
++  // MODIFIED for BizRethink (overlay 080): validate all values/defaults before factors, file copies or creation writes.
++  const signedFieldValues = validateDirectTemplateFields({
++    fields: directTemplateRecipient.fields,
++    submitted: submittedFieldValues,
++    internalVersion: directTemplateEnvelope.internalVersion,
++    documentMeta: derivedDocumentMeta,
++  });
++
+   // The resulting document contains every non-direct template recipient plus the
+   // direct recipient that is signing now. A recipientCount of 0 means unlimited.
+   // This mirrors the check in `sendDocument`, but must be done here because this
