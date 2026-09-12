@@ -1,3 +1,7 @@
+import {
+  assertRecipientAccess,
+  assertRecipientEnvelopeNotDeleted,
+} from '@bizrethink/customizations/server-only/recipient-access';
 // This is closely related to `reject-document-on-behalf-of.ts` but is intentionally
 // kept as a separate method rather than merged into one. This file focuses on
 // rejection from a recipient perspective (the recipient rejecting via their token),
@@ -22,10 +26,17 @@ export type RejectDocumentWithTokenOptions = {
   token: string;
   id: EnvelopeIdOptions;
   reason: string;
+  userId?: number;
   requestMetadata?: RequestMetadata;
 };
 
-export async function rejectDocumentWithToken({ token, id, reason, requestMetadata }: RejectDocumentWithTokenOptions) {
+export async function rejectDocumentWithToken({
+  token,
+  id,
+  reason,
+  userId,
+  requestMetadata,
+}: RejectDocumentWithTokenOptions) {
   // Find the recipient and document in a single query
   const recipient = await prisma.recipient.findFirst({
     where: {
@@ -44,6 +55,10 @@ export async function rejectDocumentWithToken({ token, id, reason, requestMetada
       message: 'Document or recipient not found',
     });
   }
+
+  // MODIFIED for BizRethink (overlay 076): recipient access also protects removal/rejection.
+  assertRecipientEnvelopeNotDeleted(envelope);
+  await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId });
 
   if (envelope.status !== DocumentStatus.PENDING) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {

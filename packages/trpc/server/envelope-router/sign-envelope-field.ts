@@ -1,3 +1,4 @@
+import { assertRecipientAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
@@ -73,6 +74,9 @@ export const signEnvelopeFieldRoute = procedure
 
     const { envelope } = field;
     const { documentMeta } = envelope;
+
+    // MODIFIED for BizRethink (overlay 076): guard ACCESS before the early uninsert path too.
+    await assertRecipientAccess({ recipient, documentAuthOptions: envelope.authOptions, userId: user?.id });
 
     if (envelope.internalVersion !== 2) {
       throw new AppError(AppErrorCode.NOT_FOUND, {

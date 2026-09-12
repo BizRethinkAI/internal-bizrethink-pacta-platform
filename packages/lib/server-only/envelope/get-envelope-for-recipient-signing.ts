@@ -1,3 +1,4 @@
+import { assertRecipientEnvelopeReadable } from '@bizrethink/customizations/server-only/recipient-access';
 import { prisma } from '@documenso/prisma';
 import DocumentMetaSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
@@ -221,6 +222,9 @@ export const getEnvelopeForRecipientSigning = async ({
       message: 'Envelope not found',
     });
   }
+
+  // MODIFIED for BizRethink (overlay 076): use the same recipient read policy as PDF downloads.
+  assertRecipientEnvelopeReadable(envelope);
 
   if (envelope.envelopeItems.length === 0) {
     throw new AppError(AppErrorCode.NOT_FOUND, {

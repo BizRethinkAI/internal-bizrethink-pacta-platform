@@ -1,3 +1,4 @@
+import { isRecipientSignatureField } from '@bizrethink/customizations/recipient-auth-policy';
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
 import type {
@@ -9,7 +10,7 @@ import type {
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { trpc } from '@documenso/trpc/react';
-import { type Envelope, FieldType, type Passkey, type Recipient } from '@prisma/client';
+import type { Envelope, Passkey, Recipient } from '@prisma/client';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { DocumentSigningAuthDialogProps } from './document-signing-auth-dialog';
@@ -141,7 +142,8 @@ export const DocumentSigningAuthProvider = ({
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
     // Directly run callback if no auth required.
-    if (!derivedRecipientActionAuth || options.actionTarget !== FieldType.SIGNATURE) {
+    // MODIFIED for BizRethink (overlay 076): prompt for FREE_SIGNATURE just like SIGNATURE.
+    if (!derivedRecipientActionAuth || !isRecipientSignatureField(options.actionTarget)) {
       await options.onReauthFormSubmit();
       return;
     }

@@ -1,3 +1,4 @@
+import { assertRecipientEnvelopeReadable } from '@bizrethink/customizations/server-only/recipient-access';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
@@ -37,6 +38,9 @@ export const getDocumentByTokenRoute = authenticatedProcedure
         message: 'Document not found',
       });
     }
+
+    // MODIFIED for BizRethink (overlay 076): recipient reads share deletion/draft policy.
+    assertRecipientEnvelopeReadable(envelope);
 
     if (envelope.envelopeItems.length !== 1) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {

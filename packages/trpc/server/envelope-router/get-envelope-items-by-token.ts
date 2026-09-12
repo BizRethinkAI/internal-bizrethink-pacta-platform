@@ -1,3 +1,4 @@
+import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getOrganisationTemplateWhereInput } from '@documenso/lib/server-only/template/get-organisation-template-by-id';
@@ -44,6 +45,9 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
         data,
       };
     }
+
+    // MODIFIED for BizRethink (overlay 076): apply persisted recipient access to this public token adapter.
+    await assertRecipientTokenAccess({ token: access.token, envelopeId, userId: user?.id });
 
     const { envelopeItems: data } = await handleGetEnvelopeItemsByToken({
       envelopeId,

@@ -61,6 +61,26 @@ No deploy has been requested for this queue. The review-and-ship session owns
 this consolidation and the single final deployment after the remaining PRs
 and final-main CI pass.
 
+## 2026-09-12 — API-token team boundary (#170)
+
+The integrated A-02 implementation keeps API credentials within their issuing
+team. Owned `api-token-team-scope.ts` carries the token team through async work;
+common single/bulk predicates AND that team outside creator/team-email access.
+Invalid or conflicting scopes fail before dispatch. Human-session and same-team
+permissions retain their existing behavior, including raw/Bearer compatibility
+and legacy-token validation. Three Hono PDF paths establish the same scope.
+The first delete lookup returns 404 for a foreign team before document deletion
+or recipient self-hide, audit and webhook writes. Overlay **075** preserves
+six production hooks and the two upstream tests' exact 404 expectations.
+
+The original defect was independently reproduced; reviewed author head
+`cf38530144d436c3d73c8ba82c631477908e8079` passed application CI. The combined
+queue is validated by GitHub CI. No rate limits, token issuance changes,
+consumer-repository edits or production queries were made. CircularPay's actual
+reliance on the removed cross-team authority remains unknown. A-03 and other
+audit findings remain separate decisions. Shwet waived the inherited comment
+requesting a second reviewer; the independent review found no blocking defect.
+
 ## Where things stand
 
 Pacta is an **additive fork of `documenso/documenso`** — a document-signing

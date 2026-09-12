@@ -1,3 +1,4 @@
+import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -22,6 +23,8 @@ import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
 export const filesRoute = new Hono<HonoEnv>()
+  // MODIFIED for BizRethink (overlay 076): covers all three token PDF adapters, including nested routes.
+  .use('/token/:token/*', recipientTokenFileAccess)
   /**
    * Uploads a document file to the appropriate storage location and creates
    * a document data record.

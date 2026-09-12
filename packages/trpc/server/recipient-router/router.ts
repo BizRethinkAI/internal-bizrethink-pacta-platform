@@ -1,3 +1,4 @@
+import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
@@ -621,6 +622,9 @@ export const recipientRouter = router({
           });
         }
 
+        // MODIFIED for BizRethink (overlay 076): gate access before the SES/TSP branch.
+        await assertRecipientTokenAccess({ token, userId: ctx.user?.id });
+
         if (isTspEnvelope(envelope)) {
           return await prepareCscRecipientSigning({
             recipientToken: token,
@@ -681,6 +685,8 @@ export const recipientRouter = router({
     });
 
     return await rejectDocumentWithToken({
+      // MODIFIED for BizRethink (overlay 076): carry recipient identity into rejection.
+      userId: ctx.user?.id,
       token,
       id: {
         type: 'documentId',

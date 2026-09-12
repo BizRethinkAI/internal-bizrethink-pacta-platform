@@ -1,3 +1,4 @@
+import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { executeTspSign } from '@documenso/ee/server-only/signing/csc/execute-tsp-sign';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 
@@ -20,6 +21,9 @@ export const cscSignEnvelopeRoute = procedure
   .input(ZCscSignEnvelopeRequestSchema)
   .output(ZCscSignEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
+    // MODIFIED for BizRethink (overlay 076): enforce recipient ACCESS before entering the CSC pipeline.
+    await assertRecipientTokenAccess({ token: input.recipientToken, userId: ctx.user?.id });
+
     const result = await Promise.race([
       executeTspSign({
         sessionId: input.sessionId,

@@ -26,6 +26,14 @@
     "regression-tests/api-token-team-boundary.test.ts",
     "regression-tests/api-token-team-downloads.test.ts",
     "regression-tests/api-token-team-fixture.ts",
-    "../app-tests/e2e/api/bizrethink/api-token-team-boundary.spec.ts"
+    "../app-tests/e2e/api/bizrethink/api-token-team-boundary.spec.ts",
+    "regression-tests/recipient-auth-fixture.ts",
+    "regression-tests/recipient-factor-identity.test.ts",
+    "regression-tests/recipient-token-operations.test.ts",
+    "regression-tests/recipient-token-files.test.ts",
+    "recipient-auth-policy.ts",
+    "server-only/recipient-access.ts",
+    "server-only/recipient-token-file-access.ts",
+    "../app-tests/e2e/api/bizrethink/recipient-token-authorization.spec.ts"
   ]
 }
