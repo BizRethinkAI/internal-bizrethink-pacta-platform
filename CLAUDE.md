@@ -10,11 +10,16 @@ BizRethink AI's document signing platform. **Additive fork of [documenso/documen
 in [`docs/state/inflight/`](docs/state/inflight/). Together they are where
 things stand.**
 
+**Read [the session workflow](docs/session-workflow.md) and the open GitHub task
+issues before starting work. Shwet or one explicitly appointed coordinator
+assigns sessions, overlapping work and overlay reservations.**
+
 **Your PR's in-flight note is `docs/state/inflight/<branch-slug>.md`** — create
 it in the first push, edit it in place, never touch another PR's. `STATE.md`
-carries the settled narrative; merged notes are folded into it and deleted.
-It is the only memory that survives between sessions — where things stand, what
-is in flight, what is blocked, and what has bitten us before. It replaced a
+carries the last consolidated narrative. One assigned consolidation author
+folds merged notes and deletes them once per shipping batch; ordinary authors
+do not edit STATE.md. GitHub task issues hold live assignments; these Git files
+hold durable context, limitations and what has bitten us before. It replaced a
 user-local memory directory on 2026-08-29.
 
 | | |

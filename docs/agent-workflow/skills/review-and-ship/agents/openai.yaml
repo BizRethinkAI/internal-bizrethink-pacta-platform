@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review and Ship"
+  short_description: "Review PR queues, coordinate fixes, deploy once"
+  default_prompt: "Use $review-and-ship in this fresh session to independently review and merge this repo's cleared PR queue, coordinate author fixes and watch CI in the background. Automatically prepare any required final state-consolidation PR for my review and merge, then resume final checks and request one Coolify deploy. Do not watch the deployment."

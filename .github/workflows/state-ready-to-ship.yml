@@ -1,0 +1,26 @@
+# MODIFIED for BizRethink: a read-only release gate, never a deployment trigger.
+name: State ready to ship
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  state-ready:
+    name: State ready to ship
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require the integrated default branch
+        env:
+          CHECKED_REF: ${{ github.ref }}
+        run: test "$CHECKED_REF" = refs/heads/main
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - name: Require consolidated state
+        run: node .github/scripts/state-notes.ts ship

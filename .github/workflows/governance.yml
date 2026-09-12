@@ -167,111 +167,22 @@ jobs:
           echo "    // legal-language-ok: <reason>"
           exit 1
 
-      # ── Guard 4: STATE.md is kept current ──────────────────────────────
-      # It is the only memory that survives between sessions, and a stale
-      # STATE.md is worse than none because it is believed.
-      #
-      # Exempt: bot-authored PRs. The weekly upstream-sync PR is opened by a
-      # GitHub Action, and failing it would turn a five-minute chore into
-      # manual intervention every Monday.
+      # MODIFIED for BizRethink: per-author state, shipping-time consolidation.
+      # Existing notes on main belong to the shipping session, not the next PR.
+      # The separate State ready to ship workflow still blocks an unprocessed
+      # integrated revision. See docs/session-workflow.md.
+      - name: Set up Node for state policy
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
       - name: State recorded for this PR
         env:
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BRANCH: ${{ github.head_ref }}
           IS_BOT: ${{ github.event.pull_request.user.type == 'Bot' }}
-        run: |
-          if [ "$IS_BOT" = "true" ] || [ "$PR_AUTHOR" = "github-actions[bot]" ]; then
-            echo "✓ Bot-authored PR ($PR_AUTHOR) — exempt."
-            exit 0
-          fi
-
-          # Union merge leaves no marker of its own, but a hand-resolved
-          # merge can leave one, and nothing looked for them before. A STATE.md
-          # with markers in it is worse than a stale one: it is unreadable AND
-          # believed.
-          if grep -qE '^(<<<<<<< |>>>>>>> )' docs/STATE.md; then
-            echo "✗ docs/STATE.md contains conflict markers."
-            echo ""
-            echo "  A hand-resolved merge left them behind. Open the file and"
-            echo "  finish the resolution before this can land."
-            exit 1
-          fi
-
-          # EITHER location. A PR's own in-flight note satisfies this and
-          # touches STATE.md not at all, which is the whole point: two PRs
-          # editing different files cannot collide.
-          if grep -qE '^docs/(STATE\.md|state/inflight/.+\.md)$' /tmp/changed.txt; then
-            echo "✓ State recorded — docs/STATE.md or an in-flight note."
-            exit 0
-          fi
-
-          echo "✗ No state was recorded for this PR."
-          echo ""
-          echo "  Add docs/state/inflight/<branch-slug>.md describing what this"
-          echo "  PR changes and what is still open — see the README in that"
-          echo "  folder. Editing docs/STATE.md directly also satisfies this,"
-          echo "  but collides with every other open PR, which is why the"
-          echo "  per-PR note exists."
-          exit 1
-
-      # ── Guard 5: an in-flight note is in flight ────────────────────────
-      # `docs/state/inflight/` is half of what a session reads to learn where
-      # things stand. A note whose branch has merged is not in flight; it is an
-      # unfolded note describing settled work as if it were live.
-      #
-      # TWO COMPACTIONS HAVE NOW BEEN DONE BY HAND — 2026-09-09 (21 notes) and
-      # 2026-09-10 (10 notes) — AND BOTH WERE OVERDUE WITH THIS WORKFLOW GREEN.
-      # Guard 4 asks whether a PR TOUCHED a state file. Nothing asked whether
-      # the folder still described live work, so on 2026-09-09 STATE.md said the
-      # clause library "does not exist" three weeks after it was built, and on
-      # 2026-09-10 it said the MCA migrations had "never been applied anywhere"
-      # six days after they were applied. The owner caught the second one.
-      #
-      # A stale note is worse than no note, for the reason Guard 4 gives about
-      # STATE.md: it is believed.
-      #
-      # This fails the NEXT PR after a merge, not the merging one, which is the
-      # intended shape — folding is a one-commit chore and the forcing function
-      # has to land on somebody. The fix is always `git rm` the note and write
-      # its substance into docs/STATE.md.
-      - name: In-flight notes describe work that is in flight
-        run: |
-          shopt -s nullglob
-          STALE=""
-          for f in docs/state/inflight/*.md; do
-            base=$(basename "$f" .md)
-            [ "$base" = "README" ] && continue
-
-            # <branch-slug> is the branch with its first "/" written as "-".
-            branch=$(echo "$base" | sed 's/-/\//')
-
-            if ! git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-              # Three ways to get here and the message has to say so, because
-              # "does not exist" sent its own author looking for the wrong
-              # problem once: the branch was merged and deleted, the branch was
-              # abandoned, OR the note is misnamed for the branch it is on —
-              # which happens when work is consolidated onto another PR and the
-              # note is not renamed with it. Only the first two are "landed".
-              STALE="$STALE  $f — no origin/$branch. Merged and deleted, abandoned, or this note is misnamed for its PR's branch.\n"
-            elif git merge-base --is-ancestor "origin/$branch" origin/main 2>/dev/null; then
-              STALE="$STALE  $f — origin/$branch is already merged\n"
-            fi
-          done
-
-          if [ -z "$STALE" ]; then
-            echo "✓ Every in-flight note belongs to a branch that is still open."
-            exit 0
-          fi
-
-          echo "✗ These notes describe work that has already landed:"
-          printf "%b" "$STALE"
-          echo ""
-          echo "  Fold each into docs/STATE.md and delete it. That is the"
-          echo "  convention in CLAUDE.md, and it is the only thing keeping"
-          echo "  the file a session reads first from going stale."
-          echo ""
-          echo "  Synthesis, not concatenation: what is still TRUE and still"
-          echo "  MATTERS, not a transcript of the note."
-          exit 1
+        run: node .github/scripts/state-notes.ts pr
 
   lint:
     name: Lint (bizrethink)
