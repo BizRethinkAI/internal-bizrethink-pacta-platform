@@ -1,17 +1,26 @@
 UTAH CODE — TITLE 7, CHAPTER 27
 COMMERCIAL FINANCING REGISTRATION AND DISCLOSURE ACT
 
-Vendored 2026-09-06 from lombard-contracts
-state-disclosures/regulatory-source/UT-Title-7-Chapter-27.layout.txt
+Publisher: Utah State Legislature
+Site: https://le.utah.gov
+Retrieved from: https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf
+Retrieved at (UTC): 2026-09-12T08:39:57.332228+00:00
+Response SHA-256: 9897aace38c58cabf845a403689fe9809f83e7c5bc3be01608a110bdf32585c0
+Linked by: https://le.utah.gov/xcode/Title7/Chapter27/7-27.html
 
-ORIGINAL RETRIEVAL SOURCE UNRECORDED. The text is the Utah Code's own
-publication format and states "Effective 5/4/2022", but nothing in the file says
-which publisher it came from, and this header does not invent one.
+The September 12 source audit matched this complete body to that official
+retrieval using pdftotext -layout. The body below is unchanged. The chapter's
+2022 marker and filename coexist with the 2024 amendments to §§101 and 202.
+The original retrieval before the September 6 lombard-contracts import was
+not recorded; this header records the later verified retrieval, not that import.
 
-le.utah.gov is the official publisher. Re-vendoring from there would make this
-as strong as the Georgia, Texas, Connecticut and Virginia sources.
+Retrieval and comparison records:
+docs/research/mca-source-audit-2026-09-12/manifest.json (ut-original)
+Citation correction and targeted recheck:
+docs/research/mca-utah-california-corrections-2026-09-12/README.md
+This header is editorial; statutory text and page breaks are preserved below.
 
-------------------------------------------------------------------------------
+--- STATUTORY TEXT BEGINS ---
 
 Utah Code
 
