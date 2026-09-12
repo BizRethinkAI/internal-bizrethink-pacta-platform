@@ -240,6 +240,18 @@ const rejected: Case[] = [
     value: (v) => (v === 1 ? '["A","A"]' : '[0,0]'),
   },
   { name: 'mismatched stored metadata', type: FieldType.NUMBER, meta: { type: 'text', text: '1000' }, value: '1' },
+  {
+    name: 'fraction rounded down to the maximum by JavaScript',
+    type: FieldType.NUMBER,
+    meta: { type: 'number', maxValue: 1000 },
+    value: '1000.00000000000001',
+  },
+  {
+    name: 'integer rounded down to the maximum by JavaScript',
+    type: FieldType.NUMBER,
+    meta: { type: 'number', maxValue: 9007199254740992 },
+    value: '9007199254740993',
+  },
 ];
 for (const version of [1, 2] as const) {
   describe(`A-07 real direct-template materialization v${version}`, () => {
