@@ -305,6 +305,21 @@ agents searched for "the pinned counts" and three found four. The reasoning is
 left in that file so the next reader does not re-derive why a test about service
 knows how many clauses exist.
 
+### #168 — the register records one memo rejection
+
+The review register now pins `lombard-contracts`
+`58974ca1eead7fb6135ed8378475b8b53d5ecca6`. PR #168 changed only
+`fair-market-value-recital-self-refuting` from `open` to `rejected`;
+REVIEW-01 now has 30 open and 2 rejected entries, and the library surface
+reports 37 outstanding findings. The tests identify both rejected findings
+and keep four other memo-mentioned findings from being silently rejected.
+A rejected disposition removes a finding's approval hold; it is distinct
+from a review's own `refuted` status, whose five entries remain unrecorded.
+No cancellation-fee disposition was recorded.
+
+PR #168 also folded the notes from #164 and #166. Their durable content is
+already above; the fold of #168's own note does not repeat those folds.
+
 ### Owed
 
 **ADR 0012's *"six findings the 2026-09-09 memo refuted"* is wrong**, and ADRs are
@@ -315,6 +330,13 @@ already fixed, two deny propositions no finding makes, and one rests on a false
 premise (*"the missing Permission to Release"*, vendored twice). **It matters
 because `rejected` stops blocking approval**: recording all six would have
 unblocked five clauses on a misreading.
+
+The source manifest note for
+`frpa-4-8-may-impede-a-merchant-complaint-to-a-regulator` still says
+"No document change made." PR #168 records that change-note 16 changed the
+text under a sibling finding. Correcting that note and deciding the remaining
+counsel question are still owed to the source-owning session; no disposition
+is changed by this state fold.
 
 ## The day of 2026-09-10: the FRPA was rewritten, and the suite around it was not
 
@@ -480,8 +502,9 @@ re-raisable thing in that note, and compaction is how they would have been lost.
   assembles an identity grid and two service waivers with no guaranty between them.
 - **`settlementBase`** is `net` and **nobody has established which base Lombard
   prices on.** It reaches every state disclosure.
-- **Six memo-refuted dispositions** in `lombard-contracts` — **`rejected` already
-  exists in `FindingDisposition`**, so this is a data fix plus a regenerate.
+- **The memo characterization needs a superseding ADR.** #168 records the one
+  rejection described above; the earlier proposal to reject six findings is
+  superseded, and must not be treated as authorization for five more.
 - **`examinedBy` over-claims on every rewritten clause.** A third `ReviewId` would
   **not** fix it — the memo read the same old text. What is missing is provenance
   for the *current body*.

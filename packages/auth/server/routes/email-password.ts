@@ -1,10 +1,7 @@
-// MODIFIED for BizRethink (overlay 028): use DB-aware isSignupDisabled in
-// the POST /signup handler so the admin Signup-gating UI override actually
-// works at form-submit time. Original used raw env() and ignored the DB row.
-import { isSignupDisabled } from '@bizrethink/customizations/server-only/signup-config';
+// MODIFIED for BizRethink (overlay 074): one DB policy for every signup gate.
+import { getSignupPolicy, isEmailDomainAllowedForSignup } from '@bizrethink/customizations/server-only/signup-config';
 import {
   isDisposableEmail,
-  isEmailDomainAllowedForSignup,
   isSigninEnabledForProvider,
   isSignupEnabledForProvider,
 } from '@documenso/lib/constants/auth';
@@ -195,12 +192,11 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
   .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
     const requestMetadata = c.get('requestMetadata');
 
-    // MODIFIED for BizRethink (overlay 028): DB-aware. Layer 1 (signup page
-    // loader) already uses isSignupDisabled(); this matches it so the admin
-    // UI's Signup-gating override applies end-to-end (form submit too).
-    // Upstream's env-driven per-provider gate runs alongside ours — either one
-    // disabling email signup rejects the request.
-    if ((await isSignupDisabled()) || !isSignupEnabledForProvider('email')) {
+    // MODIFIED for BizRethink (overlay 074): keep one validated policy for
+    // the disabled, domain and invitation gates. Independent rereads could
+    // lose restrictions after a transient settings failure (audit R-01).
+    const signupPolicy = await getSignupPolicy();
+    if (signupPolicy.signupDisabled || !isSignupEnabledForProvider('email')) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         statusCode: 400,
       });
@@ -225,8 +221,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       ipAddress: requestMetadata.ipAddress,
     });
 
-    // MODIFIED for BizRethink (overlay 012): isEmailDomainAllowedForSignup is now async.
-    if (!(await isEmailDomainAllowedForSignup(email))) {
+    // MODIFIED for BizRethink (overlay 074): evaluate the same policy, without rereading it.
+    if (!isEmailDomainAllowedForSignup(email, signupPolicy)) {
       throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         statusCode: 400,
       });
@@ -239,8 +235,8 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     // The invite is claimed once the email is VERIFIED (verifyEmail →
     // claimInvitesOnVerification, overlay 071), never at signup itself.
     // See packages/bizrethink/server-only/signup-config.ts.
-    const { isInviteRequiredForSignup } = await import('@bizrethink/customizations/server-only/signup-config');
-    if (await isInviteRequiredForSignup()) {
+    // MODIFIED for BizRethink (overlay 074): retain the first read's invitation requirement.
+    if (signupPolicy.requiresInvite) {
       const matchingInvite = await prisma.organisationMemberInvite.findFirst({
         where: {
           email: { equals: email, mode: 'insensitive' },
