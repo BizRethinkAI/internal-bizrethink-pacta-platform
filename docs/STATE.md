@@ -81,32 +81,30 @@ reliance on the removed cross-team authority remains unknown. A-03 and other
 audit findings remain separate decisions. Shwet waived the inherited comment
 requesting a second reviewer; the independent review found no blocking defect.
 
-## 2026-09-12 — recipient-token identity boundary (#172)
+## 2026-09-12 — recipient identity gates merged (#172 / A-05)
 
-**#172 / A-05** merged at `0c440a396c9b5f5c9161538358fc08ff120fdc80`.
-Recipient ACCOUNT identity applies independently of ACTION authentication to
-token reads, ordinary/signature fields, removal, completion and rejection.
-FREE_SIGNATURE has the same ACTION requirement and prompt as SIGNATURE.
-ACCOUNT and completion 2FA are cumulative; email codes remain bound to the
-recipient email and envelope. Account-backed factors must belong to the
-intended recipient. The CSC/SES/TSP entry points check ACCOUNT before entering
-the existing signing pipeline; this changes no cryptographic verification.
+PR #172 merged at `0c440a396c9b5f5c9161538358fc08ff120fdc80` after independent
+review and green final checks, including Playwright on integration head
+`ff80cca0e`. Overlay **076** wires the owned recipient policy into signing,
+metadata and PDF routes. Configured ACCOUNT identity is required independently
+of signing ACTION factors; account-backed factors belong to the intended
+recipient. Completion email codes remain bound to recipient and envelope.
 
-Recipient reads deny drafts and deleted unfinished documents. Sender deletion
-of finalized documents preserves the recipient's copy, and the owner's choice
-keeps downloads available after the signing deadline with configured identity
-checks. Token PDFs authenticate before storage/conditional responses and use
-private/no-store. Direct-template previews retain their distinct enabled-link
-capability and configured ACCOUNT contract; ordinary APIs cannot use that
-preview capability. QR and deliberately anonymous links retain their behavior.
+The owner chose to preserve downloads after the signing deadline with identity
+checks intact. Drafts and deleted unfinished documents are unavailable;
+sender-hidden finalized copies remain available to their recipients. PDF
+authorization precedes storage and conditional responses; private/no-store is
+enforced. Deliberately link-only documents, QR capabilities and enabled direct
+template previews keep their distinct existing access contracts. Preview
+capabilities do not authorize ordinary document APIs.
 
-Owned policy/middleware and **overlay 076** hold the implementation; recheck
-token entry points, factor-verifier early returns, three PDF routes and
-signature-kind UI decisions during upstream sync. Initial CI caught preview
-and finalized-copy regressions, which were corrected with focused regressions
-and HTTP coverage before the independent review. The merged PR includes the
-preceding #169/#170/#171 queue. A-03/A-04/A-06 remain separate owner decisions;
-this fold neither changes those findings nor reports deployment status.
+Final author validation: **4,334 owned tests**, **287 shared-library tests**,
+both TypeScript gates and **11 HTTP regressions** in the green final CI run.
+No schema or instance-setting change. The A-04 author owns this single fold of
+the now-merged A-05 note; no other PR was open when checked. Production shipping
+remains owned by the separate review-and-ship session; this fold does not assert
+that the merged queue is deployed. Remaining audit findings need separate
+owner decisions.
 
 ## Where things stand
 

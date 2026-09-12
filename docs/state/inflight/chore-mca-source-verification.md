@@ -65,6 +65,13 @@ CI remains the final validation gate; record its result when available.
 
 Guard 5 required folding the already merged #172 note into STATE and deleting
 it. Its merge was confirmed via GitHub; this audit does not claim a deploy.
+After this PR opened, the queue check found that concurrent **#173 / A-04** had
+also folded #172. This PR adopts the A-04 author's exact STATE summary, keeping
+the shared fold identical rather than introducing two competing narratives.
+No #173 application change is included. The merge session should retain that
+fold once and compact the next merged note as required by Guard 5. Audit PR:
+[**#174**](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/174);
+its Checks and PR description carry the final CI result for the reviewed head.
 
 ## Collaboration agreement and next session
 
