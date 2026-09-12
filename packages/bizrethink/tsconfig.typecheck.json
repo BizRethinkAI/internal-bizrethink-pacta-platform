@@ -34,6 +34,7 @@
     "recipient-auth-policy.ts",
     "server-only/recipient-access.ts",
     "server-only/recipient-token-file-access.ts",
-    "../app-tests/e2e/api/bizrethink/recipient-token-authorization.spec.ts"
+    "../app-tests/e2e/api/bizrethink/recipient-token-authorization.spec.ts",
+    "regression-tests/presign-capability-boundary.test.ts"
   ]
 }
