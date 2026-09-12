@@ -1,3 +1,4 @@
+import { getApiTokenEnvelopeScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { prisma } from '@documenso/prisma';
 import type { EnvelopeType, Prisma } from '@prisma/client';
 
@@ -182,6 +183,8 @@ export const getMultipleEnvelopeWhereInput = async ({
 
   const envelopeWhereInput: Prisma.EnvelopeWhereInput = {
     ...unsafeBuildEnvelopeIdsQuery(ids, type),
+    // MODIFIED for BizRethink (overlay 075): every ownership branch stays in the API key's team.
+    ...getApiTokenEnvelopeScope(teamId),
     OR: envelopeOrInput,
   };
 

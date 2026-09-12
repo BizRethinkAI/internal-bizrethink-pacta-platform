@@ -1,3 +1,4 @@
+import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import type { BaseApiLog, RootApiLog } from '@documenso/lib/types/api-logs';
@@ -85,14 +86,17 @@ export const authenticatedMiddleware = <
         },
       };
 
-      return await handler(
-        {
-          ...args,
-          req: request,
-        },
-        apiToken.user,
-        apiToken.team,
-        { metadata, logger: apiLogger },
+      // MODIFIED for BizRethink (overlay 075): v1 uses the same credential boundary as v2.
+      return await withApiTokenTeamScope(apiToken.teamId, () =>
+        handler(
+          {
+            ...args,
+            req: request,
+          },
+          apiToken.user,
+          apiToken.team,
+          { metadata, logger: apiLogger },
+        ),
       );
     } catch (err) {
       apiLogger.info({

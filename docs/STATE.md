@@ -12,14 +12,59 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-09_
+_Last updated: 2026-09-12_
 
 ---
+
+## 2026-09-12 — merged signup policy and derived MCA numbering
+
+**#169 / R-01** merged at `bcbec3c3b298ee28265a246e80fa7d2ba8407170`.
+Signup reads one validated policy per request for the disabled, domain and
+invitation gates. Unavailable/invalid/closed policy fails closed; a valid open
+policy retains the existing env-domain fallback and DB-domain invitation rule.
+Provider switches, invitation verification, rate limits and CAPTCHA are retained.
+Overlay **074** records the upstream wiring. No schema, instance setting or
+consumer change; a concurrent admin edit affects the next signup request.
+The independent review found no blocking defect and all final PR checks passed.
+#169 already folded #168; the duplicate #168 summary from #171 is consolidated
+below without changing any finding disposition or dropping source/ADR follow-ups.
+
+**#171 / ADR 0011 phases 1–4** merged at `8715848c25ba791e0fb4262840d069588bfcad97`.
+The clause library stores identities rather than printed numbers. Selection
+applies the existing gates, then derives consecutive section/clause numbers
+and resolves same-profile clause/group references. Missing, duplicate and
+malformed targets fail closed. Explicit structural reasons leave some records
+unnumbered; seven alternative pairs share canonical reference identities.
+The source funding grid contributes 30 existing widgets, and the existing
+interest paragraph is separately citable: **FRPA 108 / entire library 211**.
+All 209 original records, existing fields, provenance, examination links and
+selection rules are retained. Ten ungated limitations name the separately
+signed guaranty so a no-guaranty selection has no dangling reference.
+
+Staff and counsel see the same compiled citations, visible field content and
+labelled alternative examples. The default profile remains an example, with
+the net settlement base unconfirmed. Slugs still identify findings and approvals.
+Approval fingerprints include classification, fields, reference targets and gate
+source; review fingerprints also cover ordering, example facts and referenced
+instruments. Existing links/fingerprints become stale; no approvals are
+migrated. Gate-source hashing can conservatively invalidate reviews across
+compilation representations; create review links through the app runtime.
+
+All authored clauses remain draft with null authors. This introduced no merchant
+rendering, PDF assembly, publishing, sending or prescribed-disclosure change.
+Separate work remains: guaranty numbering/placement (phase 5), templates
+100/102/119–121 and sibling form migration, remaining labels, commercial
+interview answers and counsel review. Future compound gates need explicit
+review examples, and future merchant output must enforce publication approval.
+
+No deploy has been requested for this queue. The review-and-ship session owns
+this consolidation and the single final deployment after the remaining PRs
+and final-main CI pass.
 
 ## Where things stand
 
 Pacta is an **additive fork of `documenso/documenso`** — a document-signing
-platform running at `sign.pacta.ink` on Coolify, auto-deploying from `main`.
+platform running at `sign.pacta.ink` on Coolify, manually deployed from `main` (auto-deploy verified off on 2026-09-12).
 Production holds **450 documents and 34 templates**: real, signed, customer
 contracts. Treat every production action accordingly.
 
@@ -337,6 +382,10 @@ The source manifest note for
 text under a sibling finding. Correcting that note and deciding the remaining
 counsel question are still owed to the source-owning session; no disposition
 is changed by this state fold.
+
+The #168 source handoff also identifies sibling `lombard-contracts` PR #13
+as the merge needed to put `58974ca` on that repository's main. This Pacta
+queue does not perform or certify that sibling merge.
 
 ## The day of 2026-09-10: the FRPA was rewritten, and the suite around it was not
 
@@ -3049,22 +3098,3 @@ matched rather than reporting success.
   BizRethink Contracts library on the Desktop stays read-only. See *Lombard
   tenancy* above.
 - `infra-gitops` manages the VPS fleet Coolify runs on.
-
-
-## 2026-09-12 — Memo refutation correction (merged #168)
-
-`chore/mca-memo-refutations` merged at `005db8e46`. The register pins
-`lombard-contracts` commit `58974ca`: the memo refutes **one** finding,
-`fair-market-value-recital-self-refuting`, now recorded as rejected. The other
-five topics in its “should not be repeated as written” passage describe stale
-text, a different proposition, or a false premise; their dispositions were not
-changed. The totals are two rejected dispositions and 37 outstanding findings.
-`status: refuted` still describes a review withdrawing its own work and is not
-interchangeable with `disposition: rejected`.
-
-ADR 0012's description of “six findings ... refuted” remains historically
-recorded but incorrect; correct it in a superseding ADR, not by editing that
-ADR. The regulator-complaint finding's “No document change made” note also
-remains inaccurate (change-note 16 did make one); deciding its disposition is
-separate work. The handoff identifies sibling PR #13 as the merge needed to put
-`58974ca` on that repository's main; this Pacta change does not merge it.
