@@ -12,6 +12,15 @@ import type { McaClause } from '../types';
 export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   {
     slug: 'iso-pra.compliance',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '15 U.S.C. §45(a)(1) (unfair or deceptive acts or practices within FTC jurisdiction)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The referral relationship needs a common compliance covenant and prohibition on deceptive conduct; it does not establish that every listed regulatory scheme applies to every ISO.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -27,6 +36,12 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   },
   {
     slug: 'iso-pra.know-your-partner-compliance',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The ISO information covenant supports Company diligence, but does not establish an MCA-wide statutory AML onboarding duty; no alternative diligence clause is authored.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -42,6 +57,12 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   },
   {
     slug: 'iso-pra.merchant-funds',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The referral-only model reserves disbursement to Company and needs a route for funds received in error; it does not offer the ISO custody of merchant funding.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -57,6 +78,12 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   },
   {
     slug: 'iso-pra.confidentiality',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The channel confidentiality undertaking is the only authored information-sharing term; no alternative permission or duration is authored.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -72,6 +99,12 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
   },
   {
     slug: 'iso-pra.audits',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The Company audit right and cost allocation are the only authored partner-audit terms; a broker-channel choice does not select another audit regime.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -106,6 +139,15 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
    */
   {
     slug: 'iso-pra.commercial-financing-disclosures-california-and-new-york',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '10 CCR §952; 23 NYCRR §600.21 (covered provider/broker disclosure duties)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The elected direct-delivery route needs broker controls and a fallback for disclosures sent through the ISO; no alternative compliant delivery procedure is authored in this channel agreement.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -117,7 +159,6 @@ export const ISO_PRA_ADDITIONAL_OBLIGATIONS: McaClause[] = [
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: ['US-CA', 'US-NY'],
-    requiredBy: '10 CCR §952; 23 NYCRR §600.21',
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
 ];

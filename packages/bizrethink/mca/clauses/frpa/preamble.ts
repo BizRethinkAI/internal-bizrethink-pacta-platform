@@ -25,6 +25,12 @@ import type { McaClause } from '../types';
 export const FRPA_PREAMBLE: McaClause[] = [
   {
     slug: 'frpa.merchant-and-funding-information',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The parties, funding figures, itemized deductions and notice contacts must be completed for this purchase to operate; changing deal values does not select different wording.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'field-group',
@@ -133,6 +139,16 @@ export const FRPA_PREAMBLE: McaClause[] = [
   */
   {
     slug: 'frpa.holdback-explainer',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        'O.C.G.A. §10-1-393.18(e)(4); Utah Code §7-27-202(3); K.S.A. §75-784(b)(5); Mo. Rev. Stat. §427.300.3(2)(e) (variable-payment methodology in covered agreements)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The estimate must remain distinct from the actual percentage collection; the collection-method answers currently provide no alternative explanation backed by ACH terms.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'explainer',
@@ -144,7 +160,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     body: 'What is the Estimated Daily Holdback? The Estimated Daily Holdback stated in the Merchant and Funding Information grid is a good-faith illustration of the Specified Percentage of Merchant’s average daily Card Receipts, calculated from the Card Receipts history Merchant gave Buyer before the Purchase Date. It is not a payment, it is not a minimum, it is not a scheduled amount, and it is not a promise that any amount will be collected on any day. Collection occurs only as the Specified Percentage of actual Card Receipts under Sections [[section:purchase]] and [[section:reconciliation]], and no fixed amount is collected under this Agreement. If Merchant’s Card Receipts fall, what Buyer collects falls with them. Section [[section:reconciliation]] states how the illustration is reconciled and adjusted. A separate Split Funding Authorization (the Split Funding Authorization exhibit) is executed for each Approved Processor identified in the Merchant and Funding Information grid.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-GA', 'US-UT', 'US-KS', 'US-MO'],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
   /*
@@ -188,6 +204,12 @@ export const FRPA_PREAMBLE: McaClause[] = [
   */
   {
     slug: 'frpa.equipment-cost-explainer',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'The funder decides whether equipment is offered; the merchant chooses purchase or lease. This explanation must cover both merchant elections whenever equipment is offered.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'explainer',
@@ -250,6 +272,12 @@ export const FRPA_PREAMBLE: McaClause[] = [
   */
   {
     slug: 'frpa.equipment-cost-exclusivity',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'When equipment is offered, its charges must remain separate from the purchased amount and the same equipment must not be charged twice; this rule supports both merchant elections.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'explainer',
@@ -303,6 +331,12 @@ export const FRPA_PREAMBLE: McaClause[] = [
   */
   {
     slug: 'frpa.rollover-method-election',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'A renewal using either settlement method needs a completed record of the merchant’s election and resulting cash; the no-renewal answer omits this record rather than selecting alternative wording.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'explainer',
@@ -363,6 +397,12 @@ export const FRPA_PREAMBLE: McaClause[] = [
   */
   {
     slug: 'frpa.parties',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The purchase needs identified contracting parties, an effective date and a funding trigger; a processor or affiliate does not become a party merely by being named.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -413,6 +453,12 @@ export const FRPA_PREAMBLE: McaClause[] = [
   */
   {
     slug: 'frpa.granting-clause',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This is the operative transfer of the purchased share and allocation of non-generation risk; removing it would leave no defined sale of future receipts.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

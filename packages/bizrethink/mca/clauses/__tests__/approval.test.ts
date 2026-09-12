@@ -33,6 +33,8 @@ const clause = (overrides: Partial<McaClause> = {}): McaClause => ({
   instrument: 'frpa',
   kind: 'clause',
   includeWhen: null,
+  whyThisClause: { kind: 'discretionary' },
+  variance: { kind: 'fixed', because: 'load-bearing', note: 'The purchase needs an operative transfer.' },
   section: 'purchase',
   sortKey: 10,
   heading: 'Purchase and Sale',
@@ -77,7 +79,7 @@ describe('the fingerprint an approval is pinned to', () => {
       // ADR 0011: a changed reference target lapses approval; a printed number is no longer stored.
       clause({ referenceId: 'another-obligation' }),
       clause({ version: 2 }),
-      clause({ requiredBy: '10 CCR §952' }),
+      clause({ whyThisClause: { kind: 'implements', citation: '10 CCR §952' } }),
     ]) {
       expect(mcaClauseFingerprint(changed)).not.toBe(mcaClauseFingerprint(base));
     }

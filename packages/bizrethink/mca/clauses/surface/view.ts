@@ -8,6 +8,7 @@ import { agreementDigest, agreementExists, MissingAgreementError } from '../docu
 import { findingsFor, outstandingFindingsFor, REGISTER_AVAILABLE } from '../examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
 import { LOMBARD, type McaTenant } from '../parties';
+import type { ClauseVariance, WhyThisClause } from '../types';
 
 /**
  * The view model behind `/admin/mca-library`.
@@ -73,6 +74,8 @@ export type McaLibraryClauseView = {
   section: string;
   status: string;
   provenance: string;
+  whyThisClause: WhyThisClause;
+  variance: ClauseVariance;
   /** Why this clause may not be published. Empty would mean it could be. */
   publishProblems: string[];
   examinedBy: { review: string; findings: number }[];
@@ -140,6 +143,8 @@ export const mcaLibrarySurface = (tenant: McaTenant = LOMBARD) => {
       section: clause.section,
       status: clause.status,
       provenance: describeSource(clause.source),
+      whyThisClause: clause.whyThisClause,
+      variance: clause.variance,
       /*
         Computed against a HYPOTHETICAL published copy, not the draft in hand.
 

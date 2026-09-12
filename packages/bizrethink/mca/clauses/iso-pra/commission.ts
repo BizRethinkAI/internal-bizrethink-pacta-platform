@@ -12,6 +12,12 @@ import type { McaClause } from '../types';
 export const ISO_PRA_COMMISSION: McaClause[] = [
   {
     slug: 'iso-pra.parties',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The referral agreement needs the actual Company and ISO Partner identified; merchant transaction fields do not identify the parties to this channel contract.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -28,6 +34,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   },
   {
     slug: 'iso-pra.recital-company-business',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This recital describes the Company’s financing business; no different business recital is authored for a funder answer.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -44,6 +56,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   },
   {
     slug: 'iso-pra.recital-partner-purpose',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The recital identifies the referral relationship and points to its commission bargain; removing the merchant channel entirely is an instrument choice, not alternate recital wording.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -60,6 +78,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   },
   {
     slug: 'iso-pra.consideration',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This is the only authored recital of the referral parties’ mutual promises; no statute is identified as prescribing the recital.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -76,6 +100,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   },
   {
     slug: 'iso-pra.commission-rate',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The referral bargain needs a rate, funding trigger and origination-fee ceiling; choosing whether a broker channel exists does not set an alternative commission formula.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -97,6 +127,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   },
   {
     slug: 'iso-pra.when-commission-is-earned',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The commission needs an earning event distinct from application submission; no alternate earning trigger is authored.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -120,6 +156,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
   },
   {
     slug: 'iso-pra.payment-timing',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The thirty-day payout and absence of a minimum threshold are the only authored commission timing terms; no fact selects another payment schedule.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -150,6 +192,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
    */
   {
     slug: 'iso-pra.clawback-provision',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The commission recovery windows, percentages and setoff-first process are commercial terms with no authored alternative.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -186,6 +234,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
    */
   {
     slug: 'iso-pra.commission-transparency',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The portal access promise is the only authored commission-reporting mechanism; no different reporting service is selected by the funder facts.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -213,6 +267,12 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
    */
   {
     slug: 'iso-pra.sole-compensation',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The Company-paid commission and ban on additional merchant compensation are the authored channel model; applicable fee restrictions do not themselves require this universal commercial ban.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',

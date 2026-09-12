@@ -64,6 +64,12 @@ import type { McaClause } from '../types';
 export const FRPA_GUARANTY: McaClause[] = [
   {
     slug: 'frpa.guarantor-information-9-1',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'An elected guaranty needs identified guarantors and signatures in the correct capacity; no-guaranty templates omit these fields, and the same identity rule serves both guaranty scopes.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'field-group',
@@ -304,6 +310,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.guaranty-of-performance-9-2',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This is the operative limited-conduct guaranty accompanying that scope. The no-guaranty answer omits the whole guaranty, so these two guaranty texts alone do not partition all three scope values.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -422,6 +434,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.guarantor-waivers-9-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'These enforcement and consent limits accompany the limited-conduct guaranty; they cannot be independently removed while retaining that guaranty’s allocation of liability.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -476,6 +494,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.joint-and-several-liability-9-5',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The limited-conduct guaranty needs liability assessed separately for each person’s covered conduct; this rule follows that scope rather than creates a separate liability election.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -521,6 +545,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.guarantor-acknowledgement-9-6',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The acknowledgment must describe the limited liability the elected guaranty actually creates; it follows the scope choice and cannot describe the other guaranty.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -671,6 +701,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.full-performance-guaranty-9-2',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This is the operative full-performance guaranty accompanying that scope. The no-guaranty answer omits the whole guaranty, so these two guaranty texts alone do not partition all three scope values.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -731,6 +767,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.full-performance-guarantor-waivers-9-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'These enforcement and consent limits accompany the full-performance guaranty; removing them would change that guaranty’s operation independently of the elected scope.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -784,6 +826,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.full-performance-joint-and-several-liability-9-5',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The full-performance guaranty needs its joint liability and contribution rule stated consistently with that scope; it is not a separate liability election.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -825,6 +873,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.full-performance-guarantor-acknowledgement-9-6',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The acknowledgment must describe the full performance obligation actually elected; it follows that scope and cannot describe the limited-conduct guaranty.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -918,6 +972,16 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.section-10-1',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        'Conn. Gen. Stat. §36a-868; Va. Code §6.2-2234(C); Tex. Fin. Code §398.055 (covered prejudgment-waiver and confession-of-judgment prohibitions)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Every party needs one rule preserving lawful service and prohibited-waiver limits; either dispute forum can require related court proceedings.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -928,7 +992,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     body: 'A summons, a complaint or other judicial process must be served on Merchant, on Buyer, or on a Guarantor in a manner that the procedural law of the court, and any applicable order of that court, authorizes. This Section applies to each party to this Agreement, including each Guarantor, and it is the only provision of this Agreement that governs how judicial process is served.\nThis Agreement contains no waiver by any party of valid service, of an available jurisdictional objection, of a notice or a hearing that applicable law requires, or of a prior court order that applicable law requires before a prejudgment remedy is obtained. It contains no confession of judgment, and it gives no person authority to obtain a judgment otherwise than by lawful process.\nA method of giving an operational notice under Section [[clause:frpa.notices-7-3]] is not service of process, and using one is not evidence that service has been made. A party may accept service, or give up service, after a proceeding has begun, in the manner the law then applicable permits; nothing in this Agreement does so in advance.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-CT', 'US-VA', 'US-TX'],
     examinedBy: [
       { review: 'REVIEW-01', findings: ['ct-prejudgment-remedy-waiver', 'service-without-notice-vs-commitment-9'] },
     ],
@@ -967,6 +1031,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.section-10-2',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'Both authored guaranty scopes use the same judicial-service rule as every other party; the no-guaranty answer simply omits this cross-reference.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1029,6 +1099,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.section-10-3',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Merchant’s notices need a current destination distinct from agreement to accept judicial service; a dispute-forum answer does not provide those contact details.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1076,6 +1152,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.section-10-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'Both authored guaranty scopes need the same guarantor notice destinations and preserved service rights; no-guaranty templates omit these details.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1121,6 +1203,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.section-10-5',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The notice system needs a way to keep all parties’ destinations current without turning an old address into valid judicial service.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -1163,6 +1251,12 @@ export const FRPA_GUARANTY: McaClause[] = [
   */
   {
     slug: 'frpa.section-10-6',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Administration and judicial process need a single rule deciding which notice regime applies; that distinction continues under either dispute forum.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

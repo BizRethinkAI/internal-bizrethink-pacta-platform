@@ -1,7 +1,10 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+
 import { isMcaApprovalCurrent, type McaClauseApproval } from '../clauses/approval';
 import { INSTRUMENTS } from '../clauses/instruments';
 import { libraryFor } from '../clauses/library';
 import { type McaTenant, resolveClauses } from '../clauses/parties';
+import type { ClauseVariance, WhyThisClause } from '../clauses/types';
 import type { McaJurisdiction } from '../jurisdictions';
 import { type BriefingSection, counselBriefing } from './briefing';
 import { type McaLibraryReview, reviewIsStale } from './link';
@@ -38,12 +41,9 @@ import { type ReadableMcaClause, toReadableAgreement } from './readable-agreemen
  */
 
 export type CounselReviewClause = ReadableMcaClause & {
-  /**
-   * Why the clause is in the document, where a state's law put it there. Most
-   * of this corpus is commercial drafting and says nothing here — and saying so
-   * is the point: it tells a lawyer where their hour is worth spending.
-   */
-  requiredBy: string | null;
+  /** Current-clause assessments required by ADR 0014, distinct from historical findings. */
+  whyThisClause: WhyThisClause;
+  variance: ClauseVariance;
   appliesInStates: McaJurisdiction[];
   /**
    * Whether somebody's approval already covers these exact words. Read by an
@@ -135,12 +135,16 @@ export const counselReviewView = (input: CounselReviewInput): CounselReviewView 
         ...section,
         clauses: section.clauses.map((readable) => {
           const clause = clauses.find((candidate) => candidate.slug === readable.slug);
+          if (!clause) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Review clause is absent from the library.' });
+          }
 
           return {
             ...readable,
-            requiredBy: clause?.requiredBy ?? null,
-            appliesInStates: clause?.appliesInStates ?? [],
-            approved: clause === undefined ? false : isMcaApprovalCurrent(clause, approvalFor(clause.slug)),
+            whyThisClause: clause.whyThisClause,
+            variance: clause.variance,
+            appliesInStates: clause.appliesInStates,
+            approved: isMcaApprovalCurrent(clause, approvalFor(clause.slug)),
           };
         }),
       }),

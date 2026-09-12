@@ -6,6 +6,12 @@ import type { McaClause } from '../types';
 export const PAYZLI_LETTER: McaClause[] = [
   {
     slug: 'split-funding.frpa-recital',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'A processor instruction needs an identified seller, funder and purchase agreement; a statement that the processor accepted does not supply those transaction details.',
+    },
     version: 1,
     instrument: 'split-funding',
     kind: 'clause',
@@ -26,6 +32,12 @@ export const PAYZLI_LETTER: McaClause[] = [
   },
   {
     slug: 'split-funding.split-funding-instruction',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'This is the letter’s operative settlement instruction; removing it would leave no instruction at all, and neither ACH alternative has been authored in its place.',
+    },
     version: 1,
     instrument: 'split-funding',
     kind: 'clause',
@@ -58,6 +70,12 @@ export const PAYZLI_LETTER: McaClause[] = [
   },
   {
     slug: 'split-funding.satisfaction-of-payzlis-obligation',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The letter needs to explain how redirected settlement discharges the processor’s obligation to Seller; the funder’s collection preference does not replace that accounting rule.',
+    },
     version: 1,
     instrument: 'split-funding',
     kind: 'clause',
@@ -73,6 +91,12 @@ export const PAYZLI_LETTER: McaClause[] = [
   },
   {
     slug: 'split-funding.fees-are-additional',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'These are processor charges under its merchant agreement, not the funder’s price for purchased receipts; the funder’s template choices do not decide them.',
+    },
     version: 1,
     instrument: 'split-funding',
     kind: 'clause',
@@ -88,6 +112,12 @@ export const PAYZLI_LETTER: McaClause[] = [
   },
   {
     slug: 'split-funding.processor-termination-fees',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'The cited termination fees arise under the processor’s separate merchant agreement; no funder fact supplies authority to choose or vary that processor’s fee schedule.',
+    },
     version: 1,
     instrument: 'split-funding',
     kind: 'clause',
@@ -103,6 +133,12 @@ export const PAYZLI_LETTER: McaClause[] = [
   },
   {
     slug: 'split-funding.indemnity',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The seller-to-processor instruction indemnity is the only authored allocation for this letter; no narrower or broader processor indemnity is offered.',
+    },
     version: 1,
     instrument: 'split-funding',
     kind: 'clause',
@@ -118,6 +154,12 @@ export const PAYZLI_LETTER: McaClause[] = [
   },
   {
     slug: 'split-funding.remittance-instructions',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The withholding instruction needs a named payee, payment destination and contact; these are deal values to complete, not competing contract clauses.',
+    },
     version: 1,
     instrument: 'split-funding',
     kind: 'clause',

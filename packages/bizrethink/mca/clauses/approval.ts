@@ -128,7 +128,8 @@ export const mcaClauseFingerprint = (clause: McaClause): string =>
         section: clause.section,
         heading: clause.heading,
         body: clause.body,
-        requiredBy: clause.requiredBy ?? null,
+        whyThisClause: clause.whyThisClause,
+        variance: clause.variance,
         appliesInStates: [...clause.appliesInStates].sort(),
       }),
     )

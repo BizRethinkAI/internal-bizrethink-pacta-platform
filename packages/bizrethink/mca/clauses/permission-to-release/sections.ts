@@ -8,6 +8,12 @@ import type { McaClause } from '../types';
 export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   {
     slug: 'permission-to-release.preamble',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The release needs the person signing, the business and Buyer identified; naming a funder profile does not establish the signer’s authority over another person’s information.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',
@@ -24,6 +30,12 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   },
   {
     slug: 'permission-to-release.trade-landlord-and-bank-information',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This business-information authorization has no authored alternative; commercial record access is a separate question from an individual consumer-report purpose.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',
@@ -39,6 +51,12 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   },
   {
     slug: 'permission-to-release.banking-brokerage-and-processing-history',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The listed business records and sources are the only authored access scope in this release; no alternate record-access clause is selected by the funder facts.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',
@@ -54,6 +72,15 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   },
   {
     slug: 'permission-to-release.credit-bureau-authorization',
+    whyThisClause: {
+      kind: 'implements',
+      citation: '15 U.S.C. §1681b(a)(2), (f) (individual consumer-report instructions and permissible use)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'A consumer-report release needs individual authority and identified permitted use; selecting a report-pull preference cannot itself supply that authority.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',
@@ -75,6 +102,16 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   },
   {
     slug: 'permission-to-release.fair-credit-reporting-act-acknowledgment',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        '15 U.S.C. §§1681b(f), 1681m(a) (permissible consumer-report use and applicable adverse-action notices)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The release addresses permissible use and adverse-action obligations when consumer information is used; those duties do not disappear because report access was selected in a profile.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',
@@ -101,6 +138,12 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   },
   {
     slug: 'permission-to-release.continuing-authorization-reliance',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'This duration and reliance language is the only authored continuing-release provision; no alternative duration or renewal-of-consent clause is available.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',
@@ -116,6 +159,12 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   },
   {
     slug: 'permission-to-release.release-of-information-sources',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The information-source liability release is a contractual allocation, not a required FCRA notice; no narrower release or no-release alternative is authored.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',
@@ -131,6 +180,12 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
   },
   {
     slug: 'permission-to-release.personal-guarantor',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The release needs the intended individual’s signature capacity identified; a report-pull preference or Merchant’s signature cannot itself establish another person’s authority.',
+    },
     version: 1,
     instrument: 'permission-to-release',
     kind: 'clause',

@@ -74,6 +74,16 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.definitions',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        'O.C.G.A. §10-1-393.18(e)(4); Utah Code §7-27-202(3); K.S.A. §75-784(b)(5); Mo. Rev. Stat. §427.300.3(2)(e) (variable-payment methodology in covered agreements)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The settlement-base answers currently select the same net-receipts definition; a gross definition with consistent collection and disclosure terms is not authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -84,7 +94,7 @@ export const FRPA_PURCHASE: McaClause[] = [
     body: 'In this Agreement:\n“Workday” means a day other than a Saturday, a Sunday or a federal banking holiday.\n“Approved Processor” means each credit and debit card processor identified in the Merchant and Funding Information grid and each processor added under Section [[clause:frpa.approved-bank-account-2-4]]. “Approved Bank Account” means each deposit account identified in the Merchant and Funding Information grid and each account added under Section [[clause:frpa.approved-bank-account-2-4]]. “Bank” means a bank that maintains an Approved Bank Account.\n“Card Receipts” means the net credit and debit card settlement proceeds actually payable to Merchant by an Approved Processor for Merchant’s ordinary-course sales, after refunds, chargebacks, separately identified taxes and gratuities payable to others, and that Approved Processor’s own lawful ordinary charges and reserves as shown on Merchant’s settlement statements. Those charges and reserve arrangements, as they stand on the Purchase Date, are disclosed to Merchant in writing before the Purchase Date, and a material change to either is disclosed promptly. Neither party may change or arrange them in order to alter the economics stated in the Merchant and Funding Information grid. Charges billed at merchant level for equipment leased or subscribed from {{equipmentAffiliate}} are not deducted in determining Card Receipts. A released reserve is a Card Receipt when it becomes payable, and only to the extent it is attributable to a sale generated on or after the Purchase Date. Each refund, chargeback, reserve and release is traced to the sale it arises from and counted once; the same adjustment may not both reduce an amount credited to Buyer and reduce Card Receipts. Transfers between Merchant’s own accounts, capital contributions, financing proceeds, and the proceeds of sales generated before the Purchase Date are not Card Receipts.\n“Receipts” and “Daily Receipts”, wherever used in this Agreement, mean Card Receipts, unless the provision using the term says otherwise in terms.\n“Specified Percentage” means the percentage stated in the Merchant and Funding Information grid. It does not increase on an Event of Default.\n“Purchase Price”, “Factor Rate”, “Purchased Amount”, “Net Amount Funded” and “Estimated Daily Holdback” mean the amounts completed and itemized in the Merchant and Funding Information grid, and the Purchased Amount is subject to Section [[clause:frpa.completion-threshold-2-6]]. “Purchase Date” has the meaning given in Section [[clause:frpa.timing-and-method-of-funding-4-13]]. “Purchased Receipts” has the meaning given in the sale above. “Remaining Balance” and “Completion Threshold” have the meanings given in Section [[clause:frpa.completion-threshold-2-6]].\nAn estimate in this Agreement, including the Estimated Daily Holdback, states no maturity date and creates no obligation to deliver any amount by any date.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-GA', 'US-UT', 'US-KS', 'US-MO'],
     examinedBy: [{ review: 'REVIEW-02', findings: [] }],
   },
   /*
@@ -138,6 +148,12 @@ export const FRPA_PURCHASE: McaClause[] = [
       `frpa-coverage` pins.
     */
     slug: 'frpa.sales-of-receipts-not-a-loan-2-1',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The contingent purchase needs its non-generation risk and limits on recourse stated consistently with the grant and remedies; a label alone does not determine legal characterization.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -197,6 +213,16 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.collection-mechanism-and-term-2-2',
+    whyThisClause: {
+      kind: 'implements',
+      citation:
+        'O.C.G.A. §10-1-393.18(e)(4); Utah Code §7-27-202(3); K.S.A. §75-784(b)(5); Mo. Rev. Stat. §427.300.3(2)(e) (variable-payment methodology in covered agreements)',
+    },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The purchase needs a rule tying remittances to actual receipts and a completion event; removing this rule cannot supply the missing ACH collection alternatives.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -207,7 +233,7 @@ export const FRPA_PURCHASE: McaClause[] = [
     body: 'Buyer collects only the Specified Percentage of actual Card Receipts, and only through an Approved Processor under Section [[clause:frpa.primary-collection-split-funding-via-approved-processor-2-3]]. If Merchant generates no Card Receipts in a period, nothing is due for that period and no arrears accrue for it. The Estimated Daily Holdback is informational: it does not authorize a fixed debit, a minimum remittance, a catch-up collection or a payoff date, and Buyer may not collect a fixed amount under this Agreement. What Buyer collects rises and falls with Merchant’s actual Card Receipts and may be more or less than the Estimated Daily Holdback on any Workday. This Agreement continues until the Completion Threshold in Section [[clause:frpa.completion-threshold-2-6]] is attained, or until it is cancelled under Section [[clause:frpa.right-to-cancel-4-14]] or otherwise lawfully terminated. It has no maturity date, and the risk that a decline or failure of Merchant’s business leaves the Purchased Amount undelivered is Buyer’s under Section [[clause:frpa.sales-of-receipts-not-a-loan-2-1]].',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: [],
+    appliesInStates: ['US-GA', 'US-UT', 'US-KS', 'US-MO'],
     examinedBy: [
       {
         review: 'REVIEW-01',
@@ -276,6 +302,12 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.primary-collection-split-funding-via-approved-processor-2-3',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Removing the split rule would leave the agreement without a collection mechanism. Processor acceptance is required for the deal to proceed, not a reason to omit the instruction from the template.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -320,6 +352,12 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.approved-bank-account-2-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The split design needs identified processors and accounts, replacement arrangements and a rule for interrupted settlements; no alternate collection mechanism is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -367,6 +405,12 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.completion-threshold-2-6',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The purchase needs one ending balance, a stop instruction, refunds and release of its filings; removing this clause would leave collection without a contractual stopping rule.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -484,6 +528,12 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.merchant-s-right-to-reconciliation-3-1',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Verification and correction preserve the actual purchased percentage and aggregate cap; reconciliation cannot disappear when receipts fall or a default is alleged.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -559,6 +609,12 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.request-for-reconciliation-procedure-3-2',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The reconciliation right needs usable request methods, supporting records and a response process; no alternate procedure is authored.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -645,6 +701,12 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.failure-to-provide-reconciliation-information-3-3',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'Reconciliation must still operate when records are incomplete; removing this rule would leave the refund and correction process unresolved during an information gap.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',
@@ -716,6 +778,12 @@ export const FRPA_PURCHASE: McaClause[] = [
   */
   {
     slug: 'frpa.adjustment-of-the-estimated-daily-holdback-3-4',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The holdback remains an informational estimate under every currently authored collection rule; the fact does not supply an alternative fixed-payment adjustment clause.',
+    },
     version: 1,
     instrument: 'frpa',
     kind: 'clause',

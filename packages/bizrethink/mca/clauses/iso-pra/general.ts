@@ -12,6 +12,12 @@ import type { McaClause } from '../types';
 export const ISO_PRA_GENERAL: McaClause[] = [
   {
     slug: 'iso-pra.representations-and-warranties',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The ISO’s authority, status and history representations are the only authored partner warranties; no fact selects a narrower or broader version.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -27,6 +33,12 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   },
   {
     slug: 'iso-pra.term-and-termination',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The referral relationship’s notice period, cause termination and earned commissions are the only authored termination terms.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -42,6 +54,12 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   },
   {
     slug: 'iso-pra.indemnification',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The ISO’s indemnity for referral conduct has no authored alternative; a merchant guaranty choice does not change this separate contractual risk allocation.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -57,6 +75,12 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   },
   {
     slug: 'iso-pra.independent-contractor',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'no-alternative',
+      note: 'The independent-business allocation is the only authored relationship model; this contractual description does not determine statutory broker or agency status.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -72,6 +96,12 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   },
   {
     slug: 'iso-pra.governing-law',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'misattributed',
+      note: 'This forum is for disputes between Company and ISO Partner; the merchant-facing venue and arbitration facts do not choose the forum for the referral contract.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',
@@ -87,6 +117,12 @@ export const ISO_PRA_GENERAL: McaClause[] = [
   },
   {
     slug: 'iso-pra.entire-agreement',
+    whyThisClause: { kind: 'discretionary' },
+    variance: {
+      kind: 'fixed',
+      because: 'load-bearing',
+      note: 'The channel agreement needs its own document set and signed-amendment rule; a merchant purchase does not amend the referral bargain.',
+    },
     version: 1,
     instrument: 'iso-pra',
     kind: 'clause',

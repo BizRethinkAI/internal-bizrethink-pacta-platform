@@ -143,12 +143,13 @@ export type McaFacts = {
   /**
    * The states this template will be offered in.
    *
-   * ONLY TEXAS ADDS CONTENT. Of the eleven states tracked, 7 TAC §86.310(d) is
-   * the sole rule that requires words INSIDE the agreement — the OCCC complaint
-   * notice, verbatim, "as a separate section or otherwise conspicuously set out".
-   * Connecticut §36a-868 and Virginia §6.2-2234(A) are prohibitions, satisfied
-   * by a base form that omits the terms, and the rest are separate disclosure
-   * documents on the conformity surface
+   * TEXAS ADDS A SEPARATE NOTICE through this gate: 7 TAC §86.310(d)'s OCCC
+   * complaint notice, "as a separate section or otherwise conspicuously set out".
+   * The 2026-09-12 source walk also identified agreement-methodology duties in
+   * Georgia, Utah, Kansas and Missouri. Those are addressed by shared collection
+   * wording, with their legal purpose recorded on the clauses under ADR 0014;
+   * they do not create separate state-selection gates. Prescribed disclosures
+   * remain on the conformity surface
    * ([ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md)).
    *
    * So this is base-plus-Texas, not eleven of anything.

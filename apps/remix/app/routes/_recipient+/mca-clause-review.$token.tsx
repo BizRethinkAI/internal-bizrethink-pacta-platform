@@ -1,4 +1,4 @@
-import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
+import { describeClauseVariance, describeWhyThisClause } from '@bizrethink/customizations/mca/clauses/metadata';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -316,15 +316,8 @@ export default function McaClauseReviewPage() {
 
                 {clause.selectionNote && <p className="mt-1 text-muted-foreground text-sm">{clause.selectionNote}</p>}
 
-                {(clause.requiredBy !== null || clause.appliesInStates.length > 0) && (
-                  <p className="mt-1 text-muted-foreground text-xs">
-                    {clause.appliesInStates.length > 0 &&
-                      `In the agreement because of ${clause.appliesInStates
-                        .map((state) => JURISDICTION_NAMES[state])
-                        .join(' and ')} law. `}
-                    {clause.requiredBy !== null && clause.requiredBy}
-                  </p>
-                )}
+                <p className="mt-1 text-muted-foreground text-xs">{describeWhyThisClause(clause.whyThisClause)}</p>
+                <p className="mt-1 text-muted-foreground text-xs">{describeClauseVariance(clause.variance)}</p>
 
                 {clause.text && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>}
                 {clause.fields && (
