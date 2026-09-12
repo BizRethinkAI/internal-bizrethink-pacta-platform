@@ -21,14 +21,13 @@ describe('the VA spec against the Commonwealth form', () => {
 });
 
 describe('Lombard_VA_Disclosure_v1 against the Commonwealth form', () => {
-  it('carries the prescribed rows, in order', () => {
+  it('reports the four prescribed-label mismatches in the retained legacy specimen', () => {
     const divergences = checkFormConformity(VA_DISCLOSURE, rendered);
-
-    // eslint-disable-next-line no-console
-    if (divergences.length) {
-      console.log(`\n${divergences.map((d) => `  - ${d.detail}`).join('\n')}`);
-    }
-
-    expect(divergences).toEqual([]);
+    expect(divergences.map(({ kind, row }) => ({ kind, row }))).toEqual([
+      { kind: 'label', row: 0 },
+      { kind: 'label', row: 2 },
+      { kind: 'label', row: 5 },
+      { kind: 'label', row: 6 },
+    ]);
   });
 });

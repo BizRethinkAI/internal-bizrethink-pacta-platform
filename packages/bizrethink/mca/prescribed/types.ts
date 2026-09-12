@@ -24,6 +24,13 @@ export type PrescribedRow = {
   /** First-column text, reproduced exactly. */
   label: string;
   /**
+   * Fixed text printed after the heading in the label cell, such as Virginia's
+   * bracketed formulas and payment-range instruction. Kept separate because
+   * PDF reading order can interleave another column between heading and text.
+   * This is literal prescribed text; square brackets are not template slots.
+   */
+  labelSuffix?: string;
+  /**
    * Text the regulation dictates word for word, usually the third column. Null
    * where the regulation prescribes the label and leaves the content to the
    * provider.
@@ -177,11 +184,10 @@ export type PrescribedForm = {
    * column: 'Funding Provided'" — the label IS the whole cell, so anything else
    * in it is an addition.
    *
-   * 'contains' for Virginia, whose first column holds the label AND tick-boxes
-   * the provider completes ("Payment Schedule ☐ Fixed ☐ Variable") AND the
-   * bracketed formulae the form prints under several labels. Demanding an exact
-   * match there would mean writing our own answers into the spec, which would
-   * make the spec a record of what we did rather than of what Virginia requires.
+   * 'contains' is available only where the label cell also holds provider
+   * answers. Virginia's official October 2022 form has fixed labels and uses
+   * 'exact', including any `labelSuffix`. Its formerly vendored form's extra
+   * "Fixed / Variable" boxes are not part of the official label.
    *
    * Defaults to 'exact': the stricter reading should be the one you get by
    * saying nothing.

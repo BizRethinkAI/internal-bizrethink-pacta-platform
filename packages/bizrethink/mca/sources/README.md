@@ -168,3 +168,31 @@ grid to see which answer belongs to which label.
 The general point: an extraction is a lossy view of a document, and a checker
 run against the wrong view reports the loss as a defect. Pick the view that
 preserves what is being asserted.
+
+
+## Virginia official-form correction — 2026-09-12
+
+`VA-Disclosure-Form.pdf` now holds the complete, unmodified official two-page
+**Eff. 10/2022** form. Both `.txt` extractions are replaced from that same
+publication, with exact retrieval URLs, dates and PDF hash in their headers.
+The [correction record](../../../../docs/research/mca-virginia-form-correction-2026-09-12/README.md)
+links the immutable audit captures and records the visual comparison and limits.
+
+The previous local source was a different document. This is a replacement,
+with new word/structure verification dates and a new digest after review, not a
+header-only refresh. The spec now uses the official first monetary label and
+checks the fixed formulas and payment-range instruction literally. Exact label
+matching rejects the old extra Fixed/Variable boxes. The unchanged legacy
+rendered specimen is a negative control with four row-text mismatches; it is
+not rewritten into a claim that a merchant PDF has been repaired.
+
+`VA-10VAC5-240.txt` retains all four implementing rules and their histories from
+the audit capture. Section 240-10 supplies the finance-charge definition that
+was missing from the old Code-only explanation. Section 240-30 governs the form,
+page-two completion and signatures, separate-document requirement and updated
+payoff/refinance disclosure. These source records do not implement those duties.
+
+The PDF preserves the full prescribed layout. Row-text checks do not validate
+geometry, actual figures, checkbox choices or signatures. The separate contract
+renderer and stored-template rebuild require the follow-up documented in the
+correction record. Historical audit/research files remain unchanged.
