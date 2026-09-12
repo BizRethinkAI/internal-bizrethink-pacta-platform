@@ -1,10 +1,10 @@
 import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
+import { presignFileCache, resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
 import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
 import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
 import { sValidator } from '@hono/standard-validator';
@@ -25,6 +25,12 @@ import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
 export const filesRoute = new Hono<HonoEnv>()
+  // MODIFIED for BizRethink (overlay 078): delegated PDFs must revalidate on future reads.
+  .use('/envelope/:envelopeId/envelopeItem/:envelopeItemId', presignFileCache('token'))
+  .use(
+    '/envelope/:envelopeId/envelopeItem/:envelopeItemId/dataId/:documentDataId/:version/item.pdf',
+    presignFileCache('presignToken'),
+  )
   // MODIFIED for BizRethink (overlay 076): covers all three token PDF adapters, including nested routes.
   .use('/token/:token/*', recipientTokenFileAccess)
   /**
@@ -70,27 +76,19 @@ export const filesRoute = new Hono<HonoEnv>()
     sValidator('query', ZGetEnvelopeItemFileRequestQuerySchema),
     async (c) => {
       const { envelopeId, envelopeItemId } = c.req.valid('param');
-      const { token } = c.req.query();
-
-      const session = await getOptionalSession(c);
-
-      let userId = session.user?.id;
-
-      if (token) {
-        const presignToken = await verifyEmbeddingPresignToken({
-          token,
-        }).catch(() => undefined);
-
-        userId = presignToken?.userId;
-      }
+      // MODIFIED for BizRethink (overlay 078): keep the verified capability on the data-bearing query.
+      const actor = await resolvePresignFileActor(c, 'token');
+      const userId = actor?.userId;
 
       if (!userId) {
-        return c.json({ error: 'Unauthorized' }, 401);
+        const hasPresign = Boolean(c.req.query('token'));
+        return c.json({ error: hasPresign ? 'Not found' : 'Unauthorized' }, hasPresign ? 404 : 401);
       }
 
       const envelope = await prisma.envelope.findFirst({
         where: {
           id: envelopeId,
+          ...actor?.envelopeWhere,
         },
         include: {
           envelopeItems: {

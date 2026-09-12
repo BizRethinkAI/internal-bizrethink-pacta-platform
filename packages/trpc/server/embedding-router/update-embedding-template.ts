@@ -1,16 +1,16 @@
+import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
+import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 
-import { procedure } from '../trpc';
 import {
   ZUpdateEmbeddingTemplateRequestSchema,
   ZUpdateEmbeddingTemplateResponseSchema,
 } from './update-embedding-template.types';
 
-export const updateEmbeddingTemplateRoute = procedure
+export const updateEmbeddingTemplateRoute = presignProcedure
   .input(ZUpdateEmbeddingTemplateRequestSchema)
   .output(ZUpdateEmbeddingTemplateResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -21,18 +21,9 @@ export const updateEmbeddingTemplateRoute = procedure
     });
 
     try {
-      const authorizationHeader = ctx.req.headers.get('authorization');
-
-      const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
-
-      if (!presignToken) {
-        throw new AppError(AppErrorCode.UNAUTHORIZED, {
-          message: 'No presign token provided',
-        });
-      }
-
-      const apiToken = await verifyEmbeddingPresignToken({
-        token: presignToken,
+      // MODIFIED for BizRethink (overlay 078): enforce the parent team before any target mutation.
+      const apiToken = await authorizePresignOperation(ctx.presignCapability, {
+        operation: 'update',
         scope: `templateId:${input.templateId}`,
       });
 

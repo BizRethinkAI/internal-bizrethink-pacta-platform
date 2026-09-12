@@ -39,6 +39,11 @@
     "regression-tests/template-pdf-upload-ownership.test.ts",
     "server-only/template-pdf-sources.ts",
     "server-only/pdf-upload-owner.ts",
-    "../app-tests/e2e/api/bizrethink/template-pdf-source-authorization.spec.ts"
+    "../app-tests/e2e/api/bizrethink/template-pdf-source-authorization.spec.ts",
+    "regression-tests/presign-capability-boundary.test.ts",
+    "server-only/presign-capability.ts",
+    "server-only/presign-file-access.ts",
+    "../app-tests/e2e/api/bizrethink/presign-capability-boundary.spec.ts",
+    "server-only/presign-procedure.ts"
   ]
 }

@@ -1,30 +1,18 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
+import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
 
 import { createEnvelopeRouteCaller } from '../envelope-router/create-envelope';
-import { procedure } from '../trpc';
 import {
   ZCreateEmbeddingEnvelopeRequestSchema,
   ZCreateEmbeddingEnvelopeResponseSchema,
 } from './create-embedding-envelope.types';
 
-export const createEmbeddingEnvelopeRoute = procedure
+export const createEmbeddingEnvelopeRoute = presignProcedure
   .input(ZCreateEmbeddingEnvelopeRequestSchema)
   .output(ZCreateEmbeddingEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { req } = ctx;
-
-    const authorizationHeader = req.headers.get('authorization');
-
-    const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
-
-    if (!presignToken) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'No presign token provided',
-      });
-    }
-
-    const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
+    // MODIFIED for BizRethink (overlay 078): a resource-restricted pass cannot create another resource.
+    const apiToken = await authorizePresignOperation(ctx.presignCapability, { operation: 'create' });
 
     const { userId, teamId } = apiToken;
 

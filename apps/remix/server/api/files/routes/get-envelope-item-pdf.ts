@@ -1,5 +1,4 @@
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
@@ -35,20 +34,9 @@ route.get(
   async (c) => {
     const { envelopeId, envelopeItemId, documentDataId, version } = c.req.valid('param');
 
-    const { presignToken } = c.req.valid('query');
-
-    const session = await getOptionalSession(c);
-
-    let userId = session.user?.id;
-
-    // Check presignToken if provided
-    if (presignToken) {
-      const verifiedToken = await verifyEmbeddingPresignToken({
-        token: presignToken,
-      }).catch(() => undefined);
-
-      userId = verifiedToken?.userId;
-    }
+    // MODIFIED for BizRethink (overlay 078): retain the capability through the PDF's authorization query.
+    const actor = await resolvePresignFileActor(c, 'presignToken');
+    const userId = actor?.userId;
 
     if (!userId) {
       return c.json({ error: 'Not found' }, 404);
@@ -60,6 +48,7 @@ route.get(
         id: envelopeItemId,
         envelopeId,
         documentDataId,
+        envelope: actor?.envelopeWhere,
       },
       include: {
         documentData: true,

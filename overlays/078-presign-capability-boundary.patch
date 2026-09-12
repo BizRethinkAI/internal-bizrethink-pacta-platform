@@ -1,0 +1,681 @@
+# Why: A-03 delegated embedding passes must retain the current parent key's lifecycle,
+# issuing team, resource scope and operation limit through PDF reads and authoring.
+# Why-not-additive: All policy lives in packages/bizrethink/server-only/presign-*.ts.
+# Existing verifier imports, six mutation adapters, four loaders and two PDF adapters
+# need thin hooks. Replacing the old verifier removes its fail-open scope behavior.
+# Applied after overlay 077 / PR #173; this patch contains A-03 changes only.
+# Upstream-merge-fragility: high — auth/router/file adapter refactors need manual review.
+# Preserve parent revocation, request-local team context, data-query resource predicates
+# and private/no-store headers before conditional responses. Re-run the owned A-03
+# regression tests and HTTP spec after upstream sync. Ordinary session policy is unchanged.
+
+diff --git a/apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx b/apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+index 98960b34f..0cfba968d 100644
+--- a/apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
++++ b/apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+@@ -1,3 +1,4 @@
++import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
+ import { DEFAULT_DOCUMENT_DATE_FORMAT, isValidDateFormat } from '@documenso/lib/constants/date-formats';
+ import { DocumentSignatureType } from '@documenso/lib/constants/document';
+ import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
+@@ -36,7 +37,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   const token = url.searchParams.get('token') || '';
+ 
+   // We also know that the token is valid, but we need the userId + teamId
+-  const result = await verifyEmbeddingPresignToken({ token, scope: `documentId:${id}` }).catch(() => null);
++  // MODIFIED for BizRethink (overlay 078): the edit loader uses the same target/team boundary as mutations.
++  const result = await verifyEmbeddingPresignToken({ token, operation: 'update', scope: `documentId:${id}` }).catch(
++    () => null,
++  );
+ 
+   if (!result) {
+     throw new Error('Invalid token');
+@@ -48,14 +52,16 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
+     redirect(`/embed/v1/authoring/error/not-found?documentId=${documentId}`);
+   }
+ 
+-  const document = await getDocumentWithDetailsById({
+-    id: {
+-      type: 'documentId',
+-      id: documentId,
+-    },
+-    userId: result?.userId,
+-    teamId: result?.teamId ?? undefined,
+-  }).catch(() => null);
++  const document = await withApiTokenTeamScope(result.teamId, () =>
++    getDocumentWithDetailsById({
++      id: {
++        type: 'documentId',
++        id: documentId,
++      },
++      userId: result?.userId,
++      teamId: result?.teamId ?? undefined,
++    }),
++  ).catch(() => null);
+ 
+   if (!document) {
+     throw redirect(`/embed/v1/authoring/error/not-found?documentId=${documentId}`);
+diff --git a/apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx b/apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+index 1ef2bee7e..ba8476ab4 100644
+--- a/apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
++++ b/apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+@@ -1,3 +1,4 @@
++import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
+ import { DEFAULT_DOCUMENT_DATE_FORMAT, isValidDateFormat } from '@documenso/lib/constants/date-formats';
+ import { DocumentSignatureType } from '@documenso/lib/constants/document';
+ import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
+@@ -36,7 +37,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   const token = url.searchParams.get('token') || '';
+ 
+   // We also know that the token is valid, but we need the userId + teamId
+-  const result = await verifyEmbeddingPresignToken({ token, scope: `templateId:${id}` }).catch(() => null);
++  // MODIFIED for BizRethink (overlay 078): the edit loader uses the same target/team boundary as mutations.
++  const result = await verifyEmbeddingPresignToken({ token, operation: 'update', scope: `templateId:${id}` }).catch(
++    () => null,
++  );
+ 
+   if (!result) {
+     throw new Error('Invalid token');
+@@ -48,14 +52,16 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
+     redirect(`/embed/v1/authoring/error/not-found?templateId=${templateId}`);
+   }
+ 
+-  const template = await getTemplateById({
+-    id: {
+-      type: 'templateId',
+-      id: templateId,
+-    },
+-    userId: result?.userId,
+-    teamId: result?.teamId ?? undefined,
+-  }).catch(() => null);
++  const template = await withApiTokenTeamScope(result.teamId, () =>
++    getTemplateById({
++      id: {
++        type: 'templateId',
++        id: templateId,
++      },
++      userId: result?.userId,
++      teamId: result?.teamId ?? undefined,
++    }),
++  ).catch(() => null);
+ 
+   if (!template) {
+     throw redirect(`/embed/v1/authoring/error/not-found?templateId=${templateId}`);
+diff --git a/apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx b/apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
+index 2213ae56b..90e3b11fd 100644
+--- a/apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
++++ b/apps/remix/app/routes/embed+/v2+/authoring+/envelope.create._index.tsx
+@@ -43,7 +43,8 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
+   }
+ 
+   // We also know that the token is valid, but we need the userId + teamId
+-  const result = await verifyEmbeddingPresignToken({ token }).catch(() => null);
++  // MODIFIED for BizRethink (overlay 078): restrict this authoring entry to team-wide create authority.
++  const result = await verifyEmbeddingPresignToken({ token, operation: 'create' }).catch(() => null);
+ 
+   if (!result) {
+     throw new Response('Invalid token', { status: 404 });
+diff --git a/apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx b/apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+index b35c08b0c..c45ea16c4 100644
+--- a/apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
++++ b/apps/remix/app/routes/embed+/v2+/authoring+/envelope.edit.$id.tsx
+@@ -1,3 +1,4 @@
++import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
+ import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+ import type { SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+ import { captureServerEvent } from '@documenso/lib/server-only/analytics/capture-server-event';
+@@ -50,7 +51,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
+   }
+ 
+   // We also know that the token is valid, but we need the userId + teamId
+-  const result = await verifyEmbeddingPresignToken({ token, scope: `envelopeId:${id}` }).catch(() => null);
++  // MODIFIED for BizRethink (overlay 078): the edit loader uses the same target/team boundary as mutations.
++  const result = await verifyEmbeddingPresignToken({ token, operation: 'update', scope: `envelopeId:${id}` }).catch(
++    () => null,
++  );
+ 
+   if (!result) {
+     throw new Error('Invalid token');
+@@ -61,15 +65,17 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
+       userId: result.userId,
+       teamId: result.teamId,
+     }),
+-    getEditorEnvelopeById({
+-      id: {
+-        type: 'envelopeId',
+-        id,
+-      },
+-      type: null,
+-      userId: result.userId,
+-      teamId: result.teamId,
+-    }).catch(() => null),
++    withApiTokenTeamScope(result.teamId, () =>
++      getEditorEnvelopeById({
++        id: {
++          type: 'envelopeId',
++          id,
++        },
++        type: null,
++        userId: result.userId,
++        teamId: result.teamId,
++      }),
++    ).catch(() => null),
+   ]);
+ 
+   if (!envelope) {
+diff --git a/apps/remix/server/api/files/files.ts b/apps/remix/server/api/files/files.ts
+index dda28e27e..2a2a52bf9 100644
+--- a/apps/remix/server/api/files/files.ts
++++ b/apps/remix/server/api/files/files.ts
+@@ -1,10 +1,10 @@
+ import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
++import { presignFileCache, resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
+ import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
+ import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
+ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+ import { AppError } from '@documenso/lib/errors/app-error';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+ import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+ import { prisma } from '@documenso/prisma';
+ import { sValidator } from '@hono/standard-validator';
+@@ -25,6 +25,12 @@ import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
+ import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
+ 
+ export const filesRoute = new Hono<HonoEnv>()
++  // MODIFIED for BizRethink (overlay 078): delegated PDFs must revalidate on future reads.
++  .use('/envelope/:envelopeId/envelopeItem/:envelopeItemId', presignFileCache('token'))
++  .use(
++    '/envelope/:envelopeId/envelopeItem/:envelopeItemId/dataId/:documentDataId/:version/item.pdf',
++    presignFileCache('presignToken'),
++  )
+   // MODIFIED for BizRethink (overlay 076): covers all three token PDF adapters, including nested routes.
+   .use('/token/:token/*', recipientTokenFileAccess)
+   /**
+@@ -70,27 +76,19 @@ export const filesRoute = new Hono<HonoEnv>()
+     sValidator('query', ZGetEnvelopeItemFileRequestQuerySchema),
+     async (c) => {
+       const { envelopeId, envelopeItemId } = c.req.valid('param');
+-      const { token } = c.req.query();
+-
+-      const session = await getOptionalSession(c);
+-
+-      let userId = session.user?.id;
+-
+-      if (token) {
+-        const presignToken = await verifyEmbeddingPresignToken({
+-          token,
+-        }).catch(() => undefined);
+-
+-        userId = presignToken?.userId;
+-      }
++      // MODIFIED for BizRethink (overlay 078): keep the verified capability on the data-bearing query.
++      const actor = await resolvePresignFileActor(c, 'token');
++      const userId = actor?.userId;
+ 
+       if (!userId) {
+-        return c.json({ error: 'Unauthorized' }, 401);
++        const hasPresign = Boolean(c.req.query('token'));
++        return c.json({ error: hasPresign ? 'Not found' : 'Unauthorized' }, hasPresign ? 404 : 401);
+       }
+ 
+       const envelope = await prisma.envelope.findFirst({
+         where: {
+           id: envelopeId,
++          ...actor?.envelopeWhere,
+         },
+         include: {
+           envelopeItems: {
+diff --git a/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts b/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
+index 425717121..1d29230a7 100644
+--- a/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
++++ b/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
+@@ -1,5 +1,4 @@
+-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
++import { resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
+ import type { DocumentDataVersion } from '@documenso/lib/types/document';
+ import { sha256 } from '@documenso/lib/universal/crypto';
+ import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+@@ -35,20 +34,9 @@ route.get(
+   async (c) => {
+     const { envelopeId, envelopeItemId, documentDataId, version } = c.req.valid('param');
+ 
+-    const { presignToken } = c.req.valid('query');
+-
+-    const session = await getOptionalSession(c);
+-
+-    let userId = session.user?.id;
+-
+-    // Check presignToken if provided
+-    if (presignToken) {
+-      const verifiedToken = await verifyEmbeddingPresignToken({
+-        token: presignToken,
+-      }).catch(() => undefined);
+-
+-      userId = verifiedToken?.userId;
+-    }
++    // MODIFIED for BizRethink (overlay 078): retain the capability through the PDF's authorization query.
++    const actor = await resolvePresignFileActor(c, 'presignToken');
++    const userId = actor?.userId;
+ 
+     if (!userId) {
+       return c.json({ error: 'Not found' }, 404);
+@@ -60,6 +48,7 @@ route.get(
+         id: envelopeItemId,
+         envelopeId,
+         documentDataId,
++        envelope: actor?.envelopeWhere,
+       },
+       include: {
+         documentData: true,
+diff --git a/packages/lib/server-only/embedding-presign/verify-embedding-presign-token.ts b/packages/lib/server-only/embedding-presign/verify-embedding-presign-token.ts
+index 665703253..2dbc4e90e 100644
+--- a/packages/lib/server-only/embedding-presign/verify-embedding-presign-token.ts
++++ b/packages/lib/server-only/embedding-presign/verify-embedding-presign-token.ts
+@@ -1,133 +1,4 @@
+-import { prisma } from '@documenso/prisma';
+-import type { JWTPayload } from 'jose';
+-import { decodeJwt, jwtVerify } from 'jose';
++// MODIFIED for BizRethink (overlay 078): retain delegated scope and recheck parent lifecycle.
+ 
+-import { AppError, AppErrorCode } from '../../errors/app-error';
+-
+-export type VerifyEmbeddingPresignTokenOptions = {
+-  token: string;
+-  scope?: string;
+-};
+-
+-export const verifyEmbeddingPresignToken = async ({ token, scope }: VerifyEmbeddingPresignTokenOptions) => {
+-  // First decode the JWT to get the claims without verification
+-  let decodedToken: JWTPayload;
+-
+-  try {
+-    decodedToken = decodeJwt<JWTPayload>(token);
+-  } catch (error) {
+-    console.error('Error decoding JWT token:', error);
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid presign token format',
+-    });
+-  }
+-
+-  // Validate the required claims
+-  if (!decodedToken.sub || typeof decodedToken.sub !== 'string') {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid presign token format: missing or invalid subject claim',
+-    });
+-  }
+-
+-  if (!decodedToken.aud || typeof decodedToken.aud !== 'string') {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid presign token format: missing or invalid audience claim',
+-    });
+-  }
+-
+-  // Convert string IDs to numbers
+-  const tokenId = Number(decodedToken.sub);
+-  const audienceId = Number(decodedToken.aud);
+-
+-  if (Number.isNaN(tokenId) || !Number.isInteger(tokenId)) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid token ID format in subject claim',
+-    });
+-  }
+-
+-  if (Number.isNaN(audienceId) || !Number.isInteger(audienceId)) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid user ID format in audience claim',
+-    });
+-  }
+-
+-  // Get the API token to use as the verification secret
+-  const apiToken = await prisma.apiToken.findFirst({
+-    where: {
+-      id: tokenId,
+-    },
+-    include: {
+-      user: {
+-        select: {
+-          id: true,
+-          name: true,
+-          email: true,
+-        },
+-      },
+-    },
+-  });
+-
+-  if (!apiToken) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid presign token: API token not found',
+-    });
+-  }
+-
+-  // This should never happen but we need to narrow types
+-  if (!apiToken.userId || !apiToken.user) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid presign token: API token does not have a user attached',
+-    });
+-  }
+-
+-  const userId = apiToken.userId;
+-
+-  if (audienceId !== apiToken.teamId && audienceId !== apiToken.userId) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Invalid presign token: API token does not match audience',
+-    });
+-  }
+-
+-  if (decodedToken.scope && scope && decodedToken.scope !== scope) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Presign token scope not matched',
+-    });
+-  }
+-
+-  // Now verify the token with the actual secret
+-  const secret = new TextEncoder().encode(apiToken.token);
+-
+-  try {
+-    await jwtVerify(token, secret);
+-  } catch (error) {
+-    // Check if the token has expired
+-    if (error instanceof Error && error.name === 'JWTExpired') {
+-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-        message: 'Presign token has expired',
+-      });
+-    }
+-
+-    // Handle invalid signature
+-    if (error instanceof Error && error.name === 'JWSInvalid') {
+-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-        message: 'Invalid presign token signature',
+-      });
+-    }
+-
+-    // Log and rethrow other errors
+-    console.error('Error verifying JWT token:', error);
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Failed to verify presign token',
+-    });
+-  }
+-
+-  return {
+-    ...apiToken,
+-    userId,
+-    user: {
+-      id: apiToken.user.id,
+-      name: apiToken.user.name,
+-      email: apiToken.user.email,
+-    },
+-  };
+-};
++export type { VerifyPresignCapabilityOptions as VerifyEmbeddingPresignTokenOptions } from '@bizrethink/customizations/server-only/presign-capability';
++export { verifyPresignCapability as verifyEmbeddingPresignToken } from '@bizrethink/customizations/server-only/presign-capability';
+diff --git a/packages/trpc/server/embedding-router/create-embedding-document.ts b/packages/trpc/server/embedding-router/create-embedding-document.ts
+index 9fc58e396..b9721b3b6 100644
+--- a/packages/trpc/server/embedding-router/create-embedding-document.ts
++++ b/packages/trpc/server/embedding-router/create-embedding-document.ts
+@@ -1,32 +1,23 @@
++import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
++import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+ import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+ import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+ import { EnvelopeType } from '@prisma/client';
+ 
+-import { procedure } from '../trpc';
+ import {
+   ZCreateEmbeddingDocumentRequestSchema,
+   ZCreateEmbeddingDocumentResponseSchema,
+ } from './create-embedding-document.types';
+ 
+ // Todo: Envelopes - This only supports V1 documents/templates.
+-export const createEmbeddingDocumentRoute = procedure
++export const createEmbeddingDocumentRoute = presignProcedure
+   .input(ZCreateEmbeddingDocumentRequestSchema)
+   .output(ZCreateEmbeddingDocumentResponseSchema)
+-  .mutation(async ({ input, ctx: { req, metadata } }) => {
++  .mutation(async ({ input, ctx: { metadata, presignCapability } }) => {
+     try {
+-      const authorizationHeader = req.headers.get('authorization');
+-
+-      const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+-
+-      if (!presignToken) {
+-        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-          message: 'No presign token provided',
+-        });
+-      }
+-
+-      const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
++      // MODIFIED for BizRethink (overlay 078): a resource-restricted pass cannot create another resource.
++      const apiToken = await authorizePresignOperation(presignCapability, { operation: 'create' });
+ 
+       const { title, documentDataId, externalId, recipients, meta } = input;
+ 
+diff --git a/packages/trpc/server/embedding-router/create-embedding-envelope.ts b/packages/trpc/server/embedding-router/create-embedding-envelope.ts
+index 5123f6f50..4b5803712 100644
+--- a/packages/trpc/server/embedding-router/create-embedding-envelope.ts
++++ b/packages/trpc/server/embedding-router/create-embedding-envelope.ts
+@@ -1,30 +1,18 @@
+-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
++import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
++import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
+ 
+ import { createEnvelopeRouteCaller } from '../envelope-router/create-envelope';
+-import { procedure } from '../trpc';
+ import {
+   ZCreateEmbeddingEnvelopeRequestSchema,
+   ZCreateEmbeddingEnvelopeResponseSchema,
+ } from './create-embedding-envelope.types';
+ 
+-export const createEmbeddingEnvelopeRoute = procedure
++export const createEmbeddingEnvelopeRoute = presignProcedure
+   .input(ZCreateEmbeddingEnvelopeRequestSchema)
+   .output(ZCreateEmbeddingEnvelopeResponseSchema)
+   .mutation(async ({ input, ctx }) => {
+-    const { req } = ctx;
+-
+-    const authorizationHeader = req.headers.get('authorization');
+-
+-    const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+-
+-    if (!presignToken) {
+-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-        message: 'No presign token provided',
+-      });
+-    }
+-
+-    const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
++    // MODIFIED for BizRethink (overlay 078): a resource-restricted pass cannot create another resource.
++    const apiToken = await authorizePresignOperation(ctx.presignCapability, { operation: 'create' });
+ 
+     const { userId, teamId } = apiToken;
+ 
+diff --git a/packages/trpc/server/embedding-router/create-embedding-template.ts b/packages/trpc/server/embedding-router/create-embedding-template.ts
+index c76ec3b24..90f575d5b 100644
+--- a/packages/trpc/server/embedding-router/create-embedding-template.ts
++++ b/packages/trpc/server/embedding-router/create-embedding-template.ts
+@@ -1,33 +1,24 @@
++import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
++import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+ import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+ import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+ import { prisma } from '@documenso/prisma';
+ import { EnvelopeType } from '@prisma/client';
+ 
+-import { procedure } from '../trpc';
+ import {
+   ZCreateEmbeddingTemplateRequestSchema,
+   ZCreateEmbeddingTemplateResponseSchema,
+ } from './create-embedding-template.types';
+ 
+ // Todo: Envelopes - This only supports V1 documents/templates.
+-export const createEmbeddingTemplateRoute = procedure
++export const createEmbeddingTemplateRoute = presignProcedure
+   .input(ZCreateEmbeddingTemplateRequestSchema)
+   .output(ZCreateEmbeddingTemplateResponseSchema)
+-  .mutation(async ({ input, ctx: { req, metadata } }) => {
++  .mutation(async ({ input, ctx: { metadata, presignCapability } }) => {
+     try {
+-      const authorizationHeader = req.headers.get('authorization');
+-
+-      const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+-
+-      if (!presignToken) {
+-        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-          message: 'No presign token provided',
+-        });
+-      }
+-
+-      const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
++      // MODIFIED for BizRethink (overlay 078): a resource-restricted pass cannot create another resource.
++      const apiToken = await authorizePresignOperation(presignCapability, { operation: 'create' });
+ 
+       const { title, documentDataId, recipients, meta } = input;
+ 
+diff --git a/packages/trpc/server/embedding-router/update-embedding-document.ts b/packages/trpc/server/embedding-router/update-embedding-document.ts
+index e782804bd..bc85dcc94 100644
+--- a/packages/trpc/server/embedding-router/update-embedding-document.ts
++++ b/packages/trpc/server/embedding-router/update-embedding-document.ts
+@@ -1,17 +1,17 @@
++import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
++import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+ import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
+ import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
+ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
+ import { nanoid } from '@documenso/lib/universal/id';
+ 
+-import { procedure } from '../trpc';
+ import {
+   ZUpdateEmbeddingDocumentRequestSchema,
+   ZUpdateEmbeddingDocumentResponseSchema,
+ } from './update-embedding-document.types';
+ 
+-export const updateEmbeddingDocumentRoute = procedure
++export const updateEmbeddingDocumentRoute = presignProcedure
+   .input(ZUpdateEmbeddingDocumentRequestSchema)
+   .output(ZUpdateEmbeddingDocumentResponseSchema)
+   .mutation(async ({ input, ctx }) => {
+@@ -22,18 +22,9 @@ export const updateEmbeddingDocumentRoute = procedure
+     });
+ 
+     try {
+-      const authorizationHeader = ctx.req.headers.get('authorization');
+-
+-      const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+-
+-      if (!presignToken) {
+-        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-          message: 'No presign token provided',
+-        });
+-      }
+-
+-      const apiToken = await verifyEmbeddingPresignToken({
+-        token: presignToken,
++      // MODIFIED for BizRethink (overlay 078): enforce the parent team before any target mutation.
++      const apiToken = await authorizePresignOperation(ctx.presignCapability, {
++        operation: 'update',
+         scope: `documentId:${input.documentId}`,
+       });
+ 
+diff --git a/packages/trpc/server/embedding-router/update-embedding-envelope.ts b/packages/trpc/server/embedding-router/update-embedding-envelope.ts
+index 97fab6c39..6318d77cc 100644
+--- a/packages/trpc/server/embedding-router/update-embedding-envelope.ts
++++ b/packages/trpc/server/embedding-router/update-embedding-envelope.ts
+@@ -1,5 +1,6 @@
++import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
++import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+ import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
+ import { UNSAFE_createEnvelopeItems } from '@documenso/lib/server-only/envelope-item/create-envelope-items';
+@@ -18,13 +19,12 @@ import { DocumentStatus, EnvelopeType } from '@prisma/client';
+ import pMap from 'p-map';
+ import { match } from 'ts-pattern';
+ 
+-import { procedure } from '../trpc';
+ import {
+   ZUpdateEmbeddingEnvelopeRequestSchema,
+   ZUpdateEmbeddingEnvelopeResponseSchema,
+ } from './update-embedding-envelope.types';
+ 
+-export const updateEmbeddingEnvelopeRoute = procedure
++export const updateEmbeddingEnvelopeRoute = presignProcedure
+   .input(ZUpdateEmbeddingEnvelopeRequestSchema)
+   .output(ZUpdateEmbeddingEnvelopeResponseSchema)
+   .mutation(async ({ input, ctx }) => {
+@@ -37,18 +37,9 @@ export const updateEmbeddingEnvelopeRoute = procedure
+       },
+     });
+ 
+-    const authorizationHeader = ctx.req.headers.get('authorization');
+-
+-    const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+-
+-    if (!presignToken) {
+-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-        message: 'No presign token provided',
+-      });
+-    }
+-
+-    const apiToken = await verifyEmbeddingPresignToken({
+-      token: presignToken,
++    // MODIFIED for BizRethink (overlay 078): enforce the parent team before any target mutation.
++    const apiToken = await authorizePresignOperation(ctx.presignCapability, {
++      operation: 'update',
+       scope: `envelopeId:${envelopeId}`,
+     });
+ 
+diff --git a/packages/trpc/server/embedding-router/update-embedding-template.ts b/packages/trpc/server/embedding-router/update-embedding-template.ts
+index 5e074d6d7..d082568f6 100644
+--- a/packages/trpc/server/embedding-router/update-embedding-template.ts
++++ b/packages/trpc/server/embedding-router/update-embedding-template.ts
+@@ -1,16 +1,16 @@
++import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
++import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+ import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
+ import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
+ import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
+ 
+-import { procedure } from '../trpc';
+ import {
+   ZUpdateEmbeddingTemplateRequestSchema,
+   ZUpdateEmbeddingTemplateResponseSchema,
+ } from './update-embedding-template.types';
+ 
+-export const updateEmbeddingTemplateRoute = procedure
++export const updateEmbeddingTemplateRoute = presignProcedure
+   .input(ZUpdateEmbeddingTemplateRequestSchema)
+   .output(ZUpdateEmbeddingTemplateResponseSchema)
+   .mutation(async ({ input, ctx }) => {
+@@ -21,18 +21,9 @@ export const updateEmbeddingTemplateRoute = procedure
+     });
+ 
+     try {
+-      const authorizationHeader = ctx.req.headers.get('authorization');
+-
+-      const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+-
+-      if (!presignToken) {
+-        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-          message: 'No presign token provided',
+-        });
+-      }
+-
+-      const apiToken = await verifyEmbeddingPresignToken({
+-        token: presignToken,
++      // MODIFIED for BizRethink (overlay 078): enforce the parent team before any target mutation.
++      const apiToken = await authorizePresignOperation(ctx.presignCapability, {
++        operation: 'update',
+         scope: `templateId:${input.templateId}`,
+       });
+ 

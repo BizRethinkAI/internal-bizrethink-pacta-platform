@@ -155,3 +155,6 @@ packages/app-tests/e2e/api/bizrethink/api-token-team-boundary.spec.ts
 packages/app-tests/e2e/api/bizrethink/recipient-token-authorization.spec.ts
 # A-04 template replacement authorization and upload provenance HTTP regression.
 packages/app-tests/e2e/api/bizrethink/template-pdf-source-authorization.spec.ts
+
+# A-03 delegated presign capability HTTP regression, newly owned and never upstream.
+packages/app-tests/e2e/api/bizrethink/presign-capability-boundary.spec.ts

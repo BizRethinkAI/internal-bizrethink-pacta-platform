@@ -1,32 +1,23 @@
+import { authorizePresignOperation } from '@bizrethink/customizations/server-only/presign-capability';
+import { presignProcedure } from '@bizrethink/customizations/server-only/presign-procedure';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { EnvelopeType } from '@prisma/client';
 
-import { procedure } from '../trpc';
 import {
   ZCreateEmbeddingDocumentRequestSchema,
   ZCreateEmbeddingDocumentResponseSchema,
 } from './create-embedding-document.types';
 
 // Todo: Envelopes - This only supports V1 documents/templates.
-export const createEmbeddingDocumentRoute = procedure
+export const createEmbeddingDocumentRoute = presignProcedure
   .input(ZCreateEmbeddingDocumentRequestSchema)
   .output(ZCreateEmbeddingDocumentResponseSchema)
-  .mutation(async ({ input, ctx: { req, metadata } }) => {
+  .mutation(async ({ input, ctx: { metadata, presignCapability } }) => {
     try {
-      const authorizationHeader = req.headers.get('authorization');
-
-      const [presignToken] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
-
-      if (!presignToken) {
-        throw new AppError(AppErrorCode.UNAUTHORIZED, {
-          message: 'No presign token provided',
-        });
-      }
-
-      const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
+      // MODIFIED for BizRethink (overlay 078): a resource-restricted pass cannot create another resource.
+      const apiToken = await authorizePresignOperation(presignCapability, { operation: 'create' });
 
       const { title, documentDataId, externalId, recipients, meta } = input;
 
