@@ -17,6 +17,10 @@
     "mca/**/*.ts",
     "server-only/require-admin-loader.ts",
     "server-only/require-admin-loader.test.ts",
-    "regression-tests/admin-loaders-gated.test.ts"
+    "regression-tests/admin-loaders-gated.test.ts",
+    "regression-tests/api-token-team-boundary.test.ts",
+    "regression-tests/api-token-team-downloads.test.ts",
+    "regression-tests/api-token-team-fixture.ts",
+    "../app-tests/e2e/api/bizrethink/api-token-team-boundary.spec.ts"
   ]
 }
