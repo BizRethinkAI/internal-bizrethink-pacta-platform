@@ -1,0 +1,99 @@
+Publisher: Florida Senate
+Site: https://www.flsenate.gov
+Prepared: 2026-09-12 from the separately committed source audit evidence.
+Florida Statutes (2026), chapter 559, Part XIII, §§559.961–559.9615.
+Six official per-section code pages, concatenated in section order.
+Includes §559.9611(9) as amended by chapter 2024-139 §3 (July 1, 2024).
+Replaces the historical HB 1353 Engrossed 1 extract; that extract remains in Git
+history and its provenance is recorded in the source audit.
+
+Retrieved from: https://www.flsenate.gov/Laws/Statutes/2026/559.961
+Retrieved at (UTC): 2026-09-12T08:44:18.076993+00:00
+Response SHA-256: 58096d66a3100ee0af8491b4b6b1636d3bd962199d07c57ad612ebcd43808a54
+Retrieved from: https://www.flsenate.gov/Laws/Statutes/2026/559.9611
+Retrieved at (UTC): 2026-09-12T08:44:14.921648+00:00
+Response SHA-256: 0c7e3cb46517c92e951611d83c5ef2938d31d4903c872baee0374085a53b5804
+Retrieved from: https://www.flsenate.gov/Laws/Statutes/2026/559.9612
+Retrieved at (UTC): 2026-09-12T08:44:14.967746+00:00
+Response SHA-256: 11274e79a1f9b165453cab7d96b27061f09e579c7f863898eff787536c1b026c
+Retrieved from: https://www.flsenate.gov/Laws/Statutes/2026/559.9613
+Retrieved at (UTC): 2026-09-12T08:44:14.994536+00:00
+Response SHA-256: 688af9b857fc0db370301a5f0396082b20e5980671815e425bb980b0e97f7395
+Retrieved from: https://www.flsenate.gov/Laws/Statutes/2026/559.9614
+Retrieved at (UTC): 2026-09-12T08:44:15.545591+00:00
+Response SHA-256: be3f6ce5a295a154c0156ded0bb5a7a89e63341d400e5779d52492d605e1c743
+Retrieved from: https://www.flsenate.gov/Laws/Statutes/2026/559.9615
+Retrieved at (UTC): 2026-09-12T08:44:15.433918+00:00
+Response SHA-256: 20eafdd0b8d69ecb765c5fa794b8ffdebc98f409996b3ae51fb88ae4189c8839
+
+Retrieval records and extraction details:
+docs/research/mca-source-audit-2026-09-12/manifest.json
+HTML navigation removed; whitespace normalized in the audit extracts;
+statutory wording and legislative histories retained. This header is editorial.
+These identified versions do not establish completeness of implementing authorities.
+
+--- STATUTORY TEXT BEGINS ---
+
+559.961 Short title.—This part may be cited as the “Florida Commercial Financing Disclosure Law.”
+History.—s. 1, ch. 2023-290.
+
+559.9611 Definitions.—As used in this part, the term:
+(1) “Accounts receivable purchase transaction” means a transaction in which a business forwards or otherwise sells to a person all or a portion of the business’s accounts or payment intangibles as those terms are defined in s. 679.1021(1) at a discount to the expected value of the account or payment intangibles. For purposes of this part, the provider’s characterization of an accounts receivable purchase transaction as a purchase is conclusive that the accounts receivable purchase transaction is not a loan or a transaction for the use, forbearance, or detention of money.
+(2) “Advance fee” means any consideration that is assessed or collected by a broker before the closing of a commercial financing transaction.
+(3) “Broker” means a person who, for compensation or the expectation of compensation, arranges a commercial financing transaction or an offer between a third party and a business in this state which would, if executed, be binding upon that third party. The term excludes a provider and any individual or entity whose compensation is not based or dependent upon the terms of the specific commercial financing transaction obtained or offered.
+(4) “Business” means an individual or a group of individuals, a sole proprietorship, a corporation, a limited liability company, a trust, an estate, a cooperative, an association, or a limited or general partnership engaged in a business activity.
+(5) “Commercial financing facility” means a provider’s plan for purchasing multiple accounts receivable from the recipient over a period of time pursuant to an agreement that sets forth the terms and conditions governing the use of the facility.
+(6) “Commercial financing transaction” means a commercial loan, an accounts receivable purchase transaction, or a commercial open-end credit plan to the extent the transaction is also a business purpose transaction. As used in this subsection, the term “business purpose transaction” means a transaction the proceeds of which are provided to a business or are intended to be used to carry on a business and not to be used for personal, family, or household purposes. For purposes of determining whether a transaction is a business purpose transaction, the provider may rely on any written statement of intended purpose signed by the business. The statement may be a separate statement or may be contained in an application, agreement, or other document signed by the business or the business owner.
+(7) “Commercial loan” means a loan to a business, whether secured or unsecured.
+(8) “Commercial open-end credit plan” means commercial financing extended by any provider under a plan in which:
+(a) The provider reasonably contemplates repeat transactions.
+(b) The amount of financing that may be extended to the business during the term of the plan, up to any limit set by the provider, is generally made available to the extent that any outstanding balance is repaid.
+(9) “Depository institution” means a bank, a credit union, a savings bank, a savings and loan association, a savings or thrift association, or an industrial loan company doing business under the authority of a charter issued by the United States, this state, or any other state, district, territory, or commonwealth of the United States which is authorized to transact business in this state and whose deposits or share accounts are insured by the Federal Deposit Insurance Corporation or the National Credit Union Share Insurance Fund.
+(10) “Provider” means a person who consummates more than five commercial financing transactions with a business located in this state in any calendar year. The term also includes a person who enters into a written agreement with a depository institution to arrange a commercial financing transaction between the depository institution and a business via an online lending platform administered by the person. The fact that a provider extends a specific offer for a commercial financing transaction on behalf of a depository institution may not be construed to mean that the provider engaged in lending or financing or originated that loan or financing.
+History.—s. 1, ch. 2023-290; s. 3, ch. 2024-139.
+
+559.9612 Scope of this part.—This part applies to any commercial financing transaction consummated on or after January 1, 2024. This part does not apply to:
+(1) A provider that is:
+(a) A federally insured depository institution or an affiliate or holding company of such institution; or
+(b) A subsidiary or service corporation that is owned and controlled by a federally insured depository institution or under common ownership with such institution.
+(2) A provider that is a lender regulated under the Farm Credit Act of 1971, 12 U.S.C. ss. 2001 et seq.
+(3) A commercial financing transaction that is:
+(a) Secured by real property;
+(b) A lease; or
+(c) A purchase money obligation that is incurred as all or part of the price of the collateral or for value given to enable the business to acquire rights in or the use of the collateral if the value is in fact so used.
+(4) A commercial financing transaction in which the recipient is a motor vehicle dealer or an affiliate of such a dealer, or a vehicle rental company or an affiliate of such a company, pursuant to a commercial loan or commercial open-end credit plan of at least $50,000 or a commercial financing transaction offered by a person in connection with the sale or lease of products or services that such person manufactures, licenses, or distributes, or whose parent company or any of its directly or indirectly owned and controlled subsidiaries manufactures, licenses, or distributes.
+(5) A provider that is licensed as a money transmitter under chapter 560 or licensed as a money transmitter by any other state, district, territory, or commonwealth of the United States.
+(6) A provider that consummates no more than five commercial financing transactions in this state in a 12-month period.
+(7) A commercial financing transaction of more than $500,000.
+History.—s. 1, ch. 2023-290.
+
+559.9613 Disclosures.—
+(1) A provider that consummates a commercial financing transaction shall provide a written disclosure of the terms of the commercial financing transaction as required by subsection (2). The disclosure must be provided at or before consummation of the transaction. Only one disclosure must be provided for each commercial financing transaction, and a disclosure is not required as result of a modification, forbearance, or change to a consummated commercial financing transaction.
+(2) A provider shall provide a written disclosure of the following information in connection with each commercial financing transaction:
+(a) The total amount of funds provided to the business under the terms of the agreement.
+(b) The total amount of funds disbursed to the business if less than the amount specified in paragraph (a) as a result of any fees deducted or withheld at disbursement, any amount paid to the provider to satisfy a prior balance, and any amount paid to a third party on behalf of the business.
+(c) The total amount to be paid to the provider under the terms of the agreement.
+(d) The total dollar cost under the terms of the agreement, calculated by finding the difference between the amount specified in paragraph (a) and the amount specified in paragraph (c).
+(e)1. The manner, frequency, and amount of each payment; or
+2. If the amount of the payments may vary, the manner and frequency of the payments, the estimated amount of the initial payment, a description of the methodology for calculating any variable payment, and the circumstances under which payments may vary.
+(f) Whether there are any costs or discounts associated with prepayment, including a reference to the provision in the agreement which creates the contractual rights of the parties related to prepayment.
+(3) A provider that consummates a commercial financing facility may provide disclosures required by subsection (2) which are based on an example of a transaction that could occur under the agreement. The example must be based on an account receivable total face amount owed of $10,000. Only one disclosure is required for each commercial financing facility, and a disclosure is not required as result of a modification, forbearance, or change to the facility. A new disclosure is not required each time accounts receivable are purchased under the facility.
+History.—s. 1, ch. 2023-290.
+
+559.9614 Prohibited acts.—A broker may not do any of the following:
+(1) Assess, collect, or solicit an advance fee from a business to provide services as a broker. However, this subsection does not preclude a broker from soliciting a business to pay for, or preclude a business from paying for, actual services necessary to apply for a commercial financing transaction, including, but not limited to, a credit check or an appraisal of security, if such payment is made by check or money order payable to a party independent of the broker.
+(2) Make or use any false or misleading representation or omit any material fact in the offer or sale of the services of a broker or engage, directly or indirectly, in any act that operates or would operate as fraud or deception upon any person in connection with the offer or sale of the services of a broker, notwithstanding the absence of reliance by the business.
+(3) Make or use any false or deceptive representation in its business dealings.
+(4) Offer the services of a broker in any advertisement without disclosing the actual address and telephone number of the business of the broker and the address and telephone number of any forwarding service the broker may use, if any.
+History.—s. 1, ch. 2023-290.
+
+559.9615 Enforcement.—
+(1) The Attorney General has exclusive authority to enforce this part. The Attorney General may:
+(a) Receive and act on complaints.
+(b) Take action designed to obtain voluntary compliance with this part.
+(c) Commence administrative or judicial proceedings to enforce compliance with this part.
+(2)(a) A violation of this part is punishable by a fine of $500 per incident, not to exceed $20,000 for all aggregated violations, arising from the use of the transaction documentation or materials found to be in violation of this part.
+(b) A violation of this part after receipt of a written notice of a prior violation from the Attorney General is punishable by a fine of $1,000 per incident, not to exceed $50,000 for all aggregated violations, arising from the use of the transaction documentation or materials found to be in violation of this part.
+(c) A violation of this part does not affect the enforceability or validity of the underlying commercial financing transaction.
+(3) This part does not create a private right of action against any person or entity based upon compliance or noncompliance with this part.
+History.—s. 1, ch. 2023-290.

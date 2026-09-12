@@ -1786,8 +1786,8 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
         two limbs: a contract SHALL NOT CONTAIN a prejudgment-remedy waiver, and
         any such provision shall be unenforceable. Disapplying a provision
         answers the second. The first is a rule about what may be written down,
-        it carries a civil penalty under §36a-872(a), and no severance clause
-        answers it.
+        it is subject to commissioner action under §36a-872(b) (referencing
+        §§36a-50 and 36a-52), and no severance clause answers it.
 
     (3) `frpa-7-24-does-not-name-the-statute-that-actually-bites`, whose locus is
         "7.24 ... read against 7.5". §7.5 mandates New York or Pasco County,

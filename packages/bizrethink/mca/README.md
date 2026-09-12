@@ -200,8 +200,9 @@ Two things it deliberately does not claim:
    shipped California's form carrying New York's sentence.
 6. **Scope a source that holds more than one instrument.** If the vendored file
    contains other prescribed tables, other transaction types or — like
-   Missouri's SB 1359 — eighty other sections of an omnibus bill, set `section`.
-   A label found "somewhere in the file" is not evidence.
+   the former Missouri SB 1359 source — other sections of an omnibus bill, set
+   `section`. Missouri's current §427.300 source still narrows the check to its
+   disclosure subsection. A label found "somewhere in the file" is not evidence.
 7. **Our own wording goes in `providerDrafted`, never in `alsoPermitted`.**
    `alsoPermitted` means the regulator supplied these words and they can be
    matched against the source. Where a regulation requires *"a short
@@ -351,14 +352,16 @@ the check is that a required item has a home and that the words pinned as
 evidence are in it. That a row *addresses* the requirement is a human judgement,
 recorded in the spec's `requires` field so a reviewer can see what was claimed.
 
-**Twelve obligations across the two Acts that are not about the form at all** —
+**Thirteen obligations across the two Acts that are not about the form at all** —
 contract terms, sending rules, registration and enforcement. They are now
 verbatim and verified, and *verified* here means "these are the Act's words",
 not "we comply". §36a-868 bars prejudgment-remedy waivers in the contract;
 §6.2-2234(C) bars confessions of judgment, which Connecticut does not; §36a-869
 bars withdrawing a specific offer for three calendar days *subject to two
-carve-outs*; both states expire a registration by operation of law on a missed
-annual fee. Nothing in this package reads a contract, sends an offer or pays a
+carve-outs*. Virginia retains its September 15 annual fee and automatic expiry;
+Connecticut's amended §36a-870(c) instead sets December 31 expiration, a
+November–December renewal window and a $1,000 initial/renewal fee plus other
+required charges. Nothing in this package reads a contract, sends an offer or pays a
 fee. `bearsOn` on each obligation names the surface it lives on, and everything
 that is not `'the form'` is outside what any check here can reach.
 
@@ -373,6 +376,11 @@ duties, the penalties, the scope of both Acts — was closed on 2026-09-07, when
 Conn. Gen. Stat. §§36a-861 to 36a-872 and Va. Code §§6.2-2228 to 6.2-2238 were
 vendored from their official publishers and every claim became a verbatim
 quotation re-matched on every run (`statutes/ct-va-obligations.ts`).
+
+The 2026-09-12 source correction incorporates Connecticut's 2026 supplement
+(P.A. 25-115 §§21–23, effective July 1, 2025), including the revised registration
+and enforcement text. The [source record](sources/README.md) identifies both
+publications and the exact retrievals behind that consolidation.
 
 What survives is narrow and cannot be closed by reading a statute: §36a-867
 opens the door to another state's form only if *"the Banking Commissioner

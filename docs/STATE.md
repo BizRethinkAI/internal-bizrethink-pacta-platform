@@ -106,6 +106,86 @@ remains owned by the separate review-and-ship session; this fold does not assert
 that the merged queue is deployed. Remaining audit findings need separate
 owner decisions.
 
+## 2026-09-12 — template PDF ownership and presign boundaries merged (#173 / #175)
+
+**#173 / A-04** merged at `2d20163f816c7c7f20461accb82b851e1883551f`.
+Template copying authorizes every source before copying any. Existing attachments
+require current envelope/team access; API credentials retain their issuing-team
+boundary. Staged uploads have a server-recorded owner, optional verified team and
+stored reference/content fingerprint. Receipts cannot override attachment access
+or changed content. Retries and reuse remain allowed for permitted, unchanged,
+unattached uploads. Historical unowned orphan uploads require re-uploading;
+existing attachments need no guessed ownership backfill.
+
+Overlay **077** preserves the three template-copy/browser-upload/multipart hooks.
+The additive `BizrethinkPdfUpload` table is declared in owned schema additions;
+migration `20260912130000_bizrethink_pdf_upload_ownership` must be applied before
+the new app serves uploads. The implementing session did not apply a migration
+to production. An older app can ignore the table, but rolling back the app restores
+the authorization defect. No new public input, environment variable or dependency.
+
+**#175 / A-03** merged at `7f679bbb1b86ada68018502d7317593eab4d3908` after
+integrating #173. Presign verification checks JWT signature/algorithm/expiry,
+current parent expiry, disabled issuer/organisation owner and current membership.
+The minimal verified capability retains delegated team/resource/operation limits
+without carrying the parent token hash. Legacy user-ID audiences work within the
+parent team; omitted scope retains documented team-wide authoring and malformed
+scope fails closed. Resource-scoped tokens cannot create unrelated documents.
+
+All six create/update adapters receive the verified context; edit loaders and
+nested mutations retain A-02's team boundary. Both PDF adapters put team/resource
+predicates in the data query and force private/no-store before conditional cache
+responses. Overlay **078** preserves 13 upstream files; the combined overlays
+replayed to identical source across 15 affected files. No further schema change.
+Author validation recorded 37 focused regressions, 4,488 combined owned tests,
+287 shared tests and both type checks; the PR Checks are the execution record
+for the separate HTTP regressions. A-06 reads remain separate work.
+
+These merges do not establish deployment status. The MCA source-corrections PR
+owns this fold: GitHub reported #173, #174 and #175 merged and no open PRs when
+cleanup ownership was checked. It does not change either authorization feature.
+
+## 2026-09-12 — MCA source audit merged (#174)
+
+**#174** merged at `01e53dcca4cb7bab6a9a340cdcc795fd718819cc`.
+The [report and manifest](research/mca-source-audit-2026-09-12/README.md) account
+for all **16 original text files / 11 states**, with 46 official retrieval
+records and 13 retained evidence files. Exact URLs, UTC times, raw-response
+hashes, publication versions and comparison methods are recorded. Unknown
+original retrievals remain unknown. Fourteen bodies matched identified official
+publications; the two Virginia form extracts did not match the official linked
+October 2022 form. The original source bytes, digests and verification dates were
+unchanged in that audit. Its dated manifest describes that baseline, not later
+source corrections. The reviewed audit head `94e483152` passed CI; Playwright
+used the existing documentation-only exemption rather than running browser tests.
+
+The audit found missing CT supplement sections 36a-868, 870 and 872, MO's 2025
+premium-finance exemption and FL's 2024 depository-institution amendment. Their
+current text is retained for the focused follow-up. Virginia needs a separate
+prescribed-form correction covering a label, formula, estimated-payment wording
+and layout; the official PDF and both extractions are retained for that work.
+The August 2024 CT guidance still matches its official PDF but predates the
+registration amendment. Its guidance-index linkage remains qualified.
+
+The old “Texas only” inference is superseded: Utah §7-27-202(3) requires
+variable-payment information in the agreement. Its current linked PDF includes
+the 2024 amendment despite the 2022 URL. Kansas's introduced source matches the
+enrolled/current operative text after documented normalization; retain the
+Revisor's `(iii)`/`(B)` annotation. CA/NY consolidated regulatory currency, later
+Georgia code history and Texas codified rules remain qualified. The complete
+eleven-state agreement-requirements review and missing underlying statutes/rules
+remain open before ADR 0014 classification. Current clause count: **211**, not
+ADR 0014's historical 219; authored clauses remain draft with null authors.
+
+The agreed workflow keeps full reading and detailed handoffs, one coherent task
+per PR and focused TDD. CI owns comprehensive final tests/builds/typechecks and
+its existing Playwright gate. Application browser checks address meaningful
+rendered behavior, not every source/text edit. Implementers monitor their PR to
+green, then stop; a human merges or explicitly starts review-and-ship. Fresh
+independent review for sensitive changes is human-started, not an additional
+implementer-spawned review. ADR 0011 guaranty placement, remaining template/form
+migration and commercial interview answers remain separate follow-ups.
+
 ## Where things stand
 
 Pacta is an **additive fork of `documenso/documenso`** — a document-signing

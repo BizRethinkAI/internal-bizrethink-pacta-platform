@@ -125,6 +125,7 @@ describe('what the statutes require that this package cannot check', () => {
       'ct-no-prejudgment-remedy-waiver',
       'ct-offer-not-revocable-for-three-days',
       'ct-registration',
+      'ct-registration-sanctions',
       'ct-penalties',
       'va-signature-required',
       'va-venue-in-the-commonwealth',
