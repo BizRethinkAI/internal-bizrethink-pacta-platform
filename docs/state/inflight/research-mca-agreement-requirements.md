@@ -2,6 +2,12 @@
 
 Branch: `research/mca-agreement-requirements`
 
+PR: [#179](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/179)
+(opened, unmerged). Research commit: `915ddbe4f`; cleanup dependency: `cede1f021`.
+This handoff-link commit is added while the first checks are starting. Final
+CI status belongs to the PR's current head/Checks tab and is recorded in its
+description after completion, without another evidence-only CI rerun.
+
 Started from main `01e53dcca4cb7bab6a9a340cdcc795fd718819cc` after the owner
 merged PR #174 and authorized continued source verification before ADR 0014.
 PR #176's CT/FL/MO source corrections were still open at the start. They are now
@@ -93,8 +99,10 @@ Positive agreement-duty citations were checked against the complete bodies,
 including GA/UT's different subsection numbering and Texas's 15 prohibited
 practice items. No application files, source inputs or previous audit changed.
 
-Remaining: open the research PR and wait for CI. The only inherited changes are
-A-07's unchanged cleanup dependency; the research is new files plus this note.
+At this handoff commit, PR #179 is open and CI is pending. The implementing
+session must finish monitoring the final head before calling the work complete.
+The only inherited changes are A-07's unchanged cleanup dependency; the research
+is new files plus this note. Leave the PR unmerged for human review/merge.
 
 After human review/merge: implement ADR 0014's two metadata fields and backfill
 211 actual clauses using these findings and targeted clause-specific authority.
