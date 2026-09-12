@@ -17,6 +17,10 @@
     "mca/**/*.ts",
     "server-only/require-admin-loader.ts",
     "server-only/require-admin-loader.test.ts",
-    "regression-tests/admin-loaders-gated.test.ts"
+    "regression-tests/admin-loaders-gated.test.ts",
+    "regression-tests/recipient-auth-fixture.ts",
+    "regression-tests/recipient-factor-identity.test.ts",
+    "regression-tests/recipient-token-operations.test.ts",
+    "regression-tests/recipient-token-files.test.ts"
   ]
 }
