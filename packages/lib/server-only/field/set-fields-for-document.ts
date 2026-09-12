@@ -1,3 +1,8 @@
+// MODIFIED for BizRethink (overlay 082): authorize the complete replacement in one locked transaction.
+import {
+  assertFieldReplacement,
+  withDocumentReplacement,
+} from '@bizrethink/customizations/server-only/document-replacement';
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
 import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
@@ -16,7 +21,6 @@ import {
 } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffFieldChanges } from '@documenso/lib/utils/document-audit-logs';
-import { prisma } from '@documenso/prisma';
 import { EnvelopeType, type Field, FieldType } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
@@ -48,86 +52,64 @@ export const setFieldsForDocument = async ({
     teamId,
   });
 
-  const envelope = await prisma.envelope.findFirst({
-    where: envelopeWhereInput,
-    include: {
-      recipients: true,
-      envelopeItems: {
-        select: {
-          id: true,
-        },
-      },
-      fields: {
-        include: {
-          recipient: true,
-        },
-      },
-    },
-  });
+  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
+    const existingFields = envelope.fields;
 
-  if (!envelope) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+    const removedFields = assertFieldReplacement(envelope, fields);
+
+    const linkedFields = fields.map((field) => {
+      const existing = existingFields.find((existingField) => existingField.id === field.id);
+
+      const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
+
+      // Check whether the field is being attached to an allowed envelope item.
+      const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId);
+
+      if (!foundEnvelopeItem) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Envelope item ${field.envelopeItemId} not found`,
+        });
+      }
+
+      // Each field MUST have a recipient associated with it.
+      if (!recipient) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Recipient not found for field ${field.id}`,
+        });
+      }
+
+      // Check whether the existing field can be modified.
+      if (
+        existing &&
+        hasFieldBeenChanged(existing, field) &&
+        !canRecipientFieldsBeModified(recipient, existingFields)
+      ) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot modify a field where the recipient has already interacted with the document',
+        });
+      }
+
+      // Prevent creating new fields when recipient has interacted with the document.
+      if (!existing && !canRecipientFieldsBeModified(recipient, existingFields)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot modify a field where the recipient has already interacted with the document',
+        });
+      }
+
+      return {
+        ...field,
+        _persisted: existing,
+        _recipient: recipient,
+      };
     });
-  }
 
-  if (envelope.completedAt) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Document already complete',
-    });
-  }
-
-  const existingFields = envelope.fields;
-
-  const removedFields = existingFields.filter(
-    (existingField) => !fields.find((field) => field.id === existingField.id),
-  );
-
-  const linkedFields = fields.map((field) => {
-    const existing = existingFields.find((existingField) => existingField.id === field.id);
-
-    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
-
-    // Check whether the field is being attached to an allowed envelope item.
-    const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId);
-
-    if (!foundEnvelopeItem) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Envelope item ${field.envelopeItemId} not found`,
-      });
-    }
-
-    // Each field MUST have a recipient associated with it.
-    if (!recipient) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Recipient not found for field ${field.id}`,
-      });
-    }
-
-    // Check whether the existing field can be modified.
-    if (existing && hasFieldBeenChanged(existing, field) && !canRecipientFieldsBeModified(recipient, existingFields)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot modify a field where the recipient has already interacted with the document',
-      });
-    }
-
-    // Prevent creating new fields when recipient has interacted with the document.
-    if (!existing && !canRecipientFieldsBeModified(recipient, existingFields)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot modify a field where the recipient has already interacted with the document',
-      });
-    }
-
-    return {
-      ...field,
-      _persisted: existing,
-      _recipient: recipient,
-    };
-  });
-
-  const persistedFields = await prisma.$transaction(async (tx) => {
-    return await Promise.all(
+    const persistedFields = await Promise.all(
       linkedFields.map(async (field) => {
+        // The saved owner was checked above; retain already-protected fields byte-for-byte.
+        if (field._persisted && !canRecipientFieldsBeModified(field._recipient, existingFields)) {
+          return { ...field._persisted, formId: field.formId };
+        }
+
         const fieldSignerEmail = field._recipient.email.toLowerCase();
 
         const parsedFieldMeta = field.fieldMeta
@@ -289,10 +271,8 @@ export const setFieldsForDocument = async ({
         };
       }),
     );
-  });
 
-  if (removedFields.length > 0) {
-    await prisma.$transaction(async (tx) => {
+    if (removedFields.length > 0) {
       await tx.field.deleteMany({
         where: {
           id: {
@@ -309,37 +289,38 @@ export const setFieldsForDocument = async ({
             metadata: requestMetadata,
             data: {
               fieldId: field.secondaryId,
-              fieldRecipientEmail: field.recipient?.email ?? '',
+              fieldRecipientEmail:
+                envelope.recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
               fieldRecipientId: field.recipientId ?? -1,
               fieldType: field.type,
             },
           }),
         ),
       });
-    });
-  }
+    }
 
-  // Filter out fields that have been removed or have been updated.
-  const mappedFilteredFields = existingFields
-    .filter((field) => {
-      const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
-      const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
+    // Filter out fields that have been removed or have been updated.
+    const mappedFilteredFields = existingFields
+      .filter((field) => {
+        const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
+        const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
 
-      return !isRemoved && !isUpdated;
-    })
-    .map((field) => ({
+        return !isRemoved && !isUpdated;
+      })
+      .map((field) => ({
+        ...mapFieldToLegacyField(field, envelope),
+        formId: undefined,
+      }));
+
+    const mappedPersistentFields = persistedFields.map((field) => ({
       ...mapFieldToLegacyField(field, envelope),
-      formId: undefined,
+      formId: field?.formId,
     }));
 
-  const mappedPersistentFields = persistedFields.map((field) => ({
-    ...mapFieldToLegacyField(field, envelope),
-    formId: field?.formId,
-  }));
-
-  return {
-    fields: [...mappedFilteredFields, ...mappedPersistentFields],
-  };
+    return {
+      fields: [...mappedFilteredFields, ...mappedPersistentFields],
+    };
+  });
 };
 
 /**

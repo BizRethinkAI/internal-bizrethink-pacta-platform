@@ -1,3 +1,8 @@
+// MODIFIED for BizRethink (overlay 082): authorize the complete replacement in one locked transaction.
+import {
+  assertRecipientReplacement,
+  withDocumentReplacement,
+} from '@bizrethink/customizations/server-only/document-replacement';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
@@ -5,7 +10,6 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData, diffRecipientChanges } from '@documenso/lib/utils/document-audit-logs';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
-import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@prisma/client';
 import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
@@ -15,7 +19,6 @@ import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
-import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
@@ -41,100 +44,62 @@ export const setDocumentRecipients = async ({
     teamId,
   });
 
-  const envelope = await prisma.envelope.findFirst({
-    where: envelopeWhereInput,
-    include: {
-      fields: true,
-      documentMeta: true,
-      team: {
-        select: {
-          organisation: {
-            select: {
-              organisationClaim: true,
-            },
-          },
-        },
-      },
-      recipients: true,
-    },
-  });
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
-
-  if (!envelope) {
-    throw new Error('Document not found');
-  }
-
-  assertEnvelopeMutable(envelope);
-
-  if (envelope.completedAt) {
-    throw new Error('Document already complete');
-  }
-
-  const recipientsHaveActionAuth = recipients.some(
-    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
-  );
-
-  // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to set the action auth',
+  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope, afterCommit }) => {
+    const user = await tx.user.findFirstOrThrow({
+      where: { id: userId },
+      select: { id: true, name: true, email: true },
     });
-  }
 
-  for (const recipient of recipients) {
-    assertCompatibleRecipientRole({
-      signatureLevel: envelope.signatureLevel,
-      role: recipient.role,
-    });
-  }
+    const recipientsHaveActionAuth = recipients.some(
+      (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+    );
 
-  const normalizedRecipients = recipients.map((recipient) => ({
-    ...recipient,
-    email: recipient.email.toLowerCase(),
-  }));
-
-  const existingRecipients = envelope.recipients;
-
-  const removedRecipients = existingRecipients.filter(
-    (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
-  );
-
-  const linkedRecipients = normalizedRecipients.map((recipient) => {
-    const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
-
-    const canPersistedRecipientBeModified = existing && canRecipientBeModified(existing, envelope.fields);
-
-    if (
-      existing &&
-      hasRecipientBeenChanged(existing, recipient) &&
-      !canRecipientBeModified(existing, envelope.fields)
-    ) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot modify a recipient who has already interacted with the document',
+    // Check if user has permission to set the global action auth.
+    if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
       });
     }
 
-    return {
+    for (const recipient of recipients) {
+      assertCompatibleRecipientRole({
+        signatureLevel: envelope.signatureLevel,
+        role: recipient.role,
+      });
+    }
+
+    const normalizedRecipients = recipients.map((recipient) => ({
       ...recipient,
-      _persisted: existing,
-      canPersistedRecipientBeModified,
-    };
-  });
+      email: recipient.email.toLowerCase(),
+    }));
 
-  const persistedRecipients = await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+    const existingRecipients = envelope.recipients;
 
-    return await Promise.all(
+    const removedRecipients = assertRecipientReplacement(envelope, normalizedRecipients);
+
+    const linkedRecipients = normalizedRecipients.map((recipient) => {
+      const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
+
+      const canPersistedRecipientBeModified = existing && canRecipientBeModified(existing, envelope.fields);
+
+      if (
+        existing &&
+        hasRecipientBeenChanged(existing, recipient) &&
+        !canRecipientBeModified(existing, envelope.fields)
+      ) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot modify a recipient who has already interacted with the document',
+        });
+      }
+
+      return {
+        ...recipient,
+        _persisted: existing,
+        canPersistedRecipientBeModified,
+      };
+    });
+
+    const persistedRecipients = await Promise.all(
       linkedRecipients.map(async (recipient) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
 
@@ -241,10 +206,8 @@ export const setDocumentRecipients = async ({
         };
       }),
     );
-  });
 
-  if (removedRecipients.length > 0) {
-    await prisma.$transaction(async (tx) => {
+    if (removedRecipients.length > 0) {
       await tx.recipient.deleteMany({
         where: {
           id: {
@@ -268,50 +231,54 @@ export const setDocumentRecipients = async ({
           }),
         ),
       });
+
+      const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
+        envelope.documentMeta,
+      ).recipientRemoved;
+
+      if (isRecipientRemovedEmailEnabled) {
+        afterCommit(async () => {
+          await Promise.all(
+            removedRecipients.map(async (recipient) => {
+              if (
+                recipient.sendStatus !== SendStatus.SENT ||
+                recipient.role === RecipientRole.CC ||
+                !isRecipientEmailValidForSending(recipient)
+              ) {
+                return;
+              }
+
+              await jobs.triggerJob({
+                name: 'send.recipient.removed.email',
+                payload: {
+                  envelopeId: envelope.id,
+                  recipientEmail: recipient.email,
+                  recipientName: recipient.name,
+                  inviterName: user.name || undefined,
+                },
+              });
+            }),
+          );
+        });
+      }
+    }
+
+    // Filter out recipients that have been removed or have been updated.
+    const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
+      const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
+      const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
+
+      return !isRemoved && !isUpdated;
     });
 
-    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientRemoved;
-
-    if (isRecipientRemovedEmailEnabled) {
-      await Promise.all(
-        removedRecipients.map(async (recipient) => {
-          if (
-            recipient.sendStatus !== SendStatus.SENT ||
-            recipient.role === RecipientRole.CC ||
-            !isRecipientEmailValidForSending(recipient)
-          ) {
-            return;
-          }
-
-          await jobs.triggerJob({
-            name: 'send.recipient.removed.email',
-            payload: {
-              envelopeId: envelope.id,
-              recipientEmail: recipient.email,
-              recipientName: recipient.name,
-              inviterName: user.name || undefined,
-            },
-          });
-        }),
-      );
-    }
-  }
-
-  // Filter out recipients that have been removed or have been updated.
-  const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
-    const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
-    const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
-
-    return !isRemoved && !isUpdated;
+    return {
+      recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
+        ...recipient,
+        documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+        templateId: null,
+      })),
+    };
   });
-
-  return {
-    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
-      ...recipient,
-      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
-      templateId: null,
-    })),
-  };
 };
 
 /**

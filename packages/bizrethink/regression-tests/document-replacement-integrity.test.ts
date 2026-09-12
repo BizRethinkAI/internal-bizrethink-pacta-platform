@@ -2,7 +2,7 @@ import { AppErrorCode } from '@documenso/lib/errors/app-error';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import type { Field, Recipient } from '@prisma/client';
-import { DocumentStatus, FieldType, Prisma, SigningStatus } from '@prisma/client';
+import { DocumentStatus, FieldType, Prisma, SendStatus, SigningStatus } from '@prisma/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { envelopeFixture, fieldFixture, recipientFixture } from './recipient-auth-fixture';
@@ -175,6 +175,10 @@ for (const kind of ['fields', 'recipients'] as const) {
     for (const signed of [true, false]) {
       it(`rejects removal after Alice ${signed ? 'signed' : 'inserted a field'}, before any write`, async () => {
         protectAlice(signed);
+        if (signed) {
+          // Independently exercise SIGNED, without relying on inserted-field protection.
+          state.fields[0].inserted = false;
+        }
         const before = cloneState();
         await expect(omitAlice()).rejects.toMatchObject({ code: AppErrorCode.INVALID_REQUEST });
         expect(state).toEqual(before);
@@ -187,6 +191,13 @@ for (const kind of ['fields', 'recipients'] as const) {
       expect(state.audits).toBeGreaterThan(0);
       if (kind === 'fields') {
         expect(state.fields[0].positionX.toNumber()).toBe(25);
+        expect(db.documentAuditLog.createMany).toHaveBeenCalledWith({
+          data: [
+            expect.objectContaining({
+              data: expect.objectContaining({ fieldRecipientId: 1, fieldRecipientEmail: 'owner@example.invalid' }),
+            }),
+          ],
+        });
       } else {
         expect(state.recipients.map((recipient) => recipient.name)).toEqual(['Updated Bob']);
       }
@@ -199,6 +210,20 @@ for (const kind of ['fields', 'recipients'] as const) {
       await expect(omitAlice()).rejects.toMatchObject({ code: AppErrorCode.INVALID_REQUEST });
       expect(state.recipients[0].signingStatus).toBe(SigningStatus.SIGNED);
       expect(state.fields[0].inserted).toBe(true);
+      noWrites();
+    });
+    it('uses signing state committed while waiting for a database lock', async () => {
+      db.$queryRaw.mockImplementationOnce(async () => {
+        protectAlice();
+        return [];
+      });
+      await expect(omitAlice()).rejects.toMatchObject({ code: AppErrorCode.INVALID_REQUEST });
+      noWrites();
+    });
+    it('rejects completed documents before writes', async () => {
+      state.envelope.completedAt = new Date('2026-09-12T00:00:00Z');
+      state.envelope.status = DocumentStatus.COMPLETED;
+      await expect(omitAlice()).rejects.toMatchObject({ code: AppErrorCode.INVALID_REQUEST });
       noWrites();
     });
     it('rolls back updates as well as removals when the removal audit write fails', async () => {
@@ -234,6 +259,40 @@ it('binds an existing field to its persisted signer instead of the supplied unto
   ).rejects.toMatchObject({ code: AppErrorCode.INVALID_REQUEST });
   expect(state).toEqual(before);
   noWrites();
+});
+
+it('sends removal notifications only after a successful commit', async () => {
+  state.recipients[0].sendStatus = SendStatus.SENT;
+  db.$transaction.mockImplementationOnce(async (operation: Parameters<typeof transaction>[0]) => {
+    const result = await transaction(operation);
+    expect(jobs.triggerJob).not.toHaveBeenCalled();
+    return result;
+  });
+  await replaceRecipients([recipientInput(state.recipients[1])]);
+  expect(jobs.triggerJob).toHaveBeenCalledOnce();
+  expect(jobs.triggerJob).toHaveBeenCalledWith({
+    name: 'send.recipient.removed.email',
+    payload: {
+      envelopeId: state.envelope.id,
+      recipientEmail: 'owner@example.invalid',
+      recipientName: 'Alice',
+      inviterName: 'Sender',
+    },
+  });
+});
+
+it('does not send a removal notification when the commit fails', async () => {
+  state.recipients[0].sendStatus = SendStatus.SENT;
+  const before = cloneState();
+  db.$transaction.mockImplementationOnce((operation: Parameters<typeof transaction>[0]) =>
+    transaction(async (tx) => {
+      await operation(tx);
+      throw new Error('Synthetic commit failure');
+    }),
+  );
+  await expect(replaceRecipients([recipientInput(state.recipients[1])])).rejects.toThrow('Synthetic commit failure');
+  expect(state).toEqual(before);
+  expect(jobs.triggerJob).not.toHaveBeenCalled();
 });
 
 it('enforces the advanced-signature document lock for field replacement', async () => {

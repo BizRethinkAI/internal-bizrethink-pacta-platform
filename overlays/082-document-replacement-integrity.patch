@@ -1,0 +1,520 @@
+# Why: A-08 complete-list replacements must preserve protected recipient/field
+# records, use the persisted field owner and commit allowed writes/audits together.
+# Why-not-additive: Policy and locked transaction ownership live in the owned
+# document-replacement module. These two upstream helpers must enter that
+# transaction and reuse its fresh snapshot/tx throughout their existing writes.
+# Much of the diff is indentation of the unchanged validation/persistence body;
+# copying that body into the fork would make future upstream changes easier to lose.
+# Upstream-merge-fragility: high — preserve both wrapper hooks, existing parent
+# access predicates, shared mutability rules, same-transaction removals/audits and
+# post-commit notifications when upstream refactors authoring. Re-run the owned
+# unit tests and authenticated HTTP/PostgreSQL replacement regressions after sync.
+
+diff --git a/packages/lib/server-only/field/set-fields-for-document.ts b/packages/lib/server-only/field/set-fields-for-document.ts
+index 054724085..4fb0d0405 100644
+--- a/packages/lib/server-only/field/set-fields-for-document.ts
++++ b/packages/lib/server-only/field/set-fields-for-document.ts
+@@ -1,3 +1,8 @@
++// MODIFIED for BizRethink (overlay 082): authorize the complete replacement in one locked transaction.
++import {
++  assertFieldReplacement,
++  withDocumentReplacement,
++} from '@bizrethink/customizations/server-only/document-replacement';
+ import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+ import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+ import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
+@@ -16,7 +21,6 @@ import {
+ } from '@documenso/lib/types/field-meta';
+ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+ import { createDocumentAuditLogData, diffFieldChanges } from '@documenso/lib/utils/document-audit-logs';
+-import { prisma } from '@documenso/prisma';
+ import { EnvelopeType, type Field, FieldType } from '@prisma/client';
+ import { isDeepEqual } from 'remeda';
+ 
+@@ -48,86 +52,64 @@ export const setFieldsForDocument = async ({
+     teamId,
+   });
+ 
+-  const envelope = await prisma.envelope.findFirst({
+-    where: envelopeWhereInput,
+-    include: {
+-      recipients: true,
+-      envelopeItems: {
+-        select: {
+-          id: true,
+-        },
+-      },
+-      fields: {
+-        include: {
+-          recipient: true,
+-        },
+-      },
+-    },
+-  });
+-
+-  if (!envelope) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, {
+-      message: 'Document not found',
+-    });
+-  }
+-
+-  if (envelope.completedAt) {
+-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-      message: 'Document already complete',
+-    });
+-  }
++  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
++    const existingFields = envelope.fields;
+ 
+-  const existingFields = envelope.fields;
+-
+-  const removedFields = existingFields.filter(
+-    (existingField) => !fields.find((field) => field.id === existingField.id),
+-  );
++    const removedFields = assertFieldReplacement(envelope, fields);
+ 
+-  const linkedFields = fields.map((field) => {
+-    const existing = existingFields.find((existingField) => existingField.id === field.id);
++    const linkedFields = fields.map((field) => {
++      const existing = existingFields.find((existingField) => existingField.id === field.id);
+ 
+-    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
++      const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
+ 
+-    // Check whether the field is being attached to an allowed envelope item.
+-    const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId);
++      // Check whether the field is being attached to an allowed envelope item.
++      const foundEnvelopeItem = envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId);
+ 
+-    if (!foundEnvelopeItem) {
+-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-        message: `Envelope item ${field.envelopeItemId} not found`,
+-      });
+-    }
+-
+-    // Each field MUST have a recipient associated with it.
+-    if (!recipient) {
+-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-        message: `Recipient not found for field ${field.id}`,
+-      });
+-    }
++      if (!foundEnvelopeItem) {
++        throw new AppError(AppErrorCode.INVALID_REQUEST, {
++          message: `Envelope item ${field.envelopeItemId} not found`,
++        });
++      }
+ 
+-    // Check whether the existing field can be modified.
+-    if (existing && hasFieldBeenChanged(existing, field) && !canRecipientFieldsBeModified(recipient, existingFields)) {
+-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-        message: 'Cannot modify a field where the recipient has already interacted with the document',
+-      });
+-    }
++      // Each field MUST have a recipient associated with it.
++      if (!recipient) {
++        throw new AppError(AppErrorCode.INVALID_REQUEST, {
++          message: `Recipient not found for field ${field.id}`,
++        });
++      }
++
++      // Check whether the existing field can be modified.
++      if (
++        existing &&
++        hasFieldBeenChanged(existing, field) &&
++        !canRecipientFieldsBeModified(recipient, existingFields)
++      ) {
++        throw new AppError(AppErrorCode.INVALID_REQUEST, {
++          message: 'Cannot modify a field where the recipient has already interacted with the document',
++        });
++      }
+ 
+-    // Prevent creating new fields when recipient has interacted with the document.
+-    if (!existing && !canRecipientFieldsBeModified(recipient, existingFields)) {
+-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-        message: 'Cannot modify a field where the recipient has already interacted with the document',
+-      });
+-    }
++      // Prevent creating new fields when recipient has interacted with the document.
++      if (!existing && !canRecipientFieldsBeModified(recipient, existingFields)) {
++        throw new AppError(AppErrorCode.INVALID_REQUEST, {
++          message: 'Cannot modify a field where the recipient has already interacted with the document',
++        });
++      }
+ 
+-    return {
+-      ...field,
+-      _persisted: existing,
+-      _recipient: recipient,
+-    };
+-  });
++      return {
++        ...field,
++        _persisted: existing,
++        _recipient: recipient,
++      };
++    });
+ 
+-  const persistedFields = await prisma.$transaction(async (tx) => {
+-    return await Promise.all(
++    const persistedFields = await Promise.all(
+       linkedFields.map(async (field) => {
++        // The saved owner was checked above; retain already-protected fields byte-for-byte.
++        if (field._persisted && !canRecipientFieldsBeModified(field._recipient, existingFields)) {
++          return { ...field._persisted, formId: field.formId };
++        }
++
+         const fieldSignerEmail = field._recipient.email.toLowerCase();
+ 
+         const parsedFieldMeta = field.fieldMeta
+@@ -289,10 +271,8 @@ export const setFieldsForDocument = async ({
+         };
+       }),
+     );
+-  });
+ 
+-  if (removedFields.length > 0) {
+-    await prisma.$transaction(async (tx) => {
++    if (removedFields.length > 0) {
+       await tx.field.deleteMany({
+         where: {
+           id: {
+@@ -309,37 +289,38 @@ export const setFieldsForDocument = async ({
+             metadata: requestMetadata,
+             data: {
+               fieldId: field.secondaryId,
+-              fieldRecipientEmail: field.recipient?.email ?? '',
++              fieldRecipientEmail:
++                envelope.recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+               fieldRecipientId: field.recipientId ?? -1,
+               fieldType: field.type,
+             },
+           }),
+         ),
+       });
+-    });
+-  }
++    }
++
++    // Filter out fields that have been removed or have been updated.
++    const mappedFilteredFields = existingFields
++      .filter((field) => {
++        const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
++        const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
+ 
+-  // Filter out fields that have been removed or have been updated.
+-  const mappedFilteredFields = existingFields
+-    .filter((field) => {
+-      const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
+-      const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
++        return !isRemoved && !isUpdated;
++      })
++      .map((field) => ({
++        ...mapFieldToLegacyField(field, envelope),
++        formId: undefined,
++      }));
+ 
+-      return !isRemoved && !isUpdated;
+-    })
+-    .map((field) => ({
++    const mappedPersistentFields = persistedFields.map((field) => ({
+       ...mapFieldToLegacyField(field, envelope),
+-      formId: undefined,
++      formId: field?.formId,
+     }));
+ 
+-  const mappedPersistentFields = persistedFields.map((field) => ({
+-    ...mapFieldToLegacyField(field, envelope),
+-    formId: field?.formId,
+-  }));
+-
+-  return {
+-    fields: [...mappedFilteredFields, ...mappedPersistentFields],
+-  };
++    return {
++      fields: [...mappedFilteredFields, ...mappedPersistentFields],
++    };
++  });
+ };
+ 
+ /**
+diff --git a/packages/lib/server-only/recipient/set-document-recipients.ts b/packages/lib/server-only/recipient/set-document-recipients.ts
+index ca2ca666d..20a2063d0 100644
+--- a/packages/lib/server-only/recipient/set-document-recipients.ts
++++ b/packages/lib/server-only/recipient/set-document-recipients.ts
+@@ -1,3 +1,8 @@
++// MODIFIED for BizRethink (overlay 082): authorize the complete replacement in one locked transaction.
++import {
++  assertRecipientReplacement,
++  withDocumentReplacement,
++} from '@bizrethink/customizations/server-only/document-replacement';
+ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+ import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
+ import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+@@ -5,7 +10,6 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
+ import { nanoid } from '@documenso/lib/universal/id';
+ import { createDocumentAuditLogData, diffRecipientChanges } from '@documenso/lib/utils/document-audit-logs';
+ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
+-import { prisma } from '@documenso/prisma';
+ import type { Recipient } from '@prisma/client';
+ import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+ import { isDeepEqual } from 'remeda';
+@@ -15,7 +19,6 @@ import { jobs } from '../../jobs/client';
+ import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+ import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+ import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
+-import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
+ import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+ import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+ 
+@@ -41,100 +44,62 @@ export const setDocumentRecipients = async ({
+     teamId,
+   });
+ 
+-  const envelope = await prisma.envelope.findFirst({
+-    where: envelopeWhereInput,
+-    include: {
+-      fields: true,
+-      documentMeta: true,
+-      team: {
+-        select: {
+-          organisation: {
+-            select: {
+-              organisationClaim: true,
+-            },
+-          },
+-        },
+-      },
+-      recipients: true,
+-    },
+-  });
+-
+-  const user = await prisma.user.findFirstOrThrow({
+-    where: {
+-      id: userId,
+-    },
+-    select: {
+-      id: true,
+-      name: true,
+-      email: true,
+-    },
+-  });
+-
+-  if (!envelope) {
+-    throw new Error('Document not found');
+-  }
+-
+-  assertEnvelopeMutable(envelope);
+-
+-  if (envelope.completedAt) {
+-    throw new Error('Document already complete');
+-  }
+-
+-  const recipientsHaveActionAuth = recipients.some(
+-    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+-  );
+-
+-  // Check if user has permission to set the global action auth.
+-  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'You do not have permission to set the action auth',
++  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope, afterCommit }) => {
++    const user = await tx.user.findFirstOrThrow({
++      where: { id: userId },
++      select: { id: true, name: true, email: true },
+     });
+-  }
+ 
+-  for (const recipient of recipients) {
+-    assertCompatibleRecipientRole({
+-      signatureLevel: envelope.signatureLevel,
+-      role: recipient.role,
+-    });
+-  }
++    const recipientsHaveActionAuth = recipients.some(
++      (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
++    );
+ 
+-  const normalizedRecipients = recipients.map((recipient) => ({
+-    ...recipient,
+-    email: recipient.email.toLowerCase(),
+-  }));
++    // Check if user has permission to set the global action auth.
++    if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
++      throw new AppError(AppErrorCode.UNAUTHORIZED, {
++        message: 'You do not have permission to set the action auth',
++      });
++    }
+ 
+-  const existingRecipients = envelope.recipients;
++    for (const recipient of recipients) {
++      assertCompatibleRecipientRole({
++        signatureLevel: envelope.signatureLevel,
++        role: recipient.role,
++      });
++    }
+ 
+-  const removedRecipients = existingRecipients.filter(
+-    (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+-  );
++    const normalizedRecipients = recipients.map((recipient) => ({
++      ...recipient,
++      email: recipient.email.toLowerCase(),
++    }));
+ 
+-  const linkedRecipients = normalizedRecipients.map((recipient) => {
+-    const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
++    const existingRecipients = envelope.recipients;
+ 
+-    const canPersistedRecipientBeModified = existing && canRecipientBeModified(existing, envelope.fields);
++    const removedRecipients = assertRecipientReplacement(envelope, normalizedRecipients);
+ 
+-    if (
+-      existing &&
+-      hasRecipientBeenChanged(existing, recipient) &&
+-      !canRecipientBeModified(existing, envelope.fields)
+-    ) {
+-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-        message: 'Cannot modify a recipient who has already interacted with the document',
+-      });
+-    }
++    const linkedRecipients = normalizedRecipients.map((recipient) => {
++      const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
+ 
+-    return {
+-      ...recipient,
+-      _persisted: existing,
+-      canPersistedRecipientBeModified,
+-    };
+-  });
++      const canPersistedRecipientBeModified = existing && canRecipientBeModified(existing, envelope.fields);
+ 
+-  const persistedRecipients = await prisma.$transaction(async (tx) => {
+-    await assertEnvelopeMutable(envelope, tx);
++      if (
++        existing &&
++        hasRecipientBeenChanged(existing, recipient) &&
++        !canRecipientBeModified(existing, envelope.fields)
++      ) {
++        throw new AppError(AppErrorCode.INVALID_REQUEST, {
++          message: 'Cannot modify a recipient who has already interacted with the document',
++        });
++      }
+ 
+-    return await Promise.all(
++      return {
++        ...recipient,
++        _persisted: existing,
++        canPersistedRecipientBeModified,
++      };
++    });
++
++    const persistedRecipients = await Promise.all(
+       linkedRecipients.map(async (recipient) => {
+         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
+ 
+@@ -241,10 +206,8 @@ export const setDocumentRecipients = async ({
+         };
+       }),
+     );
+-  });
+ 
+-  if (removedRecipients.length > 0) {
+-    await prisma.$transaction(async (tx) => {
++    if (removedRecipients.length > 0) {
+       await tx.recipient.deleteMany({
+         where: {
+           id: {
+@@ -268,50 +231,54 @@ export const setDocumentRecipients = async ({
+           }),
+         ),
+       });
+-    });
+ 
+-    const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientRemoved;
+-
+-    if (isRecipientRemovedEmailEnabled) {
+-      await Promise.all(
+-        removedRecipients.map(async (recipient) => {
+-          if (
+-            recipient.sendStatus !== SendStatus.SENT ||
+-            recipient.role === RecipientRole.CC ||
+-            !isRecipientEmailValidForSending(recipient)
+-          ) {
+-            return;
+-          }
+-
+-          await jobs.triggerJob({
+-            name: 'send.recipient.removed.email',
+-            payload: {
+-              envelopeId: envelope.id,
+-              recipientEmail: recipient.email,
+-              recipientName: recipient.name,
+-              inviterName: user.name || undefined,
+-            },
+-          });
+-        }),
+-      );
++      const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
++        envelope.documentMeta,
++      ).recipientRemoved;
++
++      if (isRecipientRemovedEmailEnabled) {
++        afterCommit(async () => {
++          await Promise.all(
++            removedRecipients.map(async (recipient) => {
++              if (
++                recipient.sendStatus !== SendStatus.SENT ||
++                recipient.role === RecipientRole.CC ||
++                !isRecipientEmailValidForSending(recipient)
++              ) {
++                return;
++              }
++
++              await jobs.triggerJob({
++                name: 'send.recipient.removed.email',
++                payload: {
++                  envelopeId: envelope.id,
++                  recipientEmail: recipient.email,
++                  recipientName: recipient.name,
++                  inviterName: user.name || undefined,
++                },
++              });
++            }),
++          );
++        });
++      }
+     }
+-  }
+ 
+-  // Filter out recipients that have been removed or have been updated.
+-  const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
+-    const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
+-    const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
++    // Filter out recipients that have been removed or have been updated.
++    const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
++      const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
++      const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
+ 
+-    return !isRemoved && !isUpdated;
+-  });
++      return !isRemoved && !isUpdated;
++    });
+ 
+-  return {
+-    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
+-      ...recipient,
+-      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+-      templateId: null,
+-    })),
+-  };
++    return {
++      recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
++        ...recipient,
++        documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
++        templateId: null,
++      })),
++    };
++  });
+ };
+ 
+ /**
