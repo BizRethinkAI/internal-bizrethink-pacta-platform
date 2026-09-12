@@ -17,6 +17,9 @@
     "mca/**/*.ts",
     "server-only/require-admin-loader.ts",
     "server-only/require-admin-loader.test.ts",
-    "regression-tests/admin-loaders-gated.test.ts"
+    "regression-tests/admin-loaders-gated.test.ts",
+    "server-only/signup-config.ts",
+    "server-only/signup-config.test.ts",
+    "regression-tests/signup-policy-request.test.ts"
   ]
 }

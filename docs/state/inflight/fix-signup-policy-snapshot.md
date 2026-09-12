@@ -21,9 +21,9 @@ policy, initial read failure and invitation-query failure already blocked.
 with rejection expectations. These tests use mocked I/O; they do not attack
 production or write to a real database.
 
-## Intended change and boundaries
+## Change and boundaries
 
-Read one validated signup policy per request and use it for the disabled,
+Reads one validated signup policy per request and uses it for the disabled,
 domain and invitation gates. Keep the existing provider kill switches, domain
 matching, invitation verification flow, rate limiting and CAPTCHA. A valid
 open DB policy with an empty domain list may still use the existing env CSV;
@@ -32,8 +32,11 @@ rule that the invitation toggle applies to a nonempty **DB** domain list.
 
 The policy lives in `packages/bizrethink/server-only/signup-config.ts`; the
 upstream route wiring and its source guards are recorded in overlay **074**.
-Legacy individual getters must reject unavailable/closed policy rather than
-return permissive defaults. No schema, admin setting or environment change.
+Legacy individual getters reject unavailable/closed policy rather than return
+permissive defaults. A typed closed policy contains no domain/invitation
+permissions. No schema, admin setting or environment change. An admin policy
+change affects the next request; this does not serialize an already-started
+signup with concurrent admin edits.
 
 ## Verification and coordination
 
@@ -41,7 +44,16 @@ Fresh worktree `/private/tmp/pacta-r01-signup-policy`, its own `npm ci`, Prisma
 generation and Node 24.20.0. The exact main baseline already passed
 [CI](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/actions/runs/34657079323)
 and the [full Playwright suite](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/actions/runs/34657079229).
-Final local and PR checks are pending implementation.
+Local verification: **4159 Vitest tests / 193 owned-package files**, **6 auth
+source guards**, and **45 lib auth/create-user/verify-email tests** passed. The
+two R-01 files now have **36 passing tests**, including env precedence, case
+normalization, provider kill switches, successful invited/unrestricted signup,
+and failure to read the required invitation. The expanded TypeScript gate
+includes the policy and request fixtures; its initial run caught missing
+fixture audit fields, now corrected. Typecheck, owned-package formatting,
+`git diff --check` and overlay reverse-apply check pass. No tests were skipped
+or marked xfail. No local build was run; the full post-change Playwright suite
+and build run on the PR. Test-first commit: `8f4e95812`.
 
 PR **#168** (`chore/mca-memo-refutations`) already folds the two inherited MCA
 notes; this branch must not duplicate that fold. It needs to incorporate the

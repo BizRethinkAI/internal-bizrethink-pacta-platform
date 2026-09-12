@@ -63,6 +63,8 @@ const inviteRead = vi.mocked(prisma.organisationMemberInvite.findFirst);
 const openRestrictedRow: SiteSettings = {
   id: 'site.signup',
   enabled: true,
+  lastModifiedByUserId: null,
+  lastModifiedAt: new Date('2026-09-11T00:00:00Z'),
   data: {
     signupDisabled: false,
     allowedDomains: ['example.com'],
@@ -165,7 +167,15 @@ describe('POST /signup uses one validated signup policy (R-01)', () => {
 
   it('permits a matching pending invitation using the one successfully read policy', async () => {
     settingsRead.mockRejectedValue(new Error('Later reads unavailable')).mockResolvedValueOnce(openRestrictedRow);
-    inviteRead.mockResolvedValue({ id: 'test-invite' } as never);
+    inviteRead.mockResolvedValue({
+      id: 'test-invite',
+      createdAt: new Date('2026-09-11T00:00:00Z'),
+      email: 'new-user@example.com',
+      token: 'test-only-invite-token',
+      status: 'PENDING',
+      organisationId: 'test-organisation',
+      organisationRole: 'MEMBER',
+    });
     const response = await signup('New-User@EXAMPLE.COM');
     expect(response.status).toBe(201);
     expect(mocks.createUser).toHaveBeenCalledTimes(1);
@@ -197,6 +207,35 @@ describe('POST /signup uses one validated signup policy (R-01)', () => {
     settingsRead.mockResolvedValue(closedRow);
     await expectDenied(await signup());
     expect(settingsRead).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps env domain fallback for a valid open policy with an empty DB allowlist', async () => {
+    settingsRead.mockResolvedValue({
+      ...openRestrictedRow,
+      data: { signupDisabled: false, allowedDomains: [], requireInviteWhenDomainGated: true },
+    });
+    mocks.env.mockImplementation((key: string) =>
+      key === 'NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS' ? ' EXAMPLE.COM, , example.net ' : undefined,
+    );
+    await expectDenied(await signup('outsider@example.org'));
+    expect((await signup('member@example.net')).status).toBe(201);
+    // Preserve existing semantics: the invitation toggle applies to DB domains.
+    expect(inviteRead).not.toHaveBeenCalled();
+    expect(settingsRead).toHaveBeenCalledTimes(2);
+  });
+
+  it('gives a nonempty DB allowlist precedence over env and respects invitation opt-out', async () => {
+    settingsRead.mockResolvedValue({
+      ...openRestrictedRow,
+      data: { signupDisabled: false, allowedDomains: ['EXAMPLE.COM'], requireInviteWhenDomainGated: false },
+    });
+    mocks.env.mockImplementation((key: string) =>
+      key === 'NEXT_PRIVATE_ALLOWED_SIGNUP_DOMAINS' ? 'example.org' : undefined,
+    );
+    await expectDenied(await signup('outsider@example.org'));
+    expect((await signup()).status).toBe(201);
+    expect(inviteRead).not.toHaveBeenCalled();
+    expect(settingsRead).toHaveBeenCalledTimes(2);
   });
 
   it.each([
