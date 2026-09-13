@@ -6,7 +6,7 @@ structural blocks and interview guidance. `../content/` and `../prescribed/`
 hold disclosure requirements and prescribed forms; their verification view stays
 read-only. Shared navigation and evidence services do not grant authority to
 approve a regulator's words. This implements the accepted
-[unified workspace design (#200)](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/200).
+[unified workspace design (ADR 0015)](../../../../docs/adr/0015-one-mca-workspace-with-separate-content-catalogues.md).
 
 [ADR 0009](../../../../docs/adr/0009-counsel-is-parallel-not-a-gate.md) is why
 the directory exists at all right now. Counsel is a parallel track, not a
@@ -58,6 +58,25 @@ These are document definitions, not a private identity store or an implemented
 transaction-fill/signing API. The later builder must validate supplied values,
 qualify repeated fields by instrument and signer, and preserve required evidence.
 Actual merchant PDFs and stored templates require a separate rebuild/migration.
+
+### Processor-controlled forms and ancillary consent corrections
+
+**Owner clarification, 2026-09-12:** Split Funding Letters are processor-specific;
+we commonly have limited or no ability to change them. Their presence in this
+library does not make their terms ours to rewrite. The retained processor letter
+is unchanged. Its fee, collection-base and stopping-rule differences from the
+FRPA remain unresolved for a **future review session** using the particular
+processor's required form and operational requirements. A future reviewer must
+determine an agreed, workable resolution; an FRPA priority clause alone is not
+evidence that a processor accepted it or can implement it. Do not treat the
+deferral as approval, a waiver, or permission to silently alter the form.
+
+Merged #194 corrected fourteen source records for individual report use, contact
+consent and signer capacity in the Permission to Release and equipment agreements.
+Those unapproved corrections are retained in the current catalogues; its historical
+211-record count predates the catalogue extraction above. The [correction record](../../../../docs/research/mca-ancillary-consents-2026-09-12/README.md)
+explains source verification, substantive choices and template/execution work
+still required. Historical source documents and review dispositions are preserved.
 
 ### Citation contract (ADR 0011 phases 1–4)
 

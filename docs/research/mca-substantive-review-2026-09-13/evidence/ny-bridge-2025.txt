@@ -1,0 +1,233 @@
+SOURCE: https://www.nycourts.gov/reporter/3dseries/2025/2025_04306.htm
+RETRIEVED UTC: 2026-09-13T09:16:02.489416+00:00
+RAW RESPONSE SHA256: 44d881d560e3a0eb06031ba22b0bc599469a17ab214a791d049eda614a35f4cd
+METHOD: HTML text extraction; opinion and publication information, not an independent citator.
+
+Bridge Funding Cap LLC v SimonExpress Pizza, LLC (2025 NY Slip Op
+04306)
+Bridge Funding Cap LLC v SimonExpress Pizza,
+LLC
+2025 NY Slip Op 04306 [240 AD3d 1186]
+July 25, 2025
+Appellate Division, Fourth Department
+Published by New York State Law Reporting
+Bureau pursuant to Judiciary Law § 431.
+As corrected through Wednesday, September 10, 2025
+[*1]
+Bridge Funding Cap LLC,
+Respondent,
+v
+SimonExpress Pizza, LLC, Doing Business as Hungry Howies, et
+al., Appellants. (Appeal No. 2.)
+Amos Weinberg, Great Neck, for defendants-appellants.
+Berkovitch & Bouskila PLLC, Pomona (Daniela Palgi of counsel), for
+plaintiff-respondent.
+HEADNOTES
+Usury
+- What Constitutes
+- Revenue Purchase Agreement
+Contracts
+- Breach or Performance of Contract
+- Summary Judgment
+- Damages
+Appeal from an amended judgment of the Supreme Court, Ontario County (Frederick
+G. Reed, A.J.), entered June 24, 2024. The amended judgment awarded plaintiff the sum
+of $229,780, plus costs, disbursements and interest as against defendants.
+It is hereby ordered that the amended judgment so appealed from is reversed on the
+law without costs and the motion is denied.
+Memorandum: This appeal arises from the execution of and performance under a
+revenue purchase agreement between plaintiff and defendants SimonExpress Pizza, LLC,
+doing business as Hungry Howies, D19 Building, LLC, D19 Liquor, Inc., The Simon
+Corporation, Inc., The Simons Enterprise, Inc., Simon & Sons Enterprises, Inc.,
+Simon Stores Corporation, Simon Land Development Group, LLC, F & Z Holdings,
+LLC, SE Corporation of Michigan, and Simon Holding, LLC (collectively, entity
+defendants). The agreement was personally guaranteed by defendant Fawzi R. Simon
+(individual defendant), who guaranteed entity defendants' performance of the
+agreement.
+Under the agreement, plaintiff advanced a monetary amount to the entity defendants
+in exchange for 25% of the future revenues of their business, until the purchased amount,
+i.e., an agreed-upon amount that was greater than the advanced amount, was paid to
+plaintiff. There was no interest rate or payment schedule and no time period during
+which the purchased amount was to be collected by plaintiff. Indeed, the agreement
+specifically stated that it was not a loan and that the entity defendants were "not
+borrowing money from" plaintiff. The agreement contained a daily remittance amount,
+which constituted "a good faith estimate of" plaintiff's share of the future revenue stream.
+The agreement also contained an acknowledgment from plaintiff that it was "entering
+this [a]greement knowing the risks that [the entity defendants'] business may slow down
+or fail, [that plaintiff] assumes these risks," and that there would be no recourse for
+plaintiff in the event the entity defendants went bankrupt, went out of business, or
+experienced a slowdown in business, among other things. The agreement also contained
+two reconciliation provisions, whereby the daily remittance would be modified both
+retroactively and prospectively upon request and with proof of earned revenue
+amounts.
+Plaintiff commenced this action alleging, inter alia, that the entity defendants
+breached the agreement and that the individual defendant bore financial responsibility for
+that breach [*2]because he guaranteed performance by
+the entity defendants. Thereafter, plaintiff moved for summary judgment on the breach of
+contract and breach of guaranty causes of action. Defendants opposed the motion
+arguing, inter alia, that the agreement was actually a criminally usurious loan that was
+unenforceable and that, alternatively, plaintiff failed to meet its initial burden on the
+motion. Supreme Court granted plaintiff's motion, and awarded judgment to plaintiff.
+Defendants appeal from the amended judgment, which brings up for our review the order
+granting plaintiff's motion (see CPLR 5501 [a] [1]; see generally Bonczar v American
+Multi-Cinema, Inc., 38 NY3d 1023, 1025-1026 [2022], rearg denied 38
+NY3d 1170 [2022]).
+On appeal, defendants contend that the agreement is void because it is, in actuality, a
+criminally usurious loan. Consequently, they contend that the court erred in granting
+plaintiff's motion. Thus, the central question before us is whether the agreement was, in
+fact, a revenue purchase agreement or whether it was a loan. It is well settled that, "[i]f
+the transaction [in question] is not a loan, 'there can be no usury, however
+unconscionable the contract may be' " (Seidel v 18 E. 17th St. Owners,
+79 NY2d 735, 744 [1992]; see
+Principis Capital, LLC v I Do, Inc., 201 AD3d 752, 754 [2d Dept 2022]). To
+make that determination, the agreement must be considered "in its totality and judged by
+its real character, rather than by the name, color, or form which the parties have seen fit
+to give it" (LG Funding, LLC v
+United Senior Props. of Olathe, LLC, 181 AD3d 664, 665 [2d Dept 2020]
+[internal quotation marks omitted]).
+In determining whether a transaction constitutes a loan, courts must determine
+whether the plaintiff " 'is absolutely entitled to repayment under all
+circumstances' "; "[u]nless a principal sum advanced is repayable absolutely, the
+transaction is not a loan" (id. at 665-666; see Samson MCA LLC v Joseph A.
+Russo M.D. P.C./IV Therapeutics PLLC [appeal No. 2], 219 AD3d 1126, 1128 [4th
+Dept 2023]; Principis Capital, LLC, 201 AD3d at 754). "Usually, courts weigh
+three factors when determining whether repayment is absolute or contingent: (1) whether
+there is a reconciliation provision in the agreement; (2) whether the agreement has a
+finite term; and (3) whether there is any recourse should the merchant declare
+bankruptcy" (LG Funding, LLC, 181 AD3d at 666; see Samson MCA
+LLC, 219 AD3d at 1128; Principis Capital, LLC, 201 AD3d at 754).
+Here, contrary to defendants' contention, plaintiff established as a matter of law that
+the agreement was a revenue purchase agreement rather than a loan (see Samson
+MCA LLC, 219 AD3d at 1128; Principis Capital, LLC, 201 AD3d at 754).
+With respect to the first factor, the agreement submitted by plaintiff contained two
+reconciliation provisions that required the adjustment of the remittance amount upon the
+entity defendants' request based on changes to their revenues (see Samson MCA
+LLC, 219 AD3d at 1128). We note that the reconciliation provisions here were not
+illusory because, inter alia, they did not contain any language indicating that plaintiff
+would "not be subject to any consequences for failing to comply with its terms" or that
+plaintiff "ha[d] sole discretion to adjust the amount of the daily payments" (Oakshire Props., LLC v Argus
+Capital Funding, LLC, 229 AD3d 1199, 1201 [4th Dept 2024]). Under the
+second factor, we note that the agreement does not have a finite term or payment
+schedule (see Samson MCA LLC, 219 AD3d at 1128). Indeed, "the term of the
+agreement was not finite" inasmuch "as the amount of the monthly payments [made by
+the entity defendants] could change" as a consequence of the application of the
+agreement's reconciliation provisions (Principis Capital, LLC, 201 AD3d
+at 754). We further conclude that the third factor also weighs in favor of concluding that
+the agreement was not a loan inasmuch as under the agreement, plaintiff "did not have
+recourse in the event that the entity defendants declared bankruptcy," went out of
+business, or experienced a slowdown in business (Samson MCA LLC, 219 AD3d
+at 1128). Indeed, the agreement contained language indicating that plaintiff was entering
+the agreement "knowing the risks that [the entity defendants'] business may slow down or
+fail, and [that plaintiff] assumes these risks."
+We nonetheless agree with defendants' alternative contention that the court erred in
+granting the motion because plaintiff did not meet its prima facie burden of establishing
+its entitlement to judgment as a matter of law with respect to the breach of contract and
+breach of guaranty causes of action. "It is well settled that the elements of a breach of
+contract cause of action are 'the existence of a contract, the plaintiff's performance under
+the contract, the defendant's breach of that contract, and resulting damages' " (Niagara Foods, Inc. v Ferguson
+Elec. Serv. Co., Inc., 111 AD3d 1374, 1376 [4th Dept 2013], lv denied
+22 NY3d 864 [2014]; see Pearl
+St. Parking Assoc. LLC v County of Erie, 207 AD3d 1029, 1031 [4th Dept
+2022]). As the [*3]party seeking summary judgment on
+that cause of action, plaintiff bore the initial burden of establishing the existence of all of
+those elements (see Wm. Schutt
+& Assoc. Eng'g & Land Surveying P.C. v St. Bonaventure Univ., 151
+AD3d 1634, 1635 [4th Dept 2017], amended on rearg 153 AD3d 1676 [4th
+Dept 2017]; Resetarits Constr. Corp. v Elizabeth Pierce Olmsted, M.D. Center for the
+Visually Impaired [appeal No. 2], 118 AD3d 1454, 1455 [4th Dept 2014]). Here, we
+conclude that plaintiff's own submissions raise a triable issue of fact regarding the
+amount of any resulting damages inasmuch as the amount stated in the affidavit of
+plaintiff's manager conflicts with the amount stated in the complaint also verified by
+plaintiff's manager (see
+generally Sanchez v National R.R. Passenger Corp., 21 NY3d 890, 891 [2013];
+Michael P. v Dombroski,
+211 AD3d 1469, 1472 [4th Dept 2022]), and no explanation was proffered for that
+discrepancy. Plaintiff therefore failed to make the required prima facie showing of
+entitlement to judgment as a matter of law with respect to the breach of contract cause of
+action. Further, plaintiff's breach of guaranty cause of action is dependent on the success
+of the breach of contract cause of action. Inasmuch as plaintiff failed to meet its burden
+on the motion, the court should have denied the motion regardless of the sufficiency of
+defendants' opposing papers (see Winegrad v New York Univ. Med. Ctr., 64
+NY2d 851, 853 [1985]).
+In light of our conclusion, defendants' remaining contention is academic.
+All concur except Nowak and DelConte, JJ., who concur in the result in the
+following memorandum.
+Nowak and DelConte, JJ. (dissenting). We agree with the majority that given the
+factual discrepancies in this record, plaintiff failed to meet its initial burden on its motion
+for summary judgment. However, unlike the majority, we would not apply the tripartite
+test derived from K9 Bytes, Inc.
+v Arch Capital Funding, LLC, (56 Misc 3d 807, 816-818 [Sup Ct, Westchester
+County 2017]), adopted by the Second Department in LG Funding, LLC v United Senior Props. of Olathe, LLC (181
+AD3d 664, 665-666 [2d Dept 2020]) and by our Court in Samson MCA LLC v
+Joseph A. Russo M.D. P.C./IV Therapeutics PLLC ([appeal No. 2], 219 AD3d 1126,
+1128 [4th Dept 2023]) to determine whether the agreement constitutes an actual revenue
+purchase agreement or a usurious loan. In our view, the Samson MCA LLC test
+is insufficient. Instead, we propose a test which we believe is better suited to reliably
+differentiate between a loan and revenue purchase agreement.
+Under the Samson MCA LLC test, the "three factors [to be weighed] when
+determining whether repayment is absolute or contingent [are]: (1) whether there is a
+reconciliation provision in the agreement; (2) whether the agreement has a finite term;
+and (3) whether there is any recourse should the merchant declare bankruptcy"
+(Samson MCA LLC, 219 AD3d at 1128 [internal quotation marks omitted]).
+Reliance on the first two factors could result in an inaccurate finding that the parties
+have made a legitimate revenue purchase agreement as opposed to entering into a
+usurious loan. The first factor requires the presence of a reconciliation provision, but not
+necessarily an analysis of its validity. The second factor asks whether the agreement is
+for a finite term. But these two factors are just different sides of the same coin. Whether
+the agreement has a finite term is entirely dependent upon whether the agreement has a
+valid reconciliation provision. Absent a valid reconciliation
+provision—which the merchant could utilize to actually reduce its payments
+during times of lower than anticipated revenue—the agreement is
+necessarily for a fixed daily (or weekly) payment until the sum borrowed is
+repaid.
+Reliance on the third factor could lead to the opposite inaccurate result; that the
+parties entered into a usurious loan when they actually made a legitimate revenue
+purchase agreement. The K9 Bytes, Inc. court reasoned that where the lender is
+able to recover funds via a personal guarantee in the event of a breach of the agreement
+or bankruptcy, the lender is not assuming the risk that their investment might fail, and
+thus, the agreement is more akin to a usurious loan (56 Misc 3d at 818). However,
+"[u]nder . . . New York law, a guarantee agreement is separate and distinct
+from the contract between lender and borrower" (Kinville v Jarvis Real Estate Holdings, LLC, 38 AD3d
+1225, 1227 [4th Dept 2007] [internal quotation marks omitted]). Thus, a financing
+company and a merchant should be free to agree to a guarantee, which may reduce the
+interest required by the merchant, without the risk that the existence of the guarantee
+might convert the parties' otherwise legitimate agreement to exchange immediate funds
+for future accounts receivable into a usurious loan.
+In our view, the more appropriate test under these circumstances—where the
+parties agree [*4]to a fixed daily or weekly payment as an
+"estimate" of revenue—is to evaluate: (1) whether the "estimate" of the
+defendant's revenue is reasonably based upon the defendant's prior accounts receivable or
+anticipated future earnings (rather than simply conjured from the void); and (2) not
+whether a reconciliation provision exists, but whether it is
+illusory—that is, whether there is an actual, practical ability for the
+defendant merchant to reconcile and adjust the amount owed based on actual
+revenue.
+As to the first factor, if the parties' estimate of the merchant's future revenue is
+reasonably based upon the merchant's prior performance or projected upon future
+growth, the agreement would appear to reflect a true purchase of future accounts
+receivable. Conversely, where the numbers are vastly inflated, or are simply round
+numbers for ease of accounting, the agreement looks more like a loan.
+Here, the first factor compels the conclusion that the agreement looks more akin to a
+traditional loan, which precludes summary judgment to plaintiff. To that end, the
+defendant merchants agreed to pay a total of $360,000 at a rate of $3,500 per
+day—which the parties claimed to be 25% of defendants' daily receivables. Thus,
+by the express terms of the agreement, defendants were purportedly earning $14,000 per
+day, or $5,110,000 per year. However, during the course of discovery, the parties
+stipulated that defendant merchants had $1,440,220 in revenue between January 30,
+2020 and April 12, 2023, a period of over three years—earnings of $1,232.01
+per day, less than 10% of the initial $14,000 "estimate." Moreover, by the express terms
+of the agreement, defendants were required to pay 103 installments of $3,500 starting
+January 15, 2020, and thus, the debt would be fully repaid by April 27, 2020. However,
+plaintiff alleges that defendants performed under the agreement until June 30, 2020,
+more than two months after the agreement should have been repaid.
+As to the second factor, if the ability of the merchant to reconcile is merely illusory,
+then the agreement is simply a usurious loan. In some circumstances, a reconciliation
+provision may be illusory on its face, such as where a lender "has sole discretion
+to adjust the amount of the daily payments" (Oakshire Props., LLC v Argus Capital Funding, LLC, 229
+AD3d 1199, 1201 [4th Dept 2024] [emphasis added]). In other circumstances, a
+reconciliation provision may appear valid on its face, but be illusory in practice. For
+example, the lender could repeatedly request a merchant to submit documentation to
+support a change in revenue while continuing to debit the designated account. This factor
+would generally present a factual question, as it does here, and in our view, also
+precludes summary judgment to plaintiff. Present—Whalen, P.J., Curran, Smith,
+Nowak and DelConte, JJ.
