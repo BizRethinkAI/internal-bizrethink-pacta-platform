@@ -96,10 +96,24 @@ workflow before use. No calculation engine, schema migration, production operati
 or new upstream overlay is introduced.
 
 PR #194 owns the credit, communications and acknowledgment correction. Those six
-equipment bodies are intentionally not changed here; its corrections must be
-integrated before equipment templates can be used. The processor-controlled Split
+equipment bodies are outside this correction's authored changes. They are now
+integrated through the refreshed parent as recorded below. The processor-controlled Split
 Funding Letter and actual processor-form reconciliation remain separately owned.
 Final numbering/classification (including embedded headings) remains the next task.
+
+### Refresh against the merged consent corrections
+
+The shipping-requested refresh incorporates #204 at
+`3467aa86386e2d3985c14be025bbf12627378331`, including main
+`a2e0719fc38d988f489234b564095ef46307c05f` and merged #194. Only the two guaranty
+file headers conflict; the resolution describes both equipment and consent work.
+AST three-way comparison checks all 211 bodies, preserving this branch's thirty
+equipment changes and the incoming fourteen ancillary changes without overlap
+or unexpected body changes. Five affected equipment/consent/funding test files
+pass 153 tests. The README retains both field-binding and processor-form sections.
+
+Exact-head CI and the refreshed author handoff belong on PR #206 / task #205.
+The independent shipping owner still owns review, merge and consolidation.
 
 ## Validation and next action
 

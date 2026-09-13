@@ -1,8 +1,3 @@
-import { useEffect, useState } from 'react';
-
-import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -11,6 +6,9 @@ import { Label } from '@documenso/ui/primitives/label';
 import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { useEffect, useState } from 'react';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
@@ -112,19 +110,20 @@ export default function OrganisationSettingsSmtp() {
     }
 
     setTestResult(null);
-    const result = await testMutation.mutateAsync({
-      host: form.host,
-      port: form.port,
-      secure: form.secure,
-      username: form.username,
-      password: form.password,
-    });
-
-    setTestResult(
-      result.ok
-        ? { ok: true, message: t`Connection succeeded.` }
-        : { ok: false, message: result.error },
-    );
+    try {
+      // MODIFIED for BizRethink (overlay 083): the test checks this org's manage permission.
+      const result = await testMutation.mutateAsync({
+        organisationId: organisation.id,
+        host: form.host,
+        port: form.port,
+        secure: form.secure,
+        username: form.username,
+        password: form.password,
+      });
+      setTestResult(result.ok ? { ok: true, message: t`Connection succeeded.` } : { ok: false, message: result.error });
+    } catch {
+      setTestResult({ ok: false, message: t`Connection test unavailable. Check your permissions or try again later.` });
+    }
   };
 
   const handleDelete = async () => {
@@ -197,11 +196,7 @@ export default function OrganisationSettingsSmtp() {
               <Trans>Secure (implicit TLS)</Trans>
             </Label>
             <div className="flex items-center gap-2">
-              <Switch
-                id="secure"
-                checked={form.secure}
-                onCheckedChange={(v) => setForm({ ...form, secure: v })}
-              />
+              <Switch id="secure" checked={form.secure} onCheckedChange={(v) => setForm({ ...form, secure: v })} />
               <span className="text-muted-foreground text-xs">
                 {form.secure ? t`Port 465 / TLS` : t`Port 587 / STARTTLS`}
               </span>
@@ -232,10 +227,8 @@ export default function OrganisationSettingsSmtp() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             placeholder={hasExistingConfig ? t`(leave empty to keep existing)` : t`Required`}
           />
-          <p className="text-muted-foreground mt-1 text-xs">
-            <Trans>
-              Stored encrypted using the instance encryption key. Never returned to the client.
-            </Trans>
+          <p className="mt-1 text-muted-foreground text-xs">
+            <Trans>Stored encrypted using the instance encryption key. Never returned to the client.</Trans>
           </p>
         </div>
 
@@ -300,12 +293,7 @@ export default function OrganisationSettingsSmtp() {
           </Button>
 
           {hasExistingConfig && (
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              loading={deleteMutation.isPending}
-              className="ml-auto"
-            >
+            <Button variant="destructive" onClick={handleDelete} loading={deleteMutation.isPending} className="ml-auto">
               <Trans>Delete config</Trans>
             </Button>
           )}

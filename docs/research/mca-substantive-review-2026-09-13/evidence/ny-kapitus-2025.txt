@@ -1,0 +1,69 @@
+SOURCE: https://www.nycourts.gov/reporter/3dseries/2025/2025_05921.htm
+RETRIEVED UTC: 2026-09-13T09:16:02.499355+00:00
+RAW RESPONSE SHA256: eb03b25a58800fe6f2cd7ee286602433fc9fcb65561aa15dbdbcfac5a9c35d80
+METHOD: HTML text extraction; opinion and publication information, not an independent citator.
+
+Kapitus Servicing, Inc. v Ragtime Gourmet Corp./Joe-Le Holding Corp. (2025
+NY Slip Op 05921)
+Kapitus Servicing, Inc. v Ragtime Gourmet Corp./Joe-Le
+Holding Corp.
+2025 NY Slip Op 05921 [242 AD3d 638]
+October 28, 2025
+Appellate Division, First Department
+Published by New York State Law Reporting
+Bureau pursuant to Judiciary Law § 431.
+As corrected through Wednesday, December 10, 2025
+[*1]
+Kapitus Servicing, Inc., Formerly Known as Colonial
+Funding Network, Inc., Appellant,
+v
+Ragtime Gourmet Corp./Joe-Le Holding
+Corp., Doing Business as Ragtime Gourmet of Howard Beach, et al.,
+Respondents.
+Windels Marx Lane & Mittendorf, LLP, New York (Robert J. Malatak of
+counsel), for appellant.
+The Law Offices of Anthony Agrippina, P.C., Flushing (Anthony Agrippina of
+counsel), for respondents.
+HEADNOTES
+Usury
+- What Constitutes
+- Merchant Cash Advance Agreement
+Order, Supreme Court, New York County (Lyle E. Frank, J.), entered on or about
+May 23, 2025, which denied plaintiff's motion for summary judgment, unanimously
+affirmed, with costs.
+This action arises out of a merchant cash advance agreement between nonparty Core
+Business Finance and defendant Ragtime Gourmet Corp./Jo Le Holding Corp. Plaintiff
+was Core's servicer and agent. Under the agreement, which defendant Angelo Gurino
+signed on behalf of Ragtime and in his capacity as guarantor, Core paid Ragtime
+$103,500 in exchange for $132,480 of Ragtime's future receipts. Pursuant to the
+agreement, Ragtime would remit a percentage of its daily receipts to Core using an
+agreed-upon processor, until the receipts were paid in full. Plaintiff commenced this
+action after Ragtime failed to pay the full amount and certain fees payable under the
+agreement.
+The motion court correctly denied plaintiff's motion for summary judgment because
+there are issues of fact as to whether the cash advance agreement constitutes a loan that
+may be criminally usurious, rather than an enforceable agreement for the sale and
+purchase of receivables (see
+Kapitus Servicing, Inc. v Point Blank Constr., Inc., 221 AD3d 532, 533-534 [1st
+Dept 2023]; see also LG
+Funding, LLC v United Senior Props. of Olathe, LLC, 181 AD3d 664, 665-666
+[2d Dept 2020]). For example, the agreement provides recourse for Kapitus in the event
+Ragtime files for bankruptcy or is involuntarily placed in bankruptcy proceedings (see
+Kapitus Servicing, Inc., 221 AD3d at 534), which suggests that it is for a loan. The
+personal guaranty executed by Gurino granting Core/Kapitus a security interest in all of
+Ragtime's personal property in the event of Ragtime's default is a further indicator that,
+as is traditionally the case with a loan, repayment was guaranteed (see Davis v Richmond Capital
+Group, LLC, 194 AD3d 516, 517 [1st Dept 2021]). Conversely the agreement
+can be characterized as indefinite, and therefore a sale and purchase of receivables,
+insofar as it requires Ragtime to make payments to Core "until such time as [Core]
+receives payment in full of the Purchased Amount" (see Kapitus Servicing, Inc.,
+221 AD3d at 534). Another indication that the transaction was not a loan is the provision
+in the agreement that, while not quite requiring reconciliation, ensures that only a
+percentage of Ragtime's daily receipts are collected each day. Under the circumstances,
+the motion court properly left for the trier of fact to determine whether the agreement is a
+usurious loan that is unenforceable or an enforceable purchase and sale agreement (see e.g. Crystal Springs Capital,
+Inc. v Big Thicket Coin, LLC, 220 AD3d 745 [2d Dept 2023]).
+The dismissal of Jo-Le Holding from the action was proper, as it is a separate entity
+from Ragtime and was undisputedly never served with the summons and complaint (see e.g. Nossov v Hunter Mtn.,
+185 AD3d 948, 949 [2d Dept 2020]). Concur—Kern, J.P., Scarpulla,
+Mendez, Rodriguez, Rosado, JJ.

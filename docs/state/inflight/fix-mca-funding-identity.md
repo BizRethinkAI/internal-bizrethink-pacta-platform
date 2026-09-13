@@ -92,3 +92,22 @@ additional focused correction; fresh full CI remains the after gate.
 The stacked before-Playwright run on #190 now passes: run 34753452484 reports
 1,096 passed, four passed on retry, and 59 skipped. Fresh independent review of
 #190 was requested on its PR/task. This author continues without merging it.
+
+### Refresh after the shipping batch advanced main
+
+The shipping owner reported a real README conflict after #190, #194 and the
+other independently reviewed changes merged. This branch now merges main
+`a2e0719fc38d988f489234b564095ef46307c05f` and targets main directly. The resolution retains both the current
+field-binding section and the processor-controlled-form/ancillary-consent
+section. No legal wording is chosen by a blanket ours/theirs resolution.
+
+The equipment guaranty files auto-merge the field definitions with #194's
+separate report/contact/signature corrections. AST comparison confirms all 211
+clause bodies match merged main, with exactly the four intended field-group
+version increments. The affected field/consent/approval/coverage/twin selection
+passes seven files / 143 tests. No behavioral change or new test was needed for
+the documentation conflict. The
+refreshed stack preserves the later equipment/catalogue/template work; refreshed
+head hashes and CI results belong on the task/PR. Other notes and consolidation
+remain with their assigned owners. No merge into main or deployment is authorized
+for this author refresh.
