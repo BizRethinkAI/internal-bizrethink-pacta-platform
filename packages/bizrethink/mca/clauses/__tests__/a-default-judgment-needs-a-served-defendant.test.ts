@@ -1,11 +1,11 @@
 // ADR 0011 adds the existing funding grid and separates the existing interest paragraph: FRPA 108, corpus 211.
 // ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
 import { describe, expect, it } from 'vitest';
-
+import { ALL_MCA_CONTENT } from '../../catalogue';
 import { selectClauses } from '../../engine/select-clauses';
 import { LOMBARD_FACTS, type McaFacts } from '../facts';
-import { ALL_MCA_CLAUSES, libraryFor } from '../library';
-import type { McaClause } from '../types';
+import { libraryFor } from '../library';
+import type { McaContent } from '../types';
 
 /**
  * A JUDGMENT AGAINST SOMEBODY WHO NEVER HEARD ABOUT THE CASE.
@@ -49,7 +49,7 @@ import type { McaClause } from '../types';
  *
  * A per-clause review answers "is §10.1 lawful"; these statutes ask "does the
  * contract contain one anywhere", and that question can only be asked of the
- * whole set. So the sweeps below run over `ALL_MCA_CLAUSES` — every instrument,
+ * whole set. So the sweeps below run over `ALL_MCA_CONTENT` — every instrument,
  * not only the FRPA — and that is how they found the thing no brief names.
  *
  * THE DETECTORS ARE DELIBERATELY NOT NEGATION-AWARE. `fees-and-money` shipped
@@ -106,8 +106,8 @@ const BUNDLE = [JURY, CLASS, COUNTERCLAIM];
 /** The bundle plus §7.19, which is ungated but is still a clause about litigation. */
 const ABOUT_LITIGATION = [...BUNDLE, LIMITATIONS];
 
-const clause = (slug: string): McaClause => {
-  const found = ALL_MCA_CLAUSES.find((entry) => entry.slug === slug);
+const clause = (slug: string): McaContent => {
+  const found = ALL_MCA_CONTENT.find((entry) => entry.slug === slug);
 
   if (!found) {
     throw new Error(`${slug} is not in the MCA library`);
@@ -226,7 +226,7 @@ const NAMES_A_FORUM = /\bNew York\b|\bPasco County\b|\bAcceptable Forums?\b/i;
   them "different contracts" — which is precisely why the FRPA's protections do
   not reach them and why the fix had to be made in those documents.
 
-  The sweeps below now run unfiltered over `ALL_MCA_CLAUSES`. The property they
+  The sweeps below now run unfiltered over `ALL_MCA_CONTENT`. The property they
   state is asserted for the twins in their own vocabulary, over the set of both
   documents, in `the-twins-cannot-undo-the-frpa.test.ts`.
 */
@@ -239,7 +239,7 @@ describe('no provision of any instrument manufactures service of process', () =>
    * sweep adds is the two that are not.
    */
   it('has no clause that makes an act of the sender into service', () => {
-    const offenders = ALL_MCA_CLAUSES.filter((entry) => deemsService(entry.body))
+    const offenders = ALL_MCA_CONTENT.filter((entry) => deemsService(entry.body))
       .map((entry) => entry.slug)
       .sort();
 
@@ -252,7 +252,7 @@ describe('no provision of any instrument manufactures service of process', () =>
    * the sentence that removes the remedy for getting it wrong.
    */
   it('has no clause in which a party waives service or an objection to a forum', () => {
-    const offenders = ALL_MCA_CLAUSES.filter((entry) => waivesServiceOrForum(entry.body))
+    const offenders = ALL_MCA_CONTENT.filter((entry) => waivesServiceOrForum(entry.body))
       .map((entry) => entry.slug)
       .sort();
 
@@ -261,7 +261,7 @@ describe('no provision of any instrument manufactures service of process', () =>
 
   /** Conn. Gen. Stat. §36a-868, stated as a property of the corpus. */
   it('has no clause waiving notice, a judicial hearing or a prior court order', () => {
-    const offenders = ALL_MCA_CLAUSES.filter((entry) => waivesPrejudgmentProtection(entry.body))
+    const offenders = ALL_MCA_CONTENT.filter((entry) => waivesPrejudgmentProtection(entry.body))
       .map((entry) => entry.slug)
       .sort();
 
@@ -276,7 +276,7 @@ describe('no provision of any instrument manufactures service of process', () =>
    * survive the second.
    */
   it('has no clause containing a confession of judgment or anything like one', () => {
-    const offenders = ALL_MCA_CLAUSES.filter((entry) => CONFESSES_JUDGMENT.test(entry.body))
+    const offenders = ALL_MCA_CONTENT.filter((entry) => CONFESSES_JUDGMENT.test(entry.body))
       .map((entry) => entry.slug)
       .sort();
 
@@ -285,7 +285,7 @@ describe('no provision of any instrument manufactures service of process', () =>
 
   /** The sentence the manifest deleted from §10.1 and §10.2, kept out. */
   it('has no clause letting a court proceed without further notice', () => {
-    const offenders = ALL_MCA_CLAUSES.filter((entry) => PROCEEDS_WITHOUT_NOTICE.test(entry.body))
+    const offenders = ALL_MCA_CONTENT.filter((entry) => PROCEEDS_WITHOUT_NOTICE.test(entry.body))
       .map((entry) => entry.slug)
       .sort();
 
@@ -299,8 +299,8 @@ describe('no provision of any instrument manufactures service of process', () =>
    * reintroduced a filter.
    */
   it('sweeps every clause, with nothing excused', () => {
-    expect(ALL_MCA_CLAUSES.filter((entry) => deemsService(entry.body)).map((entry) => entry.slug)).toEqual([]);
-    expect(ALL_MCA_CLAUSES.filter((entry) => waivesServiceOrForum(entry.body)).map((entry) => entry.slug)).toEqual([]);
+    expect(ALL_MCA_CONTENT.filter((entry) => deemsService(entry.body)).map((entry) => entry.slug)).toEqual([]);
+    expect(ALL_MCA_CONTENT.filter((entry) => waivesServiceOrForum(entry.body)).map((entry) => entry.slug)).toEqual([]);
     /*
       THE FIFTH PINNED COUNT, AND THE ONE THE QUEUE MISSED.
 
@@ -321,7 +321,7 @@ describe('no provision of any instrument manufactures service of process', () =>
       running the union BEFORE pushing — which is the whole point of doing it
       that way, and is what the queue skipped.
     */
-    expect(ALL_MCA_CLAUSES.length).toBe(211);
+    expect(ALL_MCA_CONTENT.length).toBe(229);
   });
 });
 
@@ -767,9 +767,9 @@ describe('and the detectors do not fire on a denial', () => {
    * is a result about them rather than about an empty set.
    */
   it('runs over a corpus that really has these subjects in it', () => {
-    const aboutService = ALL_MCA_CLAUSES.filter((entry) => ABOUT_SERVICE.test(entry.body));
+    const aboutService = ALL_MCA_CONTENT.filter((entry) => ABOUT_SERVICE.test(entry.body));
 
     expect(aboutService.length).toBeGreaterThan(4);
-    expect(ALL_MCA_CLAUSES.filter((entry) => /\bjury\b/i.test(entry.body)).length).toBeGreaterThan(2);
+    expect(ALL_MCA_CONTENT.filter((entry) => /\bjury\b/i.test(entry.body)).length).toBeGreaterThan(2);
   });
 });

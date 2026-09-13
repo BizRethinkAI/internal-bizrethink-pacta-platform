@@ -4,9 +4,9 @@ import { inReviewOrder } from '../clauses/library';
 import type { McaClause } from '../clauses/types';
 
 export type SelectedMcaClause = McaClause & {
-  /** Derived after selection. Empty only when `unnumberedReason` says why. */
+  /** Derived after selection; every clause has a citation. */
   number: string;
-  /** Empty for a group consisting entirely of unnumbered structural content. */
+  /** Derived section containing this operative clause. */
   sectionNumber: string;
 };
 
@@ -23,16 +23,16 @@ export const referencedInstruments = (clauses: Pick<McaClause, 'body'>[]) => {
 
 /** Internal review/assembly data; this does not authorize publication or sending. */
 export const numberClauses = (clauses: McaClause[]): SelectedMcaClause[] => {
+  if (clauses.some((clause) => clause.kind !== 'clause' || 'unnumberedReason' in clause)) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Only operative clauses may receive clause numbers.' });
+  }
   const ordered = inReviewOrder(clauses);
-  const sections = [...new Set(ordered.filter((clause) => !clause.unnumberedReason).map((clause) => clause.section))];
+  const sections = [...new Set(ordered.map((clause) => clause.section))];
   const ordinals = new Map<string, number>();
 
   return ordered.map((clause) => {
     const index = sections.indexOf(clause.section);
-    const sectionNumber = index < 0 ? '' : String(index + 1);
-    if (clause.unnumberedReason) {
-      return { ...clause, number: '', sectionNumber };
-    }
+    const sectionNumber = String(index + 1);
     const ordinal = (ordinals.get(clause.section) ?? 0) + 1;
     ordinals.set(clause.section, ordinal);
     return { ...clause, number: `${sectionNumber}.${ordinal}`, sectionNumber };
@@ -44,7 +44,10 @@ export const numberClauses = (clauses: McaClause[]): SelectedMcaClause[] => {
  * The optional section qualifier (`frpa#purchase`) supports another instrument.
  * Lettered limbs remain inside their parent and follow the token: `…]](b)`.
  */
-export const resolveReferences = (clauses: SelectedMcaClause[], context: SelectedMcaClause[]): SelectedMcaClause[] => {
+export const resolveReferences = <T extends Pick<McaClause, 'body' | 'slug' | 'instrument'>>(
+  clauses: T[],
+  context: SelectedMcaClause[],
+): T[] => {
   const byReference = new Map<string, SelectedMcaClause>();
   const sections = new Map<string, string>();
   for (const clause of context) {

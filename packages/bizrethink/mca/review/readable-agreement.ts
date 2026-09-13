@@ -1,16 +1,18 @@
 import { inReviewOrder } from '../clauses/library';
-import type { McaClause } from '../clauses/types';
-import type { ReviewMcaClause } from './numbered-library';
+import type { McaContent } from '../clauses/types';
+import type { ReviewMcaContent } from '../reusable/review';
 
 export type ReadableMcaClause = {
   slug: string;
   /** Derived in the selection identified by `included` / `selectionNote`. */
-  number: string;
+  number: string | null;
   heading: string;
   /** References and parties resolved; widget anchors retained. */
   text: string;
-  kind: McaClause['kind'];
-  fields: McaClause['fields'];
+  kind: McaContent['kind'];
+  fields: McaContent['fields'];
+  repeatFor: McaContent['repeatFor'];
+  retiredFields: McaContent['retiredFields'];
   unnumberedReason: string | null;
   included: boolean;
   selectionNote: string | null;
@@ -38,7 +40,7 @@ const sectionName = (section: string): string => {
 };
 
 /** Only compiled review data enters this view. No source-number fallback. */
-export const toReadableAgreement = (clauses: ReviewMcaClause[]): ReadableMcaSection[] =>
+export const toReadableAgreement = (clauses: ReviewMcaContent[]): ReadableMcaSection[] =>
   inReviewOrder(clauses).reduce<ReadableMcaSection[]>((sections, clause) => {
     const readable: ReadableMcaClause = {
       slug: clause.slug,
@@ -47,6 +49,8 @@ export const toReadableAgreement = (clauses: ReviewMcaClause[]): ReadableMcaSect
       text: clause.body,
       kind: clause.kind,
       fields: clause.fields,
+      repeatFor: clause.repeatFor,
+      retiredFields: clause.retiredFields,
       unnumberedReason: clause.unnumberedReason ?? null,
       included: clause.included,
       selectionNote: clause.selectionNote,

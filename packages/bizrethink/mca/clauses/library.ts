@@ -5,7 +5,7 @@ import { ISO_PRA_LIBRARY, ISO_PRA_SECTION_ORDER } from './iso-pra';
 import { PERMISSION_TO_RELEASE_LIBRARY, PERMISSION_TO_RELEASE_SECTION_ORDER } from './permission-to-release';
 import { PAYZLI_LIBRARY, PAYZLI_SECTION_ORDER } from './split-funding';
 import { SUBSCRIPTION_LIBRARY } from './subscription';
-import type { McaClause } from './types';
+import type { McaClause, McaContentBase } from './types';
 
 /**
  * Every clause of every negotiated agreement, and the only sanctioned way to
@@ -83,14 +83,14 @@ const SECTION_ORDER: Partial<Record<McaInstrument, readonly string[]>> = {
  * twenty-three.
  *
  */
-export const inReviewOrder = <T extends McaClause>(clauses: T[]): T[] => {
-  const instrument = (clause: McaClause) => {
+export const inReviewOrder = <T extends McaContentBase>(clauses: T[]): T[] => {
+  const instrument = (clause: McaContentBase) => {
     const index = MCA_INSTRUMENTS.indexOf(clause.instrument);
 
     return index === -1 ? MCA_INSTRUMENTS.length : index;
   };
 
-  const section = (clause: McaClause) => {
+  const section = (clause: McaContentBase) => {
     const order = SECTION_ORDER[clause.instrument] ?? [];
     const index = order.indexOf(clause.section);
 

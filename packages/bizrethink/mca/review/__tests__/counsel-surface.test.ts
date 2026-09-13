@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { ALL_MCA_CONTENT, contentFor } from '../../catalogue';
 import { mcaLibraryFingerprint } from '../../clauses/approval';
 import { outstandingFindingsFor, REVIEWS } from '../../clauses/examination';
 import { MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
-import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import { LOMBARD } from '../../clauses/parties';
 import { counselReviewView } from '../counsel-view';
 import type { McaLibraryReview } from '../link';
@@ -105,7 +105,7 @@ const reviewFor = (instrument: McaInstrument, pinnedTo: 'now' | 'something else'
   reviewerEmail: 'counsel@example.com',
   instrument,
   libraryFingerprint:
-    pinnedTo === 'now' ? mcaLibraryFingerprint(libraryFor(instrument)) : 'a fingerprint from before a clause moved',
+    pinnedTo === 'now' ? mcaLibraryFingerprint(contentFor(instrument)) : 'a fingerprint from before a clause moved',
   expiresAt: new Date('2026-09-22T00:00:00Z'),
 });
 
@@ -114,7 +114,7 @@ const viewFor = (instrument: McaInstrument, pinnedTo: 'now' | 'something else' =
     review: reviewFor(instrument, pinnedTo),
     tenant: LOMBARD,
     approvals: new Map(),
-    sender: { name: 'Shwet Prabhat', email: 'contracts@pacta.ink' },
+    sender: { name: 'Review administrator', email: 'contracts@pacta.ink' },
     now: new Date('2026-09-11T00:00:00Z'),
   });
 
@@ -125,7 +125,7 @@ const briefingText = (instrument: McaInstrument) =>
 
 /** Every finding string the register would have put under a clause of this agreement. */
 const findingsOn = (instrument: McaInstrument): string[] =>
-  libraryFor(instrument).flatMap((clause) => outstandingFindingsFor(clause).map((finding) => finding.finding));
+  contentFor(instrument).flatMap((clause) => outstandingFindingsFor(clause).map((finding) => finding.finding));
 
 const route = readFileSync(
   new URL('../../../../../apps/remix/app/routes/_recipient+/mca-clause-review.$token.tsx', import.meta.url),
@@ -159,7 +159,7 @@ describe('the detectors can go red', () => {
    * be deleted, which is the same outcome as never having been written.
    */
   it('neither detector fires on clause text, slugs or statutory citations', () => {
-    for (const clause of ALL_MCA_CLAUSES) {
+    for (const clause of ALL_MCA_CONTENT) {
       expect(INTERNAL_FILE.test(clause.body), clause.slug).toBe(false);
       expect(INTERNAL_PATH.test(clause.body), clause.slug).toBe(false);
       expect(INTERNAL_FILE.test(clause.slug), clause.slug).toBe(false);
@@ -227,7 +227,7 @@ describe('no review finding reaches counsel', () => {
   it.each(MCA_INSTRUMENTS)('%s ships exactly the clause fields counsel is meant to read', (instrument) => {
     for (const section of viewFor(instrument).sections) {
       for (const clause of section.clauses) {
-        const source = libraryFor(instrument).find((candidate) => candidate.slug === clause.slug)!;
+        const source = contentFor(instrument).find((candidate) => candidate.slug === clause.slug)!;
         expect(clause.whyThisClause).toEqual(source.whyThisClause);
         expect(clause.variance).toEqual(source.variance);
         expect(Object.keys(clause).sort()).toEqual([
@@ -239,6 +239,8 @@ describe('no review finding reaches counsel', () => {
           'included',
           'kind',
           'number',
+          'repeatFor',
+          'retiredFields',
           'selectionNote',
           'slug',
           'text',
@@ -342,15 +344,15 @@ describe('the briefing claims nothing ADR 0012 closed', () => {
    * no HEADING — two different facts, one of them printed to an attorney as the
    * other. Asserted per agreement, because the briefing is per agreement.
    */
-  it.each(MCA_INSTRUMENTS)('%s states the true count of clauses it does not number', (instrument) => {
-    const clauses = libraryFor(instrument);
-    const unnumbered = clauses.filter((clause) => Boolean(clause.unnumberedReason)).length;
+  it.each(MCA_INSTRUMENTS)('%s states the true count of separately catalogued reusable items', (instrument) => {
+    const clauses = contentFor(instrument);
+    const unnumbered = clauses.filter((clause) => clause.kind !== 'clause').length;
     const body = briefingText(instrument);
 
     expect(body).not.toMatch(/forty clauses/i);
 
     // Zero is also an exact count, rather than an omitted claim.
-    const claim = body.match(/(\d+) of the (\d+) review items below carry no number/i);
+    const claim = body.match(/(\d+) of the (\d+) review items are separately identified reusable content/i);
 
     expect(claim, 'the briefing states no count of unnumbered clauses').not.toBeNull();
     expect(Number(claim?.[1])).toBe(unnumbered);

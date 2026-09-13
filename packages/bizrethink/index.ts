@@ -65,6 +65,8 @@ export {
   type McaCounselFindingView,
   type McaLibraryApprovalView,
   type McaLibraryPageClause,
+  type McaLibraryPageItem,
+  type McaLibraryPageReusable,
   type McaLibraryReviewView,
   mcaLibraryPage,
 } from './mca/server-only/library-page';

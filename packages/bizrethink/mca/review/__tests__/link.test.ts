@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-
 import { mcaLibraryFingerprint } from '../../clauses/approval';
 import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import type { McaClause } from '../../clauses/types';
+import { reusableForReview } from '../../reusable/review';
 import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview, reviewIsStale } from '../link';
 import { numberedLibraryForReview } from '../numbered-library';
 import { readableSlugs, toReadableAgreement } from '../readable-agreement';
@@ -111,11 +111,11 @@ describe('what counsel actually reads', () => {
     expect(readable.flatMap((section) => section.clauses).every((clause) => clause.text.includes('«'))).toBe(true);
   });
 
-  it('leaves a record unnumbered only by an explicit structural decision', () => {
-    const unnumbered = numberedLibraryForReview('frpa').filter((clause) => clause.unnumberedReason);
+  it('leaves only reusable content outside clause numbering', () => {
+    const unnumbered = reusableForReview('frpa');
     const readable = toReadableAgreement(unnumbered);
 
     expect(unnumbered.length).toBeGreaterThan(0);
-    expect(readable.flatMap((section) => section.clauses).every((clause) => clause.number === '')).toBe(true);
+    expect(readable.flatMap((section) => section.clauses).every((clause) => clause.number === null)).toBe(true);
   });
 });

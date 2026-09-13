@@ -1,4 +1,3 @@
-import { mcaGuarantorFields, retiredGuarantorSsn } from '../fields';
 import type { McaClause } from '../types';
 
 /**
@@ -71,9 +70,9 @@ export const FRPA_GUARANTY: McaClause[] = [
       because: 'load-bearing',
       note: 'An elected guaranty needs identified guarantors and signatures in the correct capacity; no-guaranty templates omit these fields, and the same identity rule serves both guaranty scopes.',
     },
-    version: 2,
+    version: 3,
     instrument: 'frpa',
-    kind: 'field-group',
+    kind: 'clause',
     /*
       A GUARANTY THAT DOES NOT EXIST COLLECTS NO SOCIAL SECURITY NUMBER.
 
@@ -203,9 +202,7 @@ export const FRPA_GUARANTY: McaClause[] = [
       A gate cannot close that; only drafting the full-performance guaranty can.
     */
     body: 'A person is a Guarantor under this Agreement only if that person is identified in this Section by full legal name and by an address for notice, and separately signs the Guaranty in that person’s own name or, where the Guarantor is an entity, in the stated capacity of the person signing for it. A signature given solely for Merchant does not create personal liability, and a signature given in one capacity is not a signature in the other.\nBuyer shall provide a separate identification block under this Section, and a separate signature block, for each intended Guarantor, each showing printed name, capacity where the Guarantor is an entity, signature and date. A person who is not identified in this Section, and who does not sign a guarantor signature block, is not a Guarantor and has no liability under the Guaranty. No owner, spouse, officer, employee or affiliate of Merchant becomes a Guarantor by reason of that relationship, by an entry in another document, or by signing this Agreement in any other capacity.\nThe mailing address and the email address a Guarantor gives in this Section are that Guarantor’s address for notice and for service of process, as Section [[clause:frpa.section-10-4]] provides.\nBuyer shall collect a Guarantor’s Social Security number or other government identification number through a secure channel separate from this Agreement, and shall not include the full number in a copy of this Agreement given to any person, except where applicable law requires it. A copy that identifies the Guarantor by a truncated or masked identifier satisfies this Section.',
-    fields: mcaGuarantorFields({ name: '«35»', capacity: '«36»', address: '«38»', phone: '«39»', email: '«40»' }),
-    repeatFor: 'guarantor',
-    retiredFields: [retiredGuarantorSsn('«37»')],
+
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-
+import { ALL_MCA_CONTENT } from '../../catalogue';
 import { AMBIGUOUS_FINDING_IDS, FINDINGS_BY_ID, findingsFor, REVIEWS } from '../examination';
-import { ALL_MCA_CLAUSES } from '../library';
 
 /**
  * The rule this file enforces is the one Phase 0 wrote down and nothing could
@@ -22,7 +21,7 @@ import { ALL_MCA_CLAUSES } from '../library';
  */
 describe('no clause enters the library unexamined', () => {
   it.each(
-    ALL_MCA_CLAUSES.map((clause) => [clause.slug, clause] as const),
+    ALL_MCA_CONTENT.map((clause) => [clause.slug, clause] as const),
   )('%s names at least one review that read it', (_slug, clause) => {
     expect(clause.examinedBy.length).toBeGreaterThan(0);
 
@@ -32,7 +31,7 @@ describe('no clause enters the library unexamined', () => {
   });
 
   it.each(
-    ALL_MCA_CLAUSES.map((clause) => [clause.slug, clause] as const),
+    ALL_MCA_CONTENT.map((clause) => [clause.slug, clause] as const),
   )('%s only names findings that exist', (_slug, clause) => {
     for (const examination of clause.examinedBy) {
       for (const id of examination.findings) {
@@ -99,7 +98,7 @@ describe('no clause enters the library unexamined', () => {
    * re-reads.
    */
   it('resolves a clause to its findings', () => {
-    const withFindings = ALL_MCA_CLAUSES.filter((clause) =>
+    const withFindings = ALL_MCA_CONTENT.filter((clause) =>
       clause.examinedBy.some((examination) => examination.findings.length > 0),
     );
 
@@ -119,7 +118,7 @@ describe('no clause enters the library unexamined', () => {
  * clause citing a finding, or cites one that was refuted, this is what says so.
  */
 describe('the ISO Partner Referral Agreement, as imported', () => {
-  const clauses = ALL_MCA_CLAUSES.filter((clause) => clause.instrument === 'iso-pra');
+  const clauses = ALL_MCA_CONTENT.filter((clause) => clause.instrument === 'iso-pra');
 
   it('is all twenty-eight of its clauses', () => {
     // Twenty-four numbered, plus the parties paragraph, two WHEREAS recitals

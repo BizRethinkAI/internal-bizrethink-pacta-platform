@@ -1,4 +1,3 @@
-import { mcaGuarantorFields, retiredGuarantorSsn } from '../fields';
 import type { McaClause } from '../types';
 
 /**
@@ -8,30 +7,6 @@ import type { McaClause } from '../types';
  * fresh approval before publication.
  */
 export const SUBSCRIPTION_GUARANTY: McaClause[] = [
-  {
-    slug: 'subscription.guarantor-information',
-    whyThisClause: { kind: 'discretionary' },
-    variance: {
-      kind: 'fixed',
-      because: 'misattributed',
-      note: 'These fields identify the equipment provider’s guarantor, not the receivables funder’s; the FRPA guaranty-scope answer cannot decide this separate guaranty.',
-    },
-    version: 2,
-    instrument: 'subscription',
-    kind: 'field-group',
-    includeWhen: null,
-    section: 'guaranty',
-    sortKey: 10,
-    heading: 'Guarantor Information',
-    body: '',
-    fields: mcaGuarantorFields({ name: '«21»', address: '«23»', phone: '«24»' }),
-    repeatFor: 'guarantor',
-    retiredFields: [retiredGuarantorSsn('«22»')],
-    source: { kind: 'attorney-drafted', author: null },
-    status: 'draft',
-    appliesInStates: [],
-    examinedBy: [{ review: 'REVIEW-01', findings: [] }],
-  },
   {
     slug: 'subscription.guaranty-of-payment',
     whyThisClause: { kind: 'discretionary' },

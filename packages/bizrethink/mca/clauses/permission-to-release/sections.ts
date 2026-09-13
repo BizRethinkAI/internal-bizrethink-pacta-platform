@@ -7,7 +7,8 @@ import type { McaClause } from '../types';
  *
  * Rewritten 2026-09-12 for transaction, report-use and signature boundaries.
  * The legacy source and review dispositions remain historical evidence, not
- * approval of these new bodies. All eight remain drafts at version 2. See
+ * approval of these new bodies. All eight remain drafts; catalogue integration
+ * advances the preamble again to distinguish its mapped and rewritten versions. See
  * docs/research/mca-ancillary-consents-2026-09-12/README.md for authority and
  * execution/template follow-up, including the already-present r2 signature.
  */
@@ -20,10 +21,10 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
       because: 'load-bearing',
       note: 'The release needs the person signing, the business and Buyer identified; naming a funder profile does not establish the signer’s authority over another person’s information.',
     },
-    version: 2,
+    version: 3,
     instrument: 'permission-to-release',
     kind: 'clause',
-    unnumberedReason: 'Authorization lead-in identifying the person and merchant who give the following permissions.',
+
     includeWhen: null,
     heading: 'Persons and Transaction Identified',
     body: "I, ___________«1»___________, an authorized officer or owner of _____________«2»______________ (the “Merchant”), doing business as _____________«3»______________, with principal place of business at ______________________________«4»______________________________, sign on behalf of Merchant to give the business-information permissions below to ________«9»________ (“Buyer”). This Permission relates only to the particular application or Future Receivables Purchase Agreement supplied with it and identified before signature by Merchant's name, the transaction reference and the application or agreement date (the “Transaction”). Buyer shall identify those matters and provide this Permission in full before anyone signs; an unidentified transaction is not authorized.\nAn individual report subject gives only their own instructions by a separate individual signature as provided below. Signing for Merchant alone creates no personal guaranty and gives no authority over another individual's consumer report. Buyer's agents, servicers and permitted assigns receive no broader authority than Buyer and remain subject to the purposes, recipients and safeguards stated in this Permission.",

@@ -1,13 +1,14 @@
 import { createHash } from 'node:crypto';
 
 import type { ClauseSource } from '../../provenance/types';
+import { contentFor } from '../catalogue';
 import { referencedInstruments } from '../engine/number-clauses';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS, type McaJurisdiction } from '../jurisdictions';
 import type { ReviewFinding } from './examination';
 import { LOMBARD_FACTS } from './facts';
 import type { McaInstrument } from './instruments';
-import { inReviewOrder, libraryFor } from './library';
-import type { McaClause } from './types';
+import { inReviewOrder } from './library';
+import type { McaContent } from './types';
 
 /**
  * Attorney sign-off on the negotiated agreements, and the one thing it does.
@@ -113,7 +114,7 @@ export type McaClauseApproval = {
  * shown live beside every approved clause; they do not reach back. The lease
  * library has the same gap and the same reason.
  */
-export const mcaClauseFingerprint = (clause: McaClause): string =>
+export const mcaClauseFingerprint = (clause: McaContent): string =>
   createHash('sha256')
     .update(
       JSON.stringify({
@@ -121,6 +122,9 @@ export const mcaClauseFingerprint = (clause: McaClause): string =>
         version: clause.version,
         instrument: clause.instrument,
         kind: clause.kind,
+        uses: clause.uses,
+        placement: clause.placement,
+        derivedFrom: clause.derivedFrom,
         fields: clause.fields ?? null,
         repeatFor: clause.repeatFor,
         retiredFields: clause.retiredFields,
@@ -138,7 +142,7 @@ export const mcaClauseFingerprint = (clause: McaClause): string =>
     .digest('hex');
 
 /** Does this approval still describe this clause? */
-export const isMcaApprovalCurrent = (clause: McaClause, approval: McaClauseApproval | null): boolean => {
+export const isMcaApprovalCurrent = (clause: McaContent, approval: McaClauseApproval | null): boolean => {
   if (!approval) {
     return false;
   }
@@ -191,7 +195,7 @@ const namedAuthor = (approval: McaClauseApproval): string =>
  * `retired` always wins. Retired means superseded, and nothing should render it
  * again whatever an approval says.
  */
-export const approvedMcaClause = (clause: McaClause, approval: McaClauseApproval | null): McaClause => {
+export const approvedMcaClause = (clause: McaContent, approval: McaClauseApproval | null): McaContent => {
   if (clause.status === 'retired') {
     return clause;
   }
@@ -218,7 +222,7 @@ export const approvedMcaClause = (clause: McaClause, approval: McaClauseApproval
  * what a reviewer opening a link days later needs, because they were sent an
  * agreement, not a clause.
  */
-export const mcaLibraryFingerprint = (clauses: McaClause[]): string =>
+export const mcaLibraryFingerprint = (clauses: McaContent[]): string =>
   createHash('sha256')
     .update(
       JSON.stringify({
@@ -230,7 +234,7 @@ export const mcaLibraryFingerprint = (clauses: McaClause[]): string =>
         // external citation's context changes, even if the ISO words do not.
         referenceContext: referencedInstruments(clauses)
           .filter((instrument) => !clauses.some((clause) => clause.instrument === instrument))
-          .map((instrument) => inReviewOrder(libraryFor(instrument)).map(mcaClauseFingerprint)),
+          .map((instrument) => inReviewOrder(contentFor(instrument)).map(mcaClauseFingerprint)),
       }),
     )
     .digest('hex');
@@ -286,7 +290,7 @@ const listOf = (states: readonly McaJurisdiction[]): string =>
  * make that clause unapprovable by any single attorney, and one approval row
  * carries one bar.
  */
-export const statesNotCovered = (clause: McaClause, admission: McaJurisdiction | null): McaJurisdiction[] =>
+export const statesNotCovered = (clause: McaContent, admission: McaJurisdiction | null): McaJurisdiction[] =>
   admission === null ? [...clause.appliesInStates] : clause.appliesInStates.filter((state) => state !== admission);
 
 /**
@@ -304,7 +308,7 @@ export const statesNotCovered = (clause: McaClause, admission: McaJurisdiction |
  * covering it. Counsel has been asked to confirm that; if the answer is no it
  * changes in this one function.
  */
-export const admissionBlocks = (clause: McaClause, admission: McaJurisdiction | null): string | null => {
+export const admissionBlocks = (clause: McaContent, admission: McaJurisdiction | null): string | null => {
   if (admission === null) {
     return 'Record which bar the approving attorney is admitted in. An approval that does not say which bar cannot be checked against the clause it approves.';
   }
@@ -460,7 +464,7 @@ export const counselFindingsHold = (unanswered: number): string | null => {
  * same waste pointed the other way.
  */
 export const approvalBlocks = (
-  clause: McaClause,
+  clause: McaContent,
   context: {
     admission: McaJurisdiction | null;
     outstanding: ReviewFinding[];

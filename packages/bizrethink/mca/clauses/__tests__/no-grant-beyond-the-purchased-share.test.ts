@@ -1,5 +1,7 @@
 // ADR 0011: citation assertions name semantic targets. Historical numbers in test titles identify the drafting regression.
+
 import { describe, expect, it } from 'vitest';
+import { contentFor } from '../../catalogue';
 
 import { LOMBARD_FACTS, type McaFacts } from '../facts';
 import { libraryFor } from '../library';
@@ -531,7 +533,7 @@ describe('the parties clause identifies the parties and transfers nothing', () =
    * README rule 2 keeps them.
    */
   it.each(['«31»', '«96»', '«32»'])('keeps the %s widget anchor', (widget) => {
-    expect(clause(PARTIES).body).toContain(widget);
+    expect(contentFor('frpa').find((entry) => entry.slug === 'frpa.party-identification')?.body).toContain(widget);
   });
 });
 

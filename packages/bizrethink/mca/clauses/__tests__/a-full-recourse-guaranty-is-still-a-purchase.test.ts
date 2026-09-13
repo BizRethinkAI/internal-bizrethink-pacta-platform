@@ -147,7 +147,8 @@ describe('the wide guaranty is four records, and they partition', () => {
 
     expect(section.map((entry) => entry.slug)).toContain('frpa.guarantor-information-9-1');
     expect(section.map((entry) => entry.slug)).toContain(FULL.guaranty);
-    expect(section.filter((entry) => entry.kind === 'clause')).toHaveLength(4);
+    // The identity/capacity rule is operative; its repeatable fields are separate.
+    expect(section.filter((entry) => entry.kind === 'clause')).toHaveLength(5);
   });
 });
 

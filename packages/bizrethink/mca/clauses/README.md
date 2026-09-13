@@ -1,22 +1,12 @@
 # The MCA clause library
 
-The contractual content of the MCA vertical: selectable records from six
-agreements, currently including both clauses and reusable blocks.
-[ADR 0015](../../../../docs/adr/0015-one-mca-workspace-with-separate-content-catalogues.md)
-adopts one MCA workspace with a clause-only catalogue, separate reusable content
-and distinct disclosures/requirements, sharing infrastructure. It supersedes
-ADR 0008's separate-product presentation and ADR 0011's mixed catalogue.
-
-**The catalogue migration is pending.** The status and citation contract below
-describe the current implementation, including its unnumbered exceptions. The
-target removes those exceptions from the clause catalogue: every displayed
-clause has a derived number; forms, explainers and structural blocks have their
-own catalogue. Mixed records must retain their operative language as numbered
-provisions. See the [18-record classification map](../../../../docs/design/mca-workspace.md).
-
-Disclosure rule packs remain distinct from clauses. Authored legal content
-retains appropriate review even when it belongs to a reusable block or a
-disclosure; prescribed text and structure retain conformity verification.
+MCA is one workspace with separate typed catalogues. This directory holds only
+**numbered operative clauses**. `../reusable/` holds required document fields,
+structural blocks and interview guidance. `../content/` and `../prescribed/`
+hold disclosure requirements and prescribed forms; their verification view stays
+read-only. Shared navigation and evidence services do not grant authority to
+approve a regulator's words. This implements the accepted
+[unified workspace design (ADR 0015)](../../../../docs/adr/0015-one-mca-workspace-with-separate-content-catalogues.md).
 
 [ADR 0009](../../../../docs/adr/0009-counsel-is-parallel-not-a-gate.md) is why
 the directory exists at all right now. Counsel is a parallel track, not a
@@ -25,18 +15,25 @@ text being written down.
 
 ## Status
 
-| | |
-|---|---|
-| FRPA | **108 records**, including four funding notes and two field groups |
-| ISO Partner Referral Agreement | **28 records** |
-| Equipment Lease | **30 records** |
-| Subscription | **30 records** — the Equipment Lease's twin |
-| Split Funding Authorization | **7 records** |
-| Permission to Release | **8 records** |
-| **Total** | **211 records**; a selection contains only applicable alternatives |
-| Approvals, review links, admin surface | implemented; all authored source records remain drafts |
-| Selection and numbering | implemented; no merchant rendering or sending path |
-| Interview and assembly | future work in Pacta, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
+| Instrument | Numbered clauses | Separate reusable items |
+|---|---:|---:|
+| FRPA | 107 | 7 |
+| ISO Partner Referral Agreement | 24 | 4 |
+| Equipment Lease | 32 | 4 |
+| Subscription | 32 | 4 |
+| Split Funding Authorization | 7 | 0 |
+| Permission to Release | 8 | 0 |
+| **Total** | **210** | **19** |
+
+All authored content remains draft. A selected agreement includes only applicable
+alternatives. Admin and token-scoped counsel review cover both authored catalogues;
+only the clause view assigns clause numbers. Provider interview, transaction fill
+and reusable package generation are the next implementation stage. Existing stored
+templates and merchant PDFs are not changed by this catalogue migration.
+
+The [extraction audit](../reusable/README.md) accounts for all 211 input records,
+including mixed records whose duties remain numbered while their fields or
+structural spans move to reusable content.
 
 ### Current document fields
 
@@ -74,10 +71,10 @@ determine an agreed, workable resolution; an FRPA priority clause alone is not
 evidence that a processor accepted it or can implement it. Do not treat the
 deferral as approval, a waiver, or permission to silently alter the form.
 
-The Permission to Release and both equipment agreements have a separate draft
-correction for individual report use, contact consent and signer capacity. The
-14 changed records advance to version 2 and remain unapproved; the total stays
-211. The [correction record](../../../../docs/research/mca-ancillary-consents-2026-09-12/README.md)
+Merged #194 corrected fourteen source records for individual report use, contact
+consent and signer capacity in the Permission to Release and equipment agreements.
+Those unapproved corrections are retained in the current catalogues; its historical
+211-record count predates the catalogue extraction above. The [correction record](../../../../docs/research/mca-ancillary-consents-2026-09-12/README.md)
 explains source verification, substantive choices and template/execution work
 still required. Historical source documents and review dispositions are preserved.
 
@@ -85,9 +82,12 @@ still required. Historical source documents and review dispositions are preserve
 
 A source record has **no `number`**. `selectClauses` filters first, sorts by the
 instrument's section order and each record's `sortKey`, then derives consecutive
-section and clause numbers. An `unnumberedReason` explicitly identifies a form
-grid, preamble, funding note, lead-in or execution block. All other records are
-citable. Separate guaranty numbering is still ADR 0011 phase 5.
+section and clause numbers. Every selected clause receives a number; a runtime
+guard rejects helpers entering that path. `unnumberedReason` is no longer an
+escape from numbering. Reusable items have their own `kind`, `uses` and document
+`placement`; interview-only guidance has no document placement. A record’s legal
+function determines membership: an explanation containing obligations stays a
+clause, while a required identity block remains required without a clause number.
 
 Use `[[clause:frpa.definitions]]` for a clause reference and
 `[[section:reconciliation]]` for a whole section. Opposite rules share the
@@ -223,11 +223,11 @@ document, and a script cannot make that claim — see rule 3 below.
    answers REVIEW-02's *"a fix applied to one and not the other is a divergence
    nothing checks for"* by checking for it. `instrument` is consequently
    singular: across 177 clauses not one names a second.
-6. **A clause the document does not number still gets imported.** Fourteen FRPA
-   clauses carry no number, including the granting clause — the sentence that
-   makes the instrument a sale rather than a loan.
-   `__tests__/frpa-coverage.test.ts` asserts that nothing in the document is
-   missing from the library, which is the direction that fails silently.
+6. **Account for all source content, then classify its function.** The original
+   source’s typography does not decide catalogue membership. Number operative
+   provisions; retain fields and document structure in the reusable catalogue.
+   The version-pinned extraction audit detects accidental loss at the migration
+   boundary without making old source wording a permanent drafting constraint.
 7. **Slugs are globally unique**, across instruments as well as within them.
    The lease library learned this when one attorney approval hid another's,
    because approvals are keyed by slug alone.

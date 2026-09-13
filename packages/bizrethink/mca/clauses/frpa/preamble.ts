@@ -1,4 +1,3 @@
-import { MCA_FUNDING_FIELDS } from '../fields';
 import type { McaClause } from '../types';
 
 /**
@@ -24,30 +23,6 @@ import type { McaClause } from '../types';
  * those lines non-clause would make the check vacuous and is not the answer.
  */
 export const FRPA_PREAMBLE: McaClause[] = [
-  {
-    slug: 'frpa.merchant-and-funding-information',
-    whyThisClause: { kind: 'discretionary' },
-    variance: {
-      kind: 'fixed',
-      because: 'load-bearing',
-      note: 'The parties, funding figures, itemized deductions and notice contacts must be completed for this purchase to operate; changing deal values does not select different wording.',
-    },
-    version: 2,
-    instrument: 'frpa',
-    kind: 'field-group',
-    unnumberedReason:
-      'The Merchant and Funding Information form grid is identified by its title and field labels, not a clause number.',
-    includeWhen: null,
-    section: 'funding-terms',
-    sortKey: 0,
-    heading: 'Merchant and Funding Information',
-    body: '',
-    fields: MCA_FUNDING_FIELDS,
-    source: { kind: 'attorney-drafted', author: null },
-    status: 'draft',
-    appliesInStates: [],
-    examinedBy: [{ review: 'REVIEW-02', findings: [] }],
-  },
   /*
     WHAT WAS WRONG. The estimate was drawn on "average sales revenue" while the
     only collection mechanism in the document takes a percentage of CARD
@@ -86,15 +61,15 @@ export const FRPA_PREAMBLE: McaClause[] = [
       because: 'no-alternative',
       note: 'The estimate must remain distinct from the actual percentage collection; the collection-method answers currently provide no alternative explanation backed by ACH terms.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
-    kind: 'explainer',
-    unnumberedReason: 'Funding Terms note accompanying the form grid; it has no independent clause number.',
+    kind: 'clause',
+
     includeWhen: null,
     section: 'funding-terms',
     sortKey: 10,
     heading: 'Estimated Daily Holdback',
-    body: 'What is the Estimated Daily Holdback? The Estimated Daily Holdback stated in the Merchant and Funding Information grid is a good-faith illustration of the Specified Percentage of Merchant’s average daily Card Receipts, calculated from the Card Receipts history Merchant gave Buyer before the Purchase Date. It is not a payment, it is not a minimum, it is not a scheduled amount, and it is not a promise that any amount will be collected on any day. Collection occurs only as the Specified Percentage of actual Card Receipts under Sections [[section:purchase]] and [[section:reconciliation]], and no fixed amount is collected under this Agreement. If Merchant’s Card Receipts fall, what Buyer collects falls with them. Section [[section:reconciliation]] states how the illustration is reconciled and adjusted. A separate Split Funding Authorization (the Split Funding Authorization exhibit) is executed for each Approved Processor identified in the Merchant and Funding Information grid.',
+    body: 'The Estimated Daily Holdback stated in the Merchant and Funding Information grid is a good-faith illustration of the Specified Percentage of Merchant’s average daily Card Receipts, calculated from the Card Receipts history Merchant gave Buyer before the Purchase Date. It is not a payment, it is not a minimum, it is not a scheduled amount, and it is not a promise that any amount will be collected on any day. Collection occurs only as the Specified Percentage of actual Card Receipts under Sections [[section:purchase]] and [[section:reconciliation]], and no fixed amount is collected under this Agreement. If Merchant’s Card Receipts fall, what Buyer collects falls with them. Section [[section:reconciliation]] states how the illustration is reconciled and adjusted. A separate Split Funding Authorization (the Split Funding Authorization exhibit) is executed for each Approved Processor identified in the Merchant and Funding Information grid.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: ['US-GA', 'US-UT', 'US-KS', 'US-MO'],
@@ -147,10 +122,10 @@ export const FRPA_PREAMBLE: McaClause[] = [
       because: 'misattributed',
       note: 'The funder decides whether equipment is offered; the merchant chooses purchase or lease. This explanation must cover both merchant elections whenever equipment is offered.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
-    kind: 'explainer',
-    unnumberedReason: 'Funding Terms note accompanying the form grid; it has no independent clause number.',
+    kind: 'clause',
+
     /*
       Nothing to explain when the product involves no equipment.
     */
@@ -158,7 +133,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     section: 'funding-terms',
     sortKey: 20,
     heading: 'Equipment Cost',
-    body: 'What is the Equipment Cost? Point-of-sale equipment is bought or leased under a separate written agreement, and that agreement — not this one — governs it. It identifies the equipment, the seller or lessor, the cash price, any taxes, who owns the equipment, when it is delivered, and any recurring charge. If Merchant elects to buy the equipment for cash, Merchant may separately authorize the price as an itemized deduction from the Purchase Price, shown as a dollar figure in the Itemization of Net Amount Funded grid before Merchant signs. If Merchant instead leases or subscribes for the equipment from {{equipmentAffiliate}}, no equipment amount is deducted at funding and both equipment figures in the Merchant and Funding Information grid are stated as $0.00 rather than left blank. No equipment charge is added to the Purchased Amount or to the Remaining Balance, and “Equipment Cost Deferred” in the Funding Terms grid is stated as $0.00. Merchant does not pay for the same equipment twice: where an equipment price has been deducted at funding, no lease or subscription charge is payable for that equipment, and where a lease or subscription charge is payable, no equipment price is deducted. A charge billed at merchant level for equipment leased or subscribed from {{equipmentAffiliate}} does not reduce Card Receipts. Where the law requires an equipment or related service charge to be reflected in a disclosure given with this Agreement, it is reflected as that law requires; the description of a charge in this Agreement decides nothing about how the law treats it.',
+    body: 'Point-of-sale equipment is bought or leased under a separate written agreement, and that agreement — not this one — governs it. It identifies the equipment, the seller or lessor, the cash price, any taxes, who owns the equipment, when it is delivered, and any recurring charge. If Merchant elects to buy the equipment for cash, Merchant may separately authorize the price as an itemized deduction from the Purchase Price, shown as a dollar figure in the Itemization of Net Amount Funded grid before Merchant signs. If Merchant instead leases or subscribes for the equipment from {{equipmentAffiliate}}, no equipment amount is deducted at funding and both equipment figures in the Merchant and Funding Information grid are stated as $0.00 rather than left blank. No equipment charge is added to the Purchased Amount or to the Remaining Balance, and “Equipment Cost Deferred” in the Funding Terms grid is stated as $0.00. Merchant does not pay for the same equipment twice: where an equipment price has been deducted at funding, no lease or subscription charge is payable for that equipment, and where a lease or subscription charge is payable, no equipment price is deducted. A charge billed at merchant level for equipment leased or subscribed from {{equipmentAffiliate}} does not reduce Card Receipts. Where the law requires an equipment or related service charge to be reflected in a disclosure given with this Agreement, it is reflected as that law requires; the description of a charge in this Agreement decides nothing about how the law treats it.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -215,10 +190,10 @@ export const FRPA_PREAMBLE: McaClause[] = [
       because: 'load-bearing',
       note: 'When equipment is offered, its charges must remain separate from the purchased amount and the same equipment must not be charged twice; this rule supports both merchant elections.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
-    kind: 'explainer',
-    unnumberedReason: 'Funding Terms note accompanying the form grid; its text remains part of the agreement.',
+    kind: 'clause',
+
     /*
       Same gate as the explainer above, and deliberately identical: two clauses
       that state one rule between them must appear and disappear together.
@@ -274,10 +249,10 @@ export const FRPA_PREAMBLE: McaClause[] = [
       because: 'load-bearing',
       note: 'A renewal using either settlement method needs a completed record of the merchant’s election and resulting cash; the no-renewal answer omits this record rather than selecting alternative wording.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
-    kind: 'explainer',
-    unnumberedReason: 'Funding Terms note accompanying the election widget; it has no independent clause number.',
+    kind: 'clause',
+
     /*
       The election only means something once a renewal mechanism exists.
     */
@@ -285,7 +260,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     section: 'funding-terms',
     sortKey: 40,
     heading: 'Prior Transaction Treatment',
-    body: 'Prior transaction treatment: _________«25»_________. This reads “Not applicable” where Merchant has no prior transaction to be settled out of this funding. Otherwise it states the treatment Merchant has elected under Section [[clause:frpa.rollover-methods-8-2]], and identifies the prior transaction, its settlement amount as at the Purchase Date, any rebate or discount applied, the part of the Purchase Price applied to it, and the resulting Net Amount Funded. Nothing is added to the Purchased Amount in the Funding Terms grid except as Section [[clause:frpa.rollover-methods-8-2]] expressly provides and Merchant has elected in writing before this Agreement is issued for signature. This entry may not be blank when Merchant signs, and no amount it states may be left blank.',
+    body: 'This reads “Not applicable” where Merchant has no prior transaction to be settled out of this funding. Otherwise it states the treatment Merchant has elected under Section [[clause:frpa.rollover-methods-8-2]], and identifies the prior transaction, its settlement amount as at the Purchase Date, any rebate or discount applied, the part of the Purchase Price applied to it, and the resulting Net Amount Funded. Nothing is added to the Purchased Amount in the Funding Terms grid except as Section [[clause:frpa.rollover-methods-8-2]] expressly provides and Merchant has elected in writing before this Agreement is issued for signature. This entry may not be blank when Merchant signs, and no amount it states may be left blank.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -340,15 +315,15 @@ export const FRPA_PREAMBLE: McaClause[] = [
       because: 'load-bearing',
       note: 'The purchase needs identified contracting parties, an effective date and a funding trigger; a processor or affiliate does not become a party merely by being named.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
     kind: 'clause',
-    unnumberedReason: 'Parties preamble introducing the agreement and its signatories.',
+
     includeWhen: null,
     section: 'preamble',
     sortKey: 10,
     heading: 'Parties',
-    body: 'This Future Receivables Purchase Agreement (this “Agreement”) is entered into as of ____«31»_____ (the “Effective Date”) by {{funder}}, a Florida limited liability company, with its principal office at _______________«96»_______________ (the “Buyer”), and _____________«32»_____________ (the “Merchant”), identified by its full legal name, entity type and state of organization in the Merchant and Funding Information grid. The Merchant Information, Deposit Account, Funding Terms, Itemization and Approved Processors set out in the Merchant and Funding Information grid form part of this Agreement, and the address and operational notice contact of each party are stated there; notice is given as Section [[clause:frpa.notices-7-3]] provides.\nSigning this Agreement transfers nothing. The sale and transfer of the Purchased Receipts take effect only on the Purchase Date, as Section [[clause:frpa.timing-and-method-of-funding-4-13]] provides, and only when Buyer has funded the Purchase Price.\nAn Approved Processor, an equipment seller, lessor or subscription provider, an affiliate of Buyer, a broker and a servicer are not parties to this Agreement and acquire no right and assume no obligation under it, whether or not they are named in the Merchant and Funding Information grid, unless one of them separately signs this Agreement in that capacity.',
+    body: 'The Merchant Information, Deposit Account, Funding Terms, Itemization and Approved Processors set out in the Merchant and Funding Information grid form part of this Agreement, and the address and operational notice contact of each party are stated there; notice is given as Section [[clause:frpa.notices-7-3]] provides.\nSigning this Agreement transfers nothing. The sale and transfer of the Purchased Receipts take effect only on the Purchase Date, as Section [[clause:frpa.timing-and-method-of-funding-4-13]] provides, and only when Buyer has funded the Purchase Price.\nAn Approved Processor, an equipment seller, lessor or subscription provider, an affiliate of Buyer, a broker and a servicer are not parties to this Agreement and acquire no right and assume no obligation under it, whether or not they are named in the Merchant and Funding Information grid, unless one of them separately signs this Agreement in that capacity.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

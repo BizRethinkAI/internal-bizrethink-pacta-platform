@@ -221,7 +221,7 @@ it('retains all fourteen revised records as unapproved drafts at a new version',
   expect(revised).toHaveLength(14);
 
   for (const clause of revised) {
-    expect(clause.version, clause.slug).toBe(2);
+    expect(clause.version, clause.slug).toBe(clause.slug === 'permission-to-release.preamble' ? 3 : 2);
     expect(clause.status).toBe('draft');
     expect(clause.source).toEqual({ kind: 'attorney-drafted', author: null });
     expect(assertPublishable({ ...clause, status: 'published' })).toContain(

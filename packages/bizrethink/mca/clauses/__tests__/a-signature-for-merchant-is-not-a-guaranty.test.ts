@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { selectClauses } from '../../engine/select-clauses';
+import { reusableFor } from '../../reusable/library';
 import { LOMBARD_FACTS, type McaFacts } from '../facts';
 import { ALL_MCA_CLAUSES, libraryFor } from '../library';
 
@@ -75,6 +76,7 @@ const clause = (slug: string) => {
 const body = (slug: string) => clause(slug).body;
 
 const IDENTITY = 'frpa.guarantor-information-9-1';
+const identityFields = reusableFor('frpa').find((entry) => entry.slug === 'frpa.guarantor-fields')!;
 const GUARANTY = 'frpa.guaranty-of-performance-9-2';
 const JOINT = 'frpa.joint-and-several-liability-9-5';
 const SERVICE_ADDRESS = 'frpa.section-10-4';
@@ -89,7 +91,7 @@ describe('the cluster knows which clause it is', () => {
     expect(clause(IDENTITY).instrument).toBe('frpa');
     // ADR 0011: this operative record must remain citable after selection.
     expect(clause(IDENTITY).unnumberedReason).toBeUndefined();
-    expect(clause(IDENTITY).kind).toBe('field-group');
+    expect(clause(IDENTITY).kind).toBe('clause');
   });
 });
 
@@ -220,7 +222,7 @@ describe('§10.4 and §9.5 still describe §9.1 correctly', () => {
   it('§10.4 keeps its citation and §9.1 collects what it points at', () => {
     expect(body(SERVICE_ADDRESS)).toContain('Section [[clause:frpa.guarantor-information-9-1]]');
 
-    const bindings = (clause(IDENTITY).fields ?? []).filter((field) => field.required).map((field) => field.binding);
+    const bindings = (identityFields.fields ?? []).filter((field) => field.required).map((field) => field.binding);
 
     expect(bindings).toContain('guarantor.email');
     expect(bindings).toContain('guarantor.noticeAddress');
@@ -240,7 +242,7 @@ describe('§10.4 and §9.5 still describe §9.1 correctly', () => {
 /** Current fields replace the original grid; source anchors remain historical evidence. */
 describe('the current guarantor fields implement the separate-capacity rule', () => {
   it('accounts for every original widget without reactivating the full-SSN slot', () => {
-    const identity = clause(IDENTITY);
+    const identity = identityFields;
     const retained = (identity.fields ?? []).flatMap((field) => field.legacyWidget ?? []);
     const retired = (identity.retiredFields ?? []).map((field) => field.widget);
 
@@ -259,10 +261,10 @@ describe('the current guarantor fields implement the separate-capacity rule', ()
   });
 
   it('keeps private verification identifiers out of the agreement fields', () => {
-    const ssn = (clause(IDENTITY).fields ?? []).find((field) => field.kind === 'ssn');
+    const ssn = (identityFields.fields ?? []).find((field) => field.kind === 'ssn');
 
     expect(ssn).toBeUndefined();
-    expect((clause(IDENTITY).fields ?? []).some((field) => /social security/i.test(field.label))).toBe(false);
+    expect((identityFields.fields ?? []).some((field) => /social security/i.test(field.label))).toBe(false);
     expect(body(IDENTITY)).toMatch(/truncated or masked/i);
   });
 });
@@ -320,8 +322,8 @@ describe('the gate and the provenance are unchanged', () => {
    * of the last two changes rather than found again each time.
    */
   it('adds no record to the library', () => {
-    expect(libraryFor('frpa')).toHaveLength(108);
-    expect(ALL_MCA_CLAUSES).toHaveLength(211);
+    expect(libraryFor('frpa')).toHaveLength(107);
+    expect(ALL_MCA_CLAUSES).toHaveLength(210);
     expect(ALL_MCA_CLAUSES.filter((entry) => entry.slug === IDENTITY && entry.instrument === 'frpa')).toHaveLength(1);
   });
 

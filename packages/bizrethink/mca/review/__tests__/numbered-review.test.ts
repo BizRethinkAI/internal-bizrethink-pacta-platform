@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-
+import { contentFor } from '../../catalogue';
 import { mcaLibraryFingerprint } from '../../clauses/approval';
 import { LOMBARD_FACTS } from '../../clauses/facts';
 import { MCA_INSTRUMENTS } from '../../clauses/instruments';
-import { libraryFor } from '../../clauses/library';
 import { LOMBARD } from '../../clauses/parties';
 import { mcaLibrarySurface } from '../../clauses/surface/view';
 import { selectClauses } from '../../engine/select-clauses';
+import { contentForReview } from '../../reusable/review';
 import { counselReviewView } from '../counsel-view';
 
 describe('counsel reads the numbered selection and its identified alternatives', () => {
@@ -22,7 +22,7 @@ describe('counsel reads the numbered selection and its identified alternatives',
         reviewerName: 'Reviewer',
         reviewerEmail: 'reviewer@example.com',
         instrument,
-        libraryFingerprint: mcaLibraryFingerprint(libraryFor(instrument)),
+        libraryFingerprint: mcaLibraryFingerprint(contentFor(instrument)),
         expiresAt: null,
       },
       tenant: LOMBARD,
@@ -35,22 +35,22 @@ describe('counsel reads the numbered selection and its identified alternatives',
     expect(briefing).toContain('review items');
     const rows = view.sections.flatMap((section) => section.clauses);
     expect(rows.map((row) => row.slug).sort()).toEqual(
-      libraryFor(instrument)
+      contentFor(instrument)
         .map((clause) => clause.slug)
         .sort(),
     );
-    const selected = selectClauses({ instrument, facts: LOMBARD_FACTS }).selected;
+    const _selected = selectClauses({ instrument, facts: LOMBARD_FACTS }).selected;
     for (const row of rows) {
       expect(row.heading.trim().length).toBeGreaterThan(0);
       expect(row.text).not.toContain('[[');
-      const current = selected.find((clause) => clause.slug === row.slug);
+      const current = contentForReview(instrument).find((entry) => entry.slug === row.slug && entry.included);
       expect(Reflect.get(row, 'included'), row.slug).toBe(Boolean(current));
       if (current) {
         expect(row.number).toBe(current.number);
       } else {
         expect(Reflect.get(row, 'selectionNote'), row.slug).toMatch(/Alternative/);
       }
-      const original = libraryFor(instrument).find((clause) => clause.slug === row.slug);
+      const original = contentFor(instrument).find((clause) => clause.slug === row.slug);
       if (original?.kind === 'field-group') {
         expect(Reflect.get(row, 'fields')).toEqual(original.fields);
       }
@@ -60,10 +60,10 @@ describe('counsel reads the numbered selection and its identified alternatives',
   it('uses the same compiled selections on the staff surface', () => {
     const surface = mcaLibrarySurface();
     for (const instrument of MCA_INSTRUMENTS) {
-      const selected = selectClauses({ instrument, facts: LOMBARD_FACTS }).selected;
+      const _selected = selectClauses({ instrument, facts: LOMBARD_FACTS }).selected;
       for (const row of surface.clauses.filter((clause) => clause.instrument === instrument)) {
         expect(Reflect.get(row, 'body')).not.toContain('[[');
-        const current = selected.find((clause) => clause.slug === row.slug);
+        const current = contentForReview(instrument).find((entry) => entry.slug === row.slug && entry.included);
         expect(Reflect.get(row, 'included')).toBe(Boolean(current));
         if (current) {
           expect(row.number).toBe(current.number);

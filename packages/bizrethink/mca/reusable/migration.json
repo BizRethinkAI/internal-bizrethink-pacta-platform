@@ -1,0 +1,2888 @@
+{
+  "sourceRevision": "ca31f30ba8cc5593a61a5d675cc51f3207208127",
+  "records": [
+    {
+      "sourceSlug": "frpa.merchant-and-funding-information",
+      "sourceVersion": 2,
+      "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "segments": [
+        {
+          "target": "frpa.merchant-and-funding-information",
+          "property": "body",
+          "targetVersion": 3
+        }
+      ],
+      "fieldsHash": "f2b3517d2bcac2a834ac56ccdf5018ec692b4b6d81fe5e026dd947ba00949f9c",
+      "fieldTarget": "frpa.merchant-and-funding-information",
+      "retiredFieldsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "repeatFor": null,
+      "disposition": "move-to-reusable",
+      "fieldTargetVersion": 3
+    },
+    {
+      "sourceSlug": "frpa.holdback-explainer",
+      "sourceVersion": 1,
+      "bodyHash": "e6c9a521f489bc5c4753d0910732402a52d6cd5ee1f16d8cd204b5160e10a4a2",
+      "segments": [
+        {
+          "target": "frpa.holdback-prompt",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "frpa.holdback-explainer",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "frpa.equipment-cost-explainer",
+      "sourceVersion": 1,
+      "bodyHash": "cc662e81b1808572fa25b6167bb72138a1cee070682939da79769ea474e633d9",
+      "segments": [
+        {
+          "target": "frpa.equipment-cost-prompt",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "frpa.equipment-cost-explainer",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "frpa.equipment-cost-exclusivity",
+      "sourceVersion": 1,
+      "bodyHash": "8ddc451ce0cfaa1ee77f7d7f6db1bf6f50a06b018c385bff2123e8d2c60ffbb2",
+      "segments": [
+        {
+          "target": "frpa.equipment-cost-exclusivity",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain-as-numbered-clause"
+    },
+    {
+      "sourceSlug": "frpa.rollover-method-election",
+      "sourceVersion": 1,
+      "bodyHash": "13af16eb333378f54d67431184b150352c7ca3aba590a80648a8ba67b9e0cdfd",
+      "segments": [
+        {
+          "target": "frpa.prior-transaction-fields",
+          "property": "field-label",
+          "binding": "funding.priorTransactionTreatment",
+          "legacyWidget": "«25»",
+          "sourceText": "Prior transaction treatment: _________«25»_________. ",
+          "targetVersion": 1
+        },
+        {
+          "target": "frpa.rollover-method-election",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "frpa.parties",
+      "sourceVersion": 1,
+      "bodyHash": "cb2284fc7fc62f94d7f70a4cb1d0f1518df1af0827a45c9ad3fef0543eb99e6b",
+      "segments": [
+        {
+          "target": "frpa.party-identification",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "frpa.parties",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "frpa.granting-clause",
+      "sourceVersion": 1,
+      "bodyHash": "d64e8d9444f8616466db2b88803c2eecc3ff399f3f1bfc10e924e8d97307030c",
+      "segments": [
+        {
+          "target": "frpa.granting-clause",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.definitions",
+      "sourceVersion": 1,
+      "bodyHash": "814fa59d666676ed56783a87a065eca367c73dba38a7aa83516b0a51beda66d8",
+      "segments": [
+        {
+          "target": "frpa.definitions",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.sales-of-receipts-not-a-loan-2-1",
+      "sourceVersion": 1,
+      "bodyHash": "c331c32f6868eddbd250963abb27d8b7e4c63e1529c07bf6a8f2ca64daa7af51",
+      "segments": [
+        {
+          "target": "frpa.sales-of-receipts-not-a-loan-2-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.collection-mechanism-and-term-2-2",
+      "sourceVersion": 1,
+      "bodyHash": "c69c4e768c963574bf277dfc59663e65a8d11fe5cc17b2e859125aec7f855121",
+      "segments": [
+        {
+          "target": "frpa.collection-mechanism-and-term-2-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.primary-collection-split-funding-via-approved-processor-2-3",
+      "sourceVersion": 1,
+      "bodyHash": "f66c7a8188b3b0cd998ca276e055bf5962609a1b62a33f8f7c6370a8643b5382",
+      "segments": [
+        {
+          "target": "frpa.primary-collection-split-funding-via-approved-processor-2-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.approved-bank-account-2-4",
+      "sourceVersion": 1,
+      "bodyHash": "94acae0fe014a2fc6b293ba65c76b50b71b0ece2465acd972878f51fa90acb41",
+      "segments": [
+        {
+          "target": "frpa.approved-bank-account-2-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.completion-threshold-2-6",
+      "sourceVersion": 1,
+      "bodyHash": "7954ebe6d7ebdbb85d41fe019ae423cfc00ff72c0a02b8771244c78c7d68908d",
+      "segments": [
+        {
+          "target": "frpa.completion-threshold-2-6",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.merchant-s-right-to-reconciliation-3-1",
+      "sourceVersion": 1,
+      "bodyHash": "a90f6563f5c6e23b1ef74b691baa03a7c224c934e54733966fc2671bb008242d",
+      "segments": [
+        {
+          "target": "frpa.merchant-s-right-to-reconciliation-3-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.request-for-reconciliation-procedure-3-2",
+      "sourceVersion": 1,
+      "bodyHash": "d81d6210ddc3edb02cf7f0f90ac02b3d4474ad9774416f2aec2a613bb1375510",
+      "segments": [
+        {
+          "target": "frpa.request-for-reconciliation-procedure-3-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.failure-to-provide-reconciliation-information-3-3",
+      "sourceVersion": 1,
+      "bodyHash": "d6d9c7a09df111c599281f9ebdc72280fa57aee2e53173b1efc0e0a016b71e4f",
+      "segments": [
+        {
+          "target": "frpa.failure-to-provide-reconciliation-information-3-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.adjustment-of-the-estimated-daily-holdback-3-4",
+      "sourceVersion": 1,
+      "bodyHash": "8bd2fb9126a942bb3ccc3f236dc55ceda8dce472fc0c1e746effb865dfd8e657",
+      "segments": [
+        {
+          "target": "frpa.adjustment-of-the-estimated-daily-holdback-3-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.merchant-deposit-agreement-4-1",
+      "sourceVersion": 1,
+      "bodyHash": "8cd3be2383760f86f0f2264ae7e015ef866a07a0b9c092b999da39bfdf50dbeb",
+      "segments": [
+        {
+          "target": "frpa.merchant-deposit-agreement-4-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.term-of-agreement-4-2",
+      "sourceVersion": 1,
+      "bodyHash": "9f4e706f429e75909d2f19b41d7d903df24f65c4b08471530648b242c0c4b86b",
+      "segments": [
+        {
+          "target": "frpa.term-of-agreement-4-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.financial-condition-4-3",
+      "sourceVersion": 1,
+      "bodyHash": "ccb318a2a1df1cfdff8b6c31d391a309aad9c14546d7a778ca1d2a5b793342bd",
+      "segments": [
+        {
+          "target": "frpa.financial-condition-4-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.transaction-history-4-4",
+      "sourceVersion": 1,
+      "bodyHash": "4a07dd8105402f4ce682de4e62f2cc3ab8a210c7d385ccea2d3891b30bd6bfe3",
+      "segments": [
+        {
+          "target": "frpa.transaction-history-4-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.no-liability-4-5",
+      "sourceVersion": 1,
+      "bodyHash": "a3e05ef2e6a91c96ae6195a9e6037db0a682b3fd4745d9453ec7052dd89d90cc",
+      "segments": [
+        {
+          "target": "frpa.no-liability-4-5",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.power-of-attorney-4-6",
+      "sourceVersion": 1,
+      "bodyHash": "082bca31147e6abe82ca2ef01fa722c1279a52c6a44b500cb300b2c67dd771d0",
+      "segments": [
+        {
+          "target": "frpa.power-of-attorney-4-6",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.protection-of-information-4-7",
+      "sourceVersion": 1,
+      "bodyHash": "ae06f454fd542aeb0d8b723f340c86384d914f1dc9e3e1e605e1bd3249053923",
+      "segments": [
+        {
+          "target": "frpa.protection-of-information-4-7",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.confidentiality-4-8",
+      "sourceVersion": 1,
+      "bodyHash": "d8904cbba546e720995f4ed45bc2bb04807697b472861d810856b55fabd10fec",
+      "segments": [
+        {
+          "target": "frpa.confidentiality-4-8",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.d-b-a-names-4-9",
+      "sourceVersion": 1,
+      "bodyHash": "2db7b077ca9967fd4a439608f74c12dd8bc653aa0cf427479319e133655e0f49",
+      "segments": [
+        {
+          "target": "frpa.d-b-a-names-4-9",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.security-interest-4-10",
+      "sourceVersion": 1,
+      "bodyHash": "6aedd0081a2df5d30fa51ffb3118396f9f9745f13b680d13d9b31c58b21aa376",
+      "segments": [
+        {
+          "target": "frpa.security-interest-4-10",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.negative-pledge-4-11",
+      "sourceVersion": 1,
+      "bodyHash": "8127afa973fe096103596384c69aca7dc5f158d6c5a1bdd566543324ff68bd89",
+      "segments": [
+        {
+          "target": "frpa.negative-pledge-4-11",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.remedies-4-12",
+      "sourceVersion": 1,
+      "bodyHash": "3946ba4c4e846d1b841e1285c77a45149a7cfbbb49564d6c9378d29e5f73ec3b",
+      "segments": [
+        {
+          "target": "frpa.remedies-4-12",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.timing-and-method-of-funding-4-13",
+      "sourceVersion": 1,
+      "bodyHash": "ea12e9a6f383389ef8e8b69da319a28c44368c4992befea7e2cca487f1996e1f",
+      "segments": [
+        {
+          "target": "frpa.timing-and-method-of-funding-4-13",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.right-to-cancel-4-14",
+      "sourceVersion": 1,
+      "bodyHash": "2b601a415b1037ef403e1734cdcfd1b96e6b07d0b008e2df30d0ed1c71f22dce",
+      "segments": [
+        {
+          "target": "frpa.right-to-cancel-4-14",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.position-and-cascade-of-collections-4-15",
+      "sourceVersion": 1,
+      "bodyHash": "5b84d18cc115ac419f9e4ec48eefc06ac415d9c473c8217e0c805d72ed4a8a9a",
+      "segments": [
+        {
+          "target": "frpa.position-and-cascade-of-collections-4-15",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.single-active-position-4-15",
+      "sourceVersion": 1,
+      "bodyHash": "4458c0c7ffcea7ba92a9b5447f17252143502562ef235e8dd6a5a0863efc20d7",
+      "segments": [
+        {
+          "target": "frpa.single-active-position-4-15",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.electronic-account-monitoring-authorization-plaid-4-16",
+      "sourceVersion": 1,
+      "bodyHash": "1eddd0be80d0e16e57ae3c34deb13abfd28ad1a7a76df25888534c54308e97e5",
+      "segments": [
+        {
+          "target": "frpa.electronic-account-monitoring-authorization-plaid-4-16",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.representations-lead-in",
+      "sourceVersion": 1,
+      "bodyHash": "ada4899bf957d37cc2f5fbef4fb249986effecf85ddda37ef6120c87c3595315",
+      "segments": [
+        {
+          "target": "frpa.representations-lead-in",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain-as-numbered-clause"
+    },
+    {
+      "sourceSlug": "frpa.advances-are-not-loans-5-1",
+      "sourceVersion": 1,
+      "bodyHash": "44b5d8c411302ccc7e06187ffed496fb15a78f491690458d8e2640aa446a6838",
+      "segments": [
+        {
+          "target": "frpa.advances-are-not-loans-5-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.financial-condition-and-financial-information-5-2",
+      "sourceVersion": 1,
+      "bodyHash": "d5d48e7e96446cc84453af7f01c4ea6e95b8197a32c9a024bc9630aebb84f787",
+      "segments": [
+        {
+          "target": "frpa.financial-condition-and-financial-information-5-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.governmental-approvals-5-3",
+      "sourceVersion": 1,
+      "bodyHash": "721e8d7f11872b1259a6c84953061c27f511ac1c4e5a7e5c9bcbe1913ac314b4",
+      "segments": [
+        {
+          "target": "frpa.governmental-approvals-5-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.authorization-5-4",
+      "sourceVersion": 1,
+      "bodyHash": "02fd019a3a3ee10bce8f018764e159b023df22bfe9297c65081e1f36f395c903",
+      "segments": [
+        {
+          "target": "frpa.authorization-5-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.insurance-5-5",
+      "sourceVersion": 1,
+      "bodyHash": "28ac2be8bfc612f2cd291e0a3e2a60568ce9f739d645ce285e5ddcee0fdce811",
+      "segments": [
+        {
+          "target": "frpa.insurance-5-5",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.the-account-5-6",
+      "sourceVersion": 1,
+      "bodyHash": "84cf4d6794bcb1ad4b6bb55de561677c81edc41ef206e33993bd701505091c27",
+      "segments": [
+        {
+          "target": "frpa.the-account-5-6",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.estoppel-certificate-5-8",
+      "sourceVersion": 1,
+      "bodyHash": "dd466203632a835bcfe0ad5504a0e13c9f220ac0fa477c50169db740a548d63b",
+      "segments": [
+        {
+          "target": "frpa.estoppel-certificate-5-8",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.no-bankruptcy-5-9",
+      "sourceVersion": 1,
+      "bodyHash": "066c6004182b9d9ffbe5694316138ac3ec45443bed02014ebd5c37ba1c76cbba",
+      "segments": [
+        {
+          "target": "frpa.no-bankruptcy-5-9",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.no-encumbrance-of-receipts-5-10",
+      "sourceVersion": 1,
+      "bodyHash": "4ce00ab0f813a6ece52ae519a70dd5e2c517bed448fe1724a5d831171b36deb5",
+      "segments": [
+        {
+          "target": "frpa.no-encumbrance-of-receipts-5-10",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.unencumbered-receipts-5-11",
+      "sourceVersion": 1,
+      "bodyHash": "83e578af9c364556a88012de42eaa843277c985f816d6fc9170d1e8a3f8527ab",
+      "segments": [
+        {
+          "target": "frpa.unencumbered-receipts-5-11",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.business-purpose-5-12",
+      "sourceVersion": 1,
+      "bodyHash": "cce393374449bbd9422ca6d02ca2c98b7936d389a8dc0837eb8a29056a50b300",
+      "segments": [
+        {
+          "target": "frpa.business-purpose-5-12",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.defaults-under-other-contracts-improper-transfers-5-13",
+      "sourceVersion": 1,
+      "bodyHash": "fef09a0413ef7c2d1d29ff37fc0f5a49b208a49323576a1435cd694a2ce40006",
+      "segments": [
+        {
+          "target": "frpa.defaults-under-other-contracts-improper-transfers-5-13",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.civil-criminal-regulatory-matters-5-14",
+      "sourceVersion": 1,
+      "bodyHash": "bb67e1c59de204beb8fcf2881f98609f599fb487a063a5c8c2471f1d66db5da6",
+      "segments": [
+        {
+          "target": "frpa.civil-criminal-regulatory-matters-5-14",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.business-closure-5-15",
+      "sourceVersion": 1,
+      "bodyHash": "dc07fe06dc076c911adffb07fb7d918adb6c5a9e8025a392862108227615cc03",
+      "segments": [
+        {
+          "target": "frpa.business-closure-5-15",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.stacking-prohibited-5-16",
+      "sourceVersion": 1,
+      "bodyHash": "f1390c17fbad925c38850eb6d6e362cb3b37da9dd7af4eab4cc95aeca2bbe93d",
+      "segments": [
+        {
+          "target": "frpa.stacking-prohibited-5-16",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.no-diversion-of-receipts-5-17",
+      "sourceVersion": 1,
+      "bodyHash": "d6f34faa602e928ba77147018d1a0e45d609e7232f72041ea362ec2da089a9fc",
+      "segments": [
+        {
+          "target": "frpa.no-diversion-of-receipts-5-17",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.change-of-name-or-location-or-sale-or-closing-of-business-5-18",
+      "sourceVersion": 1,
+      "bodyHash": "868e9c7862d16524b5ce2fe7b7c2225fb4baab47008c0b8a138b0eb3006d6111",
+      "segments": [
+        {
+          "target": "frpa.change-of-name-or-location-or-sale-or-closing-of-business-5-18",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.events-of-default-6-1",
+      "sourceVersion": 1,
+      "bodyHash": "c59b8725e0fd78f743dba13d6dbb1ed5a8bfefed41ae701cf9f889d8843ca7f1",
+      "segments": [
+        {
+          "target": "frpa.events-of-default-6-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.full-performance-events-of-default-6-1",
+      "sourceVersion": 1,
+      "bodyHash": "059737adfe15ee3c5425f1463c19f768622e8d52ddef0c7d59a5d84bfa122300",
+      "segments": [
+        {
+          "target": "frpa.full-performance-events-of-default-6-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.remedies-6-2",
+      "sourceVersion": 1,
+      "bodyHash": "8847cb03a37c295eb15940c6e51c6d1f346d32523b17516d62e571f0d4ea6b9c",
+      "segments": [
+        {
+          "target": "frpa.remedies-6-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.costs-of-collection-6-3",
+      "sourceVersion": 1,
+      "bodyHash": "0e77b19cdb9bd07341dd9dcd7ce82040a9bd64f9b5e7a72d0090797fa1a784cf",
+      "segments": [
+        {
+          "target": "frpa.costs-of-collection-6-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.required-notifications-6-4",
+      "sourceVersion": 1,
+      "bodyHash": "76bd6429cb4702fa22e1d65cf624d0cd40a5592a313f0230cd7a2eb9e2d87678",
+      "segments": [
+        {
+          "target": "frpa.required-notifications-6-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.prejudgment-and-postjudgment-interest",
+      "sourceVersion": 1,
+      "bodyHash": "1afc22ddfcc198d02cd0f3733674b02f3c6eebcd825840511eb774e86caa537c",
+      "segments": [
+        {
+          "target": "frpa.prejudgment-and-postjudgment-interest",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.modifications-amendments-7-1",
+      "sourceVersion": 1,
+      "bodyHash": "9d66f53598e9227fd64542deb8604db30fb7ba9f05134c8372d6cb7afb9e65dd",
+      "segments": [
+        {
+          "target": "frpa.modifications-amendments-7-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.assignment-7-2",
+      "sourceVersion": 1,
+      "bodyHash": "58aa01bf2704b92209ce47f0fc4564e5263de52fa1dc4653d7bc4bbad1aaf317",
+      "segments": [
+        {
+          "target": "frpa.assignment-7-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.notices-7-3",
+      "sourceVersion": 1,
+      "bodyHash": "eb436637505a7f76a07ca9cf683b7b96e884d2a590259fd1c42bb1a5be18e1a0",
+      "segments": [
+        {
+          "target": "frpa.notices-7-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.waiver-of-remedies-7-4",
+      "sourceVersion": 1,
+      "bodyHash": "699688461e605b8793cba0084d3bd2df694ec099f9789425259ecc333c867b16",
+      "segments": [
+        {
+          "target": "frpa.waiver-of-remedies-7-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5",
+      "sourceVersion": 1,
+      "bodyHash": "e8f25629b26c5968b3324a33d70c36743978414f0a557066470ea7d8ff59e352",
+      "segments": [
+        {
+          "target": "frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.survival-of-representations-7-6",
+      "sourceVersion": 1,
+      "bodyHash": "243feb69f68682dfef87347fce2d24cc351e171852e3cf6934984feac49320ad",
+      "segments": [
+        {
+          "target": "frpa.survival-of-representations-7-6",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.severability-7-7",
+      "sourceVersion": 1,
+      "bodyHash": "8a1c43f3a78fecd0ccdf24b6e849bbd27ee053f7b9d419bb9f4149e3d9933a7f",
+      "segments": [
+        {
+          "target": "frpa.severability-7-7",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.entire-agreement-7-8",
+      "sourceVersion": 1,
+      "bodyHash": "18299aac414e21693e561a5c00129dd206f3999d426725e8e1a472607c08d0d1",
+      "segments": [
+        {
+          "target": "frpa.entire-agreement-7-8",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.indemnification-7-9",
+      "sourceVersion": 1,
+      "bodyHash": "e7d6c36280a15309b21cc955ff111db14dc19fe7f207c69546bc057cfc924148",
+      "segments": [
+        {
+          "target": "frpa.indemnification-7-9",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.jury-trial-waiver-7-10",
+      "sourceVersion": 1,
+      "bodyHash": "55289c653239b1ebf29eaec6f8937f7facf949b01b3ea856ebfdd7bf23afe8b5",
+      "segments": [
+        {
+          "target": "frpa.jury-trial-waiver-7-10",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.class-action-waiver-7-11",
+      "sourceVersion": 1,
+      "bodyHash": "a468ac4f0078c0076e80bd11ed8449379898b67e2b66f67337a07218af22bd8c",
+      "segments": [
+        {
+          "target": "frpa.class-action-waiver-7-11",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.service-of-process-7-12",
+      "sourceVersion": 1,
+      "bodyHash": "33c3d20671e07654a53824aad3a49402c54e97baf8e810586bce4bc09053603d",
+      "segments": [
+        {
+          "target": "frpa.service-of-process-7-12",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.sale-of-additional-pool-of-receipts-right-of-first-refusal-7-13",
+      "sourceVersion": 1,
+      "bodyHash": "42a3aa5176f4be7485239cd5b0da035c7f2ebcf93e58cf9d5f6c3ed0ef94075c",
+      "segments": [
+        {
+          "target": "frpa.sale-of-additional-pool-of-receipts-right-of-first-refusal-7-13",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.reporting-7-15",
+      "sourceVersion": 1,
+      "bodyHash": "02e961785c1d96ec9f877afa7e1fbaaa6106b0607a0bcdf78b211c0dceaa5a0f",
+      "segments": [
+        {
+          "target": "frpa.reporting-7-15",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.return-of-buyer-proceeds-7-16",
+      "sourceVersion": 1,
+      "bodyHash": "e031b1076bf0279ef4c1166884578b3d5e4851db02b64fad8fdbd36689f62455",
+      "segments": [
+        {
+          "target": "frpa.return-of-buyer-proceeds-7-16",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.electronic-signatures-7-17",
+      "sourceVersion": 1,
+      "bodyHash": "a665925405057c1ae74049b914fc5b579115445acece779395b2c4b3aa0118b7",
+      "segments": [
+        {
+          "target": "frpa.electronic-signatures-7-17",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.communications-recording-and-premises-access-7-18",
+      "sourceVersion": 1,
+      "bodyHash": "a37df66f9e02ec3939658f7b71e0c53260580f7df3df5f2418c789d67247fe44",
+      "segments": [
+        {
+          "target": "frpa.communications-recording-and-premises-access-7-18",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.contractual-statutes-of-limitations-7-19",
+      "sourceVersion": 1,
+      "bodyHash": "66b15bc35da6e922981bdf6d7cd21c7d2f818304ef6329a1a8822d6b97e40a29",
+      "segments": [
+        {
+          "target": "frpa.contractual-statutes-of-limitations-7-19",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.counterclaim-waiver-7-20",
+      "sourceVersion": 1,
+      "bodyHash": "33612ad62c38e09648ef708e15b85135e2a0b3ff94f252606d4d0cc6c4cd0e18",
+      "segments": [
+        {
+          "target": "frpa.counterclaim-waiver-7-20",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.independent-sales-organizations-and-brokers-7-21",
+      "sourceVersion": 1,
+      "bodyHash": "446dcceee7426f76e112373bde9910ccd87ff79ba62b6d65cc3b71d818d2d534",
+      "segments": [
+        {
+          "target": "frpa.independent-sales-organizations-and-brokers-7-21",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.attorney-review-7-22",
+      "sourceVersion": 1,
+      "bodyHash": "1db5da3207ed3f40afd832846d04e9e4e9f1cfa9b49ce0438d7605e11cf8442f",
+      "segments": [
+        {
+          "target": "frpa.attorney-review-7-22",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.tmf-match-reporting-consent-and-release-7-23",
+      "sourceVersion": 1,
+      "bodyHash": "696624a1dfb341a09d90e5bd9ade1a1bb23832542369a83705aad7234bfcef77",
+      "segments": [
+        {
+          "target": "frpa.tmf-match-reporting-consent-and-release-7-23",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.state-law-riders-7-24",
+      "sourceVersion": 1,
+      "bodyHash": "0e7fac6024a95003627284f0a46e63f3121cc951e97b1d47d65b062b8ddac76c",
+      "segments": [
+        {
+          "target": "frpa.state-law-riders-7-24",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.texas-occc-notice-7-25",
+      "sourceVersion": 1,
+      "bodyHash": "d00e71eb83c8e7ff232e97157a6407c7da0b3a5358aa632561cf27d279fe9bfb",
+      "segments": [
+        {
+          "target": "frpa.texas-occc-notice-7-25",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.arbitration-7-26",
+      "sourceVersion": 1,
+      "bodyHash": "6129670f92ff791546dcf674636b7d375e288e7a2a8bf0a4a0ce9c9d168938f6",
+      "segments": [
+        {
+          "target": "frpa.arbitration-7-26",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.renewal-eligibility-8-1",
+      "sourceVersion": 1,
+      "bodyHash": "be710eb6cce0131b2fadaed9d5e20620373da67b2273f094b70f94ac4c72c5c7",
+      "segments": [
+        {
+          "target": "frpa.renewal-eligibility-8-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.rollover-methods-8-2",
+      "sourceVersion": 1,
+      "bodyHash": "7f42d235416ceed0b45dc42627cef7477b08d2f5b5a802165ba33a6ff46d6a52",
+      "segments": [
+        {
+          "target": "frpa.rollover-methods-8-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.rollover-carry-method-8-2",
+      "sourceVersion": 1,
+      "bodyHash": "e0f9eb5ba12ebbcd9c19e1d83c6befbd5a4e06d71269141ea019ddab8c22dd6b",
+      "segments": [
+        {
+          "target": "frpa.rollover-carry-method-8-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.voluntary-prepayment-8-3",
+      "sourceVersion": 1,
+      "bodyHash": "e4874a96af869e38dc8b511c966b1c913350009c97e415e414c18ad2d453da71",
+      "segments": [
+        {
+          "target": "frpa.voluntary-prepayment-8-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.guarantor-information-9-1",
+      "sourceVersion": 2,
+      "bodyHash": "f21de352d9a12b28f3a87c6516532db5250b00bf618c7c5b6af5bbf3478708b5",
+      "segments": [
+        {
+          "target": "frpa.guarantor-information-9-1",
+          "property": "body",
+          "targetVersion": 3
+        }
+      ],
+      "fieldsHash": "e4a691c8cbddeaf3205e2ace841931263c3c3a17f2e51e4a411c035f5c343b33",
+      "fieldTarget": "frpa.guarantor-fields",
+      "retiredFieldsHash": "27245d8560a7b2bfcda9c89a056634fd08bd70be086db48ab0b1963ee85082c3",
+      "repeatFor": "guarantor",
+      "disposition": "split",
+      "fieldTargetVersion": 1
+    },
+    {
+      "sourceSlug": "frpa.guaranty-of-performance-9-2",
+      "sourceVersion": 1,
+      "bodyHash": "79788a3d4115e0debae1e882ece477863204e3598952df35b0bb71b7bab8e785",
+      "segments": [
+        {
+          "target": "frpa.guaranty-of-performance-9-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.guarantor-waivers-9-4",
+      "sourceVersion": 1,
+      "bodyHash": "23c13b58362682730ae46bd3e5bfc88c75783cd4460812706cca1aa16252fd0c",
+      "segments": [
+        {
+          "target": "frpa.guarantor-waivers-9-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.joint-and-several-liability-9-5",
+      "sourceVersion": 1,
+      "bodyHash": "7fc9558a30cf3e3a93626f2be2b2bd4d855894a9c4360e86bc4b314a91467e6c",
+      "segments": [
+        {
+          "target": "frpa.joint-and-several-liability-9-5",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.guarantor-acknowledgement-9-6",
+      "sourceVersion": 1,
+      "bodyHash": "a0f30b2f03e5e08f375c4195d83139bd6a6e1d8176729a610c2088f29d8161f0",
+      "segments": [
+        {
+          "target": "frpa.guarantor-acknowledgement-9-6",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.full-performance-guaranty-9-2",
+      "sourceVersion": 1,
+      "bodyHash": "fe2d5bc1bdf5bcfdf7912828036a8f4472e972d1d2f0166151d9b153c6ff9d33",
+      "segments": [
+        {
+          "target": "frpa.full-performance-guaranty-9-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.full-performance-guarantor-waivers-9-4",
+      "sourceVersion": 1,
+      "bodyHash": "06300fb23251cf5832aac4ddbd01db5193b6c94d85d71a024fb88036b297414e",
+      "segments": [
+        {
+          "target": "frpa.full-performance-guarantor-waivers-9-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.full-performance-joint-and-several-liability-9-5",
+      "sourceVersion": 1,
+      "bodyHash": "52581f570c264d4d64df67e8322705788fba38151e905f881bdc7b0dbccb0973",
+      "segments": [
+        {
+          "target": "frpa.full-performance-joint-and-several-liability-9-5",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.full-performance-guarantor-acknowledgement-9-6",
+      "sourceVersion": 1,
+      "bodyHash": "d243436282ba59f35c5719701798a872358808aa337fa6035eb73101f1360e45",
+      "segments": [
+        {
+          "target": "frpa.full-performance-guarantor-acknowledgement-9-6",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.section-10-1",
+      "sourceVersion": 1,
+      "bodyHash": "0f739a9ad41d531a75860d2eb244b9dc463b483df871b7319dfa866006f88bad",
+      "segments": [
+        {
+          "target": "frpa.section-10-1",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.section-10-2",
+      "sourceVersion": 1,
+      "bodyHash": "cfc1ccad767baddf7740f692d9f97c79eb2baf37fd5d3cff5a8de393e6a523a8",
+      "segments": [
+        {
+          "target": "frpa.section-10-2",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.section-10-3",
+      "sourceVersion": 1,
+      "bodyHash": "b011274a03d4cac9b88bf246fde7cef30c10391ed56d3c8d93f626a419cf0408",
+      "segments": [
+        {
+          "target": "frpa.section-10-3",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.section-10-4",
+      "sourceVersion": 1,
+      "bodyHash": "becd4a16cc1aea5325d6d830e059fb9da27108a39af95980c5be89cf7c79d33a",
+      "segments": [
+        {
+          "target": "frpa.section-10-4",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.section-10-5",
+      "sourceVersion": 1,
+      "bodyHash": "0da99483607129c2398a3751b9233eebdae11582c433caebe7036d47f2c8a2ba",
+      "segments": [
+        {
+          "target": "frpa.section-10-5",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.section-10-6",
+      "sourceVersion": 1,
+      "bodyHash": "1be901718b5dbd429666bee9c3f01e06c662298124b517c4a396ac46cd3d2b04",
+      "segments": [
+        {
+          "target": "frpa.section-10-6",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.appendix-a-fees-collectible",
+      "sourceVersion": 1,
+      "bodyHash": "0a0cb6790a67e0a01a80cb2e9e8d85ce77f645befde33c0f8601041f76459570",
+      "segments": [
+        {
+          "target": "frpa.appendix-a-fees-collectible",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.appendix-a-origination-fee-to-iso",
+      "sourceVersion": 1,
+      "bodyHash": "6186d8c35c0ccdf8fd7788e709ef89ae7e0a711f1b32ca6973b4cf174bb0c191",
+      "segments": [
+        {
+          "target": "frpa.appendix-a-origination-fee-to-iso",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.appendix-a-attorneys-fees",
+      "sourceVersion": 1,
+      "bodyHash": "943d074eb825bdc51d543cbaf570e135aabcba0afcb655c1eeb2d01c17f82339",
+      "segments": [
+        {
+          "target": "frpa.appendix-a-attorneys-fees",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.execution",
+      "sourceVersion": 1,
+      "bodyHash": "2e1c66777329926ad17bce92e617677f4052608a96e69d7dc99e6a9942ac1de9",
+      "segments": [
+        {
+          "target": "frpa.execution-legend",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "frpa.execution",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "frpa.exhibit-a-split-funding",
+      "sourceVersion": 1,
+      "bodyHash": "bba65850a8f0472356b5fd96111745bf550541a4c094f49df68dd10401fe7ad9",
+      "segments": [
+        {
+          "target": "frpa.exhibit-a-split-funding",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "frpa.exhibit-c-permission-to-release",
+      "sourceVersion": 1,
+      "bodyHash": "ea06d555dee535e5755eaa8431e52b98f577c26cf801aa0c1ad922cc13e18546",
+      "segments": [
+        {
+          "target": "frpa.exhibit-c-permission-to-release",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.parties",
+      "sourceVersion": 2,
+      "bodyHash": "ccb42c441533e92bfe9e74a8b4782c279acdedb53bbff7f75b788f3837fc44de",
+      "segments": [
+        {
+          "target": "equipment-lease.party-identification",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "equipment-lease.parties",
+          "property": "body",
+          "targetVersion": 3
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "equipment-lease.total-payments-estimate",
+      "sourceVersion": 2,
+      "bodyHash": "c9f4203f71993970bb59a265f7b0f191222c8369e0f4e0ea7ca30783947397d9",
+      "segments": [
+        {
+          "target": "equipment-lease.total-payments-estimate",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.charges-billed",
+      "sourceVersion": 1,
+      "bodyHash": "e6c0d226b9872f849623584a057145d7a4560c40b9315cabda3c19706d67dcc6",
+      "segments": [
+        {
+          "target": "equipment-lease.charges-billed",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.read-before-signing",
+      "sourceVersion": 1,
+      "bodyHash": "6cfbbcbc7333d36eed6b67a1228041e15731e2b1607ea14cdbe05ec09c20fcc6",
+      "segments": [
+        {
+          "target": "equipment-lease.read-before-signing",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.equipment",
+      "sourceVersion": 2,
+      "bodyHash": "75added0988255fec0d0aa63279fdf7c4dfd08f8093a533317b6fd4d60280bcb",
+      "segments": [
+        {
+          "target": "equipment-lease.equipment",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.effective-date-term-and-interim-rent",
+      "sourceVersion": 2,
+      "bodyHash": "93c600d48eb4fbc43ec9bb9e16f8335f413c581b26633ba5db01d03630a2809a",
+      "segments": [
+        {
+          "target": "equipment-lease.effective-date-term-and-interim-rent",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.site-preparation",
+      "sourceVersion": 1,
+      "bodyHash": "aa759ee88cac8ef61aa6a0b463045fa7937e29806a300b2cbefbcc6daefbe158",
+      "segments": [
+        {
+          "target": "equipment-lease.site-preparation",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.payment-of-amounts-due",
+      "sourceVersion": 2,
+      "bodyHash": "0afd79344909fc8115624eeadb41886cba70770609913c1a798fa424c91fbb15",
+      "segments": [
+        {
+          "target": "equipment-lease.payment-of-amounts-due",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.use-return-of-equipment-and-insurance",
+      "sourceVersion": 2,
+      "bodyHash": "6590c48a2b236475e1e1a1347f079098a7e57265865eb8c9cc8a99884282716c",
+      "segments": [
+        {
+          "target": "equipment-lease.use-return-of-equipment-and-insurance",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.title-to-equipment",
+      "sourceVersion": 2,
+      "bodyHash": "a7c336e4593b06b9e4d75170adcc281291acb57785764347607b32a65091d7b2",
+      "segments": [
+        {
+          "target": "equipment-lease.title-to-equipment",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term",
+      "sourceVersion": 2,
+      "bodyHash": "ef5793d9c014ce88c889fee469f9e57f0b2176747af04e91bc4876d4d8fda6b2",
+      "segments": [
+        {
+          "target": "equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.software-license",
+      "sourceVersion": 2,
+      "bodyHash": "4d5d99e8755e9aebed900a2bb695733bf5f41a1d4990d9358aef2be7aa9565e6",
+      "segments": [
+        {
+          "target": "equipment-lease.software-license",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.limitation-on-liability",
+      "sourceVersion": 2,
+      "bodyHash": "693d6a9257cc63df6aaed953d001655dec97672c6798c7a858b4e01beaca855b",
+      "segments": [
+        {
+          "target": "equipment-lease.limitation-on-liability",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.warranties",
+      "sourceVersion": 2,
+      "bodyHash": "1ca4a600fc5caf38f389e5b2c00eacbaef2c8ab51ac69e42f3460bca6a293ea5",
+      "segments": [
+        {
+          "target": "equipment-lease.warranties",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.indemnification",
+      "sourceVersion": 2,
+      "bodyHash": "8635c20f2ae880dbfbaa1a6dd0ef66e56403220e58fee6e1bfdef9d6e62c75d7",
+      "segments": [
+        {
+          "target": "equipment-lease.indemnification",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.default-remedies",
+      "sourceVersion": 2,
+      "bodyHash": "eb3d2f6c8ead8996cad69edd8716889372b7d6c524178588a32d79d12b60d223",
+      "segments": [
+        {
+          "target": "equipment-lease.default-remedies",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.assignment",
+      "sourceVersion": 1,
+      "bodyHash": "cbc659883707ca024c194f6e116fc666bc7fdc5bd8c8a5395b5a69c3ab833637",
+      "segments": [
+        {
+          "target": "equipment-lease.assignment",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.lease-guaranty",
+      "sourceVersion": 2,
+      "bodyHash": "b40b38fb66ddbb6e58f5e82d72ba6bed35b3b946afca26e70f387c2f02c618d0",
+      "segments": [
+        {
+          "target": "equipment-lease.lease-guaranty",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.governing-law-and-venue",
+      "sourceVersion": 1,
+      "bodyHash": "03c8c8446363bf4471ce151b1f7f82975d9f24853277bdcda2da96de24465378",
+      "segments": [
+        {
+          "target": "equipment-lease.governing-law-and-venue",
+          "property": "body",
+          "targetVersion": 2
+        },
+        {
+          "target": "equipment-lease.jury-trial-waiver",
+          "property": "heading",
+          "prefix": "3.15A ",
+          "suffix": "\n",
+          "targetVersion": 1
+        },
+        {
+          "target": "equipment-lease.jury-trial-waiver",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "equipment-lease.class-and-representative-proceedings",
+          "property": "heading",
+          "prefix": "3.15B ",
+          "suffix": "\n",
+          "targetVersion": 1
+        },
+        {
+          "target": "equipment-lease.class-and-representative-proceedings",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "equipment-lease.limitation-of-actions",
+          "property": "heading",
+          "prefix": "3.15C ",
+          "suffix": "\n",
+          "targetVersion": 1
+        },
+        {
+          "target": "equipment-lease.limitation-of-actions",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "equipment-lease.notices",
+      "sourceVersion": 1,
+      "bodyHash": "59057546198f50194e5818c22205122bd2e26d6670020e14e11ee632053581d7",
+      "segments": [
+        {
+          "target": "equipment-lease.notices",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.electronic-signatures",
+      "sourceVersion": 1,
+      "bodyHash": "93cd7e2e949c010d38a4f222637bfde30b790631dc6d7f68481468203c76bb98",
+      "segments": [
+        {
+          "target": "equipment-lease.electronic-signatures",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.entire-agreement",
+      "sourceVersion": 1,
+      "bodyHash": "4464ac66f909d808c3d25e59cbdac55b874fb8f8c05a2f7e3b07086e1f1cdc59",
+      "segments": [
+        {
+          "target": "equipment-lease.entire-agreement",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.survival",
+      "sourceVersion": 1,
+      "bodyHash": "7afcc7837a38e174cb88c1a1bc579b3c15d9da2586e32414c673ee574d93ab03",
+      "segments": [
+        {
+          "target": "equipment-lease.survival",
+          "property": "body",
+          "targetVersion": 2
+        },
+        {
+          "target": "equipment-lease.guaranty-heading",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "equipment-lease.guarantor-information",
+      "sourceVersion": 2,
+      "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "segments": [
+        {
+          "target": "equipment-lease.guarantor-information",
+          "property": "body",
+          "targetVersion": 3
+        }
+      ],
+      "fieldsHash": "7d99633074db6573f8dc64b46fde1a7ea83daf988d6dc9c630ca9b866215aa43",
+      "fieldTarget": "equipment-lease.guarantor-information",
+      "retiredFieldsHash": "d1cdface691913dd1414b91e0227ac0f0bd28cb519ac8d06e1905ecbcf7c5f63",
+      "repeatFor": "guarantor",
+      "disposition": "move-to-reusable",
+      "fieldTargetVersion": 3
+    },
+    {
+      "sourceSlug": "equipment-lease.guaranty-of-payment",
+      "sourceVersion": 2,
+      "bodyHash": "be28c6aa9ab1ca86a63eb73583264e27d5540a7e5d19f11b1f38bdb9e2709cc9",
+      "segments": [
+        {
+          "target": "equipment-lease.guaranty-of-payment",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.independent-decision-governing-law",
+      "sourceVersion": 1,
+      "bodyHash": "bd6fa5ec04b180bcb8c5bcb3cede367acf5b907d77ca3ce7024e26b75daee02d",
+      "segments": [
+        {
+          "target": "equipment-lease.independent-decision-governing-law",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.jury-trial-and-class-action-waiver",
+      "sourceVersion": 1,
+      "bodyHash": "bd3aae3d9794f4b4e2aace77dc53dde109fca61c3e3b315a36b52177c0823585",
+      "segments": [
+        {
+          "target": "equipment-lease.jury-trial-and-class-action-waiver",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.credit-reporting-authorization",
+      "sourceVersion": 1,
+      "bodyHash": "29f591197925654846eb633c544cba46c15be8e9c8a662d5f91c7c579527bf37",
+      "segments": [
+        {
+          "target": "equipment-lease.credit-reporting-authorization",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.communications-consent",
+      "sourceVersion": 1,
+      "bodyHash": "039030e6c79535df32da4f99b9011825652a241b5dc75554299c2df5252e768d",
+      "segments": [
+        {
+          "target": "equipment-lease.communications-consent",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "equipment-lease.acknowledgment",
+      "sourceVersion": 1,
+      "bodyHash": "e1ca7cde2b91a54fdbe7d3186cb47524762bff423fecc610d611f992376f85cd",
+      "segments": [
+        {
+          "target": "equipment-lease.acknowledgment",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.parties",
+      "sourceVersion": 2,
+      "bodyHash": "4ebb8a2619ad1266b46fbc77a899ecf14c82cb5118310cf0088be69591e00b92",
+      "segments": [
+        {
+          "target": "subscription.party-identification",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "subscription.parties",
+          "property": "body",
+          "targetVersion": 3
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "subscription.total-payments-estimate",
+      "sourceVersion": 2,
+      "bodyHash": "832f50cdb7558e644faddb0551b378c5e118cff619f64bd265209c9d3a71168a",
+      "segments": [
+        {
+          "target": "subscription.total-payments-estimate",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.charges-billed",
+      "sourceVersion": 1,
+      "bodyHash": "2a69a06c36423c0cff6782291854c43b0c031fe1d01342850c7cd65a5df57f4e",
+      "segments": [
+        {
+          "target": "subscription.charges-billed",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.read-before-signing",
+      "sourceVersion": 1,
+      "bodyHash": "d3e2b70448ac757f8d62947690783bd4d41933570d0c547b6b4bad9768f38817",
+      "segments": [
+        {
+          "target": "subscription.read-before-signing",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.equipment",
+      "sourceVersion": 2,
+      "bodyHash": "879d4a2fd07c6b5e8f586104c9384800a72a54c3caa23ab0fd70782aea98ee83",
+      "segments": [
+        {
+          "target": "subscription.equipment",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.effective-date-term-and-interim-rent",
+      "sourceVersion": 2,
+      "bodyHash": "9d1d9257bdb2873e89d773f164aaf03941e3cf53e636c251b747032500398a51",
+      "segments": [
+        {
+          "target": "subscription.effective-date-term-and-interim-rent",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.site-preparation",
+      "sourceVersion": 1,
+      "bodyHash": "aa759ee88cac8ef61aa6a0b463045fa7937e29806a300b2cbefbcc6daefbe158",
+      "segments": [
+        {
+          "target": "subscription.site-preparation",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.payment-of-amounts-due",
+      "sourceVersion": 2,
+      "bodyHash": "2cdf147525c000a1ca97d78217b09eef8962f297eb659d1aab5d15f2d033976c",
+      "segments": [
+        {
+          "target": "subscription.payment-of-amounts-due",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.use-return-of-equipment-and-insurance",
+      "sourceVersion": 2,
+      "bodyHash": "127578f4510739d43cf7906999646713d59272ce07b85f77a1fff27da976bc60",
+      "segments": [
+        {
+          "target": "subscription.use-return-of-equipment-and-insurance",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.title-to-equipment",
+      "sourceVersion": 2,
+      "bodyHash": "9524fac6159264098658918e80a4b479756e7f935b185696e6f1455f3792678a",
+      "segments": [
+        {
+          "target": "subscription.title-to-equipment",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.return-or-continuation-of-equipment-at-end-of-subscription-term",
+      "sourceVersion": 2,
+      "bodyHash": "e530566d407574cc8fcb9afe39b9c7de7ea3cb7812ea9b17450e8b0af829a998",
+      "segments": [
+        {
+          "target": "subscription.return-or-continuation-of-equipment-at-end-of-subscription-term",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.software-license",
+      "sourceVersion": 2,
+      "bodyHash": "dea31475101df2e46f0311887fb1a12cfb779adf51d330d0d9aa6972b97e2f9d",
+      "segments": [
+        {
+          "target": "subscription.software-license",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.limitation-on-liability",
+      "sourceVersion": 2,
+      "bodyHash": "693d6a9257cc63df6aaed953d001655dec97672c6798c7a858b4e01beaca855b",
+      "segments": [
+        {
+          "target": "subscription.limitation-on-liability",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.warranties",
+      "sourceVersion": 2,
+      "bodyHash": "1ca4a600fc5caf38f389e5b2c00eacbaef2c8ab51ac69e42f3460bca6a293ea5",
+      "segments": [
+        {
+          "target": "subscription.warranties",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.indemnification",
+      "sourceVersion": 2,
+      "bodyHash": "e33ad3f621943ed716067fe0f33c821f936f66655df8c6fd4c8d6bde5ef12452",
+      "segments": [
+        {
+          "target": "subscription.indemnification",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.default-remedies",
+      "sourceVersion": 2,
+      "bodyHash": "2a4b965899b2e1deb1c78d03222fb2331f52490176ebb40b680899e89da53ad6",
+      "segments": [
+        {
+          "target": "subscription.default-remedies",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.assignment",
+      "sourceVersion": 1,
+      "bodyHash": "cbc659883707ca024c194f6e116fc666bc7fdc5bd8c8a5395b5a69c3ab833637",
+      "segments": [
+        {
+          "target": "subscription.assignment",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.subscription-guaranty",
+      "sourceVersion": 2,
+      "bodyHash": "d488f60b7c5d28100e3741a27713b80e626b0a9e0f8d5a4f18a078d291ebefc1",
+      "segments": [
+        {
+          "target": "subscription.subscription-guaranty",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.governing-law-and-venue",
+      "sourceVersion": 1,
+      "bodyHash": "534254638c62689dec195119d4dce85be8d72825a7340d907053b0ac2fbe3115",
+      "segments": [
+        {
+          "target": "subscription.governing-law-and-venue",
+          "property": "body",
+          "targetVersion": 2
+        },
+        {
+          "target": "subscription.jury-trial-waiver",
+          "property": "heading",
+          "prefix": "3.15A ",
+          "suffix": "\n",
+          "targetVersion": 1
+        },
+        {
+          "target": "subscription.jury-trial-waiver",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "subscription.class-and-representative-proceedings",
+          "property": "heading",
+          "prefix": "3.15B ",
+          "suffix": "\n",
+          "targetVersion": 1
+        },
+        {
+          "target": "subscription.class-and-representative-proceedings",
+          "property": "body",
+          "targetVersion": 1
+        },
+        {
+          "target": "subscription.limitation-of-actions",
+          "property": "heading",
+          "prefix": "3.15C ",
+          "suffix": "\n",
+          "targetVersion": 1
+        },
+        {
+          "target": "subscription.limitation-of-actions",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "subscription.notices",
+      "sourceVersion": 1,
+      "bodyHash": "a7bad84321471615c1b453774dcf534b0020dbd3f7aeb3627e1fbef6d12b4c7b",
+      "segments": [
+        {
+          "target": "subscription.notices",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.electronic-signatures",
+      "sourceVersion": 1,
+      "bodyHash": "93cd7e2e949c010d38a4f222637bfde30b790631dc6d7f68481468203c76bb98",
+      "segments": [
+        {
+          "target": "subscription.electronic-signatures",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.entire-agreement",
+      "sourceVersion": 1,
+      "bodyHash": "4464ac66f909d808c3d25e59cbdac55b874fb8f8c05a2f7e3b07086e1f1cdc59",
+      "segments": [
+        {
+          "target": "subscription.entire-agreement",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.survival",
+      "sourceVersion": 1,
+      "bodyHash": "9b4a6be25a69046647b483b8d68794892098113dfa4bc6d8708cbaf87e6a8db9",
+      "segments": [
+        {
+          "target": "subscription.survival",
+          "property": "body",
+          "targetVersion": 2
+        },
+        {
+          "target": "subscription.guaranty-heading",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "split"
+    },
+    {
+      "sourceSlug": "subscription.guarantor-information",
+      "sourceVersion": 2,
+      "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "segments": [
+        {
+          "target": "subscription.guarantor-information",
+          "property": "body",
+          "targetVersion": 3
+        }
+      ],
+      "fieldsHash": "7d99633074db6573f8dc64b46fde1a7ea83daf988d6dc9c630ca9b866215aa43",
+      "fieldTarget": "subscription.guarantor-information",
+      "retiredFieldsHash": "d1cdface691913dd1414b91e0227ac0f0bd28cb519ac8d06e1905ecbcf7c5f63",
+      "repeatFor": "guarantor",
+      "disposition": "move-to-reusable",
+      "fieldTargetVersion": 3
+    },
+    {
+      "sourceSlug": "subscription.guaranty-of-payment",
+      "sourceVersion": 2,
+      "bodyHash": "b2ad39ddeab6def041a574a71933e35b0b6e45a95a7fcbe98076fe23a66d9674",
+      "segments": [
+        {
+          "target": "subscription.guaranty-of-payment",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.independent-decision-governing-law",
+      "sourceVersion": 1,
+      "bodyHash": "5dc38531caa62677ebd52d832d8571f738a202ccd23abc2c790f26823c702a82",
+      "segments": [
+        {
+          "target": "subscription.independent-decision-governing-law",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.jury-trial-and-class-action-waiver",
+      "sourceVersion": 1,
+      "bodyHash": "7a7b3ca2e9f1db6e816034e7e387b5b5dc0659a30100873313a880e526fddbfb",
+      "segments": [
+        {
+          "target": "subscription.jury-trial-and-class-action-waiver",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.credit-reporting-authorization",
+      "sourceVersion": 1,
+      "bodyHash": "c723c164035dbf9e8dde2e5a45bcd83b6cb0f49179f436fc80a31814a3766a4a",
+      "segments": [
+        {
+          "target": "subscription.credit-reporting-authorization",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.communications-consent",
+      "sourceVersion": 1,
+      "bodyHash": "f6aeede1c3a7fc5aa90f9d50215f75ac0e9a5ccfd64f343a3551aa7434449f03",
+      "segments": [
+        {
+          "target": "subscription.communications-consent",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "subscription.acknowledgment",
+      "sourceVersion": 1,
+      "bodyHash": "ca1d47c63b3a5a83d5f74d044c14c5f5ae4d54a23458ffacebc2a367c94dc355",
+      "segments": [
+        {
+          "target": "subscription.acknowledgment",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.parties",
+      "sourceVersion": 1,
+      "bodyHash": "98c15dc7597f59028a320dd48466326ce442227c2f3774a96e8a959283dbff98",
+      "segments": [
+        {
+          "target": "iso-pra.parties",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "move-to-reusable"
+    },
+    {
+      "sourceSlug": "iso-pra.recital-company-business",
+      "sourceVersion": 1,
+      "bodyHash": "8079840da8f6c07e70434f0583dad075daa379808d07e16dc066cf59ab9c1303",
+      "segments": [
+        {
+          "target": "iso-pra.recital-company-business",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "move-to-reusable"
+    },
+    {
+      "sourceSlug": "iso-pra.recital-partner-purpose",
+      "sourceVersion": 1,
+      "bodyHash": "7530cad327c7c2523b0da43d6c810cce30b35b0419f8bd386712ad23495ca175",
+      "segments": [
+        {
+          "target": "iso-pra.recital-partner-purpose",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "move-to-reusable"
+    },
+    {
+      "sourceSlug": "iso-pra.consideration",
+      "sourceVersion": 1,
+      "bodyHash": "704c604d97180f940715d032d88dc43abea6817c7dcb02664990c4cc70ac4d79",
+      "segments": [
+        {
+          "target": "iso-pra.consideration",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "move-to-reusable"
+    },
+    {
+      "sourceSlug": "iso-pra.commission-rate",
+      "sourceVersion": 1,
+      "bodyHash": "05f18c6bacdc21d61c7a727b5128aec254c46de193453f5bd9c2fa5b3ba12957",
+      "segments": [
+        {
+          "target": "iso-pra.commission-rate",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.when-commission-is-earned",
+      "sourceVersion": 1,
+      "bodyHash": "6afda56b00ef3730321d6e948a2c91685859fff9e818150ef631f1a5f0120759",
+      "segments": [
+        {
+          "target": "iso-pra.when-commission-is-earned",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.payment-timing",
+      "sourceVersion": 1,
+      "bodyHash": "c978834bda9dd93129c0a0e9588ad36579eb5fdcbddef4b216c9cf41c15878f7",
+      "segments": [
+        {
+          "target": "iso-pra.payment-timing",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.clawback-provision",
+      "sourceVersion": 1,
+      "bodyHash": "00c08d904e75f0c6b02ba5d94b330c5e15499b4d92dd492597d4183f1ce767e5",
+      "segments": [
+        {
+          "target": "iso-pra.clawback-provision",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.commission-transparency",
+      "sourceVersion": 1,
+      "bodyHash": "b0a733fa52f0311edc113916791e40cac69e8f588cb481d40b596d47a4d344b8",
+      "segments": [
+        {
+          "target": "iso-pra.commission-transparency",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.sole-compensation",
+      "sourceVersion": 1,
+      "bodyHash": "5a222e14e9019880cb22ad6ad94a740d4a031582944c23396a6cf545cd3d9201",
+      "segments": [
+        {
+          "target": "iso-pra.sole-compensation",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.appointment",
+      "sourceVersion": 1,
+      "bodyHash": "0b3d29deaa7454d58962d94123030d5dbfc0b89bdd099e804896221339623241",
+      "segments": [
+        {
+          "target": "iso-pra.appointment",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.referral-obligations",
+      "sourceVersion": 1,
+      "bodyHash": "4ea650806ce329292d7417c06bb796f04f17d50804a27fd61127d8dcc7a1d85e",
+      "segments": [
+        {
+          "target": "iso-pra.referral-obligations",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.approval-of-applications",
+      "sourceVersion": 1,
+      "bodyHash": "a4a7776393a29e15375fb8f89bdf42b01ae8443a9b8a6b048a1c8998350c5f20",
+      "segments": [
+        {
+          "target": "iso-pra.approval-of-applications",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.duty-to-notify",
+      "sourceVersion": 1,
+      "bodyHash": "36bc4f3ff16e6cd7dd0b6e89c703ebc3f081c577580b19a9c01de7a01e0ce8b0",
+      "segments": [
+        {
+          "target": "iso-pra.duty-to-notify",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.marketing-materials",
+      "sourceVersion": 1,
+      "bodyHash": "093ffba353d66ff553584eae617eec3610ad0dc7bc671ada8e98c9d3b2d35caf",
+      "segments": [
+        {
+          "target": "iso-pra.marketing-materials",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.representatives",
+      "sourceVersion": 1,
+      "bodyHash": "f5493db739939e4f150c6ca836d3a4125c766e643d167d69717f7c5d06236d48",
+      "segments": [
+        {
+          "target": "iso-pra.representatives",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.compliance",
+      "sourceVersion": 1,
+      "bodyHash": "5f2732637d3258d5f03e51bd93797af38718ff888da0b72c34bbe58e9e58606b",
+      "segments": [
+        {
+          "target": "iso-pra.compliance",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.know-your-partner-compliance",
+      "sourceVersion": 1,
+      "bodyHash": "69baf5a8eac1f3075f5154843d7034c9fb8bcb03dd184917564ee75fa4559714",
+      "segments": [
+        {
+          "target": "iso-pra.know-your-partner-compliance",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.merchant-funds",
+      "sourceVersion": 1,
+      "bodyHash": "5267557d8fd4d88a21fda44ec66bfc2ed0dc089fdfe2d071e6eb583d138f77f8",
+      "segments": [
+        {
+          "target": "iso-pra.merchant-funds",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.confidentiality",
+      "sourceVersion": 1,
+      "bodyHash": "039b882bbe0fe4e7d2c8074130f4d1d055b8d4554556d5dddc7fa85ba59449bf",
+      "segments": [
+        {
+          "target": "iso-pra.confidentiality",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.audits",
+      "sourceVersion": 1,
+      "bodyHash": "7cae7e144a852a5afb4b9893ba48481608659fb208a6939facaf8b211021190e",
+      "segments": [
+        {
+          "target": "iso-pra.audits",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.commercial-financing-disclosures-california-and-new-york",
+      "sourceVersion": 1,
+      "bodyHash": "1a860bb81403cb39bb65bf70c653a36e97bd770b930318ffe3a70f278e1a94bf",
+      "segments": [
+        {
+          "target": "iso-pra.commercial-financing-disclosures-california-and-new-york",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.representations-and-warranties",
+      "sourceVersion": 1,
+      "bodyHash": "5e472fedc77d8a20cc97a1725929bbd7c5efbeac14270bb4a8450caccb735e89",
+      "segments": [
+        {
+          "target": "iso-pra.representations-and-warranties",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.term-and-termination",
+      "sourceVersion": 1,
+      "bodyHash": "186bd637d4fd05e7820ff22195306430726b1c5a546126bc594ecbdeb639e4d0",
+      "segments": [
+        {
+          "target": "iso-pra.term-and-termination",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.indemnification",
+      "sourceVersion": 1,
+      "bodyHash": "90e07dcedd0fe1f15257c48d87f1b4b1ebc282a02cbe6b9f761ba82d2a569872",
+      "segments": [
+        {
+          "target": "iso-pra.indemnification",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.independent-contractor",
+      "sourceVersion": 1,
+      "bodyHash": "8380c8f1cbb1833ddbab86aab73d50cab57152521ff418aad90f6315537f3442",
+      "segments": [
+        {
+          "target": "iso-pra.independent-contractor",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.governing-law",
+      "sourceVersion": 1,
+      "bodyHash": "21a3b517c98f3a6288b43f417880d62986b82c508cd5ec35b1cc4709305ba8d8",
+      "segments": [
+        {
+          "target": "iso-pra.governing-law",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "iso-pra.entire-agreement",
+      "sourceVersion": 1,
+      "bodyHash": "62764222b0091ce3e666b3559b1aae2a4fa79d2400b93775c59acec4d39cd373",
+      "segments": [
+        {
+          "target": "iso-pra.entire-agreement",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "split-funding.frpa-recital",
+      "sourceVersion": 1,
+      "bodyHash": "b8545688d5fbae0b8c55ed6a4b4adcf5ddb85b0eb9e656cdf232d6b804fa75d1",
+      "segments": [
+        {
+          "target": "split-funding.frpa-recital",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "split-funding.split-funding-instruction",
+      "sourceVersion": 1,
+      "bodyHash": "e0e8aab262007d5becbcb0a07f020b1798405a90e93985c85d8505af54b8c741",
+      "segments": [
+        {
+          "target": "split-funding.split-funding-instruction",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "split-funding.satisfaction-of-payzlis-obligation",
+      "sourceVersion": 1,
+      "bodyHash": "53d7440fcdcb41509fcd87b5825591fde59b32b0fc29b6a517c16e7527a67489",
+      "segments": [
+        {
+          "target": "split-funding.satisfaction-of-payzlis-obligation",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "split-funding.fees-are-additional",
+      "sourceVersion": 1,
+      "bodyHash": "127e373a95284a921f005aa289f98d541bb0b33134ff5c1253fcc59e46b97988",
+      "segments": [
+        {
+          "target": "split-funding.fees-are-additional",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "split-funding.processor-termination-fees",
+      "sourceVersion": 1,
+      "bodyHash": "0bd4d93f638c0633726696283e11eba73825d3d2c2b198ae8148d1280821e354",
+      "segments": [
+        {
+          "target": "split-funding.processor-termination-fees",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "split-funding.indemnity",
+      "sourceVersion": 1,
+      "bodyHash": "55bd9099196842e4205a2827e1876eeb41f44cf295f5135c7ce356a4312bf9ad",
+      "segments": [
+        {
+          "target": "split-funding.indemnity",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "split-funding.remittance-instructions",
+      "sourceVersion": 1,
+      "bodyHash": "e8b8e36c60991f94623badb856447ac7e99883ed25b8396f087a94c8fb0a2f08",
+      "segments": [
+        {
+          "target": "split-funding.remittance-instructions",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "permission-to-release.preamble",
+      "sourceVersion": 1,
+      "bodyHash": "7d98fd8dce2c476271a2fd72ad8ced5c134d9547fde724bbbdaf4367b37b05a6",
+      "segments": [
+        {
+          "target": "permission-to-release.preamble",
+          "property": "body",
+          "targetVersion": 2
+        }
+      ],
+      "disposition": "retain-as-numbered-clause"
+    },
+    {
+      "sourceSlug": "permission-to-release.trade-landlord-and-bank-information",
+      "sourceVersion": 1,
+      "bodyHash": "143d4a86e456b2abbf90e307cd2a5039a11d65dbb05626d6298fda5360a52e43",
+      "segments": [
+        {
+          "target": "permission-to-release.trade-landlord-and-bank-information",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "permission-to-release.banking-brokerage-and-processing-history",
+      "sourceVersion": 1,
+      "bodyHash": "89890679004231bb3dfc2142004171bc66e8bd73059f64e18a5158a212683fc5",
+      "segments": [
+        {
+          "target": "permission-to-release.banking-brokerage-and-processing-history",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "permission-to-release.credit-bureau-authorization",
+      "sourceVersion": 1,
+      "bodyHash": "4863e4f3002434acf5338c774dbab07da61374134c1d3837922921c7c3d41141",
+      "segments": [
+        {
+          "target": "permission-to-release.credit-bureau-authorization",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "permission-to-release.fair-credit-reporting-act-acknowledgment",
+      "sourceVersion": 1,
+      "bodyHash": "07538ad1bf74b1ceae8921afa3b019d05485c57c823857cc8380991853269528",
+      "segments": [
+        {
+          "target": "permission-to-release.fair-credit-reporting-act-acknowledgment",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "permission-to-release.continuing-authorization-reliance",
+      "sourceVersion": 1,
+      "bodyHash": "2d4679ed4051668cf4c07dcdfe4dc09755841ac2397f8c9f970c0d62a03792e4",
+      "segments": [
+        {
+          "target": "permission-to-release.continuing-authorization-reliance",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "permission-to-release.release-of-information-sources",
+      "sourceVersion": 1,
+      "bodyHash": "216b346b6518a557ebaaa6daf56ace2b37d77e74bf547af89a194378b6025db8",
+      "segments": [
+        {
+          "target": "permission-to-release.release-of-information-sources",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    },
+    {
+      "sourceSlug": "permission-to-release.personal-guarantor",
+      "sourceVersion": 1,
+      "bodyHash": "5fd991911650045f33fb0a978fb43f7c0f5a29541af0b1e6dafc4947bcd9359e",
+      "segments": [
+        {
+          "target": "permission-to-release.personal-guarantor",
+          "property": "body",
+          "targetVersion": 1
+        }
+      ],
+      "disposition": "retain"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+# Why: One MCA workspace needs one sidebar entry and readable translated labels from its owned UI components (ADR 0015).
+# Why-not-additive: The upstream admin layout owns sidebar entries and the upstream Lingui configuration owns extraction roots; content and UI stay in owned files.
+# Upstream-merge-fragility: low; recheck the Data entry and owned MCA component extraction root after upstream navigation/i18n changes.
+
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/_layout.tsx b/apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+index 2dba4a94e..abfd91b16 100644
+--- a/apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
++++ b/apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
+@@ -132,28 +132,10 @@ const NAV_GROUPS: NavGroupDef[] = [
+         bizrethink: true,
+       },
+       {
+-        // The MCA vertical's conformity surface (2026-09-07, ADR 0008). A
+-        // SEPARATE entry from Clause Library on purpose: the two are different
+-        // products with different release paths, and the only thing that kept
+-        // them apart before this page existed was that nothing could import
+-        // packages/bizrethink/mca/. Read-only — there is no approval workflow
+-        // here, because approving a regulator's prescribed words would record
+-        // an attorney's name against California's text.
+-        label: <Trans>MCA Conformity</Trans>,
+-        href: '/admin/mca',
+-        icon: ScaleIcon,
+-        bizrethink: true,
+-      },
+-      {
+-        // The MCA vertical's OTHER half, and a separate entry for the reason
+-        // ADR 0008 gives: two surfaces, two release paths. MCA Conformity is
+-        // the regulator's words and has no approval workflow; this is ours and
+-        // will need one. Named to pair with Lease Clauses -- the distinguishing
+-        // noun first, so the two read as siblings at the one place a person
+-        // chooses between them.
+-        label: <Trans>MCA Clauses</Trans>,
++        // MODIFIED for BizRethink (overlay 085): one MCA workspace (ADR 0015).
++        label: <Trans>MCA</Trans>,
+         href: '/admin/mca-library',
+-        icon: ScrollTextIcon,
++        icon: ScaleIcon,
+         bizrethink: true,
+       },
+       {
+diff --git a/lingui.config.ts b/lingui.config.ts
+index 6f79b50db..9f8f015d7 100644
+--- a/lingui.config.ts
++++ b/lingui.config.ts
+@@ -9,7 +9,14 @@ const config: LinguiConfig = {
+   catalogs: [
+     {
+       path: '<rootDir>/packages/lib/translations/{locale}/web',
+-      include: ['apps/remix/app', 'packages/ui', 'packages/lib', 'packages/email'],
++      // MODIFIED for BizRethink (overlay 085): extract the owned MCA workspace UI.
++      include: [
++        'apps/remix/app',
++        'packages/ui',
++        'packages/lib',
++        'packages/email',
++        'packages/bizrethink/mca/components',
++      ],
+       exclude: ['**/node_modules/**'],
+     },
+   ],
