@@ -73,6 +73,7 @@ export const McaProviderInterview = ({
               </h2>
               <TextAnswer name="label" label={msg`Template name`} />
               <EntityAnswers prefix="buyer" title={msg`Receivables buyer`} />
+              <TextAnswer name="buyer.servicingPhone" label={msg`Buyer servicing phone`} />
               <TextAnswer name="buyer.reconciliationEmail" label={msg`Reconciliation email`} type="email" />
               <TextAnswer name="buyer.reconciliationAddress" label={msg`Reconciliation mailing address`} />
             </>
@@ -206,7 +207,13 @@ export const McaProviderInterview = ({
                 label={msg`Form reference or controlled document location`}
               />
               {equipment !== 'none' && (
-                <EntityAnswers prefix="equipmentProvider" title={msg`Equipment contracting entity`} />
+                <>
+                  <EntityAnswers prefix="equipmentProvider" title={msg`Equipment contracting entity`} />
+                  <TextAnswer
+                    name="equipmentProvider.creditDisputeAddress"
+                    label={msg`Equipment credit reporting dispute address`}
+                  />
+                </>
               )}
               {broker && (
                 <>

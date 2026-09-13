@@ -96,19 +96,16 @@ describe('what counsel actually reads', () => {
     expect(sections.every((section) => section.clauses.length > 0)).toBe(true);
   });
 
-  /*
-    THE `«N»` MARKERS STAY. The lease's reader strips `{{SIGNATURE}}` because a
-    signing token is furniture the envelope builder adds. These are not that:
-    they are AcroForm anchors printed in the document Lombard ships, and an
-    attorney reviewing a contract has to see where a value is injected into a
-    sentence. Stripping them would show counsel a document we do not publish.
-  */
+  // Counsel sees the actual current semantic placeholders in legal sentences.
+  // Source-only AcroForm widget anchors remain in historical evidence.
   it('quotes the document verbatim, markers and all', () => {
-    const withMarkers = numberedLibraryForReview('frpa').filter((clause) => clause.body.includes('«'));
+    const withMarkers = numberedLibraryForReview('frpa').filter((clause) => clause.body.includes('{{field:'));
     const readable = toReadableAgreement(withMarkers);
 
     expect(withMarkers.length).toBeGreaterThan(0);
-    expect(readable.flatMap((section) => section.clauses).every((clause) => clause.text.includes('«'))).toBe(true);
+    expect(readable.flatMap((section) => section.clauses).every((clause) => clause.text.includes('{{field:'))).toBe(
+      true,
+    );
   });
 
   it('leaves only reusable content outside clause numbering', () => {

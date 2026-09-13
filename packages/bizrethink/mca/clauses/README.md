@@ -59,6 +59,25 @@ transaction-fill/signing API. The later builder must validate supplied values,
 qualify repeated fields by instrument and signer, and preserve required evidence.
 Actual merchant PDFs and stored templates require a separate rebuild/migration.
 
+### Processor-controlled forms and ancillary consent corrections
+
+**Owner clarification, 2026-09-12:** Split Funding Letters are processor-specific;
+we commonly have limited or no ability to change them. Their presence in this
+library does not make their terms ours to rewrite. The retained processor letter
+is unchanged. Its fee, collection-base and stopping-rule differences from the
+FRPA remain unresolved for a **future review session** using the particular
+processor's required form and operational requirements. A future reviewer must
+determine an agreed, workable resolution; an FRPA priority clause alone is not
+evidence that a processor accepted it or can implement it. Do not treat the
+deferral as approval, a waiver, or permission to silently alter the form.
+
+The Permission to Release and both equipment agreements have a separate draft
+correction for individual report use, contact consent and signer capacity. The
+14 changed records advance to version 2 and remain unapproved; the total stays
+211. The [correction record](../../../../docs/research/mca-ancillary-consents-2026-09-12/README.md)
+explains source verification, substantive choices and template/execution work
+still required. Historical source documents and review dispositions are preserved.
+
 ### Citation contract (ADR 0011 phases 1–4)
 
 A source record has **no `number`**. `selectClauses` filters first, sorts by the
@@ -165,12 +184,17 @@ document, and a script cannot make that claim — see rule 3 below.
 
 ## Rules for adding a clause
 
-1. **Nothing enters unexamined.** `examinedBy` is required and may not be empty.
+1. **No legal text enters unexamined.** Legal text requires nonempty `examinedBy`.
    Phase 0's rule was *"anything in this column enters as draft, never as
    library"*, and its reasoning is the one to keep in mind: a clause library
    seeded from unexamined text **launders that text into apparent authority**.
    A clause on a page under a heading and a version number reads as considered
    whoever typed it.
+   A new **empty-body field group** may instead remain explicitly review pending
+   in the reusable catalogue, with fields, draft status, no named approver and
+   `derivedFrom` links to examined provisions. The view labels the source reviews
+   separately; it never says those reviews read the new field bindings. The guard
+   rejects unexamined prose and unapproved published entries in this exception.
 2. **The body is the clause's words, and the `«N»` markers are kept.** Those
    markers are the AcroForm anchors the Lombard pipeline injects and are part of
    what ships.

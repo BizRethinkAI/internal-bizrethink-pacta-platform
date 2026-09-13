@@ -46,7 +46,7 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
   it('pairs all clauses and reusable content one to one', () => {
     expect(lease.map(pairKey).sort()).toEqual(subscription.map(pairKey).sort());
 
-    expect(lease).toHaveLength(36);
+    expect(lease).toHaveLength(37);
   });
 
   it('pairs every clause with its twin', () => {

@@ -101,6 +101,7 @@ export const providerValues = (profile: McaProviderProfile): Record<string, stri
   'provider.noticeEmail': profile.buyer.noticeEmail,
   'provider.reconciliationEmail': profile.buyer.reconciliationEmail,
   'provider.reconciliationAddress': profile.buyer.reconciliationAddress,
+  ...(profile.buyer.servicingPhone ? { 'provider.servicingPhone': profile.buyer.servicingPhone } : {}),
   'processor.approvedProcessors': profile.processor.legalName,
   ...(profile.equipmentProvider
     ? {
@@ -110,6 +111,9 @@ export const providerValues = (profile: McaProviderProfile): Record<string, stri
         'equipment.providerAddress': profile.equipmentProvider.address,
         'equipment.providerNoticeAddress': profile.equipmentProvider.noticeAddress,
         'equipment.providerNoticeEmail': profile.equipmentProvider.noticeEmail,
+        ...(profile.equipmentProvider.creditDisputeAddress
+          ? { 'equipment.creditDisputeAddress': profile.equipmentProvider.creditDisputeAddress }
+          : {}),
       }
     : {}),
   ...(profile.broker

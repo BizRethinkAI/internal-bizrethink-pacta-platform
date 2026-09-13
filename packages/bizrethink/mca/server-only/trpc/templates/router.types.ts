@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ZMcaProviderProfile } from '../../../templates/profile';
+import { ZMcaDraftInput } from '../../../transactions/input';
 
 export const ZListMcaTemplatesRequestSchema = z.object({ teamId: z.number().int().positive() }).strict();
 export const ZGetMcaTemplateRequestSchema = ZListMcaTemplatesRequestSchema.extend({
@@ -19,3 +20,5 @@ export const ZPreviewMcaTemplateRequestSchema = ZGetMcaTemplateRequestSchema.ext
 export const ZSetMcaAccessRequestSchema = z
   .object({ feature: z.enum(['mca-builder', 'mca-clause-draft-rendering']), enabled: z.boolean() })
   .strict();
+
+export const ZFillMcaDraftRequestSchema = ZPreviewMcaTemplateRequestSchema.extend({ draft: ZMcaDraftInput }).strict();

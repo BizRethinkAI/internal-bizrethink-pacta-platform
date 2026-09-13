@@ -44,6 +44,6 @@ Original extraction history and source documents remain unchanged; source-line
 coverage uses historical ISO anchor values solely as an audit fixture.
 
 Persistence/rollback: [ADR 0016](../../../../docs/adr/0016-mca-provider-template-revisions.md).
-The next integration fills a saved revision for an individual transaction and
-renders controlled documents. Do not create a native upstream Envelope template
+The [transaction interview](../transactions/README.md) fills a current saved
+revision for an individual transaction and renders an unsigned internal review PDF. Do not create a native upstream Envelope template
 as a shortcut around MCA approval, findings, disclosure or signing checks.

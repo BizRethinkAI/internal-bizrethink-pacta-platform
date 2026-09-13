@@ -30,6 +30,8 @@ export const MCA_FUNDING_FIELDS: ClauseField[] = [
   field('merchant.email', 'Merchant — Email for Notices', 'text', true, '«8»'),
   field('merchant.businessAddress', 'Merchant — Business Address', 'text', true, '«9»'),
   field('merchant.noticeAddress', 'Merchant — Mailing Address for Notices', 'text', true, '«10»'),
+  field('merchant.designatedEmail', 'Merchant — Different Designated Notice Email (if any)', 'text', false),
+  field('merchant.designatedNoticeAddress', 'Merchant — Different Designated Notice Address (if any)', 'text', false),
   field('account.bankName', 'Deposit Account — Bank Name', 'text', true, '«11»'),
   field('account.documentIdentifier', 'Deposit Account — Document Identifier (masked)', 'text', true, '«12»'),
   field('account.routingNumber', 'Deposit Account — Routing Number', 'text', true, '«13»'),
@@ -157,6 +159,7 @@ export const MCA_EQUIPMENT_FIELDS: ClauseField[] = [
   field('equipment.providerAddress', 'Equipment Provider — Principal Address', 'text', true, '«41»'),
   field('equipment.providerNoticeAddress', 'Equipment Provider — Notice Address', 'text', true, '«43»'),
   field('equipment.providerNoticeEmail', 'Equipment Provider — Notice Email'),
+  field('equipment.creditDisputeAddress', 'Equipment Provider — Credit Reporting Dispute Address'),
   field('equipment.returnAddress', 'Equipment — Return Address', 'text', true, '«42»'),
   field('equipment.insuranceRequirements', 'Equipment — Required Coverage and Amount'),
   field('equipment.lossPayee', 'Equipment — Loss Payee and Insurable Interest', 'text', true, '«45»'),
@@ -203,4 +206,35 @@ export const MCA_ISO_FIELDS: ClauseField[] = [
   field('iso.effectiveDate', 'ISO Agreement — Effective Date', 'date', true, '«0»'),
   field('iso.commissionPercentage', 'ISO — Commission Percentage', 'text', true, '«2»'),
   field('iso.portalUrl', 'Company — Partner Portal URL'),
+];
+
+/** Execution locations are reviewable helpers. The draft filler never accepts signature/date values. */
+export const mcaExecutionFields = (
+  roles: readonly ('buyer' | 'merchant' | 'equipmentProvider' | 'isoCompany' | 'isoPartner')[],
+): ClauseField[] =>
+  roles.flatMap((role) => {
+    const labels = {
+      buyer: 'Buyer',
+      merchant: 'Merchant',
+      equipmentProvider: 'Equipment Provider',
+      isoCompany: 'ISO Company',
+      isoPartner: 'ISO Partner',
+    };
+    return [
+      field(`signers.${role}.name`, `${labels[role]} — Authorized Signer Printed Name`),
+      field(`signers.${role}.capacity`, `${labels[role]} — Signer Capacity`),
+      field(`signers.${role}.email`, `${labels[role]} — Signer Email`),
+      field(`signers.${role}.signature`, `${labels[role]} — Separate Signature`, 'signature'),
+      field(`signers.${role}.signedDate`, `${labels[role]} — Signature Date`, 'date'),
+    ];
+  });
+
+export const MCA_REPORT_FIELDS: ClauseField[] = [
+  field('transaction.reference', 'Permission — Identified Transaction Reference'),
+  field('funding.effectiveDate', 'Permission — Application or Agreement Date', 'date'),
+  field('merchant.legalName', 'Permission — Merchant Legal Name'),
+  field('merchant.dba', 'Permission — Merchant DBA (if any)', 'text', false),
+  field('merchant.businessAddress', 'Permission — Merchant Principal Address'),
+  field('report.subjectName', 'Individual Instructions — Report Subject Full Legal Name'),
+  field('report.reportingAgency', 'Individual Instructions — Consumer Reporting Agency'),
 ];
