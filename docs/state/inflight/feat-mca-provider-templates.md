@@ -94,3 +94,14 @@ has no platform CodeQL job; integrate/retarget main in dependency order and
 require all merge gates. No independent review, merge, merchant readiness or
 deployment is claimed here. Only this note is owned; consolidation stays with
 the selected shipping session.
+
+## First after-CI correction
+
+The initial browser run 34760337856 passed 1,101 cases, with two recovered retries
+and 59 skips; the two new scenarios failed before completing their flows. One
+selector matched both the newly visible global MCA navigation and the intended
+team link; it now selects the team by its accessible name. The non-admin grant
+test expected 403, while the existing upstream admin middleware correctly uses
+401/UNAUTHORIZED; the test now requires that response and the exact denial
+message. No authorization rule or product behavior was relaxed. CI is rerun on
+the corrected head so the remaining save/history and access assertions execute.

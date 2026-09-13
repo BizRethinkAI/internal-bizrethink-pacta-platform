@@ -41,7 +41,7 @@ test('a provider interview saves, reopens and revises a real team template with 
     await expect(page.getByRole('button', { name: 'Disable my provider interview access', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Enable my internal draft previews', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Disable my internal draft previews', exact: true })).toBeVisible();
-    await page.locator(`a[href="/t/${team.url}/mca"]`).click();
+    await page.getByRole('link', { name: team.name, exact: true }).click();
     await expect(page.getByRole('heading', { name: 'MCA provider templates', exact: true })).toBeVisible();
     await page.getByLabel('Template name', { exact: true }).fill(profile.label);
     for (const [label, value] of [
@@ -129,7 +129,9 @@ test('HTTP access separates membership, write authority and draft permission; st
     });
     expect(leaf.status()).toBe(404);
     const badGrant = await post(page.request, 'setAccess', { feature: 'mca-clause-draft-rendering', enabled: true });
-    expect(badGrant.status()).toBe(403);
+    // Existing admin middleware denies non-admin sessions with UNAUTHORIZED.
+    expect(badGrant.status()).toBe(401);
+    expect(await badGrant.text()).toContain('Not authorized to perform this action');
     const update = {
       teamId,
       id: row.id,
