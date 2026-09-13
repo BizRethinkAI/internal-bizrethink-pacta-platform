@@ -2,6 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { logger } from '@documenso/lib/utils/logger';
 import { DocumentVisibility, EnvelopeType, TeamMemberRole, TemplateType } from '@prisma/client';
 import { Hono } from 'hono';
+import { SignJWT } from 'jose';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { filesRoute } from '../../../apps/remix/server/api/files/files';
@@ -11,6 +12,7 @@ import { matchesPermissionQuery, permissionTeam, permissionUser } from './docume
 
 const { db, getTeam, session, readFile } = vi.hoisted(() => ({
   db: {
+    apiToken: { findFirst: vi.fn() },
     envelope: { findFirst: vi.fn(), findUnique: vi.fn() },
     envelopeItem: { findFirst: vi.fn() },
     team: { findFirst: vi.fn() },
@@ -56,6 +58,7 @@ beforeEach(() => {
   logger.level = 'silent';
   envelope = makeEnvelope();
   role = TeamMemberRole.MEMBER;
+  db.apiToken.findFirst.mockResolvedValue(null);
   session.mockResolvedValue({ user: permissionUser, session: { id: 'synthetic' }, isAuthenticated: true });
   getTeam.mockImplementation(async ({ teamId }: { teamId: number }) => {
     if (teamId !== 10) {
@@ -76,6 +79,48 @@ beforeEach(() => {
 });
 
 describe('A-13 and A-23 actual PDF HTTP routes', () => {
+  it.each([
+    undefined,
+    'envelopeId:envelope_team_a',
+  ])('does not let delegated scope %s borrow a sibling team role for an organisation template', async (scope) => {
+    if (!envelope) {
+      throw new Error('Fixture missing');
+    }
+    envelope.type = EnvelopeType.TEMPLATE;
+    envelope.templateType = TemplateType.ORGANISATION;
+    envelope.team.organisation.teams = [permissionTeam(), permissionTeam(20, TeamMemberRole.ADMIN)];
+    const secret = 'synthetic-a13-presign-test-material-only';
+    db.apiToken.findFirst.mockResolvedValue({
+      id: 42,
+      token: secret,
+      userId: permissionUser.id,
+      teamId: 10,
+      expires: null,
+      user: permissionUser,
+      team: { organisation: { owner: { disabled: false } } },
+    });
+    const token = await new SignJWT({
+      sub: '42',
+      aud: '10',
+      exp: Math.floor(Date.now() / 1000) + 600,
+      ...(scope ? { scope } : {}),
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .sign(new TextEncoder().encode(secret));
+    for (const [path, parameter] of [
+      [paths[0], 'token'],
+      [paths[2], 'presignToken'],
+    ]) {
+      envelope.visibility = DocumentVisibility.ADMIN;
+      // The human can select their admin team; this delegated key cannot.
+      expect((await app.request(path)).status).toBe(200);
+      readFile.mockClear();
+      expect((await app.request(`${path}?${parameter}=${encodeURIComponent(token)}`)).status).toBe(404);
+      expect(readFile).not.toHaveBeenCalled();
+      envelope.visibility = DocumentVisibility.EVERYONE;
+      expect((await app.request(`${path}?${parameter}=${encodeURIComponent(token)}`)).status).toBe(200);
+    }
+  });
   for (const path of paths) {
     it(`denies a member the admin-only PDF before storage: ${path}`, async () => {
       const response = await app.request(path, { headers: { 'If-None-Match': 'known-etag' } });

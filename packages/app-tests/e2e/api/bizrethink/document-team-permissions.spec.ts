@@ -2,6 +2,8 @@
 import { randomUUID } from 'node:crypto';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { createEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/create-embedding-presign-token';
+import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { createTeam } from '@documenso/lib/server-only/team/create-team';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
@@ -9,9 +11,17 @@ import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { createTeamMembers } from '@documenso/trpc/server/team-router/create-team-members';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 import { test as base, expect } from '@playwright/test';
-import { DocumentVisibility, FolderType, Prisma, TeamMemberRole, TemplateType } from '@prisma/client';
+import {
+  DocumentVisibility,
+  FolderType,
+  OrganisationGroupType,
+  Prisma,
+  TeamMemberRole,
+  TemplateType,
+} from '@prisma/client';
 
 const baseURL = NEXT_PUBLIC_WEBAPP_URL();
 const seedDocument = async (...args: Parameters<typeof seedBlankDocument>) => {
@@ -234,6 +244,74 @@ test('A-13 organisation-shared templates require a permitted role and remain usa
       expect(response.status()).toBe(404);
       expect(await response.json()).toEqual({ error: 'Not found' });
     }
+  }
+});
+
+test('A-13 presign PDFs cannot borrow a sibling admin role after an issuing-team demotion', async ({
+  access,
+  request,
+}) => {
+  const teamUrl = `permission-${randomUUID()}`;
+  await createTeam({
+    userId: access.sender.user.id,
+    organisationId: access.sender.organisation.id,
+    teamName: 'Delegation sibling',
+    teamUrl,
+    inheritMembers: false,
+  });
+  const sibling = await prisma.team.findUniqueOrThrow({ where: { url: teamUrl } });
+  const membership = await prisma.organisationMember.findFirstOrThrow({
+    where: { userId: access.member.id, organisationId: access.sender.organisation.id },
+  });
+  for (const teamId of [access.sender.team.id, sibling.id]) {
+    await createTeamMembers({
+      userId: access.sender.user.id,
+      teamId,
+      membersToCreate: [{ organisationMemberId: membership.id, teamRole: TeamMemberRole.ADMIN }],
+    });
+  }
+  const key = await createApiToken({
+    userId: access.member.id,
+    teamId: access.sender.team.id,
+    tokenName: 'A-13 synthetic',
+    expiresIn: null,
+  });
+  const template = await seedBlankTemplate(access.sender.user, access.sender.team.id, {
+    createTemplateOptions: { templateType: TemplateType.ORGANISATION, visibility: DocumentVisibility.ADMIN },
+  });
+  const paths = pdfPaths(template);
+  const delegatedPaths: string[] = [];
+  for (const scope of [undefined, `envelopeId:${template.id}`]) {
+    const { token } = await createEmbeddingPresignToken({ apiToken: key.token, scope });
+    delegatedPaths.push(
+      `${paths[0]}?token=${encodeURIComponent(token)}`,
+      `${paths[3]}?presignToken=${encodeURIComponent(token)}`,
+    );
+  }
+  for (const path of delegatedPaths) {
+    await expectPdf(await request.get(path));
+  }
+  const removed = await prisma.organisationGroupMember.deleteMany({
+    where: {
+      organisationMemberId: membership.id,
+      group: {
+        type: OrganisationGroupType.INTERNAL_TEAM,
+        teamGroups: { some: { teamId: access.sender.team.id, teamRole: TeamMemberRole.ADMIN } },
+      },
+    },
+  });
+  expect(removed.count).toBe(1);
+  // Human sharing can still use the sibling role; credentials retain the issuing team's current role.
+  await expectPdf(await access.memberRequest.get(paths[0]));
+  for (const path of delegatedPaths) {
+    const denied = await request.get(path);
+    expect(denied.status()).toBe(404);
+    expect(await denied.json()).toEqual({ error: 'Not found' });
+    expect(denied.headers()['cache-control']).toContain('no-store');
+  }
+  await prisma.envelope.update({ where: { id: template.id }, data: { visibility: DocumentVisibility.EVERYONE } });
+  for (const path of delegatedPaths) {
+    await expectPdf(await request.get(path));
   }
 });
 

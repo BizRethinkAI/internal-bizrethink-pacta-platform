@@ -79,16 +79,21 @@ export const getEnvelopeFileWhereInput = async ({
   // File URLs do not carry a selected team. An organisation template is shared
   // when at least one current team in that organisation grants its visibility.
   // A private template or a document can never take this branch.
-  allowed.push({
-    type: EnvelopeType.TEMPLATE,
-    templateType: TemplateType.ORGANISATION,
-    OR: Object.values(TeamMemberRole).map((role) => ({
-      visibility: { in: TEAM_DOCUMENT_VISIBILITY_MAP[role] },
-      team: {
-        organisation: { teams: { some: buildTeamWhereQuery({ teamId: undefined, userId, roles: [role] }) } },
-      },
-    })),
-  });
+  // A verified presign predicate always includes its issuing team. Delegated
+  // credentials must use that team's role above, not a creator's stronger role
+  // in another team. Only ordinary human sessions get sibling-team sharing.
+  if (apiScope.teamId === undefined && Object.keys(scope).length === 0) {
+    allowed.push({
+      type: EnvelopeType.TEMPLATE,
+      templateType: TemplateType.ORGANISATION,
+      OR: Object.values(TeamMemberRole).map((role) => ({
+        visibility: { in: TEAM_DOCUMENT_VISIBILITY_MAP[role] },
+        team: {
+          organisation: { teams: { some: buildTeamWhereQuery({ teamId: undefined, userId, roles: [role] }) } },
+        },
+      })),
+    });
+  }
   return { AND: [{ id: envelopeId }, apiScope, scope, { OR: allowed }] };
 };
 
