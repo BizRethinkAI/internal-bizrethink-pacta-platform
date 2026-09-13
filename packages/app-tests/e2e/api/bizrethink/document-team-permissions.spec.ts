@@ -50,7 +50,7 @@ const test = base.extend<{ access: Access }>({
       const response = await client.post('/api/auth/email-password/authorize', {
         data: { email, password: 'password', csrfToken },
       });
-      expect(response.status(), await response.text()).toBe(200);
+      expect(response.status(), await response.text()).toBe(201);
       expect((await (await client.get('/api/auth/session')).json()).user?.email).toBe(email);
       return client;
     };

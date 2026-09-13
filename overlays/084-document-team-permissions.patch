@@ -1,5 +1,5 @@
 # Why: Enforce document/team visibility consistently in suggestions, PDFs, private-object errors and folder mutations.
-# Why-not-additive: Existing upstream callers must invoke the owned permission predicates and transactional folder helpers.
+# Why-not-additive: Existing upstream callers must invoke owned permission predicates/transactions; their HTTP tests must enforce the uniform absence contract.
 # Upstream-merge-fragility: medium — authorization callers and folder/PDF contracts must be rechecked after upstream refactors.
 # Base: 1813b1d72fb231593ddcb2cb0b2a55054ac7f040; preserves overlay 075 API scope and overlay 078 presign capability boundaries.
 diff --git a/apps/remix/server/api/files/files.helpers.ts b/apps/remix/server/api/files/files.helpers.ts
@@ -260,6 +260,35 @@ index 1d29230a7..d049f373b 100644
      return await handleEnvelopeItemPdfRequest({
        c,
        envelopeItem,
+diff --git a/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts b/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
+index b45f5f18f..b280f9dda 100644
+--- a/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
++++ b/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
+@@ -3478,7 +3478,8 @@ test.describe('Document API V2', () => {
+         expect(res.ok()).toBeFalsy();
+         // MODIFIED for BizRethink (overlay 075): foreign API-team records are hidden as 404.
+         expect(res.status()).toBe(404);
+-        expect(await res.text()).toContain('Document not found');
++        // MODIFIED for BizRethink (overlay 084): use the same envelope absence error for every denied type.
++        expect(await res.text()).toContain('Envelope not found');
+         expect(await prisma.envelope.findUnique({ where: { id: doc.id } })).toMatchObject({
+           id: doc.id,
+           teamId: teamA.id,
+diff --git a/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts b/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts
+index ff9b7ec1a..fc6b18850 100644
+--- a/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts
++++ b/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts
+@@ -43,7 +43,9 @@ test.describe('Envelope item file download endpoint authorization', () => {
+     const res = await page.request.get(downloadUrl(draft.id, draftItem.id, 'original'));
+ 
+     expect(res.ok()).toBeFalsy();
+-    expect(res.status()).toBe(403);
++    // MODIFIED for BizRethink (overlay 084): foreign and absent PDFs have one private-object response.
++    expect(res.status()).toBe(404);
++    expect(await res.json()).toEqual({ error: 'Not found' });
+   });
+ 
+   test('returns 404 for a nonexistent envelope', async ({ page }) => {
 diff --git a/packages/lib/server-only/document/delete-document.ts b/packages/lib/server-only/document/delete-document.ts
 index 51047571a..958aa87ca 100644
 --- a/packages/lib/server-only/document/delete-document.ts
