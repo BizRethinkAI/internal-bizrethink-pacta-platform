@@ -1,3 +1,4 @@
+import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { McaProviderTemplates } from '@bizrethink/customizations/mca/components/provider-templates';
 import { assertMcaTeamAccess } from '@bizrethink/customizations/mca/templates/server-only/service';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
@@ -5,6 +6,8 @@ import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { TeamMemberRole } from '@documenso/prisma/generated/types';
 import { useLoaderData } from 'react-router';
 import type { Route } from './+types/mca';
+
+export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: legalStyles }];
 
 export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const { user } = await getSession(request);

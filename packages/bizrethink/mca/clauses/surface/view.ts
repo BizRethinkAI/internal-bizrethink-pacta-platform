@@ -1,7 +1,9 @@
+import type { LegalReading } from '../../../legal-ui/reading';
 import { assertPublishable } from '../../../provenance/types';
 import { ALL_MCA_CONTENT, contentFindingSlugs } from '../../catalogue';
 import { type ReviewMcaContent, reusableForReview } from '../../reusable/review';
 import { numberedLibraryForReview, reviewProfileDescription } from '../../review/numbered-library';
+import { readingForReview } from '../../review/reading-presentation';
 import { agreementDigest, agreementExists, MissingAgreementError } from '../documents';
 import { findingsFor, outstandingFindingsFor, REGISTER_AVAILABLE } from '../examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
@@ -62,6 +64,10 @@ export type McaLibraryFindingView = {
 
 export type McaLibraryRecordView = {
   slug: string;
+  version: number;
+  placement: McaReusableContent['placement'] | null;
+  derivedFrom: McaContent['derivedFrom'];
+  reading: LegalReading;
   instrument: McaInstrument;
   number: string | null;
   kind: McaContent['kind'];
@@ -144,6 +150,10 @@ const recordView = (clause: ReviewMcaContent): McaLibraryRecordView => {
   const outstanding = new Set(outstandingFindingsFor(evidence).map((finding) => finding.id));
   return {
     slug: clause.slug,
+    version: clause.version,
+    placement: clause.kind === 'clause' ? null : clause.placement,
+    derivedFrom: clause.derivedFrom,
+    reading: readingForReview(clause.slug),
     instrument: clause.instrument,
     number: clause.number,
     kind: clause.kind,

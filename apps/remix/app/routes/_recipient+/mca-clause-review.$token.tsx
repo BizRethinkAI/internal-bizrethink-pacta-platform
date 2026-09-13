@@ -1,14 +1,17 @@
-import { describeClauseVariance, describeWhyThisClause } from '@bizrethink/customizations/mca/clauses/metadata';
+import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
+import { McaCounselReader } from '@bizrethink/customizations/mca/components/counsel-reader';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 import { useParams } from 'react-router';
+
+import type { Route } from './+types/mca-clause-review.$token';
+
+export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: legalStyles }];
 
 export function meta() {
   return [
@@ -29,7 +32,7 @@ export function meta() {
       "Future Receivables Purchase Agreement" for an Equipment Lease link would
       be worse than a general one.
     */
-    { title: i18n._(msg`Review an agreement · Pacta`) },
+    { title: i18n._(msg`Review clause library · Pacta`) },
     /*
       Repeated rather than inherited: a route that exports `meta` REPLACES what
       the parent supplies instead of merging into it, so omitting this would
@@ -74,14 +77,16 @@ function FindingBox({
   clauseSlug,
   recorded,
   onRecorded,
+  body,
+  setBody,
 }: {
   token: string;
   clauseSlug: string;
   recorded: RecordedFinding[];
   onRecorded: () => void;
+  body: string;
+  setBody: (body: string) => void;
 }) {
-  const [body, setBody] = useState('');
-
   const record = trpc.bizrethink.mcaClauseLibrary.recordFinding.useMutation({
     onSuccess: () => {
       setBody('');
@@ -145,7 +150,16 @@ function FindingBox({
           A failed save was invisible on the lease page once and cost a reviewer
           their work. Not repeating that here.
         */}
-        {record.error && <span className="text-destructive text-xs">{record.error.message}</span>}
+        {record.error && (
+          <span role="alert" className="text-destructive text-xs">
+            {record.error.message}
+          </span>
+        )}
+        {record.isSuccess && (
+          <span role="status" className="text-sm">
+            Finding recorded
+          </span>
+        )}
       </div>
     </div>
   );
@@ -194,13 +208,14 @@ function FindingBox({
  * reader supplies — but it is still text going through a splitter, so the parts
  * are rendered as React children and never as HTML.
  */
-const withEmphasis = (paragraph: string) =>
+const _withEmphasis = (paragraph: string) =>
   paragraph
     .split(/\*\*(.+?)\*\*/g)
     .map((part, index) => (index % 2 === 1 ? <strong key={index}>{part}</strong> : part));
 
 export default function McaClauseReviewPage() {
   const { token = '' } = useParams();
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const query = trpc.bizrethink.mcaClauseLibrary.openLibrary.useQuery({ token });
 
@@ -228,173 +243,20 @@ export default function McaClauseReviewPage() {
     );
   }
 
-  const { reviewerName, instrument, parties, agreementMoved, briefing, sections } = query.data;
-
-  const clauses = sections.flatMap((section) => section.clauses);
-  const approved = clauses.filter((clause) => clause.approved).length;
-
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
-      <p className="text-muted-foreground text-sm">For {reviewerName}</p>
-      <h1 className="mt-1 font-semibold text-3xl">{instrument.title}</h1>
-      <p className="mt-1 text-muted-foreground text-sm">
-        {parties.funder} · {clauses.length} review items · {approved} carry a current approval
-      </p>
-
-      {agreementMoved && (
-        <Alert className="mt-6" variant="warning">
-          <AlertTitle>This agreement has changed since the link was sent</AlertTitle>
-          <AlertDescription>
-            The library’s text, selection or citation context has changed since this link was created. Ask for a fresh
-            link before recording anything against what you read here.
-          </AlertDescription>
-        </Alert>
+    <McaCounselReader
+      view={query.data}
+      findingError={findings.error?.message}
+      renderFinding={(clause) => (
+        <FindingBox
+          clauseSlug={clause.slug}
+          token={token}
+          onRecorded={() => void findings.refetch()}
+          recorded={(findings.data?.findings ?? []).filter((finding) => finding.clauseSlug === clause.slug)}
+          body={drafts[clause.slug] ?? ''}
+          setBody={(body) => setDrafts((previous) => ({ ...previous, [clause.slug]: body }))}
+        />
       )}
-
-      {/*
-        THE BRIEFING, AND WHY IT REPLACED A FOUR-LINE ALERT.
-
-        The link was opened as counsel would open it, and the page gave a
-        funder's name, a clause count and a hundred paragraphs of contract text.
-        A lawyer cannot review a document whose purpose has not been stated: not
-        what the business is, not who is asking, not what an approval would
-        cause, not which of six documents this is, not what is deliberately
-        absent, and — worst, because the page collects nothing — not where a
-        comment goes. Every one of those was answerable from what this package
-        already knew.
-
-        RENDERED, NOT SUMMARISED, AND NOT COLLAPSED BEHIND A DISCLOSURE. The
-        reader has been engaged to read carefully; hiding the terms of the
-        engagement behind "show more" optimises the page for someone who is not
-        the audience.
-      */}
-      <section className="mt-8 rounded-lg border border-border bg-muted/30 px-6 py-5">
-        {briefing.map((part) => (
-          <div key={part.id} className="mt-6 first:mt-0">
-            <h2 className="font-semibold text-base">{part.title}</h2>
-
-            {part.body.map((paragraph, index) => (
-              <p key={index} className="mt-2 text-sm leading-relaxed">
-                {withEmphasis(paragraph)}
-              </p>
-            ))}
-          </div>
-        ))}
-      </section>
-
-      {/*
-        THE "THE REGISTER CANNOT BE READ HERE" WARNING IS GONE WITH THE FINDINGS
-        IT DESCRIBED. It told an attorney that two adversarial reviews existed
-        and that their register was absent from this environment, so that an
-        empty finding list would not read as a clean bill. With no finding list
-        there is nothing for it to qualify — and a page that names a register
-        the reader cannot see either invites a request for it or reads as
-        something withheld. The register is still read, and still holds an
-        approval: see `findingsHold` on the staff side, which is where the
-        readable/unreadable distinction has consequences.
-      */}
-
-      {sections.map((section) => (
-        <section key={section.id} className="mt-10">
-          <h2 className="border-border border-b pb-2 font-semibold text-lg">{section.name}</h2>
-
-          <ul className="mt-4 space-y-6">
-            {section.clauses.map((clause) => (
-              <li key={clause.slug} data-mca-slug={clause.slug}>
-                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  {clause.kind === 'clause' && (
-                    <span className="font-mono text-muted-foreground text-xs">{clause.number}</span>
-                  )}
-                  <h3 className="font-medium">{clause.heading}</h3>
-                  {clause.kind !== 'clause' && (
-                    <Badge variant="neutral">
-                      {clause.kind === 'guidance' ? (
-                        <Trans>Interview guidance — excluded from the contract</Trans>
-                      ) : clause.kind === 'field-group' ? (
-                        <Trans>Required document fields</Trans>
-                      ) : (
-                        <Trans>Required document block</Trans>
-                      )}
-                    </Badge>
-                  )}
-                  {clause.approved ? <Badge>Approved</Badge> : <Badge variant="neutral">No current approval</Badge>}
-                </div>
-
-                {clause.selectionNote && <p className="mt-1 text-muted-foreground text-sm">{clause.selectionNote}</p>}
-
-                <p className="mt-1 text-muted-foreground text-xs">{describeWhyThisClause(clause.whyThisClause)}</p>
-                <p className="mt-1 text-muted-foreground text-xs">{describeClauseVariance(clause.variance)}</p>
-
-                {clause.text && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>}
-                {clause.repeatFor === 'guarantor' && (
-                  <p className="mt-2 text-sm">
-                    <Trans>Complete a separate block for each guarantor signing this instrument.</Trans>
-                  </p>
-                )}
-                {clause.retiredFields && (
-                  <p className="mt-2 text-muted-foreground text-xs">
-                    <Trans>Retired source fields are excluded from the document:</Trans>{' '}
-                    {clause.retiredFields.map((field) => `${field.widget} — ${field.reason}`).join('; ')}
-                  </p>
-                )}
-                {clause.fields && (
-                  <dl className="mt-3 grid gap-3 rounded-md border border-border p-4 sm:grid-cols-2">
-                    {clause.fields.map((field) => (
-                      <div key={field.widget}>
-                        <dt className="text-muted-foreground text-xs">{field.label}</dt>
-                        <dd className="mt-1 font-mono text-sm">{field.widget}</dd>
-                        <dd className="text-muted-foreground text-xs">
-                          {field.requiredWhen ? (
-                            <Trans>Required for an entity guarantor</Trans>
-                          ) : field.required ? (
-                            <Trans>Required</Trans>
-                          ) : (
-                            <Trans>Optional</Trans>
-                          )}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                )}
-
-                {/*
-                  THE EARLIER REVIEWS' FINDINGS WERE PRINTED HERE, under the
-                  clause each one names. ADR 0012 decided on 2026-09-10 that
-                  they are drafting input and stop being shown to a reviewing
-                  attorney; the decision was recorded and the code change never
-                  happened, and no test in this repository asserted anything
-                  about what this page renders, so nothing was red for a day.
-
-                  THEY DESCRIBED TEXT THAT NO LONGER EXISTS. They audited
-                  `Lombard_FRPA_v4` and every FRPA clause has since been
-                  rewritten. Under §2.1 the clause now says the merchant makes
-                  NO representation as to fair market value; the note beneath it
-                  said §2.1 makes the merchant agree that the price EQUALS fair
-                  market value — an annotation asserting the opposite of the
-                  clause it sat under. Two of them named an internal working
-                  paper by filename and told outside counsel our own entity
-                  records were unverified.
-
-                  They are not fetched and hidden. The router no longer sends
-                  them: a field the page declines to paint is still in the JSON
-                  the browser holds and still readable by anyone with the link.
-
-                  The box below is the other register — what THIS reader writes,
-                  on a link we minted, attributable to the reviewer named on it.
-                  It stays, and with nothing above it no longer needs a label to
-                  tell the two apart.
-                */}
-                <FindingBox
-                  clauseSlug={clause.slug}
-                  onRecorded={() => void findings.refetch()}
-                  recorded={(findings.data?.findings ?? []).filter((finding) => finding.clauseSlug === clause.slug)}
-                  token={token}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
-    </div>
+    />
   );
 }

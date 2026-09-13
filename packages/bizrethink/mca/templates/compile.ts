@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-
+import type { LegalReading } from '../../legal-ui/reading';
 import { contentFor } from '../catalogue';
 import { mcaClauseFingerprint } from '../clauses/approval';
 import { INSTRUMENTS, type McaInstrument } from '../clauses/instruments';
@@ -15,6 +15,8 @@ import { reusableFor } from '../reusable/library';
 import { type McaProviderProfile, providerSelectionFacts, ZMcaProviderProfile } from './profile';
 
 export type McaTemplateItem = {
+  /** Ephemeral presentation only, added after compiling/hashing a saved recipe. */
+  reading?: LegalReading;
   slug: string;
   version: number;
   /** Selected source data; separate from counsel approval, which also pins the gate. */
@@ -126,7 +128,7 @@ export const providerValues = (profile: McaProviderProfile): Record<string, stri
     : {}),
 });
 
-const populateProvider = (body: string, profile: McaProviderProfile, values: Record<string, string>) =>
+export const populateProvider = (body: string, profile: McaProviderProfile, values: Record<string, string>) =>
   body
     .replace(/\{\{(funder|equipmentAffiliate|processor)\}\}/g, (_token, role: string) => {
       if (role === 'funder') {

@@ -1,0 +1,7 @@
+@config "./tailwind.config.ts";
+@tailwind utilities;
+
+/* The portalled dialog is itself the scope root, so descendant utilities do not size it. */
+[data-legal-workspace].legal-reference-dialog {
+  @apply max-h-[85dvh] overflow-y-auto;
+}

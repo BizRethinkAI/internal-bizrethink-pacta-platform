@@ -1,4 +1,5 @@
 import { conformitySurface, envelopeShapes, OPEN_READINGS } from '@bizrethink/customizations';
+import { disclosureReading } from '@bizrethink/customizations/mca/server-only/disclosure-reading';
 
 /**
  * The server-only half of `/admin/mca`.
@@ -26,10 +27,11 @@ import { conformitySurface, envelopeShapes, OPEN_READINGS } from '@bizrethink/cu
  * `JURISDICTION_NAMES` from `@bizrethink/customizations/mca/jurisdictions`,
  * which is a pure data module with no imports at all.
  */
-export const buildMcaConformityView = () => {
+export const buildMcaConformityView = (source: string | null = null) => {
   const surface = conformitySurface();
 
   return {
+    source: source ? disclosureReading(source) : null,
     library: surface.library as string,
     jurisdictions: [...surface.jurisdictions],
     entries: surface.entries,

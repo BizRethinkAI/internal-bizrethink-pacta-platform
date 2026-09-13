@@ -5,7 +5,7 @@ import type { McaTemplateDocument, McaTemplateItem, McaTemplateSnapshot } from '
 import { MCA_PROVIDER_BINDINGS } from '../templates/profile';
 import { type McaDraftGuarantor, type McaDraftInput, ZMcaDraftInput } from './input';
 
-type MissingValue = { document: string; binding: string; label: string };
+type MissingValue = { document: string; binding: string; label: string; inputPath: string };
 export type McaDraftSignature = {
   role: string;
   partyName: string;
@@ -152,12 +152,18 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
   }
   const missing: MissingValue[] = [];
   if (!input.reference) {
-    missing.push({ document: 'package', binding: 'reference', label: 'Transaction reference' });
+    missing.push({ document: 'package', binding: 'reference', label: 'Transaction reference', inputPath: 'reference' });
   }
-  const addMissing = (document: string, field: ClauseField, value: string | null, guarantor?: McaDraftGuarantor) => {
+  const addMissing = (
+    document: string,
+    field: ClauseField,
+    value: string | null,
+    inputPath: string,
+    guarantor?: McaDraftGuarantor,
+  ) => {
     const required = field.required || (field.requiredWhen && guarantor?.kind === field.requiredWhen.equals);
     if (required && !unsigned(field) && !value) {
-      missing.push({ document, binding: field.binding, label: field.label });
+      missing.push({ document, binding: field.binding, label: field.label, inputPath });
     }
   };
   const documents: McaDraftDocument[] = [];
@@ -191,6 +197,7 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
           missing.push({
             document: id,
             binding: `${document.instrument}.guarantors`,
+            inputPath: `guarantors.${document.instrument}`,
             label: 'At least one intended guarantor with a separate signature capacity',
           });
           copies.push(null);
@@ -201,31 +208,66 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
             const value = unsigned(field)
               ? null
               : (field.value ?? (guarantor ? (guarantor[key] ?? null) : (context[field.binding] ?? null)));
-            addMissing(id, field, value, guarantor ?? undefined);
+            const inputPath = field.binding.startsWith('guarantor.')
+              ? `guarantors.${document.instrument}.${index}.${key}`
+              : field.binding.startsWith('report.')
+                ? `reportSubjects.${subjectIndex}.${field.binding === 'report.subjectName' ? 'name' : 'reportingAgency'}`
+                : field.binding === 'transaction.reference'
+                  ? 'reference'
+                  : field.binding.startsWith('signers.')
+                    ? field.binding
+                    : field.binding === 'merchant.signerCapacity'
+                      ? 'signers.merchant.capacity'
+                      : `values.${field.binding}`;
+            addMissing(id, field, value, inputPath, guarantor ?? undefined);
             return { ...field, value };
           });
-          const body = item.body.replace(/\{\{field:([^}]+)\}\}/g, (_token, binding: string) => {
-            const value = context[binding];
-            if (value) {
-              return value;
-            }
-            return `[${labels.get(binding) ?? binding}: to complete]`;
-          });
+          const fillText = (text: string) =>
+            text.replace(/\{\{field:([^}]+)\}\}/g, (_token, binding: string) => {
+              const value = context[binding];
+              if (value) {
+                return value;
+              }
+              return `[${labels.get(binding) ?? binding}: to complete]`;
+            });
+          const body = fillText(item.body);
           items.push({
             ...item,
             slug: item.repeatFor ? `${item.slug}:${index + 1}` : item.slug,
             heading: item.repeatFor ? `${item.heading} — ${guarantor?.legalName || index + 1}` : item.heading,
             body,
+            ...(item.reading
+              ? {
+                  reading: {
+                    ...item.reading,
+                    segments: item.reading.segments.map((part) =>
+                      part.kind === 'text' ? { ...part, text: fillText(part.text) } : part,
+                    ),
+                  },
+                }
+              : {}),
             fields: filledFields,
           });
         }
       }
       const signatures: McaDraftSignature[] = [];
-      const sign = (role: string, partyName: string, signer: McaDraftInput['signers']['merchant']) => {
+      const sign = (
+        role: string,
+        partyName: string,
+        signer: McaDraftInput['signers']['merchant'],
+        paths?: Record<string, string>,
+      ) => {
         signatures.push({ role, partyName, signerName: signer.name, capacity: signer.capacity, email: signer.email });
         for (const key of ['name', 'email', 'capacity'] as const) {
           if (!signer[key]) {
-            missing.push({ document: id, binding: `signers.${role}.${key}`, label: `${role}: ${key}` });
+            missing.push({
+              document: id,
+              binding: `signers.${role}.${key}`,
+              label: `${role}: ${key}`,
+              inputPath:
+                paths?.[key] ??
+                `signers.${({ Merchant: 'merchant', Buyer: 'buyer', 'ISO company': 'isoCompany', 'ISO partner': 'isoPartner', 'Equipment provider': 'equipmentProvider' } as Record<string, string>)[role]}.${key}`,
+            });
           }
         }
       };
@@ -245,12 +287,21 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
           );
         }
       }
-      for (const guarantor of guarantors) {
-        sign('Guarantor', guarantor.legalName, {
-          name: guarantor.kind === 'individual' ? guarantor.legalName : guarantor.signerName,
-          capacity: guarantor.kind === 'individual' ? 'Individual guarantor' : guarantor.signerCapacity,
-          email: guarantor.email,
-        });
+      for (const [guarantorIndex, guarantor] of guarantors.entries()) {
+        sign(
+          'Guarantor',
+          guarantor.legalName,
+          {
+            name: guarantor.kind === 'individual' ? guarantor.legalName : guarantor.signerName,
+            capacity: guarantor.kind === 'individual' ? 'Individual guarantor' : guarantor.signerCapacity,
+            email: guarantor.email,
+          },
+          {
+            name: `guarantors.${document.instrument}.${guarantorIndex}.${guarantor.kind === 'individual' ? 'legalName' : 'signerName'}`,
+            email: `guarantors.${document.instrument}.${guarantorIndex}.email`,
+            capacity: `guarantors.${document.instrument}.${guarantorIndex}.signerCapacity`,
+          },
+        );
       }
       if (subject) {
         signatures.push({
@@ -264,6 +315,7 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
           missing.push({
             document: id,
             binding: 'report.subject',
+            inputPath: `reportSubjects.${subjectIndex}.${!subject.name ? 'name' : 'reportingAgency'}`,
             label: 'The individual report subject and reporting agency',
           });
         }

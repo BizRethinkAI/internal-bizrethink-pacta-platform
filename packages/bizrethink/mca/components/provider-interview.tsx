@@ -33,7 +33,7 @@ export const McaProviderInterview = ({
   const broker = form.watch('policy.brokerChannel');
   const next = async () => {
     const fields: FieldPath<McaProviderProfile>[] = step === 0 ? ['label', 'buyer'] : ['policy'];
-    if (await form.trigger(fields)) {
+    if (await form.trigger(fields, { shouldFocus: true })) {
       setStep(step + 1);
     }
   };
@@ -49,11 +49,14 @@ export const McaProviderInterview = ({
               setError(AppError.parseError(cause).message);
             }
           },
-          () => setError(_(msg`Complete the highlighted provider answers before saving.`)),
+          (errors) => {
+            setError(_(msg`Complete the highlighted provider answers before saving.`));
+            setStep(errors.label || errors.buyer ? 0 : errors.policy ? 1 : 2);
+          },
         )}
         className="space-y-5"
       >
-        <div className="flex flex-wrap gap-2" role="group" aria-label={_(msg`Interview steps`)}>
+        <fieldset className="flex min-w-0 flex-wrap gap-2" aria-label={_(msg`Interview steps`)}>
           {[msg`1. Provider`, msg`2. Programme`, msg`3. Operations`].map((label, index) => (
             <Button
               key={index}
@@ -64,8 +67,20 @@ export const McaProviderInterview = ({
               {_(label)}
             </Button>
           ))}
-        </div>
-        <fieldset disabled={form.formState.isSubmitting || readOnly} className="space-y-5 disabled:opacity-70">
+        </fieldset>
+        <p className="text-muted-foreground text-sm">
+          {step === 0 ? (
+            <Trans>Identify the contracting entities and where notices are received.</Trans>
+          ) : step === 1 ? (
+            <Trans>Save the programme choices this provider supports.</Trans>
+          ) : (
+            <Trans>Identify processor forms and the separate equipment or channel counterparties.</Trans>
+          )}
+        </p>
+        <fieldset
+          disabled={form.formState.isSubmitting || readOnly}
+          className="space-y-5 rounded-lg bg-muted/15 p-4 disabled:opacity-70 sm:p-6"
+        >
           {step === 0 && (
             <>
               <h2 className="font-semibold text-xl">
