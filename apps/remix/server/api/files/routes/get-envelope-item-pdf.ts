@@ -1,3 +1,4 @@
+import { getEnvelopeFileWhereInput } from '@bizrethink/customizations/server-only/document-permissions';
 import { resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { sha256 } from '@documenso/lib/universal/crypto';
@@ -9,7 +10,6 @@ import { type Context, Hono } from 'hono';
 import { z } from 'zod';
 
 import type { HonoEnv } from '../../../router';
-import { checkEnvelopeFileAccess } from '../files.helpers';
 
 const route = new Hono<HonoEnv>();
 
@@ -42,13 +42,13 @@ route.get(
       return c.json({ error: 'Not found' }, 404);
     }
 
-    // Note: We authenticate whether the user can access this in the `getTeamById` below.
+    // MODIFIED for BizRethink (overlay 084): authorize the envelope in the query that loads its file data.
     const envelopeItem = await prisma.envelopeItem.findFirst({
       where: {
         id: envelopeItemId,
         envelopeId,
         documentDataId,
-        envelope: actor?.envelopeWhere,
+        envelope: await getEnvelopeFileWhereInput({ userId, envelopeId, scope: actor?.envelopeWhere }),
       },
       include: {
         documentData: true,
@@ -64,18 +64,6 @@ route.get(
     });
 
     if (!envelopeItem) {
-      return c.json({ error: 'Not found' }, 404);
-    }
-
-    // Check whether the user has access to the document.
-    const hasAccess = await checkEnvelopeFileAccess({
-      userId,
-      teamId: envelopeItem.envelope.teamId,
-      envelopeType: envelopeItem.envelope.type,
-      templateType: envelopeItem.envelope.templateType,
-    });
-
-    if (!hasAccess) {
       return c.json({ error: 'Not found' }, 404);
     }
 

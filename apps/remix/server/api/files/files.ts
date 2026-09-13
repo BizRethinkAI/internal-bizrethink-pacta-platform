@@ -1,3 +1,7 @@
+import {
+  getEnvelopeFileWhereInput,
+  privateEnvelopeFileCache,
+} from '@bizrethink/customizations/server-only/document-permissions';
 import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
 import { presignFileCache, resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
 import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
@@ -12,7 +16,7 @@ import type { Prisma } from '@prisma/client';
 import { Hono } from 'hono';
 
 import type { HonoEnv } from '../../router';
-import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest } from './files.helpers';
+import { handleEnvelopeItemFileRequest } from './files.helpers';
 import {
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileRequestParamsSchema,
@@ -25,6 +29,8 @@ import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
 
 export const filesRoute = new Hono<HonoEnv>()
+  // MODIFIED for BizRethink (overlay 084): role/visibility changes apply to every authenticated file read.
+  .use('/envelope/*', privateEnvelopeFileCache)
   // MODIFIED for BizRethink (overlay 078): delegated PDFs must revalidate on future reads.
   .use('/envelope/:envelopeId/envelopeItem/:envelopeItemId', presignFileCache('token'))
   .use(
@@ -87,8 +93,7 @@ export const filesRoute = new Hono<HonoEnv>()
 
       const envelope = await prisma.envelope.findFirst({
         where: {
-          id: envelopeId,
-          ...actor?.envelopeWhere,
+          ...(await getEnvelopeFileWhereInput({ userId, envelopeId, scope: actor?.envelopeWhere })),
         },
         include: {
           envelopeItems: {
@@ -103,28 +108,17 @@ export const filesRoute = new Hono<HonoEnv>()
       });
 
       if (!envelope) {
-        return c.json({ error: 'Envelope not found' }, 404);
+        return c.json({ error: 'Not found' }, 404);
       }
 
       const [envelopeItem] = envelope.envelopeItems;
 
       if (!envelopeItem) {
-        return c.json({ error: 'Envelope item not found' }, 404);
-      }
-
-      const hasAccess = await checkEnvelopeFileAccess({
-        userId,
-        teamId: envelope.teamId,
-        envelopeType: envelope.type,
-        templateType: envelope.templateType,
-      });
-
-      if (!hasAccess) {
-        return c.json({ error: 'User does not have access to the team that this envelope is associated with' }, 403);
+        return c.json({ error: 'Not found' }, 404);
       }
 
       if (!envelopeItem.documentData) {
-        return c.json({ error: 'Document data not found' }, 404);
+        return c.json({ error: 'Not found' }, 404);
       }
 
       return await handleEnvelopeItemFileRequest({
@@ -154,7 +148,7 @@ export const filesRoute = new Hono<HonoEnv>()
 
         const envelope = await prisma.envelope.findFirst({
           where: {
-            id: envelopeId,
+            ...(await getEnvelopeFileWhereInput({ userId: session.user.id, envelopeId })),
           },
           include: {
             envelopeItems: {
@@ -175,33 +169,17 @@ export const filesRoute = new Hono<HonoEnv>()
         });
 
         if (!envelope) {
-          return c.json({ error: 'Envelope not found' }, 404);
+          return c.json({ error: 'Not found' }, 404);
         }
 
         const [envelopeItem] = envelope.envelopeItems;
 
         if (!envelopeItem) {
-          return c.json({ error: 'Envelope item not found' }, 404);
-        }
-
-        const hasDownloadAccess = await checkEnvelopeFileAccess({
-          userId: session.user.id,
-          teamId: envelope.teamId,
-          envelopeType: envelope.type,
-          templateType: envelope.templateType,
-        });
-
-        if (!hasDownloadAccess) {
-          return c.json(
-            {
-              error: 'User does not have access to the team that this envelope is associated with',
-            },
-            403,
-          );
+          return c.json({ error: 'Not found' }, 404);
         }
 
         if (!envelopeItem.documentData) {
-          return c.json({ error: 'Document data not found' }, 404);
+          return c.json({ error: 'Not found' }, 404);
         }
 
         const baseOptions = {

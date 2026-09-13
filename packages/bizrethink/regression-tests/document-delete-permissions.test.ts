@@ -3,7 +3,8 @@ import { logger } from '@documenso/lib/utils/logger';
 import { deleteDocumentRoute } from '@documenso/trpc/server/document-router/delete-document';
 import { deleteEnvelopeRoute } from '@documenso/trpc/server/envelope-router/delete-envelope';
 import { router } from '@documenso/trpc/server/trpc';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, TeamMemberRole } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { envelopeFixture, recipientFixture } from './api-token-team-fixture';
@@ -70,7 +71,7 @@ const rejection = async (run: () => Promise<unknown>) => {
   try {
     await run();
   } catch (error) {
-    if (error instanceof Error && error.cause instanceof AppError) {
+    if (error instanceof TRPCError && error.cause instanceof AppError) {
       return { code: error.cause.code, message: error.cause.message };
     }
     throw error;
@@ -78,6 +79,20 @@ const rejection = async (run: () => Promise<unknown>) => {
   throw new Error('Expected a permission rejection');
 };
 describe('A-23 document deletion reveals no foreign/hidden existence', () => {
+  it('does not use a template recipient as document self-hide authority', async () => {
+    if (!envelope) {
+      throw new Error('Fixture missing');
+    }
+    envelope.type = EnvelopeType.TEMPLATE;
+    envelope.secondaryId = 'template_1';
+    envelope.recipients = [{ ...recipientFixture(envelope.id), email: permissionUser.email }];
+    const foreign = await rejection(calls.envelope);
+    envelope = null;
+    expect(foreign).toEqual(await rejection(calls.envelope));
+    expect(foreign.code).toBe(AppErrorCode.NOT_FOUND);
+    expect(db.envelope.delete).not.toHaveBeenCalled();
+    expect(db.recipient.update).not.toHaveBeenCalled();
+  });
   for (const [name, run] of Object.entries(calls)) {
     it(`uses identical absence errors for hidden, foreign and missing documents (${name})`, async () => {
       const hidden = await rejection(run);

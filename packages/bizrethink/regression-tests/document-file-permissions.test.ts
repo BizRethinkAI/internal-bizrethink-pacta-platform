@@ -1,6 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { logger } from '@documenso/lib/utils/logger';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, TeamMemberRole, TemplateType } from '@prisma/client';
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -97,6 +97,8 @@ describe('A-13 and A-23 actual PDF HTTP routes', () => {
       const response = await app.request(path);
       expect(response.status).toBe(200);
       expect(await response.text()).toBe('%PDF-test');
+      expect(response.headers.get('cache-control')).toContain('private');
+      expect(response.headers.get('cache-control')).toContain('no-store');
     });
     it(`returns the identical body/status for absent and foreign objects: ${path}`, async () => {
       if (!envelope) {
@@ -112,5 +114,39 @@ describe('A-13 and A-23 actual PDF HTTP routes', () => {
       expect(await foreign.json()).toEqual(await absent.json());
       expect(readFile).not.toHaveBeenCalled();
     });
+    it(`does not borrow the old team's role if the document moves during authorization: ${path}`, async () => {
+      getTeam.mockImplementationOnce(async () => {
+        if (!envelope) {
+          throw new Error('Fixture missing');
+        }
+        envelope.teamId = 20;
+        return await Promise.resolve(permissionTeam(10, TeamMemberRole.ADMIN));
+      });
+      const response = await app.request(path);
+      expect(response.status).toBe(404);
+      expect(readFile).not.toHaveBeenCalled();
+    });
+    it(`does not turn a membership database failure into file access: ${path}`, async () => {
+      getTeam.mockRejectedValue(new Error('Synthetic membership database failure'));
+      const response = await app.request(path);
+      expect(response.status).toBe(500);
+      expect(readFile).not.toHaveBeenCalled();
+    });
   }
+  it('preserves visible organisation-shared templates, but refuses hidden ones', async () => {
+    if (!envelope) {
+      throw new Error('Fixture missing');
+    }
+    envelope.type = EnvelopeType.TEMPLATE;
+    envelope.templateType = TemplateType.ORGANISATION;
+    envelope.teamId = 20;
+    envelope.team = { ...permissionTeam(20, TeamMemberRole.ADMIN, 8), organisation: { teams: [permissionTeam()] } };
+    db.team.findFirst.mockResolvedValue({ id: 20 });
+    envelope.visibility = DocumentVisibility.EVERYONE;
+    expect((await app.request(paths[0])).status).toBe(200);
+    envelope.visibility = DocumentVisibility.ADMIN;
+    readFile.mockClear();
+    expect((await app.request(paths[0])).status).toBe(404);
+    expect(readFile).not.toHaveBeenCalled();
+  });
 });

@@ -53,6 +53,8 @@ This directory contains patches applied on top of upstream Documenso files. **Ev
 
 | 081 | `081-session-workflow-startup.patch` | **APPLIED to branch 2026-09-12** | LOW | Adds a minimal startup pointer in root AGENTS.md to the owned session workflow and CLAUDE.md. The upstream coding rules remain intact; task ownership, per-author notes and independent batch shipping stay in owned documentation/CI. Recheck the pointer after upstream instruction changes. |
 
+| 084 | `084-document-team-permissions.patch` | **APPLIED to branch 2026-09-12** | MEDIUM | A-12/A-13/A-23/A-24: membership and document visibility constrain suggestions and the queries loading PDF data; authenticated PDFs cannot retain reusable caches. Private-object failures are uniform while recipient self-hide remains available. Owned folder mutations lock/check destination and destructive descendants before existing cascades; PDF records survive. Preserve 075/078 API/presign scope and organisation-template sharing during sync. Recheck all caller hooks and the HTTP/PostgreSQL permission/locking tests. |
+
 > **Note on the original `001-default-claim-enterprise.patch`:** That patch was written against an older shape of `create-organisation.ts` (had a default-fallback). By the time of the day-1 spike, upstream had refactored to require `claim` as a parameter at every call site, breaking that single-line strategy. The patch was deleted and replaced by 001+002 above. See `~/.claude/projects/-Users-shwet-github-bizrethink-internal-bizrethink-pacta-platform/memory/documenso_paywall_audit.md` for the staleness note.
 
 ## Relocations from the 2026-08-13 upstream sync (142 commits, upstream 2.16.0)

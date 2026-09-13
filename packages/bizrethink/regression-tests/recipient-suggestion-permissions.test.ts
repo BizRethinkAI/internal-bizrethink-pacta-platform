@@ -51,7 +51,13 @@ beforeEach(() => {
     [10, 20]
       .map((teamId) => ({
         user: { id: teamId, name: `Team ${teamId} member`, email: `team${teamId}@example.invalid` },
-        organisationGroupMembers: [{ group: { teamGroups: [{ teamId }] } }],
+        organisationGroupMembers: [
+          {
+            group: {
+              teamGroups: [{ teamId, team: permissionTeam(teamId, TeamMemberRole.MEMBER, teamId === 10 ? 7 : 8) }],
+            },
+          },
+        ],
       }))
       .filter((row) => matchesPermissionQuery(row, where)),
   );

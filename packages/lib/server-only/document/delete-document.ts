@@ -1,4 +1,5 @@
 import { getApiTokenEnvelopeScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
+import { documentUnavailable } from '@bizrethink/customizations/server-only/document-permissions';
 import { prisma } from '@documenso/prisma';
 import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
 import { DocumentStatus, EnvelopeType, RecipientRole, SendStatus, WebhookTriggerEvents } from '@prisma/client';
@@ -53,9 +54,7 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
   });
 
   if (!envelope) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
-    });
+    throw documentUnavailable();
   }
 
   // Determine whether the user has authorized delete access using the
@@ -81,9 +80,8 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
   const userRecipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
   if (!hasDeleteAccess && !userRecipient) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Not allowed',
-    });
+    // MODIFIED for BizRethink (overlay 084): foreign and absent objects have the same public error.
+    throw documentUnavailable();
   }
 
   // Handle hard or soft deleting the actual document if user has permission.
