@@ -1,19 +1,28 @@
 # The MCA vertical
 
-Second vertical beside `lease/`, and **two surfaces rather than one** — see
-[ADR 0008](../../../docs/adr/0008-mca-is-two-surfaces-not-one.md).
+The second vertical beside `lease/`. The accepted design is **one MCA workspace
+with separate content catalogues and shared infrastructure** — see
+[ADR 0015](../../../docs/adr/0015-one-mca-workspace-with-separate-content-catalogues.md)
+and its [classification/migration map](../../../docs/design/mca-workspace.md).
+It supersedes ADR 0008's separate-product presentation while preserving the
+distinction between authored-content review and disclosure verification.
 
-| | where | what it is |
+| Catalogue | Current location | Role in the unified design |
 |---|---|---|
-| **Conformity** | this directory: `content/`, `prescribed/`, `statutes/`, `sources/` | does a disclosure meet a state's statute. The words are the regulator's, so there is nothing here for counsel to approve |
-| **The clause library** | [`clauses/`](clauses/) | our own contract text, the negotiated agreements. Every clause needs an attorney before it can reach a merchant |
+| Clauses | [`clauses/`](clauses/) | Numbered contractual provisions; appropriate review before merchant use. |
+| Reusable content | Currently mixed into `clauses/`; extraction pending | Document blocks, field groups and interview guidance outside the clause catalogue. |
+| Disclosures & requirements | `content/`, `prescribed/`, `statutes/`, `sources/` | Required information, prescribed forms, source evidence and conformity checks. Authored answers remain distinct from prescribed text. |
 
-The rest of this file is about the first. **This file is not about `clauses/`,
-and reading it as the whole package is the mistake ADR 0008 exists to prevent:
-`content/` and `prescribed/` are rule packs — what a state demands of a
-disclosure — and they were never going to become clauses.** The deliverable the
-whole vertical is for is the agreement builder, which selects from `clauses/`
-and must not violate what is checked here.
+**The application still has separate MCA Conformity and MCA Clauses pages.**
+Catalogue separation, common navigation and the builder are not implemented by
+this design decision. Templates will assemble applicable content across the
+catalogues; the future overview/readiness view will expose their dependencies
+and unresolved checks together.
+
+The rest of this README documents the existing disclosure and instance checkers.
+`content/` and `prescribed/` remain rule packs; they do not become clauses merely
+because their reports share the MCA workspace. Pacta's agreement builder must
+preserve the requirements checked here.
 
 ## What this checker does and does not do
 

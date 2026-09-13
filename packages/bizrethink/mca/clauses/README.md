@@ -1,15 +1,22 @@
 # The MCA clause library
 
-The second half of the MCA vertical. `content/` and `prescribed/` are the first
-half and are not clauses: they are rule packs, describing what a state demands
-of a *disclosure*. This directory holds **our own contract text** — the selectable records of six negotiated agreements — and it is what the agreement
-builder will select from.
+The contractual content of the MCA vertical: selectable records from six
+agreements, currently including both clauses and reusable blocks.
+[ADR 0015](../../../../docs/adr/0015-one-mca-workspace-with-separate-content-catalogues.md)
+adopts one MCA workspace with a clause-only catalogue, separate reusable content
+and distinct disclosures/requirements, sharing infrastructure. It supersedes
+ADR 0008's separate-product presentation and ADR 0011's mixed catalogue.
 
-[ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md) explains
-why these are two surfaces rather than one, and it comes down to whose words
-they are. Approving 10 CCR §914 would be a category error: California wrote it
-and there is nothing for counsel to approve. Approving *these* clauses is
-exactly what counsel is for.
+**The catalogue migration is pending.** The status and citation contract below
+describe the current implementation, including its unnumbered exceptions. The
+target removes those exceptions from the clause catalogue: every displayed
+clause has a derived number; forms, explainers and structural blocks have their
+own catalogue. Mixed records must retain their operative language as numbered
+provisions. See the [18-record classification map](../../../../docs/design/mca-workspace.md).
+
+Disclosure rule packs remain distinct from clauses. Authored legal content
+retains appropriate review even when it belongs to a reusable block or a
+disclosure; prescribed text and structure retain conformity verification.
 
 [ADR 0009](../../../../docs/adr/0009-counsel-is-parallel-not-a-gate.md) is why
 the directory exists at all right now. Counsel is a parallel track, not a
