@@ -1,0 +1,124 @@
+SOURCE: https://www.nycourts.gov/reporter/3dseries/2026/2026_00990.htm
+RETRIEVED UTC: 2026-09-13T09:16:02.550557+00:00
+RAW RESPONSE SHA256: 57d9c1f07d78c52438b2eb9480b209f1f4470b8ec65388a8a984875659e7dc36
+METHOD: HTML text extraction; opinion and publication information, not an independent citator.
+
+People v Richmond Capital Group LLC (2026 NY Slip Op 00990)
+People v Richmond Capital Group LLC
+2026 NY Slip Op 00990 [246 AD3d 585]
+February 19, 2026
+Appellate Division, First Department
+Published by New York State Law Reporting Bureau
+pursuant to Judiciary Law § 431.
+As corrected through Wednesday, April 8, 2026
+[*1]
+People of the State of New York,
+Respondent,
+v
+Richmond Capital Group LLC et al., Appellants, et al.,
+Respondents.
+Kravet & Vogel, LLP, New York (Donald J. Kravet of counsel), for Richmond Capital
+Group LLC and another, appellants.
+Terenzi & Confugione PC, Garden City (Ronald Terenzi of counsel), for Ram Capital
+Funding LLC and another, appellants.
+Letitia James, Attorney General State of New York (Daniel S. Magy of counsel), for
+respondent.
+HEADNOTES
+Usury
+- Usurious Transaction
+- Merchant Cash Advances
+- Characterization as Loan
+Attorney General
+- Enjoining Fraudulent or Illegal Acts
+- Repeated or Persistent Fraud
+Judgment, Supreme Court, New York County (Andrew Borrok, J.), entered April 11, 2024,
+in favor of petitioner and jointly and severally against respondents in the amount of $77,289,631
+plus interest, and bringing up for review an order, entered on or about September 15, 2023,
+which granted petitioner's motion for a summary determination of the petition pursuant to
+Executive Law § 63 (12) and denied respondents' cross-motions for a summary
+determination dismissing the petition, unanimously modified, on the law, to vacate the monetary
+aspect of the judgment, remand for further proceedings in accordance with this order, and
+otherwise affirmed, without costs. Appeal from order, same court and Justice, entered on or
+about July 25, 2024, which, insofar as appealed from as limited by the briefs, denied without
+prejudice respondents Richmond Capital Group, LLC and Robert Giardina's motion to amend the
+judgment to reduce the amount thereof, unanimously dismissed, without costs, as moot.
+The People bring this special proceeding pursuant to Executive Law § 63 (12),
+alleging predatory lending practices by respondents, who funded over 3,000 transactions styled as
+merchant cash advances, governed by purported merchant cash advance agreements (MCAs), but
+which are alleged to have been fraudulent, usurious loans-in-disguise.
+Supreme Court properly found respondents liable for violation of Executive Law
+§ 63 (12). Respondents engaged in repeated or persistent illegal acts within the
+meaning of Executive Law § 63 (12)—specifically, usury. New York usury
+law was properly applied in determining illegality because Executive Law § 63 (12)
+empowers the New York Attorney General to bring enforcement actions against New York-based
+businesses engaging in fraudulent or illegal acts in New York—even if the victims of
+those acts reside in other states (see
+People v H & R Block, Inc., 58 AD3d 415, 417 [1st Dept 2009]; Matter of
+People v Telehublink Corp., 301 AD2d 1006, 1009-1010 [3d Dept 2003]; New York v
+Feldman, 210 F Supp 2d 294, 303 [SD NY 2002]).
+The subject agreements, although styled as MCAs, are properly characterized as loans
+subject to restrictions on usury (see
+Davis v Richmond Capital Group, LLC, 194 AD3d 516, 517 [1st Dept 2021];
+Fleetwood Servs., LLC v Richmond Capital Group LLC, 2023 WL 3882697, *2, 2023
+US App LEXIS 14241, *3-4 [2d Cir, June 8, 2023, No. 22-1885-cv]; see generally LG Funding, LLC v United
+Senior Props. of Olathe, LLC, 181 AD3d 664, 665-666 [2d Dept 2020]). Although the
+MCAs have mandatory reconciliation provisions, no reconciliation was performed in practice,
+even though it was supposed to be performed on a monthly basis, and daily payments were fixed
+and did not represent a good faith estimate of receivables; there is no persuasive evidence of any
+ad hoc incidents of reconciliation (upon a merchants' request), which were subject to
+respondents' "sole discretion," and there is evidence that such requests were denied;
+bankruptcy was an express event of default in some of the MCAs, but even where it was not,
+repeated nonpayment was, as was breach of the MCAs, which was the case where a merchant
+"interrupt[ed], suspend[ed], dissolve[d] or terminate[d]" its business; and in the event of any of
+these circumstances, the full uncollected amount became due and respondents were empowered
+to enforce the personal guarantees they required the merchants to provide.
+Usurious intent is also clear as a matter of law, as, absent reconciliation, the usurious interest
+rates can readily be calculated based on the information provided on the face of the MCAs (see Blue Wolf Capital Fund II, L.P. v
+American Stevedoring, Inc., 105 AD3d 178, 183 [1st Dept 2013]).
+Respondents also engaged in repeated or persistent fraud within the meaning of Executive
+Law § 63 (12). There is ample evidence of material misrepresentations in the
+record, both to merchants and to courts in affidavits filed to obtain judgments against merchants.
+The latter category of statements is not protected by the Noerr-Pennington doctrine
+because it falls within the sham exception thereto (see Matter of People v Northern Leasing Sys., Inc., 169 AD3d 527,
+530 [1st Dept 2019]).
+The MCAs were also procedurally and substantively unconscionable (see generally
+Gillman v Chase Manhattan Bank, 73 NY2d 1, 10-12 [1988]). Substantive unconscionability
+is clear from the MCAs' exorbitant and criminally usurious interest rates, among other things. As
+to procedural unconscionability, it is not dispositive that many, although not all, of the merchants
+were sophisticated businesspeople and all had prior experience with MCAs, and respondents
+misrepresented the terms and nature of the MCAs and used other high-pressure tactics.
+Joint and several liability was appropriate with respect to respondents RAM Capital Funding
+LLC and Tzvi Reich because they participated in a common enterprise with the other
+respondents. Reich claims to have been merely a broker, but the record (and his own admissions)
+reflects that he was sometimes involved in funding, servicing, and collecting on the MCAs, as
+well as sharing an office space with the other respondents related to MCAs originated by RAM
+Capital Funding LLC.
+Personal and joint and several liability was also appropriate with respect to respondent
+Robert Giardina because the evidence reflects that he personally participated in MCA
+negotiations and funding decisions, directed the wrongful withdrawal of payments on holidays,
+executed fraudulent judgment affidavits, oversaw respondent Jonathan Braun, and otherwise
+participated in a common enterprise with the other respondents. An adverse inference may also
+be drawn from Giardina's invocation of the Fifth Amendment (see Republic of Haiti v
+Duvalier, 211 AD2d 379, 386 [1st Dept 1995]).
+Further proceedings are, however, necessary with respect to the amount of the monetary
+judgment. Judgment against the defendants is appropriate to the extent it is in the form of
+restitution that will make the victims whole, without creating a windfall (see e.g. Matter of People v Applied Card
+Sys., Inc., 11 NY3d 105, 124-125 [2008]; see also People v Trump, —
+AD3d —, 2025 NY Slip Op 04756 [1st Dept 2025]). The People are not entitled under the
+facts of this case to the additional remedy of disgorgement (id.).
+However, the People failed to meet their initial burden with respect to the amount of
+damages insofar as they made no attempt to exclude repayments of principal from their proposed
+calculation (see generally People v
+Tzitzikalakis, 8 NY3d 217, 220-222 [2007]; Trump, — AD3d at —,
+2025 NY Slip Op 04756, *1; cf. People
+v Greenberg, 27 NY3d 490, 497-498 [2016]). This failure was due, at least in part, to
+respondents' failure to provide appropriate documentation. Some attempt by the People must,
+however, be made (even if imprecise) to reduce the total amount respondents received from
+merchants to account for the portion that was for the repayment of principal.
+The Supreme Court must also consider the issue of offsets in the first instance, including (but
+not limited to) the amounts paid by the defendants in the settlement of the claims brought against
+them by the merchants. Double recovery is impermissible, and flies in the face of the notion of
+restitution by providing a windfall (see eg EEOC v Waffle House, Inc., 534 US 279, 297
+[2002]; Matter of People v Applied Card
+Sys., Inc., 11 NY3d 105, 124-125 [2008]). Concur—Manzanet-Daniels, J.P.,
+Scarpulla, Friedman, Chan, Hagler, JJ.

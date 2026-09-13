@@ -1,0 +1,2524 @@
+{
+  "reviewDate": "2026-09-13",
+  "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040",
+  "createdAt": "2026-09-13T09:46:02.259213+00:00",
+  "scope": "All 211 current clause-library records and 14 pending PR194 body variants; targeted legal authorities and refresh of the eleven dedicated disclosure schemes using prior full source walks. No production, numeric-engine, complete rendering, fifty-state or comprehensive non-MCA-law audit.",
+  "extraction": "TypeScript AST extraction of literal record data; no application code or environment executed. SHA256 body hashes are of decoded UTF-8 body strings. File hashes are exact bytes. Coverage is a record of substantive reading, not inferred from extraction.",
+  "sourceMethod": "HTTPS verification remained enabled. HTTP status/hash is not currency proof. Raw responses mostly not archived; only publisher PDFs listed in rawResponseArchivedHere are retained. Text evidence is separately hashed. Failed certificate, HTTP and access-challenge routes remain visible. Connecticut system-CA fallback also failed; no TLS verification was disabled.",
+  "corpusCounts": {
+    "frpa": 108,
+    "equipment-lease": 30,
+    "subscription": 30,
+    "iso-pra": 28,
+    "split-funding": 7,
+    "permission-to-release": 8
+  },
+  "pendingRevisions": [
+    {
+      "pr": 187,
+      "head": "e5fbec884b3c02cb02e3e32815fa5d24022310cc",
+      "scope": "Utah/California source/citation correction, pending at the initial reading and merged at the integrated base; no body changes",
+      "statusAtInitialReview": "open",
+      "statusAtIntegratedBase": "merged",
+      "mergeCommit": "7f178f8e4f8242a4abe2ca2ba4864d3ee7e16492"
+    },
+    {
+      "pr": 190,
+      "head": "eb537ac395fc16fcb1e30ac0e50f8e7908c7c3ad",
+      "scope": "pending Virginia prescribed-form correction; not body changes",
+      "statusAtInitialReview": "open",
+      "statusAtIntegratedBase": "pending at recorded snapshot"
+    },
+    {
+      "pr": 194,
+      "head": "174a45b6513772528a381f8aae63bcce9b3766e6",
+      "scope": "14 complete candidate bodies read separately; no independent review or approval",
+      "statusAtInitialReview": "open",
+      "statusAtIntegratedBase": "pending at recorded snapshot"
+    },
+    {
+      "pr": 200,
+      "head": "4c1053696129c004c137ac8f863373f7449c0722",
+      "scope": "provisional unified-catalogue design; not migrated or finalized",
+      "statusAtInitialReview": "open",
+      "statusAtIntegratedBase": "pending at recorded snapshot"
+    }
+  ],
+  "inputs": [
+    {
+      "file": "packages/bizrethink/mca/clauses/equipment-lease/agreement.ts",
+      "sha256": "68c76c890dd6b6d6b9e5c02ff75035b9c56eb74a752966d9268f4d696d2897b3",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/equipment-lease/guaranty.ts",
+      "sha256": "726277ab5a1531b2eb7aed677f019e6be56daf1b6ae12965906629f836affceb",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/facts.ts",
+      "sha256": "9df443b0a679fd298f21b582919a6137ef2b2a686cc0ec80e225e7dddf8da1d9",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/appendix.ts",
+      "sha256": "b8eeb2b717e46dd53e373609328bbacc5bd2383af8a8176c372919c9c14e1df1",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/default.ts",
+      "sha256": "f94e1d53ba37c71298fad79cda79fb5ba0eebc7085e1b860d25177e914d92b0b",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/enrollment.ts",
+      "sha256": "93f8f3de6ee5b5c12006b90a160981074455c6567d67437aef4c0296247ef23f",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/guaranty.ts",
+      "sha256": "339af786b57a5d29bf6e6a243951f4dbb4eb0b110ecf300f884f28987fdb8182",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/miscellaneous.ts",
+      "sha256": "bacf883dd7f7ba6056ad071f94c0dc60e491a5f912c2029bd32333baa1562d05",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/preamble.ts",
+      "sha256": "bab5171b2f05eb253ebbcc7f76d2d594187226209f4ca183fda5d9499d3a2ce4",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/purchase.ts",
+      "sha256": "d0d67b2ac459f971151b95b92d2262aa48b2e7d7e54efdcb80c1747d5a52ea80",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/frpa/representations.ts",
+      "sha256": "b92182d30dad69dc02e0020bb53a92f11973f490fff3d3f67c254a9f404d7a74",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/instruments.ts",
+      "sha256": "46fa07a283454b353e8c2fa1e5e6a8e6c857f6087c1f3c59ffd404e3000a0cee",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/iso-pra/additional-obligations.ts",
+      "sha256": "63b2c0c04df9b6769ee7c47a96945be4c407a1b1ce8fe161f456eb66f75b8e6e",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/iso-pra/commission.ts",
+      "sha256": "43b7500603d148104db04ee109ad5ef45a7e9e6827b38d5230e1d406c786eb6e",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/iso-pra/general.ts",
+      "sha256": "bb02ef8b2e14f58292efdfdd945319294e0a59d3bb98d1801fe0e97e33e7b9d4",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/iso-pra/referral-duties.ts",
+      "sha256": "4049eed87b38938ae7d7bf7a35905132678c37a5ef400d02e1a7b949e12fb2d4",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/library.ts",
+      "sha256": "b311159ecc8711b8e40da5af13dfe0bf994d0b7623d1ea4ae084ac2df280ffe1",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/parties.ts",
+      "sha256": "2c8cbff12f46bf5f655d42bf79c9b7b9a612fc9045fda17c96e875794c9510d4",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "sha256": "959094c2e06538fdf236d4a88406de53a913a2871ea93c64bcbe5fa64a1d5417",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/split-funding/letter.ts",
+      "sha256": "d8ca51c23f693a88521d99f8e7538fd58547ab9a75111f0b9e0cbb9b051d1168",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/subscription/agreement.ts",
+      "sha256": "b4aab2f7287a00a4b75d118e24d3f75d1abe332daf52324ce23cf48260d327e7",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/subscription/guaranty.ts",
+      "sha256": "52b9a8ac11b4b4f43f78656b09ba8d6f4a6115eb23707ef07f5c528e9770627c",
+      "scope": "complete corpus body source",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/jurisdictions.ts",
+      "sha256": "8f70511f1fd2bf9ce7b581e186a3b1bff1fb0e87235cbbef8aef611ec81485cf",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/prescribed/conformity.ts",
+      "sha256": "203708243b203bf82f160e4b4699b4d00023047f1032495ee5f0209dc4cbd65a",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/prescribed/forms/ca-lease-financing.ts",
+      "sha256": "4337ff5d4b04830a87eea7a2cd12daed51d288f0b6fad82770ec181232c404d8",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/prescribed/forms/ny-lease-financing.ts",
+      "sha256": "f86dc07e49b4938a9215755365634866f38dee36adfcaa0a8af32e8bb553ace1",
+      "scope": "targeted product/data/conformity context",
+      "revision": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    }
+  ],
+  "reusedFiles": [
+    {
+      "file": "docs/research/mca-source-audit-2026-09-12/README.md",
+      "sha256": "a40b8c172ea78f34c7e40d9452207a369285c448d947616c5bab4cfe718ced99",
+      "bytes": 19352,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+      "sha256": "51211bdde6666d3850e9bd208e7787a7ddecfbac5ca7ff15598955bcaf480ce8",
+      "bytes": 85031,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/README.md",
+      "sha256": "2e5a4e025176efcd7611fd843a1b27883170db77d476be0ae7e7b215fda7714a",
+      "bytes": 19438,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+      "sha256": "be91fd9b261dcedce5fffc7ab4ee8c74899289efa152521cd2563b0126aa456c",
+      "bytes": 119014,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/section-register.md",
+      "sha256": "575dadad677c4d436a616b4f67052c5f5f641e71d08dea6d2b42edde7dcc36d2",
+      "bytes": 35642,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-clause-metadata-2026-09-12/README.md",
+      "sha256": "6b212699c234d857fb822d3b556765e3b480ed90320161106a55e59b5836b675",
+      "bytes": 13463,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-clause-metadata-2026-09-12/manifest.json",
+      "sha256": "e41c615a4f2aef6af0f96bd67339d728b1d2bee263175203f487b7c6a32d2ca8",
+      "bytes": 8677,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-source-audit-2026-09-12/evidence/ct-2026-supplement-36a-868-870-872.txt",
+      "sha256": "52241583dd227aedcc970ab110a85cb554ab65935715092ad8958ffe67aeb076",
+      "bytes": 5060,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
+      "sha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "bytes": 11087,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-source-audit-2026-09-12/evidence/mo-427.300-2025.txt",
+      "sha256": "42f38dee51c471cdffa063e55bbf47bc7f243613d502646aec4a22f1aa4331c9",
+      "bytes": 16076,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-source-audit-2026-09-12/evidence/va-code-6.2-2228-2238-current.txt",
+      "sha256": "c19f2dcb3ec78df19f97c6b39b87174d276a53604d733a63dd8e7f4c019f9866",
+      "bytes": 9886,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ca-finance-22800-22807.txt",
+      "sha256": "fc9022f5c68e5038ea78b10a1c24ac12637123029bd7b75eae753a71812cc8cd",
+      "bytes": 13892,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ca-10-ccr-900-956.txt",
+      "sha256": "833f4a1d57fdb29159d143cddc6e714356d9630d5f6ba6c3a7c002c79bae41e8",
+      "bytes": 163712,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ny-fis-801-812.txt",
+      "sha256": "86eb63f7986f3228b1d41e51293237bb6f874a265dbecd84a81b7d83d767cf16",
+      "bytes": 28054,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ny-23-nycrr-600.txt",
+      "sha256": "5077ef1b40d3f2815dc27db2e587c48016758c568f6c3a98f764c37430313d20",
+      "bytes": 155455,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ny-register-dfs-annual-indexes.txt",
+      "sha256": "0941624f18db54d3762164e4157155fe8e7e72828a1c4ed192ac1bf61fe39473",
+      "bytes": 27254,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ny-register-dfs-jul-sep-2026.txt",
+      "sha256": "534a3ca123983cc764e40deb9e26b2aa31119744897766da6a5b2e8305209bd9",
+      "bytes": 257090,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/va-10vac5-240.txt",
+      "sha256": "cc9784a7f18c5db639b41d2db84bb0e06099d5e5036103b72cfe089e3fde2239",
+      "bytes": 9702,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ga-title-10-legislative-summaries.txt",
+      "sha256": "8dad1ede641d0fb3a7e883c86a7de0b50718d37b077402010ed0dc3bb422fd13",
+      "bytes": 9782,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/tx-adopted-rules-columns.txt",
+      "sha256": "bab26cc7f7c1f077f8a64b6660c9a7f6b2b54a2244a52b677ee88b517acdc89f",
+      "bytes": 27272,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ut-dfi-faq.txt",
+      "sha256": "a05325c82df00df1a90ffb628ed9fd8f488fcb0e948a4a390baa8ad9ed8f14bc",
+      "bytes": 9149,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/source-documents/review-register.json",
+      "sha256": "22669d9f19f37d06c499a6e0d61eef7c47acae9c08cfc14d3b34e49b83c79b32",
+      "bytes": 179580,
+      "base": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040"
+    }
+  ],
+  "retrievals": [
+    {
+      "id": "ca-ccr-900",
+      "url": "https://govt.westlaw.com/calregs/Document/ICADCBD3002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-900",
+          "sha256": "66da6263c8dfe26fe3705d659a4426a467333d0c53a9febb6ac18409b40d2b96"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:43.664751+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ICADCBD3002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 47179,
+      "sha256": "66da6263c8dfe26fe3705d659a4426a467333d0c53a9febb6ac18409b40d2b96",
+      "text_sha256": "f2ffa45d544c72a4ae98423bce0267238b4dbfb12c6024fdce6dc7de33ee656c",
+      "same_raw_response_as_previous": ["ca-ccr-900"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-900.html",
+      "scratchTextFilename": "ca-ccr-900.txt"
+    },
+    {
+      "id": "ca-ccr-901",
+      "url": "https://govt.westlaw.com/calregs/Document/ID2E59FB002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-901",
+          "sha256": "94075f3bcdb5ecf7b70f64a9577efad972c38c4310de9dc78f9fc6cd9785ff13"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:43.665246+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID2E59FB002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 25429,
+      "sha256": "94075f3bcdb5ecf7b70f64a9577efad972c38c4310de9dc78f9fc6cd9785ff13",
+      "text_sha256": "6f529359fb51510d5d2aba8bd923eb9c3da2a8eb0baa7beffccdfde32317c542",
+      "same_raw_response_as_previous": ["ca-ccr-901"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-901.html",
+      "scratchTextFilename": "ca-ccr-901.txt"
+    },
+    {
+      "id": "ca-ccr-910",
+      "url": "https://govt.westlaw.com/calregs/Document/ID4FB123002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-910",
+          "sha256": "10ee39592eb803909a86fe85d5a2ec2cebdb6b38c20bd015f5c079545784f5ac"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:43.665300+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID4FB123002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 38034,
+      "sha256": "10ee39592eb803909a86fe85d5a2ec2cebdb6b38c20bd015f5c079545784f5ac",
+      "text_sha256": "122e2e28d07c115f69dd4863ac8c5efb1ff733cb858e19d3db1b4e25036a51a4",
+      "same_raw_response_as_previous": ["ca-ccr-910"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-910.html",
+      "scratchTextFilename": "ca-ccr-910.txt"
+    },
+    {
+      "id": "ca-ccr-911",
+      "url": "https://govt.westlaw.com/calregs/Document/ID86B80D002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-911",
+          "sha256": "fe9cff47e7ca46ea985b337ecdb9ce4ae3935090107a3d287243766b9e5aff22"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:43.665347+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID86B80D002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 39285,
+      "sha256": "fe9cff47e7ca46ea985b337ecdb9ce4ae3935090107a3d287243766b9e5aff22",
+      "text_sha256": "c53f1c40658a7caba7005866826e1763f34cfda07097d68a766edc2279dbf257",
+      "same_raw_response_as_previous": ["ca-ccr-911"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-911.html",
+      "scratchTextFilename": "ca-ccr-911.txt"
+    },
+    {
+      "id": "ca-ccr-912",
+      "url": "https://govt.westlaw.com/calregs/Document/ID82920A002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-912",
+          "sha256": "a12034be5a4d074e4e759d3d30236f6798dbeb36f93ca56ee12e68f2ac4f3433"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:43.665421+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID82920A002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 25652,
+      "sha256": "a12034be5a4d074e4e759d3d30236f6798dbeb36f93ca56ee12e68f2ac4f3433",
+      "text_sha256": "925b320101431fc7dc8895b6c8fd6741da3478976c84400e357bf69d4e5f4df7",
+      "same_raw_response_as_previous": ["ca-ccr-912"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-912.html",
+      "scratchTextFilename": "ca-ccr-912.txt"
+    },
+    {
+      "id": "ca-ccr-913",
+      "url": "https://govt.westlaw.com/calregs/Document/ID703173002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-913",
+          "sha256": "91b2ee998902cd99d7bc70d234546828c210437d69808a970b68c6c926e9b263"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:43.665485+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID703173002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 28363,
+      "sha256": "91b2ee998902cd99d7bc70d234546828c210437d69808a970b68c6c926e9b263",
+      "text_sha256": "adbd8bbd57d252ce8947ec578e82654367d74c364152eb1aaa4e483aadac77cc",
+      "same_raw_response_as_previous": ["ca-ccr-913"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-913.html",
+      "scratchTextFilename": "ca-ccr-913.txt"
+    },
+    {
+      "id": "ca-ccr-914",
+      "url": "https://govt.westlaw.com/calregs/Document/ID4A773F002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-914",
+          "sha256": "afbd7b41e7a9f2d1f23d1f5332b4e43d3808369b5d221dc9a132c5cca4bf8611"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:45.948917+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID4A773F002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 32909,
+      "sha256": "afbd7b41e7a9f2d1f23d1f5332b4e43d3808369b5d221dc9a132c5cca4bf8611",
+      "text_sha256": "596bd3ed572979349eccc856fd315da83694606f38f75782809fa444d14a9267",
+      "same_raw_response_as_previous": ["ca-ccr-914"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-914.html",
+      "scratchTextFilename": "ca-ccr-914.txt"
+    },
+    {
+      "id": "ca-ccr-915",
+      "url": "https://govt.westlaw.com/calregs/Document/ID731050002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-915",
+          "sha256": "a9ab2fdb42ffcc95dc3cb6e952378a2c81639e6ef6e7dc06afecad79c0616f66"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:46.004240+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID731050002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 26563,
+      "sha256": "a9ab2fdb42ffcc95dc3cb6e952378a2c81639e6ef6e7dc06afecad79c0616f66",
+      "text_sha256": "a113cc75046f8c2235d4faf1f2c40bcfacf63b8730deecfdc249052c893be886",
+      "same_raw_response_as_previous": ["ca-ccr-915"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-915.html",
+      "scratchTextFilename": "ca-ccr-915.txt"
+    },
+    {
+      "id": "ca-ccr-916",
+      "url": "https://govt.westlaw.com/calregs/Document/ID492B37002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-916",
+          "sha256": "7cc64ef7d0096556504fa498f75903d4c1aca33fc324a873f6bb4bcb186c7220"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:46.005068+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID492B37002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 25082,
+      "sha256": "7cc64ef7d0096556504fa498f75903d4c1aca33fc324a873f6bb4bcb186c7220",
+      "text_sha256": "ae9529f58c97756d152d16e708cce515e1ac9f24082635a5711b4d2c5f10c4a9",
+      "same_raw_response_as_previous": ["ca-ccr-916"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-916.html",
+      "scratchTextFilename": "ca-ccr-916.txt"
+    },
+    {
+      "id": "ca-ccr-917",
+      "url": "https://govt.westlaw.com/calregs/Document/ID6124E9002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-917",
+          "sha256": "1ef93bbde3356391238f85dc144c86159076eaf274444b8c28222082bf971c8a"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:46.187605+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID6124E9002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 30221,
+      "sha256": "1ef93bbde3356391238f85dc144c86159076eaf274444b8c28222082bf971c8a",
+      "text_sha256": "c7983d9618ab48bb70dd1eb9de05f3838c2139ff1a7c4c2302e95c2dc52ef296",
+      "same_raw_response_as_previous": ["ca-ccr-917"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-917.html",
+      "scratchTextFilename": "ca-ccr-917.txt"
+    },
+    {
+      "id": "ca-ccr-920",
+      "url": "https://govt.westlaw.com/calregs/Document/ID65D3A4002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-920",
+          "sha256": "3a47d60d6ae2c39654eb7d536e480c486638250032f17112115f9b861550c8cb"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:46.264304+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID65D3A4002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 11906,
+      "sha256": "3a47d60d6ae2c39654eb7d536e480c486638250032f17112115f9b861550c8cb",
+      "text_sha256": "13cd6856be4464f4387fba7a8b8060dc93f5fc90346b9f4ee819aa8392cf4ac0",
+      "same_raw_response_as_previous": ["ca-ccr-920"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-920.html",
+      "scratchTextFilename": "ca-ccr-920.txt"
+    },
+    {
+      "id": "ca-ccr-921",
+      "url": "https://govt.westlaw.com/calregs/Document/ID3CCF27002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-921",
+          "sha256": "23e0711b7e35883603bb8dbf02440a1333f202952a93b3466bf48c812849fb38"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:46.480891+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID3CCF27002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 15885,
+      "sha256": "23e0711b7e35883603bb8dbf02440a1333f202952a93b3466bf48c812849fb38",
+      "text_sha256": "ccad6bfdef3b3f2dc260b80ab17576f9d6184c71b65d3998f0b4bc4f259c523c",
+      "same_raw_response_as_previous": ["ca-ccr-921"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-921.html",
+      "scratchTextFilename": "ca-ccr-921.txt"
+    },
+    {
+      "id": "ca-ccr-922",
+      "url": "https://govt.westlaw.com/calregs/Document/ID8910A3002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-922",
+          "sha256": "45f3e87a02c43fc61a7ddaf770e856e8870a4ed82ee41027eb3a55774436f11c"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:48.130651+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID8910A3002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 11273,
+      "sha256": "45f3e87a02c43fc61a7ddaf770e856e8870a4ed82ee41027eb3a55774436f11c",
+      "text_sha256": "69fd7b0e808a9f97bab6ea3dde5f61b975fe42eac564665972749f70701faf67",
+      "same_raw_response_as_previous": ["ca-ccr-922"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-922.html",
+      "scratchTextFilename": "ca-ccr-922.txt"
+    },
+    {
+      "id": "ca-ccr-930",
+      "url": "https://govt.westlaw.com/calregs/Document/ID780ABA002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-930",
+          "sha256": "ce4f7cbd7af534244a4f84ca5f0bcd8c48eb4357eb399009eabbbec9baa0da7b"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:48.365433+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID780ABA002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 18180,
+      "sha256": "ce4f7cbd7af534244a4f84ca5f0bcd8c48eb4357eb399009eabbbec9baa0da7b",
+      "text_sha256": "018d4dfe6850b23e7eb2a77f73c4d771814c1aeea34da74d1cf11b0702ebd4c0",
+      "same_raw_response_as_previous": ["ca-ccr-930"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-930.html",
+      "scratchTextFilename": "ca-ccr-930.txt"
+    },
+    {
+      "id": "ca-ccr-931",
+      "url": "https://govt.westlaw.com/calregs/Document/ID589E4B002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-931",
+          "sha256": "a471097a58c1d2fca3399a9356f01ae4f195d0a0a6b4171149cb37ce5173f815"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:48.551065+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID589E4B002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 21369,
+      "sha256": "a471097a58c1d2fca3399a9356f01ae4f195d0a0a6b4171149cb37ce5173f815",
+      "text_sha256": "98bda60e010eaddc9fabb3427126cfe07fa5bba21723270f1f1c9eca88427e54",
+      "same_raw_response_as_previous": ["ca-ccr-931"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-931.html",
+      "scratchTextFilename": "ca-ccr-931.txt"
+    },
+    {
+      "id": "ca-ccr-940",
+      "url": "https://govt.westlaw.com/calregs/Document/ID6BB5FD002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-940",
+          "sha256": "7a5b98bfdb3c11e7d686257e037f0b05074c514580fc91067d88bb7e63babacf"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:48.804992+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID6BB5FD002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 11676,
+      "sha256": "7a5b98bfdb3c11e7d686257e037f0b05074c514580fc91067d88bb7e63babacf",
+      "text_sha256": "db039a2035b910715962f57731d399a9c93c8c4b5b3b2627a22aba98d5cd3391",
+      "same_raw_response_as_previous": ["ca-ccr-940"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-940.html",
+      "scratchTextFilename": "ca-ccr-940.txt"
+    },
+    {
+      "id": "ca-ccr-941",
+      "url": "https://govt.westlaw.com/calregs/Document/ID7C3F63002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-941",
+          "sha256": "f92004a6fa4f562fcd0407488ea7b8d22b52af89bdbaf2507baad8d8061126d7"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:49.241400+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID7C3F63002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 11327,
+      "sha256": "f92004a6fa4f562fcd0407488ea7b8d22b52af89bdbaf2507baad8d8061126d7",
+      "text_sha256": "a99252d77434fdd091d44eb4d4746047a07c8688f501e7612859cb41b076d83e",
+      "same_raw_response_as_previous": ["ca-ccr-941"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-941.html",
+      "scratchTextFilename": "ca-ccr-941.txt"
+    },
+    {
+      "id": "ca-ccr-942",
+      "url": "https://govt.westlaw.com/calregs/Document/ID01F2CB002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-942",
+          "sha256": "278eebfd613b7270089ca866924b071114058d4a02b5619d7a7125805c576a27"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:49.296299+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID01F2CB002BA11ED8E17AA85475E25B5?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 14798,
+      "sha256": "278eebfd613b7270089ca866924b071114058d4a02b5619d7a7125805c576a27",
+      "text_sha256": "c94f4d74933fe45a6bba96372eb6f3eae6daa196213d95551013e07528965dcb",
+      "same_raw_response_as_previous": ["ca-ccr-942"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-942.html",
+      "scratchTextFilename": "ca-ccr-942.txt"
+    },
+    {
+      "id": "ca-ccr-943",
+      "url": "https://govt.westlaw.com/calregs/Document/ICE8070D002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-943",
+          "sha256": "be2d1e7ab9f4f3504131d6b2dc309a86684db4b982e3b80d28d66e69474da2f8"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:50.371802+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ICE8070D002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 14639,
+      "sha256": "be2d1e7ab9f4f3504131d6b2dc309a86684db4b982e3b80d28d66e69474da2f8",
+      "text_sha256": "d16f40debd5809a7ed85f3da892bd8d312e302a100d354b76e6833c961329748",
+      "same_raw_response_as_previous": ["ca-ccr-943"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-943.html",
+      "scratchTextFilename": "ca-ccr-943.txt"
+    },
+    {
+      "id": "ca-ccr-950",
+      "url": "https://govt.westlaw.com/calregs/Document/ID338A1B002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-950",
+          "sha256": "25b84452143b814e2a1cc08cdf9a5e4e015aaa71548d0fe7aede14c18ab827ad"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:51.128631+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID338A1B002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 14410,
+      "sha256": "25b84452143b814e2a1cc08cdf9a5e4e015aaa71548d0fe7aede14c18ab827ad",
+      "text_sha256": "4cd18b33e11440ea6c5ce90475ede79f2346a31a336c9421d8b3fe34a861e4f5",
+      "same_raw_response_as_previous": ["ca-ccr-950"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-950.html",
+      "scratchTextFilename": "ca-ccr-950.txt"
+    },
+    {
+      "id": "ca-ccr-951",
+      "url": "https://govt.westlaw.com/calregs/Document/ID5608AC002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-951",
+          "sha256": "ea332178ac9fccfb38d46917038394b86eb045771a7fbc8759b2ae074463ea20"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:51.556459+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID5608AC002BA11ED9BE2E932C3E0B302?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 11983,
+      "sha256": "ea332178ac9fccfb38d46917038394b86eb045771a7fbc8759b2ae074463ea20",
+      "text_sha256": "79c5786c5eb8b1e6057e8f82566d2af0e975caafb47df2ddd1f512668b88857d",
+      "same_raw_response_as_previous": ["ca-ccr-951"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-951.html",
+      "scratchTextFilename": "ca-ccr-951.txt"
+    },
+    {
+      "id": "ca-ccr-952",
+      "url": "https://govt.westlaw.com/calregs/Document/ID182663002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-952",
+          "sha256": "b10ed132f35e57cc64f261fbca0571efb5860214e22b6d637c33c1b19aadb8e2"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:51.650902+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID182663002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 16604,
+      "sha256": "b10ed132f35e57cc64f261fbca0571efb5860214e22b6d637c33c1b19aadb8e2",
+      "text_sha256": "0d6489496b916214b4a89414f59c55ba8961d9e1d388f1c4f6e1f4887d3e6069",
+      "same_raw_response_as_previous": ["ca-ccr-952"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-952.html",
+      "scratchTextFilename": "ca-ccr-952.txt"
+    },
+    {
+      "id": "ca-ccr-953",
+      "url": "https://govt.westlaw.com/calregs/Document/ICCF256C002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-953",
+          "sha256": "2e77edf9d4116a83cb0ebe1a8be34ce31ae7988a28ce0acca8e7c16af8cab8b8"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:51.756863+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ICCF256C002BA11EDAC018BAFB59BCAC8?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 11023,
+      "sha256": "2e77edf9d4116a83cb0ebe1a8be34ce31ae7988a28ce0acca8e7c16af8cab8b8",
+      "text_sha256": "1a93d58f3ee9f40f1f623fd127b72cd43914fa9361a0ee745ea46c572f8ce6da",
+      "same_raw_response_as_previous": ["ca-ccr-953"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-953.html",
+      "scratchTextFilename": "ca-ccr-953.txt"
+    },
+    {
+      "id": "ca-ccr-954",
+      "url": "https://govt.westlaw.com/calregs/Document/ID210C38002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-954",
+          "sha256": "cab0d633a6bf189442328670c53b236984230fab5ea0eb7c25ce45788693b32c"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:52.543024+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID210C38002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 11094,
+      "sha256": "cab0d633a6bf189442328670c53b236984230fab5ea0eb7c25ce45788693b32c",
+      "text_sha256": "cc58115c8ddf41549241d791e59fccad2bf8a32f49c7dda754cf88185ed9ad68",
+      "same_raw_response_as_previous": ["ca-ccr-954"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-954.html",
+      "scratchTextFilename": "ca-ccr-954.txt"
+    },
+    {
+      "id": "ca-ccr-955",
+      "url": "https://govt.westlaw.com/calregs/Document/ID6D417F002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-955",
+          "sha256": "f600b55509ef55056042b7b1a0cd1c7f51ec33cdca17fda8624127451151ee12"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:53.366166+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID6D417F002BA11EDB73FFF40D75027C1?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 13648,
+      "sha256": "f600b55509ef55056042b7b1a0cd1c7f51ec33cdca17fda8624127451151ee12",
+      "text_sha256": "ae904427c30cee224cdb9110b095c6eaa89a16f42ddc841ff4dad47c96c073f3",
+      "same_raw_response_as_previous": ["ca-ccr-955"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-955.html",
+      "scratchTextFilename": "ca-ccr-955.txt"
+    },
+    {
+      "id": "ca-ccr-956",
+      "url": "https://govt.westlaw.com/calregs/Document/ID632F5F002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-956",
+          "sha256": "0398cc0b5e0a8a62b2d6cfccf256f07bfb92c3299f6eb67206bccc80d631bee8"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:53.584964+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Document/ID632F5F002BA11ED8D48CA3FA1CB29D0?viewType=FullText&originationContext=documenttoc&transitionType=CategoryPageItem&contextData=(sc.Default)",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 21507,
+      "sha256": "0398cc0b5e0a8a62b2d6cfccf256f07bfb92c3299f6eb67206bccc80d631bee8",
+      "text_sha256": "a17135c73c1bd35a1db386fb9751c2503304be995c3a36dd3f215084e9ab5c39",
+      "same_raw_response_as_previous": ["ca-ccr-956"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-956.html",
+      "scratchTextFilename": "ca-ccr-956.txt"
+    },
+    {
+      "id": "ca-ccr-index",
+      "url": "https://govt.westlaw.com/calregs/Browse/Home/California/CaliforniaCodeofRegulations?guid=I2DA374A002B011EDAFD4F597EA22C7F5",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-ccr-index",
+          "sha256": "2f802c87276287bd05e74722cdd4b2c00662d19d8f2d5f78cf209f754e1bb5fd"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:53.985437+00:00",
+      "status": 200,
+      "final_url": "https://govt.westlaw.com/calregs/Browse/Home/California/CaliforniaCodeofRegulations?guid=I2DA374A002B011EDAFD4F597EA22C7F5&transitionType=Default&contextData=%28sc.Default%29",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 14795,
+      "sha256": "2f802c87276287bd05e74722cdd4b2c00662d19d8f2d5f78cf209f754e1bb5fd",
+      "text_sha256": "23ffed4cd2849c7ac6fc7cb0203135174b494d2cd8f404e47d1f2b03319b5411",
+      "same_raw_response_as_previous": ["ca-ccr-index"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-ccr-index.html",
+      "scratchTextFilename": "ca-ccr-index.txt"
+    },
+    {
+      "id": "ca-dfpi-rules-index",
+      "url": "https://dfpi.ca.gov/rules-enforcement/laws-and-regulations/california-financing-law-regulations-opinions-releases/",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-dfpi-rules-index",
+          "sha256": "21ba256b1143c1f27c6748fcb9ad4b50e5e0fe6eb9477bc958f2f95b1f2f3d10"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:54.139019+00:00",
+      "status": 200,
+      "final_url": "https://dfpi.ca.gov/rules-enforcement/laws-and-regulations/california-financing-law-regulations-opinions-releases/",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 189084,
+      "sha256": "21ba256b1143c1f27c6748fcb9ad4b50e5e0fe6eb9477bc958f2f95b1f2f3d10",
+      "text_sha256": "7b2b3c175c798d5aa39c9cdb0f549686213bdd2f03a5f31a68545aade8553253",
+      "same_raw_response_as_previous": ["ca-dfpi-rules-index"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-dfpi-rules-index.html",
+      "scratchTextFilename": "ca-dfpi-rules-index.txt"
+    },
+    {
+      "id": "ca-finance-current",
+      "url": "https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?lawCode=FIN&division=9.5.&title=&part=&chapter=&article=",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ca-finance-current",
+          "sha256": "a4834a4ea825c5b05ac934537638577209b8c4576b41d654e2894c02d8ca0152"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:54.521996+00:00",
+      "status": 200,
+      "final_url": "https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?lawCode=FIN&division=9.5.&title=&part=&chapter=&article=",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 149514,
+      "sha256": "344a0234364489c2162ecaea8f6eb311cdcb92ab6117cab008b6d012ba67e789",
+      "text_sha256": "dfcf236be03cb8ecb4a59a414745489c03e351e691b6cd2ccbf4743b337b63d9",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ca-finance-current.html",
+      "scratchTextFilename": "ca-finance-current.txt"
+    },
+    {
+      "id": "ct-base",
+      "url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ct-base",
+          "sha256": "2e249d87b267658dda0f0660b905932de802aa09b85723773d05476399821dc4"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.904986+00:00",
+      "error": "HTTPSConnectionPool(host='www.cga.ct.gov', port=443): Max retries exceeded with url: /current/pub/chap_669.htm (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": null,
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ct-guidance",
+      "url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ct-guidance",
+          "sha256": "c11f771ee42f5253669edfe14e58d199c607aba713990544edf988169ab833fc"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.908393+00:00",
+      "status": 200,
+      "final_url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+      "content_type": "application/pdf",
+      "bytes": 387883,
+      "sha256": "c11f771ee42f5253669edfe14e58d199c607aba713990544edf988169ab833fc",
+      "same_raw_response_as_previous": ["ct-guidance"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ct-guidance.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ct-guidance-index",
+      "url": "https://portal.ct.gov/dob/consumer-credit-licensing-info/consumer-credit-licensing-information/commercial-financing-provider-or-broker-registration-information",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ct-guidance-index",
+          "sha256": "f1078d461d01808426529850969f9c076e573a76037060e97377355927f9f857"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:54.931562+00:00",
+      "status": 200,
+      "final_url": "https://portal.ct.gov/dob/consumer-credit-licensing-info/consumer-credit-licensing-information/commercial-financing-provider-or-broker-registration-information",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 31632,
+      "sha256": "e58ca29f578744efa5ac3e2b8e0135d9851371e22ba74012d7626fd21a759dd3",
+      "text_sha256": "affa7a7cfb5f0181d478ab2cfe206d810c9cab3de2b5ab1539a33076ec156835",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ct-guidance-index.html",
+      "scratchTextFilename": "ct-guidance-index.txt"
+    },
+    {
+      "id": "ct-supplement-2026",
+      "url": "https://www.cga.ct.gov/2026/sup/chap_669.htm",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ct-supplement-2026",
+          "sha256": "e25921a3d622e0863772e54320edcfcdaad51863e5d5f80a15297f2d069946f8"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:57.074004+00:00",
+      "error": "HTTPSConnectionPool(host='www.cga.ct.gov', port=443): Max retries exceeded with url: /2026/sup/chap_669.htm (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": null,
+      "scratchTextFilename": null
+    },
+    {
+      "id": "fl-code-961",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.961",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "fl-code-961",
+          "sha256": "58096d66a3100ee0af8491b4b6b1636d3bd962199d07c57ad612ebcd43808a54"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:57.113732+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.961",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 42623,
+      "sha256": "8dd9aa14a360614bb0fa32cc129ffdadb12be0e017cae17a9e3d440d52546790",
+      "text_sha256": "1207f71828a6579c8cace1004334acc11a9715df7a25c15cb93365530cc281f1",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-code-961.html",
+      "scratchTextFilename": "fl-code-961.txt"
+    },
+    {
+      "id": "fl-code-9611",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9611",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "fl-code-9611",
+          "sha256": "0c7e3cb46517c92e951611d83c5ef2938d31d4903c872baee0374085a53b5804"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:57.188461+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9611",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 48305,
+      "sha256": "82fe442b32110f5df1c4d5aaf1a8ec964f64c3f1b77b54a3c7a8903d9b6ddc81",
+      "text_sha256": "2f695a1dd2cedcef696986747c152552ca7b44585b76ee0917d8b60ba0af0773",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-code-9611.html",
+      "scratchTextFilename": "fl-code-9611.txt"
+    },
+    {
+      "id": "fl-code-9612",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9612",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "fl-code-9612",
+          "sha256": "11274e79a1f9b165453cab7d96b27061f09e579c7f863898eff787536c1b026c"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:57.236885+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9612",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 45849,
+      "sha256": "643fd48c8507d87afe7f3dc1557395ce378c0f5b28935a532aa804732dbfbb46",
+      "text_sha256": "6c7a6698a96a2eb42eb22af931ac8688b2658e533c63361c738d0aa35ad5f3b6",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-code-9612.html",
+      "scratchTextFilename": "fl-code-9612.txt"
+    },
+    {
+      "id": "fl-code-9613",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9613",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "fl-code-9613",
+          "sha256": "688af9b857fc0db370301a5f0396082b20e5980671815e425bb980b0e97f7395"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:57.383002+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9613",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 46110,
+      "sha256": "fc761a9704663ac66d8464f84064ed578d209c40fb3dc0db8942f0ec9fba57ba",
+      "text_sha256": "dd93b136acedab7a47abc10b178025f80b1abcffc9ebfbb04c9b4e63641c0a64",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-code-9613.html",
+      "scratchTextFilename": "fl-code-9613.txt"
+    },
+    {
+      "id": "fl-code-9614",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9614",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "fl-code-9614",
+          "sha256": "be3f6ce5a295a154c0156ded0bb5a7a89e63341d400e5779d52492d605e1c743"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:58.184268+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9614",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 44255,
+      "sha256": "f47bfd99d80453cf63b7053b733b6be31c8623dc4371c65c06804957f9e390ca",
+      "text_sha256": "4aebd394c9c458249868b896df07868ecd61454ca22e81594f405f7fb0601f80",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-code-9614.html",
+      "scratchTextFilename": "fl-code-9614.txt"
+    },
+    {
+      "id": "fl-code-9615",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9615",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "fl-code-9615",
+          "sha256": "20eafdd0b8d69ecb765c5fa794b8ffdebc98f409996b3ae51fb88ae4189c8839"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:58.527238+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9615",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 44630,
+      "sha256": "39f99f18005d84400798cd07253dbb439a16bb6704b8d20854eafa12c4456ef5",
+      "text_sha256": "2329095aa969ee7c044ba53c690a3aed2e307188e39a35ba5450550a65f487c9",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-code-9615.html",
+      "scratchTextFilename": "fl-code-9615.txt"
+    },
+    {
+      "id": "fl-security-interest-2026",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/671.203",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:16:02.560112+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/671.203",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 42833,
+      "sha256": "e9e175afc9454f0a7ab322fd86fa66bf04ae383068ce6fd2a5f439ea8bd8ea53",
+      "text_sha256": "f3581e18e47e37ad172dfbc533407e7d82559769ad267ae4fb51cb0b9ff1dab8",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "Discovery route only: Florida §671.203 concerns good faith. Use fl-ucc-671-201, specifically (40), for lease/security-interest classification.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-security-interest-2026.html",
+      "scratchTextFilename": "fl-security-interest-2026.txt"
+    },
+    {
+      "id": "ga-act",
+      "url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ga-act",
+          "sha256": "48958eed53f81ca6cd784fd71602754884bcc23e16860faf2b7a9279bac3c5bc"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:58.711392+00:00",
+      "status": 200,
+      "final_url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+      "content_type": null,
+      "bytes": 36586,
+      "sha256": "48958eed53f81ca6cd784fd71602754884bcc23e16860faf2b7a9279bac3c5bc",
+      "same_raw_response_as_previous": ["ga-act"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ga-act.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ks-code-783",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0083.html",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ks-code-783",
+          "sha256": "1cfe68272bdf5bb7fac1b7250173e79676a010fa8dfe16a8ed00dbb2ea9c24a8"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:58.946903+00:00",
+      "status": 200,
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0083.html",
+      "content_type": "text/html",
+      "bytes": 20252,
+      "sha256": "1cfe68272bdf5bb7fac1b7250173e79676a010fa8dfe16a8ed00dbb2ea9c24a8",
+      "text_sha256": "bd53b234a8e966706fb330367a00e969602abf18537809f20ae07ce93af1dfd5",
+      "same_raw_response_as_previous": ["ks-code-783"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ks-code-783.html",
+      "scratchTextFilename": "ks-code-783.txt"
+    },
+    {
+      "id": "ks-code-784",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0084.html",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ks-code-784",
+          "sha256": "2f491f9256f276afd375e25d2a82c5d15c6cd52fde7864221de69de72cf0e958"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:59.537238+00:00",
+      "status": 200,
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0084.html",
+      "content_type": "text/html",
+      "bytes": 15885,
+      "sha256": "2f491f9256f276afd375e25d2a82c5d15c6cd52fde7864221de69de72cf0e958",
+      "text_sha256": "52dfc6f0cb2144901166b3ec7a7c164f46e64209af3ef25e8d1eef7d7b2e910e",
+      "same_raw_response_as_previous": ["ks-code-784"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ks-code-784.html",
+      "scratchTextFilename": "ks-code-784.txt"
+    },
+    {
+      "id": "ks-code-785",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0085.html",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ks-code-785",
+          "sha256": "5eb520f3bc95f15424b45db92ef4c08f601b7d5c586a355d83c868bdefcdf997"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:59.772450+00:00",
+      "status": 200,
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0085.html",
+      "content_type": "text/html",
+      "bytes": 14934,
+      "sha256": "5eb520f3bc95f15424b45db92ef4c08f601b7d5c586a355d83c868bdefcdf997",
+      "text_sha256": "500346fd377c0df007eb0395eff7f35d1b4f93c6e3f9ec0897b03936530ea8e7",
+      "same_raw_response_as_previous": ["ks-code-785"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ks-code-785.html",
+      "scratchTextFilename": "ks-code-785.txt"
+    },
+    {
+      "id": "ks-code-786",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0086.html",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ks-code-786",
+          "sha256": "9e43be37380d7e8cb7c3ba52fa764c7e62e1cd7c6aa87b5c454fd8598d8a9d43"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:00.055078+00:00",
+      "status": 200,
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0086.html",
+      "content_type": "text/html",
+      "bytes": 13829,
+      "sha256": "9e43be37380d7e8cb7c3ba52fa764c7e62e1cd7c6aa87b5c454fd8598d8a9d43",
+      "text_sha256": "97fbed2e230c48d6c9748d1e424f2c3250782bc474b1a42f46360bc66ae47efd",
+      "same_raw_response_as_previous": ["ks-code-786"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ks-code-786.html",
+      "scratchTextFilename": "ks-code-786.txt"
+    },
+    {
+      "id": "ks-code-787",
+      "url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0087.html",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ks-code-787",
+          "sha256": "3b6ff39055dcaa7f99d434a79e78cfff85ccf3903ee0b414b17b809cfde6c865"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:00.091310+00:00",
+      "status": 200,
+      "final_url": "https://www.ksrevisor.gov/statutes/chapters/ch75/075_007_0087.html",
+      "content_type": "text/html",
+      "bytes": 13681,
+      "sha256": "3b6ff39055dcaa7f99d434a79e78cfff85ccf3903ee0b414b17b809cfde6c865",
+      "text_sha256": "c4da089a558ef2f3e3fdfdc1a1e17f3a4de1595ec66aa27deb888a9de3bc76ef",
+      "same_raw_response_as_previous": ["ks-code-787"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ks-code-787.html",
+      "scratchTextFilename": "ks-code-787.txt"
+    },
+    {
+      "id": "la-code",
+      "url": "https://legis.la.gov/Legis/Law.aspx?d=1429292",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "la-code",
+          "sha256": "cd7309ac17ab86b0fb10d5b82e76c2ab12db7467af42d067dc4a6c93079c9601"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:00.837168+00:00",
+      "status": 200,
+      "final_url": "https://legis.la.gov/Legis/Law.aspx?d=1429292",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 33637,
+      "sha256": "cd7309ac17ab86b0fb10d5b82e76c2ab12db7467af42d067dc4a6c93079c9601",
+      "text_sha256": "9b0015c3b17762f14a4f56327b8bc4b46139fbad0c1d32cf9db68b278132ae2e",
+      "same_raw_response_as_previous": ["la-code"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "la-code.html",
+      "scratchTextFilename": "la-code.txt"
+    },
+    {
+      "id": "mo-current",
+      "url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=427.300",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "mo-current",
+          "sha256": "397ffa0ed7f9bc04b3aa7883a7f82dd174beb9237e2bea50b88b8bb49c61cca3"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:00.972587+00:00",
+      "status": 200,
+      "final_url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=427.300",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 48921,
+      "sha256": "80b6ad4b34950c246b4c215044b82baa097107b6490b1f488c91fa802139520e",
+      "text_sha256": "a84b1ae71944ac02bfa3febf4b4004a2a40f81f7242f78a73262679e58be07d6",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "mo-current.html",
+      "scratchTextFilename": "mo-current.txt"
+    },
+    {
+      "id": "ny-activity",
+      "url": "https://www.dfs.ny.gov/industry_guidance/regulatory_activity/financial_services",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ny-activity",
+          "sha256": "eb0a74c56ca34d041b94282222665477410fe51aeb8701a42b72e6bbe46e430f"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:01.020001+00:00",
+      "status": 200,
+      "final_url": "https://www.dfs.ny.gov/industry_guidance/regulatory_activity/financial_services",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 51922,
+      "sha256": "85555d93cf77a18a20b9d91f3a7fc0d1d288eef75189ce740fbf9d87f906c294",
+      "text_sha256": "a4474a1f6ae7285a5ac6efed4e3f54599943311c7963a456857ce73a2a78ba71",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-activity.html",
+      "scratchTextFilename": "ny-activity.txt"
+    },
+    {
+      "id": "ny-adopted",
+      "url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ny-adopted",
+          "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:01.197887+00:00",
+      "status": 200,
+      "final_url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+      "content_type": "application/pdf",
+      "bytes": 652140,
+      "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624",
+      "same_raw_response_as_previous": ["ny-adopted"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-adopted.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ny-bridge-2025",
+      "url": "https://www.nycourts.gov/reporter/3dseries/2025/2025_04306.htm",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:16:02.489416+00:00",
+      "status": 200,
+      "final_url": "https://www.nycourts.gov/reporter/3dseries/2025/2025_04306.htm",
+      "content_type": "text/html",
+      "bytes": 19676,
+      "sha256": "44d881d560e3a0eb06031ba22b0bc599469a17ab214a791d049eda614a35f4cd",
+      "text_sha256": "eb33c958d5d9b9a2b4082de260e7aba9e51c14e044b4dc07b5c54884358bcf16",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-bridge-2025.html",
+      "scratchTextFilename": "ny-bridge-2025.txt"
+    },
+    {
+      "id": "ny-current-linked",
+      "url": "https://www.dfs.ny.gov/industry_guidance/regulations/final_financial_services/rf_finservices_23nycrr600_text",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ny-current-linked",
+          "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:01.254827+00:00",
+      "status": 200,
+      "final_url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+      "content_type": "application/pdf",
+      "bytes": 652140,
+      "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624",
+      "same_raw_response_as_previous": ["ny-current-linked"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-current-linked.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ny-davis-2021",
+      "url": "https://www.nycourts.gov/REPORTER/3dseries/2021/2021_03111.htm",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:16:02.390795+00:00",
+      "status": 403,
+      "final_url": "https://www.nycourts.gov/REPORTER/3dseries/2021/2021_03111.htm",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 5667,
+      "sha256": "9684d1844a56fb9531f9923aa25f802f45e348b4e2f243ff3cb3b54a30623a8c",
+      "text_sha256": "766be4bcbef0163ad3da498967e1872fbcc6d356acd857b017bff4542faa9ff1",
+      "same_raw_response_as_previous": [],
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-davis-2021.html",
+      "scratchTextFilename": "ny-davis-2021.txt"
+    },
+    {
+      "id": "ny-fis-a8",
+      "url": "https://www.nysenate.gov/legislation/laws/FIS/A8",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:16:02.337716+00:00",
+      "status": 403,
+      "final_url": "https://www.nysenate.gov/legislation/laws/FIS/A8",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 5604,
+      "sha256": "ed0e1ead8647a45e687168f968ef24de5bb898b135fb7cee2c8cb79105752e12",
+      "text_sha256": "766be4bcbef0163ad3da498967e1872fbcc6d356acd857b017bff4542faa9ff1",
+      "same_raw_response_as_previous": [],
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-fis-a8.html",
+      "scratchTextFilename": "ny-fis-a8.txt"
+    },
+    {
+      "id": "ny-kapitus-2025",
+      "url": "https://www.nycourts.gov/reporter/3dseries/2025/2025_05921.htm",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:16:02.499355+00:00",
+      "status": 200,
+      "final_url": "https://www.nycourts.gov/reporter/3dseries/2025/2025_05921.htm",
+      "content_type": "text/html",
+      "bytes": 6205,
+      "sha256": "eb03b25a58800fe6f2cd7ee286602433fc9fcb65561aa15dbdbcfac5a9c35d80",
+      "text_sha256": "247378599cadf2b11b60d57d657376af7a8a236e1a79b1afe9f49b718099608b",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-kapitus-2025.html",
+      "scratchTextFilename": "ny-kapitus-2025.txt"
+    },
+    {
+      "id": "ny-principis-2022",
+      "url": "https://www.nycourts.gov/reporter/3dseries/2022/2022_00203.htm",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:16:02.402348+00:00",
+      "status": 200,
+      "final_url": "https://www.nycourts.gov/reporter/3dseries/2022/2022_00203.htm",
+      "content_type": "text/html",
+      "bytes": 8112,
+      "sha256": "8629458c3cdb1eacc4a78bf14d1526ea474da69c9ce90eeb1b670922d52f9139",
+      "text_sha256": "a5d69693b680a40a7b94a4900a93b7a2970aa2790a97f17dfc9f8533907266ee",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-principis-2022.html",
+      "scratchTextFilename": "ny-principis-2022.txt"
+    },
+    {
+      "id": "ny-register-2026-09-09",
+      "url": "https://dos.ny.gov/september-9-2026vol-xlviii-issue-36",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ny-register-2026-09-09",
+          "sha256": "7b2705a6055adddda05cb812e0e142c02c27ce7a74f2cc68ba90396bd72b655d"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:55.370860+00:00",
+      "status": 200,
+      "final_url": "https://dos.ny.gov/system/files/documents/2026/09/090926.pdf",
+      "content_type": "application/pdf",
+      "bytes": 504276,
+      "sha256": "7b2705a6055adddda05cb812e0e142c02c27ce7a74f2cc68ba90396bd72b655d",
+      "same_raw_response_as_previous": ["ny-register-2026-09-09"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-register-2026-09-09.bin",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ny-register-index",
+      "url": "https://dos.ny.gov/state-register",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ny-register-index",
+          "sha256": "dc1b1d87829d498ab3db78f231ee3fa91ced04349233a6e3a4f22424ea705896"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:55.942122+00:00",
+      "status": 200,
+      "final_url": "https://dos.ny.gov/state-register",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 79748,
+      "sha256": "223b167f7e6064b51a601d40140af912d7dd5e1a03b2febb904cc629c6cae558",
+      "text_sha256": "bdeecffdbca25179e19ce3dd3b3108510831b32711a4cc37fcb358e8c19aad2e",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-register-index.html",
+      "scratchTextFilename": "ny-register-index.txt"
+    },
+    {
+      "id": "ny-richmond-2026",
+      "url": "https://www.nycourts.gov/reporter/3dseries/2026/2026_00990.htm",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:16:02.550557+00:00",
+      "status": 200,
+      "final_url": "https://www.nycourts.gov/reporter/3dseries/2026/2026_00990.htm",
+      "content_type": "text/html",
+      "bytes": 11358,
+      "sha256": "57d9c1f07d78c52438b2eb9480b209f1f4470b8ec65388a8a984875659e7dc36",
+      "text_sha256": "f3a625fb419be2461a777ce2bfae842553ef4fabd7bfabe98291f2089b66ba91",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-richmond-2026.html",
+      "scratchTextFilename": "ny-richmond-2026.txt"
+    },
+    {
+      "id": "tx-csbf-index",
+      "url": "https://occc.texas.gov/industry/regulated-lenders/commercial-sales-based-finance/",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "tx-csbf-index",
+          "sha256": "ffb3163759d83a45b1efc1097725686a5adfee29add7761afecfe29b0acb3ab4"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.210353+00:00",
+      "status": 200,
+      "final_url": "https://occc.texas.gov/industry/regulated-lenders/commercial-sales-based-finance/",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 110929,
+      "sha256": "969a13286817be3f4acf42846f6220211cdc8df1a0497c780b51e3b30b75d508",
+      "text_sha256": "c224d409dbac15b308e8b261500c932df15c20c1492662dd857fc75232ac6421",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "tx-csbf-index.html",
+      "scratchTextFilename": "tx-csbf-index.txt"
+    },
+    {
+      "id": "tx-current-static",
+      "url": "https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "tx-current-static",
+          "sha256": "2906937b90c43fe8d696f466fc78c4520c03ad43a5850970d6ae6f4ab0c1572d"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:01.311059+00:00",
+      "status": 200,
+      "final_url": "https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm",
+      "content_type": "text/html",
+      "bytes": 24614,
+      "sha256": "2906937b90c43fe8d696f466fc78c4520c03ad43a5850970d6ae6f4ab0c1572d",
+      "text_sha256": "e8491e4ab3d96e3445f8924b7bae53a7503d4c39ce42762e7a28d401c04efef3",
+      "same_raw_response_as_previous": ["tx-current-static"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "tx-current-static.html",
+      "scratchTextFilename": "tx-current-static.txt"
+    },
+    {
+      "id": "tx-full-adoption",
+      "url": "https://occc.texas.gov/wp-content/uploads/2026/06/csbf-rules-adoption-fc-070926.pdf",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "tx-full-adoption",
+          "sha256": "d03e47a46c3be7e2af3d217dfb90df49ca349d31618944d51b3b9ec75eb0a9f8"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.254212+00:00",
+      "status": 200,
+      "final_url": "https://occc.texas.gov/wp-content/uploads/2026/06/csbf-rules-adoption-fc-070926.pdf",
+      "content_type": "application/pdf",
+      "bytes": 319806,
+      "sha256": "d03e47a46c3be7e2af3d217dfb90df49ca349d31618944d51b3b9ec75eb0a9f8",
+      "same_raw_response_as_previous": ["tx-full-adoption"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "tx-full-adoption.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "tx-occc-rules-index",
+      "url": "https://occc.texas.gov/publications/legal/rules/",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "tx-occc-rules-index",
+          "sha256": "4c1d4ee89b347280ce7d1e3c0fef956e16b84b4e72e9eec9e566c715bed0dbed"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.263176+00:00",
+      "status": 200,
+      "final_url": "https://occc.texas.gov/publications/legal/rules/",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 111639,
+      "sha256": "243ce3184f03256fec7fa2534c4369baa4cd66f2505268b35abf3747e17d3882",
+      "text_sha256": "3740f9729419b81f0a2b524cf968a791b88366570f454296dd764410fba2f5a0",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "tx-occc-rules-index.html",
+      "scratchTextFilename": "tx-occc-rules-index.txt"
+    },
+    {
+      "id": "ut-current-content",
+      "url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.html",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ut-current-content",
+          "sha256": "c852bf708cccc332ccae22c9289ebe7780495fd589013b48278fff3ab633b17b"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:01.312265+00:00",
+      "status": 200,
+      "final_url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.html",
+      "content_type": "text/html",
+      "bytes": 2861,
+      "sha256": "c852bf708cccc332ccae22c9289ebe7780495fd589013b48278fff3ab633b17b",
+      "text_sha256": "9748956c1f7e1f9e8d47a0e19a95727ec6e59b473c810393a0ff04b951f72d5c",
+      "same_raw_response_as_previous": ["ut-current-content"],
+      "contentAssessment": "Chapter navigation page only. Followed its PDF link; complete body is ut-current-chapter-pdf.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ut-current-content.html",
+      "scratchTextFilename": "ut-current-content.txt"
+    },
+    {
+      "id": "ut-dfi-index",
+      "url": "https://dfi.utah.gov/non-depository/commercial-financing/",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ut-dfi-index",
+          "sha256": "7f3a01f9d9df4d500bb23eaf070160c70e897c4d36a01072d5c79ed0c1e51708"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.361123+00:00",
+      "status": 200,
+      "final_url": "https://dfi.utah.gov/non-depository/commercial-financing/",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 29524,
+      "sha256": "7f3a01f9d9df4d500bb23eaf070160c70e897c4d36a01072d5c79ed0c1e51708",
+      "text_sha256": "ea86eff7371353f3022c3e82113f60210a89cae6c1a682518b9cbb41a1494805",
+      "same_raw_response_as_previous": ["ut-dfi-index"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ut-dfi-index.html",
+      "scratchTextFilename": "ut-dfi-index.txt"
+    },
+    {
+      "id": "ut-faq",
+      "url": "https://dfi.utah.gov/wp-content/uploads/sites/29/2026/02/FAQs-Commercial-Financing-Registration-and-Disclosure-Act.pdf",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "ut-faq",
+          "sha256": "9cf272cacc3a071cc5d939d706fd7de8cba963dcc92c757c22fe246efdb779fd"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.532727+00:00",
+      "status": 200,
+      "final_url": "https://dfi.utah.gov/wp-content/uploads/sites/29/2026/02/FAQs-Commercial-Financing-Registration-and-Disclosure-Act.pdf",
+      "content_type": "application/pdf",
+      "bytes": 188931,
+      "sha256": "9cf272cacc3a071cc5d939d706fd7de8cba963dcc92c757c22fe246efdb779fd",
+      "same_raw_response_as_previous": ["ut-faq"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ut-faq.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ut-landing",
+      "url": "https://le.utah.gov/xcode/Title7/Chapter27/7-27.html",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "ut-landing",
+          "sha256": "ea00b935d67de1f0b285f6797b32806988db52f17dd995def630b9551be87e95"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:01.465797+00:00",
+      "status": 200,
+      "final_url": "https://le.utah.gov/xcode/Title7/Chapter27/7-27.html",
+      "content_type": "text/html",
+      "bytes": 26610,
+      "sha256": "ea00b935d67de1f0b285f6797b32806988db52f17dd995def630b9551be87e95",
+      "text_sha256": "239c84025f0e3bee8bae17fdb812ce21721feacf4ee68d45bc41dc1f40945310",
+      "same_raw_response_as_previous": ["ut-landing"],
+      "contentAssessment": "JavaScript chapter landing page, not a complete statutory text capture.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ut-landing.html",
+      "scratchTextFilename": "ut-landing.txt"
+    },
+    {
+      "id": "va-code",
+      "url": "https://law.lis.virginia.gov/vacodefull/title6.2/chapter22.1/",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "va-code",
+          "sha256": "4fa6c81ebb58427793b42e138c35c569af942db44dc3600376e7c018e5faabce"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:01.538571+00:00",
+      "status": 200,
+      "final_url": "https://law.lis.virginia.gov/vacodefull/title6.2/chapter22.1/",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 37108,
+      "sha256": "404b364877ec540b90de4aa4198ccdb0d1327e623eadf19f3b26a6a627f981e9",
+      "text_sha256": "c1833da0a70014def75d0ecef5e68c817bfb3d33775b00b11871cbbbecd93969",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "va-code.html",
+      "scratchTextFilename": "va-code.txt"
+    },
+    {
+      "id": "va-form",
+      "url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "va-form",
+          "sha256": "146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:16:02.267468+00:00",
+      "status": 200,
+      "final_url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+      "content_type": "application/pdf",
+      "bytes": 127203,
+      "sha256": "146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29",
+      "same_raw_response_as_previous": ["va-form"],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "va-form.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "va-rules-current",
+      "url": "https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/",
+      "previous": [
+        {
+          "ledger": "docs/research/mca-agreement-requirements-2026-09-12/manifest.json",
+          "id": "va-rules-current",
+          "sha256": "9687fec38c67acea3c5fb4331e1e89c94ada3cc877cdf569436e80a3b98e9479"
+        },
+        {
+          "ledger": "docs/research/mca-source-audit-2026-09-12/manifest.json",
+          "id": "va-rules",
+          "sha256": "9687fec38c67acea3c5fb4331e1e89c94ada3cc877cdf569436e80a3b98e9479"
+        }
+      ],
+      "attempted_at": "2026-09-13T09:15:56.787672+00:00",
+      "status": 200,
+      "final_url": "https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 34100,
+      "sha256": "515e404f5dd6edada408fc2f78474679d1f1783cfb7da1d78d3b6b867d395dee",
+      "text_sha256": "468441cd499702605329cfaa56b7c32670d4c95155ae29708f2d36ab42cfdb13",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "va-rules-current.html",
+      "scratchTextFilename": "va-rules-current.txt"
+    },
+    {
+      "id": "ct-base-system-ca",
+      "url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:07.830091+00:00",
+      "error": "HTTPSConnectionPool(host='www.cga.ct.gov', port=443): Max retries exceeded with url: /current/pub/chap_669.htm (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": null,
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ct-supplement-system-ca",
+      "url": "https://www.cga.ct.gov/2026/sup/chap_669.htm",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:07.830202+00:00",
+      "error": "HTTPSConnectionPool(host='www.cga.ct.gov', port=443): Max retries exceeded with url: /2026/sup/chap_669.htm (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": null,
+      "scratchTextFilename": null
+    },
+    {
+      "id": "ecfr-tcpa-current",
+      "url": "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:09.269480+00:00",
+      "status": 200,
+      "final_url": "https://unblock.federalregister.gov",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 10596,
+      "sha256": "c3c9506794b59d6906fc31837b71d12ad224580bda376fef3d21e928aee61fec",
+      "text_sha256": "559b0512012b1cc48cf6f283696f7766161be29569b5ab7c21e03ea2a397b983",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP 200 access challenge; not legal text. Web-tool extraction used for targeted paragraphs.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ecfr-tcpa-current.html",
+      "scratchTextFilename": "ecfr-tcpa-current.txt"
+    },
+    {
+      "id": "fcc-da26-12",
+      "url": "https://docs.fcc.gov/public/attachments/DA-26-12A1.pdf",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:09.083439+00:00",
+      "status": 200,
+      "final_url": "https://docs.fcc.gov/public/attachments/DA-26-12A1.pdf",
+      "content_type": "application/pdf; charset=UTF-8",
+      "bytes": 97201,
+      "sha256": "b21a1ff3dda5369ee6b178658f85d62c14fa51366b8d7ee7bedddead29da92be",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": "evidence/fcc-da26-12.pdf",
+      "scratchRawFilename": "fcc-da26-12.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "fl-limitations-95-03",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/95.03",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:07.998776+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/95.03",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 42651,
+      "sha256": "b976d4d540fc26d42f4e58a94fa4b9dd3be8533b707de5bf177327ffc369c151",
+      "text_sha256": "d55f4639d40d588b0d94d8a4e33c420a08843e1679135c7170c92b5165bee8ac",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-limitations-95-03.html",
+      "scratchTextFilename": "fl-limitations-95-03.txt"
+    },
+    {
+      "id": "fl-ucc-672-316",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/672.316",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:08.079533+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/672.316",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 47206,
+      "sha256": "89518e7071fa2f8b224d055343c222fa316ddca04b79639dd1b0463499c4c993",
+      "text_sha256": "fb85892ff4386148fd58385bed0f58ed04ad2561ede62dc6423b0d60cc070513",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-672-316.html",
+      "scratchTextFilename": "fl-ucc-672-316.txt"
+    },
+    {
+      "id": "fl-ucc-679-602",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/679.602",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:08.195295+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/679.602",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 46889,
+      "sha256": "aeb10cefc162935e0faa3fab2a06e4376034eed0f34fb8392788b3b948af9e52",
+      "text_sha256": "ef58e33177cbb8850ca05c84404f70b23478d253eef09cdf436841fe2bc4b072",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-679-602.html",
+      "scratchTextFilename": "fl-ucc-679-602.txt"
+    },
+    {
+      "id": "fl-ucc-679-609",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/679.609",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:08.235788+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/679.609",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 44038,
+      "sha256": "f3a664dfcb6238a92bb5b008f93d437dad32b3ba1b97bad4129a2848be7565f8",
+      "text_sha256": "5905a523cbf239daa5963d99399e0654c8b19e9df2c4af556f6785ec7a1a8509",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-679-609.html",
+      "scratchTextFilename": "fl-ucc-679-609.txt"
+    },
+    {
+      "id": "fl-ucc-680-214",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/680.214",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:08.463489+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/680.214",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 45490,
+      "sha256": "46fa2ef1d9046df0a9f755306a08c0702dab6a9035309dd28a45a01b7cb5c2dd",
+      "text_sha256": "7e1f641249b3b7975484176bd169e0e5e3ba6e5b21a4befcd6c38d94055366c3",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-680-214.html",
+      "scratchTextFilename": "fl-ucc-680-214.txt"
+    },
+    {
+      "id": "fl-ucc-680-504",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/680.504",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:08.591516+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/680.504",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 45108,
+      "sha256": "6a76c99e00121023fc37275c55c6724d13d532f2a1b750071a801a8c5ddc6f95",
+      "text_sha256": "3320592cee12cab81b883f41c8403bcb2292426c115fc1ddc442f07a9ab4ca8c",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-680-504.html",
+      "scratchTextFilename": "fl-ucc-680-504.txt"
+    },
+    {
+      "id": "ftc-fcra-2026",
+      "url": "https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:09.352618+00:00",
+      "status": 200,
+      "final_url": "https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf",
+      "content_type": "application/pdf",
+      "bytes": 883213,
+      "sha256": "3eb6bf6fbffdb49ed56873ea584fcd4a23c0e772a2db68a337382cdadaec645a",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": "evidence/ftc-fcra-2026.pdf",
+      "scratchRawFilename": "ftc-fcra-2026.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "md-hb1007-2026",
+      "url": "https://www.mgaleg.maryland.gov/mgawebsite/Legislation/Details/hb1007?ys=2026RS",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:07.830252+00:00",
+      "error": "HTTPSConnectionPool(host='www.mgaleg.maryland.gov', port=443): Max retries exceeded with url: /mgawebsite/Legislation/Details/hb1007?ys=2026RS (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'www.mgaleg.maryland.gov'. (_ssl.c:1081)\")))",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": null,
+      "scratchTextFilename": null
+    },
+    {
+      "id": "md-sb0881-2026",
+      "url": "https://mgaleg.maryland.gov/mgawebsite/Legislation/Details/sb0881?ys=2026RS",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:07.830294+00:00",
+      "status": 200,
+      "final_url": "https://mgaleg.maryland.gov/mgawebsite/Legislation/Details/sb0881?ys=2026RS",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 117784,
+      "sha256": "ec6a98c4f82e232a1b3c9e0e5f42e15cb3be9c368ae3c60f975b149689652c1d",
+      "text_sha256": "03931a99855be65bd609289bac2ed9d54727ffe7bed53def51878cd48d184c35",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "Bill status remains House hearing, not enacted-law evidence; page last updated June 30, 2026. No additional state requirement inferred.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "md-sb0881-2026.html",
+      "scratchTextFilename": "md-sb0881-2026.txt"
+    },
+    {
+      "id": "ny-auto-renew-5-903",
+      "url": "https://www.nysenate.gov/legislation/laws/GOB/5-903",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:09.023305+00:00",
+      "status": 403,
+      "final_url": "https://www.nysenate.gov/legislation/laws/GOB/5-903",
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 5634,
+      "sha256": "f26ea7cac4803c5bd33e20562d112dcb2e674c2d55b08004395c6c4ffaf087b1",
+      "text_sha256": "766be4bcbef0163ad3da498967e1872fbcc6d356acd857b017bff4542faa9ff1",
+      "same_raw_response_as_previous": [],
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "ny-auto-renew-5-903.html",
+      "scratchTextFilename": "ny-auto-renew-5-903.txt"
+    },
+    {
+      "id": "ut-current-chapter-pdf",
+      "url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:26:07.829859+00:00",
+      "status": 200,
+      "final_url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf",
+      "content_type": "application/pdf",
+      "bytes": 13478,
+      "sha256": "9897aace38c58cabf845a403689fe9809f83e7c5bc3be01608a110bdf32585c0",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": "evidence/ut-current-chapter-pdf.pdf",
+      "scratchRawFilename": "ut-current-chapter-pdf.pdf",
+      "scratchTextFilename": null
+    },
+    {
+      "id": "fl-ucc-671-201",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/671.201",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:28:43.066480+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/671.201",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 71007,
+      "sha256": "2323e941cf69a9ae9401dd0082d3b05dc58a9704214465318b572228494c0d1b",
+      "text_sha256": "bd9fbd8718ba44d05f535c973d144f68f233eaa5d17568f4de1cd01bba0e4e53",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-671-201.html",
+      "scratchTextFilename": "fl-ucc-671-201.txt"
+    },
+    {
+      "id": "fl-ucc-679-2031",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/679.2031",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:28:43.066704+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/679.2031",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 51153,
+      "sha256": "f6bce2e7f7f43dc47a66237fc77a83dfe6a6f768d86cb0b9b5f847944d72a6a2",
+      "text_sha256": "79ac9523f17b7398994cefbe8e29cfcffad8463332fb214909adfb6f42e34344",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-679-2031.html",
+      "scratchTextFilename": "fl-ucc-679-2031.txt"
+    },
+    {
+      "id": "fl-ucc-679-509",
+      "url": "https://www.flsenate.gov/Laws/Statutes/2026/679.509",
+      "previous": [],
+      "attempted_at": "2026-09-13T09:28:43.066780+00:00",
+      "status": 200,
+      "final_url": "https://www.flsenate.gov/Laws/Statutes/2026/679.509",
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 45880,
+      "sha256": "4438f8e7cc4900baf018fbfcffb0d441eefeaa846e8721d8268d08e4177d54b1",
+      "text_sha256": "9f4e693df44837b122385e7d6e67ba302f330cc3ab03b896472e1d1fe0d5b043",
+      "same_raw_response_as_previous": [],
+      "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
+      "rawResponseArchivedHere": null,
+      "scratchRawFilename": "fl-ucc-679-509.html",
+      "scratchTextFilename": "fl-ucc-679-509.txt"
+    }
+  ],
+  "webExtractions": [
+    {
+      "file": "evidence/ny-statutes-web-extract.txt",
+      "urls": [
+        "https://www.nysenate.gov/legislation/laws/FIS/801",
+        "https://www.nysenate.gov/legislation/laws/FIS/802",
+        "https://www.nysenate.gov/legislation/laws/FIS/803",
+        "https://www.nysenate.gov/legislation/laws/FIS/808",
+        "https://www.nysenate.gov/legislation/laws/FIS/809",
+        "https://www.nysenate.gov/legislation/laws/GOB/5-903"
+      ],
+      "observedOn": "2026-09-13",
+      "sha256": "7b7a7068805375cce7693b4f465681a7c22eb4a3781d50f523073674bc1544e9",
+      "rawResponseHash": null,
+      "limit": "Targeted official-page extraction windows, not complete publisher-page downloads or raw-response hashes. Only the listed sections were read through these windows."
+    },
+    {
+      "file": "evidence/ecfr-tcpa-web-extract.txt",
+      "urls": ["https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"],
+      "observedOn": "2026-09-13",
+      "sha256": "31f5f9558236b1ae856d6bfc4b4eb0c06ae06d6ee65e91cb9795562841864c9e",
+      "rawResponseHash": null,
+      "limit": "Tool extraction window, not a hashed publisher download. eCFR primary window ends before the complete section; companion window supplies the targeted written-consent definition."
+    },
+    {
+      "file": "evidence/ecfr-tcpa-f9-web-extract.txt",
+      "urls": ["https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"],
+      "observedOn": "2026-09-13",
+      "sha256": "c095b6b69f270986dcc9f2395c9082b37df212695d65bad7653abff2781a1196",
+      "rawResponseHash": null,
+      "limit": "Tool extraction window, not a hashed publisher download. eCFR primary window ends before the complete section; companion window supplies the targeted written-consent definition."
+    }
+  ],
+  "bodyComparisons": [
+    {
+      "label": "MO",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/mo-427.300-2025.txt",
+      "retrievalIds": ["mo-current"],
+      "normalized_prior_is_contained_in_current": true,
+      "prior_characters": 16058,
+      "priorSha256": "42f38dee51c471cdffa063e55bbf47bc7f243613d502646aec4a22f1aa4331c9",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "VA Code",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/va-code-6.2-2228-2238-current.txt",
+      "retrievalIds": ["va-code"],
+      "normalized_prior_is_contained_in_current": true,
+      "prior_characters": 9875,
+      "priorSha256": "c19f2dcb3ec78df19f97c6b39b87174d276a53604d733a63dd8e7f4c019f9866",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "CA Finance Code",
+      "prior": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ca-finance-22800-22807.txt",
+      "retrievalIds": ["ca-finance-current"],
+      "prior_span_from": "22800.",
+      "prior_span_before": "end",
+      "normalized_prior_is_contained_in_current": true,
+      "prior_characters": 12608,
+      "priorSha256": "fc9022f5c68e5038ea78b10a1c24ac12637123029bd7b75eae753a71812cc8cd",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "VA Rules",
+      "prior": "docs/research/mca-agreement-requirements-2026-09-12/evidence/va-10vac5-240.txt",
+      "retrievalIds": ["va-rules-current"],
+      "prior_span_from": "10VAC5-240-10.",
+      "prior_span_before": "As a service",
+      "normalized_prior_is_contained_in_current": true,
+      "prior_characters": 8089,
+      "priorSha256": "cc9784a7f18c5db639b41d2db84bb0e06099d5e5036103b72cfe089e3fde2239",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "fl-code-961",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
+      "retrievalIds": ["fl-code-961"],
+      "normalized_prior_section_is_contained_in_current": true,
+      "prior_characters": 126,
+      "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "fl-code-9611",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
+      "retrievalIds": ["fl-code-9611"],
+      "normalized_prior_section_is_contained_in_current": true,
+      "prior_characters": 4214,
+      "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "fl-code-9612",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
+      "retrievalIds": ["fl-code-9612"],
+      "normalized_prior_section_is_contained_in_current": true,
+      "prior_characters": 1847,
+      "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "fl-code-9613",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
+      "retrievalIds": ["fl-code-9613"],
+      "normalized_prior_section_is_contained_in_current": true,
+      "prior_characters": 2393,
+      "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "fl-code-9614",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
+      "retrievalIds": ["fl-code-9614"],
+      "normalized_prior_section_is_contained_in_current": true,
+      "prior_characters": 1251,
+      "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    },
+    {
+      "label": "fl-code-9615",
+      "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
+      "retrievalIds": ["fl-code-9615"],
+      "normalized_prior_section_is_contained_in_current": true,
+      "prior_characters": 1168,
+      "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
+      "normalization": "NFKC, casefold, retain alphanumeric characters; contained prior legal span. This ignores punctuation/whitespace and is not a raw-byte or exhaustive amendment comparison."
+    }
+  ],
+  "evidence": [
+    {
+      "file": "evidence/fcc-da26-12.pdf",
+      "bytes": 97201,
+      "sha256": "b21a1ff3dda5369ee6b178658f85d62c14fa51366b8d7ee7bedddead29da92be",
+      "retrievalIds": ["fcc-da26-12"],
+      "method": "Unmodified publisher PDF response, raw-response hash verified."
+    },
+    {
+      "file": "evidence/fcc-da26-12.layout.txt",
+      "bytes": 12626,
+      "sha256": "b6b62da9387ae68d3cbc5435db27b8d43dd6190f2814fe490e4bedd12edcd18c",
+      "retrievalIds": ["fcc-da26-12"],
+      "method": "pdftotext -layout. FTC PDF emitted Invalid Font Weight warnings; text is an aid and the retained PDF controls. Only targeted FCRA paragraphs were substantively reread. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ut-current-chapter-pdf.pdf",
+      "bytes": 13478,
+      "sha256": "9897aace38c58cabf845a403689fe9809f83e7c5bc3be01608a110bdf32585c0",
+      "retrievalIds": ["ut-current-chapter-pdf"],
+      "method": "Unmodified publisher PDF response, raw-response hash verified."
+    },
+    {
+      "file": "evidence/ut-current-chapter-pdf.layout.txt",
+      "bytes": 14077,
+      "sha256": "3fc08e5ccce2f9b41ac219cc6b380ed319d8ccbbd6860e34cfcfbe21786120d8",
+      "retrievalIds": ["ut-current-chapter-pdf"],
+      "method": "pdftotext -layout. FTC PDF emitted Invalid Font Weight warnings; text is an aid and the retained PDF controls. Only targeted FCRA paragraphs were substantively reread. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ftc-fcra-2026.pdf",
+      "bytes": 883213,
+      "sha256": "3eb6bf6fbffdb49ed56873ea584fcd4a23c0e772a2db68a337382cdadaec645a",
+      "retrievalIds": ["ftc-fcra-2026"],
+      "method": "Unmodified publisher PDF response, raw-response hash verified."
+    },
+    {
+      "file": "evidence/ftc-fcra-2026.layout.txt",
+      "bytes": 318247,
+      "sha256": "7ec6c7507eaa7c21549ee758bea91fb798ce4ba1323c3ea1293d638cba294231",
+      "retrievalIds": ["ftc-fcra-2026"],
+      "method": "pdftotext -layout. FTC PDF emitted Invalid Font Weight warnings; text is an aid and the retained PDF controls. Only targeted FCRA paragraphs were substantively reread. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/fl-targeted-authorities-2026.txt",
+      "bytes": 36948,
+      "sha256": "118332b3b9439edb8bbf9811eb23e81be6df34faf09561107db888303af925f0",
+      "retrievalIds": [
+        "fl-ucc-671-201",
+        "fl-limitations-95-03",
+        "fl-ucc-672-316",
+        "fl-ucc-679-2031",
+        "fl-ucc-679-509",
+        "fl-ucc-679-602",
+        "fl-ucc-679-609",
+        "fl-ucc-680-214",
+        "fl-ucc-680-504"
+      ],
+      "method": "HTMLParser text extraction; complete selected statutory sections, from F.S. marker to end of legal body/history/notes, excluding site navigation. Section 671.201(40) is the current security-interest definition; 671.203 is not that definition. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ny-principis-2022.txt",
+      "bytes": 6246,
+      "sha256": "ea546d7c09d18c4770e332920aa3eb5d5cd7b2dd8aeff41d48a3eef9da3a7460",
+      "retrievalIds": ["ny-principis-2022"],
+      "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ny-bridge-2025.txt",
+      "bytes": 16497,
+      "sha256": "3e6cf98097dc6440dd868eaa42b1063948912318d97237eabef9110cd7d8931b",
+      "retrievalIds": ["ny-bridge-2025"],
+      "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ny-kapitus-2025.txt",
+      "bytes": 4160,
+      "sha256": "f61483fc4563e697d8996f09799cdf363f1b350f57445d2a148d3dd84009f701",
+      "retrievalIds": ["ny-kapitus-2025"],
+      "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ny-richmond-2026.txt",
+      "bytes": 8780,
+      "sha256": "a0d325c24de6ef236bd94a78bcbd0c59c8d25264349d33a88ea8e366573cb833",
+      "retrievalIds": ["ny-richmond-2026"],
+      "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/current-index-observations.txt",
+      "bytes": 60236,
+      "sha256": "f662d7e73932926a4460c98e3c9e7944e953fb98d76704be0df8c5f44713860d",
+      "retrievalIds": [
+        "ca-dfpi-rules-index",
+        "ct-guidance-index",
+        "ny-activity",
+        "ny-register-index",
+        "tx-csbf-index",
+        "tx-occc-rules-index",
+        "ut-dfi-index",
+        "md-sb0881-2026"
+      ],
+      "method": "HTMLParser text extraction of visited official indexes/status pages. A linked document or bill effective-date field is not proof of legal currentness or enactment. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ny-statutes-web-extract.txt",
+      "bytes": 24634,
+      "sha256": "7b7a7068805375cce7693b4f465681a7c22eb4a3781d50f523073674bc1544e9",
+      "retrievalIds": [],
+      "method": "Web-tool extraction window. Internal reference annotations removed; legal text and tool window labels retained. The second eCFR window includes paragraph (f)(9). Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ecfr-tcpa-web-extract.txt",
+      "bytes": 36243,
+      "sha256": "31f5f9558236b1ae856d6bfc4b4eb0c06ae06d6ee65e91cb9795562841864c9e",
+      "retrievalIds": [],
+      "method": "Web-tool extraction window. Internal reference annotations removed; legal text and tool window labels retained. The second eCFR window includes paragraph (f)(9). Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    },
+    {
+      "file": "evidence/ecfr-tcpa-f9-web-extract.txt",
+      "bytes": 18561,
+      "sha256": "c095b6b69f270986dcc9f2395c9082b37df212695d65bad7653abff2781a1196",
+      "retrievalIds": [],
+      "method": "Web-tool extraction window. Internal reference annotations removed; legal text and tool window labels retained. The second eCFR window includes paragraph (f)(9). Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
+    }
+  ],
+  "integratedBase": "7f178f8e4f8242a4abe2ca2ba4864d3ee7e16492",
+  "integrationCheck": {
+    "base": "7f178f8e4f8242a4abe2ca2ba4864d3ee7e16492",
+    "bodyCount": 211,
+    "allDecodedBodyHashesMatchInitialReview": true,
+    "files": [
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/appendix.ts",
+        "sha256": "b8eeb2b717e46dd53e373609328bbacc5bd2383af8a8176c372919c9c14e1df1"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/default.ts",
+        "sha256": "f94e1d53ba37c71298fad79cda79fb5ba0eebc7085e1b860d25177e914d92b0b"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/enrollment.ts",
+        "sha256": "93f8f3de6ee5b5c12006b90a160981074455c6567d67437aef4c0296247ef23f"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/preamble.ts",
+        "sha256": "bab5171b2f05eb253ebbcc7f76d2d594187226209f4ca183fda5d9499d3a2ce4"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/guaranty.ts",
+        "sha256": "339af786b57a5d29bf6e6a243951f4dbb4eb0b110ecf300f884f28987fdb8182"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/miscellaneous.ts",
+        "sha256": "58bf72d72584f1a0b76630f0c70e4c4c72d5014548c403f5b79c21ffbab90e1a"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/purchase.ts",
+        "sha256": "d0d67b2ac459f971151b95b92d2262aa48b2e7d7e54efdcb80c1747d5a52ea80"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/frpa/representations.ts",
+        "sha256": "b92182d30dad69dc02e0020bb53a92f11973f490fff3d3f67c254a9f404d7a74"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/equipment-lease/agreement.ts",
+        "sha256": "68c76c890dd6b6d6b9e5c02ff75035b9c56eb74a752966d9268f4d696d2897b3"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/equipment-lease/guaranty.ts",
+        "sha256": "726277ab5a1531b2eb7aed677f019e6be56daf1b6ae12965906629f836affceb"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/subscription/agreement.ts",
+        "sha256": "b4aab2f7287a00a4b75d118e24d3f75d1abe332daf52324ce23cf48260d327e7"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/subscription/guaranty.ts",
+        "sha256": "52b9a8ac11b4b4f43f78656b09ba8d6f4a6115eb23707ef07f5c528e9770627c"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/iso-pra/additional-obligations.ts",
+        "sha256": "63b2c0c04df9b6769ee7c47a96945be4c407a1b1ce8fe161f456eb66f75b8e6e"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/iso-pra/commission.ts",
+        "sha256": "43b7500603d148104db04ee109ad5ef45a7e9e6827b38d5230e1d406c786eb6e"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/iso-pra/general.ts",
+        "sha256": "bb02ef8b2e14f58292efdfdd945319294e0a59d3bb98d1801fe0e97e33e7b9d4"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/iso-pra/referral-duties.ts",
+        "sha256": "4049eed87b38938ae7d7bf7a35905132678c37a5ef400d02e1a7b949e12fb2d4"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/split-funding/letter.ts",
+        "sha256": "d8ca51c23f693a88521d99f8e7538fd58547ab9a75111f0b9e0cbb9b051d1168"
+      },
+      {
+        "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+        "sha256": "959094c2e06538fdf236d4a88406de53a913a2871ea93c64bcbe5fa64a1d5417"
+      }
+    ],
+    "change": "Merged #187 updates California state-rider citation to §22806(b) and source/comment evidence; all clause bodies are unchanged."
+  },
+  "webObservations": [
+    {
+      "url": "https://www.nysenate.gov/legislation/laws/FIS/A8",
+      "observedOn": "2026-09-13",
+      "observation": "Current article index displayed most recent revision January 7, 2022; targeted sections retained separately."
+    },
+    {
+      "url": "https://www.nysenate.gov/legislation/laws/GOB/5-901",
+      "observedOn": "2026-09-13",
+      "observation": "Official-page web result supplied complete short section and one-month-or-less renewal exception; no raw response archived."
+    },
+    {
+      "url": "https://www.mgaleg.maryland.gov/mgawebsite/Legislation/Details/hb1007?ys=2026RS",
+      "observedOn": "2026-09-13",
+      "observation": "Official-page web result shows House hearing status, last updated June 4, 2026. Direct HTTP and open failed; no enactment inferred."
+    }
+  ]
+}
