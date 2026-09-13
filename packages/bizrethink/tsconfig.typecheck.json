@@ -52,6 +52,17 @@
     "../../.github/scripts/state-notes.ts",
     "regression-tests/direct-template-field-validation.test.ts",
     "server-only/direct-template-fields.ts",
-    "../app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts"
+    "../app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts",
+    "server-only/outbound/**/*.ts",
+    "server-only/test-org-smtp.ts",
+    "server-only/trpc/org-smtp-router.ts",
+    "regression-tests/outbound-destinations.test.ts",
+    "regression-tests/smtp-test-boundary.test.ts",
+    "regression-tests/smtp-transport-boundary.test.ts",
+    "regression-tests/webhook-response-boundary.test.ts",
+    "regression-tests/outbound-tls-fixture.ts",
+    "regression-tests/webhook-tls-boundary.test.ts",
+    "regression-tests/smtp-socket-boundary.test.ts",
+    "../app-tests/e2e/api/bizrethink/smtp-test-boundary.spec.ts"
   ]
 }
