@@ -5,7 +5,8 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches: ['main']
+    # MODIFIED for BizRethink: stacked author PRs need the same build/test gates
+    # before their dependencies merge. Push-triggered runs remain main-only.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}

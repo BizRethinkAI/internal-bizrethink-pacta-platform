@@ -1,3 +1,4 @@
+import { MCA_FUNDING_FIELDS } from '../fields';
 import type { McaClause } from '../types';
 
 /**
@@ -31,7 +32,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
       because: 'load-bearing',
       note: 'The parties, funding figures, itemized deductions and notice contacts must be completed for this purchase to operate; changing deal values does not select different wording.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
     kind: 'field-group',
     unnumberedReason:
@@ -41,71 +42,7 @@ export const FRPA_PREAMBLE: McaClause[] = [
     sortKey: 0,
     heading: 'Merchant and Funding Information',
     body: '',
-    // Labels and anchors read from the vendored Lombard_FRPA_v4.txt form grid.
-    // These preserve the existing fill contract; they do not approve its labels
-    // or implement the outstanding form changes recorded in the handoff.
-    fields: [
-      { label: 'Merchant — Legal Name', widget: '«0»', kind: 'text', required: true },
-      { label: 'Merchant — DBA', widget: '«1»', kind: 'text', required: true },
-      { label: 'Merchant — Tax ID', widget: '«2»', kind: 'text', required: true },
-      { label: 'Merchant — Entity Type', widget: '«3»', kind: 'text', required: true },
-      { label: 'Merchant — State of Inc.', widget: '«4»', kind: 'text', required: true },
-      { label: 'Merchant — Title', widget: '«5»', kind: 'text', required: true },
-      { label: 'Merchant — Primary Contact', widget: '«6»', kind: 'text', required: true },
-      { label: 'Merchant — Phone', widget: '«7»', kind: 'text', required: true },
-      { label: 'Merchant — Email', widget: '«8»', kind: 'text', required: true },
-      { label: 'Merchant — Business Address', widget: '«9»', kind: 'text', required: true },
-      { label: 'Merchant — Mailing Address', widget: '«10»', kind: 'text', required: true },
-      { label: 'Deposit Account — Bank Name', widget: '«11»', kind: 'text', required: true },
-      { label: 'Deposit Account — Account #', widget: '«12»', kind: 'text', required: true },
-      { label: 'Deposit Account — Routing #', widget: '«13»', kind: 'text', required: true },
-      { label: 'Funding Terms — Purchase Price (Advance)', widget: '«14»', kind: 'currency', required: true },
-      { label: 'Funding Terms — Factor Rate', widget: '«15»', kind: 'text', required: true },
-      {
-        label: 'Funding Terms — Equipment Cost Deferred (added to Payback)',
-        widget: '«18»',
-        kind: 'currency',
-        required: true,
-      },
-      { label: 'Funding Terms — Specified %', widget: '«17»', kind: 'text', required: true },
-      { label: 'Funding Terms — Purchased Amount (Payback)', widget: '«16»', kind: 'currency', required: true },
-      { label: 'Funding Terms — Frequency', widget: '«19»', kind: 'text', required: true },
-      { label: 'Funding Terms — Estimated Daily Holdback', widget: '«20»', kind: 'currency', required: true },
-      { label: 'Funding Terms — Holdback Effective Date', widget: '«86»', kind: 'date', required: true },
-      { label: 'Itemization of Net Amount Funded — Purchase Price', widget: '«21»', kind: 'currency', required: true },
-      {
-        label: 'Itemization of Net Amount Funded — Less: Prior Balance(s)',
-        widget: '«22»',
-        kind: 'currency',
-        required: true,
-      },
-      { label: 'Itemization of Net Amount Funded — Origination Fee %', widget: '«23»', kind: 'text', required: true },
-      {
-        label: 'Itemization of Net Amount Funded — Less: Origination Fee',
-        widget: '«24»',
-        kind: 'currency',
-        required: true,
-      },
-      {
-        label: 'Itemization of Net Amount Funded — Less: Equipment fee (paid at funding)',
-        widget: '«84»',
-        kind: 'currency',
-        required: true,
-      },
-      {
-        label: 'Itemization of Net Amount Funded — Net Amount Funded to Merchant',
-        widget: '«26»',
-        kind: 'currency',
-        required: true,
-      },
-      {
-        label: 'Itemization of Net Amount Funded — Total Cost of Financing (Purchased Amount less Net Amount Funded)',
-        widget: '«28»',
-        kind: 'currency',
-        required: true,
-      },
-      { label: 'Approved Processors — Approved Processor', widget: '«27»', kind: 'text', required: true },
-    ],
+    fields: MCA_FUNDING_FIELDS,
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

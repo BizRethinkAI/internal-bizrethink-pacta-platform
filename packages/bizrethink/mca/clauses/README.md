@@ -38,6 +38,30 @@ text being written down.
 | Selection and numbering | implemented; no merchant rendering or sending path |
 | Interview and assembly | future work in Pacta, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
 
+### Current document fields
+
+`fields.ts` defines current labels and semantic `binding` keys. A field's
+`widget` is a stable `{{field:...}}` placeholder; `legacyWidget` is only the
+historical source anchor. Never fill an old PDF by treating that source anchor
+as a current binding. Retired SSN slots have explicit source dispositions and
+do not appear among current document fields. Source coverage includes retained
+and retired anchors without letting an anchor-free field group match every line.
+
+Funding fields distinguish purchase price, purchased receipts, loan principal,
+prior receivables settlement, prior unpaid charges, equipment charges and cash.
+Finance charge and its method are supplied for the applicable disclosure; no
+universal subtraction formula is encoded in a label. The two purchase-price
+placements share one value binding and have distinct presentation placeholders.
+DBA and other expressly conditional entries are optional.
+
+Each instrument's guarantor block repeats for its intended guarantors, with
+separate signatures/dates and conditional entity-signer name/capacity. Repeat
+semantics and retired-slot dispositions participate in approval fingerprints.
+These are document definitions, not a private identity store or an implemented
+transaction-fill/signing API. The later builder must validate supplied values,
+qualify repeated fields by instrument and signer, and preserve required evidence.
+Actual merchant PDFs and stored templates require a separate rebuild/migration.
+
 ### Processor-controlled forms and ancillary consent corrections
 
 **Owner clarification, 2026-09-12:** Split Funding Letters are processor-specific;

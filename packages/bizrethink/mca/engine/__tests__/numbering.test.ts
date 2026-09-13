@@ -58,7 +58,7 @@ describe('numbering belongs to a selected MCA document (ADR 0011)', () => {
     ]);
   });
 
-  it('models the unnumbered funding grid with every source widget, rather than losing it between clauses', () => {
+  it('retains every historical funding-grid widget separately from current bindings', () => {
     const grid = libraryFor('frpa').find((clause) => clause.slug === 'frpa.merchant-and-funding-information');
     const source = documentLines('Lombard_FRPA_v4.txt').find((line) =>
       line.startsWith('[TABLE] 1.1 MERCHANT INFORMATION'),
@@ -67,7 +67,12 @@ describe('numbering belongs to a selected MCA document (ADR 0011)', () => {
     const widgets = source?.match(/«\d+»/g) ?? [];
     expect(widgets).toHaveLength(30);
     expect(grid?.kind).toBe('field-group');
-    expect(grid?.fields?.map((field) => field.widget).sort()).toEqual(widgets.sort());
+    expect(
+      grid?.fields
+        ?.map((field) => field.legacyWidget)
+        .filter(Boolean)
+        .sort(),
+    ).toEqual(widgets.sort());
   });
 
   it('lapses approval when classification, selection, fields, or a reference target changes', () => {
