@@ -43,7 +43,9 @@ test.describe('Envelope item file download endpoint authorization', () => {
     const res = await page.request.get(downloadUrl(draft.id, draftItem.id, 'original'));
 
     expect(res.ok()).toBeFalsy();
-    expect(res.status()).toBe(403);
+    // MODIFIED for BizRethink (overlay 084): foreign and absent PDFs have one private-object response.
+    expect(res.status()).toBe(404);
+    expect(await res.json()).toEqual({ error: 'Not found' });
   });
 
   test('returns 404 for a nonexistent envelope', async ({ page }) => {
