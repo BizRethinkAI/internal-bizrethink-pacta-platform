@@ -164,3 +164,6 @@ packages/app-tests/e2e/api/bizrethink/assistant-signature-boundary.spec.ts
 
 # A-07 direct-template field validation HTTP regression, newly owned and never upstream.
 packages/app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts
+
+# A-12/A-13/A-23/A-24: HTTP/PostgreSQL document/team permission regressions (overlay 084).
+packages/app-tests/e2e/api/bizrethink/document-team-permissions.spec.ts

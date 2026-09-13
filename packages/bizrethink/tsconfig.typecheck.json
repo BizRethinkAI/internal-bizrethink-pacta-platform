@@ -1,5 +1,5 @@
 {
-  "//": "Type gate for the lease builder. vitest strips types without checking them, so a test fixture missing a required ClauseFacts field passes green while silently feeding `undefined` into every includeWhen predicate \u2014 which is exactly what happened, and what this caught. Scoped to lease/ plus its own server-only module: the wider package has pre-existing type errors in sso-provider-config.test.ts that are out of scope for this feature. Extended 2026-09-06 to cover mca/: the prescribed-form checker compares strings that must match a statute, and a type error there is the same class of silent-green failure this file was created for.",
+  "//": "Type gate for the lease builder. vitest strips types without checking them, so a test fixture missing a required ClauseFacts field passes green while silently feeding `undefined` into every includeWhen predicate — which is exactly what happened, and what this caught. Scoped to lease/ plus its own server-only module: the wider package has pre-existing type errors in sso-provider-config.test.ts that are out of scope for this feature. Extended 2026-09-06 to cover mca/: the prescribed-form checker compares strings that must match a statute, and a type error there is the same class of silent-green failure this file was created for.",
   "extends": "../tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
@@ -52,6 +52,15 @@
     "../../.github/scripts/state-notes.ts",
     "regression-tests/direct-template-field-validation.test.ts",
     "server-only/direct-template-fields.ts",
-    "../app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts"
+    "../app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts",
+    "server-only/document-permissions.ts",
+    "server-only/delete-visible-envelope.ts",
+    "server-only/folder-permissions.ts",
+    "regression-tests/document-permission-fixture.ts",
+    "regression-tests/document-file-permissions.test.ts",
+    "regression-tests/document-delete-permissions.test.ts",
+    "regression-tests/folder-mutation-permissions.test.ts",
+    "regression-tests/recipient-suggestion-permissions.test.ts",
+    "../app-tests/e2e/api/bizrethink/document-team-permissions.spec.ts"
   ]
 }
