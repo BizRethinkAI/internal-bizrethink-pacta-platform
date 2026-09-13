@@ -11,6 +11,12 @@ session workflow. For Pacta incident work, preserve the HANDOFF reading order
 and individual finding decisions. For Lombard, preserve each repository's
 owning-session boundaries. Do not impose another project's stack or gates.
 
+Use role labels such as repository owner, author and reviewer plus unique session
+labels in public issues, PRs, comments, commits and handoffs. Do not copy the
+owner's personal name, contact details or identifying home paths from context;
+personal attribution requires an explicit owner request. Preserve required
+source/license/professional attribution.
+
 ## Take the assignment
 
 Read open task issues and their comments, open PRs and reserved identifiers.
@@ -50,9 +56,20 @@ test-first requirements, upstream overlays, migrations and specialist review.
   return the new SHA and evidence for fresh independent review. Never force-push
   someone else's branch or resolve a semantic conflict in their work unassigned.
 - Finish with all applicable CI green on the actual final head. Record results
-  in the PR/task without a status-only code push. Report remaining independent
-  review and shipping separately; do not merge your PR or deploy it.
+  in the PR/task without a status-only code push. Update the task body's PR link,
+  status to **Review** and next action to the already-authorized review role;
+  leave it open while required review, merge, consolidation, installation or
+  shipping remains. Report those remaining steps separately; do not merge your
+  PR or deploy it.
 
 Task comments carry progress and handoffs without Git commits. They do not wake
 other sessions. Use authorized peer messaging when available or provide relay
 text through the owner, and do not claim notification without evidence.
+
+For task cards, the current responsible session maintains progress fields and
+evidence at each handoff. Re-read before editing; preserve assignment/scope,
+branch, dependencies, reservations and other sessions' updates. This does not
+appoint a coordinator or transfer work. The session finishing the last approved
+step must record completion evidence, set **Done** and **Next action: None —
+approved scope complete**, close the issue as completed and verify its state.
+An author handoff is not whole-task completion while later required steps remain.

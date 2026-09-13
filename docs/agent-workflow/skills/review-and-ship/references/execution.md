@@ -13,11 +13,14 @@ or explicitly hand it off. Record:
   owner authorization for coordination, merging and deployment; phase/run ID.
 - Repo-owning sessions and cross-repo handoffs where one-session/one-repo rules
   apply; do not use a shared ledger to bypass those boundaries.
+- Selected task numbers, approved completion criteria, current status/next action
+  and final body-update/closure verification. Use role/session labels in any
+  public evidence; omit the owner's personal name and identifying local details.
 - Per PR: authoring session, fetched/reviewed head, tested base/integration SHA,
   verdict/open findings, checks and links, state-fold owner, merge strategy/SHA.
 - Final consolidation: owner, branch/PR, covered merge SHAs, reviewed head,
   checks and merge SHA, or a verified no-op/not-applicable reason. Record phase
-  `awaiting_owner_merge` when handing your own ready PR to Shwet.
+  `awaiting_owner_merge` when handing your own ready PR to the repository owner.
 - Per app: verified repo/branch/environment, auto-deploy setting, intended
   final default-branch SHA, `deploy_attempted: false`, request time and receipt.
 
@@ -91,6 +94,10 @@ diff/changed-file content instead of expecting preserved head ancestry. A PR's
 `MERGED` status alone is insufficient. Reassess dependencies/state notes before
 the next PR; a new push requires checks on that revised integration.
 
+Update the associated task body's status and next action. Use **Merged awaiting
+shipping** while required consolidation, installation or authorized shipping
+remains. Do not close the task merely because its implementation PR merged.
+
 ## Final state consolidation where the repo requires it
 
 Final consolidation is part of every shipping batch in a repo that uses this
@@ -116,8 +123,8 @@ The shipping session is its default author without another owner instruction.
    already correct and no completed notes remain, record the verified no-op
    instead of creating an empty or duplicate PR. Repos without this convention
    get a not-applicable record, not a new state system.
-4. Hand your ready PR to Shwet for review and merge, or to an already assigned
-   independent reviewer/merger. Explain the existing no-self-merge rule, link the
+4. Hand your ready PR to the repository owner for review and merge, or to an
+   already assigned independent reviewer/merger. Explain the existing no-self-merge rule, link the
    PR and record `awaiting_owner_merge`. Never merge your own cleanup PR. This is
    the final human handoff, not a request to assign its authoring elsewhere.
 5. On resume, reuse the same ledger, verify the consolidation actually landed on
@@ -162,6 +169,26 @@ For each selected app:
    owner reconciliation and authorization. Do not poll status/logs or claim
    the revision is live. In multi-app runs, stop on an ambiguous failure before
    continuing dependent deployments and preserve already-sent receipts.
+
+## Finish the task records
+
+Before the final report, check the selected task cards and the batch card against
+their approved completion criteria. Verify required reviews/checks/merges,
+consolidation, reviewed-skill installation where assigned and the authorized
+shipping outcome. A receipt proves an accepted request, not a live revision;
+no additional deployment or production polling is authorized by task closure.
+
+For each completed task, re-read its current body and comments, preserve its
+assignment fields and intervening updates, record the completion evidence, set
+**Status: Done** and **Next action: None — approved scope complete**, then close
+the issue with reason **completed**. Verify the updated body and closed state
+and record them in the ledger. This is the finishing session's responsibility,
+not a follow-up for the owner. A completion comment alone does not finish it.
+
+Keep incomplete/uncertain tasks open with their next action and responsible role.
+If a body update or close fails, report that exact unfinished maintenance; do not
+claim the task record is complete or restart deployment to resolve it. Do not
+change scope/assignments or discard required work to obtain a closed card.
 
 Keep the ledger/evidence. Remove only clean disposable worktrees owned by this
 run; never force-remove another session's or uncommitted review work. Installing

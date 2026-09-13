@@ -11,6 +11,11 @@ merge and final checks, request one deployment of the reviewed default-branch
 revision for each selected Coolify application. Monitor long-running CI in the
 background and resume the queue automatically when it reaches a terminal result.
 
+Use role labels and unique session labels in public task/PR records, comments,
+commits and handoffs. Do not copy the owner's personal name, contact details or
+identifying home paths from context; personal attribution requires an explicit
+owner request. Preserve required source/license/professional attribution.
+
 ## Scope and authority
 
 - Default to the **current Git repository**, not every repository in its parent
@@ -67,8 +72,11 @@ Resolve stale prose against current code/configuration and explain discrepancies
 Where GitHub task coordination is adopted, read the repo's session workflow
 and separate task issues/comments before assigning work or folding notes. The
 appointed coordinator owns assignments; a ship request does not replace that
-coordinator. Append findings and receipts to the selected task records within
-authorized scope. A shared GitHub account is not a session identity. Comments
+coordinator. Maintain the selected tasks' PR links, Status and Next action as
+their current responsible session, and append findings/receipts as evidence.
+Re-read before editing and preserve assignment/scope, branch, dependencies,
+reservations and intervening updates. Progress edits do not transfer ownership.
+A shared GitHub account is not a session identity. Comments
 do not wake a separately launched session; retain explicit handoff/relay rules.
 
 Follow each project's special review requirements for money, legal text, auth,
@@ -140,8 +148,8 @@ notes and this shipping session automatically prepares one pure consolidation
 PR per repo/batch, covering all its landed PRs. Do not wait for a reminder or
 send that authoring task back to an implementation session. Honor an existing
 explicit fold assignment; coordinate a handoff instead of creating a competing
-PR. Once your consolidation is ready and its applicable checks pass, give Shwet
-the PR for review and merge, unless another independent reviewer/merger is
+PR. Once your consolidation is ready and its applicable checks pass, give the
+repository owner the PR for review and merge, unless another independent reviewer/merger is
 already assigned. **Never merge your own cleanup PR.** Resume the same shipping
 run after its merge and require final default-branch checks, including the repo's
 state readiness gate, before deployment. See the execution reference for the
@@ -185,6 +193,15 @@ when the user has requested shipping, never while creating/testing this skill.
   Record each attempt before sending. No automatic retry after an uncertain
   response. **Never watch the deployment**, poll its logs/status, run production
   tests or claim the requested revision is verified live.
+
+Before the final handoff, reconcile every selected task and the shipping batch
+card against their approved completion criteria. Keep required pending, blocked
+or uncertain work open with accurate status and next action. When the final
+required step is complete, record evidence, set **Done** and **Next action: None
+— approved scope complete**, close the issue as completed and verify its body
+and closed state. The finishing session owns this step without an owner reminder;
+a final comment alone is insufficient. Record a failed update/close as unfinished
+card maintenance. This does not authorize extra deployment or live verification.
 
 Report each PR's reviewed SHA, verdict, checks, merge SHA or blocker, and fix
 owner. Include final default-branch SHA, ledger path and deploy receipt or

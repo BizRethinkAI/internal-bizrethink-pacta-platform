@@ -6,21 +6,26 @@ body:
   - type: markdown
     attributes:
       value: |
-        The coordinator owns this assignment body. Authors and reviewers add
-        progress/findings as comments with their session label. Read other open
-        task cards before assigning overlapping work or reserving an overlay.
+        Use role labels and unique session labels, not personal names or local
+        identifying details. The coordinator owns assignments and reservations.
+        The session responsible for the current step updates the PR link, Status
+        and Next action, and adds evidence in comments. Re-read before editing;
+        preserve assignment fields and other sessions' updates. The session
+        finishing the last required step sets Done, records no remaining action
+        and closes the task as completed. A merged PR alone may leave required
+        work pending. Read other open cards before assigning overlapping work.
   - type: textarea
     id: outcome
     attributes:
       label: Approved outcome and scope
-      description: Include approval context, affected areas and completion criteria.
+      description: Include approval context, affected areas and completion criteria, including any required review, merge, consolidation, installation or authorized shipping.
     validations:
       required: true
   - type: input
     id: coordinator
     attributes:
       label: Coordinator and authority
-      placeholder: Shwet, or the one session explicitly appointed by Shwet
+      placeholder: Repository owner, or the one explicitly appointed coordinator session
     validations:
       required: true
   - type: input
@@ -48,6 +53,7 @@ body:
     id: status
     attributes:
       label: Status
+      description: Keep the body current at each handoff; Done requires all approved completion criteria and closing the issue.
       options:
         - Queued
         - Assigned
@@ -63,6 +69,6 @@ body:
     id: next-action
     attributes:
       label: Next action and responsible session
-      description: Include handoff or shipping requirements. A merge is not a deployment.
+      description: Record the next already-authorized role and required action. On completion use None — approved scope complete, record evidence and close the issue. A merge is not a deployment.
     validations:
       required: true
