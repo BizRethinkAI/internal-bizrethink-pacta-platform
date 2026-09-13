@@ -1,9 +1,4 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
-import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
-import { prisma } from '@documenso/prisma';
-import { EnvelopeType } from '@prisma/client';
-import { match } from 'ts-pattern';
+import { deleteVisibleEnvelope } from '@bizrethink/customizations/server-only/delete-visible-envelope';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
@@ -27,44 +22,8 @@ export const deleteEnvelopeRoute = authenticatedProcedure
       },
     });
 
-    const unsafeEnvelope = await prisma.envelope.findUnique({
-      where: {
-        id: envelopeId,
-      },
-      select: {
-        type: true,
-      },
-    });
-
-    if (!unsafeEnvelope) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Envelope not found',
-      });
-    }
-
-    await match(unsafeEnvelope.type)
-      .with(EnvelopeType.DOCUMENT, async () =>
-        deleteDocument({
-          userId: ctx.user.id,
-          teamId,
-          id: {
-            type: 'envelopeId',
-            id: envelopeId,
-          },
-          requestMetadata: ctx.metadata,
-        }),
-      )
-      .with(EnvelopeType.TEMPLATE, async () =>
-        deleteTemplate({
-          userId: ctx.user.id,
-          teamId,
-          id: {
-            type: 'envelopeId',
-            id: envelopeId,
-          },
-        }),
-      )
-      .exhaustive();
+    // MODIFIED for BizRethink (overlay 084): authorize dispatch and normalize private-object errors.
+    await deleteVisibleEnvelope({ envelopeId, user: ctx.user, teamId, requestMetadata: ctx.metadata });
 
     return ZGenericSuccessResponse;
   });

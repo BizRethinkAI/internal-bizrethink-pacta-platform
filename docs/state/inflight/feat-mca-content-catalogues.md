@@ -4,9 +4,29 @@ Author session: **mca-build-20260913**, directly assigned by the repository owne
 Task [#207](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/issues/207).
 Branch `feat/mca-content-catalogues` is stacked on #206, initially
 `ca31f30ba8cc5593a61a5d675cc51f3207208127`. Dependencies: accepted design #200,
-substantive research #202, funding/identity #204, equipment #206. Integrate #194's
-consent and acknowledgment correction before the completed package can be used.
+substantive research #202, funding/identity #204, equipment #206. The refresh below
+incorporates merged #194's consent and acknowledgment correction.
 Do not repeat the already completed Utah/California legal-source research.
+
+## Main and consent integration refresh
+
+Refreshed parent #206 at `ef20584ac5dca569ace19aa5157ba49f53ceeae3` incorporates
+main `a2e0719fc38d988f489234b564095ef46307c05f`. The overlay index and owned-file
+list retain both the incoming security registrations and MCA overlay 085; no
+patch payload or security behavior is changed. The clause README describes the
+implemented catalogue and retains the merged processor-form/consent record.
+
+The first focused integration run caught a preamble version collision: both the
+original mapping and #194's different Permission to Release wording used version
+2. The integrated preamble advances to version 3, preserving #194's complete
+wording and the original extraction manifest. The regression is the existing
+source reconstruction check; it is not removed or weakened. Later semantic
+changes in #212 must advance from this new parent version. The ancillary test
+pins version 3 for this record and version 2 for the other thirteen. Draft status,
+evidence, sources and existing approvals remain governed by their fingerprints.
+The affected migration, review, catalogue, consent, equipment and surface checks
+pass seven files / 378 tests. Changed-file formatting and overlay preservation
+are checked before push; refreshed full CI belongs on the PR/task.
 
 ## Delivered behavior
 

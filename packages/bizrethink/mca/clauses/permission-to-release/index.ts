@@ -30,7 +30,12 @@ export const PERMISSION_TO_RELEASE_LIBRARY: McaClause[] = Object.values(PERMISSI
 
 export const PERMISSION_TO_RELEASE_SECTION_ORDER = ['authorisations'] as const;
 
-/** Lines that belong to no section, each with the reason. */
+/**
+ * Non-clause lines in the retained legacy source, not the new execution design.
+ * Its table already includes an r2 individual signature (the older finding was
+ * implemented). The draft removes deemed guarantor status; the future template
+ * must identify the report subject's capacity and bind that separate signature.
+ */
 export const PERMISSION_TO_RELEASE_NON_CLAUSE: NonClauseLine[] = [
   { anchor: 'PERMISSION TO RELEASE INFORMATION', reason: 'document title' },
   { anchor: 'Date: ', reason: 'a date field' },

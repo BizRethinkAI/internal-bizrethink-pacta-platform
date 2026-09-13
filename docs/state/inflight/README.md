@@ -6,6 +6,12 @@ Never edit another PR's note. Include durable behavior, decisions, validation,
 limitations and unfinished work; put live assignment/status changes on the
 GitHub task card without restarting application CI.
 
+Use role/session labels instead of the owner's personal name or identifying
+local details. The responsible session updates the task body's progress fields
+at handoff. When all approved work is finished, its final responsible session
+records the evidence, sets Done/no remaining action and closes the task as
+completed. A committed handoff or completion comment does not replace that step.
+
 Read STATE.md, these notes and current task/PR records together. STATE.md is the
 last consolidation; a note on main is merged work awaiting consolidation. The
 folder name does not prove a PR is still open or a change is deployed.
@@ -13,8 +19,8 @@ folder name does not prove a PR is still open or a change is deployed.
 The shipping session automatically folds main's notes into STATE.md once per
 batch through a pure `chore/state-consolidation-<batch>` PR, preserving any
 existing explicit fold assignment until a coordinated handoff. It only updates
-STATE.md and deletes notes, and creates no note itself. Shwet reviews and merges
-it unless another independent reviewer/merger is already assigned; never
+STATE.md and deletes notes, and creates no note itself. The repository owner
+reviews and merges it unless another independent reviewer/merger is already assigned; never
 self-merge. Synthesize current facts, preserve open limitations and correct
 stale claims; do not concatenate duplicate accounts.
 

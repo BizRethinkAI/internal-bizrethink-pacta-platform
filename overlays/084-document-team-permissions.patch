@@ -1,0 +1,601 @@
+# Why: Enforce document/team visibility consistently in suggestions, PDFs, private-object errors and folder mutations.
+# Why-not-additive: Existing upstream callers must invoke owned permission predicates/transactions; their HTTP tests must enforce the uniform absence contract.
+# Upstream-merge-fragility: medium — authorization callers and folder/PDF contracts must be rechecked after upstream refactors.
+# Base: 1813b1d72fb231593ddcb2cb0b2a55054ac7f040; preserves overlay 075 API scope and overlay 078 presign capability boundaries.
+diff --git a/apps/remix/server/api/files/files.helpers.ts b/apps/remix/server/api/files/files.helpers.ts
+index 3b0dc1f05..b692a2ee9 100644
+--- a/apps/remix/server/api/files/files.helpers.ts
++++ b/apps/remix/server/api/files/files.helpers.ts
+@@ -2,20 +2,10 @@ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+ import { generatePartialSignedPdf } from '@documenso/lib/server-only/pdf/generate-partial-signed-pdf';
+-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+ import { sha256 } from '@documenso/lib/universal/crypto';
+ import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+ import { prisma } from '@documenso/prisma';
+-import {
+-  type DocumentDataType,
+-  DocumentStatus,
+-  type EnvelopeType,
+-  EnvelopeType as EnvelopeTypeEnum,
+-  type RecipientRole,
+-  type SigningStatus,
+-  type TemplateType,
+-  TemplateType as TemplateTypeEnum,
+-} from '@prisma/client';
++import { type DocumentDataType, DocumentStatus, type RecipientRole, type SigningStatus } from '@prisma/client';
+ import contentDisposition from 'content-disposition';
+ import type { Context } from 'hono';
+ import { match } from 'ts-pattern';
+@@ -259,59 +249,5 @@ const handlePendingFileRequest = async ({
+   return c.body(pdf);
+ };
+ 
+-type CheckEnvelopeFileAccessOptions = {
+-  userId: number;
+-  teamId: number;
+-  envelopeType: EnvelopeType;
+-  templateType: TemplateType;
+-};
+-
+-/**
+- * Check whether a user has access to an envelope's file.
+- *
+- * First checks team membership. If that fails and the envelope is an
+- * ORGANISATION template (not a document), falls back to checking whether
+- * the user belongs to any team in the same organisation.
+- */
+-export const checkEnvelopeFileAccess = async ({
+-  userId,
+-  teamId,
+-  envelopeType,
+-  templateType,
+-}: CheckEnvelopeFileAccessOptions): Promise<boolean> => {
+-  const team = await getTeamById({ userId, teamId }).catch(() => null);
+-
+-  if (team) {
+-    return true;
+-  }
+-
+-  if (envelopeType === EnvelopeTypeEnum.TEMPLATE && templateType === TemplateTypeEnum.ORGANISATION) {
+-    const orgAccess = await prisma.team.findFirst({
+-      where: {
+-        id: teamId,
+-        organisation: {
+-          teams: {
+-            some: {
+-              teamGroups: {
+-                some: {
+-                  organisationGroup: {
+-                    organisationGroupMembers: {
+-                      some: {
+-                        organisationMember: { userId },
+-                      },
+-                    },
+-                  },
+-                },
+-              },
+-            },
+-          },
+-        },
+-      },
+-      select: { id: true },
+-    });
+-
+-    return orgAccess !== null;
+-  }
+-
+-  return false;
+-};
++// MODIFIED for BizRethink (overlay 084): membership-only file authorization was
++// replaced by document-permissions predicates in each data-bearing file query.
+diff --git a/apps/remix/server/api/files/files.ts b/apps/remix/server/api/files/files.ts
+index 2a2a52bf9..fe497d01f 100644
+--- a/apps/remix/server/api/files/files.ts
++++ b/apps/remix/server/api/files/files.ts
+@@ -1,3 +1,7 @@
++import {
++  getEnvelopeFileWhereInput,
++  privateEnvelopeFileCache,
++} from '@bizrethink/customizations/server-only/document-permissions';
+ import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
+ import { presignFileCache, resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
+ import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
+@@ -12,7 +16,7 @@ import type { Prisma } from '@prisma/client';
+ import { Hono } from 'hono';
+ 
+ import type { HonoEnv } from '../../router';
+-import { checkEnvelopeFileAccess, handleEnvelopeItemFileRequest } from './files.helpers';
++import { handleEnvelopeItemFileRequest } from './files.helpers';
+ import {
+   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
+   ZGetEnvelopeItemFileRequestParamsSchema,
+@@ -25,6 +29,8 @@ import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
+ import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
+ 
+ export const filesRoute = new Hono<HonoEnv>()
++  // MODIFIED for BizRethink (overlay 084): role/visibility changes apply to every authenticated file read.
++  .use('/envelope/*', privateEnvelopeFileCache)
+   // MODIFIED for BizRethink (overlay 078): delegated PDFs must revalidate on future reads.
+   .use('/envelope/:envelopeId/envelopeItem/:envelopeItemId', presignFileCache('token'))
+   .use(
+@@ -87,8 +93,7 @@ export const filesRoute = new Hono<HonoEnv>()
+ 
+       const envelope = await prisma.envelope.findFirst({
+         where: {
+-          id: envelopeId,
+-          ...actor?.envelopeWhere,
++          ...(await getEnvelopeFileWhereInput({ userId, envelopeId, scope: actor?.envelopeWhere })),
+         },
+         include: {
+           envelopeItems: {
+@@ -103,28 +108,17 @@ export const filesRoute = new Hono<HonoEnv>()
+       });
+ 
+       if (!envelope) {
+-        return c.json({ error: 'Envelope not found' }, 404);
++        return c.json({ error: 'Not found' }, 404);
+       }
+ 
+       const [envelopeItem] = envelope.envelopeItems;
+ 
+       if (!envelopeItem) {
+-        return c.json({ error: 'Envelope item not found' }, 404);
+-      }
+-
+-      const hasAccess = await checkEnvelopeFileAccess({
+-        userId,
+-        teamId: envelope.teamId,
+-        envelopeType: envelope.type,
+-        templateType: envelope.templateType,
+-      });
+-
+-      if (!hasAccess) {
+-        return c.json({ error: 'User does not have access to the team that this envelope is associated with' }, 403);
++        return c.json({ error: 'Not found' }, 404);
+       }
+ 
+       if (!envelopeItem.documentData) {
+-        return c.json({ error: 'Document data not found' }, 404);
++        return c.json({ error: 'Not found' }, 404);
+       }
+ 
+       return await handleEnvelopeItemFileRequest({
+@@ -154,7 +148,7 @@ export const filesRoute = new Hono<HonoEnv>()
+ 
+         const envelope = await prisma.envelope.findFirst({
+           where: {
+-            id: envelopeId,
++            ...(await getEnvelopeFileWhereInput({ userId: session.user.id, envelopeId })),
+           },
+           include: {
+             envelopeItems: {
+@@ -175,33 +169,17 @@ export const filesRoute = new Hono<HonoEnv>()
+         });
+ 
+         if (!envelope) {
+-          return c.json({ error: 'Envelope not found' }, 404);
++          return c.json({ error: 'Not found' }, 404);
+         }
+ 
+         const [envelopeItem] = envelope.envelopeItems;
+ 
+         if (!envelopeItem) {
+-          return c.json({ error: 'Envelope item not found' }, 404);
+-        }
+-
+-        const hasDownloadAccess = await checkEnvelopeFileAccess({
+-          userId: session.user.id,
+-          teamId: envelope.teamId,
+-          envelopeType: envelope.type,
+-          templateType: envelope.templateType,
+-        });
+-
+-        if (!hasDownloadAccess) {
+-          return c.json(
+-            {
+-              error: 'User does not have access to the team that this envelope is associated with',
+-            },
+-            403,
+-          );
++          return c.json({ error: 'Not found' }, 404);
+         }
+ 
+         if (!envelopeItem.documentData) {
+-          return c.json({ error: 'Document data not found' }, 404);
++          return c.json({ error: 'Not found' }, 404);
+         }
+ 
+         const baseOptions = {
+diff --git a/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts b/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
+index 1d29230a7..d049f373b 100644
+--- a/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
++++ b/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
+@@ -1,3 +1,4 @@
++import { getEnvelopeFileWhereInput } from '@bizrethink/customizations/server-only/document-permissions';
+ import { resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
+ import type { DocumentDataVersion } from '@documenso/lib/types/document';
+ import { sha256 } from '@documenso/lib/universal/crypto';
+@@ -9,7 +10,6 @@ import { type Context, Hono } from 'hono';
+ import { z } from 'zod';
+ 
+ import type { HonoEnv } from '../../../router';
+-import { checkEnvelopeFileAccess } from '../files.helpers';
+ 
+ const route = new Hono<HonoEnv>();
+ 
+@@ -42,13 +42,13 @@ route.get(
+       return c.json({ error: 'Not found' }, 404);
+     }
+ 
+-    // Note: We authenticate whether the user can access this in the `getTeamById` below.
++    // MODIFIED for BizRethink (overlay 084): authorize the envelope in the query that loads its file data.
+     const envelopeItem = await prisma.envelopeItem.findFirst({
+       where: {
+         id: envelopeItemId,
+         envelopeId,
+         documentDataId,
+-        envelope: actor?.envelopeWhere,
++        envelope: await getEnvelopeFileWhereInput({ userId, envelopeId, scope: actor?.envelopeWhere }),
+       },
+       include: {
+         documentData: true,
+@@ -67,18 +67,6 @@ route.get(
+       return c.json({ error: 'Not found' }, 404);
+     }
+ 
+-    // Check whether the user has access to the document.
+-    const hasAccess = await checkEnvelopeFileAccess({
+-      userId,
+-      teamId: envelopeItem.envelope.teamId,
+-      envelopeType: envelopeItem.envelope.type,
+-      templateType: envelopeItem.envelope.templateType,
+-    });
+-
+-    if (!hasAccess) {
+-      return c.json({ error: 'Not found' }, 404);
+-    }
+-
+     return await handleEnvelopeItemPdfRequest({
+       c,
+       envelopeItem,
+diff --git a/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts b/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
+index b45f5f18f..b280f9dda 100644
+--- a/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
++++ b/packages/app-tests/e2e/api/v2/test-unauthorized-api-access.spec.ts
+@@ -3478,7 +3478,8 @@ test.describe('Document API V2', () => {
+         expect(res.ok()).toBeFalsy();
+         // MODIFIED for BizRethink (overlay 075): foreign API-team records are hidden as 404.
+         expect(res.status()).toBe(404);
+-        expect(await res.text()).toContain('Document not found');
++        // MODIFIED for BizRethink (overlay 084): use the same envelope absence error for every denied type.
++        expect(await res.text()).toContain('Envelope not found');
+         expect(await prisma.envelope.findUnique({ where: { id: doc.id } })).toMatchObject({
+           id: doc.id,
+           teamId: teamA.id,
+diff --git a/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts b/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts
+index ff9b7ec1a..fc6b18850 100644
+--- a/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts
++++ b/packages/app-tests/e2e/api/v2/unauthorized-api-access/api-access-file-download.spec.ts
+@@ -43,7 +43,9 @@ test.describe('Envelope item file download endpoint authorization', () => {
+     const res = await page.request.get(downloadUrl(draft.id, draftItem.id, 'original'));
+ 
+     expect(res.ok()).toBeFalsy();
+-    expect(res.status()).toBe(403);
++    // MODIFIED for BizRethink (overlay 084): foreign and absent PDFs have one private-object response.
++    expect(res.status()).toBe(404);
++    expect(await res.json()).toEqual({ error: 'Not found' });
+   });
+ 
+   test('returns 404 for a nonexistent envelope', async ({ page }) => {
+diff --git a/packages/lib/server-only/document/delete-document.ts b/packages/lib/server-only/document/delete-document.ts
+index 51047571a..958aa87ca 100644
+--- a/packages/lib/server-only/document/delete-document.ts
++++ b/packages/lib/server-only/document/delete-document.ts
+@@ -1,4 +1,5 @@
+ import { getApiTokenEnvelopeScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
++import { documentUnavailable } from '@bizrethink/customizations/server-only/document-permissions';
+ import { prisma } from '@documenso/prisma';
+ import type { DocumentMeta, Envelope, Recipient, User } from '@prisma/client';
+ import { DocumentStatus, EnvelopeType, RecipientRole, SendStatus, WebhookTriggerEvents } from '@prisma/client';
+@@ -53,9 +54,7 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
+   });
+ 
+   if (!envelope) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, {
+-      message: 'Document not found',
+-    });
++    throw documentUnavailable();
+   }
+ 
+   // Determine whether the user has authorized delete access using the
+@@ -81,9 +80,8 @@ export const deleteDocument = async ({ id, userId, teamId, requestMetadata }: De
+   const userRecipient = envelope.recipients.find((recipient) => recipient.email === user.email);
+ 
+   if (!hasDeleteAccess && !userRecipient) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'Not allowed',
+-    });
++    // MODIFIED for BizRethink (overlay 084): foreign and absent objects have the same public error.
++    throw documentUnavailable();
+   }
+ 
+   // Handle hard or soft deleting the actual document if user has permission.
+diff --git a/packages/lib/server-only/folder/delete-folder.ts b/packages/lib/server-only/folder/delete-folder.ts
+index edcb50e30..998941a3f 100644
+--- a/packages/lib/server-only/folder/delete-folder.ts
++++ b/packages/lib/server-only/folder/delete-folder.ts
+@@ -1,49 +1,10 @@
+-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { prisma } from '@documenso/prisma';
++import { deleteFolderWithPermissions } from '@bizrethink/customizations/server-only/folder-permissions';
+ 
+-import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
+-import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
+-import { getTeamById } from '../team/get-team';
+-
+-export interface DeleteFolderOptions {
++export type DeleteFolderOptions = {
+   userId: number;
+   teamId: number;
+   folderId: string;
+-}
+-
+-export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOptions) => {
+-  const team = await getTeamById({ userId, teamId });
+-
+-  const folder = await prisma.folder.findFirst({
+-    where: {
+-      id: folderId,
+-      team: buildTeamWhereQuery({
+-        teamId,
+-        userId,
+-      }),
+-      visibility: {
+-        in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+-      },
+-    },
+-  });
+-
+-  if (!folder) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, {
+-      message: 'Folder not found',
+-    });
+-  }
+-
+-  const hasPermission = canAccessTeamDocument(team.currentTeamRole, folder.visibility);
+-
+-  if (!hasPermission) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'You do not have permission to delete this folder',
+-    });
+-  }
+-
+-  return await prisma.folder.delete({
+-    where: {
+-      id: folder.id,
+-    },
+-  });
+ };
++
++// MODIFIED for BizRethink (overlay 084): authorize and lock all destructive descendants.
++export const deleteFolder = deleteFolderWithPermissions;
+diff --git a/packages/lib/server-only/folder/update-folder.ts b/packages/lib/server-only/folder/update-folder.ts
+index 198b72047..821ca5978 100644
+--- a/packages/lib/server-only/folder/update-folder.ts
++++ b/packages/lib/server-only/folder/update-folder.ts
+@@ -1,12 +1,7 @@
+-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { prisma } from '@documenso/prisma';
++import { updateFolderWithPermissions } from '@bizrethink/customizations/server-only/folder-permissions';
+ import type { DocumentVisibility } from '@documenso/prisma/generated/types';
+ 
+-import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
+-import { buildTeamWhereQuery } from '../../utils/teams';
+-import { getTeamById } from '../team/get-team';
+-
+-export interface UpdateFolderOptions {
++export type UpdateFolderOptions = {
+   userId: number;
+   teamId: number;
+   folderId: string;
+@@ -16,92 +11,7 @@ export interface UpdateFolderOptions {
+     visibility?: DocumentVisibility;
+     pinned?: boolean;
+   };
+-}
+-
+-export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFolderOptions) => {
+-  const { parentId, name, visibility, pinned } = data;
+-
+-  const team = await getTeamById({ userId, teamId });
+-
+-  const folder = await prisma.folder.findFirst({
+-    where: {
+-      id: folderId,
+-      team: buildTeamWhereQuery({
+-        teamId,
+-        userId,
+-      }),
+-      visibility: {
+-        in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+-      },
+-    },
+-  });
+-
+-  if (!folder) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, {
+-      message: 'Folder not found',
+-    });
+-  }
+-
+-  if (parentId) {
+-    const parentFolder = await prisma.folder.findFirst({
+-      where: {
+-        id: parentId,
+-        team: buildTeamWhereQuery({ teamId, userId }),
+-        type: folder.type,
+-      },
+-    });
+-
+-    if (!parentFolder) {
+-      throw new AppError(AppErrorCode.NOT_FOUND, {
+-        message: 'Parent folder not found',
+-      });
+-    }
+-
+-    if (parentId === folderId) {
+-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-        message: 'Cannot move a folder into itself',
+-      });
+-    }
+-
+-    let currentParentId = parentFolder.parentId;
+-
+-    while (currentParentId) {
+-      if (currentParentId === folderId) {
+-        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-          message: 'Cannot move a folder into its descendant',
+-        });
+-      }
+-
+-      const currentParent = await prisma.folder.findUnique({
+-        where: {
+-          id: currentParentId,
+-        },
+-        select: {
+-          parentId: true,
+-        },
+-      });
+-
+-      if (!currentParent) {
+-        break;
+-      }
+-
+-      currentParentId = currentParent.parentId;
+-    }
+-  }
+-
+-  return await prisma.folder.update({
+-    where: {
+-      id: folderId,
+-      team: buildTeamWhereQuery({
+-        teamId,
+-        userId,
+-      }),
+-    },
+-    data: {
+-      name,
+-      visibility,
+-      parentId,
+-      pinned,
+-    },
+-  });
+ };
++
++// MODIFIED for BizRethink (overlay 084): keep source and destination visibility locked through the move.
++export const updateFolder = updateFolderWithPermissions;
+diff --git a/packages/lib/server-only/recipient/get-recipient-suggestions.ts b/packages/lib/server-only/recipient/get-recipient-suggestions.ts
+index 896938334..4f641b9c2 100644
+--- a/packages/lib/server-only/recipient/get-recipient-suggestions.ts
++++ b/packages/lib/server-only/recipient/get-recipient-suggestions.ts
+@@ -1,6 +1,7 @@
++import { getRecipientSuggestionWhere } from '@bizrethink/customizations/server-only/document-permissions';
+ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
+ import { prisma } from '@documenso/prisma';
+-import { EnvelopeType, Prisma } from '@prisma/client';
++import { Prisma } from '@prisma/client';
+ 
+ export type GetRecipientSuggestionsOptions = {
+   userId: number;
+@@ -9,6 +10,8 @@ export type GetRecipientSuggestionsOptions = {
+ };
+ 
+ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetRecipientSuggestionsOptions) => {
++  // MODIFIED for BizRethink (overlay 084): verify membership before either directory read.
++  const envelopeWhere = await getRecipientSuggestionWhere(userId, teamId);
+   const trimmedQuery = query.trim();
+ 
+   const nameEmailFilter = trimmedQuery
+@@ -33,8 +36,7 @@ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetReci
+   const recipients = await prisma.recipient.findMany({
+     where: {
+       envelope: {
+-        type: EnvelopeType.DOCUMENT,
+-        team: buildTeamWhereQuery({ teamId, userId }),
++        ...envelopeWhere,
+       },
+       ...nameEmailFilter,
+     },
+@@ -67,7 +69,7 @@ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetReci
+           some: {
+             group: {
+               teamGroups: {
+-                some: { teamId },
++                some: { teamId, team: buildTeamWhereQuery({ teamId, userId }) },
+               },
+             },
+           },
+diff --git a/packages/trpc/server/envelope-router/delete-envelope.ts b/packages/trpc/server/envelope-router/delete-envelope.ts
+index cf36adc99..71a66ea81 100644
+--- a/packages/trpc/server/envelope-router/delete-envelope.ts
++++ b/packages/trpc/server/envelope-router/delete-envelope.ts
+@@ -1,9 +1,4 @@
+-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+-import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
+-import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
+-import { prisma } from '@documenso/prisma';
+-import { EnvelopeType } from '@prisma/client';
+-import { match } from 'ts-pattern';
++import { deleteVisibleEnvelope } from '@bizrethink/customizations/server-only/delete-visible-envelope';
+ 
+ import { ZGenericSuccessResponse } from '../schema';
+ import { authenticatedProcedure } from '../trpc';
+@@ -27,44 +22,8 @@ export const deleteEnvelopeRoute = authenticatedProcedure
+       },
+     });
+ 
+-    const unsafeEnvelope = await prisma.envelope.findUnique({
+-      where: {
+-        id: envelopeId,
+-      },
+-      select: {
+-        type: true,
+-      },
+-    });
+-
+-    if (!unsafeEnvelope) {
+-      throw new AppError(AppErrorCode.NOT_FOUND, {
+-        message: 'Envelope not found',
+-      });
+-    }
+-
+-    await match(unsafeEnvelope.type)
+-      .with(EnvelopeType.DOCUMENT, async () =>
+-        deleteDocument({
+-          userId: ctx.user.id,
+-          teamId,
+-          id: {
+-            type: 'envelopeId',
+-            id: envelopeId,
+-          },
+-          requestMetadata: ctx.metadata,
+-        }),
+-      )
+-      .with(EnvelopeType.TEMPLATE, async () =>
+-        deleteTemplate({
+-          userId: ctx.user.id,
+-          teamId,
+-          id: {
+-            type: 'envelopeId',
+-            id: envelopeId,
+-          },
+-        }),
+-      )
+-      .exhaustive();
++    // MODIFIED for BizRethink (overlay 084): authorize dispatch and normalize private-object errors.
++    await deleteVisibleEnvelope({ envelopeId, user: ctx.user, teamId, requestMetadata: ctx.metadata });
+ 
+     return ZGenericSuccessResponse;
+   });
