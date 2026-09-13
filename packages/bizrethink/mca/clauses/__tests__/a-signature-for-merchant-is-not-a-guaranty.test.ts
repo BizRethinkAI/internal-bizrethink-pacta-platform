@@ -220,10 +220,10 @@ describe('§10.4 and §9.5 still describe §9.1 correctly', () => {
   it('§10.4 keeps its citation and §9.1 collects what it points at', () => {
     expect(body(SERVICE_ADDRESS)).toContain('Section [[clause:frpa.guarantor-information-9-1]]');
 
-    const labels = (clause(IDENTITY).fields ?? []).map((field) => field.label);
+    const bindings = (clause(IDENTITY).fields ?? []).filter((field) => field.required).map((field) => field.binding);
 
-    expect(labels).toContain('Email');
-    expect(labels).toContain('Home Address');
+    expect(bindings).toContain('guarantor.email');
+    expect(bindings).toContain('guarantor.noticeAddress');
   });
 
   /**
@@ -237,39 +237,32 @@ describe('§10.4 and §9.5 still describe §9.1 correctly', () => {
   });
 });
 
-/**
- * The grid itself. Nothing here changed and the assertions exist to say so:
- * adding, dropping or renumbering a widget is a change to the RENDERED FORM and
- * to the Lombard AcroForm pipeline, not a drafting change this cluster may make.
- * `clauses/README.md` rule 2.
- */
-describe('the form is unchanged, and that is deliberate', () => {
-  it('keeps all six widgets exactly as the document prints them', () => {
-    expect(clause(IDENTITY).fields).toEqual([
-      { label: 'Full Name', widget: '«35»', kind: 'text', required: true },
-      { label: 'Title', widget: '«36»', kind: 'text', required: false },
-      { label: 'Social Security Number', widget: '«37»', kind: 'ssn', required: true },
-      { label: 'Home Address', widget: '«38»', kind: 'text', required: true },
-      { label: 'Phone', widget: '«39»', kind: 'text', required: true },
-      { label: 'Email', widget: '«40»', kind: 'text', required: true },
-    ]);
+/** Current fields replace the original grid; source anchors remain historical evidence. */
+describe('the current guarantor fields implement the separate-capacity rule', () => {
+  it('accounts for every original widget without reactivating the full-SSN slot', () => {
+    const identity = clause(IDENTITY);
+    const retained = (identity.fields ?? []).flatMap((field) => field.legacyWidget ?? []);
+    const retired = (identity.retiredFields ?? []).map((field) => field.widget);
+
+    expect(retained.sort()).toEqual(['«35»', '«36»', '«38»', '«39»', '«40»']);
+    expect(retired).toEqual(['«37»']);
+    expect(identity.repeatFor).toBe('guarantor');
+    expect(identity.fields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ binding: 'guarantor.signature', kind: 'signature', required: true }),
+        expect.objectContaining({
+          binding: 'guarantor.signerCapacity',
+          requiredWhen: { binding: 'guarantor.kind', equals: 'entity' },
+        }),
+      ]),
+    );
   });
 
-  /**
-   * THE OPEN CONFLICT, PINNED SO IT CANNOT BE MISTAKEN FOR CLOSED.
-   *
-   * §9.1's body now requires a truncated identifier in a distributed copy, and
-   * the field group still collects a full SSN into the body of the agreement.
-   * **The clause and the form disagree, and the form is what renders.** This
-   * asserts the disagreement rather than hiding it: when the form is fixed —
-   * a masked field, or collection moved off the contract entirely — this test
-   * is what has to be re-read, and the assertion below is what makes somebody
-   * re-read it.
-   */
-  it('records that the form does not yet honour what the clause requires', () => {
+  it('keeps private verification identifiers out of the agreement fields', () => {
     const ssn = (clause(IDENTITY).fields ?? []).find((field) => field.kind === 'ssn');
 
-    expect(ssn?.label).toBe('Social Security Number');
+    expect(ssn).toBeUndefined();
+    expect((clause(IDENTITY).fields ?? []).some((field) => /social security/i.test(field.label))).toBe(false);
     expect(body(IDENTITY)).toMatch(/truncated or masked/i);
   });
 });

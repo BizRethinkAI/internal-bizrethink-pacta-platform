@@ -77,3 +77,18 @@ The author owns CI through green, then continues the next authorized task; the
 author does not merge or deploy. The completing reviewer/merger and consolidator
 record completion and close task #203 after their required scope is finished.
 Other sessions' security/workflow work and state notes retain their owners.
+
+### First CI correction
+
+The first full CI unit run found three obsolete assertions in
+`a-signature-for-merchant-is-not-a-guaranty.test.ts` that still required the
+original full-SSN grid. Those assertions now require the current notice bindings,
+all retained/retired historical anchors, independent signature/entity capacity,
+and absence of full-SSN fields. The affected file plus new field tests pass
+**2 files / 28 tests**. This was a missed affected test, not a reason to remove
+CI or restore the unsafe field. The original 513-test evidence predates this
+additional focused correction; fresh full CI remains the after gate.
+
+The stacked before-Playwright run on #190 now passes: run 34753452484 reports
+1,096 passed, four passed on retry, and 59 skipped. Fresh independent review of
+#190 was requested on its PR/task. This author continues without merging it.
