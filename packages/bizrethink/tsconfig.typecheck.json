@@ -63,7 +63,7 @@
     "regression-tests/outbound-tls-fixture.ts",
     "regression-tests/webhook-tls-boundary.test.ts",
     "regression-tests/smtp-socket-boundary.test.ts",
-    "../app-tests/e2e/api/bizrethink/smtp-test-boundary.spec.ts"
+    "../app-tests/e2e/api/bizrethink/smtp-test-boundary.spec.ts",
     "server-only/document-replacement.ts",
     "regression-tests/document-replacement-integrity.test.ts",
     "../app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts"
