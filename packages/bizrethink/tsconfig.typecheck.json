@@ -61,7 +61,7 @@
     "regression-tests/document-delete-permissions.test.ts",
     "regression-tests/folder-mutation-permissions.test.ts",
     "regression-tests/recipient-suggestion-permissions.test.ts",
-    "../app-tests/e2e/api/bizrethink/document-team-permissions.spec.ts"
+    "../app-tests/e2e/api/bizrethink/document-team-permissions.spec.ts",
     "server-only/document-replacement.ts",
     "regression-tests/document-replacement-integrity.test.ts",
     "../app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts"
