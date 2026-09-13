@@ -1,6 +1,6 @@
-# Why: One MCA workspace needs one sidebar entry and readable translated labels from its owned UI components (ADR 0015).
+# Why: One MCA workspace needs one sidebar entry and readable translated labels from its owned MCA and shared legal UI components (ADR 0015).
 # Why-not-additive: The upstream admin layout owns sidebar entries and the upstream Lingui configuration owns extraction roots; content and UI stay in owned files.
-# Upstream-merge-fragility: low; recheck the Data entry and owned MCA component extraction root after upstream navigation/i18n changes.
+# Upstream-merge-fragility: low; recheck the Data entry and owned MCA/shared legal UI extraction roots after upstream navigation/i18n changes.
 
 diff --git a/apps/remix/app/routes/_authenticated+/admin+/_layout.tsx b/apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 index 2dba4a94e..abfd91b16 100644
@@ -39,21 +39,22 @@ index 2dba4a94e..abfd91b16 100644
        },
        {
 diff --git a/lingui.config.ts b/lingui.config.ts
-index 6f79b50db..9f8f015d7 100644
+index 6f79b50db..7057beefc 100644
 --- a/lingui.config.ts
 +++ b/lingui.config.ts
-@@ -9,7 +9,14 @@ const config: LinguiConfig = {
+@@ -9,7 +9,15 @@ const config: LinguiConfig = {
    catalogs: [
      {
        path: '<rootDir>/packages/lib/translations/{locale}/web',
 -      include: ['apps/remix/app', 'packages/ui', 'packages/lib', 'packages/email'],
-+      // MODIFIED for BizRethink (overlay 085): extract the owned MCA workspace UI.
++      // MODIFIED for BizRethink (overlay 085): extract MCA and shared legal workspace UI.
 +      include: [
 +        'apps/remix/app',
 +        'packages/ui',
 +        'packages/lib',
 +        'packages/email',
 +        'packages/bizrethink/mca/components',
++        'packages/bizrethink/legal-ui',
 +      ],
        exclude: ['**/node_modules/**'],
      },

@@ -39,7 +39,9 @@ Shared presentation code lives in `packages/bizrethink/legal-ui`. Supplemental
 Tailwind utilities use the existing preset and are scoped to the legal workspace.
 The seven owned route modules load them through external stylesheet links, so
 they work with the existing content security policy and do not depend on injected
-inline styles. No upstream overlay or stylesheet scan change is required.
+inline styles. No stylesheet scan change is required. Existing overlay 085 extends
+the translation extraction roots to this shared directory, so production builds
+include readable reference-navigation and filter labels.
 
 Reference metadata is derived from canonical tokens using the existing numbering
 engine. It is an ephemeral presentation projection, added after authorization
@@ -81,3 +83,8 @@ remains in place. Homelab hosting and state consolidation are separate work.
   subject design; the counsel tier guard remains. Browser coverage verifies each
   Florida/North Carolina clause's visible jurisdiction label and the explicitly
   selected coverage jurisdiction, including its retention in Shared browsing.
+- The first browser run exposed missing production translations in the shared
+  directory. Its test step failed before the superseded workflow was cancelled.
+  A failing extraction test reproduced the missing labels without a full build;
+  it now verifies the real application catalog extracts reference and filter
+  controls. The browser assertion remains unchanged.
