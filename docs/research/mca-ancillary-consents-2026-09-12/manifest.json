@@ -1,0 +1,182 @@
+{
+  "created_at_utc": "2026-09-12T23:57:23.109605+00:00",
+  "task": 192,
+  "base_commit": "1813b1d72fb231593ddcb2cb0b2a55054ac7f040",
+  "scope": "Fourteen draft clause revisions; processor-letter text deferred by owner. No new statute download or production-template migration.",
+  "unchanged_source_inputs": [
+    {
+      "file": "packages/bizrethink/mca/clauses/source-documents/Lombard_Permission_to_Release_v1.txt",
+      "bytes": 6712,
+      "sha256": "b0072a44d15b767d63c70160f5b826fe90378657cea7c461e2daf31795582329",
+      "unchanged_from_base": true
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/source-documents/Lombard_Equipment_Lease_Agreement_v1.txt",
+      "bytes": 32360,
+      "sha256": "5080fe893788e6c7fb2a71cbf6594547def2e752febea7e1f38c30fe703b0b42",
+      "unchanged_from_base": true
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/source-documents/Lombard_Subscription_Agreement_v2.txt",
+      "bytes": 30842,
+      "sha256": "7754b7efac442a545a0e74875d154fac8764e5309ef0a2d2984d3d91a2f79793",
+      "unchanged_from_base": true
+    },
+    {
+      "file": "packages/bizrethink/mca/clauses/source-documents/review-register.json",
+      "bytes": 179580,
+      "sha256": "22669d9f19f37d06c499a6e0d61eef7c47acae9c08cfc14d3b34e49b83c79b32",
+      "unchanged_from_base": true
+    }
+  ],
+  "reused_primary_evidence": [
+    {
+      "file": "docs/research/mca-clause-metadata-2026-09-12/evidence/cfr-web-extract.txt",
+      "sha256": "14e00e002de267bec65bfac32981a700e876de4929c4cec8d499d3e010a9a3cd",
+      "bytes": 36618,
+      "reused_without_changes": true
+    },
+    {
+      "file": "docs/research/mca-clause-metadata-2026-09-12/evidence/fcra-web-extract.txt",
+      "sha256": "06761765ba3a72b9c3f847dd8ce2d945f7e1ae10e4e34f0ff71bbc40f1b16c4c",
+      "bytes": 28153,
+      "reused_without_changes": true
+    }
+  ],
+  "live_web_read_observations": [
+    {
+      "url": "https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf",
+      "read_date": "2026-09-12",
+      "outcome": "Browser-tool text read: sections 604(a)(2), (f), 615(a), 623(a), (b); FTC March 2026 compilation, not a substitute for the U.S. Code. Original extraction metadata remains in the reused manifest."
+    },
+    {
+      "url": "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200",
+      "read_date": "2026-09-12",
+      "outcome": "Browser-tool text read: (a)(1)-(3), (10)-(11), (f)(9); Title 47 displays currency to 2026-09-10. No new raw HTTP response archived."
+    },
+    {
+      "url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title15-section1681b&num=0&edition=prelim",
+      "read_date": "2026-09-12",
+      "outcome": "Browser tool returned 403; not verified from this endpoint."
+    },
+    {
+      "url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title15-section1681m&num=0&edition=prelim",
+      "read_date": "2026-09-12",
+      "outcome": "Browser tool returned 403; not verified from this endpoint."
+    }
+  ],
+  "changed_clauses": [
+    {
+      "slug": "permission-to-release.preamble",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "7d98fd8dce2c476271a2fd72ad8ced5c134d9547fde724bbbdaf4367b37b05a6",
+      "after_body_sha256": "4ebdaed65f4e63915d28b2fefa750e2e4d875c5d6474b159b305598a09337769"
+    },
+    {
+      "slug": "permission-to-release.trade-landlord-and-bank-information",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "143d4a86e456b2abbf90e307cd2a5039a11d65dbb05626d6298fda5360a52e43",
+      "after_body_sha256": "eba6d34e73352b1d0c8102a5249cf61809845e803b13aa5e63870ff568e280cf"
+    },
+    {
+      "slug": "permission-to-release.banking-brokerage-and-processing-history",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "89890679004231bb3dfc2142004171bc66e8bd73059f64e18a5158a212683fc5",
+      "after_body_sha256": "92e935de2085992b11d9b29517eed4449a0a28f46c51ca23f2de2e7895907a77"
+    },
+    {
+      "slug": "permission-to-release.credit-bureau-authorization",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "4863e4f3002434acf5338c774dbab07da61374134c1d3837922921c7c3d41141",
+      "after_body_sha256": "06b3a8b383ca389dc01e7aef383f6364cb5805bc89d0f186fbbab283f7fbb15e"
+    },
+    {
+      "slug": "permission-to-release.fair-credit-reporting-act-acknowledgment",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "07538ad1bf74b1ceae8921afa3b019d05485c57c823857cc8380991853269528",
+      "after_body_sha256": "33b05b5e54733341cb0ce1a1ddb23625452fe4d7284e333c4ba4ca5f9d32edd6"
+    },
+    {
+      "slug": "permission-to-release.continuing-authorization-reliance",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "2d4679ed4051668cf4c07dcdfe4dc09755841ac2397f8c9f970c0d62a03792e4",
+      "after_body_sha256": "b38ab6299d8047c18458cd0336de6aaa5b6b340f4083d590382b61ab1ac918dc"
+    },
+    {
+      "slug": "permission-to-release.release-of-information-sources",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "216b346b6518a557ebaaa6daf56ace2b37d77e74bf547af89a194378b6025db8",
+      "after_body_sha256": "20a9e10413932daa7ed2644fc42055b26517492342dc1fe5a77616ab1ca8ccca"
+    },
+    {
+      "slug": "permission-to-release.personal-guarantor",
+      "file": "packages/bizrethink/mca/clauses/permission-to-release/sections.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "5fd991911650045f33fb0a978fb43f7c0f5a29541af0b1e6dafc4947bcd9359e",
+      "after_body_sha256": "9f4fd5c28e470a74fdb79c6e350ccafbff82e5c8d8348b5e83ed11b3587f19cf"
+    },
+    {
+      "slug": "equipment-lease.credit-reporting-authorization",
+      "file": "packages/bizrethink/mca/clauses/equipment-lease/guaranty.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "29f591197925654846eb633c544cba46c15be8e9c8a662d5f91c7c579527bf37",
+      "after_body_sha256": "2f0d20d6f8f7d2f1a11f92c836ce5097ce99ee0a3c64df4199cf37c657196f0a"
+    },
+    {
+      "slug": "equipment-lease.communications-consent",
+      "file": "packages/bizrethink/mca/clauses/equipment-lease/guaranty.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "039030e6c79535df32da4f99b9011825652a241b5dc75554299c2df5252e768d",
+      "after_body_sha256": "1640f3b78115843ffe017ce175d44ba95d5c321c78fcb3669a813954eb8a37d6"
+    },
+    {
+      "slug": "equipment-lease.acknowledgment",
+      "file": "packages/bizrethink/mca/clauses/equipment-lease/guaranty.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "e1ca7cde2b91a54fdbe7d3186cb47524762bff423fecc610d611f992376f85cd",
+      "after_body_sha256": "a5c8fcf0b03cb0c888c55cb1545955a299cc9fb4355e5cb5acfe12c345f56c46"
+    },
+    {
+      "slug": "subscription.credit-reporting-authorization",
+      "file": "packages/bizrethink/mca/clauses/subscription/guaranty.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "c723c164035dbf9e8dde2e5a45bcd83b6cb0f49179f436fc80a31814a3766a4a",
+      "after_body_sha256": "8f7cfca65f52c3f625f049f007dc1f3519b1f6233bb941ccfd6cc22c72cf0039"
+    },
+    {
+      "slug": "subscription.communications-consent",
+      "file": "packages/bizrethink/mca/clauses/subscription/guaranty.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "f6aeede1c3a7fc5aa90f9d50215f75ac0e9a5ccfd64f343a3551aa7434449f03",
+      "after_body_sha256": "6722cbfaeed3854dd1127da9c55e5f4475f88f2dd9d9a403beda872fba3700f0"
+    },
+    {
+      "slug": "subscription.acknowledgment",
+      "file": "packages/bizrethink/mca/clauses/subscription/guaranty.ts",
+      "before_version": 1,
+      "after_version": 2,
+      "before_body_sha256": "ca1d47c63b3a5a83d5f74d044c14c5f5ae4d54a23458ffacebc2a367c94dc355",
+      "after_body_sha256": "aeea1e06504538986f19ed477df6854481616f24dbc9a722a2cb3fae3b7e18e4"
+    }
+  ]
+}

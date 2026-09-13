@@ -6,6 +6,7 @@ import { libraryFor } from '../library';
 import { LOMBARD, resolveClauses } from '../parties';
 import { PERMISSION_TO_RELEASE_NON_CLAUSE } from '../permission-to-release';
 import { PAYZLI_NON_CLAUSE } from '../split-funding';
+import legacyRelease from './permission-to-release-legacy.fixture.json';
 
 /**
  * The two letters, and the third correction to Phase 0's corpus.
@@ -29,11 +30,19 @@ import { PAYZLI_NON_CLAUSE } from '../split-funding';
 describe.each([
   ['split-funding' as const, PAYZLI_NON_CLAUSE, 7],
   ['permission-to-release' as const, PERMISSION_TO_RELEASE_NON_CLAUSE, 8],
-])('%s accounts for its whole document', (instrument, nonClause, expected) => {
+])('%s accounts for its retained source document', (instrument, nonClause, expected) => {
   const file = LOMBARD.documents[instrument].file;
 
   it('leaves no line unaccounted for', () => {
-    expect(linesNotAccountedFor(file, resolveClauses(libraryFor(instrument), LOMBARD), nonClause)).toEqual([]);
+    // The release was substantively rewritten under ADR 0012. Keep checking
+    // complete coverage of the immutable legacy source with its pre-rewrite
+    // snapshot, not by requiring the new draft to repeat the old defects.
+    // ancillary-consent-boundaries.test.ts checks the current draft's limits
+    // and its one-to-one identities against that independently retained source.
+    const sourceClauses =
+      instrument === 'permission-to-release' ? legacyRelease : resolveClauses(libraryFor(instrument), LOMBARD);
+
+    expect(linesNotAccountedFor(file, sourceClauses, nonClause)).toEqual([]);
   });
 
   it('holds every clause the document has', () => {
