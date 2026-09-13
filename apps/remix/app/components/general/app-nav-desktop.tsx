@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 086): membership-scoped MCA template navigation.
+import { useMcaTemplateTeamUrls } from '@bizrethink/customizations/mca/components/use-template-team-urls';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -30,6 +32,7 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
 
   // MODIFIED for BizRethink (overlay 069).
   const leaseBuilderTeamUrls = useLeaseBuilderTeamUrls();
+  const mcaTemplateTeamUrls = useMcaTemplateTeamUrls();
 
   useEffect(() => {
     const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown';
@@ -60,8 +63,9 @@ export const AppNavDesktop = ({ className, setIsCommandMenuOpen, ...props }: App
       },
       // MODIFIED for BizRethink (overlay 069).
       ...(leaseBuilderTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/leases`, label: msg`Leases` }] : []),
+      ...(mcaTemplateTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/mca`, label: msg`MCA` }] : []),
     ];
-  }, [currentTeam, organisations, leaseBuilderTeamUrls]);
+  }, [currentTeam, organisations, leaseBuilderTeamUrls, mcaTemplateTeamUrls]);
 
   return (
     <div className={cn('ml-8 hidden flex-1 items-center gap-x-12 md:flex md:justify-between', className)} {...props}>

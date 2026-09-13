@@ -5,10 +5,18 @@ import { Link, useLocation } from 'react-router';
 export const McaWorkspaceNav = () => {
   const location = useLocation();
   const reusable = new URLSearchParams(location.search).get('catalogue') === 'reusable';
-  const active = location.pathname === '/admin/mca' ? 'requirements' : reusable ? 'reusable' : 'clauses';
+  const active =
+    location.pathname === '/admin/mca-templates'
+      ? 'templates'
+      : location.pathname === '/admin/mca'
+        ? 'requirements'
+        : reusable
+          ? 'reusable'
+          : 'clauses';
   const tabs = [
     { id: 'clauses', href: '/admin/mca-library', label: <Trans>Clauses</Trans> },
     { id: 'reusable', href: '/admin/mca-library?catalogue=reusable', label: <Trans>Reusable content</Trans> },
+    { id: 'templates', href: '/admin/mca-templates', label: <Trans>Provider templates</Trans> },
     { id: 'requirements', href: '/admin/mca', label: <Trans>Disclosures & requirements</Trans> },
   ];
   return (

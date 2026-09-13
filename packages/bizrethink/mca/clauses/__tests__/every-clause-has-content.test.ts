@@ -59,7 +59,9 @@ describe('every clause has content for its kind', () => {
         heading with nothing under it.
       */
     expect(clause.body.trim().length, `${clause.slug} is a ${clause.kind} with an empty body`).toBeGreaterThan(0);
-    expect(clause.fields, `${clause.slug} is a ${clause.kind} and must not declare fields`).toBeUndefined();
+    if (clause.kind === 'clause' || clause.kind === 'guidance') {
+      expect(clause.fields, `${clause.slug} is a ${clause.kind} and must not declare fields`).toBeUndefined();
+    }
   });
 
   it('gives every current field a stable binding and preserves source anchors separately', () => {

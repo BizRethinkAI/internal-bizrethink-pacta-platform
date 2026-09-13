@@ -98,7 +98,9 @@ describe('document fields express the reviewed funding and identity bargain', ()
       expect(new Set(fields.map((field) => field.widget)).size).toBe(fields.length);
       for (const field of fields) {
         expect(field).toMatchObject({
-          binding: expect.stringMatching(/^(merchant|provider|funding|equipment|broker|guarantor|account|processor)\./),
+          binding: expect.stringMatching(
+            /^(merchant|provider|funding|equipment|broker|guarantor|account|processor|iso)\./,
+          ),
         });
         expect(field.widget).toMatch(/^\{\{field:[a-zA-Z0-9.-]+\}\}$/);
       }

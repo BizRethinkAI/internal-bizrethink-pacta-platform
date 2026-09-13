@@ -1,5 +1,6 @@
 import { router } from '@documenso/trpc/server/trpc';
 import { mcaClauseLibraryRouter } from '../../mca/server-only/trpc/clause-library-router';
+import { mcaTemplatesRouter } from '../../mca/server-only/trpc/templates/router';
 import { instanceAiRouter } from './instance-ai-router';
 import { instanceSigningRouter } from './instance-signing-router';
 import { instanceStorageRouter } from './instance-storage-router';
@@ -49,4 +50,5 @@ export const bizrethinkRouter = router({
   // instance content — the same clauses and the same approvals for every
   // customer — so there is no tenancy to authorise against.
   mcaClauseLibrary: mcaClauseLibraryRouter,
+  mcaTemplates: mcaTemplatesRouter,
 });

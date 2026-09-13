@@ -1027,3 +1027,33 @@ model BizrethinkPdfUpload {
   fingerprint    String
   createdAt      DateTime @default(now())
 }
+
+/// Team-owned provider policy. This is not an upstream sendable Envelope template.
+model BizrethinkMcaTemplate {
+  id                String   @id
+  organisationId    String
+  teamId            Int
+  label             String
+  currentRevision   Int      @default(1)
+  createdByUserId    Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  revisions         BizrethinkMcaTemplateRevision[]
+
+  @@index([teamId, updatedAt])
+}
+
+/// Append-only history. Updating provider policy creates a new revision.
+model BizrethinkMcaTemplateRevision {
+  id                String   @id
+  templateId        String
+  template          BizrethinkMcaTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  version           Int
+  profile           Json
+  snapshot          Json
+  fingerprint       String
+  createdByUserId    Int
+  createdAt         DateTime @default(now())
+
+  @@unique([templateId, version])
+}

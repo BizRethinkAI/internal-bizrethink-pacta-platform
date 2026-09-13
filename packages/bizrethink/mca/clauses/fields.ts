@@ -99,6 +99,10 @@ export const MCA_FUNDING_FIELDS: ClauseField[] = [
     'text',
     false,
   ),
+  field('provider.legalName', 'Buyer — Legal Name'),
+  field('provider.entityType', 'Buyer — Entity Type'),
+  field('provider.organizationState', 'Buyer — Formation Jurisdiction'),
+  field('provider.principalAddress', 'Buyer — Principal Address'),
   field('provider.noticeAddress', 'Buyer — Mailing Address for Notices'),
   field('provider.noticeEmail', 'Buyer — Email for Notices'),
   field('provider.reconciliationEmail', 'Buyer — Reconciliation Request Email'),
@@ -191,3 +195,12 @@ export const retiredGuarantorSsn = (widget: string) => ({
   reason:
     'Full government identifiers are collected through a secure channel separate from the agreement; this source SSN slot is retired from document fields.',
 });
+
+/** Provider/channel identity stays separate from merchant transaction facts. */
+export const MCA_ISO_FIELDS: ClauseField[] = [
+  field('iso.companyLegalName', 'Company — Legal Name', 'text', true, '«10»'),
+  field('iso.partnerLegalName', 'ISO Partner — Legal Name', 'text', true, '«1»'),
+  field('iso.effectiveDate', 'ISO Agreement — Effective Date', 'date', true, '«0»'),
+  field('iso.commissionPercentage', 'ISO — Commission Percentage', 'text', true, '«2»'),
+  field('iso.portalUrl', 'Company — Partner Portal URL'),
+];

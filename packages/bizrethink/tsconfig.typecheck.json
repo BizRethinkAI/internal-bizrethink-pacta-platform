@@ -17,6 +17,7 @@
     "mca/**/*.ts",
     "mca/**/*.tsx",
     "../app-tests/e2e/bizrethink/mca-workspace.spec.ts",
+    "../app-tests/e2e/bizrethink/mca-provider-templates.spec.ts",
     "server-only/require-admin-loader.ts",
     "server-only/require-admin-loader.test.ts",
     "regression-tests/admin-loaders-gated.test.ts",
