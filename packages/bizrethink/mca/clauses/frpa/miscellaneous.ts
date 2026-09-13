@@ -1997,11 +1997,15 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     correct citation for the comment above `venueRule` in `clauses/facts.ts`
     is §6.2-2234(A), and that file is not this cluster's to edit.
 
-    DEPARTURE 3 — THE CALIFORNIA APR RULE IS STATED WITHOUT ITS CITATION. The
-    memo names Cal. Fin. Code §22806. That section is NOT vendored —
-    `mca/sources/CA-10CCR-900-956.txt` is the regulation, not the Financial Code
-    — so the rule is written conditionally ("Where a state requires ...") and the
-    citation stays here. UNVERIFIED: nobody on this project has read §22806.
+    DEPARTURE 3 — THE CALIFORNIA APR RULE IS STATED WITHOUT ITS CITATION.
+    Rechecked 2026-09-12 against current Cal. Fin. Code §22806(b), now retained
+    in `mca/sources/CA-Fin-Code-22800-22807.txt`: after extending a specific offer,
+    a provider stating a charge, pricing metric or financing amount during the
+    application process must also state its APR. SB 362 added this section
+    effective January 1, 2026; the former §22806 estimated-APR protection is
+    now §22805, and enforcement is §22807. The earlier unverified-source gap
+    is closed. The conditional body remains authored wording, not prescribed
+    text or evidence that the provider's actual communications comply.
 
     DEPARTURE 4 — TEXAS IS SPLIT OUT INTO ITS OWN SECTION. See the record below.
 
@@ -2018,7 +2022,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     whyThisClause: {
       kind: 'implements',
       citation:
-        'Conn. Gen. Stat. §36a-868; Va. Code §6.2-2234; Tex. Fin. Code §398.055; 7 TAC §86.312(b)(7); Cal. Fin. Code §22806 (applicable nonwaiver, forum and pricing-communication duties)',
+        'Conn. Gen. Stat. §36a-868; Va. Code §6.2-2234; Tex. Fin. Code §398.055; 7 TAC §86.312(b)(7); Cal. Fin. Code §22806(b) (applicable nonwaiver, forum and pricing-communication duties)',
     },
     variance: {
       kind: 'fixed',

@@ -552,17 +552,17 @@ describe('the top line says what the cards say', () => {
       'ny-lease-financing',
       'ny-offer-summary',
       'tx-disclosure',
+      'ut-disclosure',
       'va-disclosure',
     ]);
 
     /*
-      Virginia's correction records the official retrieval. Utah's separate
-      correction is still pending on this branch's base. These counts describe
+      Both Virginia and Utah now record official retrievals. These counts describe
       source origins, not full form conformity or completed merchant documents.
     */
-    expect(summary.fromOfficialPublisher).toBe(14);
+    expect(summary.fromOfficialPublisher).toBe(15);
     expect(summary.fromSecondaryPublisher).toBe(0);
-    expect(summary.originNotRecorded).toBe(summary.total - 14);
+    expect(summary.originNotRecorded).toBe(0);
   });
 
   it('carries the threshold it judged staleness by, so the page states the number it used', () => {

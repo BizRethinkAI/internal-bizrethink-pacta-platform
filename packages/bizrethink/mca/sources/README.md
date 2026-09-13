@@ -17,8 +17,9 @@ that were not recorded remain unknown; the audit establishes a new retrieval.
 Connecticut's missing 2026 supplement, Missouri's 2025 amendment and Florida's
 2024 definition amendment. It also corrects the old “Texas only” inference:
 Utah §7-27-202(3) requires variable-payment information in the agreement.
-The complete eleven-state agreement-requirements walk remains open under
-ADR 0014. Other specific currency/coverage gaps are listed in the report.
+The subsequent [eleven-state agreement-requirements review](../../../../docs/research/mca-agreement-requirements-2026-09-12/README.md)
+supplies the ADR 0014 source walk and records its remaining access/currency
+limits. References below to that review being open describe the earlier work.
 
 The audit left all sixteen text files, digests and verification dates unchanged.
 Its dated manifest remains a historical record; the corrections below advance
@@ -52,6 +53,35 @@ The focused regression compares active text against the audit captures, separate
 from the existing digest, quotation, label and content checks. It establishes
 which versions were used, not continuing legal currency. Virginia's form correction
 and the complete eleven-state agreement-requirements review remain separate work.
+
+## Utah and California reference corrections — 2026-09-12
+
+The [correction record](../../../../docs/research/mca-utah-california-corrections-2026-09-12/README.md)
+links the original retrievals, targeted official-source rechecks, current section
+mapping and validation. The earlier research manifests remain unchanged.
+
+- **Utah:** `UT-Title-7-Ch-27.txt` now records the audit's official chapter-PDF
+  retrieval. The complete statutory body is unchanged and independently matches
+  the audit's body hash. Disclosure citations now identify §7-27-202(2)(a)–(f),
+  with (e)(ii) for variable payments and §202(3) for agreement methodology.
+  §201 governs registration. The source digest moves for the header; the
+  verification date advances to September 12 for the corrected reading.
+- **California:** `CA-Fin-Code-22800-22807.txt` adds all eight current statutory
+  sections from the requirements review's retained official capture. SB 362
+  took effect January 1, 2026: §22805 now addresses estimated APR, §22806
+  pricing communications and §22807 enforcement. The live state-rider metadata
+  correctly uses the pricing rule and now identifies §22806(b) precisely.
+  The earlier comment saying this statute had not been read is superseded.
+
+California's statutory source supports clause-metadata review; the three
+prescribed-form specs still use `CA-10CCR-900-956.txt`. That regulation's published
+§953(b) cross-reference to §22805 is retained as printed, not silently renumbered.
+No source-body rewrite, new disclosure row, pricing calculation, workflow
+enforcement or authored agreement wording is introduced by these corrections.
+
+Recording Utah's retrieval changes its source-origin classification to official;
+it does not establish full content conformity or legal approval. Virginia's
+local prescribed form remains the separate unresolved source correction.
 
 ## Historical retrieval: Connecticut and Virginia statutes — 2026-09-07
 

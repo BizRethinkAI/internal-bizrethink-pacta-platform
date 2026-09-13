@@ -1,6 +1,6 @@
 # Virginia official prescribed-form correction
 
-Author: **virginia-form-20260912**. Direct Shwet assignment recorded in
+Author: **virginia-form-20260912**. Direct repository-owner assignment recorded in
 [task #189](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/issues/189).
 Branch `fix/mca-virginia-prescribed-form` begins at merged main
 `1813b1d72fb231593ddcb2cb0b2a55054ac7f040`.
@@ -50,7 +50,7 @@ Current PR CI supplies the after Playwright, complete builds/unit tests and
 separate typecheck. Final CI evidence is recorded on the PR/task without a
 status-only code push. No duplicate broad local build, suite or typecheck is run.
 
-Shwet starts one fresh independent legal-surface review. The author owns CI and
+The repository owner starts one fresh independent legal-surface review. The author owns CI and
 substantive fixes through green and does not merge/deploy. The authorized shipping
 session owns final state consolidation. A separate assignment must rebuild and
 review the merchant form and migrate stored templates; this PR does not perform
@@ -58,12 +58,26 @@ that work or claim production documents are corrected.
 
 ## Integration with the other open source correction
 
-PR #187 / task #185 is still open at this branch's base. Both PRs touch origin
-expectations. Their combined result must retain both corrections: official
-disclosure origins **15**, unrecorded **0**, both Utah and Virginia in the list.
-Keep this PR's isolated unknown-origin surface test instead of #187's temporary
-Virginia-as-anonymous fixture. The MCA author owns any required integration fix.
-The corrections to the source README are additive and both belong in the result.
+On September 13, the repository owner assigned the refresh requested by the
+fresh shipping review. Main `7f178f8e4f8242a4abe2ca2ba4864d3ee7e16492` contains
+#187 despite GitHub's stale open status for that PR. A real merge reproduced
+the two reported test-file conflicts. Before correcting their expectations,
+the combined sources produced **2 failing / 68 passing tests**.
+
+The resolution preserves both corrections: **15 official disclosure origins /
+0 unrecorded**, both Utah and Virginia in the named list, and this PR's isolated
+unknown-origin surface regression. Both source-README correction sections remain.
+This refresh changes no legal requirement, clause body, source evidence, fixture
+or checker behavior beyond incorporating already-merged main. It does not repeat
+the source research. Focused after-validation passes **5 files / 102 tests**
+(origin/surface plus Utah/California and Virginia form regressions); changed-file
+formatting and whitespace pass. Fresh CI is recorded on PR #190 and task #189;
+the shipping reviewer must assess the refreshed head before merging.
+
+Current main contains `docs/session-workflow.md` and the per-author note gate.
+The shipping ledger's statement that this file is absent and legacy Guard 5
+applies needs correction by its owner. Final consolidation remains with the
+authorized shipping session; this author does not edit that session's ledger.
 
 Task #186 / A-08, overlay 082 and its state note belong to the security author.
 No overlay or migration is used here. Other MCA agreement/option work and the
