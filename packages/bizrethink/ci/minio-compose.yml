@@ -1,0 +1,8 @@
+# CI dependency repair: Docker Hub minio/minio returned pull-denied / 404 on
+# 2026-09-13. The vendor's published Quay image is pinned to the verified
+# multi-platform manifest; all service configuration comes from the base file.
+# Publisher instructions: https://hub.docker.com/r/minio/minio/
+# Manifest: https://quay.io/v2/minio/minio/manifests/latest
+services:
+  minio:
+    image: quay.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
