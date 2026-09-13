@@ -40,13 +40,17 @@ authorize remediation of undecided findings or changes to consumer repos.
   prepares one pure `chore/state-consolidation-<batch>` PR after the selected
   implementation queue merges; no reminder or new author assignment is needed.
   It updates STATE.md and deletes processed notes, creating no new note.
-  Shwet reviews and merges it unless a different independent reviewer/merger is
-  already assigned. Never self-merge. Honor existing fold ownership and resume
+  The repository owner reviews and merges it unless a different independent
+  reviewer/merger is already assigned. Never self-merge. Honor existing fold ownership and resume
   the same shipping ledger after the handoff. Require the state check on the
   exact final main SHA before deployment. Do not add this push-only check to
   author PR requirements. Until these rules are merged/adopted, retain
   legacy Guard 5 and existing fold assignments; never silently bypass it.
   Inspect union merges for duplicate/conflicting claims and preserve limitations.
+- Use role/session labels in public records. Maintain selected task-body progress
+  under the session workflow's limited authority. Before the final handoff,
+  record completion evidence, set Done/no remaining action and close each task
+  whose approved criteria are met; verify closure. Keep required pending work open.
 - Coordinate with live Claude sessions before landing. If `SendMessage` is
   unavailable, disclose that and obtain an owner relay/direction rather than
   pretending other sessions were notified.
