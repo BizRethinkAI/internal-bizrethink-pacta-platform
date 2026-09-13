@@ -139,21 +139,11 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
     });
   });
 
-  /**
-   * The vocabulary was applied inconsistently in eleven places, and that list is a
-   * finding rather than a workaround. Pinned so it cannot quietly grow: a new
-   * entry means somebody edited one document and reworded rather than copied,
-   * which is the near-miss version of the divergence this file exists to catch.
-   */
-  it('records the eleven places the swap was applied inconsistently', () => {
-    expect(TWIN_VOCABULARY_EXCEPTIONS).toHaveLength(11);
-
+  /** Resolved historical wording differences must not remain as dead exceptions. */
+  it('records only the three remaining vocabulary exceptions', () => {
+    expect(TWIN_VOCABULARY_EXCEPTIONS).toHaveLength(3);
     expect([...new Set(TWIN_VOCABULARY_EXCEPTIONS.map((entry) => entry.slug))].sort()).toEqual([
       'equipment-lease.acknowledgment',
-      'equipment-lease.default-remedies',
-      'equipment-lease.effective-date-term-and-interim-rent',
-      'equipment-lease.equipment',
-      'equipment-lease.guaranty-of-payment',
       'equipment-lease.independent-decision-governing-law',
       'equipment-lease.parties',
     ]);
