@@ -82,9 +82,12 @@ their assigned buckets.
   implementation, through the real guard/execution helpers and authenticated
   router (four Vitest files). Additional focused red tests caught four hostname
   truncations in Node domainToASCII and one late-policy lookup during development;
-  those were fixed before the final full focused run. Filtering those diagnostic
+  those were fixed before the final full focused run. A later transport
+  compatibility check reproduced three failures for valid 204/205/304 responses
+  with compression metadata; the follow-up preserves Fetch's no-body semantics.
+  This is a code correction, not a status-only source push. Filtering those diagnostic
   runs did not add skips; all cases run in the final suite.
-- Final focused run: 67 owned tests across six files, plus 34 existing upstream
+- Final focused run: 70 owned tests across six files, plus 34 existing upstream
   URL tests. Targeted TypeScript check includes owned implementation and tests,
   their upstream consumers and the new HTTP/browser spec. Changed-file Biome,
   source whitespace and overlay forward/reverse checks pass before push. Patch files

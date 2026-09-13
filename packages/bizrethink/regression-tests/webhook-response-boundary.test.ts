@@ -87,6 +87,18 @@ describe('webhook execution and response boundaries', () => {
     expect(await call(url)).toMatchObject({ success: true, responseCode: 200, responseBody: { received: true } });
   });
 
+  it.each([204, 205, 304])('preserves a bodyless %s response even with compression metadata', async (status) => {
+    const url = await listen((res) => {
+      res.setHeader('Content-Encoding', 'gzip');
+      res.writeHead(status);
+      res.end();
+    });
+    const original = await fetch(url);
+    expect(original.status).toBe(status);
+    expect(await original.text()).toBe('');
+    expect(await call(url)).toMatchObject({ success: status < 300, responseCode: status, responseBody: '' });
+  });
+
   it.each([
     { encoding: 'gzip', compress: gzipSync },
     { encoding: 'deflate', compress: deflateSync },

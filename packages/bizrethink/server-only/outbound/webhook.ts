@@ -69,6 +69,7 @@ const responseLimitError = () =>
   });
 
 const readResponse = async (response: IncomingMessage, signal: AbortSignal) => {
+  const hasNoBody = [204, 205, 304].includes(response.statusCode ?? 0);
   const chunks: Buffer[] = [];
   let wireBytes = 0;
   let decodedBytes = 0;
@@ -89,7 +90,9 @@ const readResponse = async (response: IncomingMessage, signal: AbortSignal) => {
       callback();
     },
   });
-  const encoding = response.headers['content-encoding']?.trim().toLowerCase();
+  // Match Fetch's null-body status semantics. Representation metadata does not
+  // imply that a 204/205/304 carries a compressed stream to decode.
+  const encoding = hasNoBody ? undefined : response.headers['content-encoding']?.trim().toLowerCase();
   const decoder =
     encoding === 'gzip'
       ? createGunzip()
@@ -116,7 +119,7 @@ const readResponse = async (response: IncomingMessage, signal: AbortSignal) => {
   ) {
     throw responseLimitError();
   }
-  const text = new TextDecoder().decode(Buffer.concat(chunks, decodedBytes));
+  const text = hasNoBody ? '' : new TextDecoder().decode(Buffer.concat(chunks, decodedBytes));
   let responseBody: Prisma.InputJsonValue;
   try {
     responseBody = JSON.parse(text);
