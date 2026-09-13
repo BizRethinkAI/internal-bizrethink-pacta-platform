@@ -52,6 +52,9 @@
     "../../.github/scripts/state-notes.ts",
     "regression-tests/direct-template-field-validation.test.ts",
     "server-only/direct-template-fields.ts",
-    "../app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts"
+    "../app-tests/e2e/api/bizrethink/direct-template-field-validation.spec.ts",
+    "server-only/document-replacement.ts",
+    "regression-tests/document-replacement-integrity.test.ts",
+    "../app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts"
   ]
 }
