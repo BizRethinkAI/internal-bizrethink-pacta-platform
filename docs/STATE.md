@@ -13,7 +13,27 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-12_
+_Last updated: 2026-09-13_
+
+## 2026-09-13 — fresh review-and-ship batch merged (#188, #190, #193, #194, #197, #198, #200, #202, #204, #206, #208, #210, #212)
+
+The fresh queue was independently reviewed and merged in dependency order. The
+security, authorization, outbound-boundary, legal-draft, documentation, MCA
+funding/identity, equipment, content-catalogue, provider-template and
+transaction-fill changes passed their applicable current-head checks, including
+application/Docker builds, governance/lint, audit, CodeQL where attached, PR
+metadata and Playwright. #193 and #198 required mechanical refreshes onto the
+then-current main; their reviewed application changes were preserved.
+
+The MCA stack was retargeted to main after each parent landed: #204 merged at
+`90e82e362958de4a2bd563d625c5b73079e5ad45`, #206 at
+`1f44c02dcd96f55b6fad9b69b17f71eeead45a8d`, #208 at
+`dbd73dc38461a323fafe6543c398f6557483fb0f`, #210 at
+`baba686daba929945cdd30b578e54b600f5167a1`, and #212 at
+`e628a6daeb0493816768078d03c03c0a67569f51`. All legal wording remains draft;
+the implementation does not claim counsel approval, production migration,
+publication, signing or deployment. The final state-consolidation PR and one
+Coolify deployment remain required before this batch is complete.
 
 ---
 
