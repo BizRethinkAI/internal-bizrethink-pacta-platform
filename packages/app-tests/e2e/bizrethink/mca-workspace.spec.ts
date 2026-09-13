@@ -43,9 +43,14 @@ test('ordinary members cannot load either MCA authored-content catalogue or the 
   const { user } = await seedUser();
   await apiSignin({ page, email: user.email });
   for (const path of ['/admin/mca-library', '/admin/mca-library?catalogue=reusable', '/admin/mca']) {
-    const response = await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${path}`);
-    expect(response?.status()).toBe(404);
+    // The existing parent admin layout redirects before the leaf's 404 is shown.
+    const response = await page.request.get(`${NEXT_PUBLIC_WEBAPP_URL()}${path}`, { maxRedirects: 0 });
+    expect(response.status()).toBe(302);
+    expect(response.headers().location).toBe('/');
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${path}`);
+    await expect(page).not.toHaveURL(/\/admin(?:\/|$)/);
     await expect(page.locator('[data-mca-kind]')).toHaveCount(0);
+    await expect(page.getByRole('navigation', { name: 'MCA workspace' })).toHaveCount(0);
   }
 });
 

@@ -90,3 +90,16 @@ by this catalogue PR. Unsupported gross/ACH or other unauthored provider bargain
 must remain unavailable. Processor-controlled Split Funding Letter contradictions
 remain a separately owned reconciliation dependency. All authored text is still
 draft, with no named legal approver. No merchant-ready legal approval is implied.
+
+## CI correction on the author branch
+
+First after-Playwright run 34757628985 exposed two new-test failures, with 1,099
+passed, two passed on retry and 59 skipped. The recorded browser snapshot showed
+translation message IDs instead of the new navigation labels: Lingui’s upstream
+extraction roots excluded the owned component directory. Overlay 085 now includes
+that narrow extraction root. The authenticated non-admin trace proved the existing
+parent layout returned HTTP 302 to `/`; the browser followed it to HTTP 200. The
+new test incorrectly expected the leaf loader’s 404. It now verifies the exact
+redirect, navigation away from admin and absence of MCA rows/navigation. No access
+rule was changed. The counsel review and inherited-finding HTTP/database scenario
+already passed on the first run. Final CI is re-running for this corrected head.

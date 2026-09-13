@@ -9,7 +9,14 @@ const config: LinguiConfig = {
   catalogs: [
     {
       path: '<rootDir>/packages/lib/translations/{locale}/web',
-      include: ['apps/remix/app', 'packages/ui', 'packages/lib', 'packages/email'],
+      // MODIFIED for BizRethink (overlay 085): extract the owned MCA workspace UI.
+      include: [
+        'apps/remix/app',
+        'packages/ui',
+        'packages/lib',
+        'packages/email',
+        'packages/bizrethink/mca/components',
+      ],
       exclude: ['**/node_modules/**'],
     },
   ],
