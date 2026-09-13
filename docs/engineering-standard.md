@@ -9,7 +9,13 @@ aren't mechanically enforced decay** — this repo has the history to prove it.
 
 ## 1. Definition of done
 
-**A change is done when CI is green on a pull request. Not before.**
+**A change cannot be called complete before CI is green on its pull request.**
+
+Green PR CI completes author validation. The GitHub task stays open while its
+approved review, merge, consolidation, installation or shipping work remains.
+The session completing the final required step records the evidence, sets the
+task body to **Done** with no remaining action, closes it as completed and verifies
+the result. See [task completion](session-workflow.md#update-status-and-close-completed-tasks).
 
 Not "it builds locally". Not "the tests pass on my machine". Not "this should be
 fine". If CI cannot run, the task is **blocked**, and saying so is the correct
@@ -48,20 +54,28 @@ the one worth keeping when everything else is dropped.
 
 ### Concurrent sessions and state
 
-Follow [the session workflow](session-workflow.md). Shwet or one explicitly
-appointed coordinator assigns separate GitHub task issues. Each author owns one
+Follow [the session workflow](session-workflow.md). The repository owner or one
+explicitly appointed coordinator assigns separate GitHub task issues. Each author owns one
 branch/worktree, its PR and its CI fixes. Live assignments do not require a Git
 registry commit. Read open task cards/comments and PRs before taking work.
+
+Use role labels and unique session labels in public records; do not carry the
+owner's personal name or identifying local details into issues, PRs, comments
+or committed handoffs. See [public records](session-workflow.md#public-records-use-roles).
+Assignment fields remain coordinator-owned. The session responsible for the
+current step updates its task's PR link, status and next action as described in
+the workflow; a progress comment alone does not keep the task body current.
 
 Author PRs update only their own state note. One assigned consolidation author
 updates STATE.md and deletes merged notes in a pure consolidation PR at the end
 of a shipping batch; that PR creates no note of its own. A different session or
-Shwet reviews and merges it. Governance enforces per-PR note scope; **State ready
-to ship** must pass on the final main revision before an authorized deployment.
+the repository owner reviews and merges it. Governance enforces per-PR note
+scope; **State ready to ship** must pass on the final main revision before an
+authorized deployment.
 This replaces Guard 5's requirement that the next author fold prior merges.
 
-A fresh review-and-ship session may merge other sessions' cleared PRs when Shwet
-explicitly delegates that work. It never merges a PR it implemented. Setup or
+A fresh review-and-ship session may merge other sessions' cleared PRs when the
+repository owner explicitly delegates that work. It never merges a PR it implemented. Setup or
 review-only requests do not authorize shipping.
 
 ## 4. The PR description is the review surface

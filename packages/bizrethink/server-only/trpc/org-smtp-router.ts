@@ -1,12 +1,11 @@
-import { z } from 'zod';
-
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 import { authenticatedProcedure, router } from '@documenso/trpc/server/trpc';
-
+import { z } from 'zod';
+import { assertSmtpTestBudget } from '../outbound/smtp-test-limit';
 import { encryptOrgSmtpPassword, invalidateOrgMailer } from '../per-org-mailer';
 import { testOrgSmtp } from '../test-org-smtp';
 
@@ -18,9 +17,8 @@ import { testOrgSmtp } from '../test-org-smtp';
 //   bizrethink.organisationSmtp.delete — remove the row
 //   bizrethink.organisationSmtp.test   — verify SMTP creds without persisting
 //
-// Authorization: every procedure (except `test`) requires the user to have
-// MANAGE_ORGANISATION on the target org. `test` is loose because it doesn't
-// touch persisted state — but still authenticatedProcedure-gated.
+// Authorization: every procedure requires MANAGE_ORGANISATION on the target
+// org. A connection test also consumes per-user and per-organisation budgets.
 
 const ZOrgIdInput = z.object({
   organisationId: z.string(),
@@ -38,9 +36,9 @@ const ZSmtpConfigShape = z.object({
 
 const ZUpsertInput = ZOrgIdInput.merge(ZSmtpConfigShape);
 
-const ZTestInput = z.object({
-  host: z.string().min(1),
-  port: z.number().int().positive(),
+const ZTestInput = ZOrgIdInput.extend({
+  host: z.string().trim().min(1).max(253),
+  port: z.number().int().positive().max(65535),
   secure: z.boolean(),
   username: z.string().min(1),
   password: z.string().min(1, 'Password required to test'),
@@ -73,7 +71,7 @@ const ensureOrgManageAccess = async (organisationId: string, userId: number) => 
     where: buildOrganisationWhereQuery({
       organisationId,
       userId,
-      roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+      roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP.MANAGE_ORGANISATION,
     }),
   });
 
@@ -188,7 +186,9 @@ const deleteRoute = authenticatedProcedure
 const testRoute = authenticatedProcedure
   .input(ZTestInput)
   .output(ZTestOutput)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
+    await ensureOrgManageAccess(input.organisationId, ctx.user.id);
+    await assertSmtpTestBudget(ctx.user.id, input.organisationId);
     return await testOrgSmtp(input);
   });
 

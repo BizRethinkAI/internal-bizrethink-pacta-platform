@@ -1,0 +1,103 @@
+METHOD: Web-tool extraction observed 2026-09-13. Tool L-numbers are extraction-window lines, not publisher line numbers. Not a raw HTTP response or a complete capture of every linked page.
+
+eCFR :: 47 CFR 64.1200 -- Delivery restrictions. (https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200)
+L238: Note to paragraph (c)(2)(i)(D):
+L239:
+L240: The requirement in paragraph 64.1200(c)(2)(i)(D) for persons or entities to employ a version of the national do-not-call registry obtained from the administrator no more than 31 days prior to the date any call is made is effective January 1, 2005. Until January 1, 2005, persons or entities must continue to employ a version of the registry obtained from the administrator of the registry no more than three months prior to the date any call is made.
+L241: (E) Purchasing the national do-not-call database. It uses a process to ensure that it does not sell, rent, lease, purchase or use the national do-not-call database, or any part thereof, for any purpose except compliance with this section and any such state or federal law to prevent telephone solicitations to telephone numbers registered on the national database.
+L242: It purchases access to the relevant do-not-call data from the administrator of the national database and does not participate in any arrangement to share the cost of accessing the national database, including any arrangement with telemarketers who may not divide the costs to access the national database among various client sellers; or
+L243: (ii) It has obtained the subscriber's prior express invitation or permission. Such permission must be evidenced by a signed, written agreement between the consumer and seller which states that the consumer agrees to be contacted by this seller and includes the telephone number to which the calls may be placed; or
+L244:
+L245: (iii) The telemarketer making the call has a personal relationship with the recipient of the call.
+L246: (d) No person or entity shall initiate any artificial or prerecorded-voice telephone call pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or any call for telemarketing purposes to a residential telephone subscriber unless such person or entity has instituted procedures for maintaining a list of persons who request not to receive such calls made by or on behalf of that person or entity. The procedures instituted must meet the following minimum standards:
+L247: (1) Written policy. Persons or entities making artificial or prerecorded-voice telephone calls pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or calls for telemarketing purposes must have a written policy, available upon demand, for maintaining a do-not-call list.
+L248: (2) Training of personnel. Personnel engaged in making artificial or prerecorded-voice telephone calls pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or who are engaged in any aspect of telemarketing must be informed and trained in the existence and use of the do-not-call list.
+L249: (3) Recording, disclosure of do-not-call requests.
+L250: If a person or entity making an artificial or prerecorded-voice telephone call pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or any call for telemarketing purposes (or on whose behalf such a call is made) receives a request from a residential telephone subscriber not to receive calls from that person or entity, the person or entity must record the request and place the subscriber's name, if provided, and telephone number on the do-not-call list at the time the request is made.
+L251: Persons or entities making such calls (or on whose behalf such calls are made) must honor a residential subscriber's do-not-call request within a reasonable time from the date such request is made. This period may not exceed ten (10) business days from the receipt of such request.
+L252: If such requests are recorded or maintained by a party other than the person or entity on whose behalf the call is made, the person or entity on whose behalf the call is made will be liable for any failures to honor the do-not-call request.
+L253: A person or entity making an artificial or prerecorded-voice telephone call pursuant to an exemption under paragraphs (a)(3)(ii) through (v) or any call for telemarketing purposes must obtain a consumer's prior express permission to share or forward the consumer's request not to be called to a party other than the person or entity on whose behalf a call is made or an affiliated entity.
+L254: (4) Identification of callers and telemarketers. A person or entity making an artificial or prerecorded-voice telephone call pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or any call for telemarketing purposes must provide the called party with the name of the individual caller, the name of the person or entity on whose behalf the call is being made, and a telephone number or address at which the person or entity may be contacted.
+L255: The telephone number provided may not be a 900 number or any other number for which charges exceed local or long distance transmission charges.
+L256: (5) Affiliated persons or entities. In the absence of a specific request by the subscriber to the contrary, a residential subscriber's do-not-call request shall apply to the particular entity making the call (or on whose behalf a call is made), and will not apply to affiliated entities unless the consumer reasonably would expect them to be included given the identification of the caller and (for telemarketing calls) the product being advertised.
+L257: (6) Maintenance of do-not-call lists. A person or entity making artificial or prerecorded-voice telephone calls pursuant to an exemption under paragraphs (a)(3)(ii) through (v) of this section or any call for telemarketing purposes must maintain a record of a consumer's request not to receive further calls. A do-not-call request must be honored for 5 years from the time the request is made.
+L258: (e) The rules set forth in paragraph (c) and (d) of this section are applicable to any person or entity making telephone solicitations or telemarketing calls or text messages to wireless telephone numbers to the extent described in the Commission's Report and Order, CG Docket No. 02-278, FCC 03-153, “Rules and Regulations Implementing the Telephone Consumer Protection Act of 1991.”
+L259:
+L260: (f) As used in this section:
+L261: (1) The term advertisement means any material advertising the commercial availability or quality of any property, goods, or services.
+L262:
+L263: (2) The terms automatic telephone dialing system and autodialer mean equipment which has the capacity to store or produce telephone numbers to be called using a random or sequential number generator and to dial such numbers.
+L264: (3) The term clear and conspicuous means a notice that would be apparent to the reasonable consumer, separate and distinguishable from the advertising copy or other disclosures. With respect to facsimiles and for purposes of paragraph (a)(4)(iii)(A) of this section, the notice must be placed at either the top or bottom of the facsimile.
+L265:
+L266: (4) The term emergency purposes means calls made necessary in any situation affecting the health and safety of consumers.
+L267: (5) The term established business relationship for purposes of telephone solicitations means a prior or existing relationship formed by a voluntary two-way communication between a person or entity and a residential subscriber with or without an exchange of consideration, on the basis of the subscriber's purchase or transaction with the entity within the eighteen (18) months immediately preceding the date of the telephone call or on the basis of the subscriber's inquiry or application regarding products or services offered by the entity within the three months immediately preceding the date of the call, which relationship has not been previously terminated by either party.
+L268: (i) The subscriber's seller-specific do-not-call request, as set forth in paragraph (d)(3) of this section, terminates an established business relationship for purposes of telemarketing and telephone solicitation even if the subscriber continues to do business with the seller.
+L269: (ii) The subscriber's established business relationship with a particular business entity does not extend to affiliated entities unless the subscriber would reasonably expect them to be included given the nature and type of goods or services offered by the affiliate and the identity of the affiliate.
+L270: (6) The term established business relationship for purposes of paragraph (a)(4) of this section on the sending of facsimile advertisements means a prior or existing relationship formed by a voluntary two-way communication between a person or entity and a business or residential subscriber with or without an exchange of consideration, on the basis of an inquiry, application, purchase or transaction by the business or residential subscriber regarding products or services offered by such person or entity, which relationship has not been previously terminated by either party.
+L271: (7) The term facsimile broadcaster means a person or entity that transmits messages to telephone facsimile machines on behalf of another person or entity for a fee.
+L272:
+L273: (8) The term one-ring scam means a scam in which a caller makes a call and allows the call to ring the called party for a short duration, in order to prompt the called party to return the call, thereby subjecting the called party to charges.
+L274: (9) The term prior express written consent means an agreement, in writing, bearing the signature of the person called that clearly authorizes the seller to deliver or cause to be delivered to the person called advertisements or telemarketing messages using an automatic telephone dialing system or an artificial or prerecorded voice, and the telephone number to which the signatory authorizes such advertisements or telemarketing messages to be delivered.
+L275: (i) The written agreement shall include a clear and conspicuous disclosure informing the person signing that:
+L276:
+L277: (A) By executing the agreement, such person authorizes the seller to deliver or cause to be delivered to the signatory telemarketing calls using an automatic telephone dialing system or an artificial or prerecorded voice; and
+L278: (B) The person is not required to sign the agreement (directly or indirectly), or agree to enter into such an agreement as a condition of purchasing any property, goods, or services.
+L279:
+L280: (ii) The term “signature” shall include an electronic or digital form of signature, to the extent that such form of signature is recognized as a valid signature under applicable federal law or state contract law.
+L281: (10) The term seller means the person or entity on whose behalf a telephone call or message is initiated for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person.
+L282:
+L283: (11) The term sender for purposes of paragraph (a)(4) of this section means the person or entity on whose behalf a facsimile unsolicited advertisement is sent or whose goods or services are advertised or promoted in the unsolicited advertisement.
+L284: (12) The term telemarketer means the person or entity that initiates a telephone call or message for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person.
+L285:
+L286: (13) The term telemarketing means the initiation of a telephone call or message for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person.
+L287: (14) The term telephone facsimile machine means equipment which has the capacity to transcribe text or images, or both, from paper into an electronic signal and to transmit that signal over a regular telephone line, or to transcribe text or images (or both) from an electronic signal received over a regular telephone line onto paper.
+L288: (15) The term telephone solicitation means the initiation of a telephone call or message for the purpose of encouraging the purchase or rental of, or investment in, property, goods, or services, which is transmitted to any person, but such term does not include a call or message:
+L289:
+L290: (i) To any person with that person's prior express invitation or permission;
+L291:
+L292: (ii) To any person with whom the caller has an established business relationship; or
+L293:
+L294: (iii) By or on behalf of a tax-exempt nonprofit organization.
+L295: (16) The term unsolicited advertisement means any material advertising the commercial availability or quality of any property, goods, or services which is transmitted to any person without that person's prior express invitation or permission, in writing or otherwise.
+L296:
+L297: (17) The term personal relationship means any family member, friend, or acquaintance of the telemarketer making the call.
+L298: (18) The term effectively mitigate means identifying the source of the traffic and preventing that source from continuing to originate traffic of the same or similar nature.
+L299:
+L300: (19) The term gateway provider means a U.S.-based intermediate provider that receives a call directly from a foreign originating provider or foreign intermediate provider at its U.S.-based facilities before transmitting the call downstream to another U.S.-based provider. For purposes of this paragraph (f)(19) :
+L301: (i) U.S.-based means that the provider has facilities located in the United States, including a point of presence capable of processing the call; and
+L302:
+L303: (ii) Receives a call directly from a provider means the foreign provider directly upstream of the gateway provider in the call path sent the call to the gateway provider, with no providers in-between.
+L304:
+L305: (g) Beginning January 1, 2004, common carriers shall:
+L306: (1) When providing local exchange service, provide an annual notice, via an insert in the subscriber's bill, of the right to give or revoke a notification of an objection to receiving telephone solicitations pursuant to the national do-not-call database maintained by the federal government and the methods by which such rights may be exercised by the subscriber.
+L307: The notice must be clear and conspicuous and include, at a minimum, the Internet address and toll-free number that residential telephone subscribers may use to register on the national database.
+L308: (2) When providing service to any person or entity for the purpose of making telephone solicitations, make a one-time notification to such person or entity of the national do-not-call requirements, including, at a minimum, citation to 47 CFR 64.1200 and 16 CFR 310 . Failure to receive such notification will not serve as a defense to any person or entity making telephone solicitations from violations of this section.
+L309: (h) The administrator of the national do-not-call registry that is maintained by the federal government shall make the telephone numbers in the database available to the States so that a State may use the telephone numbers that relate to such State as part of any database, list or listing system maintained by such State for the regulation of telephone solicitations.
+L310:
+L311: (i)-(j) [Reserved]
+L312:
+L313: (k) Voice service providers may block calls so that they do not reach a called party as follows:
+L314: (1) A provider may block a voice call when the subscriber to which the originating number is assigned has requested that calls purporting to originate from that number be blocked because the number is used for inbound calls only.
+L315:
+L316: (2) A provider may block a voice call purporting to originate from any of the following:
+L317:
+L318: (i) A North American Numbering Plan number that is not valid;
+L319: (ii) A valid North American Numbering Plan number that is not allocated to a provider by the North American Numbering Plan Administrator or the Pooling Administrator; and
+L320: (iii) A valid North American Numbering Plan number that is allocated to a provider by the North American Numbering Plan Administrator or Pooling Administrator, but is unused, so long as the provider blocking the calls is the allocatee of the number and confirms that the number is unused or has obtained verification from the allocatee that the number is unused at the time of the blocking.
+L321: (iv) A telephone number that the provider identifies, based on reasonable analytics, as highly likely to be associated with a one-ring scam.
+L322:
+L323: (3) A terminating provider may block a voice call without liability under the Communications Act or the Commission's rules where:
+L324:
+L325: (i) Calls are blocked based on the use of reasonable analytics designed to identify unwanted calls;
+L326:
+L327: (ii) Those analytics include consideration of caller ID authentication information where available;
+L328: (iii) A consumer may opt out of blocking and is provided with sufficient information to make an informed decision;
+L329:
+L330: (iv) All analytics are applied in a non-discriminatory, competitively neutral manner;
+L331:
+L332: (v) Blocking services are provided with no additional line-item charge to consumers; and
+L333:
+L334: (vi) The terminating provider provides, without charge to the caller, the redress requirements set forth in paragraph (k)(8) of this section.
+L335: (4) A provider may block voice calls or cease to accept traffic from an originating or intermediate provider without liability under the Communications Act or the Commission's rules where the originating or intermediate provider, when notified by the Commission, fails to effectively mitigate illegal traffic within 48 hours or fails to implement effective measures to prevent new and renewing customers from using its network to originate illegal calls.
+L336: Prior to initiating blocking, the provider shall provide the Commission with notice and a brief summary of the basis for its determination that the originating or intermediate provider meets one or more of these two conditions for blocking.
+L337: (5) A provider may not block a voice call under paragraphs (k)(1) through (4), paragraph (k)(11), paragraphs (n)(2) and (3), paragraph (n)(5), or paragraph (o) of this section if the call is an emergency call placed to 911.

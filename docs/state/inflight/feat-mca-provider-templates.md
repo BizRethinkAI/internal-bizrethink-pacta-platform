@@ -7,6 +7,17 @@ Overlay **086** and additive migration `20260913120000_add_mca_provider_template
 are reserved on the task after checking open task bodies and recent comments.
 Existing reservations 082–085 remain with their current owners.
 
+## Main integration refresh
+
+Refreshed #208 at `3f47427bec10cf6ad14e3dabc1ff865aabe06e84` is merged into
+this branch, incorporating main `a2e0719fc38d988f489234b564095ef46307c05f` and
+the corrected consent/catalogue version history. This merge has no conflicts.
+Provider-interview implementation, overlay 086 and the additive migration are
+unchanged. Five template, extraction and consent test files pass 285 tests.
+The provider navigation overlay still reverse-applies; complete fresh CI is
+recorded on PR #210 / task #209. No independent review, merge into main or
+deployment is performed by this author.
+
 ## Work in progress
 
 The intended result is a real provider interview that saves, reopens, revises and

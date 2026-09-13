@@ -1,6 +1,7 @@
+import { getRecipientSuggestionWhere } from '@bizrethink/customizations/server-only/document-permissions';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import { EnvelopeType, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export type GetRecipientSuggestionsOptions = {
   userId: number;
@@ -9,6 +10,8 @@ export type GetRecipientSuggestionsOptions = {
 };
 
 export const getRecipientSuggestions = async ({ userId, teamId, query }: GetRecipientSuggestionsOptions) => {
+  // MODIFIED for BizRethink (overlay 084): verify membership before either directory read.
+  const envelopeWhere = await getRecipientSuggestionWhere(userId, teamId);
   const trimmedQuery = query.trim();
 
   const nameEmailFilter = trimmedQuery
@@ -33,8 +36,7 @@ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetReci
   const recipients = await prisma.recipient.findMany({
     where: {
       envelope: {
-        type: EnvelopeType.DOCUMENT,
-        team: buildTeamWhereQuery({ teamId, userId }),
+        ...envelopeWhere,
       },
       ...nameEmailFilter,
     },
@@ -67,7 +69,7 @@ export const getRecipientSuggestions = async ({ userId, teamId, query }: GetReci
           some: {
             group: {
               teamGroups: {
-                some: { teamId },
+                some: { teamId, team: buildTeamWhereQuery({ teamId, userId }) },
               },
             },
           },

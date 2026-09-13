@@ -7,7 +7,8 @@ import type { McaClause } from '../types';
  *
  * Rewritten 2026-09-12 for transaction, report-use and signature boundaries.
  * The legacy source and review dispositions remain historical evidence, not
- * approval of these new bodies. All eight remain drafts at version 2. See
+ * approval of these new bodies. All eight remain drafts; catalogue integration
+ * advances the preamble again to distinguish its mapped and rewritten versions. See
  * docs/research/mca-ancillary-consents-2026-09-12/README.md for authority and
  * execution/template follow-up, including the already-present r2 signature.
  */
@@ -20,7 +21,7 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
       because: 'load-bearing',
       note: 'The release needs the person signing, the business and Buyer identified; naming a funder profile does not establish the signer’s authority over another person’s information.',
     },
-    version: 3,
+    version: 4,
     instrument: 'permission-to-release',
     kind: 'clause',
 

@@ -1,0 +1,263 @@
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/671.201
+RETRIEVED UTC: 2026-09-13T09:28:43.066480+00:00
+RAW RESPONSE SHA256: 2323e941cf69a9ae9401dd0082d3b05dc58a9704214465318b572228494c0d1b
+EDITION: 2026 Florida Statutes
+
+F.S. 671.201
+671.201 General definitions.—Unless the context otherwise requires, words or phrases defined in this section, or in the additional definitions contained in other chapters of this code which apply to particular chapters or parts thereof, have the meanings stated. Subject to definitions contained in other chapters of this code which apply to particular chapters or parts thereof, the term:
+(1) “Action,” in the sense of a judicial proceeding, includes recoupment, counterclaim, setoff, suit in equity, and any other proceedings in which rights are determined.
+(2) “Aggrieved party” means a party entitled to pursue a remedy.
+(3) “Agreement,” as distinguished from “contract,” means the bargain of the parties in fact, as found in their language or inferred from other circumstances, including course of dealing, usage of trade, or course of performance as provided in ss. 671.205 and 672.208.
+(4) “Bank” means a person engaged in the business of banking and includes a savings bank, a savings and loan association, a credit union, and a trust company.
+(5) “Bearer” means a person in control of a negotiable electronic document of title or a person in possession of a negotiable instrument, a negotiable tangible document of title, or a certificated security that is payable to bearer or indorsed in blank.
+(6) “Bill of lading” means a document of title evidencing the receipt of goods for shipment issued by a person engaged in the business of directly or indirectly transporting or forwarding goods. The term does not include a warehouse receipt.
+(7) “Branch” includes a separately incorporated foreign branch of a bank.
+(8) “Burden of establishing” a fact means the burden of persuading the triers of fact that the existence of the fact is more probable than its nonexistence.
+(9) “Buyer in ordinary course of business” means a person who, in ordinary course, buys goods in good faith, without knowledge that the sale violates the rights of another person in the goods, from a person, other than a pawnbroker, in the business of selling goods of that kind. A person buys goods in ordinary course if the sale to the person comports with the usual or customary practices in the kind of business in which the seller is engaged or with the seller’s own usual or customary practices. A person who sells oil, gas, or other minerals at the wellhead or minehead is a person in the business of selling goods of that kind. A buyer in ordinary course of business may buy for cash, by exchange of other property, or on secured or unsecured credit and may acquire goods or documents of title under a preexisting contract for sale. Only a buyer who takes possession of the goods or has a right to recover the goods from the seller under chapter 672 may be a buyer in ordinary course of business. “Buyer in ordinary course of business” does not include a person who acquires goods in a transfer in bulk or as security for or in total or partial satisfaction of a money debt.
+(10) “Central bank digital currency” means a digital currency, a digital medium of exchange, or a digital monetary unit of account issued by the United States Federal Reserve System, a federal agency, a foreign government, a foreign central bank, or a foreign reserve system, that is made directly available to a consumer by such entities. The term includes a digital currency, a digital medium of exchange, or a digital monetary unit of account issued by the United States Federal Reserve System, a federal agency, a foreign government, a foreign central bank, or a foreign reserve system, that is processed or validated directly by such entities.
+(11) “Conspicuous,” with reference to a term, means so written, displayed, or presented that, based on the totality of the circumstances, a reasonable person against which it is to operate ought to have noticed it. Whether a term is “conspicuous” is a decision for the court.
+(12) “Consumer” means an individual who enters into a transaction primarily for personal, family, or household purposes.
+(13) “Contract,” as distinguished from “agreement,” means the total legal obligation that results from the parties’ agreement as determined by this code and as supplemented by any other applicable laws.
+(14) “Creditor” includes a general creditor, a secured creditor, a lien creditor, and any representative of creditors, including an assignee for the benefit of creditors, a trustee in bankruptcy, a receiver in equity, and an executor or administrator of an insolvent debtor’s or assignor’s estate.
+(15) “Defendant” includes a person in the position of defendant in a counterclaim, cross-claim, or third-party claim.
+(16) “Delivery,” with respect to an electronic document of title, means voluntary transfer of control and, with respect to instruments, tangible document of title, or an authoritative tangible copy of a record evidencing chattel paper, means voluntary transfer of possession.
+(17) “Document of title” means a record:
+(a) That in the regular course of business or financing is treated as adequately evidencing that the person in possession or control of the record is entitled to receive, control, hold, and dispose of the record and the goods the record covers; and
+(b) That purports to be issued by or addressed to a bailee and to cover goods in the bailee’s possession which are either identified or are fungible portions of an identified mass. The term includes a bill of lading, transport document, dock warrant, dock receipt, warehouse receipt, and order for delivery of goods. An electronic document of title means a document of title evidenced by a record consisting of information stored in an electronic medium. A tangible document of title means a document of title evidenced by a record consisting of information that is inscribed on a tangible medium.
+(18) “Electronic” means relating to technology having electrical, digital, magnetic, wireless, optical, electromagnetic, or similar capabilities.
+(19) “Fault” means a default, breach, or wrongful act or omission.
+(20) “Fungible goods” means:
+(a) Goods of which any unit, by nature or usage of trade, is the equivalent of any other like unit; or
+(b) Goods that, by agreement, are treated as equivalents.
+(21) “Genuine” means free of forgery or counterfeiting.
+(22) “Good faith,” except as otherwise provided in this code, means honesty in fact and the observance of reasonable commercial standards of fair dealing.
+(23) “Holder” means:
+(a) The person in possession of a negotiable instrument that is payable either to bearer or to an identified person that is the person in possession;
+(b) The person in possession of a negotiable tangible document of title if the goods are deliverable either to bearer or to the order of the person in possession; or
+(c) The person in control, other than pursuant to s. 677.106(7), of a negotiable electronic document of title.
+(24) “Insolvency proceeding” includes an assignment for the benefit of creditors or other proceeding intended to liquidate or rehabilitate the estate of the person involved.
+(25) “Insolvent” means:
+(a) Having ceased to pay debts in the ordinary course of business other than as a result of a bona fide dispute;
+(b) Being unable to pay debts as they become due; or
+(c) Being insolvent within the meaning of the Federal Bankruptcy Law.
+(26) “Money” means a medium of exchange that is currently authorized or adopted by a domestic or foreign government. The term includes a monetary unit of account established by an intergovernmental organization or by agreement between two or more countries. The term does not include a central bank digital currency.
+(27) Subject to subsection (29), a person has “notice” of a fact if the person:
+(a) Has actual knowledge of it;
+(b) Has received a notice or notification of it; or
+(c) From all the facts and circumstances known to the person at the time in question, has reason to know that it exists. A person “knows” or has “knowledge” of a fact when the person has actual knowledge of it. “Discover” or “learn” or a word or phrase of similar import refers to knowledge rather than to reason to know. The time and circumstances under which a notice or notification may cease to be effective are not determined by this section.
+(28) A person “notifies” or “gives” a notice or notification to another person by taking such steps as may be reasonably required to inform the other person in ordinary course, whether or not the other person actually comes to know of it. Subject to subsection (29), a person “receives” a notice or notification when:
+(a) It comes to that person’s attention; or
+(b) It is duly delivered in a form reasonable under the circumstances at the place of business through which the contract was made or at another location held out by that person as the place for receipt of such communications.
+(29) Notice, knowledge, or a notice or notification received by an organization is effective for a particular transaction from the time when it is brought to the attention of the individual conducting that transaction, and, in any event, from the time when it would have been brought to the individual’s attention if the organization had exercised due diligence. An organization exercises due diligence if it maintains reasonable routines for communicating significant information to the person conducting the transaction and there is reasonable compliance with the routines. Due diligence does not require an individual acting for the organization to communicate information unless such communication is part of the individual’s regular duties or the individual has reason to know of the transaction and that the transaction would be materially affected by the information.
+(30) “Organization” means a person other than an individual.
+(31) “Party,” as distinguished from “third party,” means a person who has engaged in a transaction or made an agreement subject to this code.
+(32) “Person” means an individual; corporation; business trust; estate; trust; partnership; limited liability company; association; joint venture; government; governmental subdivision, agency, or instrumentality; or any other legal or commercial entity. The term includes a protected series, however denominated, of an entity if the protected series is established under law other than the Uniform Commercial Code which limits, or conditionally limits if conditions specified under the law are satisfied, the ability of a creditor of the entity or of any other protected series of the entity to satisfy a claim from assets of the protected series.
+(33) “Present value” means the amount as of a date certain of one or more sums payable in the future, discounted to the date certain by use of either an interest rate specified by the parties if that rate is not manifestly unreasonable at the time the transaction is entered into or, if an interest rate is not so specified, a commercially reasonable rate that takes into account the facts and circumstances at the time the transaction is entered into.
+(34) “Purchase” means taking by sale, lease, discount, negotiation, mortgage, pledge, lien, security interest, issue or reissue, gift, or any other voluntary transaction creating an interest in property.
+(35) “Purchaser” means a person who takes by purchase.
+(36) “Record” means information that is inscribed on a tangible medium or that is stored in an electronic or other medium and is retrievable in perceivable form.
+(37) “Remedy” means any remedial right to which an aggrieved party is entitled with or without resort to a tribunal.
+(38) “Representative” means a person empowered to act for another, including an agent, an officer of a corporation or association, and a trustee, executor, or administrator of an estate.
+(39) “Right” includes “remedy.”
+(40) “Security interest” means an interest in personal property or fixtures which secures payment or performance of an obligation. “Security interest” includes any interest of a consignor and a buyer of accounts, chattel paper, a payment intangible, or a promissory note in a transaction that is subject to chapter 679. “Security interest” does not include the special property interest of a buyer of goods on identification of those goods to a contract for sale under s. 672.401, but a buyer may also acquire a security interest by complying with chapter 679. Except as otherwise provided in s. 672.505, the right of a seller or lessor of goods under chapter 672 or chapter 680 to retain or acquire possession of the goods is not a security interest, but a seller or lessor may also acquire a security interest by complying with chapter 679. The retention or reservation of title by a seller of goods, notwithstanding shipment or delivery to the buyer under s. 672.401, is limited in effect to a reservation of a security interest. Whether a transaction in the form of a lease creates a security interest is determined by the facts of each case; however:
+(a) A transaction in the form of a lease creates a security interest if the consideration that the lessee is to pay the lessor for the right to possession and use of the goods is an obligation for the term of the lease not subject to termination by the lessee and:
+1. The original term of the lease is equal to or greater than the remaining economic life of the goods;
+2. The lessee is bound to renew the lease for the remaining economic life of the goods or is bound to become the owner of the goods;
+3. The lessee has an option to renew the lease for the remaining economic life of the goods for no additional consideration or nominal additional consideration upon compliance with the lease agreement; or
+4. The lessee has an option to become the owner of the goods for no additional consideration or nominal additional consideration upon compliance with the lease agreement.
+(b) A transaction does not create a security interest merely because:
+1. The present value of the consideration the lessee is obligated to pay the lessor for the right to possession and use of the goods is substantially equal to or is greater than the fair market value of the goods at the time the lease is entered into;
+2. The lessee assumes the risk of loss of the goods;
+3. The lessee agrees to pay, with respect to the goods, taxes; insurance; filing, recording, or registration fees; or service or maintenance costs;
+4. The lessee has an option to renew the lease or to become the owner of the goods;
+5. The lessee has an option to renew the lease for a fixed rent that is equal to or greater than the reasonably predictable fair market rent for the use of the goods for the term of the renewal at the time the option is to be performed; or
+6. The lessee has an option to become the owner of the goods for a fixed price that is equal to or greater than the reasonably predictable fair market value of the goods at the time the option is to be performed.
+(c) Additional consideration is nominal if it is less than the lessee’s reasonably predictable cost of performing under the lease agreement if the option is not exercised. Additional consideration is not nominal if:
+1. When the option to renew the lease is granted to the lessee, the rent is stated to be the fair market rent for the use of the goods for the term of the renewal determined at the time the option is to be performed; or
+2. When the option to become the owner of the goods is granted to the lessee, the price is stated to be the fair market value of the goods determined at the time the option is to be performed.
+(d) The “remaining economic life of the goods” and “reasonably predictable” fair market rent, fair market value, or cost of performing under the lease agreement must be determined with reference to the facts and circumstances at the time the transaction is entered into.
+(41) “Send,” in connection with a record or notification, means:
+(a) To deposit in the mail, deliver for transmission, or transmit by any other usual means of communication, with postage or cost of transmission provided for, addressed to any address reasonable under the circumstances; or
+(b) To cause the record or notification to be received within the time it would have been received if properly sent under paragraph (a).
+(42) “Sign,” “signing,” “signed,” or “signature” means, with present intent to authenticate or adopt a record, to:
+(a) Execute or adopt a tangible symbol; or
+(b) Attach to or logically associate with the record an electronic symbol, sound, or process.
+(43) “State” means a state of the United States, the District of Columbia, Puerto Rico, the United States Virgin Islands, or any territory or insular possession subject to the jurisdiction of the United States.
+(44) “Surety” includes a guarantor or other secondary obligor.
+(45) “Term” means a portion of an agreement which relates to a particular matter.
+(46) “Unauthorized signature” means a signature made without actual, implied, or apparent authority. The term includes a forgery.
+(47) “Warehouse receipt” means a document of title issued by a person engaged in the business of storing goods for hire.
+(48) “Writing” includes printing, typewriting, or any other intentional reduction to tangible form. “Written” has a corresponding meaning.
+History.—s. 1, ch. 65-254; s. 1, ch. 78-222; s. 2, ch. 79-398; s. 2, ch. 87-275; s. 4, ch. 90-278; s. 3, ch. 92-82; s. 552, ch. 97-102; s. 1, ch. 2000-112; s. 10, ch. 2001-198; s. 8, ch. 2007-134; s. 3, ch. 2010-131; s. 1, ch. 2023-80; s. 36, ch. 2025-92.
+Note.—s. 1-201, U.C.C.; supersedes ss. 614.02, 673.01, 674.01, 674.07, 674.28, 674.29, 674.30, 678.54.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/95.03
+RETRIEVED UTC: 2026-09-13T09:26:07.998776+00:00
+RAW RESPONSE SHA256: b976d4d540fc26d42f4e58a94fa4b9dd3be8533b707de5bf177327ffc369c151
+EDITION: 2026 Florida Statutes
+
+F.S. 95.03
+95.03 Contracts shortening time.—Any provision in a contract fixing the period of time within which an action arising out of the contract may be begun at a time less than that provided by the applicable statute of limitations is void.
+History.—ss. 1, 2, ch. 6465, 1913; RGS 2931; CGL 4651; s. 2, ch. 74-382.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/672.316
+RETRIEVED UTC: 2026-09-13T09:26:08.079533+00:00
+RAW RESPONSE SHA256: 89518e7071fa2f8b224d055343c222fa316ddca04b79639dd1b0463499c4c993
+EDITION: 2026 Florida Statutes
+
+F.S. 672.316
+672.316 Exclusion or modification of warranties.—
+(1) Words or conduct relevant to the creation of an express warranty and words or conduct tending to negate or limit warranty shall be construed wherever reasonable as consistent with each other; but, subject to the provisions of this chapter on parol or extrinsic evidence (s. 672.202), negation or limitation is inoperative to the extent that such construction is unreasonable.
+(2) Subject to subsection (3), to exclude or modify the implied warranty of merchantability or any part of it, the language must mention merchantability and in case of a writing must be conspicuous; and, to exclude or modify any implied warranty of fitness, the exclusion must be by a writing and conspicuous. Language to exclude all implied warranties of fitness is sufficient if it states, for example, that “There are no warranties which extend beyond the description on the face hereof.”
+(3) Notwithstanding subsection (2):
+(a) Unless the circumstances indicate otherwise, all implied warranties are excluded by expressions like “as is” or “with all faults” or other language which in common understanding calls the buyer’s attention to the exclusion of warranties and makes plain that there is no implied warranty; and
+(b) When the buyer before entering into the contract has examined the goods or the sample or model as fully as he or she desired or has refused to examine the goods, there is no implied warranty with regard to defects which an examination ought in the circumstances to have revealed to him or her; and
+(c) An implied warranty can also be excluded or modified by a course of dealing or course of performance or usage of trade.
+(d) In a transaction involving the sale of cattle or hogs, there is no implied warranty that the cattle or hogs are free from sickness or disease. However, no exemption applies in cases where the seller knowingly sells cattle or hogs that are diseased.
+(4) Remedies for breach of warranty can be limited in accordance with the provisions of this chapter on liquidation or limitation of damages and on contractual modification of remedy (ss. 672.718 and 672.719).
+(5) The procurement, processing, storage, distribution, or use of whole blood, plasma, blood products, and blood derivatives for the purpose of injecting or transfusing the same, or any of them, into the human body for any purpose whatsoever is declared to be the rendering of a service by any person participating therein and does not constitute a sale, whether or not any consideration is given therefor; and the implied warranties of merchantability and fitness for a particular purpose are not applicable.
+(6) The procurement, processing, testing, storing, or providing of human tissue and organs for human transplant, by an institution qualified for such purposes, is the rendering of a service; and such service does not constitute the sale of goods or products to which implied warranties of merchantability or fitness for a particular purpose are applicable. No implied warranties exist as to defects which cannot be detected, removed, or prevented by reasonable use of available scientific procedures or techniques.
+History.—s. 1, ch. 65-254; s. 1, ch. 69-157; s. 1, ch. 79-141; s. 2, ch. 84-264; s. 566, ch. 97-102; s. 1, ch. 2003-74.
+Note.—s. 2-316, U.C.C.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/679.2031
+RETRIEVED UTC: 2026-09-13T09:28:43.066704+00:00
+RAW RESPONSE SHA256: f6bce2e7f7f43dc47a66237fc77a83dfe6a6f768d86cb0b9b5f847944d72a6a2
+EDITION: 2026 Florida Statutes
+
+F.S. 679.2031
+679.2031 Attachment and enforceability of security interest; proceeds; supporting obligations; formal requisites.—
+(1) A security interest attaches to collateral when it becomes enforceable against the debtor with respect to the collateral, unless an agreement expressly postpones the time of attachment.
+(2) Except as otherwise provided in subsections (3)-(10), a security interest is enforceable against the debtor and third parties with respect to the collateral only if:
+(a) Value has been given;
+(b) The debtor has rights in the collateral or the power to transfer rights in the collateral to a secured party; and
+(c) One of the following conditions is met:
+1. The debtor has signed a security agreement that provides a description of the collateral and, if the security interest covers timber to be cut, a description of the land concerned;
+2. The collateral is not a certificated security and is in the possession of the secured party under s. 679.3131 pursuant to the debtor’s security agreement;
+3. The collateral is a certificated security in registered form and the security certificate has been delivered to the secured party under s. 678.3011 pursuant to the debtor’s security agreement;
+4. The collateral is controllable accounts, controllable electronic records, controllable payment intangibles, deposit accounts, electronic documents, electronic money, investment property, or letter-of-credit rights, and the secured party has control under s. 669.105, s. 677.106, s. 679.1041, s. 679.1051, s. 679.1061, or s. 679.1071 pursuant to the debtor’s security agreement; or
+5. The collateral is chattel paper and the secured party has possession and control under s. 679.3152 pursuant to the debtor’s security agreement.
+(3) Subsection (2) is subject to s. 674.2101 on the security interest of a collecting bank, s. 675.118 on the security interest of a letter-of-credit issuer or nominated person, s. 679.1101 on a security interest arising under chapter 672 or chapter 680, and s. 679.2061 on security interests in investment property.
+(4) A person becomes bound as debtor by a security agreement entered into by another person if, by operation of law other than this chapter or by contract:
+(a) The security agreement becomes effective to create a security interest in the person’s property; or
+(b) The person becomes generally obligated for the obligations of the other person, including the obligation secured under the security agreement, and acquires or succeeds to all or substantially all of the assets of the other person.
+(5) If a new debtor becomes bound as debtor by a security agreement entered into by another person:
+(a) The agreement satisfies paragraph (2)(c) with respect to existing or after-acquired property of the new debtor to the extent the property is described in the agreement; and
+(b) Another agreement is not necessary to make a security interest in the property enforceable.
+(6) The attachment of a security interest in collateral gives the secured party the rights to proceeds provided by s. 679.3151 and is also attachment of a security interest in a supporting obligation for the collateral.
+(7) The attachment of a security interest in a right to payment or performance secured by a security interest or other lien on personal or real property is also attachment of a security interest in the security interest, mortgage, or other lien.
+(8) The attachment of a security interest in a securities account is also attachment of a security interest in the security entitlements carried in the securities account.
+(9) The attachment of a security interest in a commodity account is also attachment of a security interest in the commodity contracts carried in the commodity account.
+(10) A security interest in an account consisting of a right to payment of a monetary obligation for the sale of real property that is the debtor’s homestead under the laws of this state is not enforceable unless:
+(a) The description of the account in the security agreement conspicuously states that the collateral includes the debtor’s right to payment of a monetary obligation for the sale of real property;
+(b) The description of the account in the security agreement includes a legal description of the real property;
+(c) The description of the account in the security agreement conspicuously states that the real property is the debtor’s homestead; and
+(d) The security agreement is also signed by the debtor’s spouse, if the debtor is married; if the debtor’s spouse is incompetent, then the method of signature by the debtor’s spouse is the same as provided by the laws of this state, other than this chapter, which apply to the alienation or encumbrance of homestead property by an incompetent person.
+History.—s. 2, ch. 2001-198; s. 3, ch. 2002-242; s. 59, ch. 2010-131; s. 75, ch. 2025-92.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/679.509
+RETRIEVED UTC: 2026-09-13T09:28:43.066780+00:00
+RAW RESPONSE SHA256: 4438f8e7cc4900baf018fbfcffb0d441eefeaa846e8721d8268d08e4177d54b1
+EDITION: 2026 Florida Statutes
+
+F.S. 679.509
+679.509 Persons entitled to file a record.—
+(1) A person may file an initial financing statement, amendment that adds collateral covered by a financing statement, or amendment that adds a debtor to a financing statement only if:
+(a) The debtor authorizes the filing in a signed record or pursuant to subsection (2) or subsection (3); or
+(b) The person holds an agricultural lien that has become effective at the time of filing and the financing statement covers only collateral in which the person holds an agricultural lien.
+(2) By signing or becoming bound as a debtor by a security agreement, a debtor or new debtor authorizes the filing of an initial financing statement, and an amendment, covering:
+(a) The collateral described in the security agreement; and
+(b) Property that becomes collateral under s. 679.3151(1)(b), whether or not the security agreement expressly covers proceeds.
+(3) A person may file an amendment other than an amendment that adds collateral covered by a financing statement or an amendment that adds a debtor to a financing statement only if:
+(a) The secured party of record authorizes the filing; or
+(b) The amendment is a termination statement for a financing statement as to which the secured party of record has failed to file or send a termination statement as required by s. 679.513(1) or (3), the debtor authorizes the filing, and the termination statement indicates that the debtor authorized it to be filed.
+(4) If there is more than one secured party of record for a financing statement, each secured party of record may authorize the filing of an amendment under subsection (3).
+(5) By acquiring collateral in which a security interest or agricultural lien continues under s. 679.3151(1), a debtor authorizes the filing of an initial financing, and an amendment, covering the collateral and property that become collateral under s. 679.3151(1)(b).
+History.—s. 6, ch. 2001-198; s. 1, ch. 2003-134; s. 103, ch. 2025-92.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/679.602
+RETRIEVED UTC: 2026-09-13T09:26:08.195295+00:00
+RAW RESPONSE SHA256: aeb10cefc162935e0faa3fab2a06e4376034eed0f34fb8392788b3b948af9e52
+EDITION: 2026 Florida Statutes
+
+F.S. 679.602
+679.602 Waiver and variance of rights and duties.—Except as otherwise provided in s. 679.624, to the extent that they give rights to a debtor or obligor and impose duties on a secured party, the debtor or obligor may not waive or vary the rules stated in the following listed sections:
+(1) Section 679.2071(2)(d)3., which deals with use and operation of the collateral by the secured party;
+(2) Section 679.210, which deals with requests for an accounting and requests concerning a list of collateral and statement of account;
+(3) Section 679.607(3), which deals with collection and enforcement of collateral;
+(4) Sections 679.608(1) and 679.615(3) to the extent that they deal with application or payment of noncash proceeds of collection, enforcement, or disposition;
+(5) Sections 679.608(1) and 679.615(4) to the extent that they require accounting for or payment of surplus proceeds of collateral;
+(6) Section 679.609 to the extent that it imposes upon a secured party that takes possession of collateral without judicial process the duty to do so without breach of the peace;
+(7) Sections 679.610(2), 679.611, 679.613, and 679.614, which deal with disposition of collateral;
+(8) Section 679.615(6), which deals with calculation of a deficiency or surplus when a disposition is made to the secured party, a person related to the secured party, or a secondary obligor;
+(9) Section 679.616, which deals with explanation of the calculation of a surplus or deficiency;
+(10) Sections 679.620, 679.621, and 679.622, which deal with acceptance of collateral in satisfaction of obligation;
+(11) Section 679.623, which deals with redemption of collateral;
+(12) Section 679.624, which deals with permissible waivers; and
+(13) Sections 679.625 and 679.626, which deal with the secured party’s liability for failure to comply with this article.
+History.—s. 7, ch. 2001-198; s. 160, ch. 2025-92.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/679.609
+RETRIEVED UTC: 2026-09-13T09:26:08.235788+00:00
+RAW RESPONSE SHA256: f3a664dfcb6238a92bb5b008f93d437dad32b3ba1b97bad4129a2848be7565f8
+EDITION: 2026 Florida Statutes
+
+F.S. 679.609
+679.609 Secured party’s right to take possession after default.—
+(1) After default, a secured party:
+(a) May take possession of the collateral; and
+(b) Without removal, may render equipment unusable and dispose of collateral on a debtor’s premises under s. 679.610.
+(2) A secured party may proceed under subsection (1):
+(a) Pursuant to judicial process; or
+(b) Without judicial process, if it proceeds without breach of the peace.
+(3) If so agreed, and in any event after default, a secured party may require the debtor to assemble the collateral and make it available to the secured party at a place to be designated by the secured party which is reasonably convenient to both parties.
+History.—s. 7, ch. 2001-198.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/680.214
+RETRIEVED UTC: 2026-09-13T09:26:08.463489+00:00
+RAW RESPONSE SHA256: 46fa2ef1d9046df0a9f755306a08c0702dab6a9035309dd28a45a01b7cb5c2dd
+EDITION: 2026 Florida Statutes
+
+F.S. 680.214
+680.214 Exclusion or modification of warranties.—
+(1) Words or conduct relevant to the creation of an express warranty and words or conduct tending to negate or limit a warranty must be construed wherever reasonable as consistent with each other; but, subject to the provisions of s. 680.202 on parol or extrinsic evidence, negation or limitation is inoperative to the extent that the construction is unreasonable.
+(2) Subject to subsection (3), to exclude or modify the implied warranty of merchantability or any part of it, the language must mention “merchantability,” be by a writing, and be conspicuous. Subject to subsection (3), to exclude or modify any implied warranty of fitness, the exclusion must be by a writing and be conspicuous. Language to exclude all implied warranties of fitness is sufficient if it is in writing, is conspicuous, and states, for example, “There is no warranty that the goods will be fit for a particular purpose.”
+(3) Notwithstanding subsection (2), but subject to subsection (4):
+(a) Unless the circumstances indicate otherwise, all implied warranties are excluded by expressions like “as is” or “with all faults” or by other language that in common understanding calls the lessee’s attention to the exclusion of warranties and makes plain that there is no implied warranty, if in writing and conspicuous.
+(b) If the lessee before entering into the lease contract has examined the goods or the sample or model as fully as desired or has refused to examine the goods, there is no implied warranty with regard to defects that an examination ought in the circumstances to have revealed.
+(c) An implied warranty may also be excluded or modified by course of dealing, course of performance, or usage of trade.
+(4) To exclude or modify a warranty against interference or against infringement (s. 680.211) or any part of it, the language must be specific, be by a writing, and be conspicuous, unless the circumstances, including course of performance, course of dealing, or usage of trade, give the lessee reason to know that the goods are being leased subject to a claim or interest of any person.
+History.—s. 1, ch. 90-278.
+
+---
+
+SOURCE: https://www.flsenate.gov/Laws/Statutes/2026/680.504
+RETRIEVED UTC: 2026-09-13T09:26:08.591516+00:00
+RAW RESPONSE SHA256: 6a76c99e00121023fc37275c55c6724d13d532f2a1b750071a801a8c5ddc6f95
+EDITION: 2026 Florida Statutes
+
+F.S. 680.504
+680.504 Liquidation of damages.—
+(1) Damages payable by either party for default or any other act or omission, including indemnity for loss or diminution of anticipated tax benefits or loss or damage to lessor’s residual interest, may be liquidated in the lease agreement but only at an amount or by a formula that is reasonable in light of the then-anticipated harm caused by the default or other act or omission.
+(2) If the lease agreement provides for liquidation of damages, and such provision does not comply with subsection (1), or such provision is an exclusive or limited remedy that circumstances cause to fail of its essential purpose, remedy may be had as provided in this chapter.
+(3) If the lessor justifiably withholds or stops delivery of goods because of the lessee’s default or insolvency (s. 680.525 or s. 680.526), the lessee is entitled to restitution of any amount by which the sum of his or her payments exceeds:
+(a) The amount to which the lessor is entitled by virtue of terms liquidating the lessor’s damages in accordance with subsection (1); or
+(b) In the absence of those terms, 20 percent of the then-present value of the total rent the lessee was obligated to pay for the balance of the lease term, or, in the case of a consumer lease, the lesser of such amount or $500.
+(4) A lessee’s right to restitution under subsection (3) is subject to offset to the extent the lessor establishes:
+(a) A right to recover damages under the provisions of this chapter other than subsection (1).
+(b) The amount or value of any benefits received by the lessee directly or indirectly by reason of the lease contract.
+History.—s. 1, ch. 90-278; s. 716, ch. 97-102.

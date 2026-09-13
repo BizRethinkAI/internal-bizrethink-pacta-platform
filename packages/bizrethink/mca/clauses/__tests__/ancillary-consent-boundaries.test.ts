@@ -222,13 +222,13 @@ it('retains all fourteen revised records as unapproved drafts at a new version',
 
   for (const clause of revised) {
     expect(clause.version, clause.slug).toBe(
-      [
-        'permission-to-release.preamble',
-        'equipment-lease.credit-reporting-authorization',
-        'subscription.credit-reporting-authorization',
-      ].includes(clause.slug)
-        ? 3
-        : 2,
+      clause.slug === 'permission-to-release.preamble'
+        ? 4
+        : ['equipment-lease.credit-reporting-authorization', 'subscription.credit-reporting-authorization'].includes(
+              clause.slug,
+            )
+          ? 3
+          : 2,
     );
     expect(clause.status).toBe('draft');
     expect(clause.source).toEqual({ kind: 'attorney-drafted', author: null });

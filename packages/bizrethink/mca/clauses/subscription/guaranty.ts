@@ -4,7 +4,7 @@ import type { McaClause } from '../types';
  * Draft equipment terms include the coordinated MCA-R08–R12 correction and
  * the transaction-scoped report/contact/signature corrections from PR #194.
  * Source documents remain historical evidence. All changed versions require
- * fresh approval; current reusable guarantor fields remain in their catalogue.
+ * fresh approval before publication.
  */
 export const SUBSCRIPTION_GUARANTY: McaClause[] = [
   {

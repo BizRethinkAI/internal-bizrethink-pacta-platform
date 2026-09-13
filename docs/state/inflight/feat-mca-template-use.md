@@ -5,6 +5,28 @@ Branch `feat/mca-template-use`, based on #210
 `43ba44da92ef3cda4cd08efc1a357b80a08ef2b3`. Only this note is owned.
 Implementation ready for PR CI; independent review and merge remain outstanding.
 
+## Main integration refresh
+
+Refreshed parent #210 at `55552c0319f65604373b06fc23b980597d42c232` incorporates
+main `a2e0719fc38d988f489234b564095ef46307c05f`, including now-merged #194.
+The conflict resolution retains this PR's semantic notice/report bindings. Each
+conflicting body was compared with incoming consent text after only the known
+placeholder substitutions; no consent restriction was dropped or rewritten.
+The README retains the current catalogue and merged processor-form history.
+
+The parent now distinguishes the mapped Permission to Release preamble from
+#194's later wording at version 3. This PR's further semantic binding change
+therefore advances that record to version 4. A focused regression first rejected
+the old version; the exact-version assertion still pins the two equipment report
+clauses at 3 and the other eleven ancillary records at 2. Historical extraction
+evidence remains unchanged. Full refreshed CI and handoff belong on PR #212 /
+task #211; prior-head green results do not stand in for the new head.
+The affected template, transaction/PDF, extraction, consent and approval checks
+pass eleven files / 362 tests. AST comparison confirms existing clause/reusable
+body text is unchanged; template, transaction and reusable implementation files
+also match the pre-refresh head. The existing rendered-PDF visual evidence
+therefore remains applicable; current real PDF checks still execute locally.
+
 ## Result and boundaries
 
 A current saved provider recipe opens a stateless transaction interview,

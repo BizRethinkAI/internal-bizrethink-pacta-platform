@@ -1,0 +1,509 @@
+METHOD: Web-tool extraction observed 2026-09-13. Tool L-numbers are extraction-window lines, not publisher line numbers. Not a raw HTTP response or a complete capture of every linked page.
+
+NYS Open Legislation | NYSenate.gov (https://www.nysenate.gov/legislation/laws/FIS/801)
+L0: Sorry, you need to enable JavaScript to visit this website.
+L1:
+L2: The New York State Senate L3:
+L4: get involved login L5:
+L6: ## Search
+L7:
+L8: [Input: Search]
+L9:
+L10: Search Advanced Legislation Search [Input] [Input]
+L11:
+L12: Advanced Legislation Search L13:
+L14:   * News & Issues L15:   * Senators & Committees L16:   * Bills & Laws L17:   * Events L18:   * About The Senate L19: [Button: open and focus search]
+L20:
+L21: login L22:
+L23: ## Search
+L24:
+L25: [Input: Search]
+L26:
+L27: Search Advanced Legislation Search [Input] [Input]
+L28: ## Find your Senator and share your views on important issues.
+L29:
+L30: find your senator L31:
+L32: # Legislation
+L33:
+L34: ### Search OpenLegislation Statutes
+L35:
+L36: Search Term [Input]
+L37:
+L38: Search
+L39:
+L40: [Input] [Input]
+L41:
+L42: Viewing most recent revision (from 2022-01-07)
+L43:
+L44: View historical revision as of: [Select]
+L45:
+L46: [Input] [Input]
+L47:
+L48: ## SECTION 801
+L49:
+L50: ### Definitions
+L51: #### Financial Services Law (FIS) CHAPTER 18-A, ARTICLE 8
+L52: § 801. Definitions. For the purposes of this article:
+L53: (a) "Factoring transaction" means an accounts receivable purchase
+L54: transaction that includes an agreement to purchase, transfer, or sell a
+L55: legally enforceable claim for payment held by a recipient for goods the
+L56: recipient has supplied or services the recipient has rendered that have
+L57: been ordered but for which payment has not yet been made.
+L58: (b) "Commercial financing" means open-end financing, closed-end
+L59: financing, sales-based financing, factoring transaction, or other form
+L60: of financing, the proceeds of which the recipient does not intend to use
+L61: primarily for personal, family or household purposes. For purposes of
+L62: determining whether a financing is a commercial financing, the provider
+L63: may rely on any statement of intended purposes by the recipient. The
+L64: statement may be a separate statement signed by the recipient; may be
+L65: contained in the financing application, financing agreement, or other
+L66: document signed or consented to by the recipient; or may be provided
+L67: orally by the recipient so long as it is documented in the recipient's
+L68: application file by the provider. Electronic signatures and consents are
+L69: valid for purposes of the foregoing sentence. The provider shall not be
+L70: required to ascertain that the proceeds of a commercial financing are
+L71: used in accordance with the recipient's statement of intended purposes.
+L72: (c) "Open-end financing" means an agreement for one or more extensions
+L73: of open-end credit, secured or unsecured, the proceeds of which the
+L74: recipient does not intend to use primarily for personal, family or
+L75: household purposes. "Open-end financing" includes credit extended by a
+L76: provider under a plan in which: (i) the provider reasonably contemplates
+L77: repeated transactions; (ii) the provider may impose a finance charge
+L78: from time to time on an outstanding unpaid balance; and (iii) the amount
+L79: of credit that may be extended to the recipient during the term of the
+L80: plan (up to any limit set by the provider) is generally made available
+L81: to the extent that any outstanding balance is repaid.
+L82: (d) "Closed-end financing" means a closed-end extension of credit,
+L83: secured or unsecured, including equipment financing that does not meet
+L84: the definition of a lease under section 2-A-103 of the uniform
+L85: commercial code, the proceeds of which the recipient does not intend to
+L86: use primarily for personal, family or household purposes. "Closed-end
+L87: financing" includes financing with an established principal amount and
+L88: duration.
+L89: (e) "Finance charge" means the cost of financing as a dollar amount.
+L90: It includes any charge payable directly or indirectly by the recipient
+L91: and imposed directly or indirectly by the provider as an incident to or
+L92: a condition of the extension of financing. It includes all charges that
+L93: would be included under 12 C.F.R. part 1026.4 as if the transaction were
+L94: subject to 12 C.F.R. part 1026.4. In addition, the finance charge shall
+L95: include any charges as determined by the superintendent. For the
+L96: purposes of an open-end financing, the finance charge shall assume the
+L97: maximum amount of credit available to the recipient, in each case, is
+L98: drawn and held for the duration of the term or draw period. For the
+L99: purposes of a factoring transaction, the finance charge includes the
+L100: discount taken on the face value of the accounts receivable.
+L101: (f) "Financial institution" means any of the following: (i) a bank,
+L102: trust company, or industrial loan company doing business under the
+L103: authority of, or in accordance with, a license, certificate or charter
+L104: issued by the United States, this state or any other state, district,
+L105: territory, or commonwealth of the United States that is authorized to
+L106: transact business in this state; (ii) a federally chartered savings and
+L107: loan association, federal savings bank or federal credit union that is
+L108: authorized to transact business in this state; or (iii) a savings and
+L109: loan association, savings bank or credit union organized under the laws
+L110: of this or any other state that is authorized to transact business in
+L111: this state.
+L112: (g) "Person" means an individual, corporation, partnership, limited
+L113: liability company, joint venture, association, joint stock company,
+L114: trust or unincorporated organization including, but not limited to, a
+L115: sole proprietorship.
+L116: (h) "Provider" means a person who extends a specific offer of
+L117: commercial financing to a recipient. Unless otherwise exempt, "provider"
+L118: also includes a person who solicits and presents specific offers of
+L119: commercial financing on behalf of a third party. For the avoidance of
+L120: doubt, the extension of a specific offer or provision of disclosures for
+L121: a commercial financing, in and of itself, shall not be construed to mean
+L122: that a provider is originating, making, funding or providing commercial
+L123: financing.
+L124: (i) "Recipient" means a person who applies for commercial financing
+L125: and is made a specific offer of commercial financing by a provider. A
+L126: recipient may also be an authorized representative of such person. A
+L127: person acting as a broker cannot be a recipient.
+L128: (j) "Sales-based financing" means a transaction that is repaid by the
+L129: recipient to the provider, over time, as a percentage of sales or
+L130: revenue, in which the payment amount may increase or decrease according
+L131: to the volume of sales made or revenue received by the recipient.
+L132: Sales-based financing also includes a true-up mechanism where the
+L133: financing is repaid as a fixed payment but provides for a reconciliation
+L134: process that adjusts the payment to an amount that is a percentage of
+L135: sales or revenue.
+L136: (k) "Specific offer" means the specific terms of commercial financing,
+L137: including price or amount, that is quoted to a recipient, based on
+L138: information obtained from, or about the recipient, which, if accepted by
+L139: a recipient, shall be binding on the provider, as applicable, subject to
+L140: any specific requirements stated in such terms.
+--------------------------------------------------------------------------------
+NYS Open Legislation | NYSenate.gov (https://www.nysenate.gov/legislation/laws/FIS/802)
+L0: Sorry, you need to enable JavaScript to visit this website.
+L1:
+L2: The New York State Senate L3:
+L4: get involved login L5:
+L6: ## Search
+L7:
+L8: [Input: Search]
+L9:
+L10: Search Advanced Legislation Search [Input] [Input]
+L11:
+L12: Advanced Legislation Search L13:
+L14:   * News & Issues L15:   * Senators & Committees L16:   * Bills & Laws L17:   * Events L18:   * About The Senate L19: [Button: open and focus search]
+L20:
+L21: login L22:
+L23: ## Search
+L24:
+L25: [Input: Search]
+L26:
+L27: Search Advanced Legislation Search [Input] [Input]
+L28: ## Find your Senator and share your views on important issues.
+L29:
+L30: find your senator L31:
+L32: # Legislation
+L33:
+L34: ### Search OpenLegislation Statutes
+L35:
+L36: Search Term [Input]
+L37:
+L38: Search
+L39:
+L40: [Input] [Input]
+L41:
+L42: Viewing most recent revision (from 2022-01-07)
+L43:
+L44: View historical revision as of: [Select]
+L45:
+L46: [Input] [Input]
+L47:
+L48: ## SECTION 802
+L49:
+L50: ### Exemptions
+L51: #### Financial Services Law (FIS) CHAPTER 18-A, ARTICLE 8
+L52: § 802. Exemptions. This article shall not apply to, and shall not
+L53: place any additional requirements or obligations upon, any of the
+L54: following:
+L55: (a) a financial institution;
+L56: (b) a person acting in its capacity as a technology services provider,
+L57: such as licensing software and providing support services, to an entity
+L58: exempt under this section for use as part of the exempt entity's
+L59: commercial financing program, provided such person has no interest, or
+L60: arrangement or agreement to purchase any interest in the commercial
+L61: financing extended by the exempt entity in connection with such program;
+L62: (c) a lender regulated under the federal Farm Credit Act (12 U.S.C.
+L63: Sec. 2001 et seq.);
+L64: (d) a commercial financing transaction secured by real property;
+L65: (e) a lease as defined in section 2-A-103 of the uniform commercial
+L66: code;
+L67: (f) any person or provider who makes no more than five commercial
+L68: financing transactions in this state in a twelve-month period;
+L69: (g) an individual commercial financing transaction in an amount over
+L70: two million five hundred thousand dollars; or
+L71: (h) a commercial financing transaction in which the recipient is a
+L72: dealer as defined in section four hundred fifteen of the vehicle and
+L73: traffic law, or an affiliate of such a dealer, or a rental vehicle
+L74: company as defined in section three hundred ninety-six-z of the general
+L75: business law, or an affiliate of such a company pursuant to a commercial
+L76: financing agreement or commercial open-end credit plan of at least fifty
+L77: thousand dollars, including any commercial loan made pursuant to such a
+L78: commercial financing transaction.
+--------------------------------------------------------------------------------
+NYS Open Legislation | NYSenate.gov (https://www.nysenate.gov/legislation/laws/FIS/803)
+L0: Sorry, you need to enable JavaScript to visit this website.
+L1:
+L2: The New York State Senate L3:
+L4: get involved login L5:
+L6: ## Search
+L7:
+L8: [Input: Search]
+L9:
+L10: Search Advanced Legislation Search [Input] [Input]
+L11:
+L12: Advanced Legislation Search L13:
+L14:   * News & Issues L15:   * Senators & Committees L16:   * Bills & Laws L17:   * Events L18:   * About The Senate L19: [Button: open and focus search]
+L20:
+L21: login L22:
+L23: ## Search
+L24:
+L25: [Input: Search]
+L26:
+L27: Search Advanced Legislation Search [Input] [Input]
+L28: ## Find your Senator and share your views on important issues.
+L29:
+L30: find your senator L31:
+L32: # Legislation
+L33:
+L34: ### Search OpenLegislation Statutes
+L35:
+L36: Search Term [Input]
+L37:
+L38: Search
+L39:
+L40: [Input] [Input]
+L41:
+L42: * Closed-end commercial financing disclosure requirements L43:
+L44: Viewing most recent revision (from 2022-01-07)
+L45:
+L46: View historical revision as of: [Select]
+L47:
+L48: [Input] [Input]
+L49:
+L50: ## SECTION 803
+L51:
+L52: ### Sales-based financing disclosure requirements
+L53: #### Financial Services Law (FIS) CHAPTER 18-A, ARTICLE 8
+L54: § 803. Sales-based financing disclosure requirements. A provider
+L55: subject to this article shall provide the following disclosures to a
+L56: recipient at the time of extending a specific offer of sales-based
+L57: financing according to formatting prescribed by the superintendent:
+L58: (a) The total amount of the commercial financing, and the disbursement
+L59: amount, if different from the financing amount, after any fees deducted
+L60: or withheld at disbursement.
+L61: (b) The finance charge.
+L62: (c) The estimated annual percentage rate, using the words annual
+L63: percentage rate or the abbreviation "APR", expressed as a yearly rate,
+L64: inclusive of any fees and finance charges, and calculated in accordance
+L65: with the federal Truth in Lending Act, Regulation Z, 12 C.F.R. §
+L66: 1026.22, based on the estimated term of repayment and the projected
+L67: periodic payment amounts, regardless of whether such act or such
+L68: regulation would require such a calculation. The estimated term of
+L69: repayment and the projected periodic payment amounts shall be calculated
+L70: based on the projection of the recipient's sales, called the projected
+L71: sales volume. The projected sales volume may be calculated using the
+L72: historical method or the opt-in method. The provider shall provide
+L73: notice to the superintendent on which method they intend to use across
+L74: all instances of sales-based financing offered in calculating estimated
+L75: annual percentage rate pursuant to this section.
+L76: (i) The provider using the historical method shall use an average
+L77: historical volume of sales or revenue by which the financing's payment
+L78: amounts are based and the estimated annual percentage rate is
+L79: calculated. The provider shall fix the historical time period used to
+L80: calculate the average historical volume and use such period for all
+L81: disclosure purposes for all sales-based financing products offered. The
+L82: fixed historical time period shall either be the preceding time period
+L83: from the specific offer or, alternatively, the provider may use average
+L84: sales for the same number of months with the highest sales volume within
+L85: the past twelve months. The fixed historical time period shall be no
+L86: less than one month and not exceed twelve months.
+L87: (ii) The provider using the opt-in method shall determine the
+L88: estimated annual percentage rate, the estimated term, and the projected
+L89: payments, using a projected sales volume that the provider elects for
+L90: each disclosure, provided, that they participate in a review process
+L91: prescribed by the superintendent. A provider shall, on an annual basis,
+L92: report data to the superintendent of estimated annual percentage rates
+L93: disclosed to the recipient and actual retrospective annual percentage
+L94: rates of completed transactions. The report shall contain such
+L95: information as the superintendent, by rule or regulation, may prescribe
+L96: as necessary or appropriate for the purpose of making a determination of
+L97: whether the deviation between the estimated annual percentage rate and
+L98: actual retrospective annual percentage rates of completed transactions
+L99: was reasonable. The superintendent shall establish the method of
+L100: reporting and may, upon a finding that the use of projected sales volume
+L101: by the provider has resulted in an unacceptable deviation between
+L102: estimated and actual annual percentage rate, require the provider to use
+L103: the historical method. The superintendent may consider unusual and
+L104: extraordinary circumstances impacting the provider's deviation between
+L105: estimated and actual annual percentage rate in the determination of such
+L106: finding.
+L107: (d) The total repayment amount, which is the disbursement amount plus
+L108: the finance charge.
+L109: (e) The estimated term is the period of time required for the periodic
+L110: payments, based on the projected sales volume, to equal the total amount
+L111: required to be repaid.
+L112: (f) The payment amounts, based on the projected sales volume:
+L113: (i) for payment amounts that are fixed, the payment amounts and
+L114: frequency (e.g., daily, weekly, monthly), and, if the payment frequency
+L115: is other than monthly, the amount of the average projected payments per
+L116: month; or
+L117: (ii) for payment amounts that are variable, a payment schedule or a
+L118: description of the method used to calculate the amounts and frequency of
+L119: payments, and the amount of the average projected payments per month.
+L120: (g) A description of all other potential fees and charges not included
+L121: in the finance charge, including, but not limited to, draw fees, late
+L122: payment fees, and returned payment fees.
+L123: (h) Were the recipient to elect to pay off or refinance the commercial
+L124: financing prior to full repayment, the provider must disclose:
+L125: (i) whether the recipient would be required to pay any finance charges
+L126: other than interest accrued since their last payment. If so, disclosure
+L127: of the percentage of any unpaid portion of the finance charge and
+L128: maximum dollar amount the recipient could be required to pay; and
+L129: (ii) whether the recipient would be required to pay any additional
+L130: fees not already included in the finance charge.
+L131: (i) A description of collateral requirements or security interests, if
+L132: any.
+--------------------------------------------------------------------------------
+NYS Open Legislation | NYSenate.gov (https://www.nysenate.gov/legislation/laws/FIS/808)
+L0: Sorry, you need to enable JavaScript to visit this website.
+L1:
+L2: The New York State Senate L3:
+L4: get involved login L5:
+L6: ## Search
+L7:
+L8: [Input: Search]
+L9:
+L10: Search Advanced Legislation Search [Input] [Input]
+L11:
+L12: Advanced Legislation Search L13:
+L14:   * News & Issues L15:   * Senators & Committees L16:   * Bills & Laws L17:   * Events L18:   * About The Senate L19: [Button: open and focus search]
+L20:
+L21: login L22:
+L23: ## Search
+L24:
+L25: [Input: Search]
+L26:
+L27: Search Advanced Legislation Search [Input] [Input]
+L28: ## Find your Senator and share your views on important issues.
+L29:
+L30: find your senator L31:
+L32: # Legislation
+L33:
+L34: ### Search OpenLegislation Statutes
+L35:
+L36: Search Term [Input]
+L37:
+L38: Search
+L39:
+L40: [Input] [Input]
+L41:
+L42: Viewing most recent revision (from 2022-01-07)
+L43:
+L44: View historical revision as of: [Select]
+L45:
+L46: [Input] [Input]
+L47:
+L48: ## SECTION 808
+L49:
+L50: ### Disclosure requirements for renewal financing
+L51: #### Financial Services Law (FIS) CHAPTER 18-A, ARTICLE 8
+L52: § 808. Disclosure requirements for renewal financing. If, as a
+L53: condition of obtaining the commercial financing, the provider requires
+L54: the recipient to pay off the balance of an existing commercial financing
+L55: from the same provider, the provider must disclose:
+L56: (a) The amount of the new commercial financing that is used to pay off
+L57: the portion of the existing commercial financing that consists of
+L58: prepayment charges required to be paid and any unpaid interest expense
+L59: that was not forgiven at the time of renewal. For financing for which
+L60: the total repayment amount is calculated as a fixed amount, the
+L61: prepayment charge is equal to the original finance charge multiplied by
+L62: the amount of the renewal used to pay off existing financing as a
+L63: percentage of the total repayment amount, minus any portion of the total
+L64: repayment amount forgiven by the provider at the time of prepayment. If
+L65: the amount is more than zero, such amount shall be the answer to the
+L66: following question:
+L67: "Does the renewal financing include any amount that is used to pay
+L68: unpaid finance charge or fees, also known as double dipping? Yes, {enter
+L69: amount}. If the amount is zero, the answer would be No."
+L70: (b) If the disbursement amount will be reduced to pay down any unpaid
+L71: portion of the outstanding balance, the actual dollar amount by which
+L72: such disbursement amount will be reduced.
+--------------------------------------------------------------------------------
+NYS Open Legislation | NYSenate.gov (https://www.nysenate.gov/legislation/laws/FIS/809)
+L0: Sorry, you need to enable JavaScript to visit this website.
+L1:
+L2: The New York State Senate L3:
+L4: get involved login L5:
+L6: ## Search
+L7:
+L8: [Input: Search]
+L9:
+L10: Search Advanced Legislation Search [Input] [Input]
+L11:
+L12: Advanced Legislation Search L13:
+L14:   * News & Issues L15:   * Senators & Committees L16:   * Bills & Laws L17:   * Events L18:   * About The Senate L19: [Button: open and focus search]
+L20:
+L21: login L22:
+L23: ## Search
+L24:
+L25: [Input: Search]
+L26:
+L27: Search Advanced Legislation Search [Input] [Input]
+L28: ## Find your Senator and share your views on important issues.
+L29:
+L30: find your senator L31:
+L32: # Legislation
+L33:
+L34: ### Search OpenLegislation Statutes
+L35:
+L36: Search Term [Input]
+L37:
+L38: Search
+L39:
+L40: [Input] [Input]
+L41:
+L42: Viewing most recent revision (from 2022-01-07)
+L43:
+L44: View historical revision as of: [Select]
+L45:
+L46: [Input] [Input]
+L47:
+L48: ## SECTION 809
+L49:
+L50: ### Required signature
+L51: #### Financial Services Law (FIS) CHAPTER 18-A, ARTICLE 8
+L52:
+L53: § 809. Required signature. The provider shall obtain the recipient's
+L54: signature, which may be fulfilled by an electronic signature, on all
+L55: disclosures required to be presented to the recipient by this article
+L56: before authorizing the recipient to proceed further with the commercial
+L57: financing transaction application.
+--------------------------------------------------------------------------------
+NYS Open Legislation | NYSenate.gov (https://www.nysenate.gov/legislation/laws/GOB/5-903)
+L0: Sorry, you need to enable JavaScript to visit this website.
+L1:
+L2: The New York State Senate L3:
+L4: get involved login L5:
+L6: ## Search
+L7:
+L8: [Input: Search]
+L9:
+L10: Search Advanced Legislation Search [Input] [Input]
+L11:
+L12: Advanced Legislation Search L13:
+L14:   * News & Issues L15:   * Senators & Committees L16:   * Bills & Laws L17:   * Events L18:   * About The Senate L19: [Button: open and focus search]
+L20:
+L21: login L22:
+L23: ## Search
+L24:
+L25: [Input: Search]
+L26:
+L27: Search Advanced Legislation Search [Input] [Input]
+L28: ## Find your Senator and share your views on important issues.
+L29:
+L30: find your senator L31:
+L32: # Legislation
+L33: ### Search OpenLegislation Statutes
+L34:
+L35: Search Term [Input]
+L36:
+L37: Search
+L38:
+L39: [Input] [Input]
+L40:
+L41: * Certain provisions of leases of personal property inoperative unless notice thereof given to lessee L42:
+L43: * Requirements of Notice For Effectiveness or Enforceability L44:
+L45: * Certain provisions of leases to be inoperative unless express notice thereof is given to tenant L46:
+L47: Viewing most recent revision (from 2014-09-22)
+L48:
+L49: View historical revision as of: [Select]
+L50:
+L51: [Input] [Input]
+L52:
+L53: ## SECTION 5-903
+L54: ### Automatic renewal provision of contract for service, maintenance or repair unenforceable by contractor unless notice thereof given to rec...
+L55: #### General Obligations (GOB) CHAPTER 24-A, ARTICLE 5, TITLE 9
+L56: § 5-903. Automatic renewal provision of contract for service,
+L57: maintenance or repair unenforceable by contractor unless notice thereof
+L58: given to recipient of services. 1. As used in this section, "person"
+L59: means an individual, firm, company, partnership or corporation.
+L60: 2. No provision of a contract for service, maintenance or repair to or
+L61: for any real or personal property which states that the term of the
+L62: contract shall be deemed renewed for a specified additional period
+L63: unless the person receiving the service, maintenance or repair gives
+L64: notice to the person furnishing such contract service, maintenance or
+L65: repair of his intention to terminate the contract at the expiration of
+L66: such term, shall be enforceable against the person receiving the
+L67: service, maintenance or repair, unless the person furnishing the
+L68: service, maintenance or repair, at least fifteen days and not more than
+L69: thirty days previous to the time specified for serving such notice upon
+L70: him, shall give to the person receiving the service, maintenance or
+L71: repair written notice, served personally or by certified mail, calling
+L72: the attention of that person to the existence of such provision in the
+L73: contract.
+L74: 3. Nothing herein contained shall be construed to apply to a contract
+L75: in which the automatic renewal period specified is one month or less.

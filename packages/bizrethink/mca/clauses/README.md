@@ -6,7 +6,7 @@ structural blocks and interview guidance. `../content/` and `../prescribed/`
 hold disclosure requirements and prescribed forms; their verification view stays
 read-only. Shared navigation and evidence services do not grant authority to
 approve a regulator's words. This implements the accepted
-[unified workspace design (#200)](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/200).
+[unified workspace design (ADR 0015)](../../../../docs/adr/0015-one-mca-workspace-with-separate-content-catalogues.md).
 
 [ADR 0009](../../../../docs/adr/0009-counsel-is-parallel-not-a-gate.md) is why
 the directory exists at all right now. Counsel is a parallel track, not a
@@ -71,10 +71,10 @@ determine an agreed, workable resolution; an FRPA priority clause alone is not
 evidence that a processor accepted it or can implement it. Do not treat the
 deferral as approval, a waiver, or permission to silently alter the form.
 
-The Permission to Release and both equipment agreements have a separate draft
-correction for individual report use, contact consent and signer capacity. The
-14 changed records advance to version 2 and remain unapproved; the total stays
-211. The [correction record](../../../../docs/research/mca-ancillary-consents-2026-09-12/README.md)
+Merged #194 corrected fourteen source records for individual report use, contact
+consent and signer capacity in the Permission to Release and equipment agreements.
+Those unapproved corrections are retained in the current catalogues; its historical
+211-record count predates the catalogue extraction above. The [correction record](../../../../docs/research/mca-ancillary-consents-2026-09-12/README.md)
 explains source verification, substantive choices and template/execution work
 still required. Historical source documents and review dispositions are preserved.
 
