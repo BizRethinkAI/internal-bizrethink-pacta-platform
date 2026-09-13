@@ -45,16 +45,17 @@ export const checkFormConformity = (form: PrescribedForm, rendered: RenderedRow[
       return;
     }
 
+    const prescribedLabel = row.labelSuffix === undefined ? row.label : `${row.label} ${row.labelSuffix}`;
     const labelOk =
       form.labelMatch === 'contains'
-        ? norm(actual.label).includes(norm(row.label))
-        : norm(actual.label) === norm(row.label);
+        ? norm(actual.label).includes(norm(prescribedLabel))
+        : norm(actual.label) === norm(prescribedLabel);
 
     if (!labelOk) {
       out.push({
         kind: 'label',
         row: i,
-        detail: `row ${i}: prescribed label is ${JSON.stringify(row.label)}, form has ${JSON.stringify(actual.label)}`,
+        detail: `row ${i}: prescribed label is ${JSON.stringify(prescribedLabel)}, form has ${JSON.stringify(actual.label)}`,
       });
     }
 
@@ -144,6 +145,15 @@ export const checkAgainstSource = (form: PrescribedForm, sourceText: string): Di
         kind: 'not-in-source',
         row: i,
         detail: `row ${i}: label ${JSON.stringify(row.label)} does not appear in ${form.sourceFile}`,
+      });
+    }
+
+    // A bracketed formula is literal text, not one of asPattern's fill-in slots.
+    if (row.labelSuffix !== undefined && !source.includes(norm(row.labelSuffix))) {
+      missing.push({
+        kind: 'not-in-source',
+        row: i,
+        detail: `row ${i}: label text ${JSON.stringify(row.labelSuffix)} does not appear in ${form.sourceFile}`,
       });
     }
 

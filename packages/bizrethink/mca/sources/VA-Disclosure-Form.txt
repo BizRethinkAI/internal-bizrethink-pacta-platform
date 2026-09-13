@@ -1,25 +1,34 @@
-VIRGINIA — SALES-BASED FINANCING DISCLOSURE FORM
+VIRGINIA SCC — SALES-BASED FINANCING DISCLOSURE FORM
+Official version: Eff. 10/2022, two pages
 
-Vendored 2026-09-06 from lombard-contracts
-state-disclosures/regulatory-source/VA-Sales-Based-Financing-Disclosure-Form.pdf
-(reading-order pdftotext; the -layout companion is beside this file).
+Publisher: Virginia State Corporation Commission, Bureau of Financial Institutions
+Site: https://ris.dls.virginia.gov
+Retrieved from: https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf
+Retrieved at (UTC): 2026-09-12T08:42:05.055077+00:00
+PDF response SHA-256: 146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29
+Official link context: https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/
+Active layout authority: VA-Disclosure-Form.pdf (unmodified official PDF)
 
-ORIGINAL RETRIEVAL SOURCE UNRECORDED. Whoever first obtained this PDF did not
-write down where from, and this header does not invent one. The form itself
-carries no issuing letterhead, so provenance here rests on the document set it
-arrived with rather than on anything in the file.
+Republished from the source audit's independently retained official PDF and
+extractions. Both pages were visually inspected again on September 12, 2026.
+This replaces the mismatched local copy imported September 6 from
+lombard-contracts; its unknown original retrieval is not retroactively verified.
+The previous copy remains in Git history and the unchanged audit record.
 
-Weaker than every other source in this directory. Va. Code §§6.2-2228-2238 IS
-vendored from law.lis.virginia.gov and is primary; this form is the artefact
-the Code requires, not the Code.
+Retrieval and evidence hashes:
+docs/research/mca-source-audit-2026-09-12/manifest.json (va-form)
+Correction, layout observations and limits:
+docs/research/mca-virginia-form-correction-2026-09-12/README.md
+Extraction: pdftotext reading order; complete two-page text, only outer whitespace trimmed.
+This header is editorial. The source body below is not rewritten.
 
-------------------------------------------------------------------------------
+--- OFFICIAL FORM TEXT BEGINS ---
+
+Eff. 10/2022
 
 SALES-BASED FINANCING DISCLOSURE FORM
-Recipient’s Name:
-
-Disclosure Date
-Total Amount Financed
+Total Amount of the
+Sales-Based Financing
 
 $
 
@@ -32,45 +41,42 @@ Disbursement Amount
 
 $
 
-[Total Amount Financed minus (-) Fees
-Deducted or Withheld at Disbursement]
-
+Disclosure Date:
+Recipient’s Name:
 Recipient’s Address:
 
-Provider’s Name:
-Provider’s Address:
+[Total Amount of the Sales-Based Financing minus (-)
+Fees Deducted or Withheld at Disbursement]
 
 Finance Charge
 
 $
 
+Provider’s Name:
+
 Total Repayment Amount
 
 $
 
+Provider’s Address:
+
 [Disbursement Amount plus (+) Finance Charge]
 
-Provider’s Phone Number:
-
 Estimated Number of Payments
+[Number of payments expected, based on the projected
+sales volume, to equal the Total Repayment Amount]
+
+A reasonable range may be provided ONLY for
+transactions with a variable payment schedule.
+
+Provider’s Phone Number:
 Provider’s E-mail Address:
 
-[Number of payments expected, based
-on the projected sales volume, to equal
-the Total Repayment Amount]
-
-Payment
-Schedule
-
+Payment Schedule
 ☐ Amount of each fixed payment: $
 ☐ Frequency of fixed payments:
-
-☐ Fixed
-
-☐ Variable payment schedule, or ☐ Description of the method used to calculate the amount
-and frequency of each variable payment:
-
-☐ Variable
+☐ Variable payment schedule, or ☐ Description of the method used to calculate the amount and frequency of
+each variable payment:
 
 Method of payment:
 ☐ SEE PAGE 2
@@ -104,7 +110,9 @@ Signature
 _______________
 Date
 
-SALES-BASED FINANCING DISCLOSURE FORM - PAGE 2
+Eff. 10/2022
+
+SALES-BASED FINANCING DISCLOSURE FORM - PAGE 2
 Recipient’s Name:
 
 Disclosure Date:
@@ -122,11 +130,8 @@ The information provided below relates to the following checked item(s):
 ☐ Description of prepayment policies
 
 I acknowledge that I have received a copy of this disclosure form.
-
 _____________________
 Signature
 
 _______________
 Date
-
-

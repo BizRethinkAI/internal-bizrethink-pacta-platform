@@ -327,8 +327,8 @@ export const CT_VA_OBLIGATIONS: StatutoryObligation[] = [
     sourceFile: VA,
     text: 'The total amount of the sales-based financing, and the disbursement amount, if different from the financing amount, after any fees deducted or withheld at disbursement.',
     bearsOn: 'the form',
-    satisfiedBy: 'Total Amount Financed',
-    note: "ONE numbered item covering what the form spreads over three rows — Total Amount Financed, Fees Deducted or Withheld at Disbursement, Disbursement Amount. The form is the Commission's prescribed format under the section's opening words.",
+    satisfiedBy: 'Total Amount of the Sales-Based Financing',
+    note: "ONE numbered item covering what the form spreads over three rows — Total Amount of the Sales-Based Financing, Fees Deducted or Withheld at Disbursement, Disbursement Amount. The official October 2022 form is the Commission's prescribed format under the section's opening words.",
   },
   {
     id: 'va-2231-2-finance-charge',
@@ -338,7 +338,7 @@ export const CT_VA_OBLIGATIONS: StatutoryObligation[] = [
     text: 'The finance charge.',
     bearsOn: 'the form',
     satisfiedBy: 'Finance Charge',
-    note: 'Virginia\'s chapter does not define "finance charge" at all, where Conn. Gen. Stat. §36a-861(3) does by reference to 12 CFR 1026.4. A gap in the Code, not in our reading of it.',
+    note: 'The implementing definition in 10VAC5-240-10 includes all charges that would be finance charges under 12 CFR 1026.4 if this were consumer credit. See the retained VA-10VAC5-240.txt; the absence of a definition in the Code alone is not an unresolved definition gap.',
   },
   {
     id: 'va-2231-3-total-repayment-amount',

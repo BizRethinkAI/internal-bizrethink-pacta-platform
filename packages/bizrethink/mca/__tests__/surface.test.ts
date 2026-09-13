@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { ContentStatute } from '../content/types';
 import { UNRESOLVED_READINGS } from '../instance/identities';
 import { MCA_JURISDICTIONS } from '../jurisdictions';
 import type { ItemizationForm } from '../prescribed/itemization';
 import type { PrescribedForm } from '../prescribed/types';
 import { READING_GOES_STALE_AFTER_DAYS } from '../provenance/reading-age';
+import * as sourceOrigin from '../provenance/source-origin';
 import { normalisedDigest, readSourceText, resolveSourcesDir } from '../provenance/source-text';
 import type { McaDisclosure } from '../provenance/verify';
 import { publishableProblems } from '../provenance/verify';
@@ -222,24 +223,27 @@ describe('assurance distinguishes verified from partly verified', () => {
   });
 
   it('a matching digest and fresh reading do not establish the source origin', () => {
-    // Utah now has a recorded official retrieval. Virginia's local form remains
-    // the real unrecorded-source fixture until its separate correction lands.
-    const sourceFile = 'VA-Disclosure-Form.txt';
-    const built = entryFor(
-      {
-        ...fullyVerified,
-        sourceFile,
-        sourceDigest: normalisedDigest(readSourceText(sourceFile)),
-      },
-      { now: NOW },
-    );
+    // Isolate the origin verdict instead of borrowing whichever state's source
+    // still lacks a retrieval header. Upgrading a source must not break this
+    // negative control or force it onto a form with unrelated label failures.
+    const origin = vi.spyOn(sourceOrigin, 'originOfSource').mockReturnValue({
+      origin: 'origin-not-recorded',
+      evidence: null,
+      why: 'the source has no recorded retrieval',
+    });
 
-    expect(built.digest).toBe('matches');
-    expect(built.freshness).toBe('fresh');
-    expect(built.origin).toBe('origin-not-recorded');
-    // This synthetic form also has unrelated section/row mismatches. Pin the
-    // origin verdict separately; source-origin.test.ts isolates the header rules.
-    expect(built.assurance).toBe('unverified');
+    try {
+      const built = entryFor(fullyVerified, { now: NOW });
+
+      expect(built.problems).toEqual([]);
+      expect(built.digest).toBe('matches');
+      expect(built.freshness).toBe('fresh');
+      expect(built.origin).toBe('origin-not-recorded');
+      expect(built.assurance).toBe('partly-verified');
+      expect(built.assuranceReasons.join(' ')).toMatch(/origin|retriev/i);
+    } finally {
+      origin.mockRestore();
+    }
   });
 
   it('the same form, plus one row whose contents no check can read, is only partly verified', () => {
@@ -549,16 +553,16 @@ describe('the top line says what the cards say', () => {
       'ny-offer-summary',
       'tx-disclosure',
       'ut-disclosure',
+      'va-disclosure',
     ]);
 
     /*
-      Utah now records the September 12 audit's official retrieval. Virginia's
-      local form still awaits its separate correction. This changes the source
-      origin count, not the content/conformity assurance assigned to either form.
+      Both Virginia and Utah now record official retrievals. These counts describe
+      source origins, not full form conformity or completed merchant documents.
     */
-    expect(summary.fromOfficialPublisher).toBe(14);
+    expect(summary.fromOfficialPublisher).toBe(15);
     expect(summary.fromSecondaryPublisher).toBe(0);
-    expect(summary.originNotRecorded).toBe(summary.total - 14);
+    expect(summary.originNotRecorded).toBe(0);
   });
 
   it('carries the threshold it judged staleness by, so the page states the number it used', () => {

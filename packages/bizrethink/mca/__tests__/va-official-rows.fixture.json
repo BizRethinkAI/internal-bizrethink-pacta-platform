@@ -1,0 +1,28 @@
+[
+  { "label": "Total Amount of the Sales-Based Financing", "content": "$" },
+  { "label": "Fees Deducted or Withheld at Disbursement", "content": "$" },
+  {
+    "label": "Disbursement Amount [Total Amount of the Sales-Based Financing minus (-) Fees Deducted or Withheld at Disbursement]",
+    "content": "$"
+  },
+  { "label": "Finance Charge", "content": "$" },
+  { "label": "Total Repayment Amount [Disbursement Amount plus (+) Finance Charge]", "content": "$" },
+  {
+    "label": "Estimated Number of Payments [Number of payments expected, based on the projected sales volume, to equal the Total Repayment Amount] A reasonable range may be provided ONLY for transactions with a variable payment schedule.",
+    "content": ""
+  },
+  {
+    "label": "Payment Schedule",
+    "content": "☐ Amount of each fixed payment: $ ☐ Frequency of fixed payments: ☐ Variable payment schedule, or ☐ Description of the method used to calculate the amount and frequency of each variable payment: Method of payment: ☐ SEE PAGE 2"
+  },
+  {
+    "label": "Description of All Other Potential Fees and Charges NOT Included in the Finance Charge",
+    "content": "☐ SEE PAGE 2"
+  },
+  { "label": "Description of Collateral Requirements or Security Interests", "content": "☐ SEE PAGE 2" },
+  {
+    "label": "Broker Compensation",
+    "content": "Is provider paying compensation directly to a broker? ☐ Yes ☐ No If Yes, amount of compensation being paid directly to broker: $"
+  },
+  { "label": "Description of Prepayment Policies", "content": "☐ SEE PAGE 2" }
+]

@@ -192,14 +192,10 @@ describe('the vendored sources, classified as they actually stand', () => {
     expect(originOfSource('TX-Fin-Code-Ch-398.txt').origin).toBe('official-publisher');
   });
 
-  /**
-   * Utah's September 12 correction records the audit's official retrieval and
-   * preserves its independently matched body. Virginia's local form still
-   * awaits its separate correction. Pin the file names: a new anonymous source
-   * and a source gaining provenance must not cancel each other out in a count.
-   */
+  // Both Utah and Virginia now have recorded official retrievals. Keep the
+  // explicit absence check; synthetic inputs above still test unknown origins.
   it('names the files whose origin is not recorded', () => {
-    expect(files.filter((f) => originOfSource(f).origin === 'origin-not-recorded')).toEqual(['VA-Disclosure-Form.txt']);
+    expect(files.filter((f) => originOfSource(f).origin === 'origin-not-recorded')).toEqual([]);
   });
 
   it('holds no source from a secondary publisher, and the Georgia file’s own history does not make it one', () => {
