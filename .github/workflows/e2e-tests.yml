@@ -229,7 +229,11 @@ jobs:
 
       - name: Start Services
         if: steps.scope.outputs.code == 'true'
-        run: npm run dx:up
+        # MODIFIED for BizRethink: the Docker Hub MinIO image became unavailable.
+        # Override only its registry/digest; retain every base service and test.
+        run: >-
+          docker compose -f docker/development/compose.yml
+          -f packages/bizrethink/ci/minio-compose.yml up -d
 
       - uses: ./.github/actions/playwright-install
         if: steps.scope.outputs.code == 'true'
