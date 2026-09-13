@@ -67,11 +67,17 @@ describe('every clause has content for its kind', () => {
   it('gives every current field a stable binding and preserves source anchors separately', () => {
     const groups = ALL_MCA_CONTENT.filter((clause) => clause.kind === 'field-group');
     expect(groups.map((group) => group.slug).sort()).toEqual([
+      'equipment-lease.execution-fields',
       'equipment-lease.guarantor-information',
       'equipment-lease.merchant-and-equipment-information',
+      'frpa.execution-fields',
       'frpa.guarantor-fields',
       'frpa.merchant-and-funding-information',
       'frpa.prior-transaction-fields',
+      'iso-pra.execution-fields',
+      'permission-to-release.execution-fields',
+      'permission-to-release.transaction-fields',
+      'subscription.execution-fields',
       'subscription.guarantor-information',
       'subscription.merchant-and-equipment-information',
     ]);

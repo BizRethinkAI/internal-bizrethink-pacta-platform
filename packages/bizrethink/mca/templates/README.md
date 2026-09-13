@@ -16,7 +16,10 @@ There is no verified Lombard or Circular profile preset. The example profile in
 - `compile.ts` selects/renumbers operative clauses, inserts document helpers at
   their declared anchors, fills known provider variables and leaves future deal
   inputs blank. Interview-only guidance never enters contracts. The current
-  catalogue and vendored statutory source bytes determine a stable fingerprint.
+  selected content, saved policy and vendored statutory source bytes determine
+  a stable fingerprint. Selection predicates are evaluated, not hashed as printed
+  JavaScript: server bundling must not make an unchanged recipe stale. Counsel
+  approval fingerprints remain separate and still pin their selection gates.
 - Equipment offers produce separate lease/subscription candidate documents; the
   merchant's later election selects the applicable document. Individual-report
   instructions and ISO channel execution are separate events. They do not turn
@@ -44,6 +47,6 @@ Original extraction history and source documents remain unchanged; source-line
 coverage uses historical ISO anchor values solely as an audit fixture.
 
 Persistence/rollback: [ADR 0016](../../../../docs/adr/0016-mca-provider-template-revisions.md).
-The next integration fills a saved revision for an individual transaction and
-renders controlled documents. Do not create a native upstream Envelope template
+The [transaction interview](../transactions/README.md) fills a current saved
+revision for an individual transaction and renders an unsigned internal review PDF. Do not create a native upstream Envelope template
 as a shortcut around MCA approval, findings, disclosure or signing checks.

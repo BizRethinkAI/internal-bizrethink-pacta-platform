@@ -134,7 +134,8 @@ export type ReviewRecord = {
  * says so in its own words: *"`—` means read and no finding. That is not the
  * same as clean; it means I could not demonstrate anything, which for a clause
  * like §5.4 is the honest answer."* An empty `examinedBy`, by contrast, means
- * nobody has read it — and the test refuses that.
+ * nobody has read it. The test refuses unexamined legal text; a source-linked,
+ * empty-body draft field group is explicitly labelled review pending.
  */
 export type ClauseExamination = {
   review: ReviewId;

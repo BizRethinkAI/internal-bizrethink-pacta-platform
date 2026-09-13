@@ -5,7 +5,7 @@ import { LOMBARD_FACTS, type McaFacts } from '../facts';
 
 describe('ADR 0014 clause metadata', () => {
   it('requires an explicit legal classification and variance on all current clause and reusable records', () => {
-    expect(ALL_MCA_CONTENT).toHaveLength(229);
+    expect(ALL_MCA_CONTENT).toHaveLength(235);
     for (const clause of ALL_MCA_CONTENT) {
       expect(clause.whyThisClause, clause.slug).toBeDefined();
       expect(clause.variance, clause.slug).toBeDefined();

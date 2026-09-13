@@ -597,10 +597,19 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onAppro
               {clause.slug} · {clause.provenance}
             </p>
             <p className="mt-0.5 text-muted-foreground text-xs">
-              Read by{' '}
-              {clause.examinedBy
-                .map((entry) => `${entry.review}${entry.findings > 0 ? ` (${entry.findings})` : ''}`)
-                .join(', ')}
+              {clause.examinedBy.length ? (
+                <>
+                  Read by{' '}
+                  {clause.examinedBy
+                    .map((entry) => `${entry.review}${entry.findings > 0 ? ` (${entry.findings})` : ''}`)
+                    .join(', ')}
+                </>
+              ) : (
+                <>
+                  <Trans>New fields — review pending. Source provisions:</Trans>{' '}
+                  {clause.sourceExaminations.map((entry) => `${entry.slug} (${entry.review})`).join(', ')}
+                </>
+              )}
               {clause.appliesInStates.length > 0 &&
                 ` · in the agreement because of ${clause.appliesInStates
                   .map((state) => JURISDICTION_NAMES[state])

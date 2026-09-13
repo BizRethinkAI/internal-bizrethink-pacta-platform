@@ -99,7 +99,7 @@ describe('document fields express the reviewed funding and identity bargain', ()
       for (const field of fields) {
         expect(field).toMatchObject({
           binding: expect.stringMatching(
-            /^(merchant|provider|funding|equipment|broker|guarantor|account|processor|iso)\./,
+            /^(merchant|provider|funding|equipment|broker|guarantor|account|processor|iso|signers|report|transaction)\./,
           ),
         });
         expect(field.widget).toMatch(/^\{\{field:[a-zA-Z0-9.-]+\}\}$/);

@@ -184,12 +184,17 @@ document, and a script cannot make that claim — see rule 3 below.
 
 ## Rules for adding a clause
 
-1. **Nothing enters unexamined.** `examinedBy` is required and may not be empty.
+1. **No legal text enters unexamined.** Legal text requires nonempty `examinedBy`.
    Phase 0's rule was *"anything in this column enters as draft, never as
    library"*, and its reasoning is the one to keep in mind: a clause library
    seeded from unexamined text **launders that text into apparent authority**.
    A clause on a page under a heading and a version number reads as considered
    whoever typed it.
+   A new **empty-body field group** may instead remain explicitly review pending
+   in the reusable catalogue, with fields, draft status, no named approver and
+   `derivedFrom` links to examined provisions. The view labels the source reviews
+   separately; it never says those reviews read the new field bindings. The guard
+   rejects unexamined prose and unapproved published entries in this exception.
 2. **The body is the clause's words, and the `«N»` markers are kept.** Those
    markers are the AcroForm anchors the Lombard pipeline injects and are part of
    what ships.

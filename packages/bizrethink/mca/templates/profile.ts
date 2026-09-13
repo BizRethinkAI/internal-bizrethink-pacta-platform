@@ -30,7 +30,11 @@ const ZEntity = z
 export const ZMcaProviderProfile = z
   .object({
     label: line(120),
-    buyer: ZEntity.extend({ reconciliationEmail: email, reconciliationAddress: line(600) }).strict(),
+    buyer: ZEntity.extend({
+      reconciliationEmail: email,
+      reconciliationAddress: line(600),
+      servicingPhone: z.union([z.literal(''), line(80)]).optional(),
+    }).strict(),
     policy: z
       .object({
         collectionMethod: z.literal('split-only'),
@@ -59,7 +63,9 @@ export const ZMcaProviderProfile = z
         consumerReportPulled: z.boolean(),
       })
       .strict(),
-    equipmentProvider: ZEntity.nullable(),
+    equipmentProvider: ZEntity.extend({ creditDisputeAddress: z.union([z.literal(''), line(600)]).optional() })
+      .strict()
+      .nullable(),
     broker: z
       .object({
         company: ZEntity,
@@ -121,3 +127,27 @@ export const providerSelectionFacts = (profile: McaProviderProfile): McaFacts =>
   consumerReportPulled: profile.policy.consumerReportPulled,
   processorSplitAccepted: false,
 });
+
+/** Provider-owned inputs remain read-only in a future transaction, even if still missing. */
+export const MCA_PROVIDER_BINDINGS = new Set([
+  'provider.legalName',
+  'provider.entityType',
+  'provider.organizationState',
+  'provider.principalAddress',
+  'provider.noticeAddress',
+  'provider.noticeEmail',
+  'provider.reconciliationEmail',
+  'provider.reconciliationAddress',
+  'provider.servicingPhone',
+  'processor.approvedProcessors',
+  'equipment.providerLegalName',
+  'equipment.providerEntityType',
+  'equipment.providerFormationState',
+  'equipment.providerAddress',
+  'equipment.providerNoticeAddress',
+  'equipment.providerNoticeEmail',
+  'equipment.creditDisputeAddress',
+  'iso.companyLegalName',
+  'iso.portalUrl',
+  'iso.commissionPercentage',
+]);

@@ -735,10 +735,9 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
     rewritten for exactly this reason, having previously made Section 10
     supersede every notice provision in the Agreement.
 
-    «43» STAYS, CHECKED AGAINST THE VENDORED BODY RATHER THAN ASSUMED. It is the
-    AcroForm anchor the Lombard pipeline injects for our notice address (README
-    rule 2), and a body that stops claiming it is a body the injector fills into
-    nothing.
+    The historical «43» anchor remains in source evidence. Current Pacta
+    filling binds equipment.providerNoticeAddress to the separately identified
+    equipment provider, including where it is different from the receipts buyer.
   */
   {
     slug: 'equipment-lease.notices',
@@ -748,14 +747,14 @@ export const EQUIPMENT_LEASE_AGREEMENT: McaClause[] = [
       because: 'load-bearing',
       note: 'The separate equipment parties need notice destinations and effective-delivery rules distinct from judicial service; funder contact details do not replace them.',
     },
-    version: 1,
+    version: 2,
     instrument: 'equipment-lease',
     kind: 'clause',
     includeWhen: null,
     section: 'agreement',
     sortKey: 160,
     heading: 'Notices',
-    body: 'All notices under this Agreement must be in writing, if to you at the address you give in the Lessee and Equipment Information grid or at a later address you give us in writing, and if to us at _______________«43»_______________, Attn: Equipment Lease Department, or at a later address we or a subsequent assignee give you in writing. Each of us will tell the other promptly in writing of a change of address.\nA notice is given (i) if sent by mail or courier, on the earlier of five (5) days after mailing or actual receipt or, in the case of courier, when delivered, and (ii) if sent by email, on transmission, provided no bounce-back or other non-delivery report is received. A notice given in any other manner is effective when actually received.\nSending a notice to an address a party has told the other it no longer uses does not make that notice effective, and a failure to give a change of address does not make an otherwise ineffective notice effective. A notice given under this Section is not service of legal process and is not evidence that service was made; service of a summons, a complaint or other legal process is governed by Section [[clause:equipment-lease.independent-decision-governing-law]] and by the procedural law of the court.',
+    body: 'All notices under this Agreement must be in writing, if to you at the address you give in the Lessee and Equipment Information grid or at a later address you give us in writing, and if to us at {{field:equipment.providerNoticeAddress}}, Attn: Equipment Lease Department, or at a later address we or a subsequent assignee give you in writing. Each of us will tell the other promptly in writing of a change of address.\nA notice is given (i) if sent by mail or courier, on the earlier of five (5) days after mailing or actual receipt or, in the case of courier, when delivered, and (ii) if sent by email, on transmission, provided no bounce-back or other non-delivery report is received. A notice given in any other manner is effective when actually received.\nSending a notice to an address a party has told the other it no longer uses does not make that notice effective, and a failure to give a change of address does not make an otherwise ineffective notice effective. A notice given under this Section is not service of legal process and is not evidence that service was made; service of a summons, a complaint or other legal process is governed by Section [[clause:equipment-lease.independent-decision-governing-law]] and by the procedural law of the court.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

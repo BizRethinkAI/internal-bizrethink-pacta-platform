@@ -394,13 +394,10 @@ describe('a notice is effective when it can arrive', () => {
     expect(entry.body).toMatch(/not service|is not legal process/i);
   });
 
-  /**
-   * `«43»` is the AcroForm anchor the Lombard pipeline injects for the notice
-   * address. A body that stops claiming it is a body the injector fills into
-   * nothing — README rule 2, and the argument FRPA §10.3 makes for «48»/«49».
-   */
-  it.each(both('equipment-lease.notices'))('$slug keeps its widget anchor', (entry) => {
-    expect(entry.body).toContain('«43»');
+  // The semantic field replaces the archived source widget; both documents
+  // must use the actual equipment provider's independently supplied address.
+  it.each(both('equipment-lease.notices'))('$slug binds the actual equipment provider’s notice address', (entry) => {
+    expect(entry.body).toContain('{{field:equipment.providerNoticeAddress}}');
   });
 });
 

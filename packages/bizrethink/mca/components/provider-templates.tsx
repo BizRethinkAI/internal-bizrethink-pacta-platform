@@ -126,6 +126,14 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
               <Trans>Preview document package</Trans>
             </Button>
           </div>
+          {saved.data.current && !isOldRevision && (
+            <Link
+              className="inline-block rounded border px-3 py-2 font-medium text-sm"
+              to={`draft?template=${encodeURIComponent(saved.data.id)}&revision=${saved.data.version}`}
+            >
+              <Trans>Use this template</Trans>
+            </Link>
+          )}
           {!saved.data.current && (
             <p role="alert">
               <Trans>

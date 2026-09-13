@@ -321,7 +321,7 @@ describe('no provision of any instrument manufactures service of process', () =>
       running the union BEFORE pushing — which is the whole point of doing it
       that way, and is what the queue skipped.
     */
-    expect(ALL_MCA_CONTENT.length).toBe(229);
+    expect(ALL_MCA_CONTENT.length).toBe(235);
   });
 });
 
@@ -361,17 +361,13 @@ describe('judicial service is consolidated in Section 10.1 and answered where it
     expect(body).toMatch(/prejudgment/i);
   });
 
-  /**
-   * §10.3 loses the advance consent and keeps its two AcroForm anchors. The
-   * pipeline injects «48» and «49» whether or not a clause claims them, so a
-   * body that drops them is a body the injector fills into nothing — the
-   * argument `guaranty.ts` already makes for §10.4's «50» and «51».
-   */
-  it('keeps Section 10.3’s widget anchors while dropping the advance consent', () => {
+  // Current semantic fields preserve the optional address designation;
+  // archived «48»/«49» widgets are source evidence, not the active fill map.
+  it('keeps Section 10.3’s semantic notice fields while dropping the advance consent', () => {
     const body = clause(MERCHANT_ADDRESS).body;
 
-    expect(body).toContain('«48»');
-    expect(body).toContain('«49»');
+    expect(body).toContain('{{field:merchant.designatedEmail}}');
+    expect(body).toContain('{{field:merchant.designatedNoticeAddress}}');
     expect(body).not.toMatch(/AGREES TO ACCEPT SERVICE/i);
     expect(body).toMatch(/Section (?:10\.1|\[\[clause:frpa\.section-10-1\]\])/);
   });

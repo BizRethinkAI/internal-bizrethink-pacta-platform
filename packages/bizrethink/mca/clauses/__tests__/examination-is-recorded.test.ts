@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALL_MCA_CONTENT } from '../../catalogue';
+import { ALL_MCA_CONTENT, contentFindingSlugs } from '../../catalogue';
 import { AMBIGUOUS_FINDING_IDS, FINDINGS_BY_ID, findingsFor, REVIEWS } from '../examination';
 
 /**
@@ -12,18 +12,31 @@ import { AMBIGUOUS_FINDING_IDS, FINDINGS_BY_ID, findingsFor, REVIEWS } from '../
  * heading and a citation reads as considered. Nothing about the file it lives
  * in says whether anybody read it.
  *
- * So `examinedBy` is required and may not be empty, and the reviews it names
+ * So legal text requires a nonempty `examinedBy`, and the reviews it names
  * are vendored rather than asserted. What that buys is narrow and worth stating
  * exactly: it proves a finding id is a finding that was really raised, in a
  * review that really ran, against a document. It does not prove the finding
  * says what the clause claims, and it cannot — the argument lives in
  * `lombard-contracts` and is not reproduced here.
  */
-describe('no clause enters the library unexamined', () => {
+describe('legal text is examined and new field-only derivatives remain explicitly pending', () => {
   it.each(
     ALL_MCA_CONTENT.map((clause) => [clause.slug, clause] as const),
-  )('%s names at least one review that read it', (_slug, clause) => {
-    expect(clause.examinedBy.length).toBeGreaterThan(0);
+  )('%s records a real examination or is a source-linked draft field block', (_slug, clause) => {
+    if (clause.examinedBy.length === 0) {
+      // New semantic bindings are not new legal text, and the old reviews did
+      // not read them. The surface marks them pending instead of inventing an
+      // examination. This narrow exception never admits unexamined prose.
+      expect(clause.kind).toBe('field-group');
+      expect(clause.body).toBe('');
+      expect(clause.fields?.length).toBeGreaterThan(0);
+      expect(clause.status).toBe('draft');
+      expect(clause.source).toEqual({ kind: 'attorney-drafted', author: null });
+      expect(clause.derivedFrom?.length).toBeGreaterThan(0);
+      for (const slug of contentFindingSlugs(clause).filter((slug) => slug !== clause.slug)) {
+        expect(ALL_MCA_CONTENT.find((entry) => entry.slug === slug)?.examinedBy.length).toBeGreaterThan(0);
+      }
+    }
 
     for (const examination of clause.examinedBy) {
       expect(REVIEWS.map((review) => review.review)).toContain(examination.review);
@@ -120,11 +133,11 @@ describe('no clause enters the library unexamined', () => {
 describe('the ISO Partner Referral Agreement, as imported', () => {
   const clauses = ALL_MCA_CONTENT.filter((clause) => clause.instrument === 'iso-pra');
 
-  it('is all twenty-eight of its clauses', () => {
+  it('preserves its imported records and adds a separate execution field block', () => {
     // Twenty-four numbered, plus the parties paragraph, two WHEREAS recitals
     // and the consideration sentence — none of them numbered, and all four
     // invisible to the import that keyed on numbered headings.
-    expect(clauses).toHaveLength(28);
+    expect(clauses).toHaveLength(29);
   });
 
   /**
@@ -140,7 +153,10 @@ describe('the ISO Partner Referral Agreement, as imported', () => {
    */
   it('names REVIEW-02 for exactly the four clauses REVIEW-01 did not read', () => {
     const reviewedByTwoOnly = clauses
-      .filter((clause) => clause.examinedBy.every((examination) => examination.review === 'REVIEW-02'))
+      .filter(
+        (clause) =>
+          clause.examinedBy.length > 0 && clause.examinedBy.every((examination) => examination.review === 'REVIEW-02'),
+      )
       .map((clause) => clause.slug)
       .sort();
 

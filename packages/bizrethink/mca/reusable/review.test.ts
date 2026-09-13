@@ -21,7 +21,7 @@ describe('separate catalogues share review protection', () => {
       ),
     ).toBe(true);
     expect(clauses.totals.clauses).toBe(210);
-    expect(reusable.totals.items).toBe(19);
+    expect(reusable.totals.items).toBe(25);
   });
 
   it('includes original finding scopes when a record has been split', () => {
@@ -35,6 +35,17 @@ describe('separate catalogues share review protection', () => {
     }
     const guarantor = ALL_MCA_REUSABLE.find((entry) => entry.slug === 'frpa.guarantor-fields')!;
     expect(contentFindingSlugs(guarantor)).toEqual(['frpa.guarantor-fields', 'frpa.guarantor-information-9-1']);
+  });
+
+  it('identifies new field bindings as pending review without claiming old reviews read them', () => {
+    const fields = mcaReusableSurface().items.find((entry) => entry.slug === 'frpa.execution-fields')!;
+    expect(fields.examinedBy).toEqual([]);
+    expect(fields.sourceExaminations).toContainEqual(
+      expect.objectContaining({ slug: 'frpa.execution', review: 'REVIEW-02' }),
+    );
+    expect(fields.status).toBe('draft');
+    expect(fields.publishProblems.length).toBeGreaterThan(0);
+    expect(fields.body).toBe('');
   });
 
   it('changes approval fingerprints when a reusable item gains a different use or placement', () => {

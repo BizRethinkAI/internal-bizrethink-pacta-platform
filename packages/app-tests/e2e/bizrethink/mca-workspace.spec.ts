@@ -24,8 +24,11 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
 
   await nav.getByRole('link', { name: 'Reusable content', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'MCA Reusable content', exact: true })).toBeVisible();
-  await expect(page.locator('[data-mca-kind]')).toHaveCount(19);
+  await expect(page.locator('[data-mca-kind]')).toHaveCount(25);
   await expect(page.locator('[data-mca-number]')).toHaveCount(0);
+  await expect(page.locator('[data-mca-slug="frpa.execution-fields"]')).toContainText(
+    'New fields — review pending. Source provisions:',
+  );
   const funding = page.locator('[data-mca-slug="frpa.merchant-and-funding-information"]');
   await funding.getByRole('button').first().click();
   await expect(funding.getByText('{{field:funding.purchasePrice}}', { exact: true })).toBeVisible();

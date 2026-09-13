@@ -7,17 +7,18 @@ and its [classification/migration map](../../../docs/design/mca-workspace.md).
 It supersedes ADR 0008's separate-product presentation while preserving the
 distinction between authored-content review and disclosure verification.
 
-| Catalogue | Current location | Role in the unified design |
+| Catalogue | Current location | Role in the unified workspace |
 |---|---|---|
 | Clauses | [`clauses/`](clauses/) | Numbered contractual provisions; appropriate review before merchant use. |
-| Reusable content | Currently mixed into `clauses/`; extraction pending | Document blocks, field groups and interview guidance outside the clause catalogue. |
+| Reusable content | [`reusable/`](reusable/) | Document blocks, field groups and interview guidance outside the clause catalogue. |
 | Disclosures & requirements | `content/`, `prescribed/`, `statutes/`, `sources/` | Required information, prescribed forms, source evidence and conformity checks. Authored answers remain distinct from prescribed text. |
 
-**The application still has separate MCA Conformity and MCA Clauses pages.**
-Catalogue separation, common navigation and the builder are not implemented by
-this design decision. Templates will assemble applicable content across the
-catalogues; the future overview/readiness view will expose their dependencies
-and unresolved checks together.
+The application now has one MCA navigation entry with separate clause, reusable
+content and disclosure/requirements views. The [provider interview](templates/README.md)
+saves reusable templates, and [transaction use](transactions/README.md) fills a
+current revision and exports an unsigned internal PDF. Unresolved legal review,
+transaction applicability, disclosures, processor acceptance and signing remain
+explicit requirements; assembled output is not approved for merchant delivery.
 
 The rest of this README documents the existing disclosure and instance checkers.
 `content/` and `prescribed/` remain rule packs; they do not become clauses merely

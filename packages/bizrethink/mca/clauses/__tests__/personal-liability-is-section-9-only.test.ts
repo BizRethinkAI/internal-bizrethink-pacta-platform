@@ -483,15 +483,13 @@ describe('the duplicated service waivers stop being a second rule', () => {
     expect(text).toMatch(/no separate waiver/);
   });
 
-  it('§10.4 sends guarantor contact data to §9.1 and keeps its widgets', () => {
+  it('§10.4 sends guarantor contact data to §9.1 and uses each guarantor’s separate information block', () => {
     const text = body(SERVICE_ADDRESS);
 
     expect(text).not.toMatch(/HEREBY AGREES TO ACCEPT SERVICE/);
     expect(text).toContain('Section [[clause:frpa.guarantor-information-9-1]]');
-    // The AcroForm anchors the Lombard pipeline injects. README rule 2 keeps
-    // them even where the surrounding words are rewritten.
-    expect(text).toContain('«50»');
-    expect(text).toContain('«51»');
+    expect(text).toContain('that Guarantor’s separate Guarantor Information block');
+    expect(text).not.toMatch(/«50»|«51»/);
   });
 });
 

@@ -1053,18 +1053,11 @@ export const FRPA_GUARANTY: McaClause[] = [
     terms what a designated address is: a place a document may be sent, not an
     agreement about what counts as service.
 
-    THE MEMO SAYS "[Reserved]" AND THE LIBRARY CANNOT. ADR 0012 closed
-    `[Reserved]` — `select-clauses.ts` says an assembled document has no reserved
-    sections — and deleting the record moves `library.test.ts`'s 203 and
-    `frpa-coverage`'s 100. §10.2's note recorded that deletion is the better fix
-    and needs the counts moved in the same change. It is the better fix for
-    §10.2. It is NOT available here, and the reason is «48» and «49»: they are
-    AcroForm anchors the Lombard pipeline injects into the rendered FRPA, and a
-    body that stops claiming them is a body the injector fills into nothing. If
-    this record is ever removed, «48» and «49» must come out of the field map in
-    the same change — the identical warning §10.4 carries for «50» and «51».
-    VERIFIED against `sources/Lombard_FRPA_v4.docx`: §10.3 carries «48» and «49»
-    in two FORMTEXT fields, and §10.4 carries «50» and «51».
+    HISTORICAL ANCHORS AND THE CURRENT FILLER. The vendored FRPA carried
+    «48»/«49» here and «50»/«51» in §10.4. They remain in source evidence.
+    Pacta's current transaction filler uses merchant.designatedEmail and
+    merchant.designatedNoticeAddress here, and each guarantor's separate
+    information block in §10.4. It does not run the inherited widget injector.
 
     DEPARTURE FROM THE MEMO — MERCHANT'S ADDRESSES ARE SENT TO SECTION 1, NOT TO
     §7.3. The memo routes contact data to "§9.1 and ordinary notices". §9.1 is
@@ -1084,14 +1077,14 @@ export const FRPA_GUARANTY: McaClause[] = [
       because: 'load-bearing',
       note: 'Merchant’s notices need a current destination distinct from agreement to accept judicial service; a dispute-forum answer does not provide those contact details.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
     kind: 'clause',
     includeWhen: null,
     section: 'service',
     sortKey: 30,
     heading: 'Merchant Notice Addresses',
-    body: 'The email address and the mailing address Merchant gives in the Merchant and Funding Information grid are Merchant’s addresses for notice under Section [[clause:frpa.notices-7-3]]. Merchant may designate a different email address at _____________«48»_____________ or a different mailing address at ____________________________«49»____________________________, and a designated address governs from the date it is given.\nA designated address is a place at which a document may be sent to Merchant. It is not an agreement about what counts as service of process, it does not make a communication sent to it into service of process, and it gives up no right to be served by a means applicable law permits. Section [[clause:frpa.section-10-1]] governs judicial process.',
+    body: 'The email address and the mailing address Merchant gives in the Merchant and Funding Information grid are Merchant’s addresses for notice under Section [[clause:frpa.notices-7-3]]. Merchant may designate a different email address at {{field:merchant.designatedEmail}} or a different mailing address at {{field:merchant.designatedNoticeAddress}}, and a designated address governs from the date it is given.\nA designated address is a place at which a document may be sent to Merchant. It is not an agreement about what counts as service of process, it does not make a communication sent to it into service of process, and it gives up no right to be served by a means applicable law permits. Section [[clause:frpa.section-10-1]] governs judicial process.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -1106,22 +1099,11 @@ export const FRPA_GUARANTY: McaClause[] = [
     different addresses, and service is the one place that costs a default
     judgment.
 
-    WHAT CHANGED. §9.1's addresses are the Guarantor's addresses. The two blanks
-    survive as an OPTIONAL designation of a different address, and the Section
-    waives no right to be served by another lawful means.
-
-    THE WIDGETS ARE KEPT, «50» AND «51», in the positions the current body has
-    them. README rule 2 as ADR 0012 restates it: the body is the clause's words
-    and the `«N»` markers are kept, because they are the AcroForm anchors the
-    Lombard pipeline injects and a tidied body is a body the pipeline cannot
-    fill.
-
-    DEPARTURE FROM THE MEMO. Same as §10.2 — the disposition is DELETE and the
-    library cannot delete. The memo's own reasoning is followed instead:
-    "separate Guarantor contact data belongs in §9.1 and ordinary notices", so
-    the clause now says exactly that. If the record is ever removed, «50» and
-    «51» must be removed from the AcroForm map in the same change or the
-    pipeline injects two widgets no clause claims.
+    CURRENT FILLING. §9.1's addresses are each Guarantor's addresses. A
+    different notice address is designated in that Guarantor's own repeatable
+    information block; the historical «50»/«51» pair is not shared across
+    several guarantors. Source evidence retains the original pair. The clause
+    still waives no right to be served by another lawful means.
 
     THE CAPITALS ARE GONE, AND THAT IS DELIBERATE. Capitalising a whole
     paragraph is the conspicuousness convention some statutes require for a
@@ -1137,7 +1119,7 @@ export const FRPA_GUARANTY: McaClause[] = [
       because: 'no-alternative',
       note: 'Both authored guaranty scopes need the same guarantor notice destinations and preserved service rights; no-guaranty templates omit these details.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
     kind: 'clause',
     /* With §10.2: any guaranty, not only the limited one. */
@@ -1145,7 +1127,7 @@ export const FRPA_GUARANTY: McaClause[] = [
     section: 'service',
     sortKey: 40,
     heading: 'Guarantor Notice Addresses',
-    body: 'The email address and the mailing address a Guarantor gives in Section [[clause:frpa.guarantor-information-9-1]] are that Guarantor’s addresses for notice and for service of process under Section [[clause:frpa.section-10-1]]. A Guarantor may designate a different email address at _____________«50»_____________ or a different mailing address at ____________________________«51»____________________________, and a designated address governs from the date it is given. This Section collects no obligation of its own and waives no right to be served by any other means applicable law permits.',
+    body: 'The email address and the mailing address a Guarantor gives in Section [[clause:frpa.guarantor-information-9-1]] are that Guarantor’s addresses for notice and for service of process under Section [[clause:frpa.section-10-1]]. A Guarantor may designate a different email address or a different mailing address in that Guarantor’s separate Guarantor Information block, and a designated address governs from the date it is given. This Section collects no obligation of its own and waives no right to be served by any other means applicable law permits.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

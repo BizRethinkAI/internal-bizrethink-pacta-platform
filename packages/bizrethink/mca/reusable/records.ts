@@ -6,9 +6,11 @@ import {
   retiredGuarantorSsn,
 } from '../clauses/fields';
 import type { McaReusableContent } from '../clauses/types';
+import { MCA_EXECUTION_CONTENT } from './execution';
 
 /** Extracted/required content. Moving an identity never transfers its approval. */
 export const ALL_MCA_REUSABLE: McaReusableContent[] = [
+  ...MCA_EXECUTION_CONTENT,
   {
     slug: 'frpa.merchant-and-funding-information',
     whyThisClause: { kind: 'discretionary' },
@@ -17,7 +19,7 @@ export const ALL_MCA_REUSABLE: McaReusableContent[] = [
       because: 'load-bearing',
       note: 'The parties, funding figures, itemized deductions and notice contacts must be completed for this purchase to operate; changing deal values does not select different wording.',
     },
-    version: 4,
+    version: 5,
     instrument: 'frpa',
     includeWhen: null,
     section: 'funding-terms',
@@ -310,7 +312,7 @@ export const ALL_MCA_REUSABLE: McaReusableContent[] = [
       because: 'load-bearing',
       note: 'These equipment-specific identities, amounts, dates and operating terms must be completed for the selected equipment document; their values are not provider wording alternatives.',
     },
-    version: 1,
+    version: 2,
     instrument: 'equipment-lease',
     includeWhen: null,
     section: 'agreement',
@@ -383,7 +385,7 @@ export const ALL_MCA_REUSABLE: McaReusableContent[] = [
       because: 'load-bearing',
       note: 'These equipment-specific identities, amounts, dates and operating terms must be completed for the selected equipment document; their values are not provider wording alternatives.',
     },
-    version: 1,
+    version: 2,
     instrument: 'subscription',
     includeWhen: null,
     section: 'agreement',

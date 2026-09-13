@@ -1,4 +1,5 @@
 import { assertPublishable } from '../../../provenance/types';
+import { ALL_MCA_CONTENT, contentFindingSlugs } from '../../catalogue';
 import { type ReviewMcaContent, reusableForReview } from '../../reusable/review';
 import { numberedLibraryForReview, reviewProfileDescription } from '../../review/numbered-library';
 import { agreementDigest, agreementExists, MissingAgreementError } from '../documents';
@@ -80,6 +81,8 @@ export type McaLibraryRecordView = {
   /** Why this clause may not be published. Empty would mean it could be. */
   publishProblems: string[];
   examinedBy: { review: string; findings: number }[];
+  /** Historical reviews of the source provisions; never a claim that new fields were read. */
+  sourceExaminations: { slug: string; review: string }[];
   findings: McaLibraryFindingView[];
   outstanding: number;
 };
@@ -131,7 +134,14 @@ const sourceState = (id: McaInstrument, tenant: McaTenant): SourceState => {
 
 /** One evidence projection shared by two disjoint catalogues. */
 const recordView = (clause: ReviewMcaContent): McaLibraryRecordView => {
-  const outstanding = new Set(outstandingFindingsFor(clause).map((finding) => finding.id));
+  const sourceRecords =
+    clause.examinedBy.length === 0
+      ? ALL_MCA_CONTENT.filter(
+          (entry) => entry.slug !== clause.slug && contentFindingSlugs(clause).includes(entry.slug),
+        )
+      : [];
+  const evidence = { examinedBy: [...clause.examinedBy, ...sourceRecords.flatMap((entry) => entry.examinedBy)] };
+  const outstanding = new Set(outstandingFindingsFor(evidence).map((finding) => finding.id));
   return {
     slug: clause.slug,
     instrument: clause.instrument,
@@ -152,7 +162,10 @@ const recordView = (clause: ReviewMcaContent): McaLibraryRecordView => {
     variance: clause.variance,
     publishProblems: assertPublishable({ ...clause, status: 'published' }),
     examinedBy: clause.examinedBy.map((entry) => ({ review: entry.review, findings: entry.findings.length })),
-    findings: findingsFor(clause).map((finding) => ({
+    sourceExaminations: sourceRecords.flatMap((entry) =>
+      entry.examinedBy.map((review) => ({ slug: entry.slug, review: review.review })),
+    ),
+    findings: findingsFor(evidence).map((finding) => ({
       id: finding.id,
       review: finding.review,
       severity: finding.severity ?? 'refuted',

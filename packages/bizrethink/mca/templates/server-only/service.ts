@@ -151,6 +151,7 @@ export const previewMcaTemplate = async (input: TeamActor & { id: string; versio
     ...compileMcaTemplate(template.profile),
     templateId: input.id,
     version: input.version,
+    currentRevision: template.currentRevision,
     audience: 'internal-draft' as const,
   };
 };

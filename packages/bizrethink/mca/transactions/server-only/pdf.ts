@@ -1,0 +1,192 @@
+import { Document, Font, Page, renderToStream, StyleSheet, Text, View } from '@react-pdf/renderer';
+import type { Style } from '@react-pdf/types';
+import { createElement as h } from 'react';
+import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/render/fonts/font-data';
+import type { McaTemplateItem } from '../../templates/compile';
+import type { McaFilledDraft } from '../fill';
+
+Font.register({ family: 'McaBody', src: TINOS_REGULAR });
+Font.register({ family: 'McaSans', src: SANS_REGULAR });
+Font.register({ family: 'McaSansBold', src: SANS_SEMIBOLD });
+const styles = StyleSheet.create({
+  page: {
+    fontFamily: 'McaBody',
+    fontSize: 11,
+    paddingTop: 63,
+    paddingBottom: 56,
+    paddingHorizontal: 48,
+    color: '#17202b',
+  },
+  header: {
+    position: 'absolute',
+    top: 25,
+    left: 48,
+    right: 48,
+    fontFamily: 'McaSansBold',
+    fontSize: 8,
+    color: '#935d17',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#d5c5ae',
+    paddingBottom: 7,
+  },
+  // A fixed render callback must not inherit a numeric lineHeight: react-pdf #3452.
+  footer: {
+    position: 'absolute',
+    top: 754,
+    height: 13,
+    left: 48,
+    right: 48,
+    fontFamily: 'McaSans',
+    fontSize: 8,
+    color: '#667085',
+  },
+  title: { fontFamily: 'McaSansBold', fontSize: 19, lineHeight: 1.2, marginBottom: 10 },
+  subtitle: { fontFamily: 'McaSans', fontSize: 10, marginBottom: 15 },
+  heading: { fontFamily: 'McaSansBold', fontSize: 11, marginBottom: 5, marginTop: 13 },
+  paragraph: { fontSize: 11, marginBottom: 6, lineHeight: 1.35 },
+  field: { borderBottomWidth: 0.4, borderBottomColor: '#d5d9df', paddingVertical: 5 },
+  label: { fontFamily: 'McaSans', fontSize: 8.5, color: '#667085' },
+  value: { fontFamily: 'McaSans', fontSize: 10 },
+  warning: { fontFamily: 'McaSans', fontSize: 9, color: '#935d17', marginBottom: 9 },
+  signature: { marginTop: 14, padding: 12, borderWidth: 0.5, borderColor: '#abb3bd' },
+  signatureLine: { marginTop: 20, fontFamily: 'McaSans', fontSize: 10 },
+});
+const text = (value: string, style: Style | Style[] = styles.paragraph) => h(Text, { style }, value);
+
+/** Review output only. No AcroForms, signing tokens, delivery artifacts or regulator-form imitations. */
+export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number): Promise<Buffer> => {
+  const pages = draft.documents.map((document) =>
+    h(
+      Page,
+      { key: document.id, size: 'LETTER', style: styles.page },
+      h(Text, { style: styles.header, fixed: true }, 'INTERNAL DRAFT — NOT FOR SIGNING OR MERCHANT DELIVERY'),
+      h(Text, {
+        style: styles.footer,
+        fixed: true,
+        render: ({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
+          `PACTA MCA · Template revision ${revision} · ${document.id} · ${pageNumber} / ${totalPages}`,
+      }),
+      text(document.title, styles.title),
+      text(
+        `Transaction reference: ${draft.reference || '[to complete]'}  |  Provider template revision: ${revision}`,
+        styles.subtitle,
+      ),
+      text(
+        'This review copy is not a complete delivery package. Required disclosures, processor forms, clearance and separate signatures remain outstanding.',
+        styles.warning,
+      ),
+      ...document.items.flatMap(itemElements),
+      h(Text, { style: styles.heading, minPresenceAhead: 100 }, 'Separate execution locations — unsigned'),
+      ...document.signatures.map((signature, index) =>
+        h(
+          View,
+          { key: `${signature.role}:${index}`, style: styles.signature, wrap: false },
+          text(`${signature.role}: ${signature.partyName || '[party to identify]'}`, styles.heading),
+          text(`Printed signer: ${signature.signerName || '[to complete]'}`, styles.value),
+          text(`Capacity: ${signature.capacity || '[to complete]'}`, styles.value),
+          text(`Email: ${signature.email || '[to complete before electronic signing]'}`, styles.value),
+          text('Signature: ______________________________     Date: ______________', styles.signatureLine),
+          text('Internal draft — no signature is collected or applied in this copy.', styles.label),
+        ),
+      ),
+    ),
+  );
+  pages.push(
+    h(
+      Page,
+      { key: 'requirements', size: 'LETTER', style: styles.page },
+      h(Text, { style: styles.header, fixed: true }, 'INTERNAL WORKSHEET — NOT A STATUTORY DISCLOSURE'),
+      h(Text, {
+        style: styles.footer,
+        fixed: true,
+        render: ({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
+          `PACTA MCA · Template revision ${revision} · Review worksheet · ${pageNumber} / ${totalPages}`,
+      }),
+      text('Outstanding package requirements', styles.title),
+      text(
+        'This worksheet identifies work remaining. It is not a prescribed form, a compliance determination, processor acceptance or permission to obtain a report.',
+        styles.warning,
+      ),
+      ...draft.blockers.map((blocker) =>
+        h(Text, { key: blocker.kind, style: styles.paragraph }, `• ${blocker.detail}`),
+      ),
+      text('Disclosure and agreement sources to assess', styles.heading),
+      ...draft.requirements.map((requirement) =>
+        h(
+          Text,
+          { key: requirement.slug, style: styles.paragraph },
+          `${requirement.jurisdiction}: ${requirement.citation}`,
+        ),
+      ),
+      text('Processor-controlled document', styles.heading),
+      ...draft.externalDocuments.map((entry) =>
+        h(
+          Text,
+          { key: entry.instrument, style: styles.paragraph },
+          `${entry.processor}: ${entry.form.title}, version ${entry.form.version}. Reference: ${entry.form.reference}. Actual transaction acceptance is outstanding.`,
+        ),
+      ),
+      text('Inputs still to complete', styles.heading),
+      ...(draft.missing.length
+        ? draft.missing.map((entry, index) =>
+            h(Text, { key: index, style: styles.paragraph }, `${entry.document}: ${entry.label}`),
+          )
+        : [text('No required draft input is blank. The independent package requirements above still apply.')]),
+    ),
+  );
+  const stream = await renderToStream(
+    h(
+      Document,
+      {
+        title: `MCA internal draft — revision ${revision}`,
+        author: 'Pacta',
+        subject: `Provider template fingerprint ${draft.templateFingerprint}; internal review only`,
+      },
+      ...pages,
+    ),
+  );
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+};
+
+/** A heading and its first paragraph share one wrappable Text node. Orphan
+ * protection then keeps real body lines with the title without binding a whole
+ * long clause into a box taller than the page. Field labels stay with values. */
+const itemElements = (item: McaTemplateItem) => {
+  const heading = `${item.number ? `${item.number}  ` : ''}${item.heading}`;
+  const paragraphs = item.body.split('\n').filter(Boolean);
+  const fields = item.fields
+    .filter((field) => field.kind !== 'signature' && !field.binding.endsWith('.signedDate'))
+    .map((field) =>
+      h(
+        View,
+        { key: `${item.slug}:${field.widget}`, style: styles.field, wrap: false },
+        text(field.label, styles.label),
+        text(field.value || (field.required ? '[to complete]' : '[not designated]'), styles.value),
+      ),
+    );
+  if (!paragraphs.length) {
+    return [
+      h(View, { key: `${item.slug}:first-field`, wrap: false }, text(heading, styles.heading), fields[0]),
+      ...fields.slice(1),
+    ];
+  }
+  return [
+    h(
+      Text,
+      { key: `${item.slug}:opening`, style: [styles.paragraph, { marginTop: 13 }], orphans: 3, widows: 3 },
+      h(Text, { style: { fontFamily: 'McaSansBold' } }, heading),
+      '\n',
+      paragraphs[0],
+    ),
+    ...paragraphs
+      .slice(1)
+      .map((paragraph, index) =>
+        h(Text, { key: `${item.slug}:p${index}`, style: styles.paragraph, orphans: 3, widows: 3 }, paragraph),
+      ),
+    ...fields,
+  ];
+};
