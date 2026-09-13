@@ -354,7 +354,9 @@
       "bytes": 47179,
       "sha256": "66da6263c8dfe26fe3705d659a4426a467333d0c53a9febb6ac18409b40d2b96",
       "text_sha256": "f2ffa45d544c72a4ae98423bce0267238b4dbfb12c6024fdce6dc7de33ee656c",
-      "same_raw_response_as_previous": ["ca-ccr-900"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-900"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-900.html",
@@ -377,7 +379,9 @@
       "bytes": 25429,
       "sha256": "94075f3bcdb5ecf7b70f64a9577efad972c38c4310de9dc78f9fc6cd9785ff13",
       "text_sha256": "6f529359fb51510d5d2aba8bd923eb9c3da2a8eb0baa7beffccdfde32317c542",
-      "same_raw_response_as_previous": ["ca-ccr-901"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-901"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-901.html",
@@ -400,7 +404,9 @@
       "bytes": 38034,
       "sha256": "10ee39592eb803909a86fe85d5a2ec2cebdb6b38c20bd015f5c079545784f5ac",
       "text_sha256": "122e2e28d07c115f69dd4863ac8c5efb1ff733cb858e19d3db1b4e25036a51a4",
-      "same_raw_response_as_previous": ["ca-ccr-910"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-910"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-910.html",
@@ -423,7 +429,9 @@
       "bytes": 39285,
       "sha256": "fe9cff47e7ca46ea985b337ecdb9ce4ae3935090107a3d287243766b9e5aff22",
       "text_sha256": "c53f1c40658a7caba7005866826e1763f34cfda07097d68a766edc2279dbf257",
-      "same_raw_response_as_previous": ["ca-ccr-911"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-911"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-911.html",
@@ -446,7 +454,9 @@
       "bytes": 25652,
       "sha256": "a12034be5a4d074e4e759d3d30236f6798dbeb36f93ca56ee12e68f2ac4f3433",
       "text_sha256": "925b320101431fc7dc8895b6c8fd6741da3478976c84400e357bf69d4e5f4df7",
-      "same_raw_response_as_previous": ["ca-ccr-912"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-912"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-912.html",
@@ -469,7 +479,9 @@
       "bytes": 28363,
       "sha256": "91b2ee998902cd99d7bc70d234546828c210437d69808a970b68c6c926e9b263",
       "text_sha256": "adbd8bbd57d252ce8947ec578e82654367d74c364152eb1aaa4e483aadac77cc",
-      "same_raw_response_as_previous": ["ca-ccr-913"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-913"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-913.html",
@@ -492,7 +504,9 @@
       "bytes": 32909,
       "sha256": "afbd7b41e7a9f2d1f23d1f5332b4e43d3808369b5d221dc9a132c5cca4bf8611",
       "text_sha256": "596bd3ed572979349eccc856fd315da83694606f38f75782809fa444d14a9267",
-      "same_raw_response_as_previous": ["ca-ccr-914"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-914"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-914.html",
@@ -515,7 +529,9 @@
       "bytes": 26563,
       "sha256": "a9ab2fdb42ffcc95dc3cb6e952378a2c81639e6ef6e7dc06afecad79c0616f66",
       "text_sha256": "a113cc75046f8c2235d4faf1f2c40bcfacf63b8730deecfdc249052c893be886",
-      "same_raw_response_as_previous": ["ca-ccr-915"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-915"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-915.html",
@@ -538,7 +554,9 @@
       "bytes": 25082,
       "sha256": "7cc64ef7d0096556504fa498f75903d4c1aca33fc324a873f6bb4bcb186c7220",
       "text_sha256": "ae9529f58c97756d152d16e708cce515e1ac9f24082635a5711b4d2c5f10c4a9",
-      "same_raw_response_as_previous": ["ca-ccr-916"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-916"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-916.html",
@@ -561,7 +579,9 @@
       "bytes": 30221,
       "sha256": "1ef93bbde3356391238f85dc144c86159076eaf274444b8c28222082bf971c8a",
       "text_sha256": "c7983d9618ab48bb70dd1eb9de05f3838c2139ff1a7c4c2302e95c2dc52ef296",
-      "same_raw_response_as_previous": ["ca-ccr-917"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-917"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-917.html",
@@ -584,7 +604,9 @@
       "bytes": 11906,
       "sha256": "3a47d60d6ae2c39654eb7d536e480c486638250032f17112115f9b861550c8cb",
       "text_sha256": "13cd6856be4464f4387fba7a8b8060dc93f5fc90346b9f4ee819aa8392cf4ac0",
-      "same_raw_response_as_previous": ["ca-ccr-920"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-920"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-920.html",
@@ -607,7 +629,9 @@
       "bytes": 15885,
       "sha256": "23e0711b7e35883603bb8dbf02440a1333f202952a93b3466bf48c812849fb38",
       "text_sha256": "ccad6bfdef3b3f2dc260b80ab17576f9d6184c71b65d3998f0b4bc4f259c523c",
-      "same_raw_response_as_previous": ["ca-ccr-921"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-921"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-921.html",
@@ -630,7 +654,9 @@
       "bytes": 11273,
       "sha256": "45f3e87a02c43fc61a7ddaf770e856e8870a4ed82ee41027eb3a55774436f11c",
       "text_sha256": "69fd7b0e808a9f97bab6ea3dde5f61b975fe42eac564665972749f70701faf67",
-      "same_raw_response_as_previous": ["ca-ccr-922"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-922"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-922.html",
@@ -653,7 +679,9 @@
       "bytes": 18180,
       "sha256": "ce4f7cbd7af534244a4f84ca5f0bcd8c48eb4357eb399009eabbbec9baa0da7b",
       "text_sha256": "018d4dfe6850b23e7eb2a77f73c4d771814c1aeea34da74d1cf11b0702ebd4c0",
-      "same_raw_response_as_previous": ["ca-ccr-930"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-930"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-930.html",
@@ -676,7 +704,9 @@
       "bytes": 21369,
       "sha256": "a471097a58c1d2fca3399a9356f01ae4f195d0a0a6b4171149cb37ce5173f815",
       "text_sha256": "98bda60e010eaddc9fabb3427126cfe07fa5bba21723270f1f1c9eca88427e54",
-      "same_raw_response_as_previous": ["ca-ccr-931"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-931"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-931.html",
@@ -699,7 +729,9 @@
       "bytes": 11676,
       "sha256": "7a5b98bfdb3c11e7d686257e037f0b05074c514580fc91067d88bb7e63babacf",
       "text_sha256": "db039a2035b910715962f57731d399a9c93c8c4b5b3b2627a22aba98d5cd3391",
-      "same_raw_response_as_previous": ["ca-ccr-940"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-940"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-940.html",
@@ -722,7 +754,9 @@
       "bytes": 11327,
       "sha256": "f92004a6fa4f562fcd0407488ea7b8d22b52af89bdbaf2507baad8d8061126d7",
       "text_sha256": "a99252d77434fdd091d44eb4d4746047a07c8688f501e7612859cb41b076d83e",
-      "same_raw_response_as_previous": ["ca-ccr-941"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-941"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-941.html",
@@ -745,7 +779,9 @@
       "bytes": 14798,
       "sha256": "278eebfd613b7270089ca866924b071114058d4a02b5619d7a7125805c576a27",
       "text_sha256": "c94f4d74933fe45a6bba96372eb6f3eae6daa196213d95551013e07528965dcb",
-      "same_raw_response_as_previous": ["ca-ccr-942"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-942"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-942.html",
@@ -768,7 +804,9 @@
       "bytes": 14639,
       "sha256": "be2d1e7ab9f4f3504131d6b2dc309a86684db4b982e3b80d28d66e69474da2f8",
       "text_sha256": "d16f40debd5809a7ed85f3da892bd8d312e302a100d354b76e6833c961329748",
-      "same_raw_response_as_previous": ["ca-ccr-943"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-943"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-943.html",
@@ -791,7 +829,9 @@
       "bytes": 14410,
       "sha256": "25b84452143b814e2a1cc08cdf9a5e4e015aaa71548d0fe7aede14c18ab827ad",
       "text_sha256": "4cd18b33e11440ea6c5ce90475ede79f2346a31a336c9421d8b3fe34a861e4f5",
-      "same_raw_response_as_previous": ["ca-ccr-950"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-950"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-950.html",
@@ -814,7 +854,9 @@
       "bytes": 11983,
       "sha256": "ea332178ac9fccfb38d46917038394b86eb045771a7fbc8759b2ae074463ea20",
       "text_sha256": "79c5786c5eb8b1e6057e8f82566d2af0e975caafb47df2ddd1f512668b88857d",
-      "same_raw_response_as_previous": ["ca-ccr-951"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-951"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-951.html",
@@ -837,7 +879,9 @@
       "bytes": 16604,
       "sha256": "b10ed132f35e57cc64f261fbca0571efb5860214e22b6d637c33c1b19aadb8e2",
       "text_sha256": "0d6489496b916214b4a89414f59c55ba8961d9e1d388f1c4f6e1f4887d3e6069",
-      "same_raw_response_as_previous": ["ca-ccr-952"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-952"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-952.html",
@@ -860,7 +904,9 @@
       "bytes": 11023,
       "sha256": "2e77edf9d4116a83cb0ebe1a8be34ce31ae7988a28ce0acca8e7c16af8cab8b8",
       "text_sha256": "1a93d58f3ee9f40f1f623fd127b72cd43914fa9361a0ee745ea46c572f8ce6da",
-      "same_raw_response_as_previous": ["ca-ccr-953"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-953"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-953.html",
@@ -883,7 +929,9 @@
       "bytes": 11094,
       "sha256": "cab0d633a6bf189442328670c53b236984230fab5ea0eb7c25ce45788693b32c",
       "text_sha256": "cc58115c8ddf41549241d791e59fccad2bf8a32f49c7dda754cf88185ed9ad68",
-      "same_raw_response_as_previous": ["ca-ccr-954"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-954"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-954.html",
@@ -906,7 +954,9 @@
       "bytes": 13648,
       "sha256": "f600b55509ef55056042b7b1a0cd1c7f51ec33cdca17fda8624127451151ee12",
       "text_sha256": "ae904427c30cee224cdb9110b095c6eaa89a16f42ddc841ff4dad47c96c073f3",
-      "same_raw_response_as_previous": ["ca-ccr-955"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-955"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-955.html",
@@ -929,7 +979,9 @@
       "bytes": 21507,
       "sha256": "0398cc0b5e0a8a62b2d6cfccf256f07bfb92c3299f6eb67206bccc80d631bee8",
       "text_sha256": "a17135c73c1bd35a1db386fb9751c2503304be995c3a36dd3f215084e9ab5c39",
-      "same_raw_response_as_previous": ["ca-ccr-956"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-956"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-956.html",
@@ -952,7 +1004,9 @@
       "bytes": 14795,
       "sha256": "2f802c87276287bd05e74722cdd4b2c00662d19d8f2d5f78cf209f754e1bb5fd",
       "text_sha256": "23ffed4cd2849c7ac6fc7cb0203135174b494d2cd8f404e47d1f2b03319b5411",
-      "same_raw_response_as_previous": ["ca-ccr-index"],
+      "same_raw_response_as_previous": [
+        "ca-ccr-index"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-ccr-index.html",
@@ -975,7 +1029,9 @@
       "bytes": 189084,
       "sha256": "21ba256b1143c1f27c6748fcb9ad4b50e5e0fe6eb9477bc958f2f95b1f2f3d10",
       "text_sha256": "7b2b3c175c798d5aa39c9cdb0f549686213bdd2f03a5f31a68545aade8553253",
-      "same_raw_response_as_previous": ["ca-dfpi-rules-index"],
+      "same_raw_response_as_previous": [
+        "ca-dfpi-rules-index"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ca-dfpi-rules-index.html",
@@ -1036,7 +1092,9 @@
       "content_type": "application/pdf",
       "bytes": 387883,
       "sha256": "c11f771ee42f5253669edfe14e58d199c607aba713990544edf988169ab833fc",
-      "same_raw_response_as_previous": ["ct-guidance"],
+      "same_raw_response_as_previous": [
+        "ct-guidance"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ct-guidance.pdf",
@@ -1252,7 +1310,9 @@
       "content_type": null,
       "bytes": 36586,
       "sha256": "48958eed53f81ca6cd784fd71602754884bcc23e16860faf2b7a9279bac3c5bc",
-      "same_raw_response_as_previous": ["ga-act"],
+      "same_raw_response_as_previous": [
+        "ga-act"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ga-act.pdf",
@@ -1275,7 +1335,9 @@
       "bytes": 20252,
       "sha256": "1cfe68272bdf5bb7fac1b7250173e79676a010fa8dfe16a8ed00dbb2ea9c24a8",
       "text_sha256": "bd53b234a8e966706fb330367a00e969602abf18537809f20ae07ce93af1dfd5",
-      "same_raw_response_as_previous": ["ks-code-783"],
+      "same_raw_response_as_previous": [
+        "ks-code-783"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ks-code-783.html",
@@ -1298,7 +1360,9 @@
       "bytes": 15885,
       "sha256": "2f491f9256f276afd375e25d2a82c5d15c6cd52fde7864221de69de72cf0e958",
       "text_sha256": "52dfc6f0cb2144901166b3ec7a7c164f46e64209af3ef25e8d1eef7d7b2e910e",
-      "same_raw_response_as_previous": ["ks-code-784"],
+      "same_raw_response_as_previous": [
+        "ks-code-784"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ks-code-784.html",
@@ -1321,7 +1385,9 @@
       "bytes": 14934,
       "sha256": "5eb520f3bc95f15424b45db92ef4c08f601b7d5c586a355d83c868bdefcdf997",
       "text_sha256": "500346fd377c0df007eb0395eff7f35d1b4f93c6e3f9ec0897b03936530ea8e7",
-      "same_raw_response_as_previous": ["ks-code-785"],
+      "same_raw_response_as_previous": [
+        "ks-code-785"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ks-code-785.html",
@@ -1344,7 +1410,9 @@
       "bytes": 13829,
       "sha256": "9e43be37380d7e8cb7c3ba52fa764c7e62e1cd7c6aa87b5c454fd8598d8a9d43",
       "text_sha256": "97fbed2e230c48d6c9748d1e424f2c3250782bc474b1a42f46360bc66ae47efd",
-      "same_raw_response_as_previous": ["ks-code-786"],
+      "same_raw_response_as_previous": [
+        "ks-code-786"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ks-code-786.html",
@@ -1367,7 +1435,9 @@
       "bytes": 13681,
       "sha256": "3b6ff39055dcaa7f99d434a79e78cfff85ccf3903ee0b414b17b809cfde6c865",
       "text_sha256": "c4da089a558ef2f3e3fdfdc1a1e17f3a4de1595ec66aa27deb888a9de3bc76ef",
-      "same_raw_response_as_previous": ["ks-code-787"],
+      "same_raw_response_as_previous": [
+        "ks-code-787"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ks-code-787.html",
@@ -1390,7 +1460,9 @@
       "bytes": 33637,
       "sha256": "cd7309ac17ab86b0fb10d5b82e76c2ab12db7467af42d067dc4a6c93079c9601",
       "text_sha256": "9b0015c3b17762f14a4f56327b8bc4b46139fbad0c1d32cf9db68b278132ae2e",
-      "same_raw_response_as_previous": ["la-code"],
+      "same_raw_response_as_previous": [
+        "la-code"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "la-code.html",
@@ -1458,7 +1530,9 @@
       "content_type": "application/pdf",
       "bytes": 652140,
       "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624",
-      "same_raw_response_as_previous": ["ny-adopted"],
+      "same_raw_response_as_previous": [
+        "ny-adopted"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ny-adopted.pdf",
@@ -1497,7 +1571,9 @@
       "content_type": "application/pdf",
       "bytes": 652140,
       "sha256": "6823b66ce573aae7d85500d3791866cd69b475982a267e3417bb5776d6409624",
-      "same_raw_response_as_previous": ["ny-current-linked"],
+      "same_raw_response_as_previous": [
+        "ny-current-linked"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ny-current-linked.pdf",
@@ -1585,7 +1661,9 @@
       "content_type": "application/pdf",
       "bytes": 504276,
       "sha256": "7b2705a6055adddda05cb812e0e142c02c27ce7a74f2cc68ba90396bd72b655d",
-      "same_raw_response_as_previous": ["ny-register-2026-09-09"],
+      "same_raw_response_as_previous": [
+        "ny-register-2026-09-09"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ny-register-2026-09-09.bin",
@@ -1671,7 +1749,9 @@
       "bytes": 24614,
       "sha256": "2906937b90c43fe8d696f466fc78c4520c03ad43a5850970d6ae6f4ab0c1572d",
       "text_sha256": "e8491e4ab3d96e3445f8924b7bae53a7503d4c39ce42762e7a28d401c04efef3",
-      "same_raw_response_as_previous": ["tx-current-static"],
+      "same_raw_response_as_previous": [
+        "tx-current-static"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "tx-current-static.html",
@@ -1693,7 +1773,9 @@
       "content_type": "application/pdf",
       "bytes": 319806,
       "sha256": "d03e47a46c3be7e2af3d217dfb90df49ca349d31618944d51b3b9ec75eb0a9f8",
-      "same_raw_response_as_previous": ["tx-full-adoption"],
+      "same_raw_response_as_previous": [
+        "tx-full-adoption"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "tx-full-adoption.pdf",
@@ -1739,7 +1821,9 @@
       "bytes": 2861,
       "sha256": "c852bf708cccc332ccae22c9289ebe7780495fd589013b48278fff3ab633b17b",
       "text_sha256": "9748956c1f7e1f9e8d47a0e19a95727ec6e59b473c810393a0ff04b951f72d5c",
-      "same_raw_response_as_previous": ["ut-current-content"],
+      "same_raw_response_as_previous": [
+        "ut-current-content"
+      ],
       "contentAssessment": "Chapter navigation page only. Followed its PDF link; complete body is ut-current-chapter-pdf.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ut-current-content.html",
@@ -1762,7 +1846,9 @@
       "bytes": 29524,
       "sha256": "7f3a01f9d9df4d500bb23eaf070160c70e897c4d36a01072d5c79ed0c1e51708",
       "text_sha256": "ea86eff7371353f3022c3e82113f60210a89cae6c1a682518b9cbb41a1494805",
-      "same_raw_response_as_previous": ["ut-dfi-index"],
+      "same_raw_response_as_previous": [
+        "ut-dfi-index"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ut-dfi-index.html",
@@ -1784,7 +1870,9 @@
       "content_type": "application/pdf",
       "bytes": 188931,
       "sha256": "9cf272cacc3a071cc5d939d706fd7de8cba963dcc92c757c22fe246efdb779fd",
-      "same_raw_response_as_previous": ["ut-faq"],
+      "same_raw_response_as_previous": [
+        "ut-faq"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ut-faq.pdf",
@@ -1807,7 +1895,9 @@
       "bytes": 26610,
       "sha256": "ea00b935d67de1f0b285f6797b32806988db52f17dd995def630b9551be87e95",
       "text_sha256": "239c84025f0e3bee8bae17fdb812ce21721feacf4ee68d45bc41dc1f40945310",
-      "same_raw_response_as_previous": ["ut-landing"],
+      "same_raw_response_as_previous": [
+        "ut-landing"
+      ],
       "contentAssessment": "JavaScript chapter landing page, not a complete statutory text capture.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "ut-landing.html",
@@ -1852,7 +1942,9 @@
       "content_type": "application/pdf",
       "bytes": 127203,
       "sha256": "146da959abc2581a47fd9839da3771630bc63a0b915a5596cd8a2d4941e18b29",
-      "same_raw_response_as_previous": ["va-form"],
+      "same_raw_response_as_previous": [
+        "va-form"
+      ],
       "contentAssessment": "HTTP success only; see source-ledger for legal scope, edition and substantive comparison.",
       "rawResponseArchivedHere": null,
       "scratchRawFilename": "va-form.pdf",
@@ -2186,7 +2278,9 @@
     },
     {
       "file": "evidence/ecfr-tcpa-web-extract.txt",
-      "urls": ["https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"],
+      "urls": [
+        "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"
+      ],
       "observedOn": "2026-09-13",
       "sha256": "31f5f9558236b1ae856d6bfc4b4eb0c06ae06d6ee65e91cb9795562841864c9e",
       "rawResponseHash": null,
@@ -2194,7 +2288,9 @@
     },
     {
       "file": "evidence/ecfr-tcpa-f9-web-extract.txt",
-      "urls": ["https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"],
+      "urls": [
+        "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"
+      ],
       "observedOn": "2026-09-13",
       "sha256": "c095b6b69f270986dcc9f2395c9082b37df212695d65bad7653abff2781a1196",
       "rawResponseHash": null,
@@ -2205,7 +2301,9 @@
     {
       "label": "MO",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/mo-427.300-2025.txt",
-      "retrievalIds": ["mo-current"],
+      "retrievalIds": [
+        "mo-current"
+      ],
       "normalized_prior_is_contained_in_current": true,
       "prior_characters": 16058,
       "priorSha256": "42f38dee51c471cdffa063e55bbf47bc7f243613d502646aec4a22f1aa4331c9",
@@ -2214,7 +2312,9 @@
     {
       "label": "VA Code",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/va-code-6.2-2228-2238-current.txt",
-      "retrievalIds": ["va-code"],
+      "retrievalIds": [
+        "va-code"
+      ],
       "normalized_prior_is_contained_in_current": true,
       "prior_characters": 9875,
       "priorSha256": "c19f2dcb3ec78df19f97c6b39b87174d276a53604d733a63dd8e7f4c019f9866",
@@ -2223,7 +2323,9 @@
     {
       "label": "CA Finance Code",
       "prior": "docs/research/mca-agreement-requirements-2026-09-12/evidence/ca-finance-22800-22807.txt",
-      "retrievalIds": ["ca-finance-current"],
+      "retrievalIds": [
+        "ca-finance-current"
+      ],
       "prior_span_from": "22800.",
       "prior_span_before": "end",
       "normalized_prior_is_contained_in_current": true,
@@ -2234,7 +2336,9 @@
     {
       "label": "VA Rules",
       "prior": "docs/research/mca-agreement-requirements-2026-09-12/evidence/va-10vac5-240.txt",
-      "retrievalIds": ["va-rules-current"],
+      "retrievalIds": [
+        "va-rules-current"
+      ],
       "prior_span_from": "10VAC5-240-10.",
       "prior_span_before": "As a service",
       "normalized_prior_is_contained_in_current": true,
@@ -2245,7 +2349,9 @@
     {
       "label": "fl-code-961",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
-      "retrievalIds": ["fl-code-961"],
+      "retrievalIds": [
+        "fl-code-961"
+      ],
       "normalized_prior_section_is_contained_in_current": true,
       "prior_characters": 126,
       "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
@@ -2254,7 +2360,9 @@
     {
       "label": "fl-code-9611",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
-      "retrievalIds": ["fl-code-9611"],
+      "retrievalIds": [
+        "fl-code-9611"
+      ],
       "normalized_prior_section_is_contained_in_current": true,
       "prior_characters": 4214,
       "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
@@ -2263,7 +2371,9 @@
     {
       "label": "fl-code-9612",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
-      "retrievalIds": ["fl-code-9612"],
+      "retrievalIds": [
+        "fl-code-9612"
+      ],
       "normalized_prior_section_is_contained_in_current": true,
       "prior_characters": 1847,
       "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
@@ -2272,7 +2382,9 @@
     {
       "label": "fl-code-9613",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
-      "retrievalIds": ["fl-code-9613"],
+      "retrievalIds": [
+        "fl-code-9613"
+      ],
       "normalized_prior_section_is_contained_in_current": true,
       "prior_characters": 2393,
       "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
@@ -2281,7 +2393,9 @@
     {
       "label": "fl-code-9614",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
-      "retrievalIds": ["fl-code-9614"],
+      "retrievalIds": [
+        "fl-code-9614"
+      ],
       "normalized_prior_section_is_contained_in_current": true,
       "prior_characters": 1251,
       "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
@@ -2290,7 +2404,9 @@
     {
       "label": "fl-code-9615",
       "prior": "docs/research/mca-source-audit-2026-09-12/evidence/fl-559.961-9615-2026.txt",
-      "retrievalIds": ["fl-code-9615"],
+      "retrievalIds": [
+        "fl-code-9615"
+      ],
       "normalized_prior_section_is_contained_in_current": true,
       "prior_characters": 1168,
       "priorSha256": "896ce35f64d1a76f8a64fbff57e4b1bc9e1f5b0f524f7971f13dc2feeb9833df",
@@ -2302,42 +2418,54 @@
       "file": "evidence/fcc-da26-12.pdf",
       "bytes": 97201,
       "sha256": "b21a1ff3dda5369ee6b178658f85d62c14fa51366b8d7ee7bedddead29da92be",
-      "retrievalIds": ["fcc-da26-12"],
+      "retrievalIds": [
+        "fcc-da26-12"
+      ],
       "method": "Unmodified publisher PDF response, raw-response hash verified."
     },
     {
       "file": "evidence/fcc-da26-12.layout.txt",
       "bytes": 12626,
       "sha256": "b6b62da9387ae68d3cbc5435db27b8d43dd6190f2814fe490e4bedd12edcd18c",
-      "retrievalIds": ["fcc-da26-12"],
+      "retrievalIds": [
+        "fcc-da26-12"
+      ],
       "method": "pdftotext -layout. FTC PDF emitted Invalid Font Weight warnings; text is an aid and the retained PDF controls. Only targeted FCRA paragraphs were substantively reread. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
     },
     {
       "file": "evidence/ut-current-chapter-pdf.pdf",
       "bytes": 13478,
       "sha256": "9897aace38c58cabf845a403689fe9809f83e7c5bc3be01608a110bdf32585c0",
-      "retrievalIds": ["ut-current-chapter-pdf"],
+      "retrievalIds": [
+        "ut-current-chapter-pdf"
+      ],
       "method": "Unmodified publisher PDF response, raw-response hash verified."
     },
     {
       "file": "evidence/ut-current-chapter-pdf.layout.txt",
       "bytes": 14077,
       "sha256": "3fc08e5ccce2f9b41ac219cc6b380ed319d8ccbbd6860e34cfcfbe21786120d8",
-      "retrievalIds": ["ut-current-chapter-pdf"],
+      "retrievalIds": [
+        "ut-current-chapter-pdf"
+      ],
       "method": "pdftotext -layout. FTC PDF emitted Invalid Font Weight warnings; text is an aid and the retained PDF controls. Only targeted FCRA paragraphs were substantively reread. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
     },
     {
       "file": "evidence/ftc-fcra-2026.pdf",
       "bytes": 883213,
       "sha256": "3eb6bf6fbffdb49ed56873ea584fcd4a23c0e772a2db68a337382cdadaec645a",
-      "retrievalIds": ["ftc-fcra-2026"],
+      "retrievalIds": [
+        "ftc-fcra-2026"
+      ],
       "method": "Unmodified publisher PDF response, raw-response hash verified."
     },
     {
       "file": "evidence/ftc-fcra-2026.layout.txt",
       "bytes": 318247,
       "sha256": "7ec6c7507eaa7c21549ee758bea91fb798ce4ba1323c3ea1293d638cba294231",
-      "retrievalIds": ["ftc-fcra-2026"],
+      "retrievalIds": [
+        "ftc-fcra-2026"
+      ],
       "method": "pdftotext -layout. FTC PDF emitted Invalid Font Weight warnings; text is an aid and the retained PDF controls. Only targeted FCRA paragraphs were substantively reread. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
     },
     {
@@ -2361,28 +2489,36 @@
       "file": "evidence/ny-principis-2022.txt",
       "bytes": 6246,
       "sha256": "ea546d7c09d18c4770e332920aa3eb5d5cd7b2dd8aeff41d48a3eef9da3a7460",
-      "retrievalIds": ["ny-principis-2022"],
+      "retrievalIds": [
+        "ny-principis-2022"
+      ],
       "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
     },
     {
       "file": "evidence/ny-bridge-2025.txt",
       "bytes": 16497,
       "sha256": "3e6cf98097dc6440dd868eaa42b1063948912318d97237eabef9110cd7d8931b",
-      "retrievalIds": ["ny-bridge-2025"],
+      "retrievalIds": [
+        "ny-bridge-2025"
+      ],
       "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
     },
     {
       "file": "evidence/ny-kapitus-2025.txt",
       "bytes": 4160,
       "sha256": "f61483fc4563e697d8996f09799cdf363f1b350f57445d2a148d3dd84009f701",
-      "retrievalIds": ["ny-kapitus-2025"],
+      "retrievalIds": [
+        "ny-kapitus-2025"
+      ],
       "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
     },
     {
       "file": "evidence/ny-richmond-2026.txt",
       "bytes": 8780,
       "sha256": "a0d325c24de6ef236bd94a78bcbd0c59c8d25264349d33a88ea8e366573cb833",
-      "retrievalIds": ["ny-richmond-2026"],
+      "retrievalIds": [
+        "ny-richmond-2026"
+      ],
       "method": "HTMLParser extraction; scripts/styles omitted and whitespace normalized. Majority and separate Bridge concurrence retained; findings distinguish their authority. Trailing ASCII whitespace and web-tool transport metadata omitted where present; publisher PDF bytes are separately retained unchanged."
     },
     {

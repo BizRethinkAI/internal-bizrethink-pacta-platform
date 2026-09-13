@@ -19,7 +19,10 @@
       "analysis": "The parties record defines when the purchase becomes effective and funded; the representations lead-in limits when statements speak; execution defines signature capacity and evidentiary limits. The guarantor block determines who incurs liability and how identifiers are handled. The equipment explanation prohibits double charging. These are substantive effects inside records that look structural. The pending release preamble also limits authority to an identified transaction. An unnumbered heading or field-group tag cannot decide the fate of the entire body.",
       "nextAction": "Keep the unified MCA design and separate catalogues. Before approving the provisional map in PR #200, identify the operative sentences, data fields and presentation instructions within each candidate. Preserve enforceable terms in the executed package with stable references and review history; determine their final catalogue and numbering in the later design task. Moving an entire record into helpers must not make its obligations optional.",
       "authorityUrls": [],
-      "pendingPrs": [194, 200]
+      "pendingPrs": [
+        194,
+        200
+      ]
     },
     {
       "id": "MCA-R02",
@@ -61,7 +64,9 @@
       "analysis": "The FRPA requires identifiers to be collected securely outside the agreement and prohibits an unmasked full number in ordinary copies, but the same record declares a required Social Security Number widget. Both equipment field groups also require full SSNs and contain no body-level masking/capacity rule. A single block does not implement the FRPA’s separate identification and signature block for every intended guarantor, including an entity guarantor. PR #194 corrects acknowledgment wording but does not change these fields or create signature routing.",
       "nextAction": "Separate identity verification from document-visible identity. Make business and individual/entity capacities explicit, support repeated guarantors and document-safe identifiers, and bind each required signature/date to the correct record. Treat actual report authorization separately from becoming a guarantor.",
       "authorityUrls": [],
-      "pendingPrs": [194]
+      "pendingPrs": [
+        194
+      ]
     },
     {
       "id": "MCA-R04",
@@ -161,7 +166,9 @@
         "https://www.ftc.gov/system/files/ftc_gov/pdf/fcra-march-2026.pdf",
         "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"
       ],
-      "pendingPrs": [194]
+      "pendingPrs": [
+        194
+      ]
     },
     {
       "id": "MCA-R08",
@@ -255,7 +262,9 @@
       "analysis": "The guaranties exclude monthly payments and acceleration but guarantee return/value and Merchant fraud or material present-fact misrepresentation, without limiting misconduct to the guarantor’s own acts. They then waive defenses broadly, consent prospectively to extensions/modifications, call themselves continuing, and promise all enforcement expenses. The fee schedule’s 25% cap and default provision’s cost recovery do not clearly form one aggregate limit across guaranty, indemnity and collection charges. PR #194 narrows acknowledgment adoption but leaves these obligations unchanged.",
       "nextAction": "Decide whose conduct is guaranteed, whether innocent material error is intended to qualify, what amendments require separate consent, and the precise cost limit. Preserve the exclusion of ordinary business failure and unowed monthly payments in every related clause and signature. Do not describe this as the same limited-conduct bargain as the FRPA merely because both use the word limited.",
       "authorityUrls": [],
-      "pendingPrs": [194]
+      "pendingPrs": [
+        194
+      ]
     },
     {
       "id": "MCA-R12",
@@ -347,7 +356,9 @@
       "analysis": "The source ledger refreshes the eleven dedicated schemes using prior full reads and current official retrievals. California’s consolidated rules still print August 28, 2026 currency; New York’s linked adoption PDF remains the 2023 edition, supported by the documented register search through September 9. Connecticut’s statutory sites could not be reread this time, so the September 12 supplement evidence is reused explicitly. Georgia full current-code text and Missouri’s rule-dependent commencement history remain unclosed. PR #187 merged during the review and is integrated at 7f178f8e4; it changes source/citation metadata, with all 211 clause bodies unchanged. Virginia’s official-form correction in #190 remains a pending candidate at that snapshot. Not every disclosure requirement prescribes verbatim text.",
       "nextAction": "Retain exact URLs, dates, hashes, scope and unsuccessful routes. Complete existing correction PR review/merge without reimplementing them here. Resolve the named source gaps before relying on affected eligibility/date logic, and recheck sources when enabling a new provider/product/state. This eleven-state collection is not a certification that no other jurisdiction has relevant law.",
       "authorityUrls": [],
-      "pendingPrs": [190]
+      "pendingPrs": [
+        190
+      ]
     },
     {
       "id": "MCA-R16",
@@ -392,7 +403,9 @@
         "https://docs.fcc.gov/public/attachments/DA-26-12A1.pdf",
         "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-B/part-64/subpart-L/section-64.1200"
       ],
-      "pendingPrs": [194]
+      "pendingPrs": [
+        194
+      ]
     },
     {
       "id": "MCA-R18",

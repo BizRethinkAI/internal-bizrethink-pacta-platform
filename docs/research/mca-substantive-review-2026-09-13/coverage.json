@@ -38,7 +38,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Coordinates disclosed fees and enforcement costs; cannot enlarge the purchase cap or authorize a duplicate charge.",
-      "findingIds": ["MCA-R02"],
+      "findingIds": [
+        "MCA-R02"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -94,7 +96,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Read as a coordinated proof, cure, remedies and costs regime; no acceleration of ungenerated receipts.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -142,7 +146,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Read as a coordinated proof, cure, remedies and costs regime; no acceleration of ungenerated receipts.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -190,7 +196,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Read as a coordinated proof, cure, remedies and costs regime; no acceleration of ungenerated receipts.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -234,7 +242,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Read as a coordinated proof, cure, remedies and costs regime; no acceleration of ungenerated receipts.",
-      "findingIds": ["MCA-R14"],
+      "findingIds": [
+        "MCA-R14"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -383,11 +393,16 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["acceleration-defeats-indefinite-term", "completion-threshold-two-conflicting-tests"]
+          "findings": [
+            "acceleration-defeats-indefinite-term",
+            "completion-threshold-two-conflicting-tests"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-7-6-and-4-2-contradict-the-2-6-completion-test"]
+          "findings": [
+            "frpa-7-6-and-4-2-contradict-the-2-6-completion-test"
+          ]
         }
       ],
       "source": {
@@ -414,7 +429,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument"]
+          "findings": [
+            "frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument"
+          ]
         }
       ],
       "source": {
@@ -441,7 +458,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-undefined-capitalised-terms-in-the-unexamined-clauses"]
+          "findings": [
+            "frpa-undefined-capitalised-terms-in-the-unexamined-clauses"
+          ]
         }
       ],
       "source": {
@@ -525,7 +544,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["information-sharing-only-vs-any-third-party"]
+          "findings": [
+            "information-sharing-only-vs-any-third-party"
+          ]
         }
       ],
       "source": {
@@ -582,7 +603,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-4-9-authorises-ucc-filings-under-a-dba-the-repository-does-not-record"]
+          "findings": [
+            "frpa-4-9-authorises-ucc-filings-under-a-dba-the-repository-does-not-record"
+          ]
         }
       ],
       "source": {
@@ -619,7 +642,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-4-9-authorises-ucc-filings-under-a-dba-the-repository-does-not-record"]
+          "findings": [
+            "frpa-4-9-authorises-ucc-filings-under-a-dba-the-repository-does-not-record"
+          ]
         }
       ],
       "source": {
@@ -646,7 +671,10 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["all-assets-lien-vs-nonrecourse-recital", "frpa-sub-equipment-lien-conflict"]
+          "findings": [
+            "all-assets-lien-vs-nonrecourse-recital",
+            "frpa-sub-equipment-lien-conflict"
+          ]
         }
       ],
       "source": {
@@ -673,7 +701,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-4-12-reopens-the-acceleration-6-2-closed"]
+          "findings": [
+            "frpa-4-12-reopens-the-acceleration-6-2-closed"
+          ]
         }
       ],
       "source": {
@@ -730,11 +760,15 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["cancellation-forfeits-origination-fee"]
+          "findings": [
+            "cancellation-forfeits-origination-fee"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["iso-a2-a4-no-clawback-when-the-merchant-cancels-under-frpa-4-14"]
+          "findings": [
+            "iso-a2-a4-no-clawback-when-the-merchant-cancels-under-frpa-4-14"
+          ]
         }
       ],
       "source": {
@@ -763,7 +797,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["lombard-multi-position-vs-no-stack"]
+          "findings": [
+            "lombard-multi-position-vs-no-stack"
+          ]
         }
       ],
       "source": {
@@ -792,7 +828,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["lombard-multi-position-vs-no-stack"]
+          "findings": [
+            "lombard-multi-position-vs-no-stack"
+          ]
         }
       ],
       "source": {
@@ -846,7 +884,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Creates capacity/evidence and copy-delivery protections; signature placement alone does not implement them.",
-      "findingIds": ["MCA-R01", "MCA-R18"],
+      "findingIds": [
+        "MCA-R01",
+        "MCA-R18"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -873,7 +914,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Funding display or election with substantive price/collection effects; keep data and operative duties consistent.",
-      "findingIds": ["MCA-R02", "MCA-R18"],
+      "findingIds": [
+        "MCA-R02",
+        "MCA-R18"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -900,7 +944,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Funding display or election with substantive price/collection effects; keep data and operative duties consistent.",
-      "findingIds": ["MCA-R15"],
+      "findingIds": [
+        "MCA-R15"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -956,7 +1002,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Funding display or election with substantive price/collection effects; keep data and operative duties consistent.",
-      "findingIds": ["MCA-R01", "MCA-R02"],
+      "findingIds": [
+        "MCA-R01",
+        "MCA-R02"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -985,7 +1034,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Funding display or election with substantive price/collection effects; keep data and operative duties consistent.",
-      "findingIds": ["MCA-R02"],
+      "findingIds": [
+        "MCA-R02"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -1014,7 +1065,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Determines identification, scope or procedure for a separately signed guaranty; review actual capacity and limits.",
-      "findingIds": ["MCA-R01", "MCA-R03"],
+      "findingIds": [
+        "MCA-R01",
+        "MCA-R03"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -1023,11 +1077,15 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["frpa-guarantor-widget-bound-to-merchant"]
+          "findings": [
+            "frpa-guarantor-widget-bound-to-merchant"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-9-5-refers-to-guarantors-the-form-cannot-collect"]
+          "findings": [
+            "frpa-9-5-refers-to-guarantors-the-form-cannot-collect"
+          ]
         }
       ],
       "source": {
@@ -1047,7 +1105,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Determines identification, scope or procedure for a separately signed guaranty; review actual capacity and limits.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -1090,7 +1150,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Determines identification, scope or procedure for a separately signed guaranty; review actual capacity and limits.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -1204,7 +1266,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-9-5-refers-to-guarantors-the-form-cannot-collect"]
+          "findings": [
+            "frpa-9-5-refers-to-guarantors-the-form-cannot-collect"
+          ]
         }
       ],
       "source": {
@@ -1233,7 +1297,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-9-5-refers-to-guarantors-the-form-cannot-collect"]
+          "findings": [
+            "frpa-9-5-refers-to-guarantors-the-form-cannot-collect"
+          ]
         }
       ],
       "source": {
@@ -1317,14 +1383,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R16"],
+      "findingIds": [
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-7-1-has-no-except-as-expressly-provided-carve-out"]
+          "findings": [
+            "frpa-7-1-has-no-except-as-expressly-provided-carve-out"
+          ]
         }
       ],
       "source": {
@@ -1351,7 +1421,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-7-2-permits-delegation-of-the-reconciliation-duty"]
+          "findings": [
+            "frpa-7-2-permits-delegation-of-the-reconciliation-duty"
+          ]
         }
       ],
       "source": {
@@ -1371,18 +1443,24 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R02"],
+      "findingIds": [
+        "MCA-R02"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["reconciliation-right-conditioned-into-near-nullity"]
+          "findings": [
+            "reconciliation-right-conditioned-into-near-nullity"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-6-4-24-hour-notice-cannot-be-given-under-7-3"]
+          "findings": [
+            "frpa-6-4-24-hour-notice-cannot-be-given-under-7-3"
+          ]
         }
       ],
       "source": {
@@ -1444,7 +1522,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-7-24-does-not-name-the-statute-that-actually-bites"]
+          "findings": [
+            "frpa-7-24-does-not-name-the-statute-that-actually-bites"
+          ]
         }
       ],
       "source": {
@@ -1464,14 +1544,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R14"],
+      "findingIds": [
+        "MCA-R14"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-7-6-and-4-2-contradict-the-2-6-completion-test"]
+          "findings": [
+            "frpa-7-6-and-4-2-contradict-the-2-6-completion-test"
+          ]
         }
       ],
       "source": {
@@ -1498,7 +1582,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["frpa-severability-text-under-entire-agreement"]
+          "findings": [
+            "frpa-severability-text-under-entire-agreement"
+          ]
         }
       ],
       "source": {
@@ -1525,7 +1611,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["frpa-severability-text-under-entire-agreement"]
+          "findings": [
+            "frpa-severability-text-under-entire-agreement"
+          ]
         }
       ],
       "source": {
@@ -1590,7 +1678,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false"]
+          "findings": [
+            "frpa-7-10-jury-waiver-recites-what-7-22-contemplates-is-false"
+          ]
         }
       ],
       "source": {
@@ -1619,7 +1709,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["class-waiver-forfeits-own-recovery"]
+          "findings": [
+            "class-waiver-forfeits-own-recovery"
+          ]
         }
       ],
       "source": {
@@ -1646,7 +1738,10 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["ct-prejudgment-remedy-waiver", "service-without-notice-vs-commitment-9"]
+          "findings": [
+            "ct-prejudgment-remedy-waiver",
+            "service-without-notice-vs-commitment-9"
+          ]
         }
       ],
       "source": {
@@ -1675,7 +1770,10 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["frontload-refactors-old-balance", "lombard-multi-position-vs-no-stack"]
+          "findings": [
+            "frontload-refactors-old-balance",
+            "lombard-multi-position-vs-no-stack"
+          ]
         }
       ],
       "source": {
@@ -1702,7 +1800,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["information-sharing-only-vs-any-third-party"]
+          "findings": [
+            "information-sharing-only-vs-any-third-party"
+          ]
         }
       ],
       "source": {
@@ -1729,7 +1829,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["default-collection-reaches-cash-and-checks"]
+          "findings": [
+            "default-collection-reaches-cash-and-checks"
+          ]
         }
       ],
       "source": {
@@ -1776,14 +1878,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R17"],
+      "findingIds": [
+        "MCA-R17"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["tcpa-consent-not-revocable-as-promised"]
+          "findings": [
+            "tcpa-consent-not-revocable-as-promised"
+          ]
         }
       ],
       "source": {
@@ -1803,7 +1909,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R14"],
+      "findingIds": [
+        "MCA-R14"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -1869,7 +1977,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R02"],
+      "findingIds": [
+        "MCA-R02"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -1878,11 +1988,15 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-channel-vs-never-cold-call"]
+          "findings": [
+            "iso-channel-vs-never-cold-call"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["iso-a6-and-frpa-7-21-give-different-answers-about-a-merchant-paid-fee"]
+          "findings": [
+            "iso-a6-and-frpa-7-21-give-different-answers-about-a-merchant-paid-fee"
+          ]
         }
       ],
       "source": {
@@ -1902,7 +2016,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R16"],
+      "findingIds": [
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -1939,7 +2055,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["information-sharing-only-vs-any-third-party"]
+          "findings": [
+            "information-sharing-only-vs-any-third-party"
+          ]
         }
       ],
       "source": {
@@ -1959,7 +2077,11 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R14", "MCA-R15", "MCA-R16"],
+      "findingIds": [
+        "MCA-R14",
+        "MCA-R15",
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -1990,7 +2112,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R15"],
+      "findingIds": [
+        "MCA-R15"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -2022,7 +2146,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Governs administration, dispute procedure or third-party effects; preserve the express limits and mandatory-law qualifications.",
-      "findingIds": ["MCA-R14"],
+      "findingIds": [
+        "MCA-R14"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -2085,7 +2211,11 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Identifies the parties or creates the operative purchase; preserve funding and non-generation-risk conditions.",
-      "findingIds": ["MCA-R01", "MCA-R02", "MCA-R04"],
+      "findingIds": [
+        "MCA-R01",
+        "MCA-R02",
+        "MCA-R04"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2139,7 +2269,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Defines the purchased asset, collection mechanism or cap; review together with reconciliation and remedies.",
-      "findingIds": ["MCA-R04", "MCA-R15"],
+      "findingIds": [
+        "MCA-R04",
+        "MCA-R15"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2166,7 +2299,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Defines the purchased asset, collection mechanism or cap; review together with reconciliation and remedies.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2198,7 +2333,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Defines the purchased asset, collection mechanism or cap; review together with reconciliation and remedies.",
-      "findingIds": ["MCA-R04"],
+      "findingIds": [
+        "MCA-R04"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2230,7 +2367,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Defines the purchased asset, collection mechanism or cap; review together with reconciliation and remedies.",
-      "findingIds": ["MCA-R06"],
+      "findingIds": [
+        "MCA-R06"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2284,7 +2423,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Defines the purchased asset, collection mechanism or cap; review together with reconciliation and remedies.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2323,14 +2464,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Allocates reconciliation and correction duties, including missing-information treatment; requires real servicing performance.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["defined-term-drift", "undefined-money-terms"]
+          "findings": [
+            "defined-term-drift",
+            "undefined-money-terms"
+          ]
         }
       ],
       "source": {
@@ -2350,7 +2496,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Allocates reconciliation and correction duties, including missing-information treatment; requires real servicing performance.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2381,7 +2529,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Allocates reconciliation and correction duties, including missing-information treatment; requires real servicing performance.",
-      "findingIds": ["MCA-R05"],
+      "findingIds": [
+        "MCA-R05"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2446,7 +2596,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Distinguishes a separately offered purchase, prior-balance settlement and voluntary completion; must match itemization and disclosure.",
-      "findingIds": ["MCA-R16"],
+      "findingIds": [
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -2455,7 +2607,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["lombard-multi-position-vs-no-stack"]
+          "findings": [
+            "lombard-multi-position-vs-no-stack"
+          ]
         }
       ],
       "source": {
@@ -2475,7 +2629,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Distinguishes a separately offered purchase, prior-balance settlement and voluntary completion; must match itemization and disclosure.",
-      "findingIds": ["MCA-R16"],
+      "findingIds": [
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -2509,7 +2665,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Distinguishes a separately offered purchase, prior-balance settlement and voluntary completion; must match itemization and disclosure.",
-      "findingIds": ["MCA-R16"],
+      "findingIds": [
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": {
@@ -2543,14 +2701,20 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Distinguishes a separately offered purchase, prior-balance settlement and voluntary completion; must match itemization and disclosure.",
-      "findingIds": ["MCA-R16"],
+      "findingIds": [
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["defined-term-drift", "frpa-undefined-capitalised-terms", "undefined-money-terms"]
+          "findings": [
+            "defined-term-drift",
+            "frpa-undefined-capitalised-terms",
+            "undefined-money-terms"
+          ]
         }
       ],
       "source": {
@@ -2570,7 +2734,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Read with the lead-in limiting timing and the default provisions limiting recourse; do not infer a future revenue warranty.",
-      "findingIds": ["MCA-R01"],
+      "findingIds": [
+        "MCA-R01"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -2636,7 +2802,10 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["guaranty-covers-every-covenant", "no-cure-period-anywhere"]
+          "findings": [
+            "guaranty-covers-every-covenant",
+            "no-cure-period-anywhere"
+          ]
         }
       ],
       "source": {
@@ -2663,7 +2832,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-5-3-and-5-14-give-the-same-compliance-representation-twice"]
+          "findings": [
+            "frpa-5-3-and-5-14-give-the-same-compliance-representation-twice"
+          ]
         }
       ],
       "source": {
@@ -2690,7 +2861,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["debt-vocabulary-the-language-guard-would-not-catch"]
+          "findings": [
+            "debt-vocabulary-the-language-guard-would-not-catch"
+          ]
         }
       ],
       "source": {
@@ -2750,7 +2923,11 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["defined-term-drift", "frpa-undefined-capitalised-terms", "no-cure-period-anywhere"]
+          "findings": [
+            "defined-term-drift",
+            "frpa-undefined-capitalised-terms",
+            "no-cure-period-anywhere"
+          ]
         }
       ],
       "source": {
@@ -2777,7 +2954,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["no-cure-period-anywhere"]
+          "findings": [
+            "no-cure-period-anywhere"
+          ]
         }
       ],
       "source": {
@@ -2804,7 +2983,10 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["bankruptcy-carveout-defeated-by-5-9", "guaranty-reaches-business-failure"]
+          "findings": [
+            "bankruptcy-carveout-defeated-by-5-9",
+            "guaranty-reaches-business-failure"
+          ]
         }
       ],
       "source": {
@@ -2860,7 +3042,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2"]
+          "findings": [
+            "frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2"
+          ]
         }
       ],
       "source": {
@@ -2880,14 +3064,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Read with the lead-in limiting timing and the default provisions limiting recourse; do not infer a future revenue warranty.",
-      "findingIds": ["MCA-R16"],
+      "findingIds": [
+        "MCA-R16"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-5-12-does-not-state-the-merchants-principal-place-of-business"]
+          "findings": [
+            "frpa-5-12-does-not-state-the-merchants-principal-place-of-business"
+          ]
         }
       ],
       "source": {
@@ -2914,7 +3102,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2"]
+          "findings": [
+            "frpa-5-11-and-5-13-route-personal-liability-through-the-narrowed-9-2"
+          ]
         }
       ],
       "source": {
@@ -2941,7 +3131,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-5-3-and-5-14-give-the-same-compliance-representation-twice"]
+          "findings": [
+            "frpa-5-3-and-5-14-give-the-same-compliance-representation-twice"
+          ]
         }
       ],
       "source": {
@@ -2968,7 +3160,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["guaranty-reaches-business-failure"]
+          "findings": [
+            "guaranty-reaches-business-failure"
+          ]
         }
       ],
       "source": {
@@ -2995,7 +3189,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["information-sharing-only-vs-any-third-party"]
+          "findings": [
+            "information-sharing-only-vs-any-third-party"
+          ]
         }
       ],
       "source": {
@@ -3022,11 +3218,15 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["defined-term-drift"]
+          "findings": [
+            "defined-term-drift"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-undefined-capitalised-terms-in-the-unexamined-clauses"]
+          "findings": [
+            "frpa-undefined-capitalised-terms-in-the-unexamined-clauses"
+          ]
         }
       ],
       "source": {
@@ -3053,11 +3253,16 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["guaranty-covers-every-covenant"]
+          "findings": [
+            "guaranty-covers-every-covenant"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-5-7-duplicates-5-18", "frpa-6-1-4-defaults-on-a-sale-5-18-expressly-permits"]
+          "findings": [
+            "frpa-5-7-duplicates-5-18",
+            "frpa-6-1-4-defaults-on-a-sale-5-18-expressly-permits"
+          ]
         }
       ],
       "source": {
@@ -3084,7 +3289,10 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["ct-prejudgment-remedy-waiver", "service-without-notice-vs-commitment-9"]
+          "findings": [
+            "ct-prejudgment-remedy-waiver",
+            "service-without-notice-vs-commitment-9"
+          ]
         }
       ],
       "source": {
@@ -3113,7 +3321,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["ct-prejudgment-remedy-waiver"]
+          "findings": [
+            "ct-prejudgment-remedy-waiver"
+          ]
         }
       ],
       "source": {
@@ -3243,7 +3453,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Requires an accepted external processor instruction compatible with the purchase; current letter is unresolved.",
-      "findingIds": ["MCA-R06"],
+      "findingIds": [
+        "MCA-R06"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3270,7 +3482,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Establishes effective date and provider identity, currently a Florida LLC assumption.",
-      "findingIds": ["MCA-R04"],
+      "findingIds": [
+        "MCA-R04"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3297,7 +3511,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Term-times-payment estimate omits interim rent and other charges; not a complete disclosure calculation.",
-      "findingIds": ["MCA-R09"],
+      "findingIds": [
+        "MCA-R09"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3378,14 +3594,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Describes supplied goods and suitability disclaimer; selection/substitution and supplier rights matter.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"]
+          "findings": [
+            "el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"
+          ]
         }
       ],
       "source": {
@@ -3405,7 +3625,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Sets noncancelable term, commencement and capped interim charges; classification and compatibility depend on real facts.",
-      "findingIds": ["MCA-R08", "MCA-R09"],
+      "findingIds": [
+        "MCA-R08",
+        "MCA-R09"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3459,14 +3682,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "States the fee and collection bargain; reconcile priority, totals, caps and disclosures.",
-      "findingIds": ["MCA-R09", "MCA-R11"],
+      "findingIds": [
+        "MCA-R09",
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-4a-declares-itself-exhaustive-and-is-not"]
+          "findings": [
+            "el-3-4a-declares-itself-exhaustive-and-is-not"
+          ]
         }
       ],
       "source": {
@@ -3486,14 +3714,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Allocates possession, access, returns, loss and insurance; mandatory recovery rules and identified loss payee remain material.",
-      "findingIds": ["MCA-R10", "MCA-R12"],
+      "findingIds": [
+        "MCA-R10",
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-4a-declares-itself-exhaustive-and-is-not"]
+          "findings": [
+            "el-3-4a-declares-itself-exhaustive-and-is-not"
+          ]
         }
       ],
       "source": {
@@ -3513,7 +3746,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "States ownership/security and no-double-charge rule; a recital does not establish perfected priority.",
-      "findingIds": ["MCA-R08", "MCA-R10"],
+      "findingIds": [
+        "MCA-R08",
+        "MCA-R10"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3540,7 +3776,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Purchase option and notice/return language conflict; resolve title and completion before binding fields.",
-      "findingIds": ["MCA-R08", "MCA-R09"],
+      "findingIds": [
+        "MCA-R08",
+        "MCA-R09"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3567,7 +3806,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Licenses only provider-owned rights; manufacturer rights and processor compatibility require separate evidence.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3597,7 +3838,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Restricts provider liability broadly; scope, exclusions and operative remedies need coordinated review.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3627,14 +3870,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Disclaims express and implied warranties; legal limits and rendered conspicuousness require separate assessment.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"]
+          "findings": [
+            "el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"
+          ]
         }
       ],
       "source": {
@@ -3654,7 +3901,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Covers equipment/breach claims with gross-negligence exception and term-payment ceiling; coordinate with other liability clauses.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3684,14 +3933,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Permits recovery and discounted acceleration; treatment must match the product classification and mandatory enforcement rules.",
-      "findingIds": ["MCA-R10", "MCA-R11"],
+      "findingIds": [
+        "MCA-R10",
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-4a-declares-itself-exhaustive-and-is-not"]
+          "findings": [
+            "el-3-4a-declares-itself-exhaustive-and-is-not"
+          ]
         }
       ],
       "source": {
@@ -3738,7 +3992,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Subrogation and subordination are tied to the limited guaranteed obligations; cannot expand the guaranty.",
-      "findingIds": ["MCA-R11"],
+      "findingIds": [
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3769,7 +4025,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Uses customer-state forum with embedded jury/class/limitations headings; preserve qualifications when splitting content.",
-      "findingIds": ["MCA-R18"],
+      "findingIds": [
+        "MCA-R18"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3880,7 +4138,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Survives selected duties and embeds the next section title; preserve operative survival and separate presentation.",
-      "findingIds": ["MCA-R18"],
+      "findingIds": [
+        "MCA-R18"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3907,7 +4167,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Required identity fields include full SSN and no body; redesign secure collection and document-safe display.",
-      "findingIds": ["MCA-R03"],
+      "findingIds": [
+        "MCA-R03"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -3934,14 +4196,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Excludes monthly/accelerated payments but retains broad waivers and amendment consent; reconcile actual exposure.",
-      "findingIds": ["MCA-R11"],
+      "findingIds": [
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-14-was-not-conformed-when-4-2-was-narrowed"]
+          "findings": [
+            "el-3-14-was-not-conformed-when-4-2-was-narrowed"
+          ]
         }
       ],
       "source": {
@@ -3968,7 +4234,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt"]
+          "findings": [
+            "el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt"
+          ]
         }
       ],
       "source": {
@@ -4018,14 +4286,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current continuing report authority has a separately reviewed pending replacement; no actual consent is proved.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["el-4-5-fcra-authorisation-runs-to-a-different-entity-than-the-frpas"]
+          "findings": [
+            "el-4-5-fcra-authorisation-runs-to-a-different-entity-than-the-frpas"
+          ]
         }
       ],
       "source": {
@@ -4045,7 +4317,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current bundled/discovered-number authority has a pending replacement; statutory and contractual revocation remain distinct.",
-      "findingIds": ["MCA-R07", "MCA-R17"],
+      "findingIds": [
+        "MCA-R07",
+        "MCA-R17"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4072,7 +4347,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current adoption of all obligations risks confusing capacity; pending replacement does not itself implement signatures.",
-      "findingIds": ["MCA-R03", "MCA-R07"],
+      "findingIds": [
+        "MCA-R03",
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4099,7 +4377,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Establishes effective date and provider identity, currently a Florida LLC assumption.",
-      "findingIds": ["MCA-R04"],
+      "findingIds": [
+        "MCA-R04"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4126,7 +4406,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Term-times-payment estimate omits interim rent and other charges; not a complete disclosure calculation.",
-      "findingIds": ["MCA-R09"],
+      "findingIds": [
+        "MCA-R09"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4207,7 +4489,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Describes supplied goods and suitability disclaimer; selection/substitution and supplier rights matter.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4218,7 +4502,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"]
+          "findings": [
+            "el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"
+          ]
         }
       ],
       "source": {
@@ -4238,7 +4524,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Sets noncancelable term, commencement and capped interim charges; classification and compatibility depend on real facts.",
-      "findingIds": ["MCA-R08", "MCA-R09"],
+      "findingIds": [
+        "MCA-R08",
+        "MCA-R09"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4296,7 +4585,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "States the fee and collection bargain; reconcile priority, totals, caps and disclosures.",
-      "findingIds": ["MCA-R09", "MCA-R11"],
+      "findingIds": [
+        "MCA-R09",
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4313,7 +4605,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-4a-declares-itself-exhaustive-and-is-not"]
+          "findings": [
+            "el-3-4a-declares-itself-exhaustive-and-is-not"
+          ]
         }
       ],
       "source": {
@@ -4333,18 +4627,26 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Allocates possession, access, returns, loss and insurance; mandatory recovery rules and identified loss payee remain material.",
-      "findingIds": ["MCA-R10", "MCA-R12"],
+      "findingIds": [
+        "MCA-R10",
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["frpa-sub-equipment-lien-conflict", "sub-purchase-residue"]
+          "findings": [
+            "frpa-sub-equipment-lien-conflict",
+            "sub-purchase-residue"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-4a-declares-itself-exhaustive-and-is-not"]
+          "findings": [
+            "el-3-4a-declares-itself-exhaustive-and-is-not"
+          ]
         }
       ],
       "source": {
@@ -4364,7 +4666,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "States ownership/security and no-double-charge rule; a recital does not establish perfected priority.",
-      "findingIds": ["MCA-R08", "MCA-R10"],
+      "findingIds": [
+        "MCA-R08",
+        "MCA-R10"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4395,7 +4700,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Provides return or monthly continuation without a purchase option; do not reuse the Lease classification automatically.",
-      "findingIds": ["MCA-R08", "MCA-R09"],
+      "findingIds": [
+        "MCA-R08",
+        "MCA-R09"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4426,7 +4734,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Licenses only provider-owned rights; manufacturer rights and processor compatibility require separate evidence.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4437,7 +4747,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-8-grants-no-licence-to-manufacturer-owned-software"]
+          "findings": [
+            "el-3-8-grants-no-licence-to-manufacturer-owned-software"
+          ]
         }
       ],
       "source": {
@@ -4457,7 +4769,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Restricts provider liability broadly; scope, exclusions and operative remedies need coordinated review.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4491,7 +4805,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Disclaims express and implied warranties; legal limits and rendered conspicuousness require separate assessment.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4502,7 +4818,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"]
+          "findings": [
+            "el-3-9-sole-and-exclusive-remedies-points-at-an-empty-set"
+          ]
         }
       ],
       "source": {
@@ -4522,7 +4840,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Covers equipment/breach claims with gross-negligence exception and term-payment ceiling; coordinate with other liability clauses.",
-      "findingIds": ["MCA-R12"],
+      "findingIds": [
+        "MCA-R12"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4556,7 +4876,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Permits recovery and discounted acceleration; treatment must match the product classification and mandatory enforcement rules.",
-      "findingIds": ["MCA-R10", "MCA-R11"],
+      "findingIds": [
+        "MCA-R10",
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4572,7 +4895,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-4a-declares-itself-exhaustive-and-is-not"]
+          "findings": [
+            "el-3-4a-declares-itself-exhaustive-and-is-not"
+          ]
         }
       ],
       "source": {
@@ -4599,7 +4924,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["sub-ungrounded-upgrade-assumption-fees"]
+          "findings": [
+            "sub-ungrounded-upgrade-assumption-fees"
+          ]
         }
       ],
       "source": {
@@ -4619,7 +4946,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Subrogation and subordination are tied to the limited guaranteed obligations; cannot expand the guaranty.",
-      "findingIds": ["MCA-R11"],
+      "findingIds": [
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4653,7 +4982,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Uses customer-state forum with embedded jury/class/limitations headings; preserve qualifications when splitting content.",
-      "findingIds": ["MCA-R18"],
+      "findingIds": [
+        "MCA-R18"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4768,7 +5099,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Survives selected duties and embeds the next section title; preserve operative survival and separate presentation.",
-      "findingIds": ["MCA-R18"],
+      "findingIds": [
+        "MCA-R18"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4795,7 +5128,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Required identity fields include full SSN and no body; redesign secure collection and document-safe display.",
-      "findingIds": ["MCA-R03"],
+      "findingIds": [
+        "MCA-R03"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4822,7 +5157,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Excludes monthly/accelerated payments but retains broad waivers and amendment consent; reconcile actual exposure.",
-      "findingIds": ["MCA-R11"],
+      "findingIds": [
+        "MCA-R11"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -4837,7 +5174,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-3-14-was-not-conformed-when-4-2-was-narrowed"]
+          "findings": [
+            "el-3-14-was-not-conformed-when-4-2-was-narrowed"
+          ]
         }
       ],
       "source": {
@@ -4864,11 +5203,15 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["sub-provider-name-25-separate-widgets"]
+          "findings": [
+            "sub-provider-name-25-separate-widgets"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt"]
+          "findings": [
+            "el-4-3-makes-service-effective-on-mailing-where-the-frpa-requires-receipt"
+          ]
         }
       ],
       "source": {
@@ -4895,7 +5238,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["sub-provider-name-25-separate-widgets"]
+          "findings": [
+            "sub-provider-name-25-separate-widgets"
+          ]
         },
         {
           "review": "REVIEW-02",
@@ -4922,14 +5267,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current continuing report authority has a separately reviewed pending replacement; no actual consent is proved.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["sub-provider-name-25-separate-widgets"]
+          "findings": [
+            "sub-provider-name-25-separate-widgets"
+          ]
         }
       ],
       "source": {
@@ -4949,14 +5298,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current bundled/discovered-number authority has a pending replacement; statutory and contractual revocation remain distinct.",
-      "findingIds": ["MCA-R07", "MCA-R17"],
+      "findingIds": [
+        "MCA-R07",
+        "MCA-R17"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["sub-provider-name-25-separate-widgets"]
+          "findings": [
+            "sub-provider-name-25-separate-widgets"
+          ]
         }
       ],
       "source": {
@@ -4976,7 +5330,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current adoption of all obligations risks confusing capacity; pending replacement does not itself implement signatures.",
-      "findingIds": ["MCA-R03", "MCA-R07"],
+      "findingIds": [
+        "MCA-R03",
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5010,7 +5367,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-no-952-transmission-or-evidence-clause"]
+          "findings": [
+            "iso-no-952-transmission-or-evidence-clause"
+          ]
         }
       ],
       "source": {
@@ -5084,7 +5443,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Broad surviving restriction needs lawful compelled/regulatory/adviser exceptions and data controls.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5138,7 +5499,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Contains actual broker transmission duties and a direct-delivery policy; reconcile fallback with offer prohibition.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5226,7 +5589,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-recital-funding-not-processing"]
+          "findings": [
+            "iso-recital-funding-not-processing"
+          ]
         }
       ],
       "source": {
@@ -5273,18 +5638,25 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Sets percentage, origination-fee cap and cancellation treatment; match funding and refund records.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-a1-fee-not-tied-to-origination-revenue", "iso-renewal-rate-fixed-above-variable-base"]
+          "findings": [
+            "iso-a1-fee-not-tied-to-origination-revenue",
+            "iso-renewal-rate-fixed-above-variable-base"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["iso-a1-commission-out-of-a-fee-the-company-may-not-collect"]
+          "findings": [
+            "iso-a1-commission-out-of-a-fee-the-company-may-not-collect"
+          ]
         }
       ],
       "source": {
@@ -5334,14 +5706,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Sets 30-day payout without minimum and refers to clawback recovery; validate dated payout events.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-a3-minimum-payout-threshold", "iso-a3-pays-before-clawback-window-closes"]
+          "findings": [
+            "iso-a3-minimum-payout-threshold",
+            "iso-a3-pays-before-clawback-window-closes"
+          ]
         }
       ],
       "source": {
@@ -5361,14 +5738,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Uses merchant breach within 30/45 days and setoff/cash recovery; breach scope and evidence need definition.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-a5-clawback-window-and-tiers", "iso-clawback-does-not-survive-termination"]
+          "findings": [
+            "iso-a5-clawback-window-and-tiers",
+            "iso-clawback-does-not-survive-termination"
+          ]
         },
         {
           "review": "REVIEW-02",
@@ -5395,7 +5777,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Promises a specific live partner portal; replace with verified provider capability in later design.",
-      "findingIds": ["MCA-R04"],
+      "findingIds": [
+        "MCA-R04"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5422,7 +5806,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Prohibits merchant-paid compensation and requires refunds; chosen channel policy, not a universal broker model.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5453,7 +5839,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Absolute organizational/history representations need truthful scope and qualifications for each actual principal.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5487,7 +5875,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-clawback-does-not-survive-termination"]
+          "findings": [
+            "iso-clawback-does-not-survive-termination"
+          ]
         }
       ],
       "source": {
@@ -5541,7 +5931,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-no-bar-on-partner-charging-merchant"]
+          "findings": [
+            "iso-no-bar-on-partner-charging-merchant"
+          ]
         }
       ],
       "source": {
@@ -5561,7 +5953,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Florida/Pasco arbitration is a provider-specific ISO policy; recipient-contract forum rules are not automatically imported.",
-      "findingIds": ["MCA-R04", "MCA-R13"],
+      "findingIds": [
+        "MCA-R04",
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5615,14 +6010,19 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Nonexclusive referral role is described as agent while agency is denied; actual conduct controls legal relationships.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-partner-is-a-broker-despite-referral-agent-label", "iso-recital-funding-not-processing"]
+          "findings": [
+            "iso-partner-is-a-broker-despite-referral-agent-label",
+            "iso-recital-funding-not-processing"
+          ]
         }
       ],
       "source": {
@@ -5642,7 +6042,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Requires accurate referrals and prohibits any specific offer/pricing/approval communication by ISO.",
-      "findingIds": ["MCA-R13"],
+      "findingIds": [
+        "MCA-R13"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5679,7 +6081,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["iso-partner-may-communicate-terms-in-own-name"]
+          "findings": [
+            "iso-partner-may-communicate-terms-in-own-name"
+          ]
         }
       ],
       "source": {
@@ -5760,7 +6164,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-02",
-          "findings": ["iso-1-6-representative-removal-is-a-request-with-no-obligation"]
+          "findings": [
+            "iso-1-6-representative-removal-is-a-request-with-no-obligation"
+          ]
         }
       ],
       "source": {
@@ -5780,14 +6186,20 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Names processor/legal entity and collection base; verify against actual processor-required contract.",
-      "findingIds": ["MCA-R04", "MCA-R06"],
+      "findingIds": [
+        "MCA-R04",
+        "MCA-R06"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["payzli-two-widgets-for-one-percentage", "payzli-unbounded-irrevocable-instruction"]
+          "findings": [
+            "payzli-two-widgets-for-one-percentage",
+            "payzli-unbounded-irrevocable-instruction"
+          ]
         }
       ],
       "source": {
@@ -5807,7 +6219,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Continued withholding for fees conflicts with FRPA cap; external resolution remains deferred.",
-      "findingIds": ["MCA-R06"],
+      "findingIds": [
+        "MCA-R06"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5873,7 +6287,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Hardcoded PAYZLI charges are under another contract; do not add them to the FRPA purchased amount.",
-      "findingIds": ["MCA-R04", "MCA-R06"],
+      "findingIds": [
+        "MCA-R04",
+        "MCA-R06"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -5900,14 +6317,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Recites another contract’s termination schedule; current processor version and applicable charges are unverified.",
-      "findingIds": ["MCA-R06"],
+      "findingIds": [
+        "MCA-R06"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["payzli-hardcoded-third-party-termination-fees"]
+          "findings": [
+            "payzli-hardcoded-third-party-termination-fees"
+          ]
         }
       ],
       "source": {
@@ -5927,14 +6348,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Allocates losses from following instructions without FRPA-style limits; requires external-form review.",
-      "findingIds": ["MCA-R06"],
+      "findingIds": [
+        "MCA-R06"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["payzli-indemnity-runs-only-against-merchant"]
+          "findings": [
+            "payzli-indemnity-runs-only-against-merchant"
+          ]
         }
       ],
       "source": {
@@ -5961,7 +6386,9 @@
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["payzli-no-remittance-instructions"]
+          "findings": [
+            "payzli-no-remittance-instructions"
+          ]
         }
       ],
       "source": {
@@ -5981,7 +6408,10 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current business signature purports to grant broad related-party authority; pending body scopes transaction and capacities.",
-      "findingIds": ["MCA-R01", "MCA-R07"],
+      "findingIds": [
+        "MCA-R01",
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -6008,7 +6438,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current grant spans underwriting, ongoing qualification and collections; pending body narrows purposes.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -6035,7 +6467,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current broad records access must be separated from individual report permission; pending body supplies that boundary.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -6062,18 +6496,25 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current recurring grant has pending individual, one-use replacement; report purpose must be established in fact.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["permission-guarantor-bound-without-signing", "ptr-no-guarantor-signature-line"]
+          "findings": [
+            "permission-guarantor-bound-without-signing",
+            "ptr-no-guarantor-signature-line"
+          ]
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument"]
+          "findings": [
+            "frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument"
+          ]
         }
       ],
       "source": {
@@ -6093,7 +6534,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current FCRA notice description has pending fuller rights and notice duties; acknowledgment alone is not compliance.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -6109,7 +6552,9 @@
         },
         {
           "review": "REVIEW-02",
-          "findings": ["frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument"]
+          "findings": [
+            "frpa-4-3-consumer-report-authority-depends-on-a-separate-instrument"
+          ]
         }
       ],
       "source": {
@@ -6129,14 +6574,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current continuing/reasonable-postterm reliance has pending defined duration, revocation and retention distinctions.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["ptr-section5-adds-purposes-not-granted"]
+          "findings": [
+            "ptr-section5-adds-purposes-not-granted"
+          ]
         }
       ],
       "source": {
@@ -6156,14 +6605,18 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current broad third-party release has pending preserved-rights and limited-sharing replacement.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
       "historicReviewReferences": [
         {
           "review": "REVIEW-01",
-          "findings": ["ptr-release-misses-section1-sources"]
+          "findings": [
+            "ptr-release-misses-section1-sources"
+          ]
         }
       ],
       "source": {
@@ -6183,7 +6636,9 @@
       "version": 1,
       "reviewed": "body, fields where present, stated legal purpose, gate and related-document context",
       "observation": "Current fallback deems the business signer guarantor; pending body separates individual instructions and creates no guaranty.",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "finalCatalogue": "not assigned by this review",
       "approval": "not granted",
       "includeWhen": null,
@@ -6209,7 +6664,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6225,7 +6682,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6241,7 +6700,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6257,7 +6718,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6273,7 +6736,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6289,7 +6754,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6305,7 +6772,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6321,7 +6790,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6337,7 +6808,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6353,7 +6826,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6369,7 +6844,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6385,7 +6862,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6401,7 +6880,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
@@ -6417,7 +6898,9 @@
       "pr": 194,
       "reviewed": true,
       "approval": "not granted; not independent PR review",
-      "findingIds": ["MCA-R07"],
+      "findingIds": [
+        "MCA-R07"
+      ],
       "observation": "Read the complete candidate replacement separately; scope, signature capacity and operational evidence assessed in MCA-R07 and, for contact consent, MCA-R17.",
       "source": {
         "revision": "174a45b6513772528a381f8aae63bcce9b3766e6",
