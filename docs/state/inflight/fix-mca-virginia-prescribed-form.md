@@ -79,6 +79,29 @@ The shipping ledger's statement that this file is absent and legacy Guard 5
 applies needs correction by its owner. Final consolidation remains with the
 authorized shipping session; this author does not edit that session's ledger.
 
+### CI service dependency encountered during the refresh
+
+The first refreshed-head E2E run
+[34752658604](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/actions/runs/34752658604)
+failed before browser execution: Docker Hub denied `minio/minio`, and its public
+latest-tag endpoint returned 404. Builds, type checking and other checks passed.
+This is not resolved by another source-test expectation change or a blind retry.
+
+The E2E service-start command now composes a BizRethink-owned override that changes
+only MinIO's image to the vendor-published Quay multi-platform manifest
+`sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e`.
+The manifest was fetched successfully with TLS verification on September 13;
+it includes Linux amd64 and arm64. Publisher and manifest URLs are beside the
+override. Effective configuration is compared against the base before push.
+Ports, command, volumes, credentials, every other service and the full test/shard
+gates remain unchanged. No production Compose configuration is changed.
+
+This necessary CI repair expands the refreshed PR's review surface to the small
+workflow/override delta. The shipping reviewer must include it in fresh review;
+the author still cannot merge its own work. Final actual E2E evidence is recorded
+on the PR/task, and local configuration validation is not represented as a browser
+test run. The field/template queue must incorporate this CI dependency after merge.
+
 Task #186 / A-08, overlay 082 and its state note belong to the security author.
 No overlay or migration is used here. Other MCA agreement/option work and the
 Georgia/Missouri source-access/history limits remain as recorded in settled state.
