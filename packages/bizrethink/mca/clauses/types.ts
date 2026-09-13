@@ -63,25 +63,22 @@ export type McaClauseKind =
   | 'explainer';
 
 /**
- * One blank in a form grid.
- *
- * `widget` is the `«N»` AcroForm anchor the Lombard pipeline injects, carried
- * verbatim for the same reason clause bodies carry theirs (README rule 2):
- * without it nothing can be filled in, and a tidied copy would make the check
- * a check against a tidied document.
- *
- * IT IS NOT OPTIONAL EVEN THOUGH IT LOOKS INCIDENTAL. The Equipment Lease and
- * the Subscription number their fields IDENTICALLY — both `«21»`–`«24»` — so a
- * group copied from one twin to the other looks correct in review and is only
- * wrong at injection time.
+ * A current document field. Semantic bindings do not inherit the original
+ * document's labels or private-identifier slots. `legacyWidget` preserves the
+ * source anchor for coverage; it must never be used as an active fill key.
  */
 export type ClauseField = {
-  /** As the document prints it: "Full Name", "Social Security Number". */
+  /** Current document label; historical source labels are not the fill contract. */
   label: string;
-  /** The AcroForm anchor, e.g. `«35»`. */
+  /** Semantic value key, resolved in this instrument's transaction/signer context. */
+  binding: string;
+  /** Current stable placeholder, independent of the source form's numbered widget. */
   widget: string;
+  /** Original source anchor, retained only for provenance and coverage. */
+  legacyWidget?: string;
   kind: 'text' | 'date' | 'signature' | 'ssn' | 'currency';
   required: boolean;
+  requiredWhen?: { binding: 'guarantor.kind'; equals: 'entity' };
 };
 
 export type McaClause = {
@@ -141,6 +138,11 @@ export type McaClause = {
    * tolerating either.
    */
   fields?: ClauseField[];
+
+  /** Repeat this block for each intended guarantor of this instrument. */
+  repeatFor?: 'guarantor';
+  /** Source slots deliberately retired from the current document. */
+  retiredFields?: { widget: string; reason: string }[];
 
   /**
    * An explicit reason this structural block has no clause number. Otherwise

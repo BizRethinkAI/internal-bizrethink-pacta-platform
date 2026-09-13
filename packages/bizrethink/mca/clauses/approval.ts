@@ -122,6 +122,8 @@ export const mcaClauseFingerprint = (clause: McaClause): string =>
         instrument: clause.instrument,
         kind: clause.kind,
         fields: clause.fields ?? null,
+        repeatFor: clause.repeatFor,
+        retiredFields: clause.retiredFields,
         includeWhen: clause.includeWhen?.toString() ?? null,
         referenceId: clause.referenceId ?? null,
         unnumberedReason: clause.unnumberedReason ?? null,

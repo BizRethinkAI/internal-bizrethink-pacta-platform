@@ -163,7 +163,12 @@ export const documentLines = (file: string): string[] =>
  */
 export const linesNotAccountedFor = (
   file: string,
-  clauses: readonly { heading: string; body: string; fields?: readonly { widget: string }[] }[],
+  clauses: readonly {
+    heading: string;
+    body: string;
+    fields?: readonly { widget: string; legacyWidget?: string }[];
+    retiredFields?: readonly { widget: string; reason: string }[];
+  }[],
   declared: readonly NonClauseLine[],
 ): string[] => {
   /*
@@ -178,7 +183,8 @@ export const linesNotAccountedFor = (
     reason a reader gets is better: not "this is a form grid" but "this is the
     grid of THIS clause".
 
-    Matched on WIDGETS, not on labels. The document pads its cells with runs of
+    Matched on historical source widgets, including explicitly retired slots,
+    not current fill placeholders or labels. The document pads its cells with runs of
     underscores — `Full Name | __________«35»___________` — so neither
     containment nor equality works against a reconstructed label list. The
     widgets are exact, ordered and unique per document, and a line carrying
@@ -186,7 +192,12 @@ export const linesNotAccountedFor = (
   */
   const groupLines = clauses
     .filter((clause) => clause.fields && clause.fields.length > 0)
-    .map((clause) => clause.fields?.map((field) => field.widget) ?? []);
+    .map((clause) => [
+      ...(clause.fields?.map((field) => field.legacyWidget ?? field.widget) ?? []),
+      ...(clause.retiredFields?.map((field) => field.widget) ?? []),
+    ])
+    .map((widgets) => widgets.filter((widget) => /^«\d+»$/.test(widget)))
+    .filter((widgets) => widgets.length > 0);
 
   const isFieldGroupLine = (line: string) =>
     groupLines.some((widgets) => widgets.every((widget) => line.includes(widget)));

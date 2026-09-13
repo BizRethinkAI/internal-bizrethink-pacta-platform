@@ -62,61 +62,30 @@ describe('every clause has content for its kind', () => {
     expect(clause.fields, `${clause.slug} is a ${clause.kind} and must not declare fields`).toBeUndefined();
   });
 
-  /**
-   * The widget markers are the AcroForm anchors the Lombard pipeline injects,
-   * and they are the reason a field group is not just a list of labels: without
-   * them nothing can be filled in. `«N»` is preserved verbatim in clause bodies
-   * for the same reason (`clauses/README.md` rule 2), and a field carries its
-   * own.
-   *
-   * Asserted rather than assumed, because the twins number theirs IDENTICALLY —
-   * both the Equipment Lease and the Subscription use `«21»`–`«24»` — so a
-   * field group copied from one to the other would look correct.
-   */
-  it('gives every field group a widget for each field', () => {
+  it('gives every current field a stable binding and preserves source anchors separately', () => {
     const groups = ALL_MCA_CLAUSES.filter((clause) => clause.kind === 'field-group');
-
-    expect(groups.length, 'no field groups exist — this test would pass vacuously').toBeGreaterThan(0);
-
-    // ADR 0011 adds a merchant grid; it must not inherit the guarantor SSN assertion.
-    const funding = groups.find((group) => group.slug === 'frpa.merchant-and-funding-information');
-    expect(funding?.fields?.some((field) => field.kind === 'ssn')).toBe(false);
-    for (const group of groups.filter((entry) => entry !== funding)) {
-      for (const field of group.fields ?? []) {
-        expect(field.widget, `${group.slug}: field "${field.label}" has no widget anchor`).toMatch(/^«\d+»$/);
-      }
-    }
-  });
-
-  /**
-   * Every field group in this corpus is a guarantor identity block, and each one
-   * collects a Social Security Number.
-   *
-   * Pinned because it is the field most likely to be quietly added to a
-   * distributed copy or quietly dropped from a form that still needs it, and
-   * because the counsel memo of 2026-09-09 raises exactly this: *"avoid
-   * distributing full SSNs in contract copies."* If a fourth field group appears
-   * that is not a guarantor block, this fails and the assumption gets re-read
-   * rather than inherited.
-   */
-  it('distinguishes the funding grid from the three guarantor identity blocks', () => {
-    const groups = ALL_MCA_CLAUSES.filter((clause) => clause.kind === 'field-group');
-
     expect(groups.map((group) => group.slug).sort()).toEqual([
       'equipment-lease.guarantor-information',
       'frpa.guarantor-information-9-1',
       'frpa.merchant-and-funding-information',
       'subscription.guarantor-information',
     ]);
-
-    // ADR 0011 adds a merchant grid; it must not inherit the guarantor SSN assertion.
-    const funding = groups.find((group) => group.slug === 'frpa.merchant-and-funding-information');
-    expect(funding?.fields?.some((field) => field.kind === 'ssn')).toBe(false);
-    for (const group of groups.filter((entry) => entry !== funding)) {
-      expect(
-        (group.fields ?? []).some((field) => field.kind === 'ssn'),
-        `${group.slug} collects no SSN — is it still a guarantor block?`,
-      ).toBe(true);
+    for (const group of groups) {
+      const fields = group.fields ?? [];
+      expect(fields.length).toBeGreaterThan(0);
+      expect(fields.map((field) => field.kind)).not.toContain('ssn');
+      for (const field of fields) {
+        expect(field.binding.length).toBeGreaterThan(0);
+        expect(field.widget).toMatch(/^\{\{field:[a-zA-Z0-9.-]+\}\}$/);
+        if (field.legacyWidget) {
+          expect(field.legacyWidget).toMatch(/^«\d+»$/);
+        }
+      }
+      for (const retired of group.retiredFields ?? []) {
+        expect(retired.widget).toMatch(/^«\d+»$/);
+        expect(retired.reason.trim().length).toBeGreaterThan(0);
+        expect(fields.map((field) => field.legacyWidget)).not.toContain(retired.widget);
+      }
     }
   });
 });

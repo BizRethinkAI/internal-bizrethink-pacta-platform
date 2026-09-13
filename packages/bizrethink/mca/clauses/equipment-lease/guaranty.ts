@@ -1,3 +1,4 @@
+import { mcaGuarantorFields, retiredGuarantorSsn } from '../fields';
 import type { McaClause } from '../types';
 
 /**
@@ -17,7 +18,7 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
       because: 'misattributed',
       note: 'These fields identify the equipment provider’s guarantor, not the receivables funder’s; the FRPA guaranty-scope answer cannot decide this separate guaranty.',
     },
-    version: 1,
+    version: 2,
     instrument: 'equipment-lease',
     kind: 'field-group',
     includeWhen: null,
@@ -25,20 +26,9 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
     sortKey: 10,
     heading: 'Guarantor Information',
     body: '',
-    /*
-      Four blanks, «21»-«24». Fewer than the FRPA's six — no Title and no Email
-      — and that difference is real, not an import gap: the twins collect a
-      Phone NUMBER where the FRPA collects a Phone.
-
-      The two twins number these IDENTICALLY, which is why `widget` is required
-      on every field. A group copied from one to the other reads as correct.
-    */
-    fields: [
-      { label: 'Full Name', widget: '«21»', kind: 'text', required: true },
-      { label: 'Social Security Number', widget: '«22»', kind: 'ssn', required: true },
-      { label: 'Home Address', widget: '«23»', kind: 'text', required: true },
-      { label: 'Phone Number', widget: '«24»', kind: 'text', required: true },
-    ],
+    fields: mcaGuarantorFields({ name: '«21»', address: '«23»', phone: '«24»' }),
+    repeatFor: 'guarantor',
+    retiredFields: [retiredGuarantorSsn('«22»')],
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

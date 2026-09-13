@@ -3,7 +3,8 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches: ['main']
+    # MODIFIED for BizRethink: validate stacked author PRs with the unchanged
+    # Playwright jobs and exemptions before retargeting them to main.
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
