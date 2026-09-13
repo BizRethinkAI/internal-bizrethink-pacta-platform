@@ -11,8 +11,13 @@ in [`docs/state/inflight/`](docs/state/inflight/). Together they are where
 things stand.**
 
 **Read [the session workflow](docs/session-workflow.md) and the open GitHub task
-issues before starting work. Shwet or one explicitly appointed coordinator
-assigns sessions, overlapping work and overlay reservations.**
+issues before starting work. The repository owner or one explicitly appointed
+coordinator assigns sessions, overlapping work and overlay reservations.**
+
+Use role labels, not the owner's personal name, in public workflow records.
+Maintain the assigned task's current status; the session completing its final
+required step records completion and closes it. The session workflow defines
+the limited progress-edit authority without changing assignment ownership.
 
 **Your PR's in-flight note is `docs/state/inflight/<branch-slug>.md`** — create
 it in the first push, edit it in place, never touch another PR's. `STATE.md`

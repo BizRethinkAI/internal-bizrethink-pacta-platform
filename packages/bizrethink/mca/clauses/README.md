@@ -31,6 +31,25 @@ text being written down.
 | Selection and numbering | implemented; no merchant rendering or sending path |
 | Interview and assembly | future work in Pacta, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
 
+### Processor-controlled forms and ancillary consent corrections
+
+**Owner clarification, 2026-09-12:** Split Funding Letters are processor-specific;
+we commonly have limited or no ability to change them. Their presence in this
+library does not make their terms ours to rewrite. The retained processor letter
+is unchanged. Its fee, collection-base and stopping-rule differences from the
+FRPA remain unresolved for a **future review session** using the particular
+processor's required form and operational requirements. A future reviewer must
+determine an agreed, workable resolution; an FRPA priority clause alone is not
+evidence that a processor accepted it or can implement it. Do not treat the
+deferral as approval, a waiver, or permission to silently alter the form.
+
+The Permission to Release and both equipment agreements have a separate draft
+correction for individual report use, contact consent and signer capacity. The
+14 changed records advance to version 2 and remain unapproved; the total stays
+211. The [correction record](../../../../docs/research/mca-ancillary-consents-2026-09-12/README.md)
+explains source verification, substantive choices and template/execution work
+still required. Historical source documents and review dispositions are preserved.
+
 ### Citation contract (ADR 0011 phases 1–4)
 
 A source record has **no `number`**. `selectClauses` filters first, sorts by the
