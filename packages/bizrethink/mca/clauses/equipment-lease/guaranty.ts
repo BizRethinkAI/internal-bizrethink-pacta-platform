@@ -3,10 +3,10 @@ import type { McaClause } from '../types';
 /**
  * The Equipment Lease Agreement — section 4.
  *
- * Bodies are the words the shipped document prints. Both
- * `__tests__/bodies-match-the-document.test.ts` and
- * `__tests__/twins.test.ts` re-check them on every run — the first against
- * this document, the second against the twin.
+ * Draft bodies may differ from the retained shipped source (ADR 0012).
+ * Source digests preserve that historical evidence; twins.test.ts checks
+ * the two current drafts against each other. The 2026-09-12 report/contact/
+ * signature rewrite remains unapproved and does not rebuild a stored template.
  */
 export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
@@ -253,21 +253,22 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
     slug: 'equipment-lease.credit-reporting-authorization',
     whyThisClause: {
       kind: 'implements',
-      citation: '15 U.S.C. §1681b(a)(2), (f) (individual consumer-report instructions and permissible use)',
+      citation:
+        '15 U.S.C. §§1681b(a)(2), (f), 1681m(a), 1681s-2(a), (b) (individual instructions, permissible use, adverse-action and applicable furnishing duties)',
     },
     variance: {
       kind: 'fixed',
       because: 'misattributed',
-      note: 'This individual authorizes the equipment provider’s report use; the receivables funder’s consumer-report answer cannot grant or withdraw authority for that different provider.',
+      note: 'Only the individual authorizes this equipment provider’s one initial underwriting report. The receivables funder’s report preference cannot supply that authority; the one-report scope is authored, not a universal FCRA limit.',
     },
-    version: 1,
+    version: 2,
     instrument: 'equipment-lease',
     kind: 'clause',
     includeWhen: null,
     section: 'guaranty',
     sortKey: 50,
-    heading: 'Credit Reporting Authorization',
-    body: 'I expressly authorize {{equipmentAffiliate}} or its servicing agents or assigns continuing authority to obtain one or more consumer credit reports from a credit bureau or credit reporting agency and to conduct one or more credit checks concerning my credit history. I acknowledge that {{equipmentAffiliate}} may furnish information relating to this Lease and Guaranty to one or more credit reporting agencies. If I believe that any information that {{equipmentAffiliate}} furnishes to a credit reporting agency is inaccurate, I will notify {{equipmentAffiliate}} of that inaccuracy in writing at _______________«44»_______________ or as may be designated by {{equipmentAffiliate}} or any assignee. I understand that upon my request, {{equipmentAffiliate}} will inform me whether or not a credit report was requested, and if such report was requested, of the name and address of the consumer reporting agency that furnished the report.',
+    heading: 'Individual Report Instructions; Reporting Duties',
+    body: "By my separate individual signature as Guarantor, I authorize {{equipmentAffiliate}} to obtain one consumer report about me only to evaluate my proposed limited guaranty under this Lease, before {{equipmentAffiliate}} accepts this Lease. Before I sign, {{equipmentAffiliate}} shall identify the reporting agency and the equipment transaction to me, explain this purpose and duration, and give me the complete Agreement. It shall document a permissible purpose under the Fair Credit Reporting Act and any additional authority state law requires. A signature only for Lessee gives no individual report permission.\nThis permission expires upon the initial decision, withdrawal of the application or acceptance of this Lease, whichever occurs first, and I may revoke it before it is used by a reasonable communication received by {{equipmentAffiliate}}. It authorizes no recurring report or later report for review, servicing or collection; a later report requires new, specific individual instructions and a separately documented lawful purpose. It does not authorize the receivables funder, an unrelated affiliate or another equipment provider to obtain a report. Giving report instructions does not make me liable for any obligation beyond Section [[clause:equipment-lease.guaranty-of-payment]].\nIf {{equipmentAffiliate}} furnishes information to a consumer reporting agency, it shall comply with the accuracy, correction, investigation, notice and dispute duties applicable to it. It shall not report an equipment payment or other amount as my personal debt if I do not owe it under that Guaranty. I may report an inaccuracy at _______________«44»_______________ or through another applicable dispute channel; this does not restrict my right to dispute with a consumer reporting agency.\nIf {{equipmentAffiliate}} takes an adverse action with respect to me based in whole or in part on my consumer report, it shall give the notices required by FCRA §615(a) without waiting for a request. The notice shall identify the adverse action; give the agency's name, address and telephone number, including its toll-free number where required; explain that the agency did not make the decision and cannot give the specific reasons for it; and state my right to request a free copy from that agency within 60 days after receiving the notice and to dispute the accuracy or completeness of its report. If a numerical credit score was used, the written or electronic credit-score and related disclosures required by law must also be provided. This Section waives no statutory right.",
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -287,14 +288,14 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
       because: 'misattributed',
       note: 'Consent for equipment-provider contact belongs to the called individual; a funder profile cannot give consent on that person’s or provider’s behalf.',
     },
-    version: 1,
+    version: 2,
     instrument: 'equipment-lease',
     kind: 'clause',
     includeWhen: null,
     section: 'guaranty',
     sortKey: 60,
-    heading: 'Communications Consent',
-    body: 'I, on my behalf and on behalf of Lessee, expressly consent to receive: (1) telephone calls on a recorded line, including but not limited to collection calls and/or telemarketing calls regarding offers by or on behalf of {{equipmentAffiliate}}, its assignee, or its servicing agent, via automated dialer technology, via text, and using prerecorded messages, to the telephone number(s) (including wireless numbers) which I provide to {{equipmentAffiliate}}, or which I use to call {{equipmentAffiliate}} or its assignee, or which {{equipmentAffiliate}} learns about through other means; and (2) emails and text messages, including but not limited to collection messages and/or marketing or advertising messages regarding offers by or on behalf of {{equipmentAffiliate}}, to the email address or telephone number which I provide to {{equipmentAffiliate}}. In the event the telephone number(s) or email address which I have provided are changed or relinquished by me, I agree to promptly notify {{equipmentAffiliate}} of any such changes. I am not required to consent to the marketing or telemarketing portion of the foregoing as a condition of qualifying for or obtaining the lease or any product or service. To opt out of marketing or promotional contact, I may send written notice to the address set forth in Section [[clause:equipment-lease.notices]] (Notices).',
+    heading: 'Contact, Consent and Recording',
+    body: "{{equipmentAffiliate}} may contact Lessee and an individually identified Guarantor to administer and lawfully service this Lease by a method applicable law permits. Where an automated call, an artificial or prerecorded voice call, or a text message requires consent, {{equipmentAffiliate}} shall first obtain and record it from the person legally entitled to consent for the specified number. Providing a number, using it to call us, or our obtaining it elsewhere does not by itself establish every consent the law requires. Signing this Agreement does not itself give another person's consent or blanket consent to automated, prerecorded or marketing contact.\nMarketing consent shall be obtained separately, identify the seller and the number to be called or messaged, carry the disclosures and signature applicable law requires, and be optional and not a condition of obtaining equipment, this Lease or any product or service. No consent is given here for an unnamed affiliate or as a blanket override of a do-not-call request.\nA recipient may revoke consent at any time by any reasonable means, including STOP in reply to a text, telephone, email or writing. Revocation applies to consent-dependent servicing or collection contact as well as marketing; servicing or collection does not preserve a revoked consent. {{equipmentAffiliate}} shall honor revocation within the period applicable law allows and thereafter use only a method lawful without that consent. Section [[clause:equipment-lease.notices]] (Notices) does not restrict these methods or delay a revocation; a written request by postal mail is not required.\nBefore recording a call, {{equipmentAffiliate}} shall give the notice and obtain the consent required by applicable law from each participant, and offer an unrecorded alternative where practicable. A signature to this Agreement is not another participant's recording consent.",
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -308,14 +309,14 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
       because: 'load-bearing',
       note: 'The separate equipment agreement and guaranty need signatures and capacity identified for their own obligations; a signature on the receivables purchase cannot replace them.',
     },
-    version: 1,
+    version: 2,
     instrument: 'equipment-lease',
     kind: 'clause',
     includeWhen: null,
     section: 'guaranty',
     sortKey: 70,
-    heading: 'Acknowledgment',
-    body: 'BY SIGNING BELOW, I ACKNOWLEDGE THAT I HAVE READ THIS GUARANTY AND ALL PAGES OF THE LEASE, THAT ALL BLANKS IN THE LESSEE AND EQUIPMENT INFORMATION GRID WERE FILLED IN AT THE TIME OF SIGNING, THAT I HAVE BEEN GIVEN A COPY OR AN OPPORTUNITY TO MAKE A COPY, AND THAT I AGREE TO BE BOUND BY ALL THE TERMS OF THIS GUARANTY AND LEASE. I understand that I may consult an attorney or other advisor before signing this Guaranty and Lease.\nSignatures\nIN WITNESS WHEREOF, the parties have executed this Equipment Lease Agreement as of the Effective Date. Each of Lessee and Guarantor represents that he or she is authorized to sign this Agreement, legally binding Lessee and Guarantor to comply with its terms.',
+    heading: 'Acknowledgment and Signature Capacities',
+    body: "BEFORE SIGNING, EACH SIGNER SHALL RECEIVE THE COMPLETE AGREEMENT AND THE COMPLETED LESSEE AND EQUIPMENT INFORMATION GRID. Each signer may consult an attorney or other advisor. {{equipmentAffiliate}} shall provide a complete executed copy to each signer.\nSignatures\nIN WITNESS WHEREOF, the parties have executed this Equipment Lease Agreement as of the Effective Date. A person signing for Lessee represents that they have authority to bind Lessee in that capacity. Signing for Lessee does not make that signer a guarantor. Only a person who separately signs in the individual Guarantor capacity agrees to the Guaranty, and that signature binds that person to only the obligations Section [[clause:equipment-lease.guaranty-of-payment]] expressly guarantees, subject to its limits and the other protections of the Guaranty. It does not adopt every payment duty in this Lease or enlarge the Guaranty through an acknowledgment. No person signs for another individual or gives that individual's report, contact or recording consent.",
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
