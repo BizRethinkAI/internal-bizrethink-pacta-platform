@@ -595,10 +595,8 @@ export default function ClauseLibraryPage() {
         )}
 
         {/*
-        GROUPED BY THE LAW EACH CLAUSE DEPENDS ON, which this page never showed.
-        Sixty-four rows in module-concatenation order told a reviewer nothing
-        about which of them their admission covers, and the split has been real
-        in `libraryFor()` since 2026-09-06.
+        Subject groups keep related wording together. Each row retains the
+        jurisdiction label, and approval coverage names its jurisdiction above.
       */}
         {groups.map((group) => (
           <section key={group.section} className="mt-8">

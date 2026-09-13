@@ -76,3 +76,8 @@ remains in place. Homelab hosting and state consolidation are separate work.
   and requires the legal workspace to fit without increasing that baseline.
 - Final PR CI and a fresh independent review remain required before merge.
   The author does not merge or deploy this change.
+- The first full CI unit run exposed a legacy source assertion requiring staff
+  lease groups to use jurisdiction tiers. Staff groups now follow the approved
+  subject design; the counsel tier guard remains. Browser coverage verifies each
+  Florida/North Carolina clause's visible jurisdiction label and the explicitly
+  selected coverage jurisdiction, including its retention in Shared browsing.

@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { jurisdictionLabel } from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
 import { libraryFor } from '@bizrethink/customizations/lease/clauses/library';
 import { contentFor } from '@bizrethink/customizations/mca/catalogue';
 import { readingForReview } from '@bizrethink/customizations/mca/review/reading-presentation';
@@ -84,15 +85,28 @@ test('lease membership, disclosure details and mobile reading remain usable in t
     await page.setViewportSize(viewports[0]);
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/admin/lease-library`);
-    await expect(page.locator('[data-lease-slug]')).toHaveCount(libraryFor('US-FL').length);
-    await page.getByRole('button', { name: /^North Carolina ·/ }).click();
-    await expect(page.locator('[data-lease-slug]')).toHaveCount(libraryFor('US-NC').length);
+    for (const { jurisdiction, name } of [
+      { jurisdiction: 'US-FL', name: /^Florida ·/ },
+      { jurisdiction: 'US-NC', name: /^North Carolina ·/ },
+    ] as const) {
+      await page.getByRole('button', { name }).click();
+      const expectedClauses = libraryFor(jurisdiction);
+      await expect(page.locator('[data-lease-slug]')).toHaveCount(expectedClauses.length);
+      for (const clause of expectedClauses) {
+        await expect(
+          page
+            .locator(`[data-lease-slug="${clause.slug}"]`)
+            .getByText(jurisdictionLabel(clause.jurisdiction), { exact: true }),
+        ).toBeVisible();
+      }
+      await expect(page.getByLabel('Approval coverage jurisdiction')).toHaveValue(jurisdiction);
+    }
     await page.getByRole('button', { name: /^Shared clauses ·/ }).click();
     const nc = new Set(libraryFor('US-NC').map((item) => item.slug));
     await expect(page.locator('[data-lease-slug]')).toHaveCount(
       libraryFor('US-FL').filter((item) => nc.has(item.slug)).length,
     );
-    await expect(page.getByLabel('Approval coverage jurisdiction')).toBeVisible();
+    await expect(page.getByLabel('Approval coverage jurisdiction')).toHaveValue('US-NC');
     const firstClause = page.locator('[data-lease-slug]').first();
     await firstClause.getByRole('button').first().click();
     await expect(firstClause.getByRole('button').first()).toHaveAttribute('aria-expanded', 'true');
