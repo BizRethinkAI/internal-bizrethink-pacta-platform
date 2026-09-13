@@ -423,7 +423,11 @@ describe('nothing outside §4.2 enlarges the guaranty §4.2 narrows', () => {
     const outside = TWINS.filter((entry) => /\bguarantor\b/i.test(entry.body) && entry.section !== 'guaranty');
 
     expect(outside.map((entry) => entry.slug).sort()).toEqual([
+      'equipment-lease.default-remedies',
+      'equipment-lease.indemnification',
       'equipment-lease.lease-guaranty',
+      'subscription.default-remedies',
+      'subscription.indemnification',
       'subscription.subscription-guaranty',
     ]);
 
@@ -434,21 +438,22 @@ describe('nothing outside §4.2 enlarges the guaranty §4.2 narrows', () => {
     }
   });
 
-  it.each(both('equipment-lease.lease-guaranty'))('$slug subordinates only so far as §4.2 reaches', (entry) => {
+  it.each(
+    both('equipment-lease.lease-guaranty'),
+  )('$slug preserves subrogation without expanding liability', (entry) => {
     expect(entry.body).not.toMatch(/paid and satisfied in full/i);
     expect(entry.body).toMatch(/subrogat/i);
+    expect(entry.body).toMatch(/No general subordination/i);
   });
 
-  /**
-   * And §4.2's own limits are unchanged. A rewrite of the clauses around it that
-   * quietly relaxed the clause itself would pass every assertion above.
-   */
+  /** The revised guaranty is narrower: own intentional conduct and actual caused loss. */
   it.each(
     both('equipment-lease.guaranty-of-payment'),
-  )('$slug still guarantees three things and nothing else', (entry) => {
-    expect(entry.body).toMatch(/and nothing else/);
-    expect(entry.body).toMatch(/not personally liable/i);
-    expect(entry.body).toMatch(/has slowed, ceased, or failed/);
+  )('$slug cannot guarantee ordinary payment or someone else’s misconduct', (entry) => {
+    expect(entry.body).toMatch(/guarantees only documented direct loss caused by that Guarantor’s own intentional/i);
+    expect(entry.body).toMatch(/no liability for monthly charges, acceleration/i);
+    expect(entry.body).toMatch(/loss arising solely from slow sales, business failure/i);
+    expect(entry.body).toMatch(/innocent mistake, someone else’s misconduct/i);
   });
 });
 
@@ -496,8 +501,9 @@ describe('the twins honour what the FRPA now promises about them', () => {
    */
   it('creates no cross-default with the purchase agreement, in either document', () => {
     for (const entry of both('equipment-lease.default-remedies')) {
-      expect(entry.body).toMatch(/No default under any other agreement/);
-      expect(entry.body).toMatch(/purchase of future receipts/);
+      expect(entry.body).toMatch(
+        /receivables purchase agreement or any other agreement is not a default under this Agreement/,
+      );
     }
 
     expect(clause('frpa.entire-agreement-7-8').body).toMatch(/creates no cross-default/);

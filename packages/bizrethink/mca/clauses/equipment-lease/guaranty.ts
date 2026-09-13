@@ -2,12 +2,10 @@ import { mcaGuarantorFields, retiredGuarantorSsn } from '../fields';
 import type { McaClause } from '../types';
 
 /**
- * The Equipment Lease Agreement — section 4.
- *
- * Draft bodies may differ from the retained shipped source (ADR 0012).
- * Source digests preserve that historical evidence; twins.test.ts checks
- * the two current drafts against each other. The 2026-09-12 report/contact/
- * signature rewrite remains unapproved and does not rebuild a stored template.
+ * Draft equipment terms include the coordinated MCA-R08–R12 correction and
+ * the transaction-scoped report/contact/signature corrections from PR #194.
+ * Source documents remain historical evidence. All changed versions require
+ * fresh approval before publication.
  */
 export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
   {
@@ -42,14 +40,14 @@ export const EQUIPMENT_LEASE_GUARANTY: McaClause[] = [
       because: 'misattributed',
       note: 'This is a guaranty to the equipment provider of return and specified conduct; the receivables funder’s guaranty-scope answer does not choose its obligations.',
     },
-    version: 1,
+    version: 2,
     instrument: 'equipment-lease',
     kind: 'clause',
     includeWhen: null,
     section: 'guaranty',
     sortKey: 20,
-    heading: 'Guaranty of Payment',
-    body: 'To induce {{equipmentAffiliate}} to enter into this Lease and purchase the Equipment for Lessee, and knowing that {{equipmentAffiliate}} is relying on this guaranty as a condition to entering into this Lease, I, the undersigned (the “Guarantor”), individually guarantee to {{equipmentAffiliate}} only the following obligations of Lessee to {{equipmentAffiliate}} under this Lease, and nothing else: (a) return of the Equipment when required, or payment of its fair market value if it is not returned; (b) that Lessee has not committed fraud or made any material misrepresentation of present fact in connection with this Lease; and (c) that Lessee has not acted with intent to deprive us of the Equipment. I am not personally liable for any monthly lease payment, for any amount accelerated under Section [[clause:equipment-lease.default-remedies]](b)(ii), or for any obligation arising because Lessee’s business has slowed, ceased, or failed. Subject to those limits, I make this guaranty irrespective of any other circumstance which might otherwise constitute a defense to this Lease and/or this Guaranty. {{equipmentAffiliate}} shall not be required to proceed against Lessee or the Equipment or enforce any other remedy before proceeding against me. I agree to pay all attorneys’ fees and other expenses {{equipmentAffiliate}} incurs in enforcing any term of this Guaranty. I consent to any extension or modification granted to Lessee, and the release and/or compromise of any obligation of Lessee or any other obligors and guarantors shall not in any way release me from my obligations under this Guaranty. This is a continuing Guaranty and shall bind my heirs, successors, and assigns, and may be enforced by or for the benefit of any assignee or successor of {{equipmentAffiliate}}.',
+    heading: 'Limited Conduct Guaranty',
+    body: 'Only a person or entity identified as a Guarantor in a separate completed identity block and separately signing in that capacity gives this Guaranty to the equipment provider identified in this Agreement. An authorized representative signing solely for an entity does not personally guarantee its obligations. Each Guarantor guarantees only documented direct loss caused by that Guarantor’s own intentional fraud in procuring this Agreement, knowing material false statement of present fact made to procure it, or intentional theft, concealment, unauthorized disposition or withholding of the Equipment when that Guarantor has the ability and a lawful obligation to return it after a lawful written demand. An innocent mistake, someone else’s misconduct, ordinary wear, an insured casualty without that Guarantor’s misconduct, or inability to return Equipment beyond that Guarantor’s control does not create liability. The Guarantor has no liability for monthly charges, acceleration, a receivables purchase obligation, or loss arising solely from slow sales, business failure, insolvency or bankruptcy. Recovery is limited to the actual loss caused by the specified conduct, with all payments, insurance and Equipment value credited and no double recovery. Enforcement expenses are subject to the aggregate cost limit and individual guarantor limit in Section [[clause:equipment-lease.default-remedies]]. There is no blanket waiver of defenses, notices or rights. An amendment that increases a Guarantor’s obligations requires that Guarantor’s separately signed consent; extensions, renewals, additional equipment and future transactions are not guaranteed automatically. Assignment conveys no greater rights. Several guarantors are liable jointly only to the extent their own covered conduct caused the same loss. A release or payment reduces every overlapping claim for that loss. This Guaranty ends when its defined obligations are satisfied; survival preserves only an accrued, provable claim within these limits.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

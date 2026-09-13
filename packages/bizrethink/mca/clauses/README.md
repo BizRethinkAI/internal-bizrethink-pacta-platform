@@ -276,3 +276,19 @@ They also do not prove the findings say what a clause claims. The register keeps
 `id`, `severity`, `locus` and the finding's one-line statement, and drops the
 argument — `evidence`, `consequence`, `fix` — which stays in `lombard-contracts`
 where it can be read once rather than copied twice.
+
+### Equipment terms and field definitions
+
+The coordinated equipment correction (task #205) revises fifteen clauses in each
+instrument. The $1 Lease has an explicit completion purchase and no automatic
+renewal; the Subscription retains monthly continuation without a purchase option.
+Both use documented charges, bounded remedies and each guarantor's own intentional
+conduct. These remain draft commercial terms requiring fresh approval.
+
+`MCA_EQUIPMENT_FIELDS` describes their shared field needs separately from operative
+clauses. Catalogue/interview wiring follows in the authorized queue; this export
+is not yet a transaction-fill validator or a replacement rendered grid. Actual
+delivery facts are distinguished from dates agreed before signing. Equipment
+classification must be considered with the applicable disclosure requirements;
+neither a document title nor a financing-statement filing establishes an exemption.
+The consent/acknowledgment correction in #194 remains a required dependency.

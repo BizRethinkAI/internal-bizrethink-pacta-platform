@@ -70,34 +70,8 @@ export const TWIN_VOCABULARY: readonly (readonly [string, string])[] = [
 ];
 
 /**
- * Where the swap was applied INCONSISTENTLY, clause by clause.
- *
- * This list is not scaffolding around an imperfect table. It is the finding.
- *
- * Ten places across six clauses say the same thing in two documents using
- * words that do not correspond, and none of them is a difference of substance:
- *
- *   - §3.2 renders the same verb three ways in one clause — `to subscribe for`,
- *     `you subscribe for`, and `subscribed for` — where the Equipment Lease
- *     uses `lease` and `leased` throughout. §3.1 uses a fourth, `subscribe`
- *     with no preposition.
- *   - §4.2 and §4.3 turn `this Lease` into `the Subscription` four times, while
- *     §4.5 and everywhere else turn it into `this Subscription`. A guaranty
- *     that refers to *the* agreement rather than *this* one is a small thing to
- *     read past and not a small thing in a document whose whole subject is
- *     which obligations are guaranteed.
- *   - §3.12 loses the capital: `this Subscription` becomes `this subscription`,
- *     in the sentence that terminates the agreement.
- *   - §4.7 drops `Equipment` from the executed document's own name, where §3.16
- *     keeps it (`Equipment Subscription Department`).
- *
- * Each entry carries enough surrounding words to be unambiguous, which is also
- * what makes it readable as evidence rather than as configuration. They are
- * applied in order, each replacing the first remaining occurrence.
- *
- * ADDING TO THIS LIST IS A DECISION, NOT A FIX. An entry here says "the two
- * documents say the same thing in gratuitously different words". A real
- * difference of substance belongs in `divergent` below, with a cause.
+ * Vocabulary exceptions still present in current draft bodies. Resolved wording
+ * differences are removed; substantive differences stay in the divergence list.
  */
 export type TwinVocabularyException = {
   /** Canonical Equipment Lease clause identity; independent of numbering. */
@@ -110,46 +84,6 @@ export type TwinVocabularyException = {
 
 export const TWIN_VOCABULARY_EXCEPTIONS: readonly TwinVocabularyException[] = [
   {
-    slug: 'equipment-lease.equipment',
-    from: 'you agree to subscription from us',
-    to: 'you agree to subscribe from us',
-  },
-  {
-    slug: 'equipment-lease.effective-date-term-and-interim-rent',
-    from: 'by you to subscription the Equipment identified',
-    to: 'by you to subscribe for the Equipment identified',
-  },
-  {
-    slug: 'equipment-lease.effective-date-term-and-interim-rent',
-    from: 'Equipment and software leased under this Agreement',
-    to: 'Equipment and software you subscribe for under this Agreement',
-  },
-  {
-    slug: 'equipment-lease.effective-date-term-and-interim-rent',
-    from: 'Equipment or software leased under this Agreement',
-    to: 'Equipment or software subscribed for under this Agreement',
-  },
-  {
-    slug: 'equipment-lease.default-remedies',
-    from: 'terminate this Subscription and our future',
-    to: 'terminate this subscription and our future',
-  },
-  {
-    slug: 'equipment-lease.guaranty-of-payment',
-    from: 'under this Subscription, and nothing',
-    to: 'under the Subscription, and nothing',
-  },
-  {
-    slug: 'equipment-lease.guaranty-of-payment',
-    from: 'in connection with this Subscription; and',
-    to: 'in connection with the Subscription; and',
-  },
-  {
-    slug: 'equipment-lease.guaranty-of-payment',
-    from: 'a defense to this Subscription and/or',
-    to: 'a defense to the Subscription and/or',
-  },
-  {
     slug: 'equipment-lease.independent-decision-governing-law',
     from: 'reflected in this Subscription at Section',
     to: 'reflected in the Subscription at Section',
@@ -160,11 +94,6 @@ export const TWIN_VOCABULARY_EXCEPTIONS: readonly TwinVocabularyException[] = [
     to: 'executed this Subscription Agreement',
   },
   {
-    // The parties paragraph remains unnumbered and uses its slug — the
-    // same key `twins.test.ts` pairs unnumbered clauses on. Same asymmetry as
-    // §4.7: the Equipment Lease calls itself "Equipment Lease Agreement" and
-    // the Subscription calls itself "Subscription Agreement", not "Equipment
-    // Subscription Agreement".
     slug: 'equipment-lease.parties',
     from: 'This Equipment Subscription Agreement',
     to: 'This Subscription Agreement',
@@ -218,44 +147,31 @@ export const EQUIPMENT_TWIN: {
       slug: 'equipment-lease.payment-of-amounts-due',
       cause: 'collection',
       reason:
-        'Different collection mechanisms, not different words. The Equipment Lease bills a fixed amount to the ' +
-        "customer's merchant processing account and subordinates that billing to an affiliate's future receivables " +
-        'purchase agreement — including suspending it while the specified percentage stands at one hundred percent. ' +
-        'The Subscription invoices by email ten days before each due date, takes no automatic debit without a ' +
-        'separate written authorisation the customer may withdraw, and says nothing about the FRPA at all.',
+        'The Lease allows separately authorized processor billing only from the share remaining after the receivables purchase. The Subscription requires an independently agreed payment method and a separate revocable authorization for any automatic debit. Both require invoices, prohibit default sweeps and keep equipment outside purchased receipts.',
     },
     {
       slug: 'equipment-lease.use-return-of-equipment-and-insurance',
       cause: 'title',
       reason:
-        'The Equipment Lease conditions the use and insurance obligations on "Until title passes to you under ' +
-        'Section 3.7". The Subscription has no such section and states the obligation unconditionally.',
+        'The Lease limits restrictions, labels and insurance to an unsatisfied security interest. The Subscription retains ownership. Both require agreed access and documented return costs without automatic penalties.',
     },
     {
       slug: 'equipment-lease.title-to-equipment',
       cause: 'title',
       reason:
-        'The characterisation clause, and the sharpest of the five. The Equipment Lease says the option to acquire ' +
-        'for nominal consideration creates a SECURITY INTEREST rather than a true lease, and reserves the right to ' +
-        'file a financing statement. The Subscription says the transaction shall be treated as a lease, and claims a ' +
-        'first-lien only conditionally, if a court finds Article 2A does not govern.',
+        'The fixed-term $1 Lease identifies security-interest economics. The Subscription has no purchase option and preserves classification based on its actual term and residual. Neither invents attachment, perfection or priority, and neither claims a disclosure exemption by label.',
     },
     {
       slug: 'equipment-lease.purchase-return-or-continuation-of-equipment-at-end-of-lease-term',
       cause: 'title',
       reason:
-        'The purchase option itself. The Equipment Lease offers purchase for one dollar with title passing, makes ' +
-        'that the default where the customer neither chooses nor returns, and adds a discounted early buyout. The ' +
-        'Subscription has none of it and its heading drops the word "Purchase".',
+        'The Lease makes the $1 purchase an express election at signing, charges it with the final scheduled payment, and stops periodic billing without renewal. The Subscription retains a monthly continuation and states a definite termination, return and billing-stop mechanism without a purchase option.',
     },
     {
       slug: 'equipment-lease.software-license',
       cause: 'title',
       reason:
-        'The Equipment Lease makes the software licence perpetual as to equipment whose title passes, surviving the ' +
-        'agreement. The Subscription omits that sentence, because no title ever passes. REVIEW-02 narrowed ' +
-        '`el-3-8-software-licence-has-no-survival-and-the-document-has-no-survival-clause` to the Equipment Lease ' +
-        'alone for exactly this reason.',
+        'For identified provider-owned software, the Lease license survives ownership transfer while the Subscription license ends with its valid term. Both require third-party terms and actual licensing authority before signing and promise no rights in third-party software.',
     },
   ],
 };

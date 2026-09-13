@@ -112,6 +112,55 @@ export const MCA_FUNDING_FIELDS: ClauseField[] = [
   field('broker.compensation', 'Broker / ISO — Identity, Compensation and Payee (if applicable)', 'text', false),
 ];
 
+/** Equipment has its own counterparty, price, term, insurance and completion schedule. */
+export const MCA_EQUIPMENT_FIELDS: ClauseField[] = [
+  field('merchant.legalName', 'Customer — Legal Name', 'text', true, '«0»'),
+  field('merchant.dba', 'Customer — DBA (if any)', 'text', false, '«1»'),
+  field('merchant.documentTaxIdentifier', 'Customer — EIN or masked tax identifier', 'text', false, '«2»'),
+  field('merchant.entityType', 'Customer — Entity Type', 'text', true, '«3»'),
+  field('merchant.formationState', 'Customer — State of Formation', 'text', true, '«4»'),
+  field('merchant.phone', 'Customer — Phone', 'text', true, '«6»'),
+  field('merchant.email', 'Customer — Notice Email', 'text', true, '«9»'),
+  field('merchant.noticeAddress', 'Customer — Notice Address', 'text', true, '«10»'),
+  field('merchant.businessAddress', 'Customer — Business Address', 'text', true, '«11»'),
+  field('equipment.description', 'Equipment — Manufacturer and Model', 'text', true, '«12»'),
+  field('equipment.serialNumbers', 'Equipment — Serial Numbers (record on delivery)', 'text', false),
+  field('equipment.quantity', 'Equipment — Quantity', 'text', true, '«13»'),
+  field('equipment.location', 'Equipment — Installation Site', 'text', true, '«14»'),
+  field('equipment.monthlyCharge', 'Equipment — Monthly Charge', 'currency', true, '«15»'),
+  field('equipment.termMonths', 'Equipment — Initial Term in Months', 'text', true, '«16»'),
+  field('equipment.agreementNumber', 'Equipment — Agreement Number'),
+  field('equipment.effectiveDate', 'Equipment — Effective Date', 'date', true, '«20»'),
+  field('equipment.scheduledDeliveryDate', 'Equipment — Agreed Delivery Date', 'date'),
+  field('equipment.deliveryDate', 'Equipment — Actual Delivery Date (record on delivery)', 'date', false),
+  field('equipment.commencementDate', 'Equipment — Agreed Commencement Date', 'date'),
+  field('equipment.finalPaymentDate', 'Equipment — Final Scheduled Payment Date', 'date'),
+  field('equipment.interimCharge', 'Equipment — Itemized Interim Charge', 'currency'),
+  field('equipment.deliveryCharge', 'Equipment — Delivery Charge', 'currency'),
+  field('equipment.installationCharge', 'Equipment — Installation Charge', 'currency'),
+  field(
+    'equipment.purchasePrice',
+    'Equipment — Completion Purchase Price ($1 for Lease; $0 for Subscription)',
+    'currency',
+  ),
+  field('equipment.estimatedTaxes', 'Equipment — Estimated Taxes', 'currency'),
+  field('equipment.taxBasis', 'Equipment — Tax Jurisdiction, Base and Rate'),
+  field('equipment.scheduledTotal', 'Equipment — Supplied Itemized Scheduled Total', 'currency'),
+  field('equipment.paymentSchedule', 'Equipment — Each Amount and Due Date, Including Initial Payment'),
+  field('equipment.providerLegalName', 'Equipment Provider — Legal Name', 'text', true, '«37»'),
+  field('equipment.providerEntityType', 'Equipment Provider — Entity Type'),
+  field('equipment.providerFormationState', 'Equipment Provider — Formation State'),
+  field('equipment.providerAddress', 'Equipment Provider — Principal Address', 'text', true, '«41»'),
+  field('equipment.providerNoticeAddress', 'Equipment Provider — Notice Address', 'text', true, '«43»'),
+  field('equipment.providerNoticeEmail', 'Equipment Provider — Notice Email'),
+  field('equipment.returnAddress', 'Equipment — Return Address', 'text', true, '«42»'),
+  field('equipment.insuranceRequirements', 'Equipment — Required Coverage and Amount'),
+  field('equipment.lossPayee', 'Equipment — Loss Payee and Insurable Interest', 'text', true, '«45»'),
+  field('equipment.compatibility', 'Equipment — Express Compatibility Commitments'),
+  field('equipment.softwareSchedule', 'Software — Rights Granted, Third-party Terms and Support'),
+  field('equipment.supplierWarranties', 'Equipment — Supplier Warranties and Service Process'),
+];
+
 export const mcaGuarantorFields = (legacy: {
   name: string;
   address: string;
