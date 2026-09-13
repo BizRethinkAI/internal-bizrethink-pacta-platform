@@ -16,7 +16,10 @@ There is no verified Lombard or Circular profile preset. The example profile in
 - `compile.ts` selects/renumbers operative clauses, inserts document helpers at
   their declared anchors, fills known provider variables and leaves future deal
   inputs blank. Interview-only guidance never enters contracts. The current
-  catalogue and vendored statutory source bytes determine a stable fingerprint.
+  selected content, saved policy and vendored statutory source bytes determine
+  a stable fingerprint. Selection predicates are evaluated, not hashed as printed
+  JavaScript: server bundling must not make an unchanged recipe stale. Counsel
+  approval fingerprints remain separate and still pin their selection gates.
 - Equipment offers produce separate lease/subscription candidate documents; the
   merchant's later election selects the applicable document. Individual-report
   instructions and ISO channel execution are separate events. They do not turn

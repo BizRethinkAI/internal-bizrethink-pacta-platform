@@ -17,6 +17,7 @@ import { type McaProviderProfile, providerSelectionFacts, ZMcaProviderProfile } 
 export type McaTemplateItem = {
   slug: string;
   version: number;
+  /** Selected source data; separate from counsel approval, which also pins the gate. */
   sourceFingerprint: string;
   kind: McaContent['kind'];
   section: string;
@@ -180,7 +181,10 @@ export const compileMcaTemplate = (input: McaProviderProfile) => {
         return {
           slug: entry.slug,
           version: entry.version,
-          sourceFingerprint: mcaClauseFingerprint(source),
+          // The saved policy and the resulting selection are hashed below. A
+          // predicate's printed code varies between server bundles and is not
+          // recipe data. Keep the legal approval fingerprint itself unchanged.
+          sourceFingerprint: mcaClauseFingerprint({ ...source, includeWhen: null }),
           kind: entry.kind,
           section: entry.section,
           heading: entry.heading,

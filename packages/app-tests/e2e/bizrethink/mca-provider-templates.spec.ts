@@ -36,6 +36,7 @@ test('a provider interview saves, reopens and revises a real team template with 
   const { user, organisation } = await signedInAsAdmin({ page, redirectPath: '/admin/mca-templates' });
   const team = organisation.teams[0];
   const profile = providerFixture();
+  profile.buyer.servicingPhone = '+1 555 010 0200';
   try {
     await page.getByRole('button', { name: 'Enable my provider interview access', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Disable my provider interview access', exact: true })).toBeVisible();
@@ -56,6 +57,7 @@ test('a provider interview saves, reopens and revises a real team template with 
     ]) {
       await page.getByLabel(label, { exact: true }).fill(value);
     }
+    await page.getByLabel('Buyer servicing phone', { exact: true }).fill(profile.buyer.servicingPhone);
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
     await page.getByLabel('I confirm this provider uses these supported terms', { exact: true }).check();
     await page.getByLabel('FRPA guaranty', { exact: true }).selectOption('limited-conduct');

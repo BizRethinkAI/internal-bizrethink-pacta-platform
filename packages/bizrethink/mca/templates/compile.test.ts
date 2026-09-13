@@ -77,6 +77,30 @@ describe('the provider interview produces a reusable document-package template',
       entry.body = body;
     }
   });
+
+  it('pins selected content across server bundles without hashing a predicate’s printed code', () => {
+    const profile = providerFixture();
+    const entry = contentFor('frpa').find((item) => item.slug === 'frpa.guarantor-fields');
+    if (!entry?.includeWhen) {
+      throw new Error('The guarantor field group must have a selection predicate.');
+    }
+    const includeWhen = entry.includeWhen;
+    const first = compileMcaTemplate(profile);
+    try {
+      // Bundlers can rename parameters or change expression formatting without
+      // changing the selected content for the saved provider policy.
+      entry.includeWhen = (compiledFacts) => compiledFacts.guarantyScope !== 'none';
+      expect(entry.includeWhen.toString()).not.toBe(includeWhen.toString());
+      expect(compileMcaTemplate(profile)).toEqual(first);
+
+      entry.includeWhen = () => false;
+      const changed = compileMcaTemplate(profile);
+      expect(changed.documents[0]?.items.some((item) => item.slug === entry.slug)).toBe(false);
+      expect(changed.fingerprint).not.toBe(first.fingerprint);
+    } finally {
+      entry.includeWhen = includeWhen;
+    }
+  });
 });
 
 it('assembles both offered equipment options, the channel agreement and report permission with their own identities', () => {

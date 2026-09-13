@@ -70,6 +70,15 @@ the PR. No local application build or duplicate full Playwright suite. Browser
 scenarios cover the real saved-template → fill → download flow, immutable recipe,
 cleared stateless inputs, stale preview and direct access/revision/input denials.
 
+After-flow CI caught a stale reusable-record count and an actual PDF rejection:
+recipe fingerprints inherited a predicate's printed JavaScript, which differed
+between the tRPC and PDF server bundles. The recipe now pins selected source
+data and evaluated selection with saved policy, without hashing that printed
+function. A red/green regression proves equivalent predicates stay current while
+changed selection invalidates the recipe; body-change checks remain. Counsel
+approval fingerprints are unchanged. Browser coverage asserts 25 reusable
+records and the new fields' explicit review-pending status.
+
 Real synthetic PDFs: 36 pages for FRPA plus worksheet; 67 pages for FRPA, equipment
 lease, ISO and two individual permission copies plus worksheets. Poppler page
 montages were inspected across all 67 pages; automated PDF.js checks verify page
