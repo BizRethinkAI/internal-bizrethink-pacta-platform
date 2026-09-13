@@ -1,12 +1,13 @@
 import type {
   McaCounselFindingView,
   McaLibraryInstrumentView,
-  McaLibraryPageClause,
+  McaLibraryPageItem,
   McaLibraryReviewView,
   SourceState,
 } from '@bizrethink/customizations';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '@bizrethink/customizations/mca/clauses/instruments';
 import { describeClauseVariance, describeWhyThisClause } from '@bizrethink/customizations/mca/clauses/metadata';
+import { McaWorkspaceNav } from '@bizrethink/customizations/mca/components/workspace-nav';
 import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
@@ -22,7 +23,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { AlertTriangle, Check, ChevronDown, ChevronRight, FileWarning, Loader2, Lock, ScrollText } from 'lucide-react';
 import { useState } from 'react';
-import { useLoaderData, useRevalidator } from 'react-router';
+import { useLoaderData, useRevalidator, useSearchParams } from 'react-router';
 
 import { buildMcaLibraryView } from '~/utils/bizrethink-mca-library.server';
 import { appMetaTags } from '~/utils/meta';
@@ -99,8 +100,13 @@ const COUNTERPARTY_LABEL: Record<string, string> = {
 };
 
 export default function AdminMcaLibraryPage() {
-  const { instruments, clauses, reviews, counselFindings, totals, evidence, reviewProfile } =
-    useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+  const isReusable = searchParams.get('catalogue') === 'reusable';
+  const { reviews, counselFindings, evidence, reviewProfile } = data;
+  const clauses: McaLibraryPageItem[] = isReusable ? data.reusable : data.clauses;
+  const instruments = isReusable ? data.reusableInstruments : data.instruments;
+  const totals = isReusable ? { ...data.reusableTotals, clauses: data.reusableTotals.items } : data.totals;
 
   /*
     ONE SOURCE OF DATA, REVALIDATED. Every mutation on this page re-runs the
@@ -114,16 +120,23 @@ export default function AdminMcaLibraryPage() {
 
   return (
     <div>
+      <McaWorkspaceNav />
       <h1 className="font-semibold text-4xl">
-        <Trans>MCA Clauses</Trans>
+        {isReusable ? <Trans>MCA Reusable content</Trans> : <Trans>MCA Clauses</Trans>}
       </h1>
 
       <p className="mt-2 text-muted-foreground text-sm">
-        <Trans>
-          The negotiated agreements — our contract text, not a regulator's. Clauses name their parties by role ({'{{'}
-          funder{'}}'}, {'{{'}processor{'}}'}), and the documents below are one client's copy of them. Conformity for
-          the prescribed disclosure forms is a separate page.
-        </Trans>
+        {isReusable ? (
+          <Trans>
+            Required document blocks, field groups and interview guidance. Each item identifies its intended use and
+            retains its own review and approval evidence.
+          </Trans>
+        ) : (
+          <Trans>
+            Numbered operative provisions for the negotiated agreements. Reusable content and disclosure requirements
+            are available in the other MCA views.
+          </Trans>
+        )}
       </p>
 
       <p className="mt-3 text-muted-foreground text-sm">
@@ -142,8 +155,9 @@ export default function AdminMcaLibraryPage() {
       <Alert className="mt-6" variant={totals.publishable === totals.clauses ? 'default' : 'warning'}>
         <Lock className="h-4 w-4" />
         <AlertTitle>
-          {totals.publishable} of {totals.clauses} clauses may be sent to a merchant, and {totals.outstanding} findings
-          are outstanding
+          {totals.publishable} of {totals.clauses}{' '}
+          {isReusable ? 'reusable items have publication clearance' : 'clauses may be sent to a merchant'}, and{' '}
+          {totals.outstanding} findings are outstanding
         </AlertTitle>
         <AlertDescription>
           A clause is publishable once an attorney's approval names its author, which is what the provenance gate
@@ -371,8 +385,8 @@ const CounselLinks = ({ reviews, onChanged }: { reviews: McaLibraryReviewView[];
     <div className="mt-8 rounded-lg border border-border p-4">
       <h2 className="font-semibold">Send an agreement to counsel</h2>
       <p className="mt-1 text-muted-foreground text-sm">
-        They open a link and read one agreement with its provenance and its outstanding findings — no account needed.
-        The link is read-only, expires, and can be revoked.
+        They open a link and review one agreement’s clauses and reusable content without an account. They can record
+        findings, but cannot approve content. The link expires and can be revoked.
       </p>
 
       {live.length > 0 && (
@@ -492,7 +506,7 @@ const InstrumentCard = ({
   onApproved,
 }: {
   instrument: McaLibraryInstrumentView;
-  clauses: McaLibraryPageClause[];
+  clauses: McaLibraryPageItem[];
   onApproved: () => void;
 }) => {
   const approved = clauses.filter((clause) => clause.approved).length;
@@ -506,7 +520,7 @@ const InstrumentCard = ({
         <span className="ml-auto flex items-center gap-2">
           <Badge variant={SOURCE_VARIANT[instrument.sourceState]}>{SOURCE_LABEL[instrument.sourceState]}</Badge>
           <span className="text-muted-foreground text-sm">
-            {approved} of {instrument.clauseCount} approved · {instrument.outstanding} outstanding
+            {approved} of {clauses.length} approved · {instrument.outstanding} outstanding
           </span>
         </span>
       </header>
@@ -527,7 +541,7 @@ const InstrumentCard = ({
  * router refuses either way, but a refusal after somebody has typed a name, a
  * bar number and a jurisdiction is a worse way to learn it.
  */
-const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageClause; onApproved: () => void }) => {
+const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onApproved: () => void }) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [bar, setBar] = useState('');
@@ -544,7 +558,7 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageClause; onApp
   const lapsed = clause.approval?.lapsed === true;
 
   return (
-    <li>
+    <li data-mca-kind={clause.kind} data-mca-slug={clause.slug}>
       <button
         type="button"
         className="flex w-full items-start justify-between gap-4 px-4 py-3 text-left"
@@ -558,9 +572,24 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageClause; onApp
           )}
           <div>
             <p className="text-foreground">
-              <span className="mr-2 font-mono text-muted-foreground text-xs">{clause.number || '—'}</span>
+              {clause.kind === 'clause' && (
+                <span data-mca-number className="mr-2 font-mono text-muted-foreground text-xs">
+                  {clause.number}
+                </span>
+              )}
               {clause.heading}
             </p>
+            {clause.kind !== 'clause' && (
+              <p className="mt-1 text-muted-foreground text-xs">
+                {clause.kind === 'guidance' ? (
+                  <Trans>Interview guidance — excluded from contracts</Trans>
+                ) : clause.kind === 'field-group' ? (
+                  <Trans>Required document fields</Trans>
+                ) : (
+                  <Trans>Required document block</Trans>
+                )}
+              </p>
+            )}
             {clause.selectionNote && <p className="mt-1 text-muted-foreground text-xs">{clause.selectionNote}</p>}
             <p className="mt-1 text-muted-foreground text-xs">{describeWhyThisClause(clause.whyThisClause)}</p>
             <p className="mt-1 text-muted-foreground text-xs">{describeClauseVariance(clause.variance)}</p>
@@ -615,10 +644,29 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageClause; onApp
                 <div key={field.widget}>
                   <dt className="text-muted-foreground text-xs">{field.label}</dt>
                   <dd className="mt-1 font-mono text-sm">{field.widget}</dd>
+                  <dd className="mt-1 text-muted-foreground text-xs">
+                    {field.requiredWhen ? (
+                      <Trans>Required for an entity guarantor</Trans>
+                    ) : field.required ? (
+                      <Trans>Required</Trans>
+                    ) : (
+                      <Trans>Optional or completed when applicable</Trans>
+                    )}
+                  </dd>
                 </div>
               ))}
             </dl>
           )}
+          {clause.repeatFor === 'guarantor' && (
+            <p className="mt-2 text-sm">
+              <Trans>A separate identity block and signature are required for each intended guarantor.</Trans>
+            </p>
+          )}
+          {clause.retiredFields?.map((field) => (
+            <p key={field.widget} className="mt-2 text-muted-foreground text-xs">
+              {field.widget}: {field.reason}
+            </p>
+          ))}
 
           {clause.findings.length > 0 && (
             <ul className="mt-4 space-y-2">

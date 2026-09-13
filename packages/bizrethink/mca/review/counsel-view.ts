@@ -1,14 +1,13 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-
+import { contentFor } from '../catalogue';
 import { isMcaApprovalCurrent, type McaClauseApproval } from '../clauses/approval';
 import { INSTRUMENTS } from '../clauses/instruments';
-import { libraryFor } from '../clauses/library';
 import { type McaTenant, resolveClauses } from '../clauses/parties';
 import type { ClauseVariance, WhyThisClause } from '../clauses/types';
 import type { McaJurisdiction } from '../jurisdictions';
+import { contentForReview } from '../reusable/review';
 import { type BriefingSection, counselBriefing } from './briefing';
 import { type McaLibraryReview, reviewIsStale } from './link';
-import { numberedLibraryForReview } from './numbered-library';
 import { type ReadableMcaClause, toReadableAgreement } from './readable-agreement';
 
 /**
@@ -100,7 +99,7 @@ export type CounselReviewInput = {
 export const counselReviewView = (input: CounselReviewInput): CounselReviewView => {
   const { review, tenant, approvals, sender, now } = input;
 
-  const clauses = libraryFor(review.instrument);
+  const clauses = contentFor(review.instrument);
   const instrument = INSTRUMENTS[review.instrument];
 
   const approvalFor = (slug: string) => approvals.get(slug) ?? null;
@@ -125,29 +124,27 @@ export const counselReviewView = (input: CounselReviewInput): CounselReviewView 
       tenant,
       clauseCount: clauses.length,
       approvedCount: clauses.filter((clause) => isMcaApprovalCurrent(clause, approvalFor(clause.slug))).length,
-      unnumberedCount: clauses.filter((clause) => clause.unnumberedReason).length,
+      unnumberedCount: clauses.filter((clause) => clause.kind !== 'clause').length,
       sender,
       expiresAt: review.expiresAt,
       now,
     }),
-    sections: toReadableAgreement(resolveClauses(numberedLibraryForReview(review.instrument), tenant)).map(
-      (section) => ({
-        ...section,
-        clauses: section.clauses.map((readable) => {
-          const clause = clauses.find((candidate) => candidate.slug === readable.slug);
-          if (!clause) {
-            throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Review clause is absent from the library.' });
-          }
+    sections: toReadableAgreement(resolveClauses(contentForReview(review.instrument), tenant)).map((section) => ({
+      ...section,
+      clauses: section.clauses.map((readable) => {
+        const clause = clauses.find((candidate) => candidate.slug === readable.slug);
+        if (!clause) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Review clause is absent from the library.' });
+        }
 
-          return {
-            ...readable,
-            whyThisClause: clause.whyThisClause,
-            variance: clause.variance,
-            appliesInStates: clause.appliesInStates,
-            approved: isMcaApprovalCurrent(clause, approvalFor(clause.slug)),
-          };
-        }),
+        return {
+          ...readable,
+          whyThisClause: clause.whyThisClause,
+          variance: clause.variance,
+          appliesInStates: clause.appliesInStates,
+          approved: isMcaApprovalCurrent(clause, approvalFor(clause.slug)),
+        };
       }),
-    ),
+    })),
   };
 };

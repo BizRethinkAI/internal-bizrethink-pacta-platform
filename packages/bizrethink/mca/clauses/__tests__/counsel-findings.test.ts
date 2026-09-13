@@ -27,7 +27,7 @@ import { libraryFor } from '../library';
  * in.
  */
 describe('an unanswered counsel finding holds the clause', () => {
-  const clause = libraryFor('frpa')[0];
+  const clause = libraryFor('frpa').find((entry) => entry.slug === 'frpa.granting-clause')!;
 
   it('does not hold a clause nobody has objected to', () => {
     expect(counselFindingsHold(0)).toBeNull();

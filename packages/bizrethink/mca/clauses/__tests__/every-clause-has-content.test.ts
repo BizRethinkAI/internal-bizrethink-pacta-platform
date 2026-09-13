@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ALL_MCA_CLAUSES } from '../library';
+import { ALL_MCA_CONTENT } from '../../catalogue';
 
 /**
  * The assertion that runs the other way from `frpa-coverage.test.ts`, and the
@@ -35,7 +35,7 @@ import { ALL_MCA_CLAUSES } from '../library';
  */
 describe('every clause has content for its kind', () => {
   it.each(
-    ALL_MCA_CLAUSES.map((clause) => [clause.slug, clause] as const),
+    ALL_MCA_CONTENT.map((clause) => [clause.slug, clause] as const),
   )('%s holds something a reader can read', (_slug, clause) => {
     if (clause.kind === 'field-group') {
       /*
@@ -63,12 +63,15 @@ describe('every clause has content for its kind', () => {
   });
 
   it('gives every current field a stable binding and preserves source anchors separately', () => {
-    const groups = ALL_MCA_CLAUSES.filter((clause) => clause.kind === 'field-group');
+    const groups = ALL_MCA_CONTENT.filter((clause) => clause.kind === 'field-group');
     expect(groups.map((group) => group.slug).sort()).toEqual([
       'equipment-lease.guarantor-information',
-      'frpa.guarantor-information-9-1',
+      'equipment-lease.merchant-and-equipment-information',
+      'frpa.guarantor-fields',
       'frpa.merchant-and-funding-information',
+      'frpa.prior-transaction-fields',
       'subscription.guarantor-information',
+      'subscription.merchant-and-equipment-information',
     ]);
     for (const group of groups) {
       const fields = group.fields ?? [];

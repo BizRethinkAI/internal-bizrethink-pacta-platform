@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-
+import { contentFor } from '../../catalogue';
 import { readAgreementBody } from '../documents';
-import { libraryFor } from '../library';
 import { LOMBARD } from '../parties';
 import {
   applyTwinVocabulary,
@@ -37,17 +36,17 @@ import {
  * that produces text for a reader.
  */
 describe('the Equipment Lease and the Subscription cannot diverge unnoticed', () => {
-  const lease = libraryFor('equipment-lease');
-  const subscription = libraryFor('subscription');
+  const lease = contentFor('equipment-lease');
+  const subscription = contentFor('subscription');
 
   // ADR 0011 removes stored numbers. Pair by semantic identity, with the two
   // differently named twins mapped explicitly; numbers cannot mask a mismatch.
   const pairKey = (clause: { slug: string }) => equipmentTwinKey(clause.slug);
 
-  it('pairs its clauses one to one', () => {
+  it('pairs all clauses and reusable content one to one', () => {
     expect(lease.map(pairKey).sort()).toEqual(subscription.map(pairKey).sort());
 
-    expect(lease).toHaveLength(30);
+    expect(lease).toHaveLength(36);
   });
 
   it('pairs every clause with its twin', () => {
@@ -145,7 +144,7 @@ describe('the Equipment Lease and the Subscription cannot diverge unnoticed', ()
     expect([...new Set(TWIN_VOCABULARY_EXCEPTIONS.map((entry) => entry.slug))].sort()).toEqual([
       'equipment-lease.acknowledgment',
       'equipment-lease.independent-decision-governing-law',
-      'equipment-lease.parties',
+      'equipment-lease.party-identification',
     ]);
 
     // Every exception must actually fire. One that does not is a claim about

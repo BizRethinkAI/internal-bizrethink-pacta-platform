@@ -1,4 +1,5 @@
 import type { ConformityEntry, ConformityKind } from '@bizrethink/customizations';
+import { McaWorkspaceNav } from '@bizrethink/customizations/mca/components/workspace-nav';
 import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
@@ -14,37 +15,13 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/mca';
 
 /**
- * MCA conformity — read-only, and read-only is the design.
- *
- * ADR 0008. The lease library's page promises that "a clause reaches a third
- * party only once an attorney has approved the exact words below". That promise
- * is coherent for text we wrote and a category error for 10 CCR §914, whose
- * words California prescribes and whose row §914(a)(2) closes with "shall
- * include only". There is nothing here for counsel to approve, an approval
- * would assert an authority counsel does not have over a regulator's text, and
- * editing the text to satisfy a reviewer would be the defect rather than the
- * fix.
- *
- * SO THERE IS NO APPROVE BUTTON, AND THIS PAGE MUST NEVER GROW ONE. The first
- * person to press it would record an attorney's name and bar number against
- * California's sentence. That is also why this route shares no component with
- * `lease-library.tsx`: reusing a clause row would import its approval affordance
- * along with its layout.
- *
- * WHAT THIS PAGE IS FOR. The conformity half of the vertical has no approval
- * step, and an approval step is also a READ step — it is the mechanism that
- * forces a human to look. Nothing equivalent exists here, and the rows the
- * checker can only see the label of still need human eyes. This page is the
- * substitute, and it is a weaker one: it makes the gaps visible to anyone who
- * opens it and compels nobody to open it.
- *
- * IT DECIDES NOTHING. Every number, verdict and reason on it is computed by
- * `packages/bizrethink/mca/surface/view.ts` and asserted in
- * `mca/__tests__/surface.test.ts`. This file arranges them on a screen.
+ * ADR 0015: one MCA workspace, separate release controls. This view verifies
+ * prescribed forms and disclosure requirements; it remains read-only. Shared
+ * navigation does not grant authority to approve or alter a regulator's words.
  */
 
 export function meta() {
-  return appMetaTags(msg`MCA conformity`);
+  return appMetaTags(msg`MCA disclosures & requirements`);
 }
 
 /**
@@ -364,7 +341,8 @@ export default function AdminMcaConformityPage() {
   return (
     <div className="mx-auto w-full max-w-screen-lg px-4 pb-16 md:px-8">
       <div className="mt-8">
-        <h1 className="font-semibold text-3xl">MCA conformity</h1>
+        <McaWorkspaceNav />
+        <h1 className="font-semibold text-3xl">MCA disclosures & requirements</h1>
         <p className="mt-1 max-w-3xl text-muted-foreground">
           The eleven states that require a commercial-financing disclosure, and what each one&rsquo;s spec has actually
           been checked against. These are regulators&rsquo; words, not ours &mdash; this page reports and records

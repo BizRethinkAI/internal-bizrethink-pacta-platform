@@ -89,7 +89,7 @@ describe('the FRPA library accounts for the whole document', () => {
     }
   });
 
-  it('holds 108 records, including the funding grid and independently citable interest', () => {
+  it('holds 107 operative clauses, with fields and structural content in the reusable catalogue', () => {
     // 101 until the four `[Reserved]` records were removed. They were section
     // numbers the document holds open after a clause was taken out — lines of
     // the document, not clauses of it — and are now declared in
@@ -131,7 +131,7 @@ describe('the FRPA library accounts for the whole document', () => {
     // a RECORD and no section and every assembled document still holds one §6.1.
     // The §4.15 shape again, and for the same reason: the ungated §6.1 decided
     // the guaranty for every template from inside Section 6.
-    expect(clauses).toHaveLength(108);
+    expect(clauses).toHaveLength(107);
     expect(clauses.filter((clause) => !clause.unnumberedReason).length).toBeGreaterThan(0);
   });
 

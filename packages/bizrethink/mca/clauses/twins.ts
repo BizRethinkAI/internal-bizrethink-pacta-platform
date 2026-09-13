@@ -94,7 +94,7 @@ export const TWIN_VOCABULARY_EXCEPTIONS: readonly TwinVocabularyException[] = [
     to: 'executed this Subscription Agreement',
   },
   {
-    slug: 'equipment-lease.parties',
+    slug: 'equipment-lease.party-identification',
     from: 'This Equipment Subscription Agreement',
     to: 'This Subscription Agreement',
   },

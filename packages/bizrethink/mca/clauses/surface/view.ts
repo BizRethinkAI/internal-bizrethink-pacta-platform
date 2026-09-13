@@ -1,14 +1,11 @@
 import { assertPublishable } from '../../../provenance/types';
-import {
-  numberedLibraryForReview,
-  type ReviewMcaClause,
-  reviewProfileDescription,
-} from '../../review/numbered-library';
+import { type ReviewMcaContent, reusableForReview } from '../../reusable/review';
+import { numberedLibraryForReview, reviewProfileDescription } from '../../review/numbered-library';
 import { agreementDigest, agreementExists, MissingAgreementError } from '../documents';
 import { findingsFor, outstandingFindingsFor, REGISTER_AVAILABLE } from '../examination';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
 import { LOMBARD, type McaTenant } from '../parties';
-import type { ClauseVariance, WhyThisClause } from '../types';
+import type { ClauseVariance, McaContent, McaContentUse, McaReusableContent, WhyThisClause } from '../types';
 
 /**
  * The view model behind `/admin/mca-library`.
@@ -62,12 +59,16 @@ export type McaLibraryFindingView = {
   outstanding: boolean;
 };
 
-export type McaLibraryClauseView = {
+export type McaLibraryRecordView = {
   slug: string;
   instrument: McaInstrument;
-  number: string;
+  number: string | null;
+  kind: McaContent['kind'];
+  uses: McaContentUse[];
   body: string;
-  fields: ReviewMcaClause['fields'];
+  fields: McaContent['fields'];
+  repeatFor: McaContent['repeatFor'];
+  retiredFields: McaContent['retiredFields'];
   included: boolean;
   selectionNote: string | null;
   heading: string;
@@ -82,6 +83,9 @@ export type McaLibraryClauseView = {
   findings: McaLibraryFindingView[];
   outstanding: number;
 };
+
+export type McaLibraryClauseView = McaLibraryRecordView & { kind: 'clause'; number: string };
+export type McaLibraryReusableView = McaLibraryRecordView & { kind: McaReusableContent['kind']; number: null };
 
 export type McaLibraryInstrumentView = {
   id: McaInstrument;
@@ -125,80 +129,97 @@ const sourceState = (id: McaInstrument, tenant: McaTenant): SourceState => {
   }
 };
 
-export const mcaLibrarySurface = (tenant: McaTenant = LOMBARD) => {
-  const clauses: McaLibraryClauseView[] = MCA_INSTRUMENTS.flatMap((instrument) =>
-    numberedLibraryForReview(instrument),
-  ).map((clause) => {
-    const outstanding = new Set(outstandingFindingsFor(clause).map((finding) => finding.id));
+/** One evidence projection shared by two disjoint catalogues. */
+const recordView = (clause: ReviewMcaContent): McaLibraryRecordView => {
+  const outstanding = new Set(outstandingFindingsFor(clause).map((finding) => finding.id));
+  return {
+    slug: clause.slug,
+    instrument: clause.instrument,
+    number: clause.number,
+    kind: clause.kind,
+    uses: clause.kind === 'clause' ? ['document', 'template'] : clause.uses,
+    body: clause.body,
+    fields: clause.fields,
+    repeatFor: clause.repeatFor,
+    retiredFields: clause.retiredFields,
+    included: clause.included,
+    selectionNote: clause.selectionNote,
+    heading: clause.heading,
+    section: clause.section,
+    status: clause.status,
+    provenance: describeSource(clause.source),
+    whyThisClause: clause.whyThisClause,
+    variance: clause.variance,
+    publishProblems: assertPublishable({ ...clause, status: 'published' }),
+    examinedBy: clause.examinedBy.map((entry) => ({ review: entry.review, findings: entry.findings.length })),
+    findings: findingsFor(clause).map((finding) => ({
+      id: finding.id,
+      review: finding.review,
+      severity: finding.severity ?? 'refuted',
+      disposition: finding.disposition,
+      decides: finding.decides ?? '—',
+      finding: finding.finding,
+      outstanding: outstanding.has(finding.id),
+    })),
+    outstanding: outstanding.size,
+  };
+};
 
-    return {
-      slug: clause.slug,
-      instrument: clause.instrument,
-      number: clause.number,
-      body: clause.body,
-      fields: clause.fields,
-      included: clause.included,
-      selectionNote: clause.selectionNote,
-      heading: clause.heading,
-      section: clause.section,
-      status: clause.status,
-      provenance: describeSource(clause.source),
-      whyThisClause: clause.whyThisClause,
-      variance: clause.variance,
-      /*
-        Computed against a HYPOTHETICAL published copy, not the draft in hand.
-
-        `assertPublishable` returns nothing for a draft — correctly, since a
-        draft is not published — so asking it about the clause as it stands
-        would report no problems for all 192 and the page would read as though
-        the library were ready. What a reader needs is what WOULD stop each
-        clause reaching a merchant, which is the question the gate answers.
-      */
-      publishProblems: assertPublishable({ ...clause, status: 'published' }),
-      examinedBy: clause.examinedBy.map((entry) => ({ review: entry.review, findings: entry.findings.length })),
-      findings: findingsFor(clause).map((finding) => ({
-        id: finding.id,
-        review: finding.review,
-        severity: finding.severity ?? 'refuted',
-        disposition: finding.disposition,
-        decides: finding.decides ?? '—',
-        finding: finding.finding,
-        outstanding: outstanding.has(finding.id),
-      })),
-      outstanding: outstanding.size,
-    };
-  });
-
-  const instruments: McaLibraryInstrumentView[] = MCA_INSTRUMENTS.map((id) => {
-    const mine = clauses.filter((clause) => clause.instrument === id);
-
+const instrumentViews = (rows: McaLibraryRecordView[], tenant: McaTenant): McaLibraryInstrumentView[] =>
+  MCA_INSTRUMENTS.map((id) => {
+    const mine = rows.filter((entry) => entry.instrument === id);
     return {
       id,
       title: INSTRUMENTS[id].title,
       counterparty: INSTRUMENTS[id].counterparty,
-      clauseCount: mine.length,
-      outstanding: new Set(mine.flatMap((c) => c.findings.filter((f) => f.outstanding).map((f) => f.id))).size,
+      clauseCount: mine.filter((entry) => entry.kind === 'clause').length,
+      outstanding: new Set(
+        mine.flatMap((entry) => entry.findings.filter((finding) => finding.outstanding).map((finding) => finding.id)),
+      ).size,
       sourceDocument: tenant.documents[id]?.file ?? '',
       bodiesVerifiedAt: tenant.documents[id]?.bodiesVerifiedAt ?? null,
       sourceState: sourceState(id, tenant),
     };
   });
 
+const totalsFor = (rows: McaLibraryRecordView[]) => ({
+  findingsCited: new Set(rows.flatMap((entry) => entry.findings.map((finding) => finding.id))).size,
+  outstanding: new Set(
+    rows.flatMap((entry) => entry.findings.filter((finding) => finding.outstanding).map((finding) => finding.id)),
+  ).size,
+  publishable: rows.filter((entry) => entry.publishProblems.length === 0).length,
+});
+
+const evidenceFor = (instruments: McaLibraryInstrumentView[]) => ({
+  registerAvailable: REGISTER_AVAILABLE,
+  sourcesMissing: instruments.filter((entry) => entry.sourceState === 'source-missing').map((entry) => entry.id),
+  sourcesMoved: instruments.filter((entry) => entry.sourceState === 'digest-moved').map((entry) => entry.id),
+});
+
+export const mcaLibrarySurface = (tenant: McaTenant = LOMBARD) => {
+  const clauses: McaLibraryClauseView[] = MCA_INSTRUMENTS.flatMap((instrument) =>
+    numberedLibraryForReview(instrument),
+  ).map((clause) => ({ ...recordView(clause), kind: 'clause', number: clause.number }));
+  const instruments = instrumentViews(clauses, tenant);
   return {
     reviewProfile: reviewProfileDescription(),
     instruments,
     clauses,
-    totals: {
-      clauses: clauses.length,
-      findingsCited: new Set(clauses.flatMap((c) => c.findings.map((f) => f.id))).size,
-      outstanding: new Set(clauses.flatMap((c) => c.findings.filter((f) => f.outstanding).map((f) => f.id))).size,
-      /** Deliberately expected to be zero. See `__tests__/surface.test.ts`. */
-      publishable: clauses.filter((clause) => clause.publishProblems.length === 0).length,
-    },
-    evidence: {
-      registerAvailable: REGISTER_AVAILABLE,
-      sourcesMissing: instruments.filter((e) => e.sourceState === 'source-missing').map((e) => e.id),
-      sourcesMoved: instruments.filter((e) => e.sourceState === 'digest-moved').map((e) => e.id),
-    },
+    totals: { clauses: clauses.length, ...totalsFor(clauses) },
+    evidence: evidenceFor(instruments),
+  };
+};
+
+export const mcaReusableSurface = (tenant: McaTenant = LOMBARD) => {
+  const items: McaLibraryReusableView[] = MCA_INSTRUMENTS.flatMap((instrument) => reusableForReview(instrument)).map(
+    (entry) => ({ ...recordView(entry), kind: entry.kind, number: null }),
+  );
+  const instruments = instrumentViews(items, tenant);
+  return {
+    reviewProfile: reviewProfileDescription(),
+    instruments,
+    items,
+    totals: { items: items.length, ...totalsFor(items) },
+    evidence: evidenceFor(instruments),
   };
 };

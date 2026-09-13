@@ -72,12 +72,18 @@ const REVIEW_OPTIONS = {
   ],
 } satisfies { [K in keyof McaFacts]: [McaFacts[K], string][] };
 
+/** Shared example contexts; these do not certify provider practices. */
+export const reviewExamples = (facts: McaFacts) =>
+  Object.entries(REVIEW_OPTIONS).flatMap(([key, options]) =>
+    options.map(([value, label]) => ({ facts: { ...facts, [key]: value }, label })),
+  );
+
 export const reviewProfileDescription = (facts: McaFacts = LOMBARD_FACTS): string =>
   Object.entries(REVIEW_OPTIONS)
     .map(([key, options]) => {
       const value = facts[key as keyof McaFacts];
       if (key === 'recipientStates') {
-        return facts.recipientStates.map((state) => JURISDICTION_NAMES[state]).join(', ') + ' recipients';
+        return `${facts.recipientStates.map((state) => JURISDICTION_NAMES[state]).join(', ')} recipients`;
       }
       return options.find(([option]) => option === value)?.[1];
     })
@@ -98,9 +104,7 @@ export const numberedLibraryForReview = (
     included: true,
     selectionNote: null,
   }));
-  const examples = Object.entries(REVIEW_OPTIONS).flatMap(([key, options]) =>
-    options.map(([value, label]) => ({ facts: { ...facts, [key]: value }, label })),
-  );
+  const examples = reviewExamples(facts);
 
   for (const { clause } of base.excluded) {
     const example = examples.find(({ facts: candidate }) => clause.includeWhen?.(candidate));

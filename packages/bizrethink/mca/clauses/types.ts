@@ -24,43 +24,8 @@ export type ClauseVariance =
 
 export type { ClauseExamination } from './examination';
 
-/**
- * What a library entry actually is.
- *
- * THE DISCRIMINATOR THAT DID NOT EXIST, AND WHAT ITS ABSENCE COST. Three
- * guarantor-identity grids were imported with `body: ''` — the FRPA's §9.1 and
- * both twins' §4.1 — because that is genuinely what those sections hold: a
- * table of AcroForm widgets under a heading, no prose. `feat/mca-clauses-twins`
- * recorded the decision under "Not done, on purpose".
- *
- * The reading was defensible; the representation was not. **A deliberate empty
- * body and a dropped one are byte-identical**, so nothing could tell them apart
- * — not `frpa-coverage.test.ts`, which asks whether every LINE is inside a
- * clause and never whether every CLAUSE has content, and not a reader. An
- * outside attorney opened the FRPA on a counsel link in September 2026 and
- * could not review the guarantor execution block at all.
- *
- * `kind` says which it is, and `__tests__/every-clause-has-content.test.ts`
- * then demands the right content for each.
- *
- * NO FOURTH VALUE WITHOUT A MEMBER AND A DISTINCT BEHAVIOUR. `frpa.definitions`
- * is a `clause`, not a `definition` — defined terms bind, so it is operative
- * text, and a kind no gate branches on is a field with no user.
- * [ADR 0011](../../../../docs/adr/0011-the-mca-clause-library-is-a-library.md).
- */
-export type McaClauseKind =
-  /** Operative contract text, including definitions. */
-  | 'clause'
-  /** A grid the parties complete. Holds `fields`, never a body. */
-  | 'field-group'
-  /**
-   * Non-operative prose describing an operative term — the FRPA's four Funding
-   * Terms explainers. Still text a merchant reads, so it still needs an author
-   * before it may be published; it is separated because it READS as operative
-   * while describing something that is not, which is why the 2026-09-09 counsel
-   * memo rates the holdback explainer High.
-   */
-  | 'explainer';
+/** Operative provisions are the only entries in the clause catalogue. */
+export type McaClauseKind = 'clause';
 
 /**
  * A current document field. Semantic bindings do not inherit the original
@@ -81,130 +46,50 @@ export type ClauseField = {
   requiredWhen?: { binding: 'guarantor.kind'; equals: 'entity' };
 };
 
-export type McaClause = {
+/** Shared evidence and ordering; catalogue membership is separately typed. */
+export type McaContentBase = {
   slug: string;
   version: number;
-
-  /**
-   * The agreement this clause is published in. Exactly one.
-   *
-   * IT WAS AN ARRAY, AND THE CORPUS DISPROVED THE REASON FOR IT. The plural
-   * existed so that a clause published in two agreements could be stored once
-   * and be unable to diverge — aimed squarely at the Equipment Lease and the
-   * Subscription, which REVIEW-02 found are the same document with its
-   * vocabulary swapped and its numbering identical.
-   *
-   * They are. But the swap was made by hand and is not a function: inside §3.2
-   * alone, `leased` becomes `you subscribe for` in one sentence and `subscribed
-   * for` in the next. The two documents share no vocabulary-bearing sentence,
-   * so there was never anything to store once, and across all 177 clauses of
-   * four instruments not one names a second. A field with no user reads as
-   * evidence that sharing happens here. It does not.
-   *
-   * What replaced it is `twins.ts`, which ASSERTS the two documents' agreement
-   * instead of generating it — REVIEW-02's *"a fix applied to one and not the
-   * other is a divergence nothing checks for"* answered by checking for it.
-   *
-   * If a genuinely shared clause ever appears, widening this back is a small
-   * change and a deliberate one. That is the intended cost, and it is the same
-   * argument `jurisdictions.ts` makes about adding a federal disclosure.
-   */
   instrument: McaInstrument;
-
-  /** What this entry is. See `McaClauseKind`. */
-  kind: McaClauseKind;
-
-  /**
-   * When this clause is in the agreement. `null` means always.
-   *
-   * REQUIRED RATHER THAN OPTIONAL, and that is the whole point. An optional
-   * `includeWhen` would let a conditional clause be added with no condition and
-   * silently reach every template — the failure this field exists to prevent.
-   * `null` is a decision a reader can see; a missing field is not.
-   *
-   * A predicate rather than a data structure, following the lease's `Clause`.
-   * The alternative — a serialisable rule tree — buys storage in a database
-   * nothing here has, at the cost that the condition stops being readable
-   * beside the words it governs.
-   */
   includeWhen: ((facts: McaFacts) => boolean) | null;
-
-  /**
-   * The blanks, when `kind` is `field-group`; absent otherwise.
-   *
-   * Deliberately not `ClauseField[]` defaulting to `[]`: an empty array on a
-   * prose clause would be a third way of saying "no fields" beside `undefined`
-   * and `kind !== 'field-group'`, and the test asserts the absence rather than
-   * tolerating either.
-   */
-  fields?: ClauseField[];
-
-  /** Repeat this block for each intended guarantor of this instrument. */
-  repeatFor?: 'guarantor';
-  /** Source slots deliberately retired from the current document. */
-  retiredFields?: { widget: string; reason: string }[];
-
-  /**
-   * An explicit reason this structural block has no clause number. Otherwise
-   * selection numbers it automatically. Never infer this from an empty heading.
-   */
-  unnumberedReason?: string;
-
-  /**
-   * Shared reference identity for mutually exclusive alternatives. Defaults to
-   * `slug`. Exactly one selected clause may answer a reference identity.
-   */
   referenceId?: string;
-
-  /** Logical group within the instrument. Selection numbers surviving groups. */
   section: string;
   sortKey: number;
-
   heading: string;
-  /**
-   * The clause's words, as the document publishes them.
-   *
-   * VERBATIM, INCLUDING THE `«N»` WIDGET MARKERS. Those markers are the
-   * AcroForm anchors the Lombard pipeline injects, and they are part of the
-   * published document. Cleaning them out here would make the body prettier and
-   * make `containsClauseText` a check against a tidied copy of the agreement
-   * rather than against the agreement — which is the whole value of the check.
-   * Rendering is the renderer's problem, and this fork deliberately does not
-   * flatten those widgets (overlays 018 and 040).
-   */
   body: string;
-
   source: ClauseSource;
   status: ClauseStatus;
-
-  /**
-   * The states whose law scopes this clause, or empty when none does.
-   *
-   * NOT A JURISDICTION FILTER, AND NOT `McaJurisdiction`'S JOB TURNED INSIDE
-   * OUT. On a disclosure spec, `McaJurisdiction` means "this form IS prescribed
-   * by that state". Here it means "this clause is in the document because of
-   * that state's law" — ISO PRA §2.6 is in the agreement because 10 CCR §952
-   * and 23 NYCRR §600.21 regulate what a broker may hand a recipient, which is
-   * why it names two states rather than one.
-   *
-   * Reusing the type is right: both are answers to "which state's law". Putting
-   * the relation in the FIELD NAME rather than the type is what keeps
-   * `disclosuresFor`'s exact-equality filter meaning what it says.
-   */
   appliesInStates: McaJurisdiction[];
-
-  /** Explicit assessment of why these words are here; never inferred from a missing citation. */
   whyThisClause: WhyThisClause;
-  /** Available funder choice, or the specific reason the wording remains fixed. */
   variance: ClauseVariance;
-
-  /**
-   * Which review read this clause, and what it found.
-   *
-   * REQUIRED AND NON-EMPTY — see `examination.ts` for the argument, and
-   * `__tests__/examination-is-recorded.test.ts` for the enforcement. Phase 0's
-   * rule was "anything unexamined enters as draft, never as library"; this is
-   * that rule made structural instead of remembered.
-   */
   examinedBy: ClauseExamination[];
+  /** Original identities whose text/fields this entry extracts; not an approval. */
+  derivedFrom?: string[];
 };
+
+export type McaClause = McaContentBase & {
+  kind: 'clause';
+  fields?: never;
+  repeatFor?: never;
+  retiredFields?: never;
+  unnumberedReason?: never;
+  uses?: never;
+  placement?: never;
+};
+
+export type McaContentUse = 'document' | 'interview' | 'template';
+export type McaContentPlacement = { before: string } | { after: string } | { section: string; edge: 'start' | 'end' };
+
+/** Required document wording remains reviewable even without a clause number. */
+export type McaReusableContent = McaContentBase & {
+  kind: 'field-group' | 'document-block' | 'guidance';
+  uses: McaContentUse[];
+  placement: McaContentPlacement | null;
+  fields?: ClauseField[];
+  repeatFor?: 'guarantor';
+  retiredFields?: { widget: string; reason: string }[];
+  unnumberedReason?: never;
+};
+
+/** Shared services accept both; clause catalogue entry points accept McaClause only. */
+export type McaContent = McaClause | McaReusableContent;

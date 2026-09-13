@@ -1,6 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
 import { assertPublishable } from '../../provenance/types';
+import { ALL_MCA_CONTENT, contentFor } from '../catalogue';
 import {
   approvedMcaClause,
   findingsHold,
@@ -11,9 +12,14 @@ import {
 } from '../clauses/approval';
 import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../clauses/examination';
 import type { McaInstrument } from '../clauses/instruments';
-import { ALL_MCA_CLAUSES, libraryFor } from '../clauses/library';
 import { LOMBARD, resolveClauses } from '../clauses/parties';
-import { type McaLibraryClauseView, mcaLibrarySurface } from '../clauses/surface/view';
+import {
+  type McaLibraryClauseView,
+  type McaLibraryRecordView,
+  type McaLibraryReusableView,
+  mcaLibrarySurface,
+  mcaReusableSurface,
+} from '../clauses/surface/view';
 import type { McaJurisdiction } from '../jurisdictions';
 import { isMcaReviewUsable, type McaLibraryReview, reviewIsStale } from '../review/link';
 import { loadMcaClauseApprovals } from './clause-approvals';
@@ -67,7 +73,7 @@ export type McaLibraryApprovalView = {
   statesNotCovered: McaJurisdiction[];
 };
 
-export type McaLibraryPageClause = McaLibraryClauseView & {
+type McaLibraryPageEvidence = {
   /**
    * The clause's words, verbatim.
    *
@@ -96,6 +102,10 @@ export type McaLibraryPageClause = McaLibraryClauseView & {
   heldByFindings: string | null;
 };
 
+export type McaLibraryPageClause = McaLibraryClauseView & McaLibraryPageEvidence;
+export type McaLibraryPageReusable = McaLibraryReusableView & McaLibraryPageEvidence;
+export type McaLibraryPageItem = McaLibraryPageClause | McaLibraryPageReusable;
+
 export type McaLibraryReviewView = {
   id: string;
   token: string;
@@ -111,11 +121,11 @@ export type McaLibraryReviewView = {
   stale: boolean;
 };
 
-const BY_SLUG = new Map(ALL_MCA_CLAUSES.map((clause) => [clause.slug, clause]));
+const BY_SLUG = new Map(ALL_MCA_CONTENT.map((clause) => [clause.slug, clause]));
 
 const approvalView = (
   approval: McaClauseApproval,
-  clause: (typeof ALL_MCA_CLAUSES)[number],
+  clause: (typeof ALL_MCA_CONTENT)[number],
   recordedByName: string,
 ): McaLibraryApprovalView => ({
   approvedByName: approval.approvedByName,
@@ -164,6 +174,7 @@ export type McaCounselFindingView = {
 
 export const mcaLibraryPage = async () => {
   const surface = mcaLibrarySurface();
+  const reusableSurface = mcaReusableSurface();
   const approvals = await loadMcaClauseApprovals();
 
   /*
@@ -183,7 +194,7 @@ export const mcaLibraryPage = async () => {
     return user?.name ?? user?.email ?? `user ${id}`;
   };
 
-  const clauses: McaLibraryPageClause[] = surface.clauses.map((view) => {
+  const pageRecord = <T extends McaLibraryRecordView>(view: T): T & McaLibraryPageEvidence => {
     const clause = BY_SLUG.get(view.slug);
 
     /*
@@ -233,7 +244,9 @@ export const mcaLibraryPage = async () => {
       */
       heldByFindings: findingsHold(outstandingFindingsFor(clause), REGISTER_AVAILABLE),
     };
-  });
+  };
+  const clauses = surface.clauses.map(pageRecord);
+  const reusable = reusableSurface.items.map(pageRecord);
 
   const rows = await prisma.bizrethinkMcaLibraryReview.findMany({
     orderBy: { createdAt: 'desc' },
@@ -274,7 +287,7 @@ export const mcaLibraryPage = async () => {
       expiresAt: row.expiresAt === null ? null : row.expiresAt.toISOString(),
       createdAt: row.createdAt.toISOString(),
       usable: isMcaReviewUsable(review, now),
-      stale: reviewIsStale(review, libraryFor(review.instrument)),
+      stale: reviewIsStale(review, contentFor(review.instrument)),
     };
   });
 
@@ -301,7 +314,7 @@ export const mcaLibraryPage = async () => {
   });
 
   const counselFindings: McaCounselFindingView[] = findingRows.map((row) => {
-    const clause = ALL_MCA_CLAUSES.find((candidate) => candidate.slug === row.clauseSlug);
+    const clause = ALL_MCA_CONTENT.find((candidate) => candidate.slug === row.clauseSlug);
     const asRead = clause === undefined ? null : resolveClauses([clause], LOMBARD)[0];
 
     return {
@@ -329,6 +342,13 @@ export const mcaLibraryPage = async () => {
   return {
     ...surface,
     clauses,
+    reusable,
+    reusableInstruments: reusableSurface.instruments,
+    reusableTotals: {
+      ...reusableSurface.totals,
+      publishable: reusable.filter((entry) => entry.publishProblems.length === 0).length,
+      approved: reusable.filter((entry) => entry.approved).length,
+    },
     reviews,
     counselFindings,
     totals: {

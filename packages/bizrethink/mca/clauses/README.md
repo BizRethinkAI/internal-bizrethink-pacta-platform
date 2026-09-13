@@ -1,15 +1,12 @@
 # The MCA clause library
 
-The second half of the MCA vertical. `content/` and `prescribed/` are the first
-half and are not clauses: they are rule packs, describing what a state demands
-of a *disclosure*. This directory holds **our own contract text** — the selectable records of six negotiated agreements — and it is what the agreement
-builder will select from.
-
-[ADR 0008](../../../../docs/adr/0008-mca-is-two-surfaces-not-one.md) explains
-why these are two surfaces rather than one, and it comes down to whose words
-they are. Approving 10 CCR §914 would be a category error: California wrote it
-and there is nothing for counsel to approve. Approving *these* clauses is
-exactly what counsel is for.
+MCA is one workspace with separate typed catalogues. This directory holds only
+**numbered operative clauses**. `../reusable/` holds required document fields,
+structural blocks and interview guidance. `../content/` and `../prescribed/`
+hold disclosure requirements and prescribed forms; their verification view stays
+read-only. Shared navigation and evidence services do not grant authority to
+approve a regulator's words. This implements the accepted
+[unified workspace design (#200)](https://github.com/BizRethinkAI/internal-bizrethink-pacta-platform/pull/200).
 
 [ADR 0009](../../../../docs/adr/0009-counsel-is-parallel-not-a-gate.md) is why
 the directory exists at all right now. Counsel is a parallel track, not a
@@ -18,18 +15,25 @@ text being written down.
 
 ## Status
 
-| | |
-|---|---|
-| FRPA | **108 records**, including four funding notes and two field groups |
-| ISO Partner Referral Agreement | **28 records** |
-| Equipment Lease | **30 records** |
-| Subscription | **30 records** — the Equipment Lease's twin |
-| Split Funding Authorization | **7 records** |
-| Permission to Release | **8 records** |
-| **Total** | **211 records**; a selection contains only applicable alternatives |
-| Approvals, review links, admin surface | implemented; all authored source records remain drafts |
-| Selection and numbering | implemented; no merchant rendering or sending path |
-| Interview and assembly | future work in Pacta, per [ADR 0010](../../../../docs/adr/0010-agreement-builder-lives-in-pacta.md) |
+| Instrument | Numbered clauses | Separate reusable items |
+|---|---:|---:|
+| FRPA | 107 | 7 |
+| ISO Partner Referral Agreement | 24 | 4 |
+| Equipment Lease | 32 | 4 |
+| Subscription | 32 | 4 |
+| Split Funding Authorization | 7 | 0 |
+| Permission to Release | 8 | 0 |
+| **Total** | **210** | **19** |
+
+All authored content remains draft. A selected agreement includes only applicable
+alternatives. Admin and token-scoped counsel review cover both authored catalogues;
+only the clause view assigns clause numbers. Provider interview, transaction fill
+and reusable package generation are the next implementation stage. Existing stored
+templates and merchant PDFs are not changed by this catalogue migration.
+
+The [extraction audit](../reusable/README.md) accounts for all 211 input records,
+including mixed records whose duties remain numbered while their fields or
+structural spans move to reusable content.
 
 ### Current document fields
 
@@ -59,9 +63,12 @@ Actual merchant PDFs and stored templates require a separate rebuild/migration.
 
 A source record has **no `number`**. `selectClauses` filters first, sorts by the
 instrument's section order and each record's `sortKey`, then derives consecutive
-section and clause numbers. An `unnumberedReason` explicitly identifies a form
-grid, preamble, funding note, lead-in or execution block. All other records are
-citable. Separate guaranty numbering is still ADR 0011 phase 5.
+section and clause numbers. Every selected clause receives a number; a runtime
+guard rejects helpers entering that path. `unnumberedReason` is no longer an
+escape from numbering. Reusable items have their own `kind`, `uses` and document
+`placement`; interview-only guidance has no document placement. A record’s legal
+function determines membership: an explanation containing obligations stays a
+clause, while a required identity block remains required without a clause number.
 
 Use `[[clause:frpa.definitions]]` for a clause reference and
 `[[section:reconciliation]]` for a whole section. Opposite rules share the
@@ -197,11 +204,11 @@ document, and a script cannot make that claim — see rule 3 below.
    answers REVIEW-02's *"a fix applied to one and not the other is a divergence
    nothing checks for"* by checking for it. `instrument` is consequently
    singular: across 177 clauses not one names a second.
-6. **A clause the document does not number still gets imported.** Fourteen FRPA
-   clauses carry no number, including the granting clause — the sentence that
-   makes the instrument a sale rather than a loan.
-   `__tests__/frpa-coverage.test.ts` asserts that nothing in the document is
-   missing from the library, which is the direction that fails silently.
+6. **Account for all source content, then classify its function.** The original
+   source’s typography does not decide catalogue membership. Number operative
+   provisions; retain fields and document structure in the reusable catalogue.
+   The version-pinned extraction audit detects accidental loss at the migration
+   boundary without making old source wording a permanent drafting constraint.
 7. **Slugs are globally unique**, across instruments as well as within them.
    The lease library learned this when one attorney approval hid another's,
    because approvals are keyed by slug alone.

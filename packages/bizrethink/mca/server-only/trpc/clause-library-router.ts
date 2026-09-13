@@ -3,7 +3,7 @@ import { prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { adminProcedure, procedure, router } from '@documenso/trpc/server/trpc';
 import { z } from 'zod';
-
+import { ALL_MCA_CONTENT, contentFindingSlugs, contentFor } from '../../catalogue';
 import {
   approvalBlocks,
   mcaClauseFingerprint,
@@ -12,7 +12,6 @@ import {
 } from '../../clauses/approval';
 import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../../clauses/examination';
 import { MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
-import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import { LOMBARD, resolveClauses } from '../../clauses/parties';
 import { counselReviewView } from '../../review/counsel-view';
 import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview } from '../../review/link';
@@ -94,7 +93,7 @@ export const mcaClauseLibraryRouter = router({
         approve this one. Scoping the lookup to an instrument would make a
         clause unapprovable rather than unapproved.
       */
-      const clause = ALL_MCA_CLAUSES.find((candidate) => candidate.slug === input.clauseSlug);
+      const clause = ALL_MCA_CONTENT.find((candidate) => candidate.slug === input.clauseSlug);
 
       if (!clause) {
         throw new AppError(AppErrorCode.NOT_FOUND, { message: 'No such clause in the library.' });
@@ -125,7 +124,7 @@ export const mcaClauseLibraryRouter = router({
         approval sail past the first one's objection.
       */
       const unansweredCounselFindings = await prisma.bizrethinkMcaLibraryFinding.count({
-        where: { clauseSlug: clause.slug, answeredAt: null },
+        where: { clauseSlug: { in: contentFindingSlugs(clause) }, answeredAt: null },
       });
 
       const blocked = approvalBlocks(clause, {
@@ -221,7 +220,7 @@ export const mcaClauseLibraryRouter = router({
           reviewerEmail: input.reviewerEmail,
           instrument: input.instrument,
           // Of the SCOPED agreement. See the model comment.
-          libraryFingerprint: mcaLibraryFingerprint(libraryFor(input.instrument)),
+          libraryFingerprint: mcaLibraryFingerprint(contentFor(input.instrument)),
           createdByUserId: ctx.user.id,
           expiresAt: new Date(Date.now() + MCA_REVIEW_LINK_TTL_DAYS * 24 * 60 * 60 * 1000),
         },
@@ -431,7 +430,7 @@ export const mcaClauseLibraryRouter = router({
         in context, and a typo would become a blocker no page will ever display
         — unclearable, because `approve` counts it and no screen shows it.
       */
-      const clause = libraryFor(share.instrument as McaInstrument).find(
+      const clause = contentFor(share.instrument as McaInstrument).find(
         (candidate) => candidate.slug === input.clauseSlug,
       );
 

@@ -14,10 +14,10 @@ export const PERMISSION_TO_RELEASE_SECTIONS: McaClause[] = [
       because: 'load-bearing',
       note: 'The release needs the person signing, the business and Buyer identified; naming a funder profile does not establish the signer’s authority over another person’s information.',
     },
-    version: 1,
+    version: 2,
     instrument: 'permission-to-release',
     kind: 'clause',
-    unnumberedReason: 'Authorization lead-in identifying the person and merchant who give the following permissions.',
+
     includeWhen: null,
     heading: 'Person Giving Authorization',
     body: 'I, ___________«1»___________, an authorized officer or owner of _____________«2»______________ (the “Merchant”), doing business as _____________«3»______________, with principal place of business at ______________________________«4»______________________________, hereby grant the following authorizations to ________«9»________ (“Buyer”) and its agents, servicers, successors, and assigns:',

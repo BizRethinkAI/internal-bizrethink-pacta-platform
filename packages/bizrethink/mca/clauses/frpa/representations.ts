@@ -90,10 +90,10 @@ export const FRPA_REPRESENTATIONS: McaClause[] = [
       because: 'load-bearing',
       note: 'Every representation needs its stated dates and distinction from a continuing covenant; otherwise later business deterioration could be read as a false representation.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
     kind: 'clause',
-    unnumberedReason: 'Lead-in governing the representations as a group, read with that group.',
+
     /*
       NOT GATED. It scopes representations every template contains, and a
       funder who takes no guaranty needs it as much as one who does — more, if

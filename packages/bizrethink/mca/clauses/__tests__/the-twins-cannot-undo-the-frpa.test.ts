@@ -342,7 +342,7 @@ describe('what a natural person gives up is mutual, or is not given up', () => {
   });
 
   it.each([
-    ...both('equipment-lease.governing-law-and-venue'),
+    ...both('equipment-lease.jury-trial-waiver'),
     ...both('equipment-lease.jury-trial-and-class-action-waiver'),
   ])('$slug limits its jury waiver to a forum that gives it effect', (entry) => {
     expect(entry.body).toMatch(/trial by jury/i);
@@ -366,7 +366,7 @@ describe('what a natural person gives up is mutual, or is not given up', () => {
   });
 
   it.each([
-    ...both('equipment-lease.governing-law-and-venue'),
+    ...both('equipment-lease.limitation-of-actions'),
     ...both('equipment-lease.jury-trial-and-class-action-waiver'),
   ])('$slug runs its limitation rule against every party alike', (entry) => {
     expect(entry.body).toMatch(/limitation period|period[^.]{0,40}applicable law|accrual/i);
@@ -736,6 +736,6 @@ describe('and the detectors do not fire on a denial', () => {
     expect(TWINS.filter((entry) => MENTIONS_JURY.test(entry.body)).length).toBe(4);
     expect(TWINS.filter((entry) => ABOUT_SERVICE.test(entry.body)).length).toBeGreaterThanOrEqual(2);
     expect(TWINS.filter((entry) => ABOUT_FORUM.test(entry.body)).length).toBeGreaterThan(4);
-    expect(TWINS).toHaveLength(60);
+    expect(TWINS).toHaveLength(64);
   });
 });

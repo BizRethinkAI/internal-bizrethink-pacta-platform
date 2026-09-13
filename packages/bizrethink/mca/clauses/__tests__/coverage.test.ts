@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
-
+import { contentFor } from '../../catalogue';
 import { documentLines, linesNotAccountedFor } from '../documents';
 import { EQUIPMENT_NON_CLAUSE } from '../equipment-lease';
 import { MCA_INSTRUMENTS, type McaInstrument } from '../instruments';
 import { ISO_PRA_NON_CLAUSE } from '../iso-pra';
-import { libraryFor } from '../library';
 import { LOMBARD, resolveClauses } from '../parties';
 import { SUBSCRIPTION_NON_CLAUSE } from '../subscription';
 
@@ -92,7 +91,7 @@ describe.each(STILL_A_TRANSCRIPTION)('%s holds every line of its document', (ins
   // ADR 0011: coverage follows words and fields, independent of source or
   // selected numbering. It must still catch the originally missed ISO clause.
   it('detects the originally omitted commercial disclosure clause', () => {
-    const withoutDisclosure = libraryFor(instrument).filter(
+    const withoutDisclosure = contentFor(instrument).filter(
       (clause) => clause.slug !== 'iso-pra.commercial-financing-disclosures-california-and-new-york',
     );
     const missing = linesNotAccountedFor(
@@ -106,7 +105,7 @@ describe.each(STILL_A_TRANSCRIPTION)('%s holds every line of its document', (ins
   it('leaves no line unaccounted for', () => {
     const file = LOMBARD.documents[instrument].file;
 
-    expect(linesNotAccountedFor(file, resolveClauses(libraryFor(instrument), LOMBARD), nonClause)).toEqual([]);
+    expect(linesNotAccountedFor(file, resolveClauses(contentFor(instrument), LOMBARD), nonClause)).toEqual([]);
   });
 });
 

@@ -70,7 +70,7 @@ describe('counsel can record a finding, and it reaches something', () => {
   it('refuses a slug outside the agreement the link carries', () => {
     const source = proc(router, 'recordFinding');
 
-    expect(source).toMatch(/libraryFor\(/);
+    expect(source).toMatch(/contentFor\(share\.instrument/);
     expect(source).toMatch(/NOT_FOUND/);
   });
 

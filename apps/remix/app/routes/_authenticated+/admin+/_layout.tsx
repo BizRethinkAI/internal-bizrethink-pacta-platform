@@ -132,28 +132,10 @@ const NAV_GROUPS: NavGroupDef[] = [
         bizrethink: true,
       },
       {
-        // The MCA vertical's conformity surface (2026-09-07, ADR 0008). A
-        // SEPARATE entry from Clause Library on purpose: the two are different
-        // products with different release paths, and the only thing that kept
-        // them apart before this page existed was that nothing could import
-        // packages/bizrethink/mca/. Read-only — there is no approval workflow
-        // here, because approving a regulator's prescribed words would record
-        // an attorney's name against California's text.
-        label: <Trans>MCA Conformity</Trans>,
-        href: '/admin/mca',
-        icon: ScaleIcon,
-        bizrethink: true,
-      },
-      {
-        // The MCA vertical's OTHER half, and a separate entry for the reason
-        // ADR 0008 gives: two surfaces, two release paths. MCA Conformity is
-        // the regulator's words and has no approval workflow; this is ours and
-        // will need one. Named to pair with Lease Clauses -- the distinguishing
-        // noun first, so the two read as siblings at the one place a person
-        // chooses between them.
-        label: <Trans>MCA Clauses</Trans>,
+        // MODIFIED for BizRethink (overlay 085): one MCA workspace (ADR 0015).
+        label: <Trans>MCA</Trans>,
         href: '/admin/mca-library',
-        icon: ScrollTextIcon,
+        icon: ScaleIcon,
         bizrethink: true,
       },
       {

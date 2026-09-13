@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
-
+import { ALL_MCA_CONTENT } from '../../catalogue';
 import { mcaClauseFingerprint } from '../approval';
 import { documentLines, linesNotAccountedFor } from '../documents';
-import { ALL_MCA_CLAUSES } from '../library';
 
 const find = (slug: string) => {
-  const clause = ALL_MCA_CLAUSES.find((entry) => entry.slug === slug);
+  const clause = ALL_MCA_CONTENT.find((entry) => entry.slug === slug);
   if (!clause) {
     throw new Error(`Missing fixture: ${slug}`);
   }
@@ -56,7 +55,7 @@ describe('document fields express the reviewed funding and identity bargain', ()
   });
 
   it.each([
-    ['frpa.guarantor-information-9-1', '«37»'],
+    ['frpa.guarantor-fields', '«37»'],
     ['equipment-lease.guarantor-information', '«22»'],
     ['subscription.guarantor-information', '«22»'],
   ])('%s provides separate repeatable identities and signatures without a full SSN slot', (slug, retiredWidget) => {
@@ -94,7 +93,7 @@ describe('document fields express the reviewed funding and identity bargain', ()
   });
 
   it('uses stable current placeholders while keeping source anchors as historical evidence', () => {
-    for (const clause of ALL_MCA_CLAUSES.filter((entry) => entry.fields)) {
+    for (const clause of ALL_MCA_CONTENT.filter((entry) => entry.fields)) {
       const fields = clause.fields ?? [];
       expect(new Set(fields.map((field) => field.widget)).size).toBe(fields.length);
       for (const field of fields) {
@@ -107,7 +106,7 @@ describe('document fields express the reviewed funding and identity bargain', ()
   });
 
   it('invalidates approval when the repeatable signer boundary changes', () => {
-    const original = find('frpa.guarantor-information-9-1');
+    const original = find('frpa.guarantor-fields');
     expect(mcaClauseFingerprint({ ...original, repeatFor: undefined })).not.toBe(mcaClauseFingerprint(original));
   });
 

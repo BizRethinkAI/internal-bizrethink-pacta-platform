@@ -1,13 +1,12 @@
 import { describe, expect, it } from 'vitest';
-
+import { ALL_MCA_CONTENT } from '../../catalogue';
 import { isMcaApprovalCurrent, mcaClauseFingerprint, mcaLibraryFingerprint } from '../approval';
 import { LOMBARD_FACTS, type McaFacts } from '../facts';
-import { ALL_MCA_CLAUSES } from '../library';
 
 describe('ADR 0014 clause metadata', () => {
-  it('requires an explicit legal classification and variance on all 211 source records', () => {
-    expect(ALL_MCA_CLAUSES).toHaveLength(211);
-    for (const clause of ALL_MCA_CLAUSES) {
+  it('requires an explicit legal classification and variance on all current clause and reusable records', () => {
+    expect(ALL_MCA_CONTENT).toHaveLength(229);
+    for (const clause of ALL_MCA_CONTENT) {
       expect(clause.whyThisClause, clause.slug).toBeDefined();
       expect(clause.variance, clause.slug).toBeDefined();
       expect(clause).not.toHaveProperty('requiredBy');
@@ -33,12 +32,12 @@ describe('ADR 0014 clause metadata', () => {
 
   it('distinguishes prescribed Texas notice text from our payment-method wording', () => {
     expect(
-      ALL_MCA_CLAUSES.filter((clause) => clause.whyThisClause.kind === 'compelled').map((clause) => clause.slug),
+      ALL_MCA_CONTENT.filter((clause) => clause.whyThisClause.kind === 'compelled').map((clause) => clause.slug),
     ).toEqual(['frpa.texas-occc-notice-7-25']);
-    const notice = ALL_MCA_CLAUSES.find((clause) => clause.slug === 'frpa.texas-occc-notice-7-25')!;
+    const notice = ALL_MCA_CONTENT.find((clause) => clause.slug === 'frpa.texas-occc-notice-7-25')!;
     expect(notice.whyThisClause).toMatchObject({ kind: 'compelled', citation: '7 TAC §86.310(d)' });
     expect(notice.variance).toMatchObject({ kind: 'fixed', because: 'compelled' });
-    const method = ALL_MCA_CLAUSES.find((clause) => clause.slug === 'frpa.collection-mechanism-and-term-2-2')!;
+    const method = ALL_MCA_CONTENT.find((clause) => clause.slug === 'frpa.collection-mechanism-and-term-2-2')!;
     expect(method.whyThisClause.kind).toBe('implements');
     if (method.whyThisClause.kind === 'implements') {
       for (const citation of ['10-1-393.18(e)(4)', '7-27-202(3)', '75-784(b)(5)', '427.300.3(2)(e)']) {
@@ -57,7 +56,7 @@ describe('ADR 0014 clause metadata', () => {
       'frpa.primary-collection-split-funding-via-approved-processor-2-3': 'load-bearing',
     };
     for (const [slug, because] of Object.entries(reasons)) {
-      const clause = ALL_MCA_CLAUSES.find((candidate) => candidate.slug === slug)!;
+      const clause = ALL_MCA_CONTENT.find((candidate) => candidate.slug === slug)!;
       expect(clause.variance, slug).toMatchObject({ kind: 'fixed', because });
       expect(clause.includeWhen, slug).toBeNull();
     }
@@ -69,7 +68,7 @@ describe('ADR 0014 clause metadata', () => {
       guarantyScope: ['none', 'limited-conduct', 'full-performance'],
       disputeResolution: ['courts', 'arbitration'],
     } satisfies Partial<{ [K in keyof McaFacts]: McaFacts[K][] }>;
-    const offered = ALL_MCA_CLAUSES.filter((clause) => clause.variance?.kind === 'offered');
+    const offered = ALL_MCA_CONTENT.filter((clause) => clause.variance?.kind === 'offered');
     expect(offered.length).toBeGreaterThan(0);
     expect(
       [...new Set(offered.map((clause) => clause.variance.kind === 'offered' && clause.variance.fact))].sort(),
@@ -84,7 +83,7 @@ describe('ADR 0014 clause metadata', () => {
   });
 
   it('lapses approval and review links when either answer changes', () => {
-    const clause = ALL_MCA_CLAUSES[0];
+    const clause = ALL_MCA_CONTENT[0];
     const approval = {
       clauseSlug: clause.slug,
       clauseVersion: clause.version,

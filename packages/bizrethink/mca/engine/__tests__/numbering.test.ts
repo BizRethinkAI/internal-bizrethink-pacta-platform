@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-
 import { mcaClauseFingerprint, mcaLibraryFingerprint } from '../../clauses/approval';
 import { documentLines } from '../../clauses/documents';
 import { LOMBARD_FACTS, type McaFacts } from '../../clauses/facts';
 import { MCA_INSTRUMENTS } from '../../clauses/instruments';
 import { ALL_MCA_CLAUSES, libraryFor } from '../../clauses/library';
 import type { McaClause } from '../../clauses/types';
+import { reusableFor } from '../../reusable/library';
 import { selectClauses } from '../select-clauses';
 
 const profiles: McaFacts[] = [
@@ -44,22 +44,22 @@ describe('numbering belongs to a selected MCA document (ADR 0011)', () => {
     );
   });
 
-  it('classifies the four funding notes explicitly as explainers', () => {
-    expect(
-      libraryFor('frpa')
-        .filter((clause) => clause.kind === 'explainer')
-        .map((clause) => clause.slug)
-        .sort(),
-    ).toEqual([
+  it('keeps the operative funding rules numbered and extracts only their interview prompts', () => {
+    for (const slug of [
       'frpa.equipment-cost-exclusivity',
       'frpa.equipment-cost-explainer',
       'frpa.holdback-explainer',
       'frpa.rollover-method-election',
-    ]);
+    ]) {
+      expect(libraryFor('frpa').find((entry) => entry.slug === slug)?.kind).toBe('clause');
+    }
+    const prompts = reusableFor('frpa').filter((entry) => entry.kind === 'guidance');
+    expect(prompts.map((entry) => entry.slug).sort()).toEqual(['frpa.equipment-cost-prompt', 'frpa.holdback-prompt']);
+    expect(prompts.every((entry) => entry.placement === null && !entry.uses.includes('document'))).toBe(true);
   });
 
   it('retains every historical funding-grid widget separately from current bindings', () => {
-    const grid = libraryFor('frpa').find((clause) => clause.slug === 'frpa.merchant-and-funding-information');
+    const grid = reusableFor('frpa').find((clause) => clause.slug === 'frpa.merchant-and-funding-information');
     const source = documentLines('Lombard_FRPA_v4.txt').find((line) =>
       line.startsWith('[TABLE] 1.1 MERCHANT INFORMATION'),
     );
@@ -78,13 +78,15 @@ describe('numbering belongs to a selected MCA document (ADR 0011)', () => {
   it('lapses approval when classification, selection, fields, or a reference target changes', () => {
     const original = libraryFor('frpa')[0];
     for (const delta of [
-      { kind: 'explainer' },
+      { kind: 'document-block', uses: ['document'], placement: null },
       { includeWhen: (facts: McaFacts) => facts.brokerChannel },
       { fields: [{ label: 'A changed field', widget: '«0»', kind: 'text', required: true }] },
       { referenceId: 'a-different-obligation' },
       { unnumberedReason: 'A different structural role.' },
     ]) {
-      expect(mcaClauseFingerprint({ ...original, ...delta } as McaClause)).not.toBe(mcaClauseFingerprint(original));
+      expect(mcaClauseFingerprint({ ...original, ...delta } as unknown as McaClause)).not.toBe(
+        mcaClauseFingerprint(original),
+      );
     }
   });
 
@@ -96,15 +98,12 @@ describe('numbering belongs to a selected MCA document (ADR 0011)', () => {
     expect(mcaLibraryFingerprint([first, second])).not.toBe(mcaLibraryFingerprint([moved, second]));
   });
 
-  it('numbers every selected record except a deliberately unnumbered one', () => {
+  it('numbers every selected operative clause', () => {
     for (const instrument of MCA_INSTRUMENTS) {
       for (const facts of profiles) {
-        const { selected } = selectClauses({ facts, instrument });
-        for (const clause of selected) {
-          const reason = Reflect.get(clause, 'unnumberedReason');
-          expect(clause.number !== '' || (typeof reason === 'string' && reason.trim().length > 0), clause.slug).toBe(
-            true,
-          );
+        for (const clause of selectClauses({ facts, instrument }).selected) {
+          expect(clause.kind).toBe('clause');
+          expect(clause.number, clause.slug).toMatch(/^\d+\.\d+$/);
         }
       }
     }

@@ -1,6 +1,6 @@
 import { mcaLibraryFingerprint } from '../clauses/approval';
 import type { McaInstrument } from '../clauses/instruments';
-import type { McaClause } from '../clauses/types';
+import type { McaContent } from '../clauses/types';
 
 /**
  * Sending an agreement out to be read by counsel, who has no account.
@@ -92,5 +92,5 @@ export const isMcaReviewUsable = (review: McaLibraryReview, now: Date): boolean 
  * is not what was meant to be sent. Compared against the same scoped list the
  * link pinned.
  */
-export const reviewIsStale = (review: McaLibraryReview, clauses: McaClause[]): boolean =>
+export const reviewIsStale = (review: McaLibraryReview, clauses: McaContent[]): boolean =>
   review.libraryFingerprint !== mcaLibraryFingerprint(clauses);

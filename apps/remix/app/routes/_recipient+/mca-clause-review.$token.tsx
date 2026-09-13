@@ -300,15 +300,21 @@ export default function McaClauseReviewPage() {
 
           <ul className="mt-4 space-y-6">
             {section.clauses.map((clause) => (
-              <li key={clause.slug}>
+              <li key={clause.slug} data-mca-slug={clause.slug}>
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  {clause.number !== '' && (
+                  {clause.kind === 'clause' && (
                     <span className="font-mono text-muted-foreground text-xs">{clause.number}</span>
                   )}
                   <h3 className="font-medium">{clause.heading}</h3>
-                  {clause.kind === 'explainer' && (
+                  {clause.kind !== 'clause' && (
                     <Badge variant="neutral">
-                      <Trans>Funding terms note</Trans>
+                      {clause.kind === 'guidance' ? (
+                        <Trans>Interview guidance — excluded from the contract</Trans>
+                      ) : clause.kind === 'field-group' ? (
+                        <Trans>Required document fields</Trans>
+                      ) : (
+                        <Trans>Required document block</Trans>
+                      )}
                     </Badge>
                   )}
                   {clause.approved ? <Badge>Approved</Badge> : <Badge variant="neutral">No current approval</Badge>}
@@ -320,12 +326,32 @@ export default function McaClauseReviewPage() {
                 <p className="mt-1 text-muted-foreground text-xs">{describeClauseVariance(clause.variance)}</p>
 
                 {clause.text && <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{clause.text}</p>}
+                {clause.repeatFor === 'guarantor' && (
+                  <p className="mt-2 text-sm">
+                    <Trans>Complete a separate block for each guarantor signing this instrument.</Trans>
+                  </p>
+                )}
+                {clause.retiredFields && (
+                  <p className="mt-2 text-muted-foreground text-xs">
+                    <Trans>Retired source fields are excluded from the document:</Trans>{' '}
+                    {clause.retiredFields.map((field) => `${field.widget} — ${field.reason}`).join('; ')}
+                  </p>
+                )}
                 {clause.fields && (
                   <dl className="mt-3 grid gap-3 rounded-md border border-border p-4 sm:grid-cols-2">
                     {clause.fields.map((field) => (
                       <div key={field.widget}>
                         <dt className="text-muted-foreground text-xs">{field.label}</dt>
                         <dd className="mt-1 font-mono text-sm">{field.widget}</dd>
+                        <dd className="text-muted-foreground text-xs">
+                          {field.requiredWhen ? (
+                            <Trans>Required for an entity guarantor</Trans>
+                          ) : field.required ? (
+                            <Trans>Required</Trans>
+                          ) : (
+                            <Trans>Optional</Trans>
+                          )}
+                        </dd>
                       </div>
                     ))}
                   </dl>
