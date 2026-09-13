@@ -26,6 +26,10 @@ pass eleven files / 362 tests. AST comparison confirms existing clause/reusable
 body text is unchanged; template, transaction and reusable implementation files
 also match the pre-refresh head. The existing rendered-PDF visual evidence
 therefore remains applicable; current real PDF checks still execute locally.
+The incoming top-level MCA README still described the design-stage mixed catalogue
+and separate navigation. It now points to the implemented reusable catalogue,
+provider interview and internal transaction workflow, preserving the disclosure
+checker's scope and the remaining merchant-use requirements.
 
 ## Result and boundaries
 
