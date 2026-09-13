@@ -18,7 +18,7 @@ const request = () =>
   });
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.session.mockResolvedValue({ user: { id: 31 } });
+  mocks.session.mockResolvedValue({ user: { id: 31, disabled: false } });
   mocks.prepare.mockResolvedValue({ readyToSend: false });
   mocks.render.mockResolvedValue(Buffer.from('%PDF-test'));
 });
@@ -45,4 +45,13 @@ it('returns a private attachment using server-resolved content and identity', as
   expect(response.headers.get('Cache-Control')).toContain('no-store');
   expect(response.headers.get('Content-Disposition')).toBe('attachment; filename="mca-internal-draft.pdf"');
   expect(mocks.prepare).toHaveBeenCalledWith({ ...payload, userId: 31 });
+});
+
+it('denies a disabled account even when its existing session remains valid', async () => {
+  mocks.session.mockResolvedValue({ user: { id: 31, disabled: true } });
+  const response = await downloadMcaDraftPdf(request());
+  expect(response.status).toBe(403);
+  expect(await response.text()).toContain('Account disabled');
+  expect(mocks.prepare).not.toHaveBeenCalled();
+  expect(mocks.render).not.toHaveBeenCalled();
 });

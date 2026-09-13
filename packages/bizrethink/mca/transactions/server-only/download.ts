@@ -1,5 +1,6 @@
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
+import { assertUserNotDisabled } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import { ZFillMcaDraftRequestSchema } from '../../server-only/trpc/templates/router.types';
 import { renderMcaDraftPdf } from './pdf';
 import { prepareMcaDraft } from './prepare';
@@ -16,6 +17,7 @@ export const downloadMcaDraftPdf = async (request: Request): Promise<Response> =
     if (!user) {
       return Response.json({ message: 'Sign in to prepare a draft.' }, { status: 401, headers });
     }
+    assertUserNotDisabled(user);
     const input = ZFillMcaDraftRequestSchema.safeParse(await readMcaDraftRequest(request));
     if (!input.success) {
       return Response.json(

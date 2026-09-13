@@ -10,7 +10,7 @@ local review copy, not a stored document, Envelope, signature request or deliver
 ## Boundaries implemented
 
 - Both the filled-preview mutation and PDF POST resolve the saved revision on
-  the server, recheck live team membership, `mca-builder` and the distinct
+  the server, reject disabled accounts, recheck live team membership, `mca-builder` and the distinct
   `mca-clause-draft-rendering` permission, and reject stale source fingerprints
   and older revisions for new transactions. Neither accepts a client snapshot.
 - Provider identities, contacts, processor form reference and policy cannot be

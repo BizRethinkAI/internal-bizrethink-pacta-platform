@@ -166,7 +166,17 @@ test('filled preview and direct PDF export enforce the same live access, revisio
     await grant(own.user.id, 'mca-builder', false);
     expect((await post(page.request, 'fill', { ...input, version: 2 })).status()).toBe(404);
     expect((await pdf(page.request, { ...input, version: 2 })).status()).toBe(404);
+    await grant(own.user.id, 'mca-builder', true);
+    await grant(own.user.id, 'mca-clause-draft-rendering', true);
+    await prisma.user.update({ where: { id: own.user.id }, data: { disabled: true } });
+    const disabledPreview = await post(page.request, 'fill', { ...input, version: 2 });
+    expect(disabledPreview.status()).toBe(403);
+    expect(await disabledPreview.text()).toContain('Account disabled');
+    const disabledPdf = await pdf(page.request, { ...input, version: 2 });
+    expect(disabledPdf.status()).toBe(403);
+    expect(await disabledPdf.text()).toContain('Account disabled');
   } finally {
+    await prisma.user.update({ where: { id: own.user.id }, data: { disabled: false } });
     await cleanup(own.user.id);
   }
 });

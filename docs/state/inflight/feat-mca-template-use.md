@@ -12,7 +12,7 @@ selects the actual equipment/report/channel instruments, fills semantic fields
 and instrument-specific guarantors, previews legal text and downloads a marked,
 unsigned PDF review copy. Saved provider revisions never absorb merchant input.
 The server reloads and checks the revision for both output paths: live team
-membership, builder access, separate internal-draft permission, source fingerprint
+membership, disabled-account rejection, builder access, separate internal-draft permission, source fingerprint
 and latest revision. Direct PDF errors preserve 400/401/403/404, never a success
 status with a denial body. JSON reads stop at 600,000 bytes; responses are no-store.
 
