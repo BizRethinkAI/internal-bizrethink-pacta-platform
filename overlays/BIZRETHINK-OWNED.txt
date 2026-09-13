@@ -167,3 +167,8 @@ packages/app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts
 
 # MCA workspace browser regression, newly owned and never upstream.
 packages/app-tests/e2e/bizrethink/mca-workspace.spec.ts
+
+# MCA provider interview and team-owned package templates (task #209).
+apps/remix/app/routes/_authenticated+/t.$teamUrl+/mca*.tsx
+apps/remix/app/routes/_authenticated+/admin+/mca-templates.tsx
+packages/app-tests/e2e/bizrethink/mca-provider-templates.spec.ts

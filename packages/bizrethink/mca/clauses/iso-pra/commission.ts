@@ -1,13 +1,8 @@
 import type { McaClause } from '../types';
 
-/**
- * SECTION A — COMMISSION STRUCTURE.
- *
- * Bodies are the words the shipped document prints, and
- * `__tests__/bodies-match-the-document.test.ts` re-finds every one of them
- * in `source-documents/Lombard_ISO_Partner_Referral_Agreement_v2.txt` on every
- * run. Edit one here and the test goes red, which is correct: the document is
- * where a clause is amended, and this library follows it.
+/** Commission terms retain their source wording with provider-selected rate and portal variables.
+ * Historical source coverage uses audit anchors; actual providers supply their own values.
+ * Deliberate later drafting remains governed by ADR 0012 and pinned legal approvals.
  */
 export const ISO_PRA_COMMISSION: McaClause[] = [
   {
@@ -18,14 +13,14 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
       because: 'load-bearing',
       note: 'The referral bargain needs a rate, funding trigger and origination-fee ceiling; choosing whether a broker channel exists does not set an alternative commission formula.',
     },
-    version: 1,
+    version: 2,
     instrument: 'iso-pra',
     kind: 'clause',
     includeWhen: null,
     section: 'commission',
     sortKey: 10,
     heading: 'Commission Rate',
-    body: 'Company shall pay ISO Partner a commission equal to _«2»_% of the amount advanced for each merchant cash advance successfully funded as a result of ISO Partner’s introduction. The commission is payable solely out of the Origination Fee actually collected by Company on that transaction and shall not exceed that Origination Fee. If no Origination Fee is collected on a transaction, no commission is payable on it. An Origination Fee is not actually collected on a transaction that Merchant cancels under Section [[clause:frpa.right-to-cancel-4-14]] of the Future Receivables Purchase Agreement; no commission is payable on such a transaction, and any commission already paid on it is repayable to Company and is recovered in the manner set out in Section [[clause:iso-pra.clawback-provision]]. This default rate is subject to adjustment by mutual written agreement based on volume performance or special arrangements.',
+    body: 'Company shall pay ISO Partner a commission equal to {{field:iso.commissionPercentage}}% of the amount advanced for each merchant cash advance successfully funded as a result of ISO Partner’s introduction. The commission is payable solely out of the Origination Fee actually collected by Company on that transaction and shall not exceed that Origination Fee. If no Origination Fee is collected on a transaction, no commission is payable on it. An Origination Fee is not actually collected on a transaction that Merchant cancels under Section [[clause:frpa.right-to-cancel-4-14]] of the Future Receivables Purchase Agreement; no commission is payable on such a transaction, and any commission already paid on it is repayable to Company and is recovered in the manner set out in Section [[clause:iso-pra.clawback-provision]]. This default rate is subject to adjustment by mutual written agreement based on volume performance or special arrangements.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -152,14 +147,14 @@ export const ISO_PRA_COMMISSION: McaClause[] = [
       because: 'no-alternative',
       note: 'The portal access promise is the only authored commission-reporting mechanism; no different reporting service is selected by the funder facts.',
     },
-    version: 1,
+    version: 2,
     instrument: 'iso-pra',
     kind: 'clause',
     includeWhen: null,
     section: 'commission',
     sortKey: 50,
     heading: 'Commission Transparency',
-    body: 'ISO Partner shall have access to a real-time partner portal at app.lombardpay.com displaying all submitted applications, funding statuses, earned commissions, and payout history.',
+    body: 'ISO Partner shall have access to a real-time partner portal at {{field:iso.portalUrl}} displaying all submitted applications, funding statuses, earned commissions, and payout history.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

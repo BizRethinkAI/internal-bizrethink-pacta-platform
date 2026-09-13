@@ -87,6 +87,20 @@ const COVERED: [McaInstrument, { anchor: string; reason: string }[]][] = [
  */
 const STILL_A_TRANSCRIPTION = COVERED.filter(([instrument]) => instrument === 'iso-pra');
 
+// Populate only the newly generalized ISO variables with the historical source
+// anchors. This retains loss detection for the unchanged prose; these values
+// are audit fixtures, never a real provider profile or runtime default.
+const historicalIsoContent = () =>
+  contentFor('iso-pra').map((entry) => ({
+    ...entry,
+    body: entry.body
+      .replace('{{field:iso.effectiveDate}}', '_____«0»_____')
+      .replace('{{field:iso.companyLegalName}}', '________«10»________')
+      .replace('{{field:iso.partnerLegalName}}', '_____________«1»______________')
+      .replace('{{field:iso.commissionPercentage}}', '_«2»_')
+      .replace('{{field:iso.portalUrl}}', 'app.lombardpay.com'),
+  }));
+
 describe.each(STILL_A_TRANSCRIPTION)('%s holds every line of its document', (instrument, nonClause) => {
   // ADR 0011: coverage follows words and fields, independent of source or
   // selected numbering. It must still catch the originally missed ISO clause.
@@ -105,7 +119,7 @@ describe.each(STILL_A_TRANSCRIPTION)('%s holds every line of its document', (ins
   it('leaves no line unaccounted for', () => {
     const file = LOMBARD.documents[instrument].file;
 
-    expect(linesNotAccountedFor(file, resolveClauses(contentFor(instrument), LOMBARD), nonClause)).toEqual([]);
+    expect(linesNotAccountedFor(file, resolveClauses(historicalIsoContent(), LOMBARD), nonClause)).toEqual([]);
   });
 });
 

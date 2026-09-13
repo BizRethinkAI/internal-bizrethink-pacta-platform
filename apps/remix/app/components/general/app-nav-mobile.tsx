@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 086): membership-scoped MCA template navigation.
+import { useMcaTemplateTeamUrls } from '@bizrethink/customizations/mca/components/use-template-team-urls';
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -27,6 +29,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
 
   // MODIFIED for BizRethink (overlay 069).
   const leaseBuilderTeamUrls = useLeaseBuilderTeamUrls();
+  const mcaTemplateTeamUrls = useMcaTemplateTeamUrls();
 
   const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
     {
@@ -72,6 +75,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
       },
       // MODIFIED for BizRethink (overlay 069).
       ...(leaseBuilderTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/leases`, text: t`Leases` }] : []),
+      ...(mcaTemplateTeamUrls.includes(teamUrl) ? [{ href: `/t/${teamUrl}/mca`, text: t`MCA` }] : []),
       {
         href: '/inbox',
         text: t`Inbox`,
@@ -81,7 +85,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         text: t`Settings`,
       },
     ];
-  }, [currentTeam, organisations, leaseBuilderTeamUrls]);
+  }, [currentTeam, organisations, leaseBuilderTeamUrls, mcaTemplateTeamUrls]);
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>

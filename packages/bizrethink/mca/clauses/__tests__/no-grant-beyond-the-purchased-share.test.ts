@@ -527,12 +527,12 @@ describe('the parties clause identifies the parties and transfers nothing', () =
     expect(body).toMatch(/separately signs/);
   });
 
-  /**
-   * The `«N»` AcroForm anchors are kept where the current body has them. The
-   * memo moves all three into Section 1; dropping them would break injection and
-   * README rule 2 keeps them.
-   */
-  it.each(['«31»', '«96»', '«32»'])('keeps the %s widget anchor', (widget) => {
+  // The provider template uses semantic inputs; historical anchors stay in the extraction audit.
+  it.each([
+    '{{field:funding.effectiveDate}}',
+    '{{field:provider.principalAddress}}',
+    '{{field:merchant.legalName}}',
+  ])('keeps the %s identity input', (widget) => {
     expect(contentFor('frpa').find((entry) => entry.slug === 'frpa.party-identification')?.body).toContain(widget);
   });
 });

@@ -1,4 +1,10 @@
-import { MCA_EQUIPMENT_FIELDS, MCA_FUNDING_FIELDS, mcaGuarantorFields, retiredGuarantorSsn } from '../clauses/fields';
+import {
+  MCA_EQUIPMENT_FIELDS,
+  MCA_FUNDING_FIELDS,
+  MCA_ISO_FIELDS,
+  mcaGuarantorFields,
+  retiredGuarantorSsn,
+} from '../clauses/fields';
 import type { McaReusableContent } from '../clauses/types';
 
 /** Extracted/required content. Moving an identity never transfers its approval. */
@@ -11,7 +17,7 @@ export const ALL_MCA_REUSABLE: McaReusableContent[] = [
       because: 'load-bearing',
       note: 'The parties, funding figures, itemized deductions and notice contacts must be completed for this purchase to operate; changing deal values does not select different wording.',
     },
-    version: 3,
+    version: 4,
     instrument: 'frpa',
     includeWhen: null,
     section: 'funding-terms',
@@ -87,13 +93,13 @@ export const ALL_MCA_REUSABLE: McaReusableContent[] = [
       because: 'load-bearing',
       note: 'The referral agreement needs the actual Company and ISO Partner identified; merchant transaction fields do not identify the parties to this channel contract.',
     },
-    version: 2,
+    version: 3,
     instrument: 'iso-pra',
     includeWhen: null,
     section: 'commission',
     sortKey: 1,
     heading: 'Parties',
-    body: 'This ISO Partner Referral Agreement (the “Agreement”) is entered into and effective as of _____«0»_____ (the “Effective Date”) by and between ________«10»________ (“Company”), and _____________«1»______________ (“ISO Partner”).',
+    body: 'This ISO Partner Referral Agreement (the “Agreement”) is entered into and effective as of {{field:iso.effectiveDate}} (the “Effective Date”) by and between {{field:iso.companyLegalName}} (“Company”), and {{field:iso.partnerLegalName}} (“ISO Partner”).',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],
@@ -101,6 +107,7 @@ export const ALL_MCA_REUSABLE: McaReusableContent[] = [
     kind: 'document-block',
     uses: ['document', 'template'],
     placement: { section: 'commission', edge: 'start' },
+    fields: MCA_ISO_FIELDS,
   },
   {
     slug: 'iso-pra.recital-company-business',
@@ -231,13 +238,13 @@ export const ALL_MCA_REUSABLE: McaReusableContent[] = [
       because: 'load-bearing',
       note: 'The purchase needs identified contracting parties, an effective date and a funding trigger; a processor or affiliate does not become a party merely by being named.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
     includeWhen: null,
     section: 'preamble',
     sortKey: 9.9,
     heading: 'Party identification',
-    body: 'This Future Receivables Purchase Agreement (this “Agreement”) is entered into as of ____«31»_____ (the “Effective Date”) by {{funder}}, a Florida limited liability company, with its principal office at _______________«96»_______________ (the “Buyer”), and _____________«32»_____________ (the “Merchant”), identified by its full legal name, entity type and state of organization in the Merchant and Funding Information grid. ',
+    body: 'This Future Receivables Purchase Agreement (this “Agreement”) is entered into as of {{field:funding.effectiveDate}} (the “Effective Date”) by {{funder}}, a {{field:provider.entityType}} organized under the laws of {{field:provider.organizationState}}, with its principal office at {{field:provider.principalAddress}} (the “Buyer”), and {{field:merchant.legalName}} (the “Merchant”), identified by its full legal name, entity type and state of organization in the Merchant and Funding Information grid. ',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: [],

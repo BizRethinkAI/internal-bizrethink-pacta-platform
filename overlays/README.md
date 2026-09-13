@@ -61,6 +61,8 @@ This directory contains patches applied on top of upstream Documenso files. **Ev
 > **Note on the original `001-default-claim-enterprise.patch`:** That patch was written against an older shape of `create-organisation.ts` (had a default-fallback). By the time of the day-1 spike, upstream had refactored to require `claim` as a parameter at every call site, breaking that single-line strategy. The patch was deleted and replaced by 001+002 above. See `~/.claude/projects/-Users-shwet-github-bizrethink-internal-bizrethink-pacta-platform/memory/documenso_paywall_audit.md` for the staleness note.
 | 083 | `083-safe-outbound-connections.patch` | **APPLIED to branch 2026-09-12** | MEDIUM | A-09, A-14 and webhook A-10: thin upstream webhook delegates use owned fail-closed DNS/IP validation, checked-address HTTP(S) and bounded responses/deadlines. The SMTP form supplies its organisation and handles test rejection; owned routes require manage permission and durable test budgets. Exact admin webhook exceptions remain separate from public-only SMTP tests. Supersedes overlay 017's guard body while preserving its deferred DB-backed configuration loader. Recheck both delegates, upstream DNS-failure tests and the form payload after sync. |
 
+| 086 | `086-mca-provider-template-navigation.patch` | **APPLIED to branch 2026-09-13** | LOW | Both responsive team navigation surfaces use an owned membership/feature-gated hook to reach the provider interview and versioned MCA templates. No access policy is implemented in upstream components. Recheck the hook and team URL after upstream navigation changes. |
+
 ## Relocations from the 2026-08-13 upstream sync (142 commits, upstream 2.16.0)
 
 Upstream refactored several files out from under these overlays. The behavior was
