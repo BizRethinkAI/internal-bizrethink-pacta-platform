@@ -180,5 +180,5 @@ packages/app-tests/e2e/bizrethink/mca-template-use.spec.ts
 # Legal workspace interaction and responsive regression coverage.
 packages/app-tests/e2e/bizrethink/legal-workspace-ui.spec.ts
 
-# Incident A-17/A-21 request/log transport regression, authored in overlay 090.
-packages/app-tests/e2e/api/bizrethink/sensitive-information-boundary.spec.ts
+# Account protection HTTP/PostgreSQL regressions (overlay 087).
+packages/app-tests/e2e/api/bizrethink/account-protection.spec.ts

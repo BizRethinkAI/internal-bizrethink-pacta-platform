@@ -3,6 +3,7 @@ import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 import { focusReadingItem, LegalText, legalItemId, ReferenceWorkspace } from '../../legal-ui/reader';
 import type { LegalReading } from '../../legal-ui/reading';
+import { groupMcaSections } from '../engine/section-headings';
 import type { McaTemplateDocument } from '../templates/compile';
 import type { McaDraftSignature } from '../transactions/fill';
 
@@ -104,16 +105,23 @@ export const McaPackageReader = ({
           <summary className="cursor-pointer font-medium text-sm">
             <Trans>Document index</Trans> · {active.items.length} items
           </summary>
-          <nav className="mt-3 grid gap-2 sm:grid-cols-2" aria-label="Document index">
-            {active.items.map((item) => (
-              <button
-                key={item.slug}
-                type="button"
-                className="rounded px-2 py-1.5 text-left text-sm hover:bg-muted"
-                onClick={() => focusReadingItem(legalItemId(item.slug))}
-              >
-                {item.number} {item.heading}
-              </button>
+          <nav className="mt-3 space-y-4" aria-label="Document index">
+            {groupMcaSections(active.items).map((section, index) => (
+              <div key={`${section.section}:${index}`}>
+                <p className="mb-2 font-semibold text-sm">{section.heading}</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {section.items.map((item) => (
+                    <button
+                      key={item.slug}
+                      type="button"
+                      className="rounded px-2 py-1.5 text-left text-sm hover:bg-muted"
+                      onClick={() => focusReadingItem(legalItemId(item.slug))}
+                    >
+                      {item.number} {item.heading}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
         </details>
@@ -123,49 +131,54 @@ export const McaPackageReader = ({
           </p>
         )}
         <div className="space-y-7 rounded-lg border p-5 sm:p-7">
-          {active.items.map((item) => (
-            <article
-              key={item.slug}
-              id={legalItemId(item.slug)}
-              tabIndex={-1}
-              data-mca-template-item={item.sourceSlug}
-              className="scroll-mt-8 border-b pb-7 last:border-0 last:pb-0"
-            >
-              <h3 className="mb-4 font-semibold text-lg">
-                {item.number && (
-                  <button
-                    type="button"
-                    className="mr-2 text-primary underline underline-offset-4"
-                    onClick={() => focusReadingItem(legalItemId(item.slug))}
-                  >
-                    {item.number}
-                  </button>
-                )}
-                {item.heading}
-              </h3>
-              <LegalText sourceId={item.slug} segments={item.reading.segments} />
-              {item.repeatFor && unfilled && (
-                <p className="mt-3 text-muted-foreground text-sm">
-                  <Trans>
-                    Repeat for each guarantor in this instrument; each signs separately in the stated capacity.
-                  </Trans>
-                </p>
-              )}
-              {item.fields.length > 0 && (
-                <dl className="mt-4 grid gap-4 rounded-md bg-muted/20 p-4 sm:grid-cols-2">
-                  {item.fields
-                    .filter(
-                      (field) => unfilled || (field.kind !== 'signature' && !field.binding.endsWith('.signedDate')),
-                    )
-                    .map((field) => (
-                      <div key={field.widget}>
-                        <dt className="text-muted-foreground text-xs">{field.label}</dt>
-                        <dd className="mt-1 break-words text-sm">{field.value || '—'}</dd>
-                      </div>
-                    ))}
-                </dl>
-              )}
-            </article>
+          {groupMcaSections(active.items).map((section, index) => (
+            <section key={`${section.section}:${index}`} data-mca-section={section.section} className="space-y-7">
+              <h3 className="border-b pb-3 font-semibold text-xl">{section.heading}</h3>
+              {section.items.map((item) => (
+                <article
+                  key={item.slug}
+                  id={legalItemId(item.slug)}
+                  tabIndex={-1}
+                  data-mca-template-item={item.sourceSlug}
+                  className="scroll-mt-8 border-b pb-7 last:border-0 last:pb-0"
+                >
+                  <h4 className="mb-4 font-semibold text-lg">
+                    {item.number && (
+                      <button
+                        type="button"
+                        className="mr-2 text-primary underline underline-offset-4"
+                        onClick={() => focusReadingItem(legalItemId(item.slug))}
+                      >
+                        {item.number}
+                      </button>
+                    )}
+                    {item.heading}
+                  </h4>
+                  <LegalText sourceId={item.slug} segments={item.reading.segments} />
+                  {item.repeatFor && unfilled && (
+                    <p className="mt-3 text-muted-foreground text-sm">
+                      <Trans>
+                        Repeat for each guarantor in this instrument; each signs separately in the stated capacity.
+                      </Trans>
+                    </p>
+                  )}
+                  {item.fields.length > 0 && (
+                    <dl className="mt-4 grid gap-4 rounded-md bg-muted/20 p-4 sm:grid-cols-2">
+                      {item.fields
+                        .filter(
+                          (field) => unfilled || (field.kind !== 'signature' && !field.binding.endsWith('.signedDate')),
+                        )
+                        .map((field) => (
+                          <div key={field.widget}>
+                            <dt className="text-muted-foreground text-xs">{field.label}</dt>
+                            <dd className="mt-1 break-words text-sm">{field.value || '—'}</dd>
+                          </div>
+                        ))}
+                    </dl>
+                  )}
+                </article>
+              ))}
+            </section>
           ))}
         </div>
         {active.signatures && (

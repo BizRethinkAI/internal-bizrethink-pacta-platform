@@ -1,274 +1,333 @@
-import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
-import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
-import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   autoClaimInvitesOnSignup,
   claimInvitesOnVerification,
   hasPendingInvites,
+  recoverOnboardingOnLogin,
 } from './auto-claim-invites-on-signup';
 
+type Invite = {
+  createdAt: Date;
+  id: string;
+  email: string;
+  organisationId: string;
+  organisationRole: 'MEMBER' | 'ADMIN';
+  status: string;
+  organisation: { id: string; name: string; groups: { id: string }[] };
+};
+const mocks = vi.hoisted(() => ({
+  job: vi.fn(),
+  add: vi.fn(),
+  personal: vi.fn(),
+  userRead: vi.fn(),
+  inviteRead: vi.fn(),
+  update: vi.fn(),
+  memberRead: vi.fn(),
+  count: vi.fn(),
+  query: vi.fn(),
+  tx: vi.fn(),
+  receiptRead: vi.fn(),
+  receiptUpsert: vi.fn(),
+}));
+vi.mock('@documenso/lib/jobs/client', () => ({ jobs: { triggerJob: mocks.job } }));
+vi.mock('@documenso/lib/server-only/organisation/accept-organisation-invitation', () => ({
+  addUserToOrganisation: mocks.add,
+}));
+vi.mock('@documenso/lib/server-only/organisation/create-organisation', () => ({
+  createPersonalOrganisation: mocks.personal,
+}));
 vi.mock('@documenso/prisma', () => ({
   prisma: {
-    organisationMemberInvite: {
-      findMany: vi.fn(),
-      findFirst: vi.fn(),
-      update: vi.fn(),
-    },
-    organisationMember: {
-      count: vi.fn(),
-    },
+    user: { findUnique: mocks.userRead },
+    bizrethinkVerifiedOnboarding: { findUnique: mocks.receiptRead, upsert: mocks.receiptUpsert },
+    organisationMemberInvite: { findMany: mocks.inviteRead, findFirst: vi.fn(), update: mocks.update },
+    organisationMember: { findUnique: mocks.memberRead, count: mocks.count },
+    $queryRaw: mocks.query,
+    $transaction: mocks.tx,
   },
 }));
-
-vi.mock('@documenso/lib/server-only/organisation/accept-organisation-invitation', () => ({
-  addUserToOrganisation: vi.fn(),
-}));
-
-vi.mock('@documenso/lib/server-only/organisation/create-organisation', () => ({
-  createPersonalOrganisation: vi.fn(),
-}));
-
-const mockedFindMany = vi.mocked(prisma.organisationMemberInvite.findMany);
-const mockedFindFirst = vi.mocked(prisma.organisationMemberInvite.findFirst);
-const mockedUpdate = vi.mocked(prisma.organisationMemberInvite.update);
-const mockedMemberCount = vi.mocked(prisma.organisationMember.count);
-const mockedAddUser = vi.mocked(addUserToOrganisation);
-const mockedCreatePersonalOrg = vi.mocked(createPersonalOrganisation);
-
-const inviteFixture = (overrides: Record<string, unknown> = {}) => ({
-  id: 'invite-1',
-  email: 'jane@example.com',
+let user: { id: number; email: string; emailVerified: Date | null; disabled: boolean };
+let invites: Invite[];
+let members: string[];
+let workspaces: number;
+let receipt: { userId: number; completedAt: Date | null } | null;
+let tail: Promise<unknown>;
+const invite = (id: string): Invite => ({
+  id,
+  createdAt: new Date('2026-09-01T00:00:00Z'),
+  email: 'jane@example.test',
+  organisationId: `org-${id}`,
   organisationRole: 'MEMBER',
-  status: OrganisationMemberInviteStatus.PENDING,
-  organisation: {
-    id: 'org-1',
-    name: 'Acme Org',
-    groups: [{ id: 'group-1', type: 'INTERNAL_ORGANISATION' }],
-  },
-  ...overrides,
+  status: 'PENDING',
+  organisation: { id: `org-${id}`, name: `Organisation ${id}`, groups: [{ id: `group-${id}` }] },
 });
+const options = { userId: 7, email: 'Jane@Example.test' };
+const signupOptions = { userId: 7, userEmail: options.email };
 
 beforeEach(() => {
-  mockedFindMany.mockReset();
-  mockedFindFirst.mockReset();
-  mockedUpdate.mockReset();
-  mockedMemberCount.mockReset();
-  mockedAddUser.mockReset();
-  mockedCreatePersonalOrg.mockReset();
-  mockedAddUser.mockResolvedValue({} as never);
-  mockedUpdate.mockResolvedValue({} as never);
-  mockedCreatePersonalOrg.mockResolvedValue(undefined);
+  vi.resetAllMocks();
+  user = { id: 7, email: options.email, emailVerified: new Date(), disabled: false };
+  invites = [invite('a')];
+  members = [];
+  workspaces = 0;
+  receipt = null;
+  mocks.receiptRead.mockImplementation(async () => structuredClone(receipt));
+  mocks.receiptUpsert.mockImplementation(async ({ create, update }) => {
+    receipt = receipt ? { ...receipt, ...update } : { completedAt: null, ...create };
+    return structuredClone(receipt);
+  });
+  tail = Promise.resolve();
+  vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  mocks.job.mockResolvedValue(undefined);
+  mocks.userRead.mockImplementation(async () => ({ ...user }));
+  mocks.inviteRead.mockImplementation(async ({ where }) =>
+    invites
+      .filter((row) => row.status === 'PENDING' && (!where.createdAt?.lte || row.createdAt <= where.createdAt.lte))
+      .map((row) => structuredClone(row)),
+  );
+  mocks.update.mockImplementation(async ({ where, data }) => {
+    const row = invites.find((row) => row.id === where.id);
+    if (!row) {
+      throw new Error('Missing invite');
+    }
+    Object.assign(row, data);
+    return row;
+  });
+  mocks.memberRead.mockImplementation(async ({ where }) =>
+    members.includes(where.userId_organisationId.organisationId) ? { id: 'existing' } : null,
+  );
+  mocks.count.mockImplementation(async () => members.length);
+  mocks.add.mockImplementation(async ({ organisationId }) => {
+    if (members.includes(organisationId)) {
+      throw new Error('Duplicate membership');
+    }
+    members.push(organisationId);
+  });
+  mocks.personal.mockImplementation(async () => {
+    members.push('personal');
+    workspaces++;
+  });
+  mocks.tx.mockImplementation((work) => {
+    const execution = tail.then(async () => {
+      const before = structuredClone({ invites, members, workspaces, receipt });
+      try {
+        return await work(prisma);
+      } catch (error) {
+        ({ invites, members, workspaces, receipt } = before);
+        throw error;
+      }
+    });
+    tail = execution.catch(() => undefined);
+    return execution;
+  });
 });
+afterEach(() => vi.restoreAllMocks());
 
-describe('autoClaimInvitesOnSignup', () => {
-  it('returns empty array when no PENDING invites match the user email', async () => {
-    mockedFindMany.mockResolvedValueOnce([]);
-    const result = await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'nobody@example.com' });
-    expect(result).toEqual([]);
-    expect(mockedAddUser).not.toHaveBeenCalled();
-    expect(mockedUpdate).not.toHaveBeenCalled();
+describe('verified onboarding transaction and recovery (R-03)', () => {
+  it('leaves a legacy account without organisations alone when no onboarding work is recorded', async () => {
+    invites = [];
+    await recoverOnboardingOnLogin(7);
+    expect(mocks.personal).not.toHaveBeenCalled();
+    expect(members).toEqual([]);
+    expect(receipt).toBeNull();
+  });
+  it('does not recreate a deliberately deleted workspace on login or a completed-token retry', async () => {
+    invites = [];
+    await claimInvitesOnVerification(options);
+    expect(workspaces).toBe(1);
+    members = [];
+    await recoverOnboardingOnLogin(7);
+    await claimInvitesOnVerification(options);
+    expect(workspaces).toBe(1);
+    expect(members).toEqual([]);
+    expect(receipt?.completedAt).toBeInstanceOf(Date);
+  });
+  it('keeps a pending receipt after fallback rollback and completes it only after recovery commits', async () => {
+    invites = [];
+    mocks.personal.mockRejectedValueOnce(new Error('Team write failed'));
+    await claimInvitesOnVerification(options);
+    expect(receipt).toEqual({ userId: 7, completedAt: null });
+    expect(members).toEqual([]);
+    await recoverOnboardingOnLogin(7);
+    expect(members).toEqual(['personal']);
+    expect(receipt?.completedAt).toBeInstanceOf(Date);
+  });
+  it('rolls back membership and acceptance if recording completion fails', async () => {
+    mocks.receiptUpsert
+      .mockImplementationOnce(async ({ create }) => {
+        receipt = { completedAt: null, ...create };
+        return structuredClone(receipt);
+      })
+      .mockRejectedValueOnce(new Error('Completion unavailable'));
+    await claimInvitesOnVerification(options);
+    expect(members).toEqual([]);
+    expect(invites[0].status).toBe('PENDING');
+    expect(receipt?.completedAt).toBeNull();
+    expect(mocks.job).not.toHaveBeenCalled();
+    await recoverOnboardingOnLogin(7);
+    expect(members).toEqual(['org-a']);
+    expect(receipt?.completedAt).toBeInstanceOf(Date);
   });
 
-  it('queries with case-insensitive email + PENDING status filter', async () => {
-    mockedFindMany.mockResolvedValueOnce([]);
-    await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'Jane@Example.COM' });
-    expect(mockedFindMany).toHaveBeenCalledOnce();
-    const query = mockedFindMany.mock.calls[0][0] as {
-      where: { email: { equals: string; mode: string }; status: string };
-    };
-    expect(query.where.email.equals).toBe('Jane@Example.COM');
-    expect(query.where.email.mode).toBe('insensitive');
-    expect(query.where.status).toBe(OrganisationMemberInviteStatus.PENDING);
+  it('commits membership and acceptance together, then notifies', async () => {
+    expect((await claimInvitesOnVerification(options)).map((row) => row.inviteId)).toEqual(['a']);
+    expect(members).toEqual(['org-a']);
+    expect(invites[0].status).toBe('ACCEPTED');
+    expect(mocks.add).toHaveBeenCalledWith(expect.objectContaining({ transaction: prisma, bypassEmail: true }));
+    expect(mocks.job).toHaveBeenCalledOnce();
+    expect(mocks.personal).not.toHaveBeenCalled();
   });
-
-  it('accepts a single PENDING invite via addUserToOrganisation', async () => {
-    mockedFindMany.mockResolvedValueOnce([inviteFixture()] as never);
-    const result = await autoClaimInvitesOnSignup({ userId: 42, userEmail: 'jane@example.com' });
-
-    expect(mockedAddUser).toHaveBeenCalledWith({
-      userId: 42,
-      organisationId: 'org-1',
-      organisationGroups: [{ id: 'group-1', type: 'INTERNAL_ORGANISATION' }],
-      organisationMemberRole: 'MEMBER',
-    });
-    expect(mockedUpdate).toHaveBeenCalledWith({
-      where: { id: 'invite-1' },
-      data: { status: OrganisationMemberInviteStatus.ACCEPTED },
-    });
-    expect(result).toEqual([
-      {
-        organisationId: 'org-1',
-        organisationName: 'Acme Org',
-        organisationRole: 'MEMBER',
-        inviteId: 'invite-1',
-      },
+  it('claims all matching invitations across organisations, preserving assigned roles', async () => {
+    invites.push({ ...invite('b'), organisationRole: 'ADMIN' });
+    expect((await autoClaimInvitesOnSignup(signupOptions)).map((row) => row.organisationRole)).toEqual([
+      'MEMBER',
+      'ADMIN',
     ]);
+    expect(members).toEqual(['org-a', 'org-b']);
   });
-
-  it('accepts multiple PENDING invites across different orgs', async () => {
-    mockedFindMany.mockResolvedValueOnce([
-      inviteFixture({
-        id: 'inv-a',
-        organisation: { id: 'org-a', name: 'Org A', groups: [] },
-        organisationRole: 'ADMIN',
-      }),
-      inviteFixture({
-        id: 'inv-b',
-        organisation: { id: 'org-b', name: 'Org B', groups: [] },
-        organisationRole: 'MANAGER',
-      }),
-    ] as never);
-    const result = await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' });
-
-    expect(mockedAddUser).toHaveBeenCalledTimes(2);
-    expect(mockedUpdate).toHaveBeenCalledTimes(2);
-    expect(result.map((r) => r.organisationId)).toEqual(['org-a', 'org-b']);
-    expect(result.map((r) => r.organisationRole)).toEqual(['ADMIN', 'MANAGER']);
+  it.each([
+    'unverified',
+    'disabled',
+    'wrong-email',
+  ] as const)('rejects a %s identity before any onboarding write', async (kind) => {
+    if (kind === 'unverified') {
+      user.emailVerified = null;
+    }
+    if (kind === 'disabled') {
+      user.disabled = true;
+    }
+    if (kind === 'wrong-email') {
+      user.email = 'elsewhere@example.test';
+    }
+    expect(await claimInvitesOnVerification(options)).toEqual([]);
+    expect(members).toEqual([]);
+    expect(workspaces).toBe(0);
+    expect(mocks.inviteRead).not.toHaveBeenCalled();
   });
-
-  it('continues processing other invites when one addUserToOrganisation fails', async () => {
-    mockedFindMany.mockResolvedValueOnce([
-      inviteFixture({ id: 'inv-a', organisation: { id: 'org-a', name: 'A', groups: [] } }),
-      inviteFixture({ id: 'inv-b', organisation: { id: 'org-b', name: 'B', groups: [] } }),
-      inviteFixture({ id: 'inv-c', organisation: { id: 'org-c', name: 'C', groups: [] } }),
-    ] as never);
-
-    // Make inv-b fail
-    mockedAddUser
-      .mockResolvedValueOnce({} as never)
-      .mockRejectedValueOnce(new Error('addUser failed'))
-      .mockResolvedValueOnce({} as never);
-
-    const consoleErrSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
-
-    const result = await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' });
-
-    expect(mockedAddUser).toHaveBeenCalledTimes(3);
-    // Only 2 updates (the failing one was skipped before update)
-    expect(mockedUpdate).toHaveBeenCalledTimes(2);
-    expect(result.map((r) => r.inviteId)).toEqual(['inv-a', 'inv-c']);
-    expect(consoleErrSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ event: 'invitation.claim-failed', err: { type: 'Error' } }),
+  it('rolls back membership if acceptance fails, then succeeds on retry', async () => {
+    mocks.update.mockRejectedValueOnce(new Error('Write unavailable'));
+    expect(await claimInvitesOnVerification(options)).toEqual([]);
+    expect(members).toEqual([]);
+    expect(invites[0].status).toBe('PENDING');
+    expect(mocks.job).not.toHaveBeenCalled();
+    expect(await claimInvitesOnVerification(options)).toHaveLength(1);
+    expect(members).toEqual(['org-a']);
+    expect(invites[0].status).toBe('ACCEPTED');
+  });
+  it('rolls back earlier invitations if a later membership write fails', async () => {
+    invites.push(invite('b'));
+    mocks.add.mockImplementation(async ({ organisationId }) => {
+      if (organisationId === 'org-b') {
+        throw new Error('Missing group');
+      }
+      members.push(organisationId);
+    });
+    expect(await claimInvitesOnVerification(options)).toEqual([]);
+    expect(members).toEqual([]);
+    expect(invites.map((row) => row.status)).toEqual(['PENDING', 'PENDING']);
+    expect(mocks.personal).not.toHaveBeenCalled();
+    expect(mocks.job).not.toHaveBeenCalled();
+  });
+  it('repairs historical partial membership without inserting or changing roles', async () => {
+    members.push('org-a');
+    expect(await claimInvitesOnVerification(options)).toHaveLength(1);
+    expect(invites[0].status).toBe('ACCEPTED');
+    expect(members).toEqual(['org-a']);
+    expect(mocks.add).not.toHaveBeenCalled();
+    expect(mocks.job).not.toHaveBeenCalled();
+  });
+  it('serializes repeated claims to one membership and notification', async () => {
+    const results = await Promise.all(Array.from({ length: 4 }, () => claimInvitesOnVerification(options)));
+    expect(results.flat()).toHaveLength(1);
+    expect(members).toEqual(['org-a']);
+    expect(mocks.job).toHaveBeenCalledOnce();
+  });
+  it('queries the current database email case-insensitively and pending only', async () => {
+    await autoClaimInvitesOnSignup(signupOptions);
+    expect(mocks.inviteRead).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          email: { equals: user.email, mode: 'insensitive' },
+          status: 'PENDING',
+          createdAt: { lte: user.emailVerified },
+        },
+      }),
     );
-
-    consoleErrSpy.mockRestore();
   });
-
-  it('continues when update to ACCEPTED fails (logs but does NOT include in result)', async () => {
-    mockedFindMany.mockResolvedValueOnce([
-      inviteFixture({ id: 'inv-a', organisation: { id: 'org-a', name: 'A', groups: [] } }),
-      inviteFixture({ id: 'inv-b', organisation: { id: 'org-b', name: 'B', groups: [] } }),
-    ] as never);
-    mockedUpdate.mockRejectedValueOnce(new Error('update failed')).mockResolvedValueOnce({} as never);
-
-    const consoleErrSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
-
-    const result = await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' });
-
-    expect(mockedAddUser).toHaveBeenCalledTimes(2);
-    // Both inv-a (failed update) and inv-b were attempted; only inv-b succeeded fully
-    expect(result.map((r) => r.inviteId)).toEqual(['inv-b']);
-    expect(consoleErrSpy).toHaveBeenCalled();
-
-    consoleErrSpy.mockRestore();
+  it('the signup-only helper does not create a fallback', async () => {
+    invites = [];
+    expect(await autoClaimInvitesOnSignup(signupOptions)).toEqual([]);
+    expect(mocks.personal).not.toHaveBeenCalled();
   });
-
-  it('propagates findMany errors (catastrophic — caller decides)', async () => {
-    mockedFindMany.mockRejectedValueOnce(new Error('DB down'));
-    // The helper does NOT catch the findMany error — caller (onCreateUserHook
-    // in create-user.ts) has its own catch that falls back to Personal Org.
-    await expect(autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' })).rejects.toThrow('DB down');
+  it('creates a single complete fallback under concurrent retries', async () => {
+    invites = [];
+    await Promise.all(Array.from({ length: 4 }, () => claimInvitesOnVerification(options)));
+    expect(workspaces).toBe(1);
+    expect(mocks.personal).toHaveBeenCalledWith({
+      userId: 7,
+      transaction: prisma,
+      throwErrorOnOrganisationCreationFailure: true,
+    });
+  });
+  it('never creates a fallback on invite read failure; login retries', async () => {
+    mocks.inviteRead.mockRejectedValueOnce(new Error('Read unavailable'));
+    expect(await claimInvitesOnVerification(options)).toEqual([]);
+    expect(mocks.personal).not.toHaveBeenCalled();
+    expect(members).toEqual([]);
+    await recoverOnboardingOnLogin(7);
+    expect(members).toEqual(['org-a']);
+  });
+  it('rolls back a partial fallback and retries on login', async () => {
+    invites = [];
+    mocks.personal.mockImplementationOnce(async () => {
+      members.push('partial');
+      workspaces++;
+      throw new Error('Team failed');
+    });
+    expect(await claimInvitesOnVerification(options)).toEqual([]);
+    expect(workspaces).toBe(0);
+    expect(members).toEqual([]);
+    await recoverOnboardingOnLogin(7);
+    expect(workspaces).toBe(1);
+    expect(members).toEqual(['personal']);
+  });
+  it('preserves existing memberships without another personal organisation', async () => {
+    invites = [];
+    members.push('existing');
+    await claimInvitesOnVerification(options);
+    expect(members).toEqual(['existing']);
+    expect(mocks.personal).not.toHaveBeenCalled();
+  });
+  it('notification failure cannot roll back or duplicate committed membership', async () => {
+    mocks.job.mockRejectedValueOnce(new Error('Queue unavailable'));
+    expect(await claimInvitesOnVerification(options)).toHaveLength(1);
+    expect(await claimInvitesOnVerification(options)).toEqual([]);
+    expect(members).toEqual(['org-a']);
+    expect(mocks.job).toHaveBeenCalledOnce();
+  });
+  it('leaves invitations created after email verification for the normal acceptance flow', async () => {
+    user.emailVerified = new Date('2026-09-10T00:00:00Z');
+    invites = [{ ...invite('later'), createdAt: new Date('2026-09-11T00:00:00Z') }];
+    members.push('existing-workspace');
+    await recoverOnboardingOnLogin(7);
+    expect(invites[0].status).toBe('PENDING');
+    expect(members).toEqual(['existing-workspace']);
+    expect(mocks.add).not.toHaveBeenCalled();
+  });
+  it('propagates signup claim failure and leaves no writes', async () => {
+    mocks.inviteRead.mockRejectedValueOnce(new Error('DB unavailable'));
+    await expect(autoClaimInvitesOnSignup(signupOptions)).rejects.toThrow('DB unavailable');
+    expect(members).toEqual([]);
   });
 });
-
-describe('hasPendingInvites (overlay 071)', () => {
-  it('returns true when a PENDING invite matches the email', async () => {
-    mockedFindFirst.mockResolvedValueOnce({ id: 'invite-1' } as never);
-    await expect(hasPendingInvites('jane@example.com')).resolves.toBe(true);
-  });
-
-  it('returns false when no PENDING invite matches the email', async () => {
-    mockedFindFirst.mockResolvedValueOnce(null);
-    await expect(hasPendingInvites('nobody@example.com')).resolves.toBe(false);
-  });
-
-  it('queries case-insensitively and for PENDING only', async () => {
-    mockedFindFirst.mockResolvedValueOnce(null);
-    await hasPendingInvites('Jane@Example.COM');
-    const query = mockedFindFirst.mock.calls[0][0] as {
-      where: { email: { equals: string; mode: string }; status: string };
-    };
-    expect(query.where.email.equals).toBe('Jane@Example.COM');
-    expect(query.where.email.mode).toBe('insensitive');
-    expect(query.where.status).toBe(OrganisationMemberInviteStatus.PENDING);
-  });
-});
-
-describe('claimInvitesOnVerification (overlay 071)', () => {
-  it('claims pending invites for the verified user and skips the Personal Org', async () => {
-    mockedFindMany.mockResolvedValueOnce([inviteFixture()] as never);
-
-    const result = await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
-
-    expect(mockedAddUser).toHaveBeenCalledOnce();
-    expect(result.map((r) => r.inviteId)).toEqual(['invite-1']);
-    expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
-  });
-
-  it('creates the Personal Org fallback when nothing was accepted and the user has zero memberships', async () => {
-    mockedFindMany.mockResolvedValueOnce([]);
-    mockedMemberCount.mockResolvedValueOnce(0);
-
-    await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
-
-    expect(mockedMemberCount).toHaveBeenCalledWith({ where: { userId: 42 } });
-    expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 42 });
-  });
-
-  it('does NOT create a Personal Org when nothing was accepted but the user already has a membership', async () => {
-    mockedFindMany.mockResolvedValueOnce([]);
-    mockedMemberCount.mockResolvedValueOnce(1);
-
-    await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
-
-    expect(mockedCreatePersonalOrg).not.toHaveBeenCalled();
-  });
-
-  it('creates the Personal Org fallback when every invite failed to claim and there are zero memberships', async () => {
-    mockedFindMany.mockResolvedValueOnce([inviteFixture()] as never);
-    mockedAddUser.mockRejectedValueOnce(new Error('addUser failed'));
-    mockedMemberCount.mockResolvedValueOnce(0);
-    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
-
-    await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
-
-    expect(mockedCreatePersonalOrg).toHaveBeenCalledWith({ userId: 42 });
-    errorSpy.mockRestore();
-  });
-
-  it('swallows and logs errors so email verification never fails', async () => {
-    mockedFindMany.mockRejectedValueOnce(new Error('DB down'));
-    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
-
-    await expect(claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' })).resolves.toEqual([]);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ event: 'verification.claim-failed', err: { type: 'Error' } }),
-    );
-    errorSpy.mockRestore();
-  });
-
-  it('swallows a Personal Org fallback failure too', async () => {
-    mockedFindMany.mockResolvedValueOnce([]);
-    mockedMemberCount.mockResolvedValueOnce(0);
-    mockedCreatePersonalOrg.mockRejectedValueOnce(new Error('org create failed'));
-    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
-
-    await expect(claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' })).resolves.toEqual([]);
-    expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
+describe('pending invitation detection', () => {
+  it.each([true, false])('reports %s and retains email/status scope', async (found) => {
+    vi.mocked(prisma.organisationMemberInvite.findFirst).mockResolvedValue(found ? ({ id: 'a' } as never) : null);
+    expect(await hasPendingInvites(options.email)).toBe(found);
+    expect(prisma.organisationMemberInvite.findFirst).toHaveBeenCalledWith({
+      where: { email: { equals: options.email, mode: 'insensitive' }, status: 'PENDING' },
+      select: { id: true },
+    });
   });
 });
