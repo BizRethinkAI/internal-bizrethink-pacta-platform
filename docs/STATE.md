@@ -15,6 +15,23 @@ true *right now*.
 
 _Last updated: 2026-09-13_
 
+## 2026-09-14 — legal workspace readability (#215)
+
+PR #215 merged at `80809278cc1d9a113da33569919af8c873422d07` after independent
+review and fresh exact-head CI. The unified MCA and lease workspaces now expose
+compact searchable catalogues, bounded readable text, canonical reference
+navigation, counsel/package reading context, disclosure provenance and
+transaction missing-input paths. The change is presentation-only: it adds no
+permission, approval-policy, signing, sending, PDF-eligibility or schema
+behavior, and all legal wording remains draft.
+
+The review initially flagged the template reading integrity comparison. Re-reading
+the compiler path showed operative clauses are resolved before compilation and
+reusable content before placement; the author added explicit referenced-body and
+negative mismatch tests. The final head passed builds, Docker, governance/lint,
+audit, CodeQL, Playwright, metadata and type gates. No deployment status is
+implied by this merge; the processed handoff note is folded here.
+
 ## 2026-09-13 — fresh review-and-ship batch merged (#188, #190, #193, #194, #197, #198, #200, #202, #204, #206, #208, #210, #212)
 
 The fresh queue was independently reviewed and merged in dependency order. The
