@@ -1,3 +1,4 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import {
   getEnvelopeFileWhereInput,
   privateEnvelopeFileCache,
@@ -5,6 +6,8 @@ import {
 import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
 import { presignFileCache, resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
 import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
+import { withUploadAdmission } from '@bizrethink/customizations/server-only/resources/admission';
+import { readBoundedForm } from '@bizrethink/customizations/server-only/resources/bounded-body';
 import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
@@ -43,7 +46,7 @@ export const filesRoute = new Hono<HonoEnv>()
    * Uploads a document file to the appropriate storage location and creates
    * a document data record.
    */
-  .post('/upload-pdf', sValidator('form', ZUploadPdfRequestSchema), async (c) => {
+  .post('/upload-pdf', async (c) => {
     try {
       // MODIFIED for BizRethink (overlay 077): retain verified ownership for staged PDF replacements.
       const owner = await resolvePdfUploadOwner(c);
@@ -52,26 +55,24 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      const { file } = c.req.valid('form');
-
-      if (!file) {
-        return c.json({ error: 'No file provided' }, 400);
-      }
-
-      // Todo: (RR7) This is new.
-      // Add file size validation.
-      // Convert MB to bytes (1 MB = 1024 * 1024 bytes)
-      const MAX_FILE_SIZE = APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024;
-
-      if (file.size > MAX_FILE_SIZE) {
-        return c.json({ error: 'File too large' }, 400);
-      }
-
-      const result = await putNormalizedPdfFileServerSide(file);
-      await recordPdfUpload(result, owner);
-
-      return c.json(result);
+      return await withUploadAdmission(owner.userId, async () => {
+        const form = await readBoundedForm(c.req.raw, (APP_DOCUMENT_UPLOAD_SIZE_LIMIT + 1) * 1024 * 1024);
+        const parsed = ZUploadPdfRequestSchema.safeParse({ file: form.get('file') });
+        if (!parsed.success) {
+          return c.json({ error: 'No file provided' }, 400);
+        }
+        const { file } = parsed.data;
+        if (file.size > APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024) {
+          return c.json({ error: 'File too large' }, 413);
+        }
+        const result = await putNormalizedPdfFileServerSide(file);
+        await recordPdfUpload(result, owner);
+        return c.json(result);
+      });
     } catch (error) {
+      if (error instanceof AppError) {
+        return c.json({ error: error.message }, (error.statusCode ?? 400) as 400 | 408 | 413 | 429);
+      }
       console.error('Upload failed:', error);
       return c.json({ error: 'Upload failed' }, 500);
     }

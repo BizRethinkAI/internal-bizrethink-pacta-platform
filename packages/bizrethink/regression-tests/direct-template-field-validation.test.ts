@@ -12,6 +12,9 @@ import { envelopeFixture, fieldFixture, recipientFixture } from './recipient-aut
 
 const { db, readFile, putFile, quota, send, jobs, nextId } = vi.hoisted(() => ({
   db: {
+    team: { findUniqueOrThrow: vi.fn() },
+    organisation: { findUniqueOrThrow: vi.fn() },
+    bizrethinkOrganisationBilling: { findUnique: vi.fn() },
     envelope: { findFirst: vi.fn(), create: vi.fn() },
     recipient: { create: vi.fn() },
     user: { findFirst: vi.fn() },
@@ -120,6 +123,9 @@ const savedFields = () => {
 };
 beforeEach(() => {
   vi.clearAllMocks();
+  db.team.findUniqueOrThrow.mockResolvedValue({ organisationId: 'org-a' });
+  db.organisation.findUniqueOrThrow.mockResolvedValue({ id: 'org-a', subscription: null });
+  db.bizrethinkOrganisationBilling.findUnique.mockResolvedValue({ bizrethinkInternal: true });
   template = makeTemplate();
   db.envelope.findFirst.mockImplementation(async ({ where }: { where: { directLink: { token: string } } }) =>
     where.directLink.token === template.directLink.token ? template : null,

@@ -8,6 +8,7 @@ import { instanceStripeRouter } from './instance-stripe-router';
 import { leaseBuilderRouter } from './lease-builder-router';
 import { orgSmtpRouter } from './org-smtp-router';
 import { organisationBillingRouter } from './organisation-billing-router';
+import { resourcePolicyRouter } from './resource-policy-router';
 import { ssoProviderRouter } from './sso-provider-router';
 
 // Top-level BizRethink TRPC router. Wired into the main `appRouter` via
@@ -21,6 +22,7 @@ import { ssoProviderRouter } from './sso-provider-router';
 // Phase C adds `instanceSigning` (instance-wide cert + TSA + contact info).
 
 export const bizrethinkRouter = router({
+  resourcePolicy: resourcePolicyRouter,
   organisationSmtp: orgSmtpRouter,
   instanceSigning: instanceSigningRouter,
   instanceStorage: instanceStorageRouter,

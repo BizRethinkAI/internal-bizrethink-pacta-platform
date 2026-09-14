@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { reserveTrialUsage } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { convertPlaceholdersToFieldInputs } from '@documenso/lib/server-only/pdf/auto-place-fields';
@@ -167,7 +169,7 @@ export const createEnvelope = async ({
   }
 
   // Enforce the organisation document-creation limit before doing any work.
-  // Only documents count towards the limit (templates are exempt).
+  // The upstream monthly counter applies to documents; trial storage also counts templates.
   if (type === EnvelopeType.DOCUMENT) {
     await assertOrganisationRatesAndLimits({
       organisationId: team.organisationId,
@@ -175,6 +177,9 @@ export const createEnvelope = async ({
       type: 'document',
       count: 1,
     });
+  } else {
+    // Templates allocate stored PDFs too; retain paid/internal accounting.
+    await reserveTrialUsage({ organisationId: team.organisationId, type: 'document', count: 1 });
   }
 
   // Verify that the folder exists and is associated with the team.

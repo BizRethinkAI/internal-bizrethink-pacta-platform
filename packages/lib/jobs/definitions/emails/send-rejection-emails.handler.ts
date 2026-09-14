@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { reserveTrialRecipientEmail } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
@@ -97,6 +99,7 @@ export const run = async ({ payload, io }: { payload: TSendSigningRejectionEmail
         }),
       ]);
 
+      await reserveTrialRecipientEmail(envelope.teamId);
       await emailTransport.sendMail({
         to: {
           name: recipient.name,

@@ -1,13 +1,9 @@
-import sharp from 'sharp';
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+// BizRethink overlay 089: finite bytes, pixels, concurrency and processing time.
+import { processBoundedImage } from '@bizrethink/customizations/server-only/resources/media-worker';
 
-export const optimiseAvatar = async (bytes: string) => {
-  return await sharp(Buffer.from(bytes, 'base64')).resize(512, 512).toFormat('jpeg', { quality: 75 }).toBuffer();
-};
-
-export const loadAvatar = async (bytes: string) => {
-  const content = await sharp(Buffer.from(bytes, 'base64')).toFormat('jpeg').toBuffer();
-  return {
-    contentType: 'image/jpeg',
-    content,
-  };
-};
+export const optimiseAvatar = (bytes: string) => processBoundedImage('avatar', bytes);
+export const loadAvatar = async (bytes: string) => ({
+  contentType: 'image/jpeg',
+  content: await processBoundedImage('avatar-load', bytes),
+});

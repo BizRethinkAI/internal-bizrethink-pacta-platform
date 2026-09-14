@@ -1,4 +1,6 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import { DeleteEmailIdentityCommand } from '@aws-sdk/client-sesv2';
+import { preserveDomainOwnership } from '@bizrethink/customizations/server-only/resources/email-domains';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
@@ -76,6 +78,8 @@ export const reregisterEmailDomain = async ({ emailDomainId }: ReregisterEmailDo
 
   // Recreate the SES identity with the same DKIM key pair.
   await verifyDomainWithDKIM(emailDomain.domain, selector, decryptedPrivateKey);
+
+  await preserveDomainOwnership(emailDomainId);
 
   // Reset status to PENDING and update lastVerifiedAt.
   const updatedEmailDomain = await prisma.emailDomain.update({

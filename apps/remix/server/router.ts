@@ -1,4 +1,6 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import { isMalformedPath } from '@bizrethink/customizations/server-only/is-malformed-path';
+import { requestBodyLimits } from '@bizrethink/customizations/server-only/resources/request-body-limits';
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { csc } from '@documenso/ee/server-only/signing/csc/hono';
@@ -80,6 +82,8 @@ app.use(async (c, next) => {
 /**
  * Attach session and context to requests.
  */
+// BizRethink overlay 089: limit bytes/time before any body decoder.
+app.use(requestBodyLimits);
 app.use(contextStorage());
 app.use(appContext);
 

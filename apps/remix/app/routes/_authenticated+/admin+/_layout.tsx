@@ -1,3 +1,4 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
@@ -211,6 +212,12 @@ const NAV_GROUPS: NavGroupDef[] = [
         label: <Trans>AI Config</Trans>,
         href: '/admin/ai',
         icon: SparklesIcon,
+        bizrethink: true,
+      },
+      {
+        label: <Trans>Trial Limits</Trans>,
+        href: '/admin/resource-limits',
+        icon: DatabaseIcon,
         bizrethink: true,
       },
       {

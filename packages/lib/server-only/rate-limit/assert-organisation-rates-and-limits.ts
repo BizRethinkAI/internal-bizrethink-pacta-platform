@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { reserveTrialUsage } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { prisma } from '@documenso/prisma';
 import type { OrganisationClaim } from '@prisma/client';
 import { match } from 'ts-pattern';
@@ -29,6 +31,9 @@ type AssertOrganisationRatesAndLimitsOptions = {
 export const assertOrganisationRatesAndLimits = async (
   opts: AssertOrganisationRatesAndLimitsOptions,
 ): Promise<void> => {
+  // Trial policy is independent of billing, cloned claims and test rate bypasses.
+  await reserveTrialUsage(opts);
+
   if (process.env.DANGEROUS_BYPASS_RATE_LIMITS === 'true') {
     return;
   }

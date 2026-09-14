@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { assertTrialDistribution } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { materializeTspAnchorsForEnvelope } from '@documenso/ee/server-only/signing/csc/materialize-anchors';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -109,6 +111,8 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   if (envelope.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
+
+  await assertTrialDistribution(envelope.teamId, envelope.recipients.length, userId);
 
   // A recipientCount of 0 means unlimited recipients are allowed.
   const maximumRecipientCount = envelope.team.organisation.organisationClaim.recipientCount;

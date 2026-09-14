@@ -1,4 +1,6 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import { validateDirectTemplateFields } from '@bizrethink/customizations/server-only/direct-template-fields';
+import { assertTrialDistribution } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
@@ -330,6 +332,8 @@ export const createDocumentFromDirectTemplate = async ({
   const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature === null);
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
+
+  await assertTrialDistribution(directTemplateEnvelope.teamId, recipients.length, directTemplateEnvelope.userId);
 
   // Enforce the organisation document-creation limit before creating the document.
   await assertOrganisationRatesAndLimits({

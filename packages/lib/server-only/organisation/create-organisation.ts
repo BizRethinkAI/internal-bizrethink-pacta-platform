@@ -1,5 +1,10 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
+import {
+  prepareTrialOrganisation,
+  recordTrialOrganisation,
+} from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
 import { prisma } from '@documenso/prisma';
@@ -19,10 +24,20 @@ type CreateOrganisationOptions = {
   type: OrganisationType;
   url?: string;
   customerId?: string;
+  /** Server-controlled paid checkout path; never taken from arbitrary client input. */
+  pendingCheckout?: boolean;
   claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 };
 
-export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
+export const createOrganisation = async ({
+  name,
+  url,
+  type,
+  userId,
+  customerId,
+  claim,
+  pendingCheckout = false,
+}: CreateOrganisationOptions) => {
   let customerIdToUse = customerId;
 
   if (!customerId && IS_BILLING_ENABLED()) {
@@ -51,6 +66,7 @@ export const createOrganisation = async ({ name, url, type, userId, customerId, 
   }
 
   return await prisma.$transaction(async (tx) => {
+    const trial = await prepareTrialOrganisation(tx, userId, pendingCheckout);
     const organisationSetting = await tx.organisationGlobalSettings.create({
       data: {
         ...generateDefaultOrganisationSettings(),
@@ -134,6 +150,7 @@ export const createOrganisation = async ({ name, url, type, userId, customerId, 
       },
     });
 
+    await recordTrialOrganisation(tx, organisation.id, trial);
     return organisation;
   });
 };

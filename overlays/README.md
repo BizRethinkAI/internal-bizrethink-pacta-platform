@@ -63,6 +63,8 @@ This directory contains patches applied on top of upstream Documenso files. **Ev
 
 | 086 | `086-mca-provider-template-navigation.patch` | **APPLIED to branch 2026-09-13** | LOW | Both responsive team navigation surfaces use an owned membership/feature-gated hook to reach the provider interview and versioned MCA templates. No access policy is implemented in upstream components. Recheck the hook and team URL after upstream navigation changes. |
 
+| 089 | `089-resource-abuse-limits.patch` | **APPLIED to branch 2026-09-14** | HIGH | Finite external trial budgets, bounded body/media/AI processing, and nonexclusive expiring domain proof. Policy is owned; inherited entry points delegate. Preserve account transaction propagation from #221, existing recipient/email gates, template form behavior and DNS ownership on sync. See this branch’s state note for technical ceilings and operational limits. |
+
 ## Relocations from the 2026-08-13 upstream sync (142 commits, upstream 2.16.0)
 
 Upstream refactored several files out from under these overlays. The behavior was
