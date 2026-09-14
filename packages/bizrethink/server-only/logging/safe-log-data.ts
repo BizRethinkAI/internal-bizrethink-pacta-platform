@@ -159,11 +159,11 @@ export const logRouteCategory = (value: unknown) => {
   }
   return 'other';
 };
-const correlation = (value: string) => {
+const correlation = (value: string, isRequestId: boolean) => {
   if (/^sha256:[a-f\d]{24}$/.test(value)) {
     return value;
   }
-  if (/^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i.test(value)) {
+  if (isRequestId && /^[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12}$/i.test(value)) {
     return value;
   }
   // Keep stable correlation without echoing an accidentally supplied bearer.
@@ -187,7 +187,7 @@ export const safeLogRecord = (input: unknown): Record<string, unknown> => {
     if (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0) {
       result[key] = value;
     } else if (typeof value === 'string' && value.length > 0) {
-      result[key] = correlation(value);
+      result[key] = correlation(value, key === 'requestId' || key === 'nonBatchedRequestId');
     }
   }
   for (const key of NUMBERS) {

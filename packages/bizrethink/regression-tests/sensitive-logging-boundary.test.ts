@@ -106,3 +106,9 @@ it('retains fixed authentication error codes while omitting their sensitive mess
   expect(captured.lines.join('')).not.toContain(secret);
   expect(JSON.parse(captured.lines[0]).error.code).toBe('INVALID_CREDENTIALS');
 });
+it('A-21 UUID-shaped values are hashed in object IDs; only request correlation may retain a UUID', () => {
+  const bearer = '6aeb190a-62ce-4c0c-9e8d-c3a719a84c20';
+  logger.info({ envelopeId: bearer });
+  expect(captured.lines.join('')).not.toContain(bearer);
+  expect(JSON.parse(captured.lines[0]).envelopeId).toMatch(/^sha256:/);
+});
