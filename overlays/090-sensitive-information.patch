@@ -369,7 +369,7 @@ index e88f55a9b..257a3e8ee 100644
  }
  
 diff --git a/apps/remix/server/router.ts b/apps/remix/server/router.ts
-index 5e67a6bdb..bc24e5199 100644
+index 5e67a6bdb..9b685534e 100644
 --- a/apps/remix/server/router.ts
 +++ b/apps/remix/server/router.ts
 @@ -1,3 +1,4 @@
@@ -385,16 +385,16 @@ index 5e67a6bdb..bc24e5199 100644
  import type { RequestIdVariables } from 'hono/request-id';
  import { requestId } from 'hono/request-id';
  import type { Logger } from 'pino';
-@@ -38,6 +40,9 @@ import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
- // load-context.ts. server/main.js imports getLoadContext from the rolled-up
- // output to wire it into the React Router adapter.
- export { getLoadContext } from './load-context';
+@@ -34,6 +36,9 @@ import { securityHeadersMiddleware } from './security-headers';
+ import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
+ import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
+ 
 +// Include the owned early-instrumentation module in this existing Rollup entry.
 +// instrument.mjs imports its generated file directly, without loading the app.
 +export { safeSentryOptions } from '@bizrethink/customizations/server-only/logging/sentry-options';
- 
- export interface HonoEnv {
-   Variables: RequestIdVariables & {
+ // Re-export so the rollup build (entry: server/router.ts) bundles
+ // load-context.ts. server/main.js imports getLoadContext from the rolled-up
+ // output to wire it into the React Router adapter.
 @@ -50,6 +55,13 @@ export interface HonoEnv {
  const basePath = (env('NEXT_PUBLIC_BASE_PATH') ?? '').replace(/\/$/, '');
  
