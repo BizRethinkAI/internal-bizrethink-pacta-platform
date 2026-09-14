@@ -152,8 +152,9 @@ describe('the jurisdiction reaches both pages', () => {
     expect(counselPage).toMatch(/jurisdictionLabel/);
   });
 
-  it('groups both pages by tier', () => {
-    expect(staffPage).toMatch(/JURISDICTION_TIERS/);
+  // Staff browsing now groups by subject. The legal-workspace browser test
+  // checks every row's jurisdiction label across Florida and North Carolina.
+  it('groups the jurisdiction-scoped counsel page by tier', () => {
     expect(counselPage).toMatch(/JURISDICTION_TIERS/);
   });
 

@@ -84,10 +84,11 @@ test('a provider interview saves, reopens and revises a real team template with 
     await page.getByRole('button', { name: 'Preview document package', exact: true }).click();
     const preview = page.locator('[data-mca-template-preview]');
     await expect(preview).toContainText('Internal draft — transaction fields remain unfilled');
-    await preview.getByText('Future Receivables Purchase Agreement', { exact: true }).click();
+    await preview.getByLabel('Package document', { exact: true }).selectOption('frpa');
     await expect(preview.locator('[data-mca-template-item="frpa.party-identification"]')).toContainText(
       'Example Receipts Inc., a corporation organized under the laws of DE',
     );
+    await page.getByRole('button', { name: 'Provider answers', exact: true }).click();
     await page.getByLabel('Template name', { exact: true }).fill('Revised synthetic programme');
     await page.getByRole('button', { name: '3. Operations', exact: true }).click();
     await page.getByRole('button', { name: 'Save template revision', exact: true }).click();

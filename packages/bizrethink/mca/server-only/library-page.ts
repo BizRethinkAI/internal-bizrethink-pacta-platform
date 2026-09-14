@@ -12,6 +12,7 @@ import {
 } from '../clauses/approval';
 import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../clauses/examination';
 import type { McaInstrument } from '../clauses/instruments';
+import { MCA_INSTRUMENTS } from '../clauses/instruments';
 import { LOMBARD, resolveClauses } from '../clauses/parties';
 import {
   type McaLibraryClauseView,
@@ -22,6 +23,7 @@ import {
 } from '../clauses/surface/view';
 import type { McaJurisdiction } from '../jurisdictions';
 import { isMcaReviewUsable, type McaLibraryReview, reviewIsStale } from '../review/link';
+import { readingContextsForReview } from '../review/reading-presentation';
 import { loadMcaClauseApprovals } from './clause-approvals';
 
 /**
@@ -340,6 +342,7 @@ export const mcaLibraryPage = async () => {
   });
 
   return {
+    readingContexts: readingContextsForReview([...MCA_INSTRUMENTS]),
     ...surface,
     clauses,
     reusable,

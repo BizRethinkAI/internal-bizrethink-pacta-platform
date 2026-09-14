@@ -21,14 +21,23 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
   expect(numbers).toHaveLength(210);
   expect(numbers.every((number) => /^\d+\.\d+$/.test(number.trim()))).toBe(true);
   await expect(page.getByRole('button', { name: /Merchant and Funding Information/ })).toHaveCount(0);
+  await page.getByLabel('Instrument', { exact: true }).selectOption('frpa');
+  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(
+    contentFor('frpa').filter((item) => item.kind === 'clause').length,
+  );
+  await page.getByLabel('Search library', { exact: true }).fill('no-such-clause-unique');
+  await expect(page.locator('[data-mca-kind]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
+  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(210);
 
   await nav.getByRole('link', { name: 'Reusable content', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'MCA Reusable content', exact: true })).toBeVisible();
   await expect(page.locator('[data-mca-kind]')).toHaveCount(25);
   await expect(page.locator('[data-mca-number]')).toHaveCount(0);
-  await expect(page.locator('[data-mca-slug="frpa.execution-fields"]')).toContainText(
-    'New fields — review pending. Source provisions:',
-  );
+  const execution = page.locator('[data-mca-slug="frpa.execution-fields"]');
+  await execution.getByRole('button').first().click();
+  await execution.locator('summary').filter({ hasText: 'Context & provenance' }).click();
+  await expect(execution).toContainText('New fields — review pending. Source provisions:');
   const funding = page.locator('[data-mca-slug="frpa.merchant-and-funding-information"]');
   await funding.getByRole('button').first().click();
   await expect(funding.getByText('{{field:funding.purchasePrice}}', { exact: true })).toBeVisible();
@@ -96,6 +105,8 @@ test('counsel can review extracted fields and an original unresolved finding sti
   try {
     const counsel = await counselContext.newPage();
     await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/mca-clause-review/${token}`);
+    await counsel.getByRole('button', { name: 'All', exact: true }).click();
+    await counsel.getByRole('button', { name: 'Read all items', exact: true }).click();
     const fieldBlock = counsel.locator('[data-mca-slug="frpa.guarantor-fields"]');
     await expect(fieldBlock.getByText('{{field:guarantor.signature}}', { exact: true })).toBeVisible();
     await expect(fieldBlock.getByText('Required for an entity guarantor', { exact: true })).toHaveCount(2);

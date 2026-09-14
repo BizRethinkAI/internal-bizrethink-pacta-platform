@@ -239,6 +239,7 @@ describe('no review finding reaches counsel', () => {
           'included',
           'kind',
           'number',
+          'reading',
           'repeatFor',
           'retiredFields',
           'selectionNote',
@@ -379,7 +380,9 @@ describe('the reviewer is still told when the agreement moved', () => {
   });
 
   it('keeps the banner on the page', () => {
-    expect(route).toMatch(/agreementMoved/);
-    expect(route).toMatch(/This agreement has changed since the link was sent/);
+    const reader = readFileSync(new URL('../../components/counsel-reader.tsx', import.meta.url), 'utf8');
+    expect(route).toMatch(/McaCounselReader\s+view=\{query.data\}/);
+    expect(reader).toMatch(/view.agreementMoved/);
+    expect(reader).toMatch(/This review content has changed since the link was sent/);
   });
 });

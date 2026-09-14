@@ -5,6 +5,17 @@ import type {
   McaLibraryReviewView,
   SourceState,
 } from '@bizrethink/customizations';
+import { filterCatalogue } from '@bizrethink/customizations/legal-ui/catalogue';
+import { CatalogueToolbar } from '@bizrethink/customizations/legal-ui/catalogue-toolbar';
+import {
+  LegalSummary,
+  LegalText,
+  LegalWorkspace,
+  legalItemId,
+  ReferenceWorkspace,
+} from '@bizrethink/customizations/legal-ui/reader';
+import { subjectLabel } from '@bizrethink/customizations/legal-ui/reading';
+import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '@bizrethink/customizations/mca/clauses/instruments';
 import { describeClauseVariance, describeWhyThisClause } from '@bizrethink/customizations/mca/clauses/metadata';
 import { McaWorkspaceNav } from '@bizrethink/customizations/mca/components/workspace-nav';
@@ -21,7 +32,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { AlertTriangle, Check, ChevronDown, ChevronRight, FileWarning, Loader2, Lock, ScrollText } from 'lucide-react';
+import {
+  AlertTriangleIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  FileWarningIcon,
+  Loader2Icon,
+  ScrollTextIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useLoaderData, useRevalidator, useSearchParams } from 'react-router';
 
@@ -29,6 +48,8 @@ import { buildMcaLibraryView } from '~/utils/bizrethink-mca-library.server';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/mca-library';
+
+export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: legalStyles }];
 
 export function meta() {
   return appMetaTags(msg`MCA Clauses`);
@@ -101,132 +122,174 @@ const COUNTERPARTY_LABEL: Record<string, string> = {
 
 export default function AdminMcaLibraryPage() {
   const data = useLoaderData<typeof loader>();
-  const [searchParams] = useSearchParams();
-  const isReusable = searchParams.get('catalogue') === 'reusable';
+  const [params, setParams] = useSearchParams();
+  const isReusable = params.get('catalogue') === 'reusable';
   const { reviews, counselFindings, evidence, reviewProfile } = data;
   const clauses: McaLibraryPageItem[] = isReusable ? data.reusable : data.clauses;
   const instruments = isReusable ? data.reusableInstruments : data.instruments;
   const totals = isReusable ? { ...data.reusableTotals, clauses: data.reusableTotals.items } : data.totals;
-
-  /*
-    ONE SOURCE OF DATA, REVALIDATED. Every mutation on this page re-runs the
-    loader rather than refetching half of it. The lease library fetches clauses
-    over one query and share links over another, and had to remember to refetch
-    both after answering a finding — a page where two lists can disagree about
-    whether a clause is approved is a page that will eventually say both.
-  */
+  const visible = filterCatalogue(clauses, params);
   const revalidator = useRevalidator();
   const reload = () => void revalidator.revalidate();
+  const context = params.get('context') ?? '';
 
   return (
-    <div>
-      <McaWorkspaceNav />
-      <h1 className="font-semibold text-4xl">
-        {isReusable ? <Trans>MCA Reusable content</Trans> : <Trans>MCA Clauses</Trans>}
-      </h1>
-
-      <p className="mt-2 text-muted-foreground text-sm">
-        {isReusable ? (
-          <Trans>
-            Required document blocks, field groups and interview guidance. Each item identifies its intended use and
-            retains its own review and approval evidence.
-          </Trans>
-        ) : (
-          <Trans>
-            Numbered operative provisions for the negotiated agreements. Reusable content and disclosure requirements
-            are available in the other MCA views.
-          </Trans>
-        )}
-      </p>
-
-      <p className="mt-3 text-muted-foreground text-sm">
-        <Trans>
-          Numbers follow an example selection; alternatives show their own citation context. These are review examples,
-          not confirmed commercial instructions.
-        </Trans>{' '}
-        {reviewProfile}
-      </p>
-
-      {/*
-        Stated first and plainly, because the failure mode of a page like this
-        is looking reassuring. Clauses under headings and version numbers read
-        as considered whoever typed them.
-      */}
-      <Alert className="mt-6" variant={totals.publishable === totals.clauses ? 'default' : 'warning'}>
-        <Lock className="h-4 w-4" />
-        <AlertTitle>
-          {totals.publishable} of {totals.clauses}{' '}
-          {isReusable ? 'reusable items have publication clearance' : 'clauses may be sent to a merchant'}, and{' '}
-          {totals.outstanding} findings are outstanding
-        </AlertTitle>
-        <AlertDescription>
-          A clause is publishable once an attorney's approval names its author, which is what the provenance gate
-          demands of attorney-drafted text — and only while the words stay the words that were approved. Outstanding
-          counts only findings nobody has disposed of: {totals.findingsCited} were cited across the library and the rest
-          are recorded as implemented, rejected or withdrawn in the review manifests.
-        </AlertDescription>
-      </Alert>
-
-      {/*
-        Stated plainly rather than buried. Someone reading this page a year from
-        now needs to know what the approval record actually is.
-      */}
-      <Alert className="mt-4">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>What an approval here is, and is not</AlertTitle>
-        <AlertDescription>
-          You record an attorney's approval on their behalf, under their name and bar number. It is a record of their
-          sign-off, not a signature by them, and the page prints both the attorney and the person who typed it. An
-          approval is pinned to the exact wording shown — editing a clause lapses it, and the clause returns to
-          unapproved.
-        </AlertDescription>
-      </Alert>
-
-      {evidence.sourcesMoved.length > 0 && (
-        <Alert className="mt-4" variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>
-            <Trans>
-              {evidence.sourcesMoved.length} document(s) changed since these clauses were transcribed from them
-            </Trans>
-          </AlertTitle>
-          <AlertDescription>
-            <Trans>
-              The clause text below may be quoting superseded sentences. Re-vendor the affected documents from
-              lombard-contracts and re-earn their verification dates.
-            </Trans>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {(!evidence.registerAvailable || evidence.sourcesMissing.length > 0) && (
-        <Alert className="mt-4" variant="warning">
-          <FileWarning className="h-4 w-4" />
-          <AlertTitle>
-            <Trans>Some evidence is not present in this environment</Trans>
-          </AlertTitle>
-          <AlertDescription>
-            <Trans>
-              What is missing cannot be checked here, so an empty result below is not a clean one. This is a deployment
-              fact rather than a defect in the text.
-            </Trans>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <CounselLinks reviews={reviews} onChanged={reload} />
-
-      <CounselFindings findings={counselFindings} onAnswered={reload} />
-
-      {instruments.map((instrument) => (
-        <InstrumentCard
-          key={instrument.id}
-          instrument={instrument}
-          clauses={clauses.filter((clause) => clause.instrument === instrument.id)}
-          onApproved={reload}
-        />
-      ))}
-    </div>
+    <LegalWorkspace>
+      <ReferenceWorkspace
+        items={[...data.clauses, ...data.reusable]}
+        contexts={data.readingContexts}
+        captureReturn={() => {
+          const saved = new URLSearchParams(params);
+          return () => setParams(saved, { preventScrollReset: true });
+        }}
+        onNavigate={(reference) => {
+          const target = [...data.clauses, ...data.reusable].find((item) => item.slug === reference.targetSlug);
+          if (!target) {
+            return;
+          }
+          const next = new URLSearchParams();
+          if (target.kind !== 'clause') {
+            next.set('catalogue', 'reusable');
+          }
+          next.set('instrument', target.instrument);
+          next.set('item', target.slug);
+          next.set('context', reference.context);
+          setParams(next, { preventScrollReset: true });
+        }}
+      >
+        <div className="min-w-0">
+          <McaWorkspaceNav />
+          <p className="mb-2 font-medium text-muted-foreground text-xs uppercase tracking-widest">
+            <Trans>Authored content</Trans>
+          </p>
+          <h1 className="font-semibold text-3xl tracking-tight">
+            {isReusable ? <Trans>MCA Reusable content</Trans> : <Trans>MCA Clauses</Trans>}
+          </h1>
+          <p className="mt-2 max-w-2xl text-muted-foreground text-sm leading-relaxed">
+            {isReusable ? (
+              <Trans>
+                Document blocks, fields and interview guidance, with their placement, intended use and review evidence.
+              </Trans>
+            ) : (
+              <Trans>Reusable agreement wording. Review each provision and its business alternatives in context.</Trans>
+            )}
+          </p>
+          <LegalSummary
+            values={[
+              { label: isReusable ? <Trans>Reusable items</Trans> : <Trans>Clauses</Trans>, value: clauses.length },
+              { label: <Trans>Current approvals</Trans>, value: totals.approved },
+              { label: <Trans>Publication clearance</Trans>, value: totals.publishable },
+              { label: <Trans>Historical findings outstanding</Trans>, value: totals.outstanding },
+            ]}
+          />
+          <details className="mb-4 rounded-lg border bg-muted/20 p-4">
+            <summary className="cursor-pointer font-medium text-sm">
+              <Trans>Review links & counsel findings</Trans> · {reviews.length} links ·{' '}
+              {counselFindings.filter((finding) => finding.answeredAt === null).length} unanswered
+            </summary>
+            <CounselLinks reviews={reviews} onChanged={reload} />
+            <CounselFindings findings={counselFindings} onAnswered={reload} />
+          </details>
+          <details className="text-muted-foreground text-xs leading-relaxed">
+            <summary className="cursor-pointer">
+              <Trans>Numbering context, source status & approval rules</Trans>
+            </summary>
+            <p className="mt-3">
+              <Trans>
+                Numbers follow a review example; each alternative retains its own citation context. These are not
+                confirmed commercial instructions.
+              </Trans>{' '}
+              {reviewProfile}
+            </p>
+            <p className="mt-2">
+              <Trans>
+                An approval records an attorney's sign-off under their name and bar number, with the staff recorder
+                identified separately. This is not a signature by the attorney. It applies to the exact wording reviewed
+                and lapses when that wording changes.
+              </Trans>
+            </p>
+            <p className="mt-2">
+              {totals.findingsCited} historical findings cited · {totals.outstanding} outstanding.{' '}
+              <Trans>Publication clearance remains subject to the provenance gate.</Trans>
+            </p>
+          </details>
+          {(evidence.sourcesMoved.length > 0 || !evidence.registerAvailable || evidence.sourcesMissing.length > 0) && (
+            <Alert className="mt-4" variant="warning">
+              <FileWarningIcon className="h-4 w-4" />
+              <AlertTitle>
+                <Trans>Some source evidence needs attention</Trans>
+              </AlertTitle>
+              <AlertDescription>
+                {evidence.sourcesMoved.length} changed sources · {evidence.sourcesMissing.length} unreadable sources ·{' '}
+                {evidence.registerAvailable ? 'findings register available' : 'findings register unavailable'}
+              </AlertDescription>
+            </Alert>
+          )}
+          <CatalogueToolbar
+            subjects={[...new Set(clauses.map((item) => item.section))]}
+            instruments={instruments}
+            kinds={
+              isReusable
+                ? [
+                    { id: 'document-block', title: 'Document blocks' },
+                    { id: 'field-group', title: 'Field groups' },
+                    { id: 'guidance', title: 'Interview guidance' },
+                  ]
+                : undefined
+            }
+          />
+          <div className="flex flex-wrap items-center justify-between gap-3 text-muted-foreground text-xs">
+            <p role="status">
+              {visible.length} of {clauses.length} {isReusable ? 'items' : 'clauses'}
+            </p>
+            <details className="max-w-full">
+              <summary className="cursor-pointer">
+                <Trans>Subject index</Trans>
+              </summary>
+              <nav aria-label="Subject index" className="mt-3 flex max-w-full flex-wrap gap-2">
+                {[...new Set(clauses.map((item) => item.section))].map((subject) => (
+                  <button
+                    type="button"
+                    key={subject}
+                    className="rounded border px-2 py-1 hover:bg-muted"
+                    onClick={() => {
+                      const next = new URLSearchParams(params);
+                      next.set('subject', subject);
+                      next.delete('item');
+                      setParams(next, { preventScrollReset: true });
+                    }}
+                  >
+                    {subjectLabel(subject)}
+                  </button>
+                ))}
+              </nav>
+            </details>
+          </div>
+          {context && data.readingContexts[context] && (
+            <p className="mt-4 rounded-md border bg-muted/30 p-3 text-xs">
+              <Trans>Reading in citation context</Trans>: {context}
+            </p>
+          )}
+          {visible.length === 0 && (
+            <div className="my-8 rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+              <Trans>No items match these filters. Clear a filter to return to the library.</Trans>
+            </div>
+          )}
+          {instruments
+            .filter((instrument) => visible.some((item) => item.instrument === instrument.id))
+            .map((instrument) => (
+              <InstrumentCard
+                key={instrument.id}
+                instrument={instrument}
+                clauses={visible
+                  .filter((item) => item.instrument === instrument.id)
+                  .map((item) => ({ ...item, reading: data.readingContexts[context]?.[item.slug] ?? item.reading }))}
+                onApproved={reload}
+              />
+            ))}
+        </div>
+      </ReferenceWorkspace>
+    </LegalWorkspace>
   );
 }
 
@@ -383,9 +446,9 @@ const CounselLinks = ({ reviews, onChanged }: { reviews: McaLibraryReviewView[];
 
   return (
     <div className="mt-8 rounded-lg border border-border p-4">
-      <h2 className="font-semibold">Send an agreement to counsel</h2>
+      <h2 className="font-semibold">Create a counsel review link</h2>
       <p className="mt-1 text-muted-foreground text-sm">
-        They open a link and review one agreement’s clauses and reusable content without an account. They can record
+        They open a link and review one instrument’s clauses and reusable content without an account. They can record
         findings, but cannot approve content. The link expires and can be revoked.
       </p>
 
@@ -414,7 +477,7 @@ const CounselLinks = ({ reviews, onChanged }: { reviews: McaLibraryReviewView[];
                     : `Expires ${new Date(review.expiresAt).toLocaleDateString()}`}
                 </p>
               </div>
-              <div className="flex flex-none items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -468,7 +531,7 @@ const CounselLinks = ({ reviews, onChanged }: { reviews: McaLibraryReviewView[];
               </SelectContent>
             </Select>
             <p className="mt-1 text-muted-foreground text-xs">
-              The link carries this agreement's clauses and nothing else, and is pinned to their exact wording.
+              The link includes this instrument’s clauses and reusable content, pinned to their exact wording.
             </p>
           </div>
 
@@ -483,7 +546,7 @@ const CounselLinks = ({ reviews, onChanged }: { reviews: McaLibraryReviewView[];
               disabled={name.trim() === '' || email.trim() === '' || share.isPending}
               onClick={() => share.mutate({ reviewerName: name.trim(), reviewerEmail: email.trim(), instrument })}
             >
-              {share.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {share.isPending ? <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> : null}
               Create the link
             </Button>
             <Button variant="ghost" onClick={() => setSharing(false)}>
@@ -514,7 +577,7 @@ const InstrumentCard = ({
   return (
     <section className="mt-6 rounded-lg border border-border">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-border border-b px-4 py-3">
-        <ScrollText className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <ScrollTextIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
         <h2 className="font-medium text-foreground">{instrument.title}</h2>
         <Badge variant="secondary">{COUNTERPARTY_LABEL[instrument.counterparty] ?? instrument.counterparty}</Badge>
         <span className="ml-auto flex items-center gap-2">
@@ -542,7 +605,17 @@ const InstrumentCard = ({
  * bar number and a jurisdiction is a worse way to learn it.
  */
 const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onApproved: () => void }) => {
-  const [open, setOpen] = useState(false);
+  const [rowParams, setRowParams] = useSearchParams();
+  const open = rowParams.get('item') === clause.slug;
+  const setOpen = (value: boolean) => {
+    const next = new URLSearchParams(rowParams);
+    if (value) {
+      next.set('item', clause.slug);
+    } else {
+      next.delete('item');
+    }
+    setRowParams(next, { preventScrollReset: true });
+  };
   const [name, setName] = useState('');
   const [bar, setBar] = useState('');
   const [admitted, setAdmitted] = useState('');
@@ -561,20 +634,23 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onAppro
     <li data-mca-kind={clause.kind} data-mca-slug={clause.slug}>
       <button
         type="button"
-        className="flex w-full items-start justify-between gap-4 px-4 py-3 text-left"
-        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full flex-wrap items-start justify-between gap-3 px-4 py-4 text-left hover:bg-muted/30 focus-visible:outline focus-visible:outline-primary"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls={`detail-${clause.slug}`}
+        id={legalItemId(clause.slug)}
       >
         <div className="flex gap-3">
           {open ? (
-            <ChevronDown className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
+            <ChevronDownIcon className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
           ) : (
-            <ChevronRight className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
+            <ChevronRightIcon className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
           )}
           <div>
             <p className="text-foreground">
               {clause.kind === 'clause' && (
                 <span data-mca-number className="mr-2 font-mono text-muted-foreground text-xs">
-                  {clause.number}
+                  {clause.reading.number ?? clause.number}
                 </span>
               )}
               {clause.heading}
@@ -591,6 +667,33 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onAppro
               </p>
             )}
             {clause.selectionNote && <p className="mt-1 text-muted-foreground text-xs">{clause.selectionNote}</p>}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {clause.outstanding > 0 && (
+            <Badge variant="destructive">
+              {clause.outstanding === 1 ? '1 finding outstanding' : `${clause.outstanding} findings outstanding`}
+            </Badge>
+          )}
+          {lapsed && <Badge variant="destructive">Lapsed — text changed</Badge>}
+          {clause.approved ? (
+            <Badge>
+              <CheckIcon className="mr-1 h-3 w-3" />
+              Approved
+            </Badge>
+          ) : (
+            !lapsed && <Badge variant="neutral">Unapproved</Badge>
+          )}
+        </div>
+      </button>
+
+      {open && (
+        <div id={`detail-${clause.slug}`} className="space-y-5 border-border/60 border-t px-5 py-6 sm:px-8">
+          <details className="rounded-md border bg-muted/20 p-3">
+            <summary className="cursor-pointer font-medium text-sm">
+              Context & provenance · version {clause.version}
+            </summary>{' '}
             <p className="mt-1 text-muted-foreground text-xs">{describeWhyThisClause(clause.whyThisClause)}</p>
             <p className="mt-1 text-muted-foreground text-xs">{describeClauseVariance(clause.variance)}</p>
             <p className="mt-0.5 font-mono text-muted-foreground text-xs">
@@ -615,38 +718,23 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onAppro
                   .map((state) => JURISDICTION_NAMES[state])
                   .join(' and ')} law`}
             </p>
-          </div>
-        </div>
-
-        <div className="flex flex-none items-center gap-2">
-          {clause.outstanding > 0 && (
-            <Badge variant="destructive">
-              {clause.outstanding === 1 ? '1 finding outstanding' : `${clause.outstanding} findings outstanding`}
-            </Badge>
-          )}
-          {lapsed && <Badge variant="destructive">Lapsed — text changed</Badge>}
-          {clause.approved ? (
-            <Badge>
-              <Check className="mr-1 h-3 w-3" />
-              Approved
-            </Badge>
-          ) : (
-            !lapsed && <Badge variant="neutral">Unapproved</Badge>
-          )}
-        </div>
-      </button>
-
-      {open && (
-        <div className="border-border/60 border-t px-4 py-4">
+            <p className="mt-2 text-xs">
+              Uses: {clause.uses.join(', ')} · Placement:{' '}
+              {clause.placement
+                ? JSON.stringify(clause.placement)
+                : clause.kind === 'clause'
+                  ? 'Numbered provision'
+                  : 'No document placement'}
+            </p>
+            {clause.derivedFrom && <p className="mt-2 text-xs">Derived from: {clause.derivedFrom.join(', ')}</p>}
+          </details>
           {/*
             VERBATIM, `«N»` MARKERS AND ALL. Those markers are the AcroForm
             anchors the Lombard pipeline injects and are printed in the document
             a merchant signs. Tidying them out of the display would show a
             reviewer a document we do not publish.
           */}
-          {clause.body && (
-            <p className="whitespace-pre-wrap rounded-md bg-muted/40 p-4 text-sm leading-relaxed">{clause.body}</p>
-          )}
+          {clause.body && <LegalText sourceId={clause.slug} segments={clause.reading.segments} />}
           {clause.fields && (
             <dl className="mt-3 grid gap-3 rounded-md border border-border p-4 sm:grid-cols-2">
               {clause.fields.map((field) => (
@@ -721,7 +809,7 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onAppro
 
               {clause.heldByFindings !== null && (
                 <Alert className="mt-3" variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTriangleIcon className="h-4 w-4" />
                   <AlertTitle>Held by a finding nothing has disposed of</AlertTitle>
                   <AlertDescription>{clause.heldByFindings}</AlertDescription>
                 </Alert>
@@ -785,7 +873,7 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onAppro
 
               {approve.error && (
                 <Alert variant="destructive" className="mt-4">
-                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTriangleIcon className="h-4 w-4" />
                   <AlertTitle>Not recorded</AlertTitle>
                   <AlertDescription>{approve.error.message}</AlertDescription>
                 </Alert>
@@ -809,7 +897,7 @@ const ClauseRow = ({ clause, onApproved }: { clause: McaLibraryPageItem; onAppro
                   })
                 }
               >
-                {approve.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {approve.isPending ? <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Record approval of this wording
               </Button>
             </div>

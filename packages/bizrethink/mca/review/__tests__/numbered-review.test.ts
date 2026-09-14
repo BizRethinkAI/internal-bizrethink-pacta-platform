@@ -82,6 +82,8 @@ describe('counsel reads the numbered selection and its identified alternatives',
     expect(visibleSlug.test('<span>{clause.slug}</span>')).toBe(true);
     expect(route).not.toMatch(visibleSlug);
     expect(route).toContain('clauseSlug={clause.slug}');
-    expect(route).toContain('citation context has changed');
+    const reader = readFileSync(new URL('../../components/counsel-reader.tsx', import.meta.url), 'utf8');
+    expect(reader).toContain('view.agreementMoved');
+    expect(reader).toContain('This review content has changed since the link was sent');
   });
 });

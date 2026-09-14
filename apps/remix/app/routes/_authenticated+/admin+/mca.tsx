@@ -1,18 +1,25 @@
 import type { ConformityEntry, ConformityKind } from '@bizrethink/customizations';
+import { LegalSummary, LegalText, LegalWorkspace } from '@bizrethink/customizations/legal-ui/reader';
+import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { McaWorkspaceNav } from '@bizrethink/customizations/mca/components/workspace-nav';
 import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
+import { Input } from '@documenso/ui/primitives/input';
 import { msg } from '@lingui/core/macro';
-import { AlertTriangle, BookMarked, Eye, FileWarning, HelpCircle, ScrollText } from 'lucide-react';
-import { useLoaderData } from 'react-router';
+import { Trans } from '@lingui/react/macro';
+import { AlertTriangleIcon, EyeIcon, FileWarningIcon } from 'lucide-react';
+import { Link, useLoaderData, useSearchParams } from 'react-router';
 
 import { buildMcaConformityView } from '~/utils/bizrethink-mca-conformity.server';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/mca';
+
+export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: legalStyles }];
 
 /**
  * ADR 0015: one MCA workspace, separate release controls. This view verifies
@@ -46,7 +53,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  return buildMcaConformityView();
+  return buildMcaConformityView(new URL(request.url).searchParams.get('source'));
 }
 
 const ASSURANCE_LABEL = {
@@ -254,7 +261,7 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
     {entry.unreadable.length > 0 && (
       <div className="mt-4 rounded border border-amber-500/40 bg-amber-500/5 p-3">
         <p className="flex items-center gap-2 font-medium text-sm">
-          <Eye className="h-4 w-4" aria-hidden="true" />
+          <EyeIcon className="h-4 w-4" aria-hidden="true" />
           {entry.unreadable.length} of {entry.rowsTotal} {KIND_UNIT[entry.kind]}: label read, contents not
         </p>
         <ul className="mt-2 space-y-1 text-sm">
@@ -301,7 +308,7 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
 
     {entry.problems.length > 0 && (
       <Alert variant="destructive" className="mt-3">
-        <FileWarning className="h-4 w-4" />
+        <FileWarningIcon className="h-4 w-4" />
         <AlertTitle>Provenance problems</AlertTitle>
         <AlertDescription>
           <ul className="space-y-1">
@@ -317,7 +324,7 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
 
     {entry.publishGate.length > 0 && (
       <Alert variant="destructive" className="mt-3">
-        <AlertTriangle className="h-4 w-4" />
+        <AlertTriangleIcon className="h-4 w-4" />
         <AlertTitle>The publish gate refuses this spec</AlertTitle>
         <AlertDescription>
           <ul className="space-y-1">
@@ -336,191 +343,313 @@ const StateCard = ({ entry }: { entry: ConformityEntry }) => (
 );
 
 export default function AdminMcaConformityPage() {
-  const { library, jurisdictions, entries, envelopes, readings, summary } = useLoaderData<typeof loader>();
-
+  const { jurisdictions, entries, envelopes, readings, summary, source } = useLoaderData<typeof loader>();
+  const [params, setParams] = useSearchParams();
+  const active = ['readings', 'checks'].includes(params.get('view') ?? '') ? params.get('view') : 'disclosures';
+  const state = params.get('state') ?? '';
+  const query = (params.get('q') ?? '').toLowerCase();
+  const update = (key: string, value: string) => {
+    const next = new URLSearchParams(params);
+    if (value) {
+      next.set(key, value);
+    } else {
+      next.delete(key);
+    }
+    setParams(next, { preventScrollReset: true, replace: key === 'q' });
+  };
+  const filtered = entries.filter(
+    (entry) =>
+      (!state || entry.jurisdiction === state) &&
+      `${entry.jurisdictionName} ${entry.citation} ${entry.kind}`.toLowerCase().includes(query),
+  );
   return (
-    <div className="mx-auto w-full max-w-screen-lg px-4 pb-16 md:px-8">
-      <div className="mt-8">
+    <LegalWorkspace>
+      <div className="min-w-0 pb-12">
         <McaWorkspaceNav />
-        <h1 className="font-semibold text-3xl">MCA disclosures & requirements</h1>
-        <p className="mt-1 max-w-3xl text-muted-foreground">
-          The eleven states that require a commercial-financing disclosure, and what each one&rsquo;s spec has actually
-          been checked against. These are regulators&rsquo; words, not ours &mdash; this page reports and records
-          nothing.
+        <p className="mb-2 text-muted-foreground text-xs uppercase tracking-widest">
+          <Trans>Disclosure register</Trans>
         </p>
-        <p className="mt-2 font-mono text-muted-foreground text-xs">library: {library}</p>
-      </div>
-
-      {/*
-        Stated first, plainly, because the failure mode of a page like this is
-        looking reassuring. Someone opening it a year from now needs to know
-        what "verified" claims and what it does not.
-      */}
-      {/*
-        THE SUMMARY IS COMPUTED IN THE PACKAGE, NOT HERE.
-
-        These numbers were `entries.filter(...)` calls in this file, which is a
-        view model no test runs — and the top line is the one sentence most
-        readers take away. They now come off `surface.summary`, beside the cards
-        they summarise and asserted in `mca/__tests__/surface.test.ts`.
-      */}
-      <Alert className="mt-6" variant="warning">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>
-          {summary.verified} of {summary.total} disclosures are fully verified, and {summary.unreadable} rows, lines and
-          requirements across them have contents no check reads
-        </AlertTitle>
-        <AlertDescription>
-          A verification date means every prescribed label and every prescribed sentence was still found in the vendored
-          source, in the section the spec was transcribed from, on the last run. It does not mean a human has read the
-          current regulation, and it says nothing about a row the regulation leaves unworded. Those rows are listed
-          under each state.
-        </AlertDescription>
-      </Alert>
-
-      {/*
-        THE TWO QUESTIONS "VERIFIED" USED TO BE READ AS ANSWERING.
-
-        A digest compares our text to OUR VENDORED COPY. It cannot see a
-        regulator amending the rule — our file does not move, so the digest
-        matches and the card stays green about text that is now wrong — and it
-        cannot see that the copy was weak to begin with. Georgia was verified
-        against a browser capture of law.justia.com that was also incomplete,
-        and its card was indistinguishable from California's.
-      */}
-      <Alert className="mt-4" variant="warning">
-        <BookMarked className="h-4 w-4" />
-        <AlertTitle>
-          {summary.fromOfficialPublisher} of {summary.total} are vendored from the publisher that enacted or codified
-          them, and {summary.staleReadings} were last read more than {summary.staleAfterDays} days ago
-        </AlertTitle>
-        <AlertDescription>
-          Where a source came from is read off that file&rsquo;s own vendoring header on every load &mdash; it is never
-          a field on a spec. {summary.originNotRecorded} of these disclosures rest on a file that records no retrieval
-          at all: the text is probably the official publisher&rsquo;s, and nothing in the file lets a reader check that.
-          Age is counted from the OLDER of a spec&rsquo;s applicable verification dates, because a claim is only as
-          current as its stalest half. A disclosure counts as verified only when both hold.
-        </AlertDescription>
-      </Alert>
-
-      <Alert className="mt-4">
-        <ScrollText className="h-4 w-4" />
-        <AlertTitle>There is no approval on this page, and that is deliberate</AlertTitle>
-        <AlertDescription>
-          The clause library records an attorney&rsquo;s approval of the exact words of a clause we drafted. Nothing
-          here is ours to word: 10 CCR &sect;914 closes most of its rows with &ldquo;shall include only&rdquo;. An
-          approval recorded against a regulator&rsquo;s sentence would put a name and bar number behind text no lawyer
-          authored. Open questions are carried below as readings instead.
-        </AlertDescription>
-      </Alert>
-
-      {jurisdictions.map((jurisdiction) => {
-        const rows = entries.filter((e) => e.jurisdiction === jurisdiction);
-
-        if (rows.length === 0) {
-          return null;
-        }
-
-        return (
-          <section key={jurisdiction} className="mt-8">
-            <h2 className="font-semibold text-muted-foreground text-sm uppercase tracking-wide">
-              {JURISDICTION_NAMES[jurisdiction]}
+        <h1 className="font-semibold text-3xl tracking-tight">
+          <Trans>MCA disclosures & requirements</Trans>
+        </h1>
+        <p className="mt-2 max-w-2xl text-muted-foreground text-sm leading-relaxed">
+          <Trans>
+            Read the prescribed wording, source evidence and limits of each check. Provider-drafted explanations remain
+            distinct from prescribed text.
+          </Trans>
+        </p>
+        <LegalSummary
+          values={[
+            { label: <Trans>Disclosure specifications</Trans>, value: summary.total },
+            { label: <Trans>Fully verified</Trans>, value: summary.verified },
+            { label: <Trans>Contents no check reads</Trans>, value: summary.unreadable },
+            { label: <Trans>Open readings</Trans>, value: readings.length },
+          ]}
+        />
+        <p className="mb-5 rounded-lg border bg-muted/20 p-3 text-muted-foreground text-xs leading-relaxed">
+          {summary.fromOfficialPublisher} / {summary.total} <Trans>sources from the official publisher</Trans> ·{' '}
+          {summary.staleReadings} <Trans>readings older than</Trans> {summary.staleAfterDays}{' '}
+          <Trans>
+            days. Verification compares retained sources; it does not establish that current law or a filled disclosure
+            has been reviewed.
+          </Trans>
+        </p>
+        <fieldset className="mb-5 flex min-w-0 flex-wrap gap-2" aria-label="Disclosure views">
+          {[
+            { id: 'disclosures', label: <Trans>Disclosures</Trans> },
+            { id: 'readings', label: <Trans>Open readings</Trans> },
+            { id: 'checks', label: <Trans>Document checks</Trans> },
+          ].map((tab) => (
+            <Button
+              key={tab.id}
+              variant={active === tab.id ? 'secondary' : 'ghost'}
+              size="sm"
+              aria-pressed={active === tab.id}
+              onClick={() => update('view', tab.id)}
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </fieldset>
+        {active === 'disclosures' && (
+          <>
+            <div className="mb-5 flex flex-wrap gap-3">
+              <Input
+                aria-label="Search disclosures"
+                placeholder="Search a state, citation or form…"
+                value={params.get('q') ?? ''}
+                onChange={(event) => update('q', event.target.value)}
+                className="min-w-48 flex-1"
+              />
+              <select
+                aria-label="Disclosure jurisdiction"
+                value={state}
+                onChange={(event) => update('state', event.target.value)}
+                className="h-10 rounded-md border bg-background px-3 text-sm"
+              >
+                <option value="">All jurisdictions</option>
+                {jurisdictions.map((jurisdiction) => (
+                  <option key={jurisdiction} value={jurisdiction}>
+                    {JURISDICTION_NAMES[jurisdiction]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p role="status" className="mb-3 text-muted-foreground text-xs">
+              {filtered.length} <Trans>disclosures</Trans>
+            </p>
+            <div className="space-y-3">
+              {filtered.map((entry) => (
+                <details
+                  key={entry.slug}
+                  open={params.get('source') === entry.slug || undefined}
+                  className="rounded-lg border"
+                  data-disclosure={entry.slug}
+                >
+                  <summary className="cursor-pointer px-4 py-4">
+                    <span className="inline-flex max-w-full flex-wrap items-center gap-3">
+                      <strong>{entry.jurisdictionName}</strong>
+                      <span className="text-muted-foreground text-sm">
+                        {entry.citation} · {KIND_LABEL[entry.kind]}
+                      </span>
+                      <Badge variant={ASSURANCE_VARIANT[entry.assurance]}>{ASSURANCE_LABEL[entry.assurance]}</Badge>
+                    </span>
+                  </summary>
+                  <div className="space-y-5 border-t p-4">
+                    <StateCard entry={entry} />
+                    <Button asChild variant="outline" size="sm">
+                      <Link
+                        preventScrollReset
+                        to={`?${new URLSearchParams({ ...Object.fromEntries(params), source: entry.slug })}`}
+                      >
+                        <Trans>Read source & coverage details</Trans>
+                      </Link>
+                    </Button>
+                    {source?.slug === entry.slug && (
+                      <>
+                        <h3 className="font-semibold text-lg">
+                          <Trans>Rows, lines & requirements</Trans>
+                        </h3>
+                        <ol className="divide-y rounded-lg border">
+                          {source.rows.map((row) => (
+                            <li key={row.id} className="space-y-3 p-4">
+                              <div className="flex flex-wrap gap-3">
+                                <span className="text-muted-foreground text-sm">{row.id}</span>
+                                <h4 className="font-semibold">{row.label}</h4>
+                              </div>
+                              <p className="text-muted-foreground text-xs">{row.citation}</p>
+                              {row.labelPrescribed && (
+                                <Badge variant="neutral">
+                                  <Trans>Prescribed label</Trans>
+                                </Badge>
+                              )}
+                              {row.calculation && (
+                                <p className="rounded-md bg-muted p-3 text-sm">
+                                  <Trans>Required calculation reference</Trans>:{' '}
+                                  {row.calculation.kind === 'sum-of-preceding' ? (
+                                    <Trans>Sum of all preceding lines</Trans>
+                                  ) : (
+                                    <>
+                                      {row.calculation.minuend} − {row.calculation.subtrahend}
+                                    </>
+                                  )}
+                                </p>
+                              )}
+                              {row.evidence.length > 0 && (
+                                <details className="rounded-md border p-3">
+                                  <summary className="cursor-pointer text-sm">
+                                    <Trans>Required evidence in this row</Trans>
+                                  </summary>
+                                  <ul className="mt-2 space-y-2">
+                                    {row.evidence.map((text) => (
+                                      <li key={text}>
+                                        <LegalText text={text} />
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </details>
+                              )}
+                              {row.labelSuffix && <LegalText text={row.labelSuffix} />}
+                              {row.text ? (
+                                <LegalText text={row.text} />
+                              ) : (
+                                <p className="text-muted-foreground text-sm">
+                                  <Trans>No fixed sentence supplied for this content.</Trans>
+                                </p>
+                              )}
+                              {row.onlyPrescribedContent && (
+                                <Badge variant="warning">
+                                  <Trans>Only prescribed content</Trans>
+                                </Badge>
+                              )}
+                              {row.thirdColumnEmpty && (
+                                <p className="font-medium text-sm">
+                                  <Trans>The third column must remain empty.</Trans>
+                                </p>
+                              )}
+                              {row.alsoPermitted.map((text) => (
+                                <div key={text}>
+                                  <h5 className="mb-2 font-medium text-sm">
+                                    <Trans>Also permitted</Trans>
+                                  </h5>
+                                  <LegalText text={text} />
+                                </div>
+                              ))}
+                              {row.providerDrafted.map((item) => (
+                                <div key={item.citation} className="rounded-md bg-muted p-3">
+                                  <h5 className="mb-2 font-medium text-sm">
+                                    <Trans>Provider-drafted explanation</Trans> · {item.citation}
+                                  </h5>
+                                  <LegalText text={item.text} />
+                                </div>
+                              ))}
+                            </li>
+                          ))}
+                        </ol>
+                        <details className="rounded-lg border p-4" open>
+                          <summary className="cursor-pointer font-semibold">
+                            <Trans>Scoped source passage</Trans>
+                          </summary>
+                          <div className="mt-4 max-h-[60dvh] overflow-y-auto pr-3">
+                            {source.passage ? (
+                              <LegalText text={source.passage} />
+                            ) : (
+                              <p role="alert">
+                                <Trans>
+                                  The recorded section boundaries are unavailable. No wider passage has been
+                                  substituted.
+                                </Trans>
+                              </p>
+                            )}
+                          </div>
+                        </details>
+                        <details className="rounded-lg border p-4">
+                          <summary className="cursor-pointer font-medium text-sm">
+                            <Trans>Full retained source · outside the scoped verification passage</Trans>
+                          </summary>
+                          <div className="mt-4 max-h-[60dvh] overflow-y-auto pr-3">
+                            <LegalText text={source.wholeSource} />
+                          </div>
+                        </details>
+                      </>
+                    )}
+                  </div>
+                </details>
+              ))}
+            </div>
+            {filtered.length === 0 && (
+              <p className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+                <Trans>No disclosures match these filters.</Trans>
+              </p>
+            )}
+          </>
+        )}
+        {active === 'readings' && (
+          <section>
+            <h2 className="font-semibold text-xl">
+              <Trans>Open readings</Trans>
             </h2>
-            <div className="mt-2 space-y-3">
-              {rows.map((entry) => (
-                <StateCard key={entry.slug} entry={entry} />
+            <p className="my-3 text-muted-foreground text-sm">
+              <Trans>
+                Questions that affect the current checks. This register does not record or resolve counsel's answer.
+              </Trans>
+            </p>
+            <div className="space-y-4">
+              {readings.map((reading) => (
+                <article key={reading.id} className="rounded-lg border p-5">
+                  <p className="mb-2 text-muted-foreground text-xs">
+                    {reading.id} · {reading.jurisdictions.map((j) => JURISDICTION_NAMES[j]).join(', ')} ·{' '}
+                    {reading.surface}
+                  </p>
+                  <h3 className="font-medium leading-relaxed">{reading.question}</h3>
+                  <p className="mt-3 text-muted-foreground text-sm leading-relaxed">{reading.effect}</p>
+                  {reading.changesVerdicts && (
+                    <Badge variant="warning" className="mt-3">
+                      <Trans>Changes verdicts</Trans>
+                    </Badge>
+                  )}
+                </article>
               ))}
             </div>
           </section>
-        );
-      })}
-
-      {/*
-        The instance checker's blind spots, by envelope shape.
-
-        There is no filled envelope to report on here, and inventing figures so
-        a number could be shown would be the reassurance the rest of this page
-        refuses. What can be stated without one is which identities a given
-        combination of DOCUMENTS lets the checker decide at all — which is what
-        `skipped` turns on.
-      */}
-      <section className="mt-12">
-        <h2 className="font-semibold text-2xl">What a filled disclosure could not be checked for</h2>
-        <p className="mt-1 max-w-3xl text-muted-foreground text-sm">
-          The instance checker compares figures printed on the documents travelling in one envelope. Two of the three
-          REVIEW-01 blockers move the same sum in opposite directions, so every check that needs only the offer summary
-          cancels exactly. An empty findings list on a one-document envelope therefore means very little.
-        </p>
-
-        <div className="mt-4 space-y-3">
-          {envelopes.map((shape) => (
-            <div key={shape.id} className="rounded-lg border border-border p-4">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h3 className="font-medium">{shape.label}</h3>
-                <span className="text-muted-foreground text-sm">
-                  {shape.evaluable} of {shape.total} identities can be decided
-                </span>
-              </div>
-
-              {shape.undetectable.length > 0 && (
-                <p className="mt-2 text-destructive text-sm">
-                  Undetectable in this shape: {shape.undetectable.join(', ')}
-                </p>
-              )}
-
-              {shape.skipped.length > 0 && (
-                <ul className="mt-2 space-y-1 text-sm">
-                  {shape.skipped.map((s) => (
-                    <li key={s.identity}>
-                      <span className="font-mono text-xs">{s.identity}</span>{' '}
-                      <span className="text-muted-foreground">
-                        &mdash; {s.statement}. Skipped: {s.reason}.
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+        )}
+        {active === 'checks' && (
+          <section>
+            <h2 className="font-semibold text-xl">
+              <Trans>Document check availability</Trans>
+            </h2>
+            <p className="my-3 text-muted-foreground text-sm">
+              <Trans>
+                These counts show which checks a document combination makes possible. They are not results from a filled
+                transaction.
+              </Trans>
+            </p>
+            <div className="space-y-4">
+              {envelopes.map((shape) => (
+                <article key={shape.id} className="rounded-lg border p-5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-3">
+                    <h3 className="font-semibold">{shape.label}</h3>
+                    <Badge variant="neutral">
+                      {shape.evaluable} / {shape.total} evaluable
+                    </Badge>
+                  </div>
+                  {shape.undetectable.length > 0 && (
+                    <p className="mt-3 text-sm">Undetectable: {shape.undetectable.join(', ')}</p>
+                  )}
+                  <ul className="mt-4 divide-y">
+                    {shape.skipped.map((check) => (
+                      <li key={check.identity} className="py-3 text-sm">
+                        <strong>{check.statement}</strong>
+                        <p className="mt-1 text-muted-foreground">Unavailable: {check.reason}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/*
-        READINGS, NOT APPROVALS.
-
-        Each of these is a place where a check runs on an assumption because the
-        regulation is silent or says two things. None of them is resolved by
-        pressing anything on this page; they are resolved by counsel saying
-        which way it goes, after which the code changes.
-      */}
-      <section className="mt-12">
-        <h2 className="font-semibold text-2xl">Open readings</h2>
-        <p className="mt-1 max-w-3xl text-muted-foreground text-sm">
-          {readings.length} questions where a check runs on an assumption. Each is pinned by an assertion so it cannot
-          be smoothed over before it is answered. These are questions for counsel; nothing on this page answers or
-          records an answer to one.
-        </p>
-
-        <div className="mt-4 space-y-3">
-          {readings.map((reading) => (
-            <div key={reading.id} className="rounded-lg border border-border p-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <HelpCircle className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                <span className="font-mono text-sm">{reading.id}</span>
-                <Badge variant="secondary">{reading.surface}</Badge>
-                <span className="text-muted-foreground text-xs">
-                  {reading.jurisdictions.map((j) => JURISDICTION_NAMES[j]).join(', ')}
-                </span>
-                {reading.changesVerdicts && <Badge variant="warning">changes verdicts</Badge>}
-              </div>
-
-              <p className="mt-2 text-sm">{reading.question}</p>
-              <p className="mt-2 text-muted-foreground text-sm">{reading.effect}</p>
-              <p className="mt-2 font-mono text-muted-foreground text-xs">pinned by mca/{reading.pinnedBy.file}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
+          </section>
+        )}
+      </div>
+    </LegalWorkspace>
   );
 }

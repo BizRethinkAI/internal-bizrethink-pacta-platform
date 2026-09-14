@@ -1,14 +1,16 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import type { LegalReading } from '../../legal-ui/reading';
 import { contentFor } from '../catalogue';
 import { isMcaApprovalCurrent, type McaClauseApproval } from '../clauses/approval';
 import { INSTRUMENTS } from '../clauses/instruments';
-import { type McaTenant, resolveClauses } from '../clauses/parties';
+import { type McaTenant, resolveClauses, resolveParties } from '../clauses/parties';
 import type { ClauseVariance, WhyThisClause } from '../clauses/types';
 import type { McaJurisdiction } from '../jurisdictions';
 import { contentForReview } from '../reusable/review';
 import { type BriefingSection, counselBriefing } from './briefing';
 import { type McaLibraryReview, reviewIsStale } from './link';
 import { type ReadableMcaClause, toReadableAgreement } from './readable-agreement';
+import { readingContextsForReview, readingForReview } from './reading-presentation';
 
 /**
  * Everything a reviewing attorney is sent, in one object — and the reason it is
@@ -40,6 +42,7 @@ import { type ReadableMcaClause, toReadableAgreement } from './readable-agreemen
  */
 
 export type CounselReviewClause = ReadableMcaClause & {
+  reading: LegalReading;
   /** Current-clause assessments required by ADR 0014, distinct from historical findings. */
   whyThisClause: WhyThisClause;
   variance: ClauseVariance;
@@ -69,6 +72,7 @@ export type CounselReviewSection = {
 };
 
 export type CounselReviewView = {
+  readingContexts: Record<string, Record<string, LegalReading>>;
   reviewerName: string;
   instrument: { id: string; title: string; counterparty: string };
   /** Whose paper the reviewer is reading. A tenant fact, not a library one. */
@@ -105,6 +109,7 @@ export const counselReviewView = (input: CounselReviewInput): CounselReviewView 
   const approvalFor = (slug: string) => approvals.get(slug) ?? null;
 
   return {
+    readingContexts: readingContextsForReview([review.instrument], (text) => resolveParties(text, tenant)),
     reviewerName: review.reviewerName,
     instrument: {
       id: instrument.id,
@@ -139,6 +144,7 @@ export const counselReviewView = (input: CounselReviewInput): CounselReviewView 
 
         return {
           ...readable,
+          reading: readingForReview(clause.slug, (text) => resolveParties(text, tenant)),
           whyThisClause: clause.whyThisClause,
           variance: clause.variance,
           appliesInStates: clause.appliesInStates,

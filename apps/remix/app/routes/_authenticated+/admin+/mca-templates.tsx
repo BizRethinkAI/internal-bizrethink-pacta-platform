@@ -1,9 +1,12 @@
+import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { McaTemplateAdminHub } from '@bizrethink/customizations/mca/components/provider-templates';
 import { McaWorkspaceNav } from '@bizrethink/customizations/mca/components/workspace-nav';
 import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
 import { prisma } from '@documenso/prisma';
 import { useLoaderData } from 'react-router';
 import type { Route } from './+types/mca-templates';
+
+export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: legalStyles }];
 
 export const loader = async ({ request }: Route.LoaderArgs) => {
   const user = await requireAdminLoader(request);

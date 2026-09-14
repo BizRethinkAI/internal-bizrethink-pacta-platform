@@ -1,10 +1,11 @@
-import {
-  JURISDICTION_TIERS,
-  jurisdictionLabel,
-  jurisdictionName,
-  PORTABLE_TIERS,
-} from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
+import { jurisdictionLabel, jurisdictionName } from '@bizrethink/customizations/lease/clauses/approval-jurisdiction';
+import { browseLeaseScope } from '@bizrethink/customizations/lease/clauses/browse-scope';
 import { outstandingFindings } from '@bizrethink/customizations/lease/clauses/findings';
+import { filterCatalogue } from '@bizrethink/customizations/legal-ui/catalogue';
+import { CatalogueToolbar } from '@bizrethink/customizations/legal-ui/catalogue-toolbar';
+import { LegalSummary, LegalText, LegalWorkspace, legalItemId } from '@bizrethink/customizations/legal-ui/reader';
+import { subjectLabel } from '@bizrethink/customizations/legal-ui/reading';
+import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { prisma } from '@documenso/prisma';
@@ -17,21 +18,24 @@ import { Label } from '@documenso/ui/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
 import {
-  AlertTriangle,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Loader2,
-  MessageSquareWarning,
-  ShieldCheck,
+  AlertTriangleIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  Loader2Icon,
+  MessageSquareWarningIcon,
+  ShieldCheckIcon,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useSearchParams } from 'react-router';
 
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/lease-library';
+
+export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: legalStyles }];
 
 /**
  * The clause library, and attorney sign-off on it.
@@ -180,7 +184,20 @@ export default function ClauseLibraryPage() {
     unreviewable — and attorney review is the critical path for the whole
     product, not a background task.
   */
-  const [jurisdiction, setJurisdiction] = useState<'US-FL' | 'US-NC'>('US-FL');
+  const [params, setParams] = useSearchParams();
+  const scope = ['US-FL', 'US-NC', 'all', 'shared'].includes(params.get('scope') ?? '')
+    ? (params.get('scope') ?? 'US-FL')
+    : 'US-FL';
+  const jurisdiction =
+    scope === 'US-NC' || (['all', 'shared'].includes(scope) && params.get('coverage') === 'US-NC') ? 'US-NC' : 'US-FL';
+  const setJurisdiction = (value: 'US-FL' | 'US-NC') => {
+    const next = new URLSearchParams(params);
+    next.set('coverage', value);
+    if (!['all', 'shared'].includes(scope)) {
+      next.set('scope', value);
+    }
+    setParams(next, { preventScrollReset: true });
+  };
 
   const library = trpc.bizrethink.leaseBuilder.clauseLibrary.list.useQuery({ organisationId, jurisdiction });
 
@@ -264,198 +281,227 @@ export default function ClauseLibraryPage() {
     "does that approval cover the lease I am about to assemble" — the same
     question the counsel badge asks, so both now come from the one helper.
   */
-  const published = clauses.filter((clause) => clause.approvedForJurisdiction).length;
+  const scoped = browseLeaseScope(clauses, scope);
+  const published = scoped.filter((clause) => clause.approvedForJurisdiction).length;
+  const filtered = filterCatalogue(
+    scoped.map((clause) => ({
+      ...clause,
+      approved: clause.approvedForJurisdiction,
+      outstanding: stillOpen.filter((row) => row.clauseSlug === clause.slug).length,
+    })),
+    params,
+  );
 
   /*
     Grouped by the law each clause depends on. The rows arrive in
     `inReviewOrder`, so a group's members are already in document order and this
     only has to split them.
   */
-  const tiers = JURISDICTION_TIERS.map((tier) => ({
-    tier,
-    rows: clauses.filter((clause) => clause.jurisdiction === tier),
-  })).filter((group) => group.rows.length > 0);
+  const groups = [...new Set(filtered.map((clause) => clause.section))].map((section) => ({
+    section,
+    rows: filtered.filter((clause) => clause.section === section),
+  }));
 
   return (
-    <div className="mx-auto w-full max-w-screen-lg px-4 pb-16 md:px-8">
-      <div className="mt-8">
-        <h1 className="font-semibold text-3xl">Lease clause library</h1>
-        {/*
-          THE OLD HEADING WAS FALSE FOR 36 OF 64. It read "Every clause a
-          Florida lease can be assembled from", which is true as a set and reads
-          as a claim that all of them are Florida law. Most of them are not:
-          they turn on no state's law at all, which is the whole reason a second
-          state is a filter rather than a second copy of the library.
-        */}
-        <p className="mt-1 max-w-2xl text-muted-foreground">
-          Every clause the library holds, grouped by the law it depends on. A lease is assembled from its own
-          state&rsquo;s clauses plus the ones that turn on no state&rsquo;s law. A clause reaches a third party only
-          once an attorney has approved the exact words below.
+    <LegalWorkspace>
+      <div className="min-w-0 pb-12">
+        <p className="mb-2 text-muted-foreground text-xs uppercase tracking-widest">
+          <Trans>Residential leases</Trans>
         </p>
-      </div>
-
-      {clauses.length > 0 && (
-        <Alert className="mt-6" variant={published === clauses.length ? 'default' : 'warning'}>
-          <ShieldCheck className="h-4 w-4" />
-          <AlertTitle>
-            {published} of {clauses.length} clauses carry an approval that covers a {jurisdictionName(jurisdiction)}{' '}
-            lease
-          </AlertTitle>
-          <AlertDescription>
-            {published === clauses.length
-              ? 'Every clause in the library carries a current approval.'
-              : 'The rest render only inside this organisation and cannot be sent to a third party.'}
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/*
-        Stated plainly rather than buried. Someone reading this page a year
-        from now needs to know what the approval record actually is.
-      */}
-      <Alert className="mt-4">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle>What an approval here is, and is not</AlertTitle>
-        <AlertDescription>
-          You record an attorney's approval on their behalf, under their name and bar number. It is a record of their
-          sign-off, not a signature by them. An approval is pinned to the exact wording shown — editing a clause lapses
-          it, and the clause returns to unapproved.
-        </AlertDescription>
-      </Alert>
-
-      {/*
-        Read-only on the other end. A token holder sees every clause and why it
-        exists; recording an approval stays in here, where it is attributable to
-        someone who signed in. Sending a link should not grant write access.
-      */}
-      <div className="mt-8 rounded-lg border p-4">
-        <h2 className="font-semibold">Send the library to counsel</h2>
-        <p className="mt-1 text-muted-foreground text-sm">
-          They open a link and read every clause with its provenance — no account needed. The link is read-only, and you
-          can revoke it.
+        <h1 className="font-semibold text-3xl tracking-tight">
+          <Trans>Lease clause library</Trans>
+        </h1>
+        <p className="mt-2 max-w-2xl text-muted-foreground text-sm leading-relaxed">
+          <Trans>
+            Browse reusable wording by jurisdiction and subject. Read complete variants, sources and the approval
+            evidence for each clause.
+          </Trans>
         </p>
+        <fieldset className="mt-5 flex min-w-0 flex-wrap gap-2" aria-label="Lease browsing scope">
+          {[
+            { id: 'US-FL', label: 'Florida' },
+            { id: 'US-NC', label: 'North Carolina' },
+            { id: 'all', label: 'All clauses' },
+            { id: 'shared', label: 'Shared clauses' },
+          ].map((option) => (
+            <Button
+              key={option.id}
+              variant={scope === option.id ? 'secondary' : 'ghost'}
+              size="sm"
+              aria-pressed={scope === option.id}
+              onClick={() => {
+                const next = new URLSearchParams(params);
+                next.set('scope', option.id);
+                next.set('coverage', jurisdiction);
+                next.delete('item');
+                next.delete('subject');
+                setParams(next, { preventScrollReset: true });
+              }}
+            >
+              {option.label} · {browseLeaseScope(clauses, option.id).length}
+            </Button>
+          ))}
+        </fieldset>
+        <LegalSummary
+          values={[
+            { label: <Trans>Clauses in scope</Trans>, value: scoped.length },
+            { label: `Approvals covering ${jurisdictionName(jurisdiction)}`, value: published },
+            {
+              label: <Trans>Open findings in scope</Trans>,
+              value: stillOpen.filter((row) => scoped.some((clause) => clause.slug === row.clauseSlug)).length,
+            },
+          ]}
+        />
+        <label className="mb-4 flex flex-wrap items-center gap-3 text-sm">
+          <Trans>Assess approval coverage for</Trans>
+          <select
+            aria-label="Approval coverage jurisdiction"
+            className="rounded-md border bg-background px-3 py-2"
+            value={jurisdiction}
+            onChange={(event) => setJurisdiction(event.target.value as 'US-FL' | 'US-NC')}
+          >
+            <option value="US-FL">Florida</option>
+            <option value="US-NC">North Carolina</option>
+          </select>
+        </label>
+        <p className="mb-5 text-muted-foreground text-xs">
+          <Trans>
+            All and Shared describe library membership. Approval badges apply only to the jurisdiction named above and
+            to the exact reviewed wording.
+          </Trans>
+        </p>
+        <details className="rounded-lg border bg-muted/20 p-4">
+          <summary className="cursor-pointer font-medium text-sm">
+            <Trans>Review links & counsel findings</Trans> · {liveShares.length} links · {stillOpen.length} outstanding
+          </summary>
+          <div className="mt-8 rounded-lg border p-4">
+            <h2 className="font-semibold">Send the library to counsel</h2>
+            <p className="mt-1 text-muted-foreground text-sm">
+              They open a link and read every clause with its provenance — no account needed. The link is read-only, and
+              you can revoke it.
+            </p>
 
-        {liveShares.length > 0 && (
-          <ul className="mt-4 space-y-2">
-            {liveShares.map((row, index) => (
-              <li key={row.id} className="flex items-start justify-between gap-4 rounded border p-3">
-                <div>
-                  <p className="font-medium text-sm">{row.reviewerName}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {row.reviewerEmail} · {jurisdictionLabel(row.jurisdiction)}
-                  </p>
-                  {/*
+            {liveShares.length > 0 && (
+              <ul className="mt-4 space-y-2">
+                {liveShares.map((row, index) => (
+                  <li key={row.id} className="flex items-start justify-between gap-4 rounded border p-3">
+                    <div>
+                      <p className="font-medium text-sm">{row.reviewerName}</p>
+                      <p className="text-muted-foreground text-xs">
+                        {row.reviewerEmail} · {jurisdictionLabel(row.jurisdiction)}
+                      </p>
+                      {/*
                     Two live links for the same person rendered as identical
                     cards on the tenant reviewer page, and the wrong one got
                     copied. Newest first, and it says which.
                   */}
-                  <p
-                    className={
-                      index === 0
-                        ? 'mt-1 font-medium text-[#a2560c] text-xs dark:text-[#d99a4e]'
-                        : 'mt-1 text-muted-foreground text-xs'
-                    }
-                  >
-                    {index === 0 ? 'Current link — send this one' : 'Superseded. Revoke it so it cannot be opened.'}
-                  </p>
-                </div>
-                <div className="flex flex-none items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={revokeShare.isPending}
-                    onClick={() => revokeShare.mutate({ organisationId, shareId: row.id })}
-                  >
-                    Revoke
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => void copyShare(row.token, row.id)}>
-                    {copiedShare === row.id ? 'Copied' : 'Copy link'}
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+                      <p
+                        className={
+                          index === 0
+                            ? 'mt-1 font-medium text-[#a2560c] text-xs dark:text-[#d99a4e]'
+                            : 'mt-1 text-muted-foreground text-xs'
+                        }
+                      >
+                        {index === 0 ? 'Current link — send this one' : 'Superseded. Revoke it so it cannot be opened.'}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        disabled={revokeShare.isPending}
+                        onClick={() => revokeShare.mutate({ organisationId, shareId: row.id })}
+                      >
+                        Revoke
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => void copyShare(row.token, row.id)}>
+                        {copiedShare === row.id ? 'Copied' : 'Copy link'}
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
 
-        {sharing ? (
-          <div className="mt-4 space-y-3">
-            <div>
-              <Label htmlFor="counsel-name">Attorney's name</Label>
-              <Input
-                id="counsel-name"
-                className="mt-1"
-                value={counselName}
-                onChange={(event) => setCounselName(event.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="counsel-email">Email</Label>
-              <Input
-                id="counsel-email"
-                type="email"
-                className="mt-1"
-                value={counselEmail}
-                onChange={(event) => setCounselEmail(event.target.value)}
-              />
-            </div>
+            {sharing ? (
+              <div className="mt-4 space-y-3">
+                <div>
+                  <Label htmlFor="counsel-name">Attorney's name</Label>
+                  <Input
+                    id="counsel-name"
+                    className="mt-1"
+                    value={counselName}
+                    onChange={(event) => setCounselName(event.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="counsel-email">Email</Label>
+                  <Input
+                    id="counsel-email"
+                    type="email"
+                    className="mt-1"
+                    value={counselEmail}
+                    onChange={(event) => setCounselEmail(event.target.value)}
+                  />
+                </div>
 
-            {/*
+                {/*
               WHICH LIBRARY GOES ON THE LINK. Every link used to carry all 64
               clauses whatever it was for. One option, because the library holds
               one state — the control exists so that adding the second is a line
               here rather than a redesign, and so the page says out loud that a
               link covers a jurisdiction.
             */}
-            <div>
-              <Label htmlFor="counsel-jurisdiction">Which library</Label>
-              <Select value={jurisdiction} onValueChange={(value) => setJurisdiction(value as 'US-FL' | 'US-NC')}>
-                <SelectTrigger id="counsel-jurisdiction" className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="US-FL">A Florida lease</SelectItem>
-                  <SelectItem value="US-NC">A North Carolina lease</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="mt-1 text-muted-foreground text-xs">
-                The link carries the clauses that reach a lease in this state — the ones that turn on its law, plus the
-                ones that turn on no state&rsquo;s law.
-              </p>
-            </div>
+                <div>
+                  <Label htmlFor="counsel-jurisdiction">Which library</Label>
+                  <Select value={jurisdiction} onValueChange={(value) => setJurisdiction(value as 'US-FL' | 'US-NC')}>
+                    <SelectTrigger id="counsel-jurisdiction" className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="US-FL">A Florida lease</SelectItem>
+                      <SelectItem value="US-NC">A North Carolina lease</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="mt-1 text-muted-foreground text-xs">
+                    The link carries the clauses that reach a lease in this state — the ones that turn on its law, plus
+                    the ones that turn on no state&rsquo;s law.
+                  </p>
+                </div>
 
-            {share.error && (
-              <Alert variant="destructive">
-                <AlertDescription>{share.error.message}</AlertDescription>
-              </Alert>
+                {share.error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{share.error.message}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="flex gap-2">
+                  <Button
+                    disabled={counselName.trim() === '' || counselEmail.trim() === '' || share.isPending}
+                    onClick={() =>
+                      share.mutate({
+                        organisationId,
+                        reviewerName: counselName.trim(),
+                        reviewerEmail: counselEmail.trim(),
+                        jurisdiction,
+                      })
+                    }
+                  >
+                    Create the link
+                  </Button>
+                  <Button variant="ghost" onClick={() => setSharing(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button variant="outline" className="mt-4" onClick={() => setSharing(true)}>
+                Send it to counsel
+              </Button>
             )}
-
-            <div className="flex gap-2">
-              <Button
-                disabled={counselName.trim() === '' || counselEmail.trim() === '' || share.isPending}
-                onClick={() =>
-                  share.mutate({
-                    organisationId,
-                    reviewerName: counselName.trim(),
-                    reviewerEmail: counselEmail.trim(),
-                    jurisdiction,
-                  })
-                }
-              >
-                Create the link
-              </Button>
-              <Button variant="ghost" onClick={() => setSharing(false)}>
-                Cancel
-              </Button>
-            </div>
           </div>
-        ) : (
-          <Button variant="outline" className="mt-4" onClick={() => setSharing(true)}>
-            Send it to counsel
-          </Button>
-        )}
-      </div>
 
-      {/*
+          {/*
         THE OTHER END OF THE REVIEW LINK.
 
         Counsel could record a finding and nothing on this side displayed it.
@@ -463,102 +509,128 @@ export default function ClauseLibraryPage() {
         solve; a finding arriving into an unread table is the same problem with
         an extra step.
       */}
-      <div className="mt-8 rounded-lg border p-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="flex items-center gap-2 font-semibold">
-            <MessageSquareWarning className="h-4 w-4" />
-            What counsel found
-          </h2>
-          {findingRows.length > 0 && (
-            <p className="text-muted-foreground text-sm">
-              {stillOpen.length} outstanding of {findingRows.length}
+          <div className="mt-8 rounded-lg border p-4">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="flex items-center gap-2 font-semibold">
+                <MessageSquareWarningIcon className="h-4 w-4" />
+                What counsel found
+              </h2>
+              {findingRows.length > 0 && (
+                <p className="text-muted-foreground text-sm">
+                  {stillOpen.length} outstanding of {findingRows.length}
+                </p>
+              )}
+            </div>
+
+            <p className="mt-1 text-muted-foreground text-sm">
+              A finding is a defect report against text we are calling lawful, not a comment. It holds its clause
+              unapproved until somebody answers it here, in writing.
             </p>
-          )}
-        </div>
 
-        <p className="mt-1 text-muted-foreground text-sm">
-          A finding is a defect report against text we are calling lawful, not a comment. It holds its clause unapproved
-          until somebody answers it here, in writing.
-        </p>
+            {findings.isLoading && (
+              <p className="mt-4 flex items-center gap-2 text-muted-foreground text-sm">
+                <Loader2Icon className="h-4 w-4 animate-spin" /> Loading findings…
+              </p>
+            )}
 
-        {findings.isLoading && (
-          <p className="mt-4 flex items-center gap-2 text-muted-foreground text-sm">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading findings…
-          </p>
-        )}
+            {!findings.isLoading && findingRows.length === 0 && (
+              <p className="mt-4 text-muted-foreground text-sm">
+                Nothing recorded yet. Findings appear here as counsel works through the link above.
+              </p>
+            )}
 
-        {!findings.isLoading && findingRows.length === 0 && (
-          <p className="mt-4 text-muted-foreground text-sm">
-            Nothing recorded yet. Findings appear here as counsel works through the link above.
-          </p>
-        )}
-
-        {findingsByClause.length > 0 && (
-          <ul className="mt-4 space-y-4">
-            {findingsByClause.map((group) => (
-              <FindingGroup
-                key={group.clauseSlug}
-                clauseSlug={group.clauseSlug}
-                heading={clauses.find((clause) => clause.slug === group.clauseSlug)?.heading ?? null}
-                rows={group.rows}
-                organisationId={organisationId}
-                onAnswered={async () => {
-                  await findings.refetch();
-                  /*
+            {findingsByClause.length > 0 && (
+              <ul className="mt-4 space-y-4">
+                {findingsByClause.map((group) => (
+                  <FindingGroup
+                    key={group.clauseSlug}
+                    clauseSlug={group.clauseSlug}
+                    heading={clauses.find((clause) => clause.slug === group.clauseSlug)?.heading ?? null}
+                    rows={group.rows}
+                    organisationId={organisationId}
+                    onAnswered={async () => {
+                      await findings.refetch();
+                      /*
                     The library too: answering a finding is what releases the
                     clause for approval, and the approval form on this page
                     refuses while one is outstanding.
                   */
-                  await library.refetch();
-                }}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {library.isLoading && (
-        <p className="mt-8 flex items-center gap-2 text-muted-foreground text-sm">
-          <Loader2 className="h-4 w-4 animate-spin" /> Loading the library…
+                      await library.refetch();
+                      await shares.refetch();
+                    }}
+                  />
+                ))}
+              </ul>
+            )}
+          </div>
+        </details>
+        <CatalogueToolbar subjects={[...new Set(scoped.map((item) => item.section))]} />
+        <p role="status" className="text-muted-foreground text-xs">
+          {filtered.length} / {scoped.length} <Trans>clauses in this scope</Trans>
         </p>
-      )}
-
-      {/*
-        GROUPED BY THE LAW EACH CLAUSE DEPENDS ON, which this page never showed.
-        Sixty-four rows in module-concatenation order told a reviewer nothing
-        about which of them their admission covers, and the split has been real
-        in `libraryFor()` since 2026-09-06.
-      */}
-      {tiers.map((group) => (
-        <section key={group.tier} className="mt-8">
-          <h2 className="font-semibold text-lg">{jurisdictionLabel(group.tier)}</h2>
-          <p className="mt-0.5 text-muted-foreground text-sm">
-            {group.rows.length} {group.rows.length === 1 ? 'clause' : 'clauses'} ·{' '}
-            {PORTABLE_TIERS.has(group.tier)
-              ? 'In every state\u2019s library.'
-              : `Only in a ${jurisdictionName(group.tier)} lease.`}
+        {library.error && (
+          <p role="alert" className="my-4 text-destructive">
+            {library.error.message}
           </p>
+        )}
+        {shares.error && (
+          <p role="alert" className="my-4 text-destructive">
+            {shares.error.message}
+          </p>
+        )}
+        {findings.error && (
+          <p role="alert" className="my-4 text-destructive">
+            {findings.error.message}
+          </p>
+        )}
+        {!library.isLoading && filtered.length === 0 && (
+          <p className="my-8 rounded-lg border border-dashed p-6 text-center text-muted-foreground">
+            <Trans>No clauses match these filters.</Trans>
+          </p>
+        )}
+        {library.isLoading && (
+          <p className="mt-8 flex items-center gap-2 text-muted-foreground text-sm">
+            <Loader2Icon className="h-4 w-4 animate-spin" /> Loading the library…
+          </p>
+        )}
 
-          <ul className="mt-3 space-y-2">
-            {group.rows.map((clause) => (
-              <ClauseRowItem
-                key={clause.slug}
-                clause={clause}
-                /*
+        {/*
+        Subject groups keep related wording together. Each row retains the
+        jurisdiction label, and approval coverage names its jurisdiction above.
+      */}
+        {groups.map((group) => (
+          <section key={group.section} className="mt-8">
+            <h2 className="font-semibold text-lg">{subjectLabel(group.section)}</h2>
+            <p className="mt-0.5 text-muted-foreground text-sm">
+              {group.rows.length} {group.rows.length === 1 ? 'clause' : 'clauses'} ·{' '}
+              <Trans>Full wording and variants</Trans>
+            </p>
+
+            <ul className="mt-3 space-y-2">
+              {group.rows.map((clause) => (
+                <ClauseRowItem
+                  key={clause.slug}
+                  clause={clause}
+                  /*
                   Shown on the row rather than only discovered on submit. The
                   guard in `approve` refuses, but a refusal after somebody has
                   typed a name, a bar number and a jurisdiction is a worse way
                   to learn it.
                 */
-                outstanding={stillOpen.filter((row) => row.clauseSlug === clause.slug).length}
-                organisationId={organisationId}
-                onApproved={() => void library.refetch()}
-              />
-            ))}
-          </ul>
-        </section>
-      ))}
-    </div>
+                  outstanding={stillOpen.filter((row) => row.clauseSlug === clause.slug).length}
+                  organisationId={organisationId}
+                  onApproved={() => {
+                    void library.refetch();
+                    void shares.refetch();
+                    void findings.refetch();
+                  }}
+                />
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </LegalWorkspace>
   );
 }
 
@@ -645,7 +717,7 @@ const FindingGroup = ({
                     disabled={draft.trim() === '' || answerFinding.isPending}
                     onClick={() => answerFinding.mutate({ organisationId, findingId: row.id, answer: draft.trim() })}
                   >
-                    {answerFinding.isPending ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : null}
+                    {answerFinding.isPending ? <Loader2Icon className="mr-2 h-3 w-3 animate-spin" /> : null}
                     Record the answer
                   </Button>
                 </div>
@@ -657,7 +729,7 @@ const FindingGroup = ({
 
       {answerFinding.error && (
         <Alert variant="destructive" className="mt-3">
-          <AlertTriangle className="h-4 w-4" />
+          <AlertTriangleIcon className="h-4 w-4" />
           <AlertTitle>Not recorded</AlertTitle>
           <AlertDescription>{answerFinding.error.message}</AlertDescription>
         </Alert>
@@ -677,7 +749,17 @@ const ClauseRowItem = ({
   organisationId: string;
   onApproved: () => void;
 }) => {
-  const [open, setOpen] = useState(false);
+  const [rowParams, setRowParams] = useSearchParams();
+  const open = rowParams.get('item') === clause.slug;
+  const setOpen = (value: boolean) => {
+    const next = new URLSearchParams(rowParams);
+    if (value) {
+      next.set('item', clause.slug);
+    } else {
+      next.delete('item');
+    }
+    setRowParams(next, { preventScrollReset: true });
+  };
   const [name, setName] = useState('');
   const [bar, setBar] = useState('');
   const [admitted, setAdmitted] = useState('');
@@ -701,17 +783,19 @@ const ClauseRowItem = ({
   const lapsed = clause.approval?.lapsed === true;
 
   return (
-    <li className="rounded-lg border">
+    <li className="rounded-lg border" data-lease-slug={clause.slug}>
       <button
         type="button"
-        className="flex w-full items-start justify-between gap-4 p-4 text-left"
-        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full flex-wrap items-start justify-between gap-3 p-4 text-left hover:bg-muted/30"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        id={legalItemId(clause.slug)}
       >
         <div className="flex gap-3">
           {open ? (
-            <ChevronDown className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
+            <ChevronDownIcon className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
           ) : (
-            <ChevronRight className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
+            <ChevronRightIcon className="mt-1 h-4 w-4 flex-none text-muted-foreground" />
           )}
           <div>
             <p className="font-medium">{clause.heading}</p>
@@ -724,6 +808,32 @@ const ClauseRowItem = ({
               three the heading is off-screen.
             */}
             <p className="mt-0.5 text-muted-foreground text-xs">{jurisdictionLabel(clause.jurisdiction)}</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {outstanding > 0 && (
+            <Badge variant="destructive">
+              {outstanding === 1 ? '1 finding outstanding' : `${outstanding} findings outstanding`}
+            </Badge>
+          )}
+          {lapsed && <Badge variant="destructive">Lapsed — text changed</Badge>}
+          {approved ? (
+            <Badge>
+              <CheckIcon className="mr-1 h-3 w-3" />
+              Approved
+            </Badge>
+          ) : (
+            !lapsed && <Badge variant="neutral">Unapproved</Badge>
+          )}
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t p-4">
+          <LegalText text={clause.body} />
+          <details className="mt-5 rounded-lg border bg-muted/20 p-4">
+            <summary className="cursor-pointer font-medium text-sm">Context & provenance</summary>{' '}
             {/*
               WHY THIS CLAUSE EXISTS. The page used to show the slug and the
               section — true, and useless to a reviewer, who cannot tell a
@@ -757,30 +867,7 @@ const ClauseRowItem = ({
                   : 'Safe-harbour form — the statute asks for "substantially" this.'
                 : 'Drafted in-house. No attorney has reviewed these words.'}
             </p>{' '}
-          </div>
-        </div>
-
-        <div className="flex flex-none items-center gap-2">
-          {outstanding > 0 && (
-            <Badge variant="destructive">
-              {outstanding === 1 ? '1 finding outstanding' : `${outstanding} findings outstanding`}
-            </Badge>
-          )}
-          {lapsed && <Badge variant="destructive">Lapsed — text changed</Badge>}
-          {approved ? (
-            <Badge>
-              <Check className="mr-1 h-3 w-3" />
-              Approved
-            </Badge>
-          ) : (
-            !lapsed && <Badge variant="neutral">Unapproved</Badge>
-          )}
-        </div>
-      </button>
-
-      {open && (
-        <div className="border-t p-4">
-          <p className="whitespace-pre-wrap rounded-md bg-muted/40 p-4 text-sm leading-relaxed">{clause.body}</p>
+          </details>
 
           {clause.approval && (
             <p className="mt-3 text-muted-foreground text-sm">
@@ -805,7 +892,7 @@ const ClauseRowItem = ({
               */}
               {outstanding > 0 && (
                 <Alert className="mt-3" variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTriangleIcon className="h-4 w-4" />
                   <AlertTitle>Held by an unanswered finding</AlertTitle>
                   <AlertDescription>
                     Counsel recorded a finding against this clause that nobody has answered. Answer it under &ldquo;What
@@ -816,7 +903,7 @@ const ClauseRowItem = ({
 
               {clause.verbatimRequired && (
                 <Alert className="mt-3">
-                  <ShieldCheck className="h-4 w-4" />
+                  <ShieldCheckIcon className="h-4 w-4" />
                   <AlertTitle>This text is prescribed by statute</AlertTitle>
                   <AlertDescription>
                     {clause.citation} requires substantially these words, and a paraphrase does not discharge the
@@ -887,7 +974,7 @@ const ClauseRowItem = ({
 
               {approve.error && (
                 <Alert variant="destructive" className="mt-4">
-                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTriangleIcon className="h-4 w-4" />
                   <AlertTitle>Not recorded</AlertTitle>
                   <AlertDescription>{approve.error.message}</AlertDescription>
                 </Alert>
@@ -910,7 +997,7 @@ const ClauseRowItem = ({
                   })
                 }
               >
-                {approve.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                {approve.isPending ? <Loader2Icon className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Record approval of this wording
               </Button>
             </div>

@@ -9,10 +9,12 @@ import { Trans } from '@lingui/react/macro';
 import { useId, useState } from 'react';
 import { type FieldPath, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { Link, useSearchParams } from 'react-router';
-
+import { focusReadingItem, LegalWorkspace } from '../../legal-ui/reader';
+import { subjectLabel } from '../../legal-ui/reading';
 import type { McaTemplateSnapshot } from '../templates/compile';
 import { mcaDraftControls } from '../transactions/fill';
 import { emptyMcaDraftInput, type McaDraftInput, ZMcaDraftInput } from '../transactions/input';
+import { McaPackageReader } from './package-reader';
 
 export const McaTemplateUseWorkspace = ({ teamId, teamUrl }: { teamId: number; teamUrl: string }) => {
   const [search] = useSearchParams();
@@ -23,45 +25,47 @@ export const McaTemplateUseWorkspace = ({ teamId, teamUrl }: { teamId: number; t
     { enabled: Boolean(id) && Number.isInteger(version) && version > 0, retry: false, refetchOnWindowFocus: false },
   );
   return (
-    <div className="mx-auto max-w-5xl space-y-5 p-4 sm:p-6">
-      <Link className="text-sm underline" to={`/t/${teamUrl}/mca${id ? `?template=${encodeURIComponent(id)}` : ''}`}>
-        <Trans>Back to provider templates</Trans>
-      </Link>
-      <h1 className="font-semibold text-2xl">
-        <Trans>Prepare an MCA transaction draft</Trans>
-      </h1>
-      <p className="text-muted-foreground">
-        <Trans>
-          Enter this transaction's facts. Provider policy stays with the saved template. This workspace produces
-          internal review copies with blank signature locations.
-        </Trans>
-      </p>
-      {template.error && <p role="alert">{template.error.message}</p>}
-      {template.isLoading && (
-        <p>
-          <Trans>Loading the selected template…</Trans>
+    <LegalWorkspace>
+      <div className="mx-auto max-w-5xl space-y-5 p-4 sm:p-6">
+        <Link className="text-sm underline" to={`/t/${teamUrl}/mca${id ? `?template=${encodeURIComponent(id)}` : ''}`}>
+          <Trans>Back to provider templates</Trans>
+        </Link>
+        <h1 className="font-semibold text-2xl">
+          <Trans>Prepare an MCA transaction draft</Trans>
+        </h1>
+        <p className="text-muted-foreground">
+          <Trans>
+            Enter this transaction's facts. Provider policy stays with the saved template. This workspace produces
+            internal review copies with blank signature locations.
+          </Trans>
         </p>
-      )}
-      {!id && (
-        <p>
-          <Trans>Select a saved provider template first.</Trans>
-        </p>
-      )}
-      {template.data &&
-        (template.data.currentRevision !== version ? (
-          <p role="alert">
-            <Trans>Choose the latest provider revision before starting a new transaction.</Trans>
+        {template.error && <p role="alert">{template.error.message}</p>}
+        {template.isLoading && (
+          <p>
+            <Trans>Loading the selected template…</Trans>
           </p>
-        ) : (
-          <McaDraftInterview
-            key={`${id}:${version}`}
-            teamId={teamId}
-            templateId={id}
-            version={version}
-            template={template.data}
-          />
-        ))}
-    </div>
+        )}
+        {!id && (
+          <p>
+            <Trans>Select a saved provider template first.</Trans>
+          </p>
+        )}
+        {template.data &&
+          (template.data.currentRevision !== version ? (
+            <p role="alert">
+              <Trans>Choose the latest provider revision before starting a new transaction.</Trans>
+            </p>
+          ) : (
+            <McaDraftInterview
+              key={`${id}:${version}`}
+              teamId={teamId}
+              templateId={id}
+              version={version}
+              template={template.data}
+            />
+          ))}
+      </div>
+    </LegalWorkspace>
   );
 };
 
@@ -88,7 +92,7 @@ const McaDraftInterview = ({
   const currentEquipment = watched.equipmentElection;
   const hasEquipment = currentEquipment === 'lease' || currentEquipment === 'subscription';
   const equipmentInstrument = currentEquipment === 'lease' ? 'equipment-lease' : 'subscription';
-  const fieldId = useId();
+  const _fieldId = useId();
   const refresh = form.handleSubmit(
     async (draft) => {
       setError(null);
@@ -233,13 +237,16 @@ const McaDraftInterview = ({
                         return true;
                       })
                       .map((control) => (
-                        <div key={control.binding} className="space-y-1">
-                          <label htmlFor={`${fieldId}-${control.binding}`} className="font-medium text-sm">
+                        <div key={control.binding} className="space-y-1 rounded-md border bg-background p-3">
+                          <p className="mb-2 text-muted-foreground text-xs uppercase tracking-wide">
+                            {subjectLabel(control.binding.split('.')[0])}
+                          </p>
+                          <label htmlFor={`draft-input-values.${control.binding}`} className="font-medium text-sm">
                             {control.label}
                             {control.required ? ' *' : ''}
                           </label>
                           <Input
-                            id={`${fieldId}-${control.binding}`}
+                            id={`draft-input-values.${control.binding}`}
                             type={control.kind === 'date' ? 'date' : 'text'}
                             inputMode={control.kind === 'currency' ? 'decimal' : undefined}
                             value={field.value[control.binding] ?? ''}
@@ -264,13 +271,15 @@ const McaDraftInterview = ({
                 Identify who will sign in each role. Nothing entered here is a signature or an authorization.
               </Trans>
             </p>
-            <SignerInputs role="merchant" label={t`Merchant representative`} />
-            <SignerInputs role="buyer" label={t`Receivables buyer representative`} />
-            {hasEquipment && <SignerInputs role="equipmentProvider" label={t`Equipment provider representative`} />}
+            <SignerInputs signerRole="merchant" label={t`Merchant representative`} />
+            <SignerInputs signerRole="buyer" label={t`Receivables buyer representative`} />
+            {hasEquipment && (
+              <SignerInputs signerRole="equipmentProvider" label={t`Equipment provider representative`} />
+            )}
             {watched.includeChannelAgreement && (
               <>
-                <SignerInputs role="isoCompany" label={t`ISO company representative`} />
-                <SignerInputs role="isoPartner" label={t`ISO partner representative`} />
+                <SignerInputs signerRole="isoCompany" label={t`ISO company representative`} />
+                <SignerInputs signerRole="isoPartner" label={t`ISO partner representative`} />
               </>
             )}
           </section>
@@ -322,47 +331,18 @@ const McaDraftInterview = ({
               <ul className="space-y-1 text-sm">
                 {preview.data.missing.map((entry, index) => (
                   <li key={`${entry.document}-${entry.binding}-${index}`}>
-                    {entry.document}: {entry.label}
+                    <button
+                      type="button"
+                      className="text-left text-primary underline underline-offset-4"
+                      onClick={() => focusReadingItem(`draft-input-${entry.inputPath}`)}
+                    >
+                      {entry.document}: {entry.label}
+                    </button>
                   </li>
                 ))}
               </ul>
             </details>
-            {preview.data.documents.map((document) => (
-              <details key={document.id} className="rounded border p-3">
-                <summary className="cursor-pointer font-medium">{document.title}</summary>
-                <div className="mt-4 space-y-5">
-                  {document.items.map((item) => (
-                    <article key={item.slug}>
-                      <h3 className="font-semibold">
-                        {item.number ? `${item.number} ` : ''}
-                        {item.heading}
-                      </h3>
-                      <p className="whitespace-pre-wrap text-sm">{item.body}</p>
-                      {item.fields.length > 0 && (
-                        <dl className="mt-2 space-y-1 text-sm">
-                          {item.fields
-                            .filter((field) => field.kind !== 'signature' && !field.binding.endsWith('.signedDate'))
-                            .map((field) => (
-                              <div key={field.widget}>
-                                <dt className="text-muted-foreground">{field.label}</dt>
-                                <dd>{field.value || '—'}</dd>
-                              </div>
-                            ))}
-                        </dl>
-                      )}
-                    </article>
-                  ))}
-                  <h3 className="font-semibold">
-                    <Trans>Separate unsigned execution locations</Trans>
-                  </h3>
-                  {document.signatures.map((signature, index) => (
-                    <p key={`${signature.role}-${index}`} className="text-sm">
-                      {signature.role}: {signature.partyName} — {signature.signerName} ({signature.capacity})
-                    </p>
-                  ))}
-                </div>
-              </details>
-            ))}
+            <McaPackageReader documents={preview.data.documents} />
             <Button type="button" disabled={!isPreviewCurrent || downloading} onClick={() => void download()}>
               <Trans>Download internal draft PDF</Trans>
             </Button>
@@ -381,9 +361,10 @@ const DraftText = ({ name, label }: { name: FieldPath<McaDraftInput>; label: str
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel htmlFor={`draft-input-${name}`}>{label}</FormLabel>
           <FormControl>
             <Input
+              id={`draft-input-${name}`}
               name={field.name}
               ref={field.ref}
               onBlur={field.onBlur}
@@ -397,7 +378,7 @@ const DraftText = ({ name, label }: { name: FieldPath<McaDraftInput>; label: str
     />
   );
 };
-const SignerInputs = ({ role, label }: { role: keyof McaDraftInput['signers']; label: string }) => (
+const SignerInputs = ({ signerRole: role, label }: { signerRole: keyof McaDraftInput['signers']; label: string }) => (
   <fieldset className="space-y-3 rounded border p-3">
     <legend className="px-1 font-medium">{label}</legend>
     <div className="grid gap-3 sm:grid-cols-3">
@@ -463,6 +444,7 @@ const GuarantorInputs = ({ instrument, label }: { instrument: keyof McaDraftInpu
         </fieldset>
       ))}
       <Button
+        id={`draft-input-guarantors.${instrument}`}
         type="button"
         variant="outline"
         disabled={fields.length >= 10}

@@ -32,7 +32,7 @@ const cleanup = async (userId: number) => {
 
 test('a saved provider template opens a stateless transaction interview and downloads an unsigned review PDF', async ({
   page,
-}) => {
+}, testInfo) => {
   test.setTimeout(60_000);
   const own = await seedUser();
   const team = own.organisation.teams[0];
@@ -48,12 +48,16 @@ test('a saved provider template opens a stateless transaction interview and down
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca?template=${saved.id}`);
     await page.getByRole('link', { name: 'Use this template', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Prepare an MCA transaction draft', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Preview filled draft', exact: true }).click();
+    await page.getByText('Missing inputs', { exact: true }).click();
+    await page.getByRole('button', { name: 'package: Transaction reference', exact: true }).click();
+    await expect(page.getByLabel('Transaction reference', { exact: true })).toBeFocused();
     await page.getByLabel('Transaction reference', { exact: true }).fill('SYNTHETIC-BROWSER-DRAFT');
-    await page.locator('input[id$="-merchant.legalName"]').fill('Example Merchant Inc.');
-    await page.locator('input[id$="-merchant.documentTaxIdentifier"]').fill('12-3456789');
-    await page.locator('input[id$="-account.documentIdentifier"]').fill('****4321');
-    await page.locator('input[id$="-funding.purchasePrice"]').fill('10000.00');
-    await page.locator('input[id$="-funding.purchasedAmount"]').fill('14000.00');
+    await page.locator('input[id="draft-input-values.merchant.legalName"]').fill('Example Merchant Inc.');
+    await page.locator('input[id="draft-input-values.merchant.documentTaxIdentifier"]').fill('12-3456789');
+    await page.locator('input[id="draft-input-values.account.documentIdentifier"]').fill('****4321');
+    await page.locator('input[id="draft-input-values.funding.purchasePrice"]').fill('10000.00');
+    await page.locator('input[id="draft-input-values.funding.purchasedAmount"]').fill('14000.00');
     for (const [role, name] of [
       ['Merchant representative', 'Merchant Signer'],
       ['Receivables buyer representative', 'Buyer Signer'],
@@ -75,10 +79,12 @@ test('a saved provider template opens a stateless transaction interview and down
     await page.getByRole('button', { name: 'Preview filled draft', exact: true }).click();
     const preview = page.locator('[data-mca-filled-preview]');
     await expect(preview).toContainText('Internal transaction draft');
-    await preview.getByText('Future Receivables Purchase Agreement', { exact: true }).click();
+    await preview.getByLabel('Package document', { exact: true }).selectOption('frpa');
     await expect(preview).toContainText('Example Merchant Inc.');
     await expect(preview).toContainText('Guarantor: Separate Guarantor LLC — Entity Officer (Manager)');
     await expect(preview).toContainText('First Draft Guarantor');
+    await preview.getByText('Internal transaction draft', { exact: true }).scrollIntoViewIfNeeded();
+    await page.screenshot({ path: testInfo.outputPath('transaction-package.png'), fullPage: false });
     const downloadButton = page.getByRole('button', { name: 'Download internal draft PDF', exact: true });
     await expect(downloadButton).toBeEnabled();
     await page.getByLabel('Transaction reference', { exact: true }).fill('SYNTHETIC-REVISED-DRAFT');
