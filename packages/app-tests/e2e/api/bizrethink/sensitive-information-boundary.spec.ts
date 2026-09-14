@@ -66,7 +66,8 @@ test('A-21 a rejected direct-template request keeps its bearer and recipient ema
     }),
     headers: { 'content-type': 'application/json', 'x-request-id': canary },
   });
-  expect(response.status(), await response.text()).toBe(404);
+  expect(response.status(), await response.text()).toBe(400);
+  expect((await response.json()).error.json.data.code).toBe('INVALID_REQUEST');
   await assertSafeRequestLog(response.headers()['x-request-id'], canary);
 });
 
