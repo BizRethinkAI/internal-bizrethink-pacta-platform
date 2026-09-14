@@ -1,8 +1,9 @@
-import { generateAvaliableRecipientPlaceholder } from '@documenso/lib/utils/templates';
-import { prisma } from '@documenso/prisma';
-import { EnvelopeType } from '@prisma/client';
+// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
+import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
+import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
+import { generateAvaliableRecipientPlaceholder } from '@documenso/lib/utils/templates';
+import { EnvelopeType } from '@prisma/client';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type DeleteTemplateDirectLinkOptions = {
@@ -26,33 +27,25 @@ export const deleteTemplateDirectLink = async ({
     teamId,
   });
 
-  const envelope = await prisma.envelope.findUnique({
-    where: envelopeWhereInput,
-    include: {
-      directLink: true,
-      recipients: true,
-    },
-  });
+  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
+    const { directLink } = envelope;
 
-  if (!envelope) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Template not found',
-    });
-  }
+    if (!directLink) {
+      return;
+    }
 
-  const { directLink } = envelope;
-
-  if (!directLink) {
-    return;
-  }
-
-  await prisma.$transaction(async (tx) => {
     await tx.recipient.update({
       where: {
         envelopeId: envelope.id,
         id: directLink.directTemplateRecipientId,
       },
       data: {
+        ...(await recipientIdentityReset(
+          tx,
+          envelope.recipients.find((row) => row.id === directLink.directTemplateRecipientId),
+          generateAvaliableRecipientPlaceholder(envelope.recipients),
+          envelope.fields,
+        )),
         ...generateAvaliableRecipientPlaceholder(envelope.recipients),
       },
     });

@@ -248,6 +248,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
   // here includes the reminder we just sent and gates the next one.
   if (recipient.sentAt) {
     await updateRecipientNextReminder({
+      recipientToken: recipient.token,
       recipientId: recipient.id,
       envelopeId: envelope.id,
       sentAt: recipient.sentAt,

@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 088): provider results retain the bearer identity checked before signing.
+import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
@@ -370,69 +372,81 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
   // stays unsigned and the session row stays attached. `envelopeItem.
   // documentDataId` is preserved across the run; only `documentData.{type,
   // data}` changes. Mirrors `materializeTspAnchorsForEnvelope`.
-  await prisma.$transaction(async (tx) => {
-    for (const { envelopeItemDataId, uploadedType, uploadedData } of signedItemDataUpdates) {
-      await tx.documentData.update({
-        where: { id: envelopeItemDataId },
-        data: { type: uploadedType, data: uploadedData },
+  const committed = await prisma
+    .$transaction(async (tx) => {
+      await assertCurrentRecipientAuthority(tx, { recipient, envelope });
+      for (const { envelopeItemDataId, uploadedType, uploadedData } of signedItemDataUpdates) {
+        await tx.documentData.update({
+          where: { id: envelopeItemDataId },
+          data: { type: uploadedType, data: uploadedData },
+        });
+      }
+
+      await tx.recipient.update({
+        where: { id: recipient.id },
+        data: {
+          signingStatus: SigningStatus.SIGNED,
+          signedAt: new Date(),
+        },
       });
-    }
 
-    await tx.recipient.update({
-      where: { id: recipient.id },
-      data: {
-        signingStatus: SigningStatus.SIGNED,
-        signedAt: new Date(),
-      },
+      const authOptions = extractDocumentAuthMethods({
+        documentAuth: envelope.authOptions,
+        recipientAuth: recipient.authOptions,
+      });
+
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
+          envelopeId: envelope.id,
+          user: {
+            name: recipient.name,
+            email: recipient.email,
+          },
+          requestMetadata,
+          data: {
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientId: recipient.id,
+            recipientRole: recipient.role,
+            actionAuth: authOptions.derivedRecipientActionAuth,
+          },
+        }),
+      });
+
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGNED,
+          envelopeId: envelope.id,
+          user: { name: recipient.name, email: recipient.email },
+          requestMetadata,
+          data: {
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientId: recipient.id,
+            recipientRole: recipient.role,
+            providerId: credential.providerId,
+            credentialId: credential.credentialId,
+            sessionId,
+            numItemsSigned: signedItemDataUpdates.length,
+            signatureAlgorithm: credential.signatureAlgorithm,
+            digestAlgorithm: credential.digestAlgorithm,
+          },
+        }),
+      });
+
+      await consumeCscSession(sessionId, tx);
+      return true;
+    })
+    .catch((cause: unknown) => {
+      if (cause instanceof AppError && cause.code === AppErrorCode.RECIPIENT_ALREADY_SIGNED) {
+        return false;
+      }
+      throw cause;
     });
-
-    const authOptions = extractDocumentAuthMethods({
-      documentAuth: envelope.authOptions,
-      recipientAuth: recipient.authOptions,
-    });
-
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
-        envelopeId: envelope.id,
-        user: {
-          name: recipient.name,
-          email: recipient.email,
-        },
-        requestMetadata,
-        data: {
-          recipientEmail: recipient.email,
-          recipientName: recipient.name,
-          recipientId: recipient.id,
-          recipientRole: recipient.role,
-          actionAuth: authOptions.derivedRecipientActionAuth,
-        },
-      }),
-    });
-
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGNED,
-        envelopeId: envelope.id,
-        user: { name: recipient.name, email: recipient.email },
-        requestMetadata,
-        data: {
-          recipientEmail: recipient.email,
-          recipientName: recipient.name,
-          recipientId: recipient.id,
-          recipientRole: recipient.role,
-          providerId: credential.providerId,
-          credentialId: credential.credentialId,
-          sessionId,
-          numItemsSigned: signedItemDataUpdates.length,
-          signatureAlgorithm: credential.signatureAlgorithm,
-          digestAlgorithm: credential.digestAlgorithm,
-        },
-      }),
-    });
-
-    await consumeCscSession(sessionId, tx);
-  });
+  if (!committed) {
+    return { outcome: 'already_signed' };
+  }
 
   // Post-tx side effects (webhooks, emails, next-signer advancement, seal
   // job dispatch). Inlined rather than shared with the SES completion path —

@@ -146,6 +146,7 @@ export const cscOAuthCallbackRoute = new Hono<HonoCscEnv>().get(
         const serviceTokenExpiresAt = tokens.accessTokenExpiresAt();
 
         await upsertCscCredential({
+          recipientToken: cookie.recipientToken,
           recipientId: recipient.id,
           providerId: transport.serviceBaseUrl,
           credentialId,
@@ -254,6 +255,7 @@ export const cscOAuthCallbackRoute = new Hono<HonoCscEnv>().get(
     const sadExpiresAt = tokens.accessTokenExpiresAt();
 
     await updateCscSessionWithSad({
+      recipientToken: cookie.recipientToken,
       sessionId: cookie.sessionId,
       encryptedSad: sadCiphertext,
       sadExpiresAt,

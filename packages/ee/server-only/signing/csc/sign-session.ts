@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 088): bind provider proof writes to the current recipient bearer.
+import { withCurrentCscRecipient } from '@bizrethink/customizations/server-only/recipient-authority';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { type TCscSessionItems, ZCscSessionItemsSchema } from '@documenso/lib/types/csc-session';
 import { prisma } from '@documenso/prisma';
@@ -34,6 +36,7 @@ export type CscSessionRow = {
 };
 
 type UpsertCscSessionInput = {
+  recipientToken: string;
   recipientId: number;
   envelopeId: string;
   signingTime: Date;
@@ -49,29 +52,35 @@ type UpsertCscSessionInput = {
 export const upsertCscSession = async (input: UpsertCscSessionInput): Promise<CscSessionRow> => {
   const { recipientId, envelopeId, signingTime, items } = input;
 
-  const row = await prisma.cscSession.upsert({
-    where: { recipientId },
-    create: {
-      recipientId,
-      envelopeId,
-      signingTime,
-      itemsJson: items,
-      encryptedSad: null,
-      sadExpiresAt: null,
-    },
-    update: {
-      envelopeId,
-      signingTime,
-      itemsJson: items,
-      encryptedSad: null,
-      sadExpiresAt: null,
-    },
-  });
+  return withCurrentCscRecipient(input.recipientToken, async (tx, recipient) => {
+    if (recipient.id !== recipientId || recipient.envelopeId !== envelopeId) {
+      throw new AppError(AppErrorCode.NOT_FOUND);
+    }
+    const row = await tx.cscSession.upsert({
+      where: { recipientId },
+      create: {
+        recipientId,
+        envelopeId,
+        signingTime,
+        itemsJson: items,
+        encryptedSad: null,
+        sadExpiresAt: null,
+      },
+      update: {
+        envelopeId,
+        signingTime,
+        itemsJson: items,
+        encryptedSad: null,
+        sadExpiresAt: null,
+      },
+    });
 
-  return toCscSessionRow(row);
+    return toCscSessionRow(row);
+  });
 };
 
 type UpdateCscSessionWithSadInput = {
+  recipientToken: string;
   sessionId: string;
   encryptedSad: Uint8Array;
   sadExpiresAt: Date;
@@ -86,17 +95,21 @@ export const updateCscSessionWithSad = async (input: UpdateCscSessionWithSadInpu
   const { sessionId, encryptedSad, sadExpiresAt } = input;
 
   try {
-    const row = await prisma.cscSession.update({
-      where: {
-        id: sessionId,
-      },
-      data: {
-        encryptedSad: Buffer.from(encryptedSad),
-        sadExpiresAt,
-      },
-    });
+    return await withCurrentCscRecipient(input.recipientToken, async (tx, recipient) => {
+      const row = await tx.cscSession.update({
+        where: {
+          id: sessionId,
+          recipientId: recipient.id,
+          envelopeId: recipient.envelopeId,
+        },
+        data: {
+          encryptedSad: Buffer.from(encryptedSad),
+          sadExpiresAt,
+        },
+      });
 
-    return toCscSessionRow(row);
+      return toCscSessionRow(row);
+    });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
       throw new AppError(AppErrorCode.NOT_FOUND, {

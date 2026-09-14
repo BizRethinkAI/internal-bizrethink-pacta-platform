@@ -1,5 +1,8 @@
+// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
+
 import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
 import { assertRecipientAccess } from '@bizrethink/customizations/server-only/recipient-access';
+import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
@@ -134,6 +137,7 @@ export const signEnvelopeFieldRoute = procedure
     // Early return for uninserting fields.
     if (!insertionValues.inserted) {
       return await prisma.$transaction(async (tx) => {
+        await assertCurrentRecipientAuthority(tx, { recipient, envelope, field });
         const updatedField = await tx.field.update({
           where: {
             id: field.id,
@@ -204,6 +208,7 @@ export const signEnvelopeFieldRoute = procedure
     }
 
     return await prisma.$transaction(async (tx) => {
+      await assertCurrentRecipientAuthority(tx, { recipient, envelope, field });
       const updatedField = await tx.field.update({
         where: {
           id: field.id,
