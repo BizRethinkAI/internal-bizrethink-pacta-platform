@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 // MODIFIED for BizRethink (overlay 074): one DB policy for every signup gate.
 import { getSignupPolicy, isEmailDomainAllowedForSignup } from '@bizrethink/customizations/server-only/signup-config';
 import {
@@ -58,6 +60,8 @@ import {
   ZUpdatePasswordSchema,
   ZVerifyEmailSchema,
 } from '../types/email-password';
+
+const serverConsole = createServerConsole('packages/auth/server/routes/email-password');
 
 export const emailPasswordRoute = new Hono<HonoAuthContext>()
   /**
@@ -262,7 +266,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     }
 
     const user = await createUser({ name, email, password, signature }).catch((err) => {
-      console.error(err);
+      serverConsole.error(err);
       throw err;
     });
 

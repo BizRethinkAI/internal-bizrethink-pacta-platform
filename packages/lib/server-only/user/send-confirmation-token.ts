@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 import crypto from 'crypto';
 import { DateTime } from 'luxon';
@@ -6,6 +8,8 @@ import { USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER } from '../../constants/email
 import { ONE_HOUR } from '../../constants/time';
 import { sendConfirmationEmail } from '../auth/send-confirmation-email';
 import { getMostRecentEmailVerificationToken } from './get-most-recent-email-verification-token';
+
+const serverConsole = createServerConsole('packages/lib/server-only/user/send-confirmation-token');
 
 type SendConfirmationTokenOptions = { email: string; force?: boolean };
 
@@ -59,7 +63,7 @@ export const sendConfirmationToken = async ({ email, force = false }: SendConfir
 
     return { success: true };
   } catch (err) {
-    console.log(err);
+    serverConsole.log(err);
     throw new Error(`Failed to send the confirmation email`);
   }
 };

@@ -1,6 +1,12 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { Stripe, stripe } from '../../../server-only/stripe';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TCancelOrganisationSubscriptionJobDefinition } from './cancel-organisation-subscription';
+
+const serverConsole = createServerConsole(
+  'packages/lib/jobs/definitions/internal/cancel-organisation-subscription.handler',
+);
 
 /**
  * Marks the given Stripe subscription for cancellation at the end of the
@@ -25,7 +31,7 @@ export const run = async ({ payload }: { payload: TCancelOrganisationSubscriptio
     // Subscription no longer exists in Stripe \u2014 nothing to cancel. Treat as
     // success so the job doesn't retry indefinitely.
     if (error instanceof Stripe.errors.StripeInvalidRequestError && error.code === 'resource_missing') {
-      console.warn(
+      serverConsole.warn(
         `[CANCEL_ORGANISATION_SUBSCRIPTION] Stripe subscription ${stripeSubscriptionId} no longer exists; skipping.`,
       );
 

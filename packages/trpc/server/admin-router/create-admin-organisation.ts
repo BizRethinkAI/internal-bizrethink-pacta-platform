@@ -1,5 +1,8 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
 import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
@@ -9,6 +12,8 @@ import {
   ZCreateAdminOrganisationRequestSchema,
   ZCreateAdminOrganisationResponseSchema,
 } from './create-admin-organisation.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/admin-router/create-admin-organisation');
 
 export const createAdminOrganisationRoute = adminProcedure
   .input(ZCreateAdminOrganisationRequestSchema)
@@ -36,7 +41,7 @@ export const createAdminOrganisationRoute = adminProcedure
 
     // BizRethink (overlay 041): record the trial window for the new org.
     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
-      console.error('[bizrethink] startTrialForNewOrg failed', err);
+      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
     });
 
     return {

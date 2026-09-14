@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
@@ -5,6 +7,8 @@ import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { buildTeamWhereQuery } from '../../utils/teams';
+
+const serverConsole = createServerConsole('packages/lib/server-only/team/update-team');
 
 export type UpdateTeamOptions = {
   userId: number;
@@ -50,7 +54,7 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): P
       },
     });
   } catch (err) {
-    console.error(err);
+    serverConsole.error(err);
 
     if (!(err instanceof Prisma.PrismaClientKnownRequestError)) {
       throw err;

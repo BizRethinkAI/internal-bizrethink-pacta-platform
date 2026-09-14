@@ -1,6 +1,9 @@
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 
 import { ZSiteSettingsWebhookSchema } from './site-settings/schemas/webhook';
+
+const serverConsole = createServerConsole('packages/bizrethink/server-only/webhook-config');
 
 // Phase I (overlay 017): DB-aware webhook SSRF bypass hosts loader.
 //
@@ -56,7 +59,7 @@ export const getWebhookSsrfBypassHosts = async (): Promise<Set<string>> => {
       }
     }
   } catch (err) {
-    console.warn(
+    serverConsole.warn(
       '[bizrethink/webhook-config] DB read failed; falling back to env-only SSRF bypass hosts:',
       err instanceof Error ? err.message : err,
     );

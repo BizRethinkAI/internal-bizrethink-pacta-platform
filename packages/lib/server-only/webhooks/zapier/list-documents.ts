@@ -1,9 +1,13 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, type Webhook } from '@prisma/client';
 
 import { mapSecondaryIdToDocumentId } from '../../../utils/envelope';
 import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
 import { validateApiToken } from './validateApiToken';
+
+const serverConsole = createServerConsole('packages/lib/server-only/webhooks/zapier/list-documents');
 
 export const listDocumentsHandler = async (req: Request) => {
   try {
@@ -83,7 +87,7 @@ export const listDocumentsHandler = async (req: Request) => {
 
     return Response.json([testWebhook]);
   } catch (err) {
-    console.error(err);
+    serverConsole.error(err);
 
     return Response.json(
       {

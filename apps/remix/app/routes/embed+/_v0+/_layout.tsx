@@ -1,8 +1,6 @@
+// MODIFIED for BizRethink (overlay 090): render diagnostics contain fixed metadata only.
+import { logRenderError } from '@bizrethink/customizations/log-render-error';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { Trans } from '@lingui/react/macro';
-import { useEffect } from 'react';
-import { isRouteErrorResponse, Outlet, useRouteError } from 'react-router';
-
 // MODIFIED for BizRethink (overlay 014): async getters for SSO flags + OIDC label.
 // Upstream reads IS_*_SSO_ENABLED / OIDC_PROVIDER_LABEL as module constants;
 // ours are DB-backed and therefore async (ADR 0004).
@@ -12,6 +10,9 @@ import {
   isMicrosoftSsoEnabled,
   isOidcSsoEnabled,
 } from '@documenso/lib/constants/auth';
+import { Trans } from '@lingui/react/macro';
+import { useEffect } from 'react';
+import { isRouteErrorResponse, Outlet, useRouteError } from 'react-router';
 
 import { EmbedAuthenticationRequired } from '~/components/embed/embed-authentication-required';
 import { EmbedDocumentCompleted } from '~/components/embed/embed-document-completed';
@@ -33,13 +34,12 @@ import type { Route } from './+types/_layout';
 
 export async function loader() {
   // SSO + label via DB-aware getters (overlay 014).
-  const [isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel] =
-    await Promise.all([
-      isGoogleSsoEnabled(),
-      isMicrosoftSsoEnabled(),
-      isOidcSsoEnabled(),
-      getOidcProviderLabel(),
-    ]);
+  const [isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel] = await Promise.all([
+    isGoogleSsoEnabled(),
+    isMicrosoftSsoEnabled(),
+    isOidcSsoEnabled(),
+    getOidcProviderLabel(),
+  ]);
 
   return {
     isGoogleSSOEnabled,
@@ -54,13 +54,12 @@ export default function Layout() {
 }
 
 export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
-  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } =
-    loaderData || {};
+  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData || {};
 
   const analytics = useAnalytics();
   const error = useRouteError();
 
-  console.log({ routeError: error });
+  logRenderError('embed', isRouteErrorResponse(error) ? error.status : 500);
 
   useEffect(() => {
     const isExpectedEmbedResponse =

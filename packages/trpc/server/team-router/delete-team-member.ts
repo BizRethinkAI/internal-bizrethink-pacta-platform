@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
@@ -7,6 +9,8 @@ import { OrganisationGroupType } from '@prisma/client';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZDeleteTeamMemberRequestSchema, ZDeleteTeamMemberResponseSchema } from './delete-team-member.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/team-router/delete-team-member');
 
 export const deleteTeamMemberRoute = authenticatedProcedure
   // .meta(deleteTeamMemberMeta)
@@ -96,7 +100,7 @@ export const deleteTeamMemberRoute = authenticatedProcedure
     // This means that the member was inherited (which means they should not be deleted directly)
     // or it means that they are not part of any team groups relating to this?
     if (team.teamGroups.length !== 1) {
-      console.error('Member must have 1 one internal team group. This should not happen.');
+      serverConsole.error('Member must have 1 one internal team group. This should not happen.');
 
       // Todo: Logging.
     }

@@ -1,4 +1,7 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 import { PassThrough } from 'node:stream';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { shouldLogRequestError } from '@bizrethink/customizations/server-only/should-log-request-error';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { dynamicActivate, extractLocaleData } from '@documenso/lib/utils/i18n';
@@ -12,6 +15,8 @@ import type { AppLoadContext, EntryContext, HandleErrorFunction } from 'react-ro
 import { ServerRouter } from 'react-router';
 
 import { langCookie } from './storage/lang-cookie.server';
+
+const serverConsole = createServerConsole('apps/remix/app/entry.server');
 
 export const streamTimeout = 5_000;
 
@@ -76,7 +81,7 @@ export default async function handleRequest(
           // errors encountered during initial shell rendering since they'll
           // reject and get logged in handleDocumentRequest.
           if (shellRendered) {
-            console.error(error);
+            serverConsole.error(error);
           }
         },
       },
@@ -101,5 +106,5 @@ export const handleError: HandleErrorFunction = (error, { request }) => {
     return;
   }
 
-  console.error(error);
+  serverConsole.error(error);
 };

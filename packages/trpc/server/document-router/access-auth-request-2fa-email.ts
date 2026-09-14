@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { TWO_FACTOR_EMAIL_EXPIRATION_MINUTES } from '@documenso/lib/server-only/2fa/email/constants';
 import { send2FATokenEmail } from '@documenso/lib/server-only/2fa/email/send-2fa-token-email';
 import { assertRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
@@ -14,6 +16,8 @@ import {
   ZAccessAuthRequest2FAEmailRequestSchema,
   ZAccessAuthRequest2FAEmailResponseSchema,
 } from './access-auth-request-2fa-email.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/document-router/access-auth-request-2fa-email');
 
 export const accessAuthRequest2FAEmailRoute = procedure
   .input(ZAccessAuthRequest2FAEmailRequestSchema)
@@ -90,7 +94,7 @@ export const accessAuthRequest2FAEmailRoute = procedure
         expiresAt: expiresAt.toJSDate(),
       };
     } catch (error) {
-      console.error('Error sending access auth 2FA email:', error);
+      serverConsole.error('Error sending access auth 2FA email:', error);
 
       if (error instanceof TRPCError) {
         throw error;

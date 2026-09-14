@@ -1,4 +1,6 @@
 // MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+// MODIFIED for BizRethink (overlay 090): server-generated request correlation and safe error diagnostics.
+import { HTTPException } from 'hono/http-exception';
 import { isMalformedPath } from '@bizrethink/customizations/server-only/is-malformed-path';
 import { requestBodyLimits } from '@bizrethink/customizations/server-only/resources/request-body-limits';
 import { tsRestHonoApp } from '@documenso/api/hono';
@@ -19,6 +21,7 @@ import { migrateDeletedAccountServiceAccount } from '@documenso/lib/server-only/
 import { migrateLegacyServiceAccount } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { env } from '@documenso/lib/utils/env';
 import { logger } from '@documenso/lib/utils/logger';
+export { safeSentryOptions } from '@bizrethink/customizations/server-only/logging/sentry-options';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 import { Hono } from 'hono';
 import { contextStorage } from 'hono/context-storage';
@@ -100,20 +103,25 @@ app.use(securityHeadersMiddleware);
  * RR7 app middleware.
  */
 app.use('*', appMiddleware);
-app.use('*', requestId());
+app.use('*', requestId({ headerName: '' }));
 app.use(async (c, next) => {
-  const metadata = c.get('context').requestMetadata;
-
   const honoLogger = logger.child({
     requestId: c.var.requestId,
     requestPath: c.req.path,
-    ipAddress: metadata.ipAddress,
-    userAgent: metadata.userAgent,
   });
 
   c.set('logger', honoLogger);
+  c.header('X-Request-Id', c.var.requestId);
 
   await next();
+});
+
+app.onError((err, c) => {
+  logger.error({ event: 'request.failed', err, requestId: c.var.requestId, requestPath: c.req.path });
+  if (err instanceof HTTPException) {
+    return err.getResponse();
+  }
+  return c.text('Internal Server Error', 500);
 });
 
 // Apply cors and rate limits to API routes.

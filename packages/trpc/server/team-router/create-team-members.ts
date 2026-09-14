@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
@@ -9,6 +11,8 @@ import { match } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZCreateTeamMembersRequestSchema, ZCreateTeamMembersResponseSchema } from './create-team-members.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/team-router/create-team-members');
 
 export const createTeamMembersRoute = authenticatedProcedure
   .input(ZCreateTeamMembersRequestSchema)
@@ -108,7 +112,7 @@ export const createTeamMembers = async ({ userId, teamId, membersToCreate }: Cre
   );
 
   if (!teamMemberGroup || !teamManagerGroup || !teamAdminGroup) {
-    console.error({
+    serverConsole.error({
       message: 'Team groups not found.',
       teamMemberGroup: Boolean(teamMemberGroup),
       teamManagerGroup: Boolean(teamManagerGroup),

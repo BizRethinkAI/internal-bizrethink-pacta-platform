@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import type { PDFDocument } from '@cantoo/pdf-lib';
 import { degrees, RotationTypes, radiansToDegrees, rgb } from '@cantoo/pdf-lib';
@@ -26,6 +28,8 @@ import {
   ZTextFieldMeta,
 } from '../../types/field-meta';
 import { getPageSize } from './get-page-size';
+
+const serverConsole = createServerConsole('packages/lib/server-only/pdf/legacy-insert-field-in-pdf');
 
 export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
@@ -207,7 +211,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
       const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
-        console.error(meta.error);
+        serverConsole.error(meta.error);
 
         throw new Error('Invalid checkbox field meta');
       }
@@ -248,7 +252,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
       const meta = ZRadioFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
-        console.error(meta.error);
+        serverConsole.error(meta.error);
 
         throw new Error('Invalid radio field meta');
       }

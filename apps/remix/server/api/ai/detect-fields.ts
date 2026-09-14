@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -9,6 +11,8 @@ import { streamText } from 'hono/streaming';
 
 import type { HonoEnv } from '../../router';
 import { ZDetectFieldsRequestSchema } from './detect-fields.types';
+
+const serverConsole = createServerConsole('apps/remix/server/api/ai/detect-fields');
 
 const KEEPALIVE_INTERVAL_MS = 5000;
 
@@ -117,7 +121,7 @@ export const detectFieldsRoute = new Hono<HonoEnv>().post(
 
           // The logger below it stringifies the error, using `console.error`
           // to attempt to get a stack trace
-          console.error(error);
+          serverConsole.error(error);
 
           logger.error({
             event: 'ai.detect-fields.error',

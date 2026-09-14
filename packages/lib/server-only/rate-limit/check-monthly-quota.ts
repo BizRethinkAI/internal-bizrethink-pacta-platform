@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobsClient } from '../../jobs/client';
@@ -5,6 +7,8 @@ import { generateDatabaseId } from '../../universal/id';
 import { currentMonthlyPeriod } from '../../universal/monthly-period';
 import { getQuotaAlertKind } from './get-quota-alert-kind';
 import type { LimitCounter } from './types';
+
+const serverConsole = createServerConsole('packages/lib/server-only/rate-limit/check-monthly-quota');
 
 type CheckMonthlyQuotaOptions = {
   organisationId: string;
@@ -82,7 +86,7 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
         },
       })
       .catch((error) => {
-        console.error({
+        serverConsole.error({
           msg: 'Failed to send organisation limit alert email',
           error,
         });

@@ -1,4 +1,7 @@
 // MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+const serverConsole = createServerConsole('apps/remix/server/api/files/files');
 import {
   getEnvelopeFileWhereInput,
   privateEnvelopeFileCache,
@@ -73,7 +76,7 @@ export const filesRoute = new Hono<HonoEnv>()
       if (error instanceof AppError) {
         return c.json({ error: error.message }, (error.statusCode ?? 400) as 400 | 408 | 413 | 429);
       }
-      console.error('Upload failed:', error);
+      serverConsole.error('Upload failed:', error);
       return c.json({ error: 'Upload failed' }, 500);
     }
   })

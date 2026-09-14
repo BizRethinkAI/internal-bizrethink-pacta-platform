@@ -1,3 +1,4 @@
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/crypto';
@@ -6,6 +7,8 @@ import { prisma } from '@documenso/prisma';
 import { bytesToUtf8 } from '@noble/ciphers/utils';
 
 import { isSsoDisabledByBuild } from '../feature-flags';
+
+const serverConsole = createServerConsole('packages/bizrethink/server-only/sso-provider-config');
 
 // Phase F (overlay 014): DB-backed SSO provider config.
 //
@@ -127,7 +130,7 @@ export const getProviderConfig = async (provider: Provider): Promise<ProviderCon
       where: { provider },
     });
   } catch (err) {
-    console.warn(
+    serverConsole.warn(
       '[bizrethink/sso-provider-config] DB read failed; falling back to env-only:',
       err instanceof Error ? err.message : err,
     );

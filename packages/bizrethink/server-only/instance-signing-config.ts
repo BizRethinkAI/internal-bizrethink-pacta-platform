@@ -1,8 +1,11 @@
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { symmetricDecrypt, symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { prisma } from '@documenso/prisma';
 import { bytesToUtf8 } from '@noble/ciphers/utils';
+
+const serverConsole = createServerConsole('packages/bizrethink/server-only/instance-signing-config');
 
 // Phase C (overlay 011): DB-backed signing config loader.
 //
@@ -110,7 +113,7 @@ export const getInstanceSigningConfig = async (): Promise<DecryptedSigningConfig
       where: { id: 'singleton' },
     });
   } catch (err) {
-    console.warn(
+    serverConsole.warn(
       '[bizrethink/instance-signing-config] DB read failed; returning null (env fallback):',
       err instanceof Error ? err.message : err,
     );

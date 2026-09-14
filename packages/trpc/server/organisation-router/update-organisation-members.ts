@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { generateDatabaseId } from '@documenso/lib/universal/id';
@@ -14,6 +16,8 @@ import {
   ZUpdateOrganisationMemberRequestSchema,
   ZUpdateOrganisationMemberResponseSchema,
 } from './update-organisation-members.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/organisation-router/update-organisation-members');
 
 export const updateOrganisationMemberRoute = authenticatedProcedure
   //   .meta(updateOrganisationMemberMeta)
@@ -121,7 +125,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
     const newMemberGroup = organisation.groups.find((group) => group.organisationRole === data.role);
 
     if (!currentMemberGroup) {
-      console.error('[CRITICAL]: Missing internal group');
+      serverConsole.error('[CRITICAL]: Missing internal group');
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
         message: 'Current member group not found',
@@ -129,7 +133,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
     }
 
     if (!newMemberGroup) {
-      console.error('[CRITICAL]: Missing internal group');
+      serverConsole.error('[CRITICAL]: Missing internal group');
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
         message: 'New member group not found',

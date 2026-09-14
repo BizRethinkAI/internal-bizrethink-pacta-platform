@@ -22,6 +22,9 @@
  * (same pattern as main.js).
  */
 import * as Sentry from '@sentry/node';
+// MODIFIED for BizRethink (overlay 090): the server entry exports the owned sanitizer for Rollup;
+// it has no app/database startup side effects and loads before instrumentation.
+import { safeSentryOptions } from './hono/packages/bizrethink/server-only/logging/sentry-options.js';
 
 const dsn = process.env.NEXT_PRIVATE_SENTRY_DSN;
 const nodeEnv = process.env.NODE_ENV;
@@ -51,36 +54,7 @@ if (shouldEnable) {
     // (Same trade-off CircularPay made.)
     sendDefaultPii: false,
 
-    // Scrub sensitive data — fintech/PCI hygiene.
-    beforeSend(event) {
-      // Query strings can contain signing tokens (e.g. /sign/:token URLs)
-      // that would be leaked into Sentry events otherwise.
-      if (event.request?.query_string) {
-        event.request.query_string = '[Filtered]';
-      }
-
-      // Cookies can contain session tokens — strip server-side.
-      if (event.request?.cookies) {
-        event.request.cookies = {};
-      }
-
-      // Authorization headers are session-bearing.
-      if (event.request?.headers) {
-        const headers = event.request.headers;
-
-        if (typeof headers === 'object' && !Array.isArray(headers)) {
-          if ('authorization' in headers) {
-            headers.authorization = '[Filtered]';
-          }
-
-          if ('cookie' in headers) {
-            headers.cookie = '[Filtered]';
-          }
-        }
-      }
-
-      return event;
-    },
+    ...safeSentryOptions,
   });
 }
 

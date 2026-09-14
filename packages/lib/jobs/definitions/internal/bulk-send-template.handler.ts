@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { BulkSendCompleteEmail } from '@documenso/email/templates/bulk-send-complete';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
@@ -16,6 +18,8 @@ import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TBulkSendTemplateJobDefinition } from './bulk-send-template';
+
+const serverConsole = createServerConsole('packages/lib/jobs/definitions/internal/bulk-send-template.handler');
 
 const ZRecipientRowSchema = z.object({
   name: z.string().optional(),
@@ -135,7 +139,7 @@ export const run = async ({ payload, io }: { payload: TBulkSendTemplateJobDefini
               requestMetadata: requestMetadata || {},
             },
           }).catch((err) => {
-            console.error(err);
+            serverConsole.error(err);
 
             throw new AppError('DOCUMENT_SEND_FAILED');
           });

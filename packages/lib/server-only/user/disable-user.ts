@@ -1,5 +1,9 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
+
+const serverConsole = createServerConsole('packages/lib/server-only/user/disable-user');
 
 export type DisableUserOptions = {
   id: number;
@@ -66,7 +70,7 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
       });
     });
   } catch (error) {
-    console.error('Error disabling user', error);
+    serverConsole.error('Error disabling user', error);
     throw error;
   }
 };

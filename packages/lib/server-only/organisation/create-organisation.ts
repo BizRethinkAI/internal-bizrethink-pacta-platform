@@ -1,5 +1,6 @@
 // MODIFIED for BizRethink (overlay 087): compose verified onboarding in one transaction.
 import { accountTransaction } from '@bizrethink/customizations/server-only/account-transaction';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 // MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
@@ -19,6 +20,8 @@ import { INTERNAL_CLAIM_ID } from '../../types/subscription';
 import { generateDatabaseId, prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
 import { createTeam } from '../team/create-team';
+
+const serverConsole = createServerConsole('packages/lib/server-only/organisation/create-organisation');
 
 type CreateOrganisationOptions = {
   userId: number;
@@ -63,7 +66,7 @@ export const createOrganisation = async ({
     })
       .then((customer) => customer.id)
       .catch((err) => {
-        console.error(err);
+        serverConsole.error(err);
 
         return undefined;
       });
@@ -192,7 +195,7 @@ export const createPersonalOrganisation = async ({
     claim: proSubscriptionClaim,
     transaction,
   }).catch((err) => {
-    console.error(err);
+    serverConsole.error(err);
 
     if (throwErrorOnOrganisationCreationFailure || transaction) {
       throw err;
@@ -210,7 +213,7 @@ export const createPersonalOrganisation = async ({
       if (transaction) {
         throw err;
       }
-      console.error('[bizrethink] startTrialForNewOrg failed', err);
+      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
     });
   }
 
@@ -226,7 +229,7 @@ export const createPersonalOrganisation = async ({
       if (transaction) {
         throw err;
       }
-      console.error(err);
+      serverConsole.error(err);
 
       // Todo: (LOGS)
     });

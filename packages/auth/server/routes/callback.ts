@@ -1,12 +1,15 @@
-import { Hono } from 'hono';
-
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { Hono } from 'hono';
 
 // MODIFIED for BizRethink (overlay 014): use async getters.
 import { getGoogleAuthOptions, getMicrosoftAuthOptions, getOidcAuthOptions } from '../config';
 import { handleOAuthCallbackUrl } from '../lib/utils/handle-oauth-callback-url';
 import { handleOAuthOrganisationCallbackUrl } from '../lib/utils/handle-oauth-organisation-callback-url';
 import type { HonoAuthContext } from '../types/context';
+
+const serverConsole = createServerConsole('packages/auth/server/routes/callback');
 
 /**
  * Have to create this route instead of bundling callback with oauth routes to provide
@@ -16,9 +19,7 @@ export const callbackRoute = new Hono<HonoAuthContext>()
   /**
    * OIDC callback verification.
    */
-  .get('/oidc', async (c) =>
-    handleOAuthCallbackUrl({ c, clientOptions: await getOidcAuthOptions() }),
-  )
+  .get('/oidc', async (c) => handleOAuthCallbackUrl({ c, clientOptions: await getOidcAuthOptions() }))
 
   /**
    * Organisation OIDC callback verification.
@@ -32,7 +33,7 @@ export const callbackRoute = new Hono<HonoAuthContext>()
         orgUrl,
       });
     } catch (err) {
-      console.error(err);
+      serverConsole.error(err);
 
       if (err instanceof Error) {
         throw new AppError(err.name, {
@@ -48,13 +49,9 @@ export const callbackRoute = new Hono<HonoAuthContext>()
   /**
    * Google callback verification.
    */
-  .get('/google', async (c) =>
-    handleOAuthCallbackUrl({ c, clientOptions: await getGoogleAuthOptions() }),
-  )
+  .get('/google', async (c) => handleOAuthCallbackUrl({ c, clientOptions: await getGoogleAuthOptions() }))
 
   /**
    * Microsoft callback verification.
    */
-  .get('/microsoft', async (c) =>
-    handleOAuthCallbackUrl({ c, clientOptions: await getMicrosoftAuthOptions() }),
-  );
+  .get('/microsoft', async (c) => handleOAuthCallbackUrl({ c, clientOptions: await getMicrosoftAuthOptions() }));

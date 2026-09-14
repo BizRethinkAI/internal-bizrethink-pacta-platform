@@ -1,8 +1,12 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { match } from 'ts-pattern';
 
 import { ERROR_CODES } from './errors';
 import { getServerLimits } from './server';
+
+const serverConsole = createServerConsole('packages/ee/server-only/limits/handler');
 
 export const limitsHandler = async (req: Request) => {
   try {
@@ -26,7 +30,7 @@ export const limitsHandler = async (req: Request) => {
       status: 200,
     });
   } catch (err) {
-    console.error('error', err);
+    serverConsole.error('error', err);
 
     if (err instanceof Error) {
       const status = match(err.message)

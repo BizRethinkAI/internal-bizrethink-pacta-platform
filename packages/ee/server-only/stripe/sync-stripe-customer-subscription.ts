@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import { type Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
@@ -6,6 +8,8 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationType, type Prisma, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 import { reconcileSeatBasedPlans } from './update-subscription-item-quantity';
+
+const serverConsole = createServerConsole('packages/ee/server-only/stripe/sync-stripe-customer-subscription');
 
 const LIVE_SUBSCRIPTION_STATUSES: Stripe.Subscription.Status[] = ['active', 'trialing', 'past_due'];
 
@@ -47,7 +51,9 @@ export const syncStripeCustomerSubscription = async ({
   );
 
   if (liveSubscriptions.length > 1) {
-    console.error(`Customer ${customerId} has ${liveSubscriptions.length} live subscriptions, expected at most 1`);
+    serverConsole.error(
+      `Customer ${customerId} has ${liveSubscriptions.length} live subscriptions, expected at most 1`,
+    );
 
     throw new Error(`Customer ${customerId} has multiple live subscriptions`);
   }
@@ -63,7 +69,7 @@ export const syncStripeCustomerSubscription = async ({
   });
 
   if (!organisation) {
-    console.error(`Organisation not found for customer ${customerId}, nothing to sync`);
+    serverConsole.error(`Organisation not found for customer ${customerId}, nothing to sync`);
 
     return;
   }
@@ -147,7 +153,7 @@ const handleLiveSubscription = async ({
   bypassClaimUpdate,
 }: HandleLiveSubscriptionOptions) => {
   if (subscription.items.data.length !== 1) {
-    console.error(`No support for multiple subscription items on subscription ${subscription.id}`);
+    serverConsole.error(`No support for multiple subscription items on subscription ${subscription.id}`);
 
     throw new Error(`No support for multiple subscription items on subscription ${subscription.id}`);
   }
@@ -157,7 +163,7 @@ const handleLiveSubscription = async ({
   const claim = await extractStripeClaim(subscriptionItem.price);
 
   if (!claim) {
-    console.error(`Subscription claim on ${subscriptionItem.price.id} not found`);
+    serverConsole.error(`Subscription claim on ${subscriptionItem.price.id} not found`);
 
     throw new Error(`Subscription claim on ${subscriptionItem.price.id} not found`);
   }
@@ -302,7 +308,7 @@ export const extractStripeClaim = async (priceId: Stripe.Price) => {
   });
 
   if (!subscriptionClaim) {
-    console.error(`Subscription claim ${claimId} not found`);
+    serverConsole.error(`Subscription claim ${claimId} not found`);
     return null;
   }
 

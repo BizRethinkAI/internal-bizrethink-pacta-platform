@@ -1,8 +1,11 @@
 import { jobs } from '@documenso/lib/jobs/client';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
+
+const serverConsole = createServerConsole('packages/bizrethink/server-only/auto-claim-invites-on-signup');
 import { pendingVerifiedOnboarding } from './verified-onboarding-receipt';
 
 export type AutoClaimedInvite = {
@@ -106,7 +109,7 @@ const reconcileVerifiedOnboarding = async ({
         name: 'send.organisation-member-joined.email',
         payload: { organisationId, memberUserId: userId },
       })
-      .catch(() => console.error('[verified-onboarding] member notification failed'));
+      .catch(() => serverConsole.error({ event: 'server.error' }));
   }
   return result.accepted;
 };
@@ -144,7 +147,7 @@ export const claimInvitesOnVerification = async ({ userId, email }: { userId: nu
     });
     return allowed ? await reconcileVerifiedOnboarding({ userId, userEmail: email, createFallback: true }) : [];
   } catch {
-    console.error('[verified-onboarding] reconciliation failed; retry available');
+    serverConsole.error({ event: 'verification.claim-failed' });
     return [];
   }
 };
@@ -156,6 +159,6 @@ export const recoverOnboardingOnLogin = async (userId: number) => {
       await reconcileVerifiedOnboarding({ userId, userEmail: user.email, createFallback: true });
     }
   } catch {
-    console.error('[verified-onboarding] login reconciliation unavailable');
+    serverConsole.error({ event: 'verification.claim-failed' });
   }
 };

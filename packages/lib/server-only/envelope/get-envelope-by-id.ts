@@ -1,4 +1,7 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 import { getApiTokenEnvelopeScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 import type { EnvelopeType, Prisma } from '@prisma/client';
 
@@ -7,6 +10,8 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { getTeamById } from '../team/get-team';
+
+const serverConsole = createServerConsole('packages/lib/server-only/envelope/get-envelope-by-id');
 
 export type GetEnvelopeByIdOptions = {
   id: EnvelopeIdOptions;
@@ -129,7 +134,7 @@ export type GetEnvelopeWhereInputOptions = {
 export const getEnvelopeWhereInput = async ({ id, userId, teamId, type }: GetEnvelopeWhereInputOptions) => {
   // Backup validation incase something goes wrong.
   if (!id.id || !userId || !teamId || type === undefined) {
-    console.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
+    serverConsole.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
 
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Envelope ID not found',

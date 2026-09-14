@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
@@ -40,6 +42,8 @@ import {
   ZUpdateTemplateFieldsRequestSchema,
   ZUpdateTemplateFieldsResponseSchema,
 } from './schema';
+
+const serverConsole = createServerConsole('packages/trpc/server/field-router/router');
 
 export const fieldRouter = router({
   /**
@@ -639,8 +643,8 @@ export const fieldRouter = router({
         error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
       });
 
-      // Raw console.log incase we're somehow deailing with a funky error object that doesn't serialize well.
-      console.log('Error signing field with token', err);
+      // Preserve safe diagnostics even for unusual error objects.
+      serverConsole.log('Error signing field with token', err);
 
       // Rethrow the error so that the client receives the appropriate error response.
       throw err;
@@ -676,7 +680,7 @@ export const fieldRouter = router({
           error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
         });
 
-        console.log('Error removing signed field with token', err);
+        serverConsole.log('Error removing signed field with token', err);
 
         // Rethrow the error so that the client receives the appropriate error response.
         throw err;

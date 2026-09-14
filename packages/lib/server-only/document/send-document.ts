@@ -1,4 +1,6 @@
 // MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { assertTrialDistribution } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { materializeTspAnchorsForEnvelope } from '@documenso/ee/server-only/signing/csc/materialize-anchors';
 import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
@@ -23,6 +25,8 @@ import { validateCheckboxLength } from '../../advanced-fields-validation/validat
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '../../constants/direct-templates';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
+
+const serverConsole = createServerConsole('packages/lib/server-only/document/send-document');
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import {
   ZCheckboxFieldMeta,
@@ -133,7 +137,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
   let signingOrder = envelope.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
   if (isTspEnvelope(envelope) && signingOrder === DocumentSigningOrder.PARALLEL && envelope.documentMeta) {
-    console.warn(
+    serverConsole.warn(
       `[CSC] Coercing signingOrder=PARALLEL → SEQUENTIAL for ${envelope.signatureLevel} envelope ${envelope.id} at send time. The schema-layer guard should have caught this earlier.`,
     );
 

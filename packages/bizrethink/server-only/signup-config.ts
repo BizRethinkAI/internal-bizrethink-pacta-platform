@@ -1,9 +1,12 @@
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
 import { ZSiteSettingsSignupSchema } from './site-settings/schemas/signup';
+
+const serverConsole = createServerConsole('packages/bizrethink/server-only/signup-config');
 
 // Phase D (overlay 012): DB-aware getters for signup-related settings.
 //
@@ -24,10 +27,7 @@ const readDbConfig = async () => {
       where: { id: 'site.signup' },
     });
   } catch (err) {
-    console.warn(
-      '[bizrethink/signup-config] DB read failed; treating signup as closed:',
-      err instanceof Error ? err.message : err,
-    );
+    serverConsole.warn({ event: 'signup.closed', reason: 'settings-unavailable', err });
     return null;
   }
 
@@ -37,10 +37,7 @@ const readDbConfig = async () => {
 
   const parsed = ZSiteSettingsSignupSchema.safeParse(row);
   if (!parsed.success) {
-    console.warn(
-      '[bizrethink/signup-config] site.signup row does not parse; treating signup as closed:',
-      parsed.error.message,
-    );
+    serverConsole.warn({ event: 'signup.closed', reason: 'settings-invalid', err: parsed.error });
     return null;
   }
 

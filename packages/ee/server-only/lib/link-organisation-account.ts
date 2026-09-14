@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { getOrganisationAuthenticationPortalOptions } from '@documenso/auth/server/lib/utils/organisation-portal';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import {
@@ -10,6 +12,8 @@ import { ZOrganisationAccountLinkMetadataSchema } from '@documenso/lib/types/org
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 import { UserSecurityAuditLogType } from '@prisma/client';
+
+const serverConsole = createServerConsole('packages/ee/server-only/lib/link-organisation-account');
 
 export interface LinkOrganisationAccountOptions {
   token: string;
@@ -64,7 +68,7 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
   const tokenMetadata = ZOrganisationAccountLinkMetadataSchema.safeParse(verificationToken.metadata);
 
   if (!tokenMetadata.success) {
-    console.error('Invalid token metadata', tokenMetadata.error);
+    serverConsole.error('Invalid token metadata', tokenMetadata.error);
 
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Verification token not found, used or expired',

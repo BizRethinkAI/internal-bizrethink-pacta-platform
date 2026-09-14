@@ -1,4 +1,6 @@
 // MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
@@ -6,6 +8,8 @@ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+
+const serverConsole = createServerConsole('packages/trpc/server/organisation-router/create-organisation');
 import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
@@ -135,7 +139,7 @@ export const createOrganisationRoute = authenticatedProcedure
 
     // BizRethink (overlay 041): record the trial window for the new org.
     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
-      console.error('[bizrethink] startTrialForNewOrg failed', err);
+      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
     });
 
     return {

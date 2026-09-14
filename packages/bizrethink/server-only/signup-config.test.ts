@@ -1,4 +1,5 @@
 import { env } from '@documenso/lib/utils/env';
+import { logger } from '@documenso/lib/utils/logger';
 
 import { prisma } from '@documenso/prisma';
 import type { SiteSettings } from '@prisma/client';
@@ -65,18 +66,22 @@ describe('isSignupDisabled', () => {
   });
 
   it('is closed when the DB read throws, and says why', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
     mockedFindFirst.mockRejectedValueOnce(new Error('Prisma connection failed'));
     expect(await isSignupDisabled()).toBe(true);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('closed'), expect.anything());
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'signup.closed', reason: 'settings-unavailable', err: { type: 'Error' } }),
+    );
     warn.mockRestore();
   });
 
   it('is closed when the row does not parse, and says why', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
     mockedFindFirst.mockResolvedValueOnce(dbRow({ ...OPEN, signupDisabled: 'no' }));
     expect(await isSignupDisabled()).toBe(true);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('closed'), expect.anything());
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'signup.closed', reason: 'settings-invalid', err: { type: 'ZodError' } }),
+    );
     warn.mockRestore();
   });
 

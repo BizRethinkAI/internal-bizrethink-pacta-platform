@@ -1,6 +1,9 @@
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 
 import { ZSiteSettingsCaptchaSchema } from './site-settings/schemas/captcha';
+
+const serverConsole = createServerConsole('packages/bizrethink/server-only/captcha-config');
 
 // Phase G (overlay 015): DB-aware captcha config getters.
 
@@ -12,15 +15,19 @@ const readDb = async () => {
       where: { id: 'site.captcha' },
     });
   } catch (err) {
-    console.warn(
+    serverConsole.warn(
       '[bizrethink/captcha-config] DB read failed; falling back to env-only:',
       err instanceof Error ? err.message : err,
     );
     return null;
   }
-  if (!row || !row.enabled) return null;
+  if (!row || !row.enabled) {
+    return null;
+  }
   const parsed = ZSiteSettingsCaptchaSchema.safeParse(row);
-  if (!parsed.success) return null;
+  if (!parsed.success) {
+    return null;
+  }
   return parsed.data.data;
 };
 
@@ -30,7 +37,9 @@ const readDb = async () => {
  */
 export const getTurnstileSiteKey = async (): Promise<string> => {
   const cfg = await readDb();
-  if (cfg && cfg.siteKey) return cfg.siteKey;
+  if (cfg && cfg.siteKey) {
+    return cfg.siteKey;
+  }
   return process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
 };
 
@@ -40,6 +49,8 @@ export const getTurnstileSiteKey = async (): Promise<string> => {
  */
 export const getTurnstileSecretKey = async (): Promise<string> => {
   const cfg = await readDb();
-  if (cfg && cfg.secretKey) return cfg.secretKey;
+  if (cfg && cfg.secretKey) {
+    return cfg.secretKey;
+  }
   return process.env.NEXT_PRIVATE_TURNSTILE_SECRET_KEY ?? '';
 };
