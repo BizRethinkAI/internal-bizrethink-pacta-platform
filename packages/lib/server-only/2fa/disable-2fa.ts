@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 087): removal stays bound to the proved factor.
+import { removeAccountMfa } from '@bizrethink/customizations/server-only/account-mfa';
 import { prisma } from '@documenso/prisma';
 import type { User } from '@prisma/client';
 import { UserSecurityAuditLogType } from '@prisma/client';
@@ -36,16 +38,7 @@ export const disableTwoFactorAuthentication = async ({
   }
 
   await prisma.$transaction(async (tx) => {
-    await tx.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        twoFactorEnabled: false,
-        twoFactorBackupCodes: null,
-        twoFactorSecret: null,
-      },
-    });
+    await removeAccountMfa(tx, user);
 
     await tx.userSecurityAuditLog.create({
       data: {

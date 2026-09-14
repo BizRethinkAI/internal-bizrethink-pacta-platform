@@ -182,3 +182,5 @@ packages/app-tests/e2e/bizrethink/legal-workspace-ui.spec.ts
 
 # A-19 recipient reassignment and in-flight bearer HTTP/PostgreSQL regression.
 packages/app-tests/e2e/api/bizrethink/recipient-identity.spec.ts
+# Account protection HTTP/PostgreSQL regressions (overlay 087).
+packages/app-tests/e2e/api/bizrethink/account-protection.spec.ts

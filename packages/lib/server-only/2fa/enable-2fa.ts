@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 087): confirm only the proved enrollment.
+import { activateAccountMfa } from '@bizrethink/customizations/server-only/account-mfa';
 import { prisma } from '@documenso/prisma';
 import { type User, UserSecurityAuditLogType } from '@prisma/client';
 
@@ -34,14 +36,7 @@ export const enableTwoFactorAuthentication = async ({
   let recoveryCodes: string[] = [];
 
   await prisma.$transaction(async (tx) => {
-    const updatedUser = await tx.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        twoFactorEnabled: true,
-      },
-    });
+    const updatedUser = await activateAccountMfa(tx, user);
 
     recoveryCodes = getBackupCodes({ user: updatedUser }) ?? [];
 

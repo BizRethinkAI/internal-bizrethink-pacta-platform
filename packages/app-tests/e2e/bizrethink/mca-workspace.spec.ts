@@ -11,7 +11,9 @@ import { expect, test } from '@playwright/test';
 import { apiSignin } from '../fixtures/authentication';
 import { signedInAsAdmin } from '../fixtures/bizrethink-auth';
 
-test('one MCA workspace separates numbered clauses, reusable content and read-only disclosures', async ({ page }) => {
+test('one MCA workspace separates numbered clauses, reusable content and read-only disclosures', async ({
+  page,
+}, testInfo) => {
   await signedInAsAdmin({ page, redirectPath: '/admin/mca-library' });
   const nav = page.getByRole('navigation', { name: 'MCA workspace' });
   await expect(page.getByRole('heading', { name: 'MCA Clauses', exact: true })).toBeVisible();
@@ -20,6 +22,10 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
   const numbers = await page.locator('[data-mca-number]').allTextContents();
   expect(numbers).toHaveLength(210);
   expect(numbers.every((number) => /^\d+\.\d+$/.test(number.trim()))).toBe(true);
+  const fundingSection = page.locator('[data-mca-section="funding-terms"]');
+  await expect(fundingSection.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+  await expect(fundingSection.locator('[data-mca-slug="frpa.holdback-explainer"] [data-mca-number]')).toHaveText('1.1');
+  await fundingSection.screenshot({ path: testInfo.outputPath('mca-funding-section.png') });
   await expect(page.getByRole('button', { name: /Merchant and Funding Information/ })).toHaveCount(0);
   await page.getByLabel('Instrument', { exact: true }).selectOption('frpa');
   await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(
@@ -27,6 +33,9 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
   );
   await page.getByLabel('Search library', { exact: true }).fill('no-such-clause-unique');
   await expect(page.locator('[data-mca-kind]')).toHaveCount(0);
+  await expect(page.locator('[data-mca-section]')).toHaveCount(0);
+  await page.getByLabel('Search library', { exact: true }).fill('Definitions');
+  await expect(page.getByRole('heading', { name: '3. Purchase', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
   await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(210);
 

@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 087): retry verified onboarding after successful authentication.
+import { recoverOnboardingOnLogin } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
 import { assertUserNotDisabledById } from '@documenso/lib/server-only/user/assert-user-not-disabled';
 import type { Context } from 'hono';
 
@@ -19,6 +21,8 @@ type AuthorizeUser = {
  */
 export const onAuthorize = async (user: AuthorizeUser, c: Context<HonoAuthContext>) => {
   await assertUserNotDisabledById({ userId: user.userId });
+
+  await recoverOnboardingOnLogin(user.userId);
 
   const metadata = c.get('requestMetadata');
 

@@ -6,7 +6,7 @@ import { verifyEmail } from './verify-email';
 // Overlay 071: pending organisation invites are claimed at verify-email time
 // (not at signup), so only an address the user proved they own can join the
 // inviting org. These tests pin that the claim runs on a successful
-// verification and on no other outcome.
+// verification and a still-valid completed-token retry; never on an invalid token.
 
 const mockedClaim = vi.fn();
 const mockedTriggerJob = vi.fn();
@@ -19,6 +19,7 @@ vi.mock('@documenso/prisma', () => ({
       updateMany: vi.fn(),
       deleteMany: vi.fn(),
     },
+    bizrethinkVerifiedOnboarding: { upsert: vi.fn() },
     user: {
       update: vi.fn(),
     },
@@ -95,13 +96,13 @@ describe('verifyEmail — overlay 071 invite claim', () => {
     expect(mockedTransaction).not.toHaveBeenCalled();
   });
 
-  it('does NOT claim on a second click (ALREADY_VERIFIED)', async () => {
+  it('reconciles on a second valid click without repeating verification (overlay 087)', async () => {
     mockedFindFirst.mockResolvedValueOnce(tokenFixture({ completed: true }) as never);
 
     const result = await verifyEmail({ token: 'tok' });
 
     expect(result.state).toBe(EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED);
-    expect(mockedClaim).not.toHaveBeenCalled();
+    expect(mockedClaim).toHaveBeenCalledWith({ userId: 7, email: 'jane@example.com' });
     expect(mockedTransaction).not.toHaveBeenCalled();
   });
 

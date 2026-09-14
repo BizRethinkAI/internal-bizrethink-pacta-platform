@@ -68,31 +68,35 @@ export const createSession = async (token: string, userId: number, metadata: Req
 export const validateSessionToken = async (token: string): Promise<SessionValidationResult> => {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
-  const result = await prisma.session.findUnique({
-    where: {
-      id: sessionId,
-    },
-    include: {
-      user: {
-        /**
-         * Do not expose anything sensitive here.
-         */
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          emailVerified: true,
-          avatarImageId: true,
-          twoFactorEnabled: true,
-          roles: true,
-          signature: true,
-          disabled: true,
+  // MODIFIED for BizRethink (overlay 087): read the primary, including revocations.
+  const result = await prisma.$transaction((tx) =>
+    tx.session.findUnique({
+      where: {
+        id: sessionId,
+      },
+      include: {
+        user: {
+          /**
+           * Do not expose anything sensitive here.
+           */
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            emailVerified: true,
+            avatarImageId: true,
+            twoFactorEnabled: true,
+            roles: true,
+            signature: true,
+            disabled: true,
+          },
         },
       },
-    },
-  });
+    }),
+  );
 
-  if (!result?.user) {
+  // MODIFIED for BizRethink (overlay 087): disabled users have no session authority.
+  if (!result?.user || result.user.disabled) {
     return { session: null, user: null, isAuthenticated: false };
   }
 

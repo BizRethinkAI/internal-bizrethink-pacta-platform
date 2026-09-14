@@ -1,7 +1,8 @@
+// MODIFIED for BizRethink (overlay 087): exclude consumed codes from the response.
+import { readRemainingAccountRecoveryCodes } from '@bizrethink/customizations/server-only/account-mfa';
 import type { User } from '@prisma/client';
 
 import { AppError } from '../../errors/app-error';
-import { getBackupCodes } from './get-backup-code';
 import { validateTwoFactorAuthentication } from './validate-2fa';
 
 type ViewBackupCodesOptions = {
@@ -20,7 +21,7 @@ export const viewBackupCodes = async ({ token, user }: ViewBackupCodesOptions) =
     throw new AppError('INCORRECT_TWO_FACTOR_CODE');
   }
 
-  const backupCodes = getBackupCodes({ user });
+  const backupCodes = await readRemainingAccountRecoveryCodes(user);
 
   if (!backupCodes) {
     throw new AppError('MISSING_BACKUP_CODE');

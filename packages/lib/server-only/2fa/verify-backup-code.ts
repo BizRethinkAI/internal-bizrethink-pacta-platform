@@ -1,18 +1,11 @@
+// MODIFIED for BizRethink (overlay 087): atomically consume a current code.
+import { consumeAccountRecoveryCode } from '@bizrethink/customizations/server-only/account-mfa';
 import type { User } from '@prisma/client';
-
-import { getBackupCodes } from './get-backup-code';
 
 type VerifyBackupCodeParams = {
   user: Pick<User, 'id' | 'twoFactorEnabled' | 'twoFactorBackupCodes'>;
   backupCode: string;
 };
 
-export const verifyBackupCode = ({ user, backupCode }: VerifyBackupCodeParams) => {
-  const userBackupCodes = getBackupCodes({ user });
-
-  if (!userBackupCodes) {
-    throw new Error('User has no backup codes');
-  }
-
-  return userBackupCodes.includes(backupCode);
-};
+export const verifyBackupCode = ({ user, backupCode }: VerifyBackupCodeParams) =>
+  consumeAccountRecoveryCode(user.id, backupCode);

@@ -2,6 +2,7 @@ import { Document, Font, Page, renderToStream, StyleSheet, Text, View } from '@r
 import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
 import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/render/fonts/font-data';
+import { groupMcaSections } from '../../engine/section-headings';
 import type { McaTemplateItem } from '../../templates/compile';
 import type { McaFilledDraft } from '../fill';
 
@@ -42,6 +43,7 @@ const styles = StyleSheet.create({
   },
   title: { fontFamily: 'McaSansBold', fontSize: 19, lineHeight: 1.2, marginBottom: 10 },
   subtitle: { fontFamily: 'McaSans', fontSize: 10, marginBottom: 15 },
+  sectionHeading: { fontFamily: 'McaSansBold', fontSize: 14, lineHeight: 1.2, marginTop: 18, marginBottom: 8 },
   heading: { fontFamily: 'McaSansBold', fontSize: 11, marginBottom: 5, marginTop: 13 },
   paragraph: { fontSize: 11, marginBottom: 6, lineHeight: 1.35 },
   field: { borderBottomWidth: 0.4, borderBottomColor: '#d5d9df', paddingVertical: 5 },
@@ -75,7 +77,10 @@ export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number)
         'This review copy is not a complete delivery package. Required disclosures, processor forms, clearance and separate signatures remain outstanding.',
         styles.warning,
       ),
-      ...document.items.flatMap(itemElements),
+      ...groupMcaSections(document.items).flatMap((section, index) => [
+        h(Text, { key: `section:${index}`, style: styles.sectionHeading, minPresenceAhead: 90 }, section.heading),
+        ...section.items.flatMap(itemElements),
+      ]),
       h(Text, { style: styles.heading, minPresenceAhead: 100 }, 'Separate execution locations — unsigned'),
       ...document.signatures.map((signature, index) =>
         h(

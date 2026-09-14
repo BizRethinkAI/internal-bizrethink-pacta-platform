@@ -80,6 +80,10 @@ test('a saved provider template opens a stateless transaction interview and down
     const preview = page.locator('[data-mca-filled-preview]');
     await expect(preview).toContainText('Internal transaction draft');
     await preview.getByLabel('Package document', { exact: true }).selectOption('frpa');
+    await expect(preview.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+    await expect(
+      preview.locator('[data-mca-section="funding-terms"] [data-mca-template-item="frpa.holdback-explainer"]'),
+    ).toBeVisible();
     await expect(preview).toContainText('Example Merchant Inc.');
     await expect(preview).toContainText('Guarantor: Separate Guarantor LLC — Entity Officer (Manager)');
     await expect(preview).toContainText('First Draft Guarantor');
@@ -176,11 +180,12 @@ test('filled preview and direct PDF export enforce the same live access, revisio
     await grant(own.user.id, 'mca-clause-draft-rendering', true);
     await prisma.user.update({ where: { id: own.user.id }, data: { disabled: true } });
     const disabledPreview = await post(page.request, 'fill', { ...input, version: 2 });
-    expect(disabledPreview.status()).toBe(403);
-    expect(await disabledPreview.text()).toContain('Account disabled');
+    expect(disabledPreview.status()).toBe(401);
+    expect(await disabledPreview.text()).toContain('UNAUTHORIZED');
     const disabledPdf = await pdf(page.request, { ...input, version: 2 });
-    expect(disabledPdf.status()).toBe(403);
-    expect(await disabledPdf.text()).toContain('Account disabled');
+    expect(disabledPdf.status()).toBe(401);
+    expect(await disabledPdf.json()).toEqual({ message: 'Sign in to prepare a draft.' });
+    expect(disabledPdf.headers()['content-type']).not.toContain('application/pdf');
   } finally {
     await prisma.user.update({ where: { id: own.user.id }, data: { disabled: false } });
     await cleanup(own.user.id);

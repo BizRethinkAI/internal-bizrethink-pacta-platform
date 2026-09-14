@@ -1,4 +1,5 @@
 import { prisma } from '@documenso/prisma';
+import type { Prisma } from '@prisma/client';
 
 /**
  * Trial window length for newly-created external orgs. 14 days is industry
@@ -10,6 +11,7 @@ const TRIAL_DAYS = 14;
 
 type StartTrialForNewOrgOptions = {
   organisationId: string;
+  transaction?: Prisma.TransactionClient;
   /**
    * If true, the org is a BizRethink-operated internal org (Personal, BizRethink
    * AI, MFG, MORG CAP, plus future team-member personal orgs). Skips trial
@@ -44,11 +46,12 @@ type StartTrialForNewOrgOptions = {
 export async function startTrialForNewOrg({
   organisationId,
   internal = false,
+  transaction,
 }: StartTrialForNewOrgOptions): Promise<void> {
   const now = new Date();
   const trialEndsAt = internal ? null : new Date(now.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000);
 
-  await prisma.bizrethinkOrganisationBilling.upsert({
+  await (transaction ?? prisma).bizrethinkOrganisationBilling.upsert({
     where: { organisationId },
     create: {
       organisationId,
