@@ -1,8 +1,12 @@
 // MODIFIED for BizRethink (overlay 087): compose verified onboarding in one transaction.
 import { accountTransaction } from '@bizrethink/customizations/server-only/account-transaction';
-import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
+import {
+  prepareTrialOrganisation,
+  recordTrialOrganisation,
+} from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
 import { prisma } from '@documenso/prisma';
@@ -16,14 +20,14 @@ import { generateDatabaseId, prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
 import { createTeam } from '../team/create-team';
 
-const serverConsole = createServerConsole('packages/lib/server-only/organisation/create-organisation');
-
 type CreateOrganisationOptions = {
   userId: number;
   name: string;
   type: OrganisationType;
   url?: string;
   customerId?: string;
+  /** Server-controlled paid checkout path; never taken from arbitrary client input. */
+  pendingCheckout?: boolean;
   claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
   transaction?: Prisma.TransactionClient;
 };
@@ -35,6 +39,7 @@ export const createOrganisation = async ({
   userId,
   customerId,
   claim,
+  pendingCheckout = false,
   transaction,
 }: CreateOrganisationOptions) => {
   let customerIdToUse = customerId;
@@ -58,13 +63,14 @@ export const createOrganisation = async ({
     })
       .then((customer) => customer.id)
       .catch((err) => {
-        serverConsole.error(err);
+        console.error(err);
 
         return undefined;
       });
   }
 
   return await accountTransaction(transaction).$transaction(async (tx) => {
+    const trial = await prepareTrialOrganisation(tx, userId, pendingCheckout);
     const organisationSetting = await tx.organisationGlobalSettings.create({
       data: {
         ...generateDefaultOrganisationSettings(),
@@ -148,6 +154,7 @@ export const createOrganisation = async ({
       },
     });
 
+    await recordTrialOrganisation(tx, organisation.id, trial);
     return organisation;
   });
 };
@@ -185,7 +192,7 @@ export const createPersonalOrganisation = async ({
     claim: proSubscriptionClaim,
     transaction,
   }).catch((err) => {
-    serverConsole.error(err);
+    console.error(err);
 
     if (throwErrorOnOrganisationCreationFailure || transaction) {
       throw err;
@@ -203,7 +210,7 @@ export const createPersonalOrganisation = async ({
       if (transaction) {
         throw err;
       }
-      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
+      console.error('[bizrethink] startTrialForNewOrg failed', err);
     });
   }
 
@@ -219,7 +226,7 @@ export const createPersonalOrganisation = async ({
       if (transaction) {
         throw err;
       }
-      serverConsole.error(err);
+      console.error(err);
 
       // Todo: (LOGS)
     });

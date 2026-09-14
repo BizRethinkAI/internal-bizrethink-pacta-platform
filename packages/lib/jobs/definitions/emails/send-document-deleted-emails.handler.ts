@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { reserveTrialRecipientEmail } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import DocumentCancelTemplate from '@documenso/email/templates/document-cancel';
 import { msg } from '@lingui/core/macro';
 import { createElement } from 'react';
@@ -54,6 +56,7 @@ export const run = async ({ payload, io }: { payload: TSendDocumentDeletedEmails
         renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
       ]);
 
+      await reserveTrialRecipientEmail(teamId);
       await emailTransport.sendMail({
         to: {
           address: recipient.email,

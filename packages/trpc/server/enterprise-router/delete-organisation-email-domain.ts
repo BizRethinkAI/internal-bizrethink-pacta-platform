@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { getDomainChallenge } from '@bizrethink/customizations/server-only/resources/email-domains';
 import { deleteEmailDomain } from '@documenso/ee/server-only/lib/delete-email-domain';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -28,6 +30,11 @@ export const deleteOrganisationEmailDomainRoute = authenticatedProcedure
     // membership check via buildOrganisationWhereQuery is the real authorization
     // gate. See overlays/008.
 
+    const pending = await getDomainChallenge(emailDomainId, user.id);
+    if (pending) {
+      await deleteEmailDomain({ emailDomainId });
+      return;
+    }
     const emailDomain = await prisma.emailDomain.findFirst({
       where: {
         id: emailDomainId,

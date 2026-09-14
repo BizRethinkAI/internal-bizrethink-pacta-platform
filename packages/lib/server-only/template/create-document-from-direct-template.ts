@@ -1,7 +1,6 @@
-// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
-
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import { validateDirectTemplateFields } from '@bizrethink/customizations/server-only/direct-template-fields';
-import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+import { assertTrialDistribution } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
@@ -52,8 +51,6 @@ import { assertOrganisationRatesAndLimits } from '../rate-limit/assert-organisat
 import { resolveSignatureLevel } from '../signature-level/resolve-signature-level';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-
-const serverConsole = createServerConsole('packages/lib/server-only/template/create-document-from-direct-template');
 
 export type CreateDocumentFromDirectTemplateOptions = {
   directRecipientName?: string;
@@ -335,6 +332,8 @@ export const createDocumentFromDirectTemplate = async ({
   const directTemplateNonSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature === null);
 
   const directTemplateSignatureFields = createDirectRecipientFieldArgs.filter(({ signature }) => signature !== null);
+
+  await assertTrialDistribution(directTemplateEnvelope.teamId, recipients.length, directTemplateEnvelope.userId);
 
   // Enforce the organisation document-creation limit before creating the document.
   await assertOrganisationRatesAndLimits({
@@ -825,7 +824,7 @@ export const createDocumentFromDirectTemplate = async ({
       teamId: refetchedEnvelope.teamId ?? undefined,
     });
   } catch (err) {
-    serverConsole.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
+    console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
 
     // Don't launch an error since the document has already been created.
     // Log and reseal as required until we configure middleware.

@@ -85,12 +85,12 @@ export const instanceAiRouter = router({
    */
   test: adminProcedure
     .output(z.object({ ok: z.boolean(), provider: z.string().optional(), error: z.string().optional() }))
-    .mutation(async () => {
+    .mutation(async ({ ctx }) => {
       // Reads the row rather than the cache: an admin testing a key they just
       // saved must not be answered from a value loaded before the save.
       invalidateAiConfig();
 
-      const result = await testAiConnection();
+      const result = await testAiConnection({ userId: ctx.user.id, organisationId: null });
 
       return result.ok ? { ok: true, provider: result.provider } : { ok: false, error: result.error };
     }),

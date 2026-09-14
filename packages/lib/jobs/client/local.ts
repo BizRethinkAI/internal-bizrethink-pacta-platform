@@ -1,12 +1,12 @@
-// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
-import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { readBoundedBytes } from '@bizrethink/customizations/server-only/resources/bounded-body';
 import { prisma } from '@documenso/prisma';
 import { sha256 } from '@noble/hashes/sha2';
 import { BackgroundJobStatus, Prisma } from '@prisma/client';
 import { CronExpressionParser } from 'cron-parser';
 import type { Context as HonoContext } from 'hono';
-
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
+import { AppError } from '../../errors/app-error';
 import { sign } from '../../server-only/crypto/sign';
 import { verify } from '../../server-only/crypto/verify';
 import {
@@ -17,8 +17,6 @@ import {
 } from './_internal/job';
 import type { Json } from './_internal/json';
 import { BaseJobProvider } from './base';
-
-const serverConsole = createServerConsole('packages/lib/jobs/client/local');
 
 /**
  * Build a deterministic BackgroundJob ID for a cron run so that multiple
@@ -79,7 +77,7 @@ export class LocalJobProvider extends BaseJobProvider {
           lastTickAt: new Date(),
         });
 
-        serverConsole.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
+        console.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
       }
     }
   }
@@ -115,7 +113,7 @@ export class LocalJobProvider extends BaseJobProvider {
 
     tick();
 
-    serverConsole.log(`[JOBS]: Started cron poller for ${this._cronJobs.length} job(s)`);
+    console.log(`[JOBS]: Started cron poller for ${this._cronJobs.length} job(s)`);
   }
 
   private async processCronTick() {
@@ -167,7 +165,7 @@ export class LocalJobProvider extends BaseJobProvider {
           isRetry: false,
         });
       } catch (error) {
-        serverConsole.error(`[JOBS]: Cron tick failed for ${cronJob.definition.id}`, error);
+        console.error(`[JOBS]: Cron tick failed for ${cronJob.definition.id}`, error);
       }
     }
   }
@@ -233,12 +231,20 @@ export class LocalJobProvider extends BaseJobProvider {
       const signature = req.header('x-job-signature');
       const isRetry = req.header('x-job-retry') !== undefined;
 
-      const options = await req
-        .json()
-        .then(async (data) => ZSimpleTriggerJobOptionsSchema.parseAsync(data))
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        .then((data) => data as SimpleTriggerJobOptions)
-        .catch(() => null);
+      if (!jobId || jobId.length > 256 || !signature || signature.length > 4096) {
+        return c.text('Unauthorized', 401);
+      }
+
+      let options: SimpleTriggerJobOptions | null;
+      try {
+        const bytes = await readBoundedBytes(req.raw, { maxBytes: 2 * 1024 * 1024, timeoutMs: 15_000 });
+        options = await ZSimpleTriggerJobOptionsSchema.parseAsync(JSON.parse(bytes.toString('utf8')));
+      } catch (error) {
+        if (error instanceof AppError && (error.statusCode === 408 || error.statusCode === 413)) {
+          return c.text(error.message, error.statusCode);
+        }
+        return c.text('Bad request', 400);
+      }
 
       if (!options) {
         return c.text('Bad request', 400);
@@ -255,7 +261,7 @@ export class LocalJobProvider extends BaseJobProvider {
       }
 
       if (definition && !definition.enabled) {
-        serverConsole.log('Attempted to trigger a disabled job', options.name);
+        console.log('Attempted to trigger a disabled job', options.name);
 
         return c.text('Job not found', 404);
       }
@@ -276,7 +282,7 @@ export class LocalJobProvider extends BaseJobProvider {
         payload = result.data;
       }
 
-      serverConsole.info({ event: 'job.received', jobId });
+      console.log(`[JOBS]: Triggering job ${options.name} with payload`, payload);
 
       let backgroundJob = await prisma.backgroundJob
         .update({
@@ -315,7 +321,7 @@ export class LocalJobProvider extends BaseJobProvider {
           },
         });
       } catch (error) {
-        serverConsole.log(`[JOBS]: Job ${options.name} failed`, error);
+        console.log(`[JOBS]: Job ${options.name} failed`, error);
 
         const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
         const jobHasExceededRetries =
@@ -379,7 +385,7 @@ export class LocalJobProvider extends BaseJobProvider {
       headers['X-Job-Retry'] = '1';
     }
 
-    serverConsole.log('Submitting job to endpoint:', endpoint);
+    console.log('Submitting job to endpoint:', endpoint);
     await Promise.race([
       fetch(endpoint, {
         method: 'POST',
@@ -454,13 +460,19 @@ export class LocalJobProvider extends BaseJobProvider {
             },
           });
 
-          serverConsole.log(`[JOBS:${task.id}] Task failed`, err);
+          console.log(`[JOBS:${task.id}] Task failed`, err);
 
           throw new BackgroundTaskFailedError('Task failed');
         }
       },
       triggerJob: async (_cacheKey, payload) => await this.triggerJob(payload),
-      logger: createServerConsole('packages/lib/jobs/client/local', { jobId }),
+      logger: {
+        debug: (...args) => console.debug(`[${jobId}]`, ...args),
+        error: (...args) => console.error(`[${jobId}]`, ...args),
+        info: (...args) => console.info(`[${jobId}]`, ...args),
+        log: (...args) => console.log(`[${jobId}]`, ...args),
+        warn: (...args) => console.warn(`[${jobId}]`, ...args),
+      },
       // eslint-disable-next-line @typescript-eslint/require-await
       wait: async () => {
         throw new Error('Not implemented');

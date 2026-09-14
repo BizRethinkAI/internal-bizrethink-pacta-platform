@@ -1,5 +1,6 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import { EmailDomainSchema } from '@documenso/prisma/generated/zod/modelSchema/EmailDomainSchema';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { ZOrganisationEmailLiteSchema } from './organisation-email';
 
@@ -20,6 +21,7 @@ export const ZEmailDomainSchema = EmailDomainSchema.pick({
   lastVerifiedAt: true,
 }).extend({
   emails: ZOrganisationEmailLiteSchema.array(),
+  expiresAt: z.date().nullable().optional(),
 });
 
 export type TEmailDomain = z.infer<typeof ZEmailDomainSchema>;
@@ -36,6 +38,6 @@ export const ZEmailDomainManySchema = EmailDomainSchema.pick({
   createdAt: true,
   updatedAt: true,
   lastVerifiedAt: true,
-});
+}).extend({ expiresAt: z.date().nullable().optional() });
 
 export type TEmailDomainMany = z.infer<typeof ZEmailDomainManySchema>;

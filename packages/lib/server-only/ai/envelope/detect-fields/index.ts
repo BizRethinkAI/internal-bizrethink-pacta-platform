@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { type AiBudget, withAiBudget } from '@bizrethink/customizations/server-only/resources/ai-budget';
 import { prisma } from '@documenso/prisma';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { DocumentStatus, type Field, RecipientRole } from '@prisma/client';
@@ -47,71 +49,83 @@ export const detectFieldsFromEnvelope = async ({
     });
   }
 
-  // Extract recipients for field assignment context
-  const recipients: RecipientContext[] = envelope.recipients.map((r) => ({
-    id: r.id,
-    name: r.name,
-    email: r.email,
-  }));
+  const team = await prisma.team.findUniqueOrThrow({ where: { id: teamId }, select: { organisationId: true } });
+  return withAiBudget({ userId, organisationId: team.organisationId }, async (budget) => {
+    if ((context?.length ?? 0) > 4000 || envelope.recipients.length > 100 || envelope.envelopeItems.length > 20) {
+      throw new AppError(AppErrorCode.LIMIT_EXCEEDED);
+    }
+    // Extract recipients for field assignment context
+    const recipients: RecipientContext[] = envelope.recipients.map((r) => ({
+      id: r.id,
+      name: r.name,
+      email: r.email,
+    }));
 
-  const allFields: NormalizedFieldWithContext[] = [];
+    const allFields: NormalizedFieldWithContext[] = [];
 
-  for (const item of envelope.envelopeItems) {
-    const existingFields = await prisma.field.findMany({
-      where: {
-        envelopeItemId: item.id,
-      },
-    });
-
-    const pdfBytes = await getFileServerSide(item.documentData);
-    const fields = await detectFieldsFromPdf({
-      pdfBytes,
-      existingFields,
-      recipients,
-      context,
-      onProgress,
-    });
-
-    // Resolve recipientKey to actual recipient and add context
-    const fieldsWithContext = await Promise.all(
-      fields.map(async (field) => {
-        const { recipientKey, ...fieldWithoutKey } = field;
-
-        let resolvedRecipient = resolveRecipientFromKey(recipientKey, recipients);
-
-        // If no recipients exist, create a blank recipient
-        if (!resolvedRecipient) {
-          const { recipients: createdRecipients } = await createEnvelopeRecipients({
-            id: {
-              id: envelope.id,
-              type: 'envelopeId',
-            },
-            recipients: [
-              {
-                name: '',
-                email: '',
-                role: RecipientRole.SIGNER,
-              },
-            ],
-            userId,
-            teamId,
-          });
-
-          resolvedRecipient = createdRecipients[0];
-        }
-
-        return {
-          ...fieldWithoutKey,
+    for (const item of envelope.envelopeItems) {
+      budget.signal.throwIfAborted();
+      const existingFields = await prisma.field.findMany({
+        where: {
           envelopeItemId: item.id,
-          recipientId: resolvedRecipient.id,
-        };
-      }),
-    );
+        },
+      });
 
-    allFields.push(...fieldsWithContext);
-  }
+      if (existingFields.length > 1000) {
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED);
+      }
+      const pdfBytes = await getFileServerSide(item.documentData);
+      const fields = await detectFieldsFromPdf({
+        budget,
+        pdfBytes,
+        existingFields,
+        recipients,
+        context,
+        onProgress,
+      });
 
-  return allFields;
+      // Resolve recipientKey to actual recipient and add context
+      const fieldsWithContext = await Promise.all(
+        fields.map(async (field) => {
+          budget.signal.throwIfAborted();
+          const { recipientKey, ...fieldWithoutKey } = field;
+
+          let resolvedRecipient = resolveRecipientFromKey(recipientKey, recipients);
+
+          // If no recipients exist, create a blank recipient
+          if (!resolvedRecipient) {
+            const { recipients: createdRecipients } = await createEnvelopeRecipients({
+              id: {
+                id: envelope.id,
+                type: 'envelopeId',
+              },
+              recipients: [
+                {
+                  name: '',
+                  email: '',
+                  role: RecipientRole.SIGNER,
+                },
+              ],
+              userId,
+              teamId,
+            });
+
+            resolvedRecipient = createdRecipients[0];
+          }
+
+          return {
+            ...fieldWithoutKey,
+            envelopeItemId: item.id,
+            recipientId: resolvedRecipient.id,
+          };
+        }),
+      );
+
+      allFields.push(...fieldsWithContext);
+    }
+
+    return allFields;
+  });
 };
 
 export type DetectFieldsProgress = {
@@ -121,6 +135,7 @@ export type DetectFieldsProgress = {
 };
 
 export type DetectFieldsFromPdfOptions = {
+  budget: AiBudget;
   pdfBytes: Uint8Array;
   recipients?: RecipientContext[];
   existingFields?: Field[];
@@ -129,18 +144,22 @@ export type DetectFieldsFromPdfOptions = {
 };
 
 export const detectFieldsFromPdf = async ({
+  budget,
   pdfBytes,
   recipients = [],
   existingFields = [],
   context,
   onProgress,
 }: DetectFieldsFromPdfOptions) => {
-  const pageImages = await pdfToImages(pdfBytes);
+  budget.signal.throwIfAborted();
+  const pageImages = await pdfToImages(pdfBytes, { maxPages: budget.remainingPages() });
+  budget.consumePages(pageImages.length);
 
   if (pageImages.length === 0) {
     return [];
   }
 
+  await budget.reserveProviderCalls(pageImages.length);
   let pagesProcessed = 0;
   let totalFieldsDetected = 0;
 
@@ -158,7 +177,9 @@ export const detectFieldsFromPdf = async ({
         fields: fieldsOnPage,
       });
 
+      budget.signal.throwIfAborted();
       const rawFields = await detectFieldsFromPage({
+        budget,
         image: maskedImage,
         pageNumber: page.pageNumber,
         recipients,
@@ -185,7 +206,7 @@ export const detectFieldsFromPdf = async ({
 
       return normalizedFields;
     },
-    { concurrency: 5 },
+    { concurrency: 2 },
   );
 
   return results.flat();
@@ -230,13 +251,20 @@ const maskFieldsOnImage = async ({ image, width, height, fields }: MaskFieldsOnI
 };
 
 type DetectFieldsFromPageOptions = {
+  budget: AiBudget;
   image: Buffer;
   pageNumber: number;
   recipients: RecipientContext[];
   context?: string;
 };
 
-const detectFieldsFromPage = async ({ image, pageNumber, recipients, context }: DetectFieldsFromPageOptions) => {
+const detectFieldsFromPage = async ({
+  image,
+  pageNumber,
+  recipients,
+  context,
+  budget,
+}: DetectFieldsFromPageOptions) => {
   // Resize to 1000x1000 for consistent coordinate mapping
   const resizedImage = await resizeImageToGeminiImage({ image });
 
@@ -273,6 +301,9 @@ const detectFieldsFromPage = async ({ image, pageNumber, recipients, context }: 
 
   const result = await generateObject({
     model: vertex('gemini-3-flash-preview'),
+    maxOutputTokens: 4096,
+    maxRetries: 0,
+    abortSignal: budget.signal,
     system: SYSTEM_PROMPT,
     schema: ZSubmitDetectedFieldsInputSchema,
     messages,

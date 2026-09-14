@@ -1,8 +1,6 @@
-// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
-
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
-import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -14,8 +12,6 @@ import { prisma } from '@documenso/prisma';
 import { OrganisationType, SubscriptionStatus } from '@prisma/client';
 import { authenticatedProcedure } from '../trpc';
 import { ZCreateOrganisationRequestSchema, ZCreateOrganisationResponseSchema } from './create-organisation.types';
-
-const serverConsole = createServerConsole('packages/trpc/server/organisation-router/create-organisation');
 
 export const createOrganisationRoute = authenticatedProcedure
   // .meta(createOrganisationMeta)
@@ -84,6 +80,7 @@ export const createOrganisationRoute = authenticatedProcedure
         name,
         type: OrganisationType.ORGANISATION,
         claim: freeSubscriptionClaim,
+        pendingCheckout: true,
       });
 
       let customerId = organisation.customerId;
@@ -138,7 +135,7 @@ export const createOrganisationRoute = authenticatedProcedure
 
     // BizRethink (overlay 041): record the trial window for the new org.
     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
-      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
+      console.error('[bizrethink] startTrialForNewOrg failed', err);
     });
 
     return {

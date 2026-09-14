@@ -1,22 +1,9 @@
-import sharp from 'sharp';
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+// BizRethink overlay 089: bound both newly supplied and legacy stored images.
+import { processBoundedImage } from '@bizrethink/customizations/server-only/resources/media-worker';
 
-export const loadLogo = async (file: Uint8Array) => {
-  const content = await sharp(file).toFormat('png', { quality: 80 }).toBuffer();
-
-  return {
-    contentType: 'image/png',
-    content,
-  };
-};
-
-/**
- * Validate and sanitise an uploaded branding logo. Re-encoding through `sharp`
- * proves the bytes are a real raster image and strips any embedded payloads.
- * Throws if the input cannot be parsed as an image.
- */
-export const optimiseBrandingLogo = async (input: Buffer | Uint8Array): Promise<Buffer> => {
-  return await sharp(input)
-    .resize(512, 512, { fit: 'inside', withoutEnlargement: true })
-    .png({ quality: 80 })
-    .toBuffer();
-};
+export const loadLogo = async (file: Uint8Array) => ({
+  contentType: 'image/png',
+  content: await processBoundedImage('logo-load', file),
+});
+export const optimiseBrandingLogo = (input: Buffer | Uint8Array): Promise<Buffer> => processBoundedImage('logo', input);

@@ -1,10 +1,15 @@
-import { countPagesFromBytes } from '@bizrethink/customizations/lease/documents/count-pages';
 import { MAX_DOCUMENT_MB } from '@bizrethink/customizations/lease/documents/placement';
-import { attachLeaseDocument } from '@bizrethink/customizations/lease/server-only/attach-document';
-import { PDFDocument } from '@cantoo/pdf-lib';
+import {
+  attachLeaseDocument,
+  resolveLeaseDocumentOwner,
+} from '@bizrethink/customizations/lease/server-only/attach-document';
+import { withUploadAdmission } from '@bizrethink/customizations/server-only/resources/admission';
+import { readBoundedForm } from '@bizrethink/customizations/server-only/resources/bounded-body';
+import { countBoundedPdfPages } from '@bizrethink/customizations/server-only/resources/media-worker';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { AppError } from '@documenso/lib/errors/app-error';
 
-import type { Route } from './+types/bizrethink.lease-document';
+import type { ActionFunctionArgs } from 'react-router';
 
 /**
  * Upload one governing document or condition report.
@@ -27,75 +32,51 @@ import type { Route } from './+types/bizrethink.lease-document';
  * app rather than to a package of pure lease logic.
  */
 
-/**
- * Pages: the cheap scan first, a real parse only when it comes back empty.
- *
- * The scan reads most files exactly and costs one pass over the bytes. It
- * cannot see the pages of a linearised PDF, whose page objects live in
- * compressed object streams — the Estancia master declaration is one of those,
- * 155 pages of which the scan finds none.
- *
- * Parsing settles it (155 in ~40 ms; the 418-page, 54 MB inspection in ~400 ms),
- * but only on the files that need it. A parse failure is not an upload failure:
- * an encrypted or malformed PDF still stores, and the receipt simply omits the
- * extent rather than asserting one nobody established.
- */
-const countPages = async (bytes: Uint8Array): Promise<number | null> => {
-  const scanned = countPagesFromBytes(bytes);
-
-  if (scanned !== null) {
-    return scanned;
-  }
-
-  try {
-    const parsed = await PDFDocument.load(bytes, { updateMetadata: false });
-
-    return parsed.getPageCount();
-  } catch {
-    return null;
-  }
-};
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== 'POST') {
     return Response.json({ message: 'Method not allowed' }, { status: 405 });
   }
 
   const { user } = await getSession(request);
 
-  const form = await request.formData();
-  const file = form.get('file');
-
-  if (!(file instanceof File)) {
-    return Response.json({ message: 'No file was uploaded.' }, { status: 400 });
-  }
-
-  if (file.size > MAX_DOCUMENT_MB * 1024 * 1024) {
-    return Response.json({ message: `That file is larger than the ${MAX_DOCUMENT_MB} MB limit.` }, { status: 413 });
-  }
-
-  if (file.type !== 'application/pdf') {
-    return Response.json({ message: 'Only PDF documents can be attached.' }, { status: 415 });
-  }
-
-  const asString = (key: string) => {
-    const value = form.get(key);
-    return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
-  };
-
   try {
-    const document = await attachLeaseDocument({
-      pageCount: await countPages(new Uint8Array(await file.arrayBuffer())),
-      userId: user.id,
-      propertyId: asString('propertyId'),
-      matterId: asString('matterId'),
-      kind: asString('kind') ?? '',
-      label: asString('label') ?? file.name.replace(/\.pdf$/i, ''),
-      reference: asString('reference'),
-      documentDate: asString('documentDate'),
-      file,
-    });
+    return await withUploadAdmission(user.id, async () => {
+      const form = await readBoundedForm(request, (MAX_DOCUMENT_MB + 1) * 1024 * 1024);
+      const file = form.get('file');
 
-    return Response.json({ document }, { status: 201 });
+      if (!(file instanceof File)) {
+        return Response.json({ message: 'No file was uploaded.' }, { status: 400 });
+      }
+
+      if (file.size > MAX_DOCUMENT_MB * 1024 * 1024) {
+        return Response.json({ message: `That file is larger than the ${MAX_DOCUMENT_MB} MB limit.` }, { status: 413 });
+      }
+
+      if (file.type !== 'application/pdf') {
+        return Response.json({ message: 'Only PDF documents can be attached.' }, { status: 415 });
+      }
+
+      const asString = (key: string) => {
+        const value = form.get(key);
+        return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
+      };
+
+      const input = {
+        userId: user.id,
+        propertyId: asString('propertyId'),
+        matterId: asString('matterId'),
+        kind: asString('kind') ?? '',
+        label: asString('label') ?? file.name.replace(/\.pdf$/i, ''),
+        reference: asString('reference'),
+        documentDate: asString('documentDate'),
+        file,
+      };
+      await resolveLeaseDocumentOwner(input);
+      const pageCount = await countBoundedPdfPages(new Uint8Array(await file.arrayBuffer()));
+      const document = await attachLeaseDocument({ ...input, pageCount });
+
+      return Response.json({ document }, { status: 201 });
+    });
   } catch (error) {
     /*
       The placement and ownership errors are written to be read by the person
@@ -104,6 +85,6 @@ export async function action({ request }: Route.ActionArgs) {
     */
     const message = error instanceof Error ? error.message : 'The document could not be attached.';
 
-    return Response.json({ message }, { status: 400 });
+    return Response.json({ message }, { status: error instanceof AppError ? (error.statusCode ?? 400) : 400 });
   }
 }

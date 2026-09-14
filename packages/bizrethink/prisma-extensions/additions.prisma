@@ -1058,6 +1058,75 @@ model BizrethinkMcaTemplateRevision {
   @@unique([templateId, version])
 }
 
+// Incident A-11: finite external trials. Scalar identifiers intentionally have
+// no cascading relations: deleting an organisation must not renew its trial.
+// MODIFIED for BizRethink (overlay 089): durable finite resource policy.
+model BizrethinkInstanceResourcePolicy {
+  id                 String   @id @default("singleton")
+  trialDocuments     Int      @default(5)
+  trialEmails        Int      @default(10)
+  trialRecipients    Int      @default(10)
+  trialOrganisations Int      @default(1)
+  updatedByUserId     Int?
+  updatedAt          DateTime @updatedAt
+}
+
+model BizrethinkTrialBudget {
+  ownerUserId          Int      @id
+  startedAt            DateTime
+  expiresAt            DateTime
+  documentsUsed        Int      @default(0)
+  emailsUsed           Int      @default(0)
+  organisationsCreated Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model BizrethinkTrialOrganisation {
+  organisationId String   @id
+  ownerUserId    Int
+  createdAt      DateTime @default(now())
+
+  @@index([ownerUserId])
+}
+
+// A-10: short-lived admission leases span all application replicas.
+model BizrethinkResourceLease {
+  id             String   @id
+  kind           String
+  userId         Int
+  organisationId String?
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  @@index([kind, expiresAt])
+  @@index([userId, expiresAt])
+  @@index([organisationId, expiresAt])
+}
+
+// A-20: pending proof is nonexclusive; EmailDomain remains the ownership table.
+model BizrethinkEmailDomainChallenge {
+  id             String   @id
+  organisationId String
+  ownerUserId    Int
+  domain         String
+  selector       String
+  publicKey      String
+  privateKey     String
+  expiresAt      DateTime
+  lastVerifiedAt DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organisationId, domain])
+  @@index([ownerUserId, expiresAt])
+}
+
+// Preserve known proof even if a later DNS check temporarily returns PENDING.
+model BizrethinkEmailDomainOwnership {
+  emailDomainId String   @id
+  verifiedAt    DateTime @default(now())
+}
 
 /// Durable distinction between unfinished verified onboarding and a user who
 /// deliberately left/deleted all workspaces. Scalar ID avoids upstream relations.

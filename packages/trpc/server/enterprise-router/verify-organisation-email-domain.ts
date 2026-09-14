@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { findVerifiableDomains } from '@bizrethink/customizations/server-only/resources/email-domains';
 import { verifyEmailDomain } from '@documenso/ee/server-only/lib/verify-email-domain';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -34,23 +36,14 @@ export const verifyOrganisationEmailDomainRoute = authenticatedProcedure
         userId: user.id,
         roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
       }),
-      include: {
-        emailDomains: true,
-      },
     });
 
     if (!organisation) {
       throw new AppError(AppErrorCode.UNAUTHORIZED);
     }
 
-    // Filter down emails to verify a specific email, otherwise verify all emails regardless of status.
-    const emailsToVerify = organisation.emailDomains.filter((email) => {
-      if (emailDomainId && email.id !== emailDomainId) {
-        return false;
-      }
-
-      return true;
-    });
-
-    await Promise.all(emailsToVerify.map(async (email) => verifyEmailDomain(email.id)));
+    const emailsToVerify = await findVerifiableDomains(organisation.id, emailDomainId);
+    for (const email of emailsToVerify) {
+      await verifyEmailDomain(email.id);
+    }
   });

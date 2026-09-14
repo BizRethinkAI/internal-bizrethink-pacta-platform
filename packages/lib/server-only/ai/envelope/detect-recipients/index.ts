@@ -1,3 +1,6 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { type AiBudget, withAiBudget } from '@bizrethink/customizations/server-only/resources/ai-budget';
+import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@prisma/client';
 import type { ImagePart, ModelMessage } from 'ai';
 import { generateObject } from 'ai';
@@ -56,25 +59,32 @@ export const detectRecipientsFromEnvelope = async ({
     });
   }
 
-  let allRecipients: TDetectedRecipientSchema[] = [];
+  const team = await prisma.team.findUniqueOrThrow({ where: { id: teamId }, select: { organisationId: true } });
+  return withAiBudget({ userId, organisationId: team.organisationId }, async (budget) => {
+    let allRecipients: TDetectedRecipientSchema[] = [];
 
-  for (const item of envelope.envelopeItems) {
-    const pdfBytes = await getFileServerSide(item.documentData);
-    const recipients = await detectRecipientsFromPdf({ pdfBytes, onProgress });
+    for (const item of envelope.envelopeItems) {
+      budget.signal.throwIfAborted();
+      const pdfBytes = await getFileServerSide(item.documentData);
+      const recipients = await detectRecipientsFromPdf({ pdfBytes, onProgress, budget });
 
-    allRecipients = mergeRecipients(allRecipients, recipients);
-  }
+      allRecipients = mergeRecipients(allRecipients, recipients);
+    }
 
-  return allRecipients;
+    return allRecipients;
+  });
 };
 
 export type DetectRecipientsFromPdfOptions = {
+  budget: AiBudget;
   pdfBytes: Uint8Array;
   onProgress?: (progress: DetectRecipientsProgress) => void;
 };
 
-export const detectRecipientsFromPdf = async ({ pdfBytes, onProgress }: DetectRecipientsFromPdfOptions) => {
-  const pageImages = await pdfToImages(pdfBytes);
+export const detectRecipientsFromPdf = async ({ pdfBytes, onProgress, budget }: DetectRecipientsFromPdfOptions) => {
+  budget.signal.throwIfAborted();
+  const pageImages = await pdfToImages(pdfBytes, { maxPages: budget.remainingPages() });
+  budget.consumePages(pageImages.length);
 
   if (pageImages.length === 0) {
     return [];
@@ -82,10 +92,11 @@ export const detectRecipientsFromPdf = async ({ pdfBytes, onProgress }: DetectRe
 
   const images = pageImages.map((p) => p.image);
 
-  return await detectRecipientsFromImages({ images, onProgress });
+  return await detectRecipientsFromImages({ images, onProgress, budget });
 };
 
 type DetectRecipientsFromImagesOptions = {
+  budget: AiBudget;
   images: Buffer[];
   onProgress?: (progress: DetectRecipientsProgress) => void;
 };
@@ -160,7 +171,7 @@ Please analyze these pages and submit any recipients you find using the tool. I 
 Please analyze these pages and submit any NEW recipients you find (not already listed above) using the tool.`;
 };
 
-const detectRecipientsFromImages = async ({ images, onProgress }: DetectRecipientsFromImagesOptions) => {
+const detectRecipientsFromImages = async ({ images, onProgress, budget }: DetectRecipientsFromImagesOptions) => {
   const imageChunks = chunk(images, MAX_PAGES_PER_CHUNK);
 
   const totalChunks = imageChunks.length;
@@ -170,6 +181,8 @@ const detectRecipientsFromImages = async ({ images, onProgress }: DetectRecipien
   let allRecipients: TDetectedRecipientSchema[] = [];
 
   for (const [chunkIndex, currentChunk] of imageChunks.entries()) {
+    budget.signal.throwIfAborted();
+    await budget.reserveProviderCalls(1);
     const startPage = chunkIndex * MAX_PAGES_PER_CHUNK + 1;
     const endPage = startPage + currentChunk.length - 1;
 
@@ -196,6 +209,9 @@ const detectRecipientsFromImages = async ({ images, onProgress }: DetectRecipien
 
     const result = await generateObject({
       model: vertex('gemini-3-flash-preview'),
+      maxOutputTokens: 4096,
+      maxRetries: 0,
+      abortSignal: budget.signal,
       system: SYSTEM_PROMPT,
       schema: ZDetectedRecipientsSchema,
       messages,
@@ -205,7 +221,11 @@ const detectRecipientsFromImages = async ({ images, onProgress }: DetectRecipien
     const newRecipients = result.object?.recipients ?? [];
 
     // Merge new recipients into our accumulated list (handles duplicates)
+    budget.signal.throwIfAborted();
     allRecipients = mergeRecipients(allRecipients, newRecipients);
+    if (allRecipients.length > 100) {
+      throw new AppError(AppErrorCode.LIMIT_EXCEEDED);
+    }
 
     // Report progress (endPage represents pages processed so far)
     onProgress?.({
