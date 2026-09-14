@@ -1,5 +1,6 @@
 import { inReviewOrder } from '../clauses/library';
 import type { McaContent } from '../clauses/types';
+import { groupMcaSections } from '../engine/section-headings';
 import type { ReviewMcaContent } from '../reusable/review';
 
 export type ReadableMcaClause = {
@@ -24,25 +25,12 @@ export type ReadableMcaSection = {
   clauses: ReadableMcaClause[];
 };
 
-const sectionName = (section: string): string => {
-  const names: Record<string, string> = {
-    appendix: 'Fee Schedule',
-    'split-funding-exhibit': 'Split Funding Authorization exhibit',
-    'permission-to-release-exhibit': 'Permission to Release exhibit',
-  };
-  return (
-    names[section] ??
-    section
-      .split('-')
-      .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
-      .join(' ')
-  );
-};
-
 /** Only compiled review data enters this view. No source-number fallback. */
 export const toReadableAgreement = (clauses: ReviewMcaContent[]): ReadableMcaSection[] =>
-  inReviewOrder(clauses).reduce<ReadableMcaSection[]>((sections, clause) => {
-    const readable: ReadableMcaClause = {
+  groupMcaSections(inReviewOrder(clauses)).map((section) => ({
+    id: section.section,
+    name: section.heading,
+    clauses: section.items.map((clause) => ({
       slug: clause.slug,
       number: clause.number,
       heading: clause.heading,
@@ -54,14 +42,8 @@ export const toReadableAgreement = (clauses: ReviewMcaContent[]): ReadableMcaSec
       unnumberedReason: clause.unnumberedReason ?? null,
       included: clause.included,
       selectionNote: clause.selectionNote,
-    };
-    const last = sections[sections.length - 1];
-    if (last !== undefined && last.id === clause.section) {
-      last.clauses.push(readable);
-      return sections;
-    }
-    return [...sections, { id: clause.section, name: sectionName(clause.section), clauses: [readable] }];
-  }, []);
+    })),
+  }));
 
 export const readableSlugs = (sections: ReadableMcaSection[]): string[] =>
   sections.flatMap((section) => section.clauses.map((clause) => clause.slug));

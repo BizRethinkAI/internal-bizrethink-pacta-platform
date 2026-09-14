@@ -80,6 +80,10 @@ test('a saved provider template opens a stateless transaction interview and down
     const preview = page.locator('[data-mca-filled-preview]');
     await expect(preview).toContainText('Internal transaction draft');
     await preview.getByLabel('Package document', { exact: true }).selectOption('frpa');
+    await expect(preview.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+    await expect(
+      preview.locator('[data-mca-section="funding-terms"] [data-mca-template-item="frpa.holdback-explainer"]'),
+    ).toBeVisible();
     await expect(preview).toContainText('Example Merchant Inc.');
     await expect(preview).toContainText('Guarantor: Separate Guarantor LLC — Entity Officer (Manager)');
     await expect(preview).toContainText('First Draft Guarantor');

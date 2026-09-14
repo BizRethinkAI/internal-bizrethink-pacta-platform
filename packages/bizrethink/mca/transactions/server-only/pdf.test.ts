@@ -18,6 +18,10 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
           ),
         ),
       );
+      const parentHeadings = ['1. Funding Terms', '2. Preamble', '3. Purchase', '4. Reconciliation'];
+      for (const heading of parentHeadings) {
+        headings.add(heading);
+      }
       const bytes = await renderMcaDraftPdf(draft, 3);
       const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
       const parsed = await pdfjs.getDocument({ data: new Uint8Array(bytes), useSystemFonts: false }).promise;
@@ -29,7 +33,8 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
         const text = content.items
           .filter((item) => 'str' in item)
           .map((item) => ('str' in item ? item.str : ''))
-          .join(' ');
+          .join(' ')
+          .replace(/\s+/g, ' ');
         texts.push(text);
         const last = content.items
           .filter(
@@ -41,6 +46,11 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
           last && 'str' in last && headings.has(last.str.replace(/\s+/g, ' ').trim()),
           `orphan heading on page ${number}`,
         ).toBe(false);
+        if (last && 'str' in last) {
+          // PDF.js can split the section number and title into separate items.
+          // Section/document headings use a larger font than the 11pt body.
+          expect(last.height, `orphan parent heading on page ${number}`).toBeLessThan(13);
+        }
         expect(text, `page ${number}`).toMatch(/INTERNAL (DRAFT|WORKSHEET)/);
         expect(text, `page ${number}`).not.toMatch(/\{\{|\[\[|«\d/);
         for (const item of content.items) {
@@ -53,6 +63,7 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
         }
       }
       for (const phrase of [
+        ...parentHeadings,
         'Example Merchant Inc.',
         'First Test Guarantor',
         'Merchant Signer',
@@ -64,6 +75,11 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
           phrase,
         ).toBe(true);
       }
+      const completeText = texts.join(' ').replace(/\s+/g, ' ');
+      expect(completeText.indexOf('1. Funding Terms')).toBeLessThan(
+        completeText.indexOf('1.1 Estimated Daily Holdback'),
+      );
+      expect(completeText.indexOf('3. Purchase')).toBeLessThan(completeText.indexOf('3.1 Definitions'));
       await parsed.destroy();
       const structure = await PDFDocument.load(bytes);
       expect(structure.catalog.has(PDFName.of('AcroForm'))).toBe(false);

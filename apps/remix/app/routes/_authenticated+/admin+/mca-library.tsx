@@ -19,6 +19,7 @@ import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '@bizrethink/customizations/mca/clauses/instruments';
 import { describeClauseVariance, describeWhyThisClause } from '@bizrethink/customizations/mca/clauses/metadata';
 import { McaWorkspaceNav } from '@bizrethink/customizations/mca/components/workspace-nav';
+import { groupMcaSections } from '@bizrethink/customizations/mca/engine/section-headings';
 import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
@@ -588,11 +589,16 @@ const InstrumentCard = ({
         </span>
       </header>
 
-      <ul className="divide-y divide-border/60">
-        {clauses.map((clause) => (
-          <ClauseRow key={clause.slug} clause={clause} onApproved={onApproved} />
-        ))}
-      </ul>
+      {groupMcaSections(clauses).map((section, index) => (
+        <section key={`${section.section}:${index}`} data-mca-section={section.section}>
+          <h3 className="border-border border-b bg-muted/40 px-4 py-3 font-semibold">{section.heading}</h3>
+          <ul className="divide-y divide-border/60">
+            {section.items.map((clause) => (
+              <ClauseRow key={clause.slug} clause={clause} onApproved={onApproved} />
+            ))}
+          </ul>
+        </section>
+      ))}
     </section>
   );
 };
