@@ -103,6 +103,22 @@ ownership and separate-typecheck declarations.
   with unchanged advisory identities/paths through Prisma configuration and
   OpenAPI generation. No dependency changed; advisory success is not zero findings.
 
+CI follow-up: the first broad run passed 5,331 unit tests and failed the three
+provider-execution cases because their synthetic constructor used an arrow
+function. Both provider test doubles now use constructible functions; all three
+cases pass locally with the original rejection, success and idempotence
+assertions unchanged. No production behavior changed in this correction. The
+final revision must receive a fresh CI verdict.
+
+The first HTTP run passed 1,140 cases, reported two existing retry flakes and
+59 existing exclusions, and failed four new cases on incorrect test assumptions:
+three compared a nullable empty auth representation with its equivalent
+normalized object; the fourth expected 403 where the existing PDF middleware
+deliberately returns 404. Fixtures now seed the explicit empty policy and retain
+exact equality after reassignment; the account denial checks the exact 404 JSON.
+The admin edit and both real database lock races passed on their first run.
+No application behavior or existing suite assertions changed for these failures.
+
 Next: author owns final-head CI through green and substantive review fixes.
 Fresh human-started adversarial review of signing/auth/upstream changes remains
 required. The separate shipping session owns approved merges and final batch

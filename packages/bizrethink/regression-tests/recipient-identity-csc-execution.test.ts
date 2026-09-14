@@ -40,10 +40,14 @@ vi.mock('@documenso/ee/server-only/signing/csc/client/signatures', () => ({
   cscSignHash: async () => ({ signatures: ['Bw=='] }),
 }));
 vi.mock('@documenso/ee/server-only/signing/csc/signers/capture-signer', () => ({
-  CscCaptureSigner: vi.fn(() => ({ capturedDigest: new Uint8Array([7]) })),
+  CscCaptureSigner: vi.fn(function captureSigner() {
+    return { capturedDigest: new Uint8Array([7]) };
+  }),
 }));
 vi.mock('@documenso/ee/server-only/signing/csc/signers/fifo-signer', () => ({
-  CscFifoSigner: vi.fn(() => ({})),
+  CscFifoSigner: vi.fn(function fifoSigner() {
+    return {};
+  }),
 }));
 vi.mock('@libpdf/core', () => ({
   PDF: { load: async () => ({ sign: async () => ({ bytes: new Uint8Array([9]) }) }) },

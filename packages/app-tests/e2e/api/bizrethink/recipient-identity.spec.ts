@@ -57,6 +57,7 @@ const fixture = async (version: 1 | 2 = 2, account = false) => {
     where: { id: envelope.recipients[0].id },
     data: {
       signingStatus: SigningStatus.NOT_SIGNED,
+      authOptions: { accessAuth: [], actionAuth: [] },
       signedAt: null,
       sendStatus: SendStatus.SENT,
       readStatus: ReadStatus.OPENED,
@@ -195,7 +196,9 @@ test('A-19 reassignment retains ACCOUNT identity checks and does not extend an e
   try {
     await login(previous, f.original.user.email);
     await login(intended, f.replacement.user.email);
-    expect((await pdf(previous, f, current.token)).status()).toBe(403);
+    const deniedPdf = await pdf(previous, f, current.token);
+    expect(deniedPdf.status()).toBe(404);
+    expect(await deniedPdf.json()).toEqual({ error: 'Not found' });
     await ok(await pdf(intended, f, current.token));
     await denied(
       await trpc(intended, 'recipient.completeDocumentWithToken', { token: current.token, documentId: f.documentId }),
