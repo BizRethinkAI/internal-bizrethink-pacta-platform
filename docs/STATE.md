@@ -13,7 +13,23 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-13_
+_Last updated: 2026-09-14_
+
+## 2026-09-14 — security queue and MCA headings shipped
+
+Fresh review-and-ship batch PRs #221, #223, #224, #225 and #226 landed in
+sequence. Final `main` is `e5aff0271`; each refreshed final head passed all
+applicable checks, including Playwright. The batch protects disabled sessions,
+MFA and verified onboarding; revokes superseded recipient authority; bounds
+trial/resource, media/AI and domain-proof abuse; removes ambient credentials
+and sensitive payloads from analytics/diagnostics; and renders existing MCA
+parent headings across readers/PDFs without changing legal text.
+
+Mechanical base refreshes were required after sequential merges. A local-job
+redaction regression in #226 was corrected at `5ea764489`; its fresh full CI
+passed. The five in-flight notes are folded by this shipping consolidation.
+No historical-log review, revocation, capacity tuning or other operational
+follow-up is implied by this entry.
 
 ## 2026-09-14 — legal workspace readability (#215)
 
