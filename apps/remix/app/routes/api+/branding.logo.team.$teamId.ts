@@ -7,11 +7,10 @@ import { loadLogo } from '@documenso/lib/utils/images/logo';
 
 import type { Route } from './+types/branding.logo.team.$teamId';
 
-const serverConsole = createServerConsole('apps/remix/app/routes/api+/branding.logo.team.$teamId');
-
 const CACHE_CONTROL = 'public, max-age=0, stale-while-revalidate=86400';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  const serverConsole = createServerConsole('apps/remix/app/routes/api+/branding.logo.team.$teamId');
   const teamId = Number(params.teamId);
 
   if (teamId === 0 || Number.isNaN(teamId)) {

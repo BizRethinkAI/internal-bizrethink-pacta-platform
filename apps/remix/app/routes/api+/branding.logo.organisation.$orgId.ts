@@ -7,11 +7,10 @@ import { prisma } from '@documenso/prisma';
 
 import type { Route } from './+types/branding.logo.organisation.$orgId';
 
-const serverConsole = createServerConsole('apps/remix/app/routes/api+/branding.logo.organisation.$orgId');
-
 const CACHE_CONTROL = 'public, max-age=0, stale-while-revalidate=86400';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  const serverConsole = createServerConsole('apps/remix/app/routes/api+/branding.logo.organisation.$orgId');
   const organisationId = params.orgId;
 
   if (!organisationId) {

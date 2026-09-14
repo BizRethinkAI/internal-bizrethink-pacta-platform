@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): render diagnostics contain fixed metadata only.
+import { logRenderError } from '@bizrethink/customizations/log-render-error';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
@@ -207,7 +209,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   const errorCode = isRouteErrorResponse(error) ? error.status : 500;
 
   if (errorCode !== 404) {
-    console.error('[RootErrorBoundary]', error);
+    logRenderError('root', errorCode);
   }
 
   useEffect(() => {
