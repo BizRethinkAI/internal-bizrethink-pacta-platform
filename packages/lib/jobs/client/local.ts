@@ -1,10 +1,12 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { readBoundedBytes } from '@bizrethink/customizations/server-only/resources/bounded-body';
 import { prisma } from '@documenso/prisma';
 import { sha256 } from '@noble/hashes/sha2';
 import { BackgroundJobStatus, Prisma } from '@prisma/client';
 import { CronExpressionParser } from 'cron-parser';
 import type { Context as HonoContext } from 'hono';
-
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
+import { AppError } from '../../errors/app-error';
 import { sign } from '../../server-only/crypto/sign';
 import { verify } from '../../server-only/crypto/verify';
 import {
@@ -229,12 +231,20 @@ export class LocalJobProvider extends BaseJobProvider {
       const signature = req.header('x-job-signature');
       const isRetry = req.header('x-job-retry') !== undefined;
 
-      const options = await req
-        .json()
-        .then(async (data) => ZSimpleTriggerJobOptionsSchema.parseAsync(data))
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        .then((data) => data as SimpleTriggerJobOptions)
-        .catch(() => null);
+      if (!jobId || jobId.length > 256 || !signature || signature.length > 4096) {
+        return c.text('Unauthorized', 401);
+      }
+
+      let options: SimpleTriggerJobOptions | null;
+      try {
+        const bytes = await readBoundedBytes(req.raw, { maxBytes: 2 * 1024 * 1024, timeoutMs: 15_000 });
+        options = await ZSimpleTriggerJobOptionsSchema.parseAsync(JSON.parse(bytes.toString('utf8')));
+      } catch (error) {
+        if (error instanceof AppError && (error.statusCode === 408 || error.statusCode === 413)) {
+          return c.text(error.message, error.statusCode);
+        }
+        return c.text('Bad request', 400);
+      }
 
       if (!options) {
         return c.text('Bad request', 400);

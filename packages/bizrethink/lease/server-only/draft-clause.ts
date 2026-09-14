@@ -1,4 +1,6 @@
 import { getResolvedAiConfig } from '../../server-only/instance-ai-config';
+import { type AiActor, withAiBudget } from '../../server-only/resources/ai-budget';
+import { readBoundedBytes } from '../../server-only/resources/bounded-body';
 import type { ClauseDraft } from '../ai/clause-draft';
 import { buildClauseDraftPrompt, parseClauseDraft } from '../ai/clause-draft';
 import type { AiProvider } from '../ai/providers';
@@ -38,6 +40,7 @@ export const callAi = async (
   provider: AiProvider,
   apiKey: string,
   prompt: string,
+  signal?: AbortSignal,
 ): Promise<{ ok: true; text: string } | AiCallFailure> => {
   const request = buildAiRequest(provider, apiKey, prompt);
 
@@ -46,12 +49,16 @@ export const callAi = async (
       method: 'POST',
       headers: request.headers,
       body: JSON.stringify(request.body),
+      redirect: 'error',
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20_000)]) : AbortSignal.timeout(20_000),
     });
 
+    const bytes = await readBoundedBytes(response, { maxBytes: 256 * 1024, timeoutMs: 20_000 });
+    const decoded: unknown = JSON.parse(bytes.toString('utf8'));
     if (!response.ok) {
       // Parsed defensively: a gateway may return HTML, which must not throw
       // here and turn a bad key into an unhandled error.
-      const body = await response.json().catch(() => null);
+      const body = decoded;
 
       return {
         ok: false,
@@ -60,7 +67,7 @@ export const callAi = async (
       };
     }
 
-    return { ok: true, text: extractAiText(provider, await response.json()) };
+    return { ok: true, text: extractAiText(provider, decoded) };
   } catch {
     return {
       ok: false,
@@ -73,12 +80,14 @@ export const callAi = async (
 export type DraftClauseResult = { ok: true; draft: ClauseDraft } | AiCallFailure;
 
 export type DraftClauseOptions = {
+  actor: AiActor;
   request: string;
   sections: string[];
   jurisdiction?: string;
 };
 
 export const draftClause = async ({
+  actor,
   request,
   sections,
   jurisdiction = 'US-FL',
@@ -94,23 +103,27 @@ export const draftClause = async ({
     return NOT_CONFIGURED;
   }
 
-  const called = await callAi(
-    config.provider,
-    config.apiKey,
-    buildClauseDraftPrompt({ request, sections, jurisdiction }),
-  );
+  return withAiBudget(actor, async (budget) => {
+    await budget.reserveProviderCalls(1);
+    const called = await callAi(
+      config.provider,
+      config.apiKey,
+      buildClauseDraftPrompt({ request, sections, jurisdiction }),
+      budget.signal,
+    );
 
-  if (!called.ok) {
-    return called;
-  }
+    if (!called.ok) {
+      return called;
+    }
 
-  const parsed = parseClauseDraft(called.text, { sections });
+    const parsed = parseClauseDraft(called.text, { sections });
 
-  if (!parsed.ok) {
-    return { ok: false, reason: 'rejected', error: parsed.error };
-  }
+    if (!parsed.ok) {
+      return { ok: false, reason: 'rejected', error: parsed.error };
+    }
 
-  return { ok: true, draft: parsed.draft };
+    return { ok: true, draft: parsed.draft };
+  });
 };
 
 /**
@@ -121,26 +134,29 @@ export const draftClause = async ({
  * equally have been a bad prompt. Asks for one word, so a success costs
  * almost nothing.
  */
-export const testAiConnection = async (): Promise<{ ok: true; provider: AiProvider } | AiCallFailure> => {
+export const testAiConnection = async (actor: AiActor): Promise<{ ok: true; provider: AiProvider } | AiCallFailure> => {
   const config = await getResolvedAiConfig();
 
   if (!config) {
     return NOT_CONFIGURED;
   }
 
-  const called = await callAi(config.provider, config.apiKey, 'Reply with the single word: ready');
+  return withAiBudget(actor, async (budget) => {
+    await budget.reserveProviderCalls(1);
+    const called = await callAi(config.provider, config.apiKey, 'Reply with the single word: ready', budget.signal);
 
-  if (!called.ok) {
-    return called;
-  }
+    if (!called.ok) {
+      return called;
+    }
 
-  if (called.text.trim() === '') {
-    return {
-      ok: false,
-      reason: 'call-failed',
-      error: 'The key was accepted but the model returned nothing. The response format may have changed.',
-    };
-  }
+    if (called.text.trim() === '') {
+      return {
+        ok: false,
+        reason: 'call-failed',
+        error: 'The key was accepted but the model returned nothing. The response format may have changed.',
+      };
+    }
 
-  return { ok: true, provider: config.provider };
+    return { ok: true, provider: config.provider };
+  });
 };

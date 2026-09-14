@@ -8,7 +8,7 @@ import { filesRoute } from '../../../apps/remix/server/api/files/files';
 import type { HonoEnv } from '../../../apps/remix/server/router';
 
 const { db, getSession, verifyPresign, putFile } = vi.hoisted(() => ({
-  db: { bizrethinkPdfUpload: { create: vi.fn() } },
+  db: { rateLimit: { upsert: vi.fn() }, bizrethinkPdfUpload: { create: vi.fn() } },
   getSession: vi.fn(),
   verifyPresign: vi.fn(),
   putFile: vi.fn(),
@@ -40,6 +40,7 @@ const upload = (authorization?: string) => {
 };
 beforeEach(() => {
   vi.clearAllMocks();
+  db.rateLimit.upsert.mockResolvedValue({ count: 1 });
   logger.level = 'silent';
   getSession.mockResolvedValue({ user: { id: 7 }, session: { id: 'session_test' } });
   verifyPresign.mockResolvedValue({ userId: 7, teamId: 10 });

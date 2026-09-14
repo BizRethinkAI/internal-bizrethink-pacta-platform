@@ -92,6 +92,12 @@
     "../app-tests/e2e/api/bizrethink/document-team-permissions.spec.ts",
     "server-only/document-replacement.ts",
     "regression-tests/document-replacement-integrity.test.ts",
-    "../app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts"
+    "../app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts",
+    "server-only/resources/**/*.ts",
+    "regression-tests/trial-*.test.ts",
+    "regression-tests/resource-*.test.ts",
+    "resource-policy.ts",
+    "admin/resource-policy-page.tsx",
+    "../app-tests/e2e/api/bizrethink/resource-abuse-boundary.spec.ts"
   ]
 }

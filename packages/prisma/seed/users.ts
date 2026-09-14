@@ -1,3 +1,4 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
 import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
 import { OrganisationType, Role } from '@prisma/client';
@@ -16,6 +17,8 @@ type SeedUserOptions = {
   inheritMembers?: boolean;
   isAdmin?: boolean;
   isPersonalOrganisation?: boolean;
+  /** General feature fixtures model an internal organisation; trial-boundary fixtures opt in explicitly. */
+  isExternalTrial?: boolean;
 };
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
@@ -32,6 +35,7 @@ export const seedUser = async ({
   inheritMembers = true,
   isAdmin = false,
   isPersonalOrganisation = false,
+  isExternalTrial = false,
 }: SeedUserOptions = {}) => {
   if (!email) {
     email = `${nanoid()}@test.documenso.com`;
@@ -62,6 +66,13 @@ export const seedUser = async ({
       organisationClaim: true,
     },
   });
+
+  if (!isExternalTrial) {
+    await prisma.bizrethinkOrganisationBilling.update({
+      where: { organisationId: organisation.id },
+      data: { bizrethinkInternal: true },
+    });
+  }
 
   await prisma.organisationClaim.update({
     where: {

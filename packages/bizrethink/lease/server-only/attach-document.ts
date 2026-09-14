@@ -1,5 +1,6 @@
 import { putFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
+import { reserveTrialUsage } from '../../server-only/resources/trial-policy';
 
 import type { DocumentKind } from '../documents/derive-documents';
 import { assertDocumentPlacement } from '../documents/placement';
@@ -37,7 +38,9 @@ const KINDS: DocumentKind[] = ['hoa-governing', 'move-in-report', 'move-out-repo
 
 const isKind = (value: string): value is DocumentKind => (KINDS as string[]).includes(value);
 
-export const attachLeaseDocument = async (input: AttachDocumentInput) => {
+export const resolveLeaseDocumentOwner = async (
+  input: Pick<AttachDocumentInput, 'userId' | 'propertyId' | 'matterId' | 'kind'>,
+) => {
   if (!isKind(input.kind)) {
     throw new Error(`"${input.kind}" is not a kind of document this system stores.`);
   }
@@ -72,6 +75,13 @@ export const attachLeaseDocument = async (input: AttachDocumentInput) => {
   if (!owner) {
     throw new Error('That property or lease could not be found.');
   }
+
+  return owner;
+};
+
+export const attachLeaseDocument = async (input: AttachDocumentInput) => {
+  const owner = await resolveLeaseDocumentOwner(input);
+  await reserveTrialUsage({ organisationId: owner.organisationId, type: 'document', count: 1 });
 
   /*
     `file.size`, not a re-read of the buffer. Counting the pages already reads

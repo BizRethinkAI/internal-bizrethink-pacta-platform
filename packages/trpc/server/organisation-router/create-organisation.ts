@@ -1,3 +1,4 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
 import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
@@ -79,6 +80,7 @@ export const createOrganisationRoute = authenticatedProcedure
         name,
         type: OrganisationType.ORGANISATION,
         claim: freeSubscriptionClaim,
+        pendingCheckout: true,
       });
 
       let customerId = organisation.customerId;

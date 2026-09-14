@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { reserveTrialUsage } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { prisma } from '@documenso/prisma';
 import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
 import pMap from 'p-map';
@@ -94,6 +96,9 @@ export const duplicateEnvelope = async ({ id, userId, teamId, overrides }: Dupli
       type: 'document',
       count: 1,
     });
+  } else {
+    // Templates allocate stored PDFs too; retain paid/internal accounting.
+    await reserveTrialUsage({ organisationId: team.organisationId, type: 'document', count: 1 });
   }
 
   const [{ legacyNumberId, secondaryId }, createdDocumentMeta] = await Promise.all([

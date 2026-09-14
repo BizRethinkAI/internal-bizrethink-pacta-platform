@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { getTrialLimits } from '@bizrethink/customizations/server-only/resources/trial-policy';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { isOrganisationPendingPayment } from '@documenso/lib/utils/billing';
@@ -43,6 +45,11 @@ export const getServerLimits = async ({ userId, teamId }: GetServerLimitsOptions
 
   const subscription = organisation.subscription;
   const maximumEnvelopeItemCount = organisation.organisationClaim.envelopeItemCount;
+
+  const trial = await getTrialLimits(organisation.id);
+  if (trial) {
+    return { quota: trial.quota, remaining: trial.remaining, maximumEnvelopeItemCount };
+  }
 
   if (!IS_BILLING_ENABLED()) {
     return {

@@ -1,8 +1,7 @@
-import { expect, test } from '@playwright/test';
-
 import { prisma } from '@documenso/prisma';
 import { resetAllBizRethinkSingletons } from '@documenso/prisma/seed/bizrethink';
 import { seedUser } from '@documenso/prisma/seed/users';
+import { expect, test } from '@playwright/test';
 
 /**
  * E3 from COVERAGE-PLAN-2026-05-25.md — org creation runs overlay 041
@@ -25,7 +24,7 @@ test.describe('BizRethink org creation — 14-day trial bookkeeping', () => {
 
   test('seedUser creates a Personal Org that gets a BizRethink trial row', async () => {
     const before = Date.now();
-    const { organisation } = await seedUser();
+    const { organisation } = await seedUser({ isExternalTrial: true });
     const after = Date.now();
 
     const billing = await prisma.bizrethinkOrganisationBilling.findUnique({

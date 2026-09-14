@@ -1638,13 +1638,17 @@ export const leaseBuilderRouter = router({
         z.object({
           organisationId: z.string(),
           request: z.string().min(10).max(2000),
-          sections: z.array(z.string()).min(1),
+          sections: z.array(z.string().max(200)).min(1).max(40),
         }),
       )
       .mutation(async ({ ctx, input }) => {
         await assertAccess(input.organisationId, ctx.user.id);
 
-        return await draftClause({ request: input.request, sections: input.sections });
+        return await draftClause({
+          request: input.request,
+          sections: input.sections,
+          actor: { userId: ctx.user.id, organisationId: input.organisationId },
+        });
       }),
   }),
 

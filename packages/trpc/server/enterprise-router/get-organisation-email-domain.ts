@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+import { getDomainChallenge } from '@bizrethink/customizations/server-only/resources/email-domains';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
@@ -33,6 +35,10 @@ type GetOrganisationEmailDomainOptions = {
 };
 
 export const getOrganisationEmailDomain = async ({ userId, emailDomainId }: GetOrganisationEmailDomainOptions) => {
+  const pending = await getDomainChallenge(emailDomainId, userId);
+  if (pending) {
+    return pending;
+  }
   const emailDomain = await prisma.emailDomain.findFirst({
     where: {
       id: emailDomainId,

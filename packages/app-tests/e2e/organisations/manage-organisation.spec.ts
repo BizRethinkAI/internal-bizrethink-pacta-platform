@@ -1,5 +1,8 @@
+// MODIFIED for BizRethink (overlay 089): exercise first-trial creation, then deletion; deletion does not renew a trial.
+import { hashSync } from '@documenso/lib/server-only/auth/hash';
 import { createTeam } from '@documenso/lib/server-only/team/create-team';
 import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
 import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedUser } from '@documenso/prisma/seed/users';
 import { expect, test } from '@playwright/test';
@@ -8,35 +11,36 @@ import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { expectTextToBeVisible, expectTextToNotBeVisible, openDropdownMenu } from '../fixtures/generic';
 
 test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
-  const { user, organisation } = await seedUser({
-    isPersonalOrganisation: false,
+  // Start before the account has received any trial organisation. The security
+  // HTTP suite separately proves that deleting it cannot reset this allowance.
+  const user = await prisma.user.create({
+    data: {
+      name: 'Synthetic organisation owner',
+      email: `create-org-${nanoid()}@test.documenso.com`.toLowerCase(),
+      password: hashSync('password'),
+      emailVerified: new Date(),
+    },
   });
-
-  await apiSignin({
-    page,
-    email: user.email,
-    redirectPath: `/settings/organisations`,
-  });
-
-  await expect(page.getByRole('button', { name: 'Leave' })).toBeDisabled();
-
-  await page.getByRole('link', { name: 'Manage' }).click();
-  await page.waitForURL(`/o/${organisation.url}/settings/general`);
-
-  await page.getByRole('button', { name: 'Delete' }).click();
-  await page.getByLabel(`Confirm by typing delete ${organisation.name}`).fill(`delete ${organisation.name}`);
-  await page.getByRole('button', { name: 'Delete' }).click();
-
-  await page.waitForURL(`/settings/organisations`);
+  await apiSignin({ page, email: user.email, redirectPath: `/settings/organisations` });
+  const session = await page.request.get('/api/auth/session');
+  expect((await session.json()).user?.id).toBe(user.id);
   await expectTextToBeVisible(page, 'No results found');
   await page.getByRole('button', { name: 'Create organization' }).click();
-
   await page.getByLabel('Organization Name*').fill('test');
   await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByText('Your organization has been created').first()).toBeVisible();
   await page.reload();
 
-  await page.getByRole('row').filter({ hasText: 'test' }).getByRole('link').nth(1).click();
+  const organisation = await prisma.organisation.findFirstOrThrow({ where: { ownerUserId: user.id } });
+  await expect(page.getByRole('button', { name: 'Leave' })).toBeDisabled();
+  await page.getByRole('link', { name: 'Manage' }).click();
+  await page.waitForURL(`/o/${organisation.url}/settings/general`);
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByLabel(`Confirm by typing delete ${organisation.name}`).fill(`delete ${organisation.name}`);
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.waitForURL(`/settings/organisations`);
+  await expectTextToBeVisible(page, 'No results found');
+  expect(await prisma.organisation.count({ where: { ownerUserId: user.id } })).toBe(0);
 });
 
 test('[ORGANISATIONS]: manage general settings', async ({ page }) => {
