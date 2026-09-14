@@ -8,6 +8,7 @@ import {
 } from './auto-claim-invites-on-signup';
 
 type Invite = {
+  createdAt: Date;
   id: string;
   email: string;
   organisationId: string;
@@ -50,6 +51,7 @@ let workspaces: number;
 let tail: Promise<unknown>;
 const invite = (id: string): Invite => ({
   id,
+  createdAt: new Date('2026-09-01T00:00:00Z'),
   email: 'jane@example.test',
   organisationId: `org-${id}`,
   organisationRole: 'MEMBER',
@@ -69,8 +71,10 @@ beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => undefined);
   mocks.job.mockResolvedValue(undefined);
   mocks.userRead.mockImplementation(async () => ({ ...user }));
-  mocks.inviteRead.mockImplementation(async () =>
-    invites.filter((row) => row.status === 'PENDING').map((row) => structuredClone(row)),
+  mocks.inviteRead.mockImplementation(async ({ where }) =>
+    invites
+      .filter((row) => row.status === 'PENDING' && (!where.createdAt?.lte || row.createdAt <= where.createdAt.lte))
+      .map((row) => structuredClone(row)),
   );
   mocks.update.mockImplementation(async ({ where, data }) => {
     const row = invites.find((row) => row.id === where.id);
@@ -187,7 +191,13 @@ describe('verified onboarding transaction and recovery (R-03)', () => {
   it('queries the current database email case-insensitively and pending only', async () => {
     await autoClaimInvitesOnSignup(signupOptions);
     expect(mocks.inviteRead).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { email: { equals: user.email, mode: 'insensitive' }, status: 'PENDING' } }),
+      expect.objectContaining({
+        where: {
+          email: { equals: user.email, mode: 'insensitive' },
+          status: 'PENDING',
+          createdAt: { lte: user.emailVerified },
+        },
+      }),
     );
   });
   it('the signup-only helper does not create a fallback', async () => {
@@ -240,6 +250,15 @@ describe('verified onboarding transaction and recovery (R-03)', () => {
     expect(await claimInvitesOnVerification(options)).toEqual([]);
     expect(members).toEqual(['org-a']);
     expect(mocks.job).toHaveBeenCalledOnce();
+  });
+  it('leaves invitations created after email verification for the normal acceptance flow', async () => {
+    user.emailVerified = new Date('2026-09-10T00:00:00Z');
+    invites = [{ ...invite('later'), createdAt: new Date('2026-09-11T00:00:00Z') }];
+    members.push('existing-workspace');
+    await recoverOnboardingOnLogin(7);
+    expect(invites[0].status).toBe('PENDING');
+    expect(members).toEqual(['existing-workspace']);
+    expect(mocks.add).not.toHaveBeenCalled();
   });
   it('propagates signup claim failure and leaves no writes', async () => {
     mocks.inviteRead.mockRejectedValueOnce(new Error('DB unavailable'));

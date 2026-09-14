@@ -37,8 +37,9 @@ consolidation and shipping remain separate. No production operation occurred.
   avoids an unrequested migration and preserves the existing remaining-code
   screen. They are now single-use; this is not a claim that codes are hashed.
   No new recovery mechanism, reset bypass or new configuration is introduced.
-- Login reconciles matching pending invitations for a currently verified active
-  account, consistent with the fork's automatic invitation onboarding. It also
+- Login reconciles matching pending invitations created before email verification for an active
+  account, consistent with the fork's automatic invitation onboarding. Later
+  invitations retain their normal acceptance flow. It also
   repairs historical membership-with-pending-status without changing roles.
 - Reconciliation failures do not undo email verification or prevent a valid
   login. They emit a fixed diagnostic without the email, token or raw exception.
@@ -77,9 +78,9 @@ organisation refactor, retaining earlier overlays and the verified-email boundar
   helper: 12 failed / 7 passed. The new login hook does not exist in that base;
   those missing-hook failures are distinct from the reproduced partial-write
   and identity failures. The implemented selection passes.
-- Local focused validation: 10 owned files / 129 tests and two upstream caller
+- Local focused validation: 10 owned files / 130 tests and two upstream caller
   files / 17 tests passed; separate TypeScript and changed-file formatting pass.
-- Eleven HTTP/PostgreSQL cases cover disabled live cookies and re-enable,
+- Twelve HTTP/PostgreSQL cases cover disabled live cookies and re-enable,
   both MFA setup paths, one concurrent recovery winner, remaining-code display,
   verified concurrent claims, later-invite failure rollback/retry, historical
   membership repair, one fallback workspace, full constructor rollback and

@@ -15,7 +15,9 @@ export type AutoClaimedInvite = {
  * Current verified identity, membership/group insertion and invite consumption
  * share a transaction. A user-row lock serializes verification/login retries;
  * invite locks prevent accepting a concurrently declined/deleted invitation.
- * Existing memberships are retained without changing their roles.
+ * Only invitations present when the email was verified belong to this recovery
+ * unit. Later invitations retain their normal acceptance flow. Existing
+ * memberships are retained without changing their roles.
  */
 const reconcileVerifiedOnboarding = async ({
   userId,
@@ -34,10 +36,14 @@ const reconcileVerifiedOnboarding = async ({
     }
 
     await tx.$queryRaw`SELECT id FROM "OrganisationMemberInvite"
-      WHERE LOWER(email) = LOWER(${user.email}) AND status = 'PENDING'
+      WHERE LOWER(email) = LOWER(${user.email}) AND status = 'PENDING' AND "createdAt" <= ${user.emailVerified}
       ORDER BY id FOR UPDATE`;
     const pendingInvites = await tx.organisationMemberInvite.findMany({
-      where: { email: { equals: user.email, mode: 'insensitive' }, status: OrganisationMemberInviteStatus.PENDING },
+      where: {
+        email: { equals: user.email, mode: 'insensitive' },
+        status: OrganisationMemberInviteStatus.PENDING,
+        createdAt: { lte: user.emailVerified },
+      },
       include: { organisation: { include: { groups: true } } },
       orderBy: { id: 'asc' },
     });

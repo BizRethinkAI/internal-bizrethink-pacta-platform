@@ -246,6 +246,10 @@ test('R-03 login repairs a historical pending invitation with an existing member
 }) => {
   const seed = await seedUser();
   const invitation = await inviteUser(seed.user.email, seed.organisation.id);
+  await prisma.organisationMemberInvite.update({
+    where: { id: invitation.id },
+    data: { createdAt: new Date(seed.user.emailVerified!.getTime() - 1000) },
+  });
   const before = await prisma.organisationGroupMember.findMany({
     where: { organisationMember: { userId: seed.user.id, organisationId: seed.organisation.id } },
   });
@@ -308,4 +312,19 @@ test('R-03 reconciliation refuses unverified and disabled users even with a matc
       'PENDING',
     );
   }
+});
+
+test('R-03 login does not auto-accept invitations created after email verification', async ({ clients }) => {
+  const seed = await seedUser();
+  const inviting = await seedUser();
+  const invitation = await inviteUser(seed.user.email, inviting.organisation.id);
+  await clients.login(seed.user.email);
+  expect((await prisma.organisationMemberInvite.findUniqueOrThrow({ where: { id: invitation.id } })).status).toBe(
+    'PENDING',
+  );
+  expect(
+    await prisma.organisationMember.count({
+      where: { userId: seed.user.id, organisationId: inviting.organisation.id },
+    }),
+  ).toBe(0);
 });
