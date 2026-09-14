@@ -1,8 +1,12 @@
 // MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
 import { validateDirectTemplateFields } from '@bizrethink/customizations/server-only/direct-template-fields';
 import { assertTrialDistribution } from '@bizrethink/customizations/server-only/resources/trial-policy';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+
+const serverConsole = createServerConsole('packages/lib/server-only/template/create-document-from-direct-template');
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 import type { Field, Signature } from '@prisma/client';
 import {
@@ -824,7 +828,7 @@ export const createDocumentFromDirectTemplate = async ({
       teamId: refetchedEnvelope.teamId ?? undefined,
     });
   } catch (err) {
-    console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
+    serverConsole.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
 
     // Don't launch an error since the document has already been created.
     // Log and reseal as required until we configure middleware.
