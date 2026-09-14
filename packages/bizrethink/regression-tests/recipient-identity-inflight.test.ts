@@ -7,7 +7,7 @@ import type { TrpcContext } from '@documenso/trpc/server/context';
 import { signEnvelopeFieldRoute } from '@documenso/trpc/server/envelope-router/sign-envelope-field';
 import { router } from '@documenso/trpc/server/trpc';
 import type { Recipient } from '@prisma/client';
-import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
+import { DocumentSigningOrder, DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
 import { beforeEach, expect, it, vi } from 'vitest';
 
 import { envelopeFixture, fieldFixture, recipientFixture } from './recipient-auth-fixture';
@@ -27,6 +27,8 @@ const { db, job, webhook } = vi.hoisted(() => ({
     documentMeta: { findFirst: vi.fn() },
     documentAuditLog: { create: vi.fn(), createMany: vi.fn() },
     signature: { upsert: vi.fn(), deleteMany: vi.fn() },
+    cscCredential: { deleteMany: vi.fn() },
+    cscSession: { deleteMany: vi.fn() },
     $queryRaw: vi.fn(),
     $transaction: vi.fn(),
   },
@@ -44,8 +46,13 @@ let envelope: ReturnType<typeof envelopeFixture> & {
   useLegacyFieldInsertion: boolean;
 };
 let reassignBeforeWrite: boolean;
+let nextRecipient: Recipient | null;
 const token = 'original-test-bearer';
-const snapshot = () => ({ ...envelope, recipients: [{ ...recipient }], fields: [{ ...field }] });
+const snapshot = () => ({
+  ...envelope,
+  recipients: [{ ...recipient }, ...(nextRecipient ? [{ ...nextRecipient }] : [])],
+  fields: [{ ...field }],
+});
 const api = router({ sign: signEnvelopeFieldRoute });
 const context = (): TrpcContext => ({
   user: null,
@@ -110,6 +117,7 @@ beforeEach(() => {
     qrToken: null,
     useLegacyFieldInsertion: false,
   };
+  nextRecipient = null;
   reassignBeforeWrite = false;
   const readRecipient = async ({ where }: { where: { token?: string } }) =>
     where.token && where.token !== recipient.token ? null : { ...recipient, envelope: snapshot() };
@@ -205,3 +213,30 @@ for (const operation of operations) {
     expect(db.documentAuditLog.create).toHaveBeenCalled();
   });
 }
+
+it('A-19 rotates the next signer link when a completing signer dictates a replacement identity', async () => {
+  if (!envelope.documentMeta) {
+    throw new Error('Missing fixture metadata');
+  }
+  envelope.documentMeta.signingOrder = DocumentSigningOrder.SEQUENTIAL;
+  envelope.documentMeta.allowDictateNextSigner = true;
+  field = { ...fieldFixture(FieldType.DATE), inserted: false };
+  nextRecipient = { ...recipientFixture(envelope.id), id: 2, signingOrder: 2, token: 'previous-next-signer-token' };
+  const oldToken = nextRecipient.token;
+  db.recipient.findMany.mockImplementation(async () => (nextRecipient ? [{ ...nextRecipient }] : []));
+  db.recipient.update.mockImplementation(async ({ data }) => {
+    if (!nextRecipient) {
+      throw new Error('Missing next recipient fixture');
+    }
+    nextRecipient = { ...nextRecipient, ...data };
+    return { ...nextRecipient };
+  });
+  await completeDocumentWithToken({
+    token,
+    id,
+    nextSigner: { name: 'Replacement', email: 'replacement@example.invalid' },
+  });
+  expect(nextRecipient).toMatchObject({ name: 'Replacement', email: 'replacement@example.invalid' });
+  expect(nextRecipient?.token).not.toBe(oldToken);
+  expect(db.cscCredential.deleteMany).toHaveBeenCalledWith({ where: { recipientId: 2 } });
+});

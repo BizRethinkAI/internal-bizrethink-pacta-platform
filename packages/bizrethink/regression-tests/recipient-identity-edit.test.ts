@@ -5,7 +5,15 @@ import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/u
 import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
 import type { Recipient } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, ReadStatus, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+import {
+  DocumentDistributionMethod,
+  DocumentStatus,
+  EnvelopeType,
+  ReadStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@prisma/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { envelopeFixture, type fieldFixture, recipientFixture } from './recipient-auth-fixture';
@@ -211,4 +219,22 @@ it('revokes direct preview bearer authority when the direct link is removed', as
   await deleteTemplateDirectLink({ userId: 7, teamId: 10, templateId: 1 });
   expect(recipient.token).not.toBe(oldToken);
   expect(db.cscSession.deleteMany).toHaveBeenCalledWith({ where: { recipientId: recipient.id } });
+});
+
+it('queues a replacement signing link after a delivered recipient changes', async () => {
+  await adapters[0].run({ email: 'replacement@example.invalid' });
+  expect(job).toHaveBeenCalledWith(
+    expect.objectContaining({
+      name: 'send.signing.requested.email',
+      payload: expect.objectContaining({ recipientId: recipient.id, documentId: 1, userId: 7 }),
+    }),
+  );
+});
+it('keeps manual distribution manual when identity changes', async () => {
+  if (!envelope.documentMeta) {
+    throw new Error('Missing fixture metadata');
+  }
+  envelope.documentMeta.distributionMethod = DocumentDistributionMethod.NONE;
+  await adapters[0].run({ email: 'replacement@example.invalid' });
+  expect(job).not.toHaveBeenCalled();
 });
