@@ -1,12 +1,16 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { PDF } from '@libpdf/core';
 
 import { AppError } from '../../errors/app-error';
+
+const serverConsole = createServerConsole('packages/lib/server-only/pdf/normalize-pdf');
 
 export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean } = {}) => {
   const shouldFlattenForm = options.flattenForm ?? true;
 
   const pdfDoc = await PDF.load(pdf).catch((e) => {
-    console.error(`PDF normalization error: ${e.message}`);
+    serverConsole.error(`PDF normalization error: ${e.message}`);
 
     throw new AppError('INVALID_DOCUMENT_FILE', {
       message: 'The document is not a valid PDF',

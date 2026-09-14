@@ -1,5 +1,8 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { HonoAdapter } from '@bull-board/hono';
@@ -17,6 +20,8 @@ import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
 import type { Json } from './_internal/json';
 import { BaseJobProvider } from './base';
+
+const serverConsole = createServerConsole('packages/lib/jobs/client/bullmq');
 
 const QUEUE_NAME = 'documenso-jobs';
 
@@ -70,14 +75,14 @@ export class BullMQJobProvider extends BaseJobProvider {
     );
 
     this._worker.on('failed', (job, error) => {
-      console.error(`[JOBS]: Job ${job?.name ?? 'unknown'} failed`, error);
+      serverConsole.error(`[JOBS]: Job ${job?.name ?? 'unknown'} failed`, error);
     });
 
     this._worker.on('error', (error) => {
-      console.error('[JOBS]: Worker error', error);
+      serverConsole.error('[JOBS]: Worker error', error);
     });
 
-    console.log(`[JOBS]: BullMQ provider initialized (concurrency: ${concurrency})`);
+    serverConsole.log(`[JOBS]: BullMQ provider initialized (concurrency: ${concurrency})`);
   }
 
   /**
@@ -123,10 +128,10 @@ export class BullMQJobProvider extends BaseJobProvider {
           },
         )
         .then(() => {
-          console.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
+          serverConsole.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
         })
         .catch((error) => {
-          console.error(`[JOBS]: Failed to register cron job ${definition.id}`, error);
+          serverConsole.error(`[JOBS]: Failed to register cron job ${definition.id}`, error);
         });
     }
   }
@@ -218,12 +223,12 @@ export class BullMQJobProvider extends BaseJobProvider {
     const definition = this._jobDefinitions[definitionId];
 
     if (!definition) {
-      console.error(`[JOBS]: No definition found for job ${definitionId}`);
+      serverConsole.error(`[JOBS]: No definition found for job ${definitionId}`);
       throw new Error(`No definition found for job ${definitionId}`);
     }
 
     if (!definition.enabled) {
-      console.log(`[JOBS]: Skipping disabled job ${definitionId}`);
+      serverConsole.log(`[JOBS]: Skipping disabled job ${definitionId}`);
       return;
     }
 
@@ -239,7 +244,7 @@ export class BullMQJobProvider extends BaseJobProvider {
       const result = definition.trigger.schema.safeParse(payload);
 
       if (!result.success) {
-        console.error(`[JOBS]: Payload validation failed for ${definitionId}`, result.error);
+        serverConsole.error(`[JOBS]: Payload validation failed for ${definitionId}`, result.error);
         throw new Error(`Payload validation failed for ${definitionId}`);
       }
 
@@ -264,7 +269,7 @@ export class BullMQJobProvider extends BaseJobProvider {
         .catch(() => null);
     }
 
-    console.log(`[JOBS]: Processing job ${definitionId} with payload`, payload);
+    serverConsole.info({ event: 'job.received', jobId: job.id });
 
     try {
       await definition.handler({
@@ -364,19 +369,13 @@ export class BullMQJobProvider extends BaseJobProvider {
             },
           });
 
-          console.log(`[JOBS:${task.id}] Task failed`, err);
+          serverConsole.log(`[JOBS:${task.id}] Task failed`, err);
 
           throw err;
         }
       },
       triggerJob: async (_cacheKey, payload) => await this.triggerJob(payload),
-      logger: {
-        debug: (...args) => console.debug(`[${jobId}]`, ...args),
-        error: (...args) => console.error(`[${jobId}]`, ...args),
-        info: (...args) => console.info(`[${jobId}]`, ...args),
-        log: (...args) => console.log(`[${jobId}]`, ...args),
-        warn: (...args) => console.warn(`[${jobId}]`, ...args),
-      },
+      logger: createServerConsole('packages/lib/jobs/client/bullmq', { jobId }),
       // eslint-disable-next-line @typescript-eslint/require-await
       wait: async () => {
         throw new Error('Not implemented');

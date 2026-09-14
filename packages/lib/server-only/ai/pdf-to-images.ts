@@ -1,6 +1,10 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { Canvas, Image, Path2D } from '@documenso/skia-canvas';
 import pMap from 'p-map';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+
+const serverConsole = createServerConsole('packages/lib/server-only/ai/pdf-to-images');
 
 // @ts-expect-error napi-rs/canvas satisfies the requirements
 globalThis.Path2D = Path2D;
@@ -90,8 +94,8 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
     { concurrency: 10 },
   );
 
-  void pdf.destroy().catch((e) => console.error(e));
-  void task.destroy().catch((e) => console.error(e));
+  void pdf.destroy().catch((e) => serverConsole.error(e));
+  void task.destroy().catch((e) => serverConsole.error(e));
 
   return images;
 };

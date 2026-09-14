@@ -1,7 +1,10 @@
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
+
+const serverConsole = createServerConsole('packages/bizrethink/server-only/auto-claim-invites-on-signup');
 
 // Phase L (2026-05-11): auto-accept ALL pending OrganisationMemberInvite
 // rows that match a newly-signed-up user's email.
@@ -98,7 +101,7 @@ export const autoClaimInvitesOnSignup = async ({
     } catch (err) {
       // Log + continue. We don't want one bad invite to fail the whole
       // signup. The user still gets account created; admin can re-invite.
-      console.error(`[auto-claim-invites] Failed to accept invite ${invite.id} for ${userEmail}:`, err);
+      serverConsole.error({ event: 'invitation.claim-failed', userId, err });
     }
   }
 
@@ -159,7 +162,7 @@ export const claimInvitesOnVerification = async ({
 
     return accepted;
   } catch (err) {
-    console.error(`[claim-invites-on-verification] Failed for user ${userId}:`, err);
+    serverConsole.error({ event: 'verification.claim-failed', userId, err });
     return [];
   }
 };

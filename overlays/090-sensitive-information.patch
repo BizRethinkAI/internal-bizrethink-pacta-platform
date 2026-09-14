@@ -1,0 +1,2650 @@
+# Why: Prevent analytics credential forwarding and reusable bearer disclosure through application diagnostics.
+# Why-not-additive: The proxy, logger, jobs, server console and instrumentation entry points are inherited; all sanitization policy lives in the owned package.
+# Upstream-merge-fragility: high; preserve preceding auth/transaction/resource gates, every safe diagnostic delegate and the early sanitizer export/import during sync.
+
+diff --git a/apps/remix/app/entry.server.tsx b/apps/remix/app/entry.server.tsx
+index 8f8c46c28..8934f7edc 100644
+--- a/apps/remix/app/entry.server.tsx
++++ b/apps/remix/app/entry.server.tsx
+@@ -1,4 +1,7 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import { PassThrough } from 'node:stream';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { shouldLogRequestError } from '@bizrethink/customizations/server-only/should-log-request-error';
+ import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+ import { dynamicActivate, extractLocaleData } from '@documenso/lib/utils/i18n';
+@@ -13,6 +16,8 @@ import { ServerRouter } from 'react-router';
+ 
+ import { langCookie } from './storage/lang-cookie.server';
+ 
++const serverConsole = createServerConsole('apps/remix/app/entry.server');
++
+ export const streamTimeout = 5_000;
+ 
+ export default async function handleRequest(
+@@ -76,7 +81,7 @@ export default async function handleRequest(
+           // errors encountered during initial shell rendering since they'll
+           // reject and get logged in handleDocumentRequest.
+           if (shellRendered) {
+-            console.error(error);
++            serverConsole.error(error);
+           }
+         },
+       },
+@@ -101,5 +106,5 @@ export const handleError: HandleErrorFunction = (error, { request }) => {
+     return;
+   }
+ 
+-  console.error(error);
++  serverConsole.error(error);
+ };
+diff --git a/apps/remix/app/routes/_redirects+/ingest.$.tsx b/apps/remix/app/routes/_redirects+/ingest.$.tsx
+index 6b84d4402..c84ace2b3 100644
+--- a/apps/remix/app/routes/_redirects+/ingest.$.tsx
++++ b/apps/remix/app/routes/_redirects+/ingest.$.tsx
+@@ -1,55 +1,6 @@
+-/**
+- * https://posthog.com/docs/advanced/proxy/remix
+- */
+-import type { Route } from './+types/ingest.$';
++// MODIFIED for BizRethink (overlay 090): analytics receives content with a minimal header allowlist.
++import { posthogProxy } from '@bizrethink/customizations/server-only/analytics-proxy';
++import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
+ 
+-const API_HOST = 'eu.i.posthog.com';
+-const ASSET_HOST = 'eu-assets.i.posthog.com';
+-
+-const posthogProxy = async (request: Request) => {
+-  const url = new URL(request.url);
+-  const hostname = url.pathname.startsWith('/ingest/static/') ? ASSET_HOST : API_HOST;
+-
+-  const newUrl = new URL(url);
+-  newUrl.protocol = 'https';
+-  newUrl.hostname = hostname;
+-  newUrl.port = '443';
+-  newUrl.pathname = newUrl.pathname.replace(/^\/ingest/, '');
+-
+-  const headers = new Headers(request.headers);
+-  headers.set('host', hostname);
+-
+-  const fetchOptions: RequestInit = {
+-    method: request.method,
+-    headers,
+-    redirect: 'follow',
+-  };
+-
+-  if (!['GET', 'HEAD'].includes(request.method)) {
+-    fetchOptions.body = request.body;
+-    // @ts-expect-error - It should exist
+-    fetchOptions.duplex = 'half';
+-  }
+-
+-  const response = await fetch(newUrl, fetchOptions);
+-
+-  const responseHeaders = new Headers(response.headers);
+-  responseHeaders.delete('content-encoding');
+-  responseHeaders.delete('content-length');
+-  responseHeaders.delete('transfer-encoding');
+-  responseHeaders.delete('cookie');
+-
+-  return new Response(response.body, {
+-    status: response.status,
+-    statusText: response.statusText,
+-    headers: responseHeaders,
+-  });
+-};
+-
+-export async function loader({ request }: Route.LoaderArgs) {
+-  return posthogProxy(request);
+-}
+-
+-export async function action({ request }: Route.ActionArgs) {
+-  return posthogProxy(request);
+-}
++export const loader = ({ request }: LoaderFunctionArgs) => posthogProxy(request);
++export const action = ({ request }: ActionFunctionArgs) => posthogProxy(request);
+diff --git a/apps/remix/app/routes/api+/branding.logo.organisation.$orgId.ts b/apps/remix/app/routes/api+/branding.logo.organisation.$orgId.ts
+index 050bb4a6b..909fcc919 100644
+--- a/apps/remix/app/routes/api+/branding.logo.organisation.$orgId.ts
++++ b/apps/remix/app/routes/api+/branding.logo.organisation.$orgId.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { sha256 } from '@documenso/lib/universal/crypto';
+ import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+ import { loadLogo } from '@documenso/lib/utils/images/logo';
+@@ -5,6 +7,8 @@ import { prisma } from '@documenso/prisma';
+ 
+ import type { Route } from './+types/branding.logo.organisation.$orgId';
+ 
++const serverConsole = createServerConsole('apps/remix/app/routes/api+/branding.logo.organisation.$orgId');
++
+ const CACHE_CONTROL = 'public, max-age=0, stale-while-revalidate=86400';
+ 
+ export async function loader({ params, request }: Route.LoaderArgs) {
+@@ -64,7 +68,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
+   }
+ 
+   const file = await getFileServerSide(JSON.parse(settings.brandingLogo)).catch((e) => {
+-    console.error(e);
++    serverConsole.error(e);
+   });
+ 
+   if (!file) {
+diff --git a/apps/remix/app/routes/api+/branding.logo.team.$teamId.ts b/apps/remix/app/routes/api+/branding.logo.team.$teamId.ts
+index 923e8e0ca..5d70f8cbd 100644
+--- a/apps/remix/app/routes/api+/branding.logo.team.$teamId.ts
++++ b/apps/remix/app/routes/api+/branding.logo.team.$teamId.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
+ import { sha256 } from '@documenso/lib/universal/crypto';
+ import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
+@@ -5,6 +7,8 @@ import { loadLogo } from '@documenso/lib/utils/images/logo';
+ 
+ import type { Route } from './+types/branding.logo.team.$teamId';
+ 
++const serverConsole = createServerConsole('apps/remix/app/routes/api+/branding.logo.team.$teamId');
++
+ const CACHE_CONTROL = 'public, max-age=0, stale-while-revalidate=86400';
+ 
+ export async function loader({ params, request }: Route.LoaderArgs) {
+@@ -57,7 +61,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
+   }
+ 
+   const file = await getFileServerSide(JSON.parse(settings.brandingLogo)).catch((e) => {
+-    console.error(e);
++    serverConsole.error(e);
+   });
+ 
+   if (!file) {
+diff --git a/apps/remix/server/api/ai/detect-fields.ts b/apps/remix/server/api/ai/detect-fields.ts
+index cae5f513f..f2f48cea5 100644
+--- a/apps/remix/server/api/ai/detect-fields.ts
++++ b/apps/remix/server/api/ai/detect-fields.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+ import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+@@ -10,6 +12,8 @@ import { streamText } from 'hono/streaming';
+ import type { HonoEnv } from '../../router';
+ import { ZDetectFieldsRequestSchema } from './detect-fields.types';
+ 
++const serverConsole = createServerConsole('apps/remix/server/api/ai/detect-fields');
++
+ const KEEPALIVE_INTERVAL_MS = 5000;
+ 
+ export const detectFieldsRoute = new Hono<HonoEnv>().post(
+@@ -117,7 +121,7 @@ export const detectFieldsRoute = new Hono<HonoEnv>().post(
+ 
+           // The logger below it stringifies the error, using `console.error`
+           // to attempt to get a stack trace
+-          console.error(error);
++          serverConsole.error(error);
+ 
+           logger.error({
+             event: 'ai.detect-fields.error',
+diff --git a/apps/remix/server/api/ai/detect-recipients.ts b/apps/remix/server/api/ai/detect-recipients.ts
+index 94d511c88..a6a69ce9b 100644
+--- a/apps/remix/server/api/ai/detect-recipients.ts
++++ b/apps/remix/server/api/ai/detect-recipients.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+ import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+@@ -10,6 +12,8 @@ import { streamText } from 'hono/streaming';
+ import type { HonoEnv } from '../../router';
+ import { ZDetectRecipientsRequestSchema } from './detect-recipients.types';
+ 
++const serverConsole = createServerConsole('apps/remix/server/api/ai/detect-recipients');
++
+ const KEEPALIVE_INTERVAL_MS = 5000;
+ 
+ export const detectRecipientsRoute = new Hono<HonoEnv>().post(
+@@ -115,7 +119,7 @@ export const detectRecipientsRoute = new Hono<HonoEnv>().post(
+ 
+           // The logger below it stringifies the error, using `console.error`
+           // to attempt to get a stack trace
+-          console.error(error);
++          serverConsole.error(error);
+ 
+           logger.error({
+             event: 'ai.detect-recipients.error',
+diff --git a/apps/remix/server/api/files/files.helpers.ts b/apps/remix/server/api/files/files.helpers.ts
+index b692a2ee9..81438dfcd 100644
+--- a/apps/remix/server/api/files/files.helpers.ts
++++ b/apps/remix/server/api/files/files.helpers.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+@@ -12,6 +14,8 @@ import { match } from 'ts-pattern';
+ 
+ import type { HonoEnv } from '../../router';
+ 
++const serverConsole = createServerConsole('apps/remix/server/api/files/files.helpers');
++
+ type DocumentDataInput = {
+   type: DocumentDataType;
+   data: string;
+@@ -111,7 +115,7 @@ const handleStaticFileRequest = async ({
+     type: documentData.type,
+     data: documentDataToUse,
+   }).catch((error) => {
+-    console.error(error);
++    serverConsole.error(error);
+ 
+     return null;
+   });
+@@ -215,7 +219,7 @@ const handlePendingFileRequest = async ({
+     type: documentData.type,
+     data: documentData.initialData,
+   }).catch((error) => {
+-    console.error(error);
++    serverConsole.error(error);
+ 
+     return null;
+   });
+diff --git a/apps/remix/server/api/files/files.ts b/apps/remix/server/api/files/files.ts
+index fe497d01f..71e38c1ce 100644
+--- a/apps/remix/server/api/files/files.ts
++++ b/apps/remix/server/api/files/files.ts
+@@ -1,7 +1,10 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import {
+   getEnvelopeFileWhereInput,
+   privateEnvelopeFileCache,
+ } from '@bizrethink/customizations/server-only/document-permissions';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
+ import { presignFileCache, resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
+ import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
+@@ -28,6 +31,8 @@ import {
+ import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
+ import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
+ 
++const serverConsole = createServerConsole('apps/remix/server/api/files/files');
++
+ export const filesRoute = new Hono<HonoEnv>()
+   // MODIFIED for BizRethink (overlay 084): role/visibility changes apply to every authenticated file read.
+   .use('/envelope/*', privateEnvelopeFileCache)
+@@ -72,7 +77,7 @@ export const filesRoute = new Hono<HonoEnv>()
+ 
+       return c.json(result);
+     } catch (error) {
+-      console.error('Upload failed:', error);
++      serverConsole.error('Upload failed:', error);
+       return c.json({ error: 'Upload failed' }, 500);
+     }
+   })
+diff --git a/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts b/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
+index d049f373b..8da8ee48a 100644
+--- a/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
++++ b/apps/remix/server/api/files/routes/get-envelope-item-pdf.ts
+@@ -1,4 +1,7 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import { getEnvelopeFileWhereInput } from '@bizrethink/customizations/server-only/document-permissions';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
+ import type { DocumentDataVersion } from '@documenso/lib/types/document';
+ import { sha256 } from '@documenso/lib/universal/crypto';
+@@ -11,6 +14,8 @@ import { z } from 'zod';
+ 
+ import type { HonoEnv } from '../../../router';
+ 
++const serverConsole = createServerConsole('apps/remix/server/api/files/routes/get-envelope-item-pdf');
++
+ const route = new Hono<HonoEnv>();
+ 
+ const ZGetEnvelopeItemPdfRequestParamsSchema = z.object({
+@@ -113,7 +118,7 @@ export const handleEnvelopeItemPdfRequest = async ({
+     type: envelopeItem.documentData.type,
+     data: documentDataToUse,
+   }).catch((error) => {
+-    console.error(error);
++    serverConsole.error(error);
+ 
+     return null;
+   });
+diff --git a/apps/remix/server/instrument.mjs b/apps/remix/server/instrument.mjs
+index e88f55a9b..257a3e8ee 100644
+--- a/apps/remix/server/instrument.mjs
++++ b/apps/remix/server/instrument.mjs
+@@ -22,6 +22,9 @@
+  * (same pattern as main.js).
+  */
+ import * as Sentry from '@sentry/node';
++// MODIFIED for BizRethink (overlay 090): the server entry exports the owned sanitizer for Rollup;
++// it has no app/database startup side effects and loads before instrumentation.
++import { safeSentryOptions } from './hono/packages/bizrethink/server-only/logging/sentry-options.js';
+ 
+ const dsn = process.env.NEXT_PRIVATE_SENTRY_DSN;
+ const nodeEnv = process.env.NODE_ENV;
+@@ -51,36 +54,7 @@ if (shouldEnable) {
+     // (Same trade-off CircularPay made.)
+     sendDefaultPii: false,
+ 
+-    // Scrub sensitive data — fintech/PCI hygiene.
+-    beforeSend(event) {
+-      // Query strings can contain signing tokens (e.g. /sign/:token URLs)
+-      // that would be leaked into Sentry events otherwise.
+-      if (event.request?.query_string) {
+-        event.request.query_string = '[Filtered]';
+-      }
+-
+-      // Cookies can contain session tokens — strip server-side.
+-      if (event.request?.cookies) {
+-        event.request.cookies = {};
+-      }
+-
+-      // Authorization headers are session-bearing.
+-      if (event.request?.headers) {
+-        const headers = event.request.headers;
+-
+-        if (typeof headers === 'object' && !Array.isArray(headers)) {
+-          if ('authorization' in headers) {
+-            headers.authorization = '[Filtered]';
+-          }
+-
+-          if ('cookie' in headers) {
+-            headers.cookie = '[Filtered]';
+-          }
+-        }
+-      }
+-
+-      return event;
+-    },
++    ...safeSentryOptions,
+   });
+ }
+ 
+diff --git a/apps/remix/server/router.ts b/apps/remix/server/router.ts
+index 5e67a6bdb..bc24e5199 100644
+--- a/apps/remix/server/router.ts
++++ b/apps/remix/server/router.ts
+@@ -1,3 +1,4 @@
++// MODIFIED for BizRethink (overlay 090): server-generated request correlation and safe error diagnostics.
+ import { isMalformedPath } from '@bizrethink/customizations/server-only/is-malformed-path';
+ import { tsRestHonoApp } from '@documenso/api/hono';
+ import { auth } from '@documenso/auth/server';
+@@ -21,6 +22,7 @@ import { openApiDocument } from '@documenso/trpc/server/open-api';
+ import { Hono } from 'hono';
+ import { contextStorage } from 'hono/context-storage';
+ import { cors } from 'hono/cors';
++import { HTTPException } from 'hono/http-exception';
+ import type { RequestIdVariables } from 'hono/request-id';
+ import { requestId } from 'hono/request-id';
+ import type { Logger } from 'pino';
+@@ -38,6 +40,9 @@ import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
+ // load-context.ts. server/main.js imports getLoadContext from the rolled-up
+ // output to wire it into the React Router adapter.
+ export { getLoadContext } from './load-context';
++// Include the owned early-instrumentation module in this existing Rollup entry.
++// instrument.mjs imports its generated file directly, without loading the app.
++export { safeSentryOptions } from '@bizrethink/customizations/server-only/logging/sentry-options';
+ 
+ export interface HonoEnv {
+   Variables: RequestIdVariables & {
+@@ -50,6 +55,13 @@ export interface HonoEnv {
+ const basePath = (env('NEXT_PUBLIC_BASE_PATH') ?? '').replace(/\/$/, '');
+ 
+ const app = new Hono<HonoEnv>().basePath(basePath || '/');
++app.onError((err, c) => {
++  logger.error({ event: 'request.failed', err, requestId: c.var.requestId, requestPath: c.req.path });
++  if (err instanceof HTTPException) {
++    return err.getResponse();
++  }
++  return c.text('Internal Server Error', 500);
++});
+ 
+ /**
+  * Database-backed rate limiting for API routes.
+@@ -96,15 +108,12 @@ app.use(securityHeadersMiddleware);
+  * RR7 app middleware.
+  */
+ app.use('*', appMiddleware);
+-app.use('*', requestId());
++app.use('*', requestId({ headerName: '' }));
+ app.use(async (c, next) => {
+-  const metadata = c.get('context').requestMetadata;
+-
++  c.header('X-Request-Id', c.var.requestId);
+   const honoLogger = logger.child({
+     requestId: c.var.requestId,
+     requestPath: c.req.path,
+-    ipAddress: metadata.ipAddress,
+-    userAgent: metadata.userAgent,
+   });
+ 
+   c.set('logger', honoLogger);
+diff --git a/packages/api/hono.ts b/packages/api/hono.ts
+index 0efa87b92..52b0d17ef 100644
+--- a/packages/api/hono.ts
++++ b/packages/api/hono.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { ApiContractV1 } from '@documenso/api/v1/contract';
+ import { ApiContractV1Implementation } from '@documenso/api/v1/implementation';
+ import { OpenAPIV1 } from '@documenso/api/v1/openapi';
+@@ -10,6 +12,8 @@ import type { HonoEnv } from '@documenso/remix/server/router';
+ import { fetchRequestHandler, TsRestHttpError } from '@ts-rest/serverless/fetch';
+ import { Hono } from 'hono';
+ 
++const serverConsole = createServerConsole('packages/api/hono');
++
+ // This is bad, ts-router will be created on each request.
+ // But don't really have a choice here.
+ export const tsRestHonoApp = new Hono<HonoEnv>();
+@@ -33,7 +37,7 @@ tsRestHonoApp.mount('/', async (request) => {
+     options: {
+       errorHandler: (err) => {
+         if (err instanceof TsRestHttpError && err.statusCode === 500) {
+-          console.error(err);
++          serverConsole.error(err);
+         }
+       },
+     },
+diff --git a/packages/api/v1/middleware/authenticated.ts b/packages/api/v1/middleware/authenticated.ts
+index f4bc92a36..e70b897c8 100644
+--- a/packages/api/v1/middleware/authenticated.ts
++++ b/packages/api/v1/middleware/authenticated.ts
+@@ -1,3 +1,4 @@
++// MODIFIED for BizRethink (overlay 090): routine diagnostics omit client addresses and user-agent headers.
+ import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
+@@ -38,8 +39,6 @@ export const authenticatedMiddleware = <
+     const requestMetadata = extractRequestMetadata(request);
+ 
+     const apiLogger = logger.child({
+-      ipAddress: requestMetadata.ipAddress,
+-      userAgent: requestMetadata.userAgent,
+       requestId: nanoid(),
+     } satisfies RootApiLog);
+ 
+diff --git a/packages/auth/server/index.ts b/packages/auth/server/index.ts
+index 1fd7088b6..ccab3442b 100644
+--- a/packages/auth/server/index.ts
++++ b/packages/auth/server/index.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+@@ -16,6 +18,8 @@ import { signOutRoute } from './routes/sign-out';
+ import { twoFactorRoute } from './routes/two-factor';
+ import type { HonoAuthContext } from './types/context';
+ 
++const serverConsole = createServerConsole('packages/auth/server/index');
++
+ // Note: You must chain routes for Hono RPC client to work.
+ export const auth = new Hono<HonoAuthContext>()
+   .use(async (c, next) => {
+@@ -80,7 +84,7 @@ auth.onError((err, c) => {
+   }
+ 
+   // Handle other errors
+-  console.error('Unknown Error:', err);
++  serverConsole.error('Unknown Error:', err);
+   return c.json(
+     {
+       code: AppErrorCode.UNKNOWN_ERROR,
+diff --git a/packages/auth/server/lib/utils/handle-oauth-callback-url.ts b/packages/auth/server/lib/utils/handle-oauth-callback-url.ts
+index 8c20ba8e5..f339d9fb1 100644
+--- a/packages/auth/server/lib/utils/handle-oauth-callback-url.ts
++++ b/packages/auth/server/lib/utils/handle-oauth-callback-url.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+ import {
+   isDisposableEmail,
+@@ -21,6 +23,8 @@ import { AuthenticationErrorCode } from '../errors/error-codes';
+ import { onAuthorize } from './authorizer';
+ import { getOpenIdConfiguration } from './open-id';
+ 
++const serverConsole = createServerConsole('packages/auth/server/lib/utils/handle-oauth-callback-url');
++
+ type HandleOAuthCallbackUrlOptions = {
+   c: Context;
+   clientOptions: OAuthClientOptions;
+@@ -177,7 +181,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
+ 
+   await onCreateUserHook(createdUser).catch((err) => {
+     // Todo: (RR7) Add logging.
+-    console.error(err);
++    serverConsole.error(err);
+   });
+ 
+   await onAuthorize({ userId: createdUser.id }, c);
+diff --git a/packages/auth/server/lib/utils/handle-oauth-organisation-callback-url.ts b/packages/auth/server/lib/utils/handle-oauth-organisation-callback-url.ts
+index 51f35a766..3215f97ad 100644
+--- a/packages/auth/server/lib/utils/handle-oauth-organisation-callback-url.ts
++++ b/packages/auth/server/lib/utils/handle-oauth-organisation-callback-url.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { sendOrganisationAccountLinkConfirmationEmail } from '@documenso/ee/server-only/lib/send-organisation-account-link-confirmation-email';
+ import { formatPath } from '@documenso/lib/constants/app';
+ import { isDisposableEmail, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
+@@ -13,6 +15,8 @@ import { onAuthorize } from './authorizer';
+ import { validateOauth } from './handle-oauth-callback-url';
+ import { getOrganisationAuthenticationPortalOptions } from './organisation-portal';
+ 
++const serverConsole = createServerConsole('packages/auth/server/lib/utils/handle-oauth-organisation-callback-url');
++
+ type HandleOAuthOrganisationCallbackUrlOptions = {
+   c: Context;
+   orgUrl: string;
+@@ -99,7 +103,7 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
+       skipPersonalOrganisation: !organisation.organisationAuthenticationPortal.allowPersonalOrganisations,
+     }).catch((err) => {
+       // Todo: (RR7) Add logging.
+-      console.error(err);
++      serverConsole.error(err);
+     });
+   }
+ 
+diff --git a/packages/auth/server/routes/callback.ts b/packages/auth/server/routes/callback.ts
+index 8667155b8..c79b4b9da 100644
+--- a/packages/auth/server/routes/callback.ts
++++ b/packages/auth/server/routes/callback.ts
+@@ -1,6 +1,7 @@
+-import { Hono } from 'hono';
+-
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { AppError } from '@documenso/lib/errors/app-error';
++import { Hono } from 'hono';
+ 
+ // MODIFIED for BizRethink (overlay 014): use async getters.
+ import { getGoogleAuthOptions, getMicrosoftAuthOptions, getOidcAuthOptions } from '../config';
+@@ -8,6 +9,8 @@ import { handleOAuthCallbackUrl } from '../lib/utils/handle-oauth-callback-url';
+ import { handleOAuthOrganisationCallbackUrl } from '../lib/utils/handle-oauth-organisation-callback-url';
+ import type { HonoAuthContext } from '../types/context';
+ 
++const serverConsole = createServerConsole('packages/auth/server/routes/callback');
++
+ /**
+  * Have to create this route instead of bundling callback with oauth routes to provide
+  * backwards compatibility for self-hosters (since we used to use NextAuth).
+@@ -16,9 +19,7 @@ export const callbackRoute = new Hono<HonoAuthContext>()
+   /**
+    * OIDC callback verification.
+    */
+-  .get('/oidc', async (c) =>
+-    handleOAuthCallbackUrl({ c, clientOptions: await getOidcAuthOptions() }),
+-  )
++  .get('/oidc', async (c) => handleOAuthCallbackUrl({ c, clientOptions: await getOidcAuthOptions() }))
+ 
+   /**
+    * Organisation OIDC callback verification.
+@@ -32,7 +33,7 @@ export const callbackRoute = new Hono<HonoAuthContext>()
+         orgUrl,
+       });
+     } catch (err) {
+-      console.error(err);
++      serverConsole.error(err);
+ 
+       if (err instanceof Error) {
+         throw new AppError(err.name, {
+@@ -48,13 +49,9 @@ export const callbackRoute = new Hono<HonoAuthContext>()
+   /**
+    * Google callback verification.
+    */
+-  .get('/google', async (c) =>
+-    handleOAuthCallbackUrl({ c, clientOptions: await getGoogleAuthOptions() }),
+-  )
++  .get('/google', async (c) => handleOAuthCallbackUrl({ c, clientOptions: await getGoogleAuthOptions() }))
+ 
+   /**
+    * Microsoft callback verification.
+    */
+-  .get('/microsoft', async (c) =>
+-    handleOAuthCallbackUrl({ c, clientOptions: await getMicrosoftAuthOptions() }),
+-  );
++  .get('/microsoft', async (c) => handleOAuthCallbackUrl({ c, clientOptions: await getMicrosoftAuthOptions() }));
+diff --git a/packages/auth/server/routes/email-password.ts b/packages/auth/server/routes/email-password.ts
+index f280527f8..f9b1fc476 100644
+--- a/packages/auth/server/routes/email-password.ts
++++ b/packages/auth/server/routes/email-password.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ // MODIFIED for BizRethink (overlay 074): one DB policy for every signup gate.
+ import { getSignupPolicy, isEmailDomainAllowedForSignup } from '@bizrethink/customizations/server-only/signup-config';
+ import {
+@@ -59,6 +61,8 @@ import {
+   ZVerifyEmailSchema,
+ } from '../types/email-password';
+ 
++const serverConsole = createServerConsole('packages/auth/server/routes/email-password');
++
+ export const emailPasswordRoute = new Hono<HonoAuthContext>()
+   /**
+    * Authorize endpoint.
+@@ -262,7 +266,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
+     }
+ 
+     const user = await createUser({ name, email, password, signature }).catch((err) => {
+-      console.error(err);
++      serverConsole.error(err);
+       throw err;
+     });
+ 
+diff --git a/packages/ee/server-only/lib/delete-email-domain.ts b/packages/ee/server-only/lib/delete-email-domain.ts
+index 0598d9425..80b9c471d 100644
+--- a/packages/ee/server-only/lib/delete-email-domain.ts
++++ b/packages/ee/server-only/lib/delete-email-domain.ts
+@@ -1,10 +1,15 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import { DeleteEmailIdentityCommand } from '@aws-sdk/client-sesv2';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ 
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { prisma } from '@documenso/prisma';
+ 
+ import { getSesClient } from './create-email-domain';
+ 
++const serverConsole = createServerConsole('packages/ee/server-only/lib/delete-email-domain');
++
+ type DeleteEmailDomainOptions = {
+   emailDomainId: string;
+ };
+@@ -36,7 +41,7 @@ export const deleteEmailDomain = async ({ emailDomainId }: DeleteEmailDomainOpti
+       }),
+     )
+     .catch((err) => {
+-      console.error(err);
++      serverConsole.error(err);
+ 
+       // Do nothing if it no longer exists in SES.
+       if (err.name === 'NotFoundException') {
+diff --git a/packages/ee/server-only/lib/link-organisation-account.ts b/packages/ee/server-only/lib/link-organisation-account.ts
+index 71f7f168b..973680560 100644
+--- a/packages/ee/server-only/lib/link-organisation-account.ts
++++ b/packages/ee/server-only/lib/link-organisation-account.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { getOrganisationAuthenticationPortalOptions } from '@documenso/auth/server/lib/utils/organisation-portal';
+ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+ import {
+@@ -11,6 +13,8 @@ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-m
+ import { prisma } from '@documenso/prisma';
+ import { UserSecurityAuditLogType } from '@prisma/client';
+ 
++const serverConsole = createServerConsole('packages/ee/server-only/lib/link-organisation-account');
++
+ export interface LinkOrganisationAccountOptions {
+   token: string;
+   requestMeta: RequestMetadata;
+@@ -64,7 +68,7 @@ export const linkOrganisationAccount = async ({ token, requestMeta }: LinkOrgani
+   const tokenMetadata = ZOrganisationAccountLinkMetadataSchema.safeParse(verificationToken.metadata);
+ 
+   if (!tokenMetadata.success) {
+-    console.error('Invalid token metadata', tokenMetadata.error);
++    serverConsole.error('Invalid token metadata', tokenMetadata.error);
+ 
+     throw new AppError(AppErrorCode.INVALID_REQUEST, {
+       message: 'Verification token not found, used or expired',
+diff --git a/packages/ee/server-only/limits/handler.ts b/packages/ee/server-only/limits/handler.ts
+index faf0e1938..9c487fee9 100644
+--- a/packages/ee/server-only/limits/handler.ts
++++ b/packages/ee/server-only/limits/handler.ts
+@@ -1,9 +1,13 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+ import { match } from 'ts-pattern';
+ 
+ import { ERROR_CODES } from './errors';
+ import { getServerLimits } from './server';
+ 
++const serverConsole = createServerConsole('packages/ee/server-only/limits/handler');
++
+ export const limitsHandler = async (req: Request) => {
+   try {
+     const { user } = await getSession(req);
+@@ -26,7 +30,7 @@ export const limitsHandler = async (req: Request) => {
+       status: 200,
+     });
+   } catch (err) {
+-    console.error('error', err);
++    serverConsole.error('error', err);
+ 
+     if (err instanceof Error) {
+       const status = match(err.message)
+diff --git a/packages/ee/server-only/stripe/sync-stripe-customer-subscription.ts b/packages/ee/server-only/stripe/sync-stripe-customer-subscription.ts
+index e4363e556..982163712 100644
+--- a/packages/ee/server-only/stripe/sync-stripe-customer-subscription.ts
++++ b/packages/ee/server-only/stripe/sync-stripe-customer-subscription.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
+ import { type Stripe, stripe } from '@documenso/lib/server-only/stripe';
+ import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+@@ -7,6 +9,8 @@ import { OrganisationType, type Prisma, SubscriptionStatus } from '@prisma/clien
+ import { match } from 'ts-pattern';
+ import { reconcileSeatBasedPlans } from './update-subscription-item-quantity';
+ 
++const serverConsole = createServerConsole('packages/ee/server-only/stripe/sync-stripe-customer-subscription');
++
+ const LIVE_SUBSCRIPTION_STATUSES: Stripe.Subscription.Status[] = ['active', 'trialing', 'past_due'];
+ 
+ export type SyncStripeCustomerSubscriptionOptions = {
+@@ -47,7 +51,9 @@ export const syncStripeCustomerSubscription = async ({
+   );
+ 
+   if (liveSubscriptions.length > 1) {
+-    console.error(`Customer ${customerId} has ${liveSubscriptions.length} live subscriptions, expected at most 1`);
++    serverConsole.error(
++      `Customer ${customerId} has ${liveSubscriptions.length} live subscriptions, expected at most 1`,
++    );
+ 
+     throw new Error(`Customer ${customerId} has multiple live subscriptions`);
+   }
+@@ -63,7 +69,7 @@ export const syncStripeCustomerSubscription = async ({
+   });
+ 
+   if (!organisation) {
+-    console.error(`Organisation not found for customer ${customerId}, nothing to sync`);
++    serverConsole.error(`Organisation not found for customer ${customerId}, nothing to sync`);
+ 
+     return;
+   }
+@@ -147,7 +153,7 @@ const handleLiveSubscription = async ({
+   bypassClaimUpdate,
+ }: HandleLiveSubscriptionOptions) => {
+   if (subscription.items.data.length !== 1) {
+-    console.error(`No support for multiple subscription items on subscription ${subscription.id}`);
++    serverConsole.error(`No support for multiple subscription items on subscription ${subscription.id}`);
+ 
+     throw new Error(`No support for multiple subscription items on subscription ${subscription.id}`);
+   }
+@@ -157,7 +163,7 @@ const handleLiveSubscription = async ({
+   const claim = await extractStripeClaim(subscriptionItem.price);
+ 
+   if (!claim) {
+-    console.error(`Subscription claim on ${subscriptionItem.price.id} not found`);
++    serverConsole.error(`Subscription claim on ${subscriptionItem.price.id} not found`);
+ 
+     throw new Error(`Subscription claim on ${subscriptionItem.price.id} not found`);
+   }
+@@ -302,7 +308,7 @@ export const extractStripeClaim = async (priceId: Stripe.Price) => {
+   });
+ 
+   if (!subscriptionClaim) {
+-    console.error(`Subscription claim ${claimId} not found`);
++    serverConsole.error(`Subscription claim ${claimId} not found`);
+     return null;
+   }
+ 
+diff --git a/packages/ee/server-only/stripe/webhook/handler.ts b/packages/ee/server-only/stripe/webhook/handler.ts
+index 52d9f22b7..1fad97137 100644
+--- a/packages/ee/server-only/stripe/webhook/handler.ts
++++ b/packages/ee/server-only/stripe/webhook/handler.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ // MODIFIED for BizRethink (overlay 045b): billing-enabled and the webhook
+ // secret come from the DB-backed instance Stripe config (admin UI) with env
+ // fallback, and the Stripe SDK singleton is refreshed to the active
+@@ -6,11 +8,14 @@ import {
+   getInstanceStripeConfig,
+   isBillingEnabled as isBillingEnabledFromConfig,
+ } from '@bizrethink/customizations/server-only/instance-stripe-config';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import type { Stripe } from '@documenso/lib/server-only/stripe';
+ import { ensureStripeClient, stripe } from '@documenso/lib/server-only/stripe';
+ import { env } from '@documenso/lib/utils/env';
+ import { syncStripeCustomerSubscription } from '../sync-stripe-customer-subscription';
+ 
++const serverConsole = createServerConsole('packages/ee/server-only/stripe/webhook/handler');
++
+ type StripeWebhookResponse = {
+   success: boolean;
+   message: string;
+@@ -100,7 +105,7 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
+     const customerId = typeof eventObject.customer === 'string' ? eventObject.customer : eventObject.customer?.id;
+ 
+     if (!customerId) {
+-      console.error(`No customer found on ${event.type} event ${event.id}, nothing to sync`);
++      serverConsole.error(`No customer found on ${event.type} event ${event.id}, nothing to sync`);
+ 
+       return Response.json(
+         {
+@@ -121,7 +126,7 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
+       { status: 200 },
+     );
+   } catch (err) {
+-    console.error(err);
++    serverConsole.error(err);
+ 
+     return Response.json(
+       {
+diff --git a/packages/lib/jobs/client/bullmq.ts b/packages/lib/jobs/client/bullmq.ts
+index 3897de93c..f756d20bd 100644
+--- a/packages/lib/jobs/client/bullmq.ts
++++ b/packages/lib/jobs/client/bullmq.ts
+@@ -1,5 +1,8 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import { createRequire } from 'node:module';
+ import path from 'node:path';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { createBullBoard } from '@bull-board/api';
+ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+ import { HonoAdapter } from '@bull-board/hono';
+@@ -18,6 +21,8 @@ import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_intern
+ import type { Json } from './_internal/json';
+ import { BaseJobProvider } from './base';
+ 
++const serverConsole = createServerConsole('packages/lib/jobs/client/bullmq');
++
+ const QUEUE_NAME = 'documenso-jobs';
+ 
+ const DEFAULT_CONCURRENCY = 10;
+@@ -70,14 +75,14 @@ export class BullMQJobProvider extends BaseJobProvider {
+     );
+ 
+     this._worker.on('failed', (job, error) => {
+-      console.error(`[JOBS]: Job ${job?.name ?? 'unknown'} failed`, error);
++      serverConsole.error(`[JOBS]: Job ${job?.name ?? 'unknown'} failed`, error);
+     });
+ 
+     this._worker.on('error', (error) => {
+-      console.error('[JOBS]: Worker error', error);
++      serverConsole.error('[JOBS]: Worker error', error);
+     });
+ 
+-    console.log(`[JOBS]: BullMQ provider initialized (concurrency: ${concurrency})`);
++    serverConsole.log(`[JOBS]: BullMQ provider initialized (concurrency: ${concurrency})`);
+   }
+ 
+   /**
+@@ -123,10 +128,10 @@ export class BullMQJobProvider extends BaseJobProvider {
+           },
+         )
+         .then(() => {
+-          console.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
++          serverConsole.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
+         })
+         .catch((error) => {
+-          console.error(`[JOBS]: Failed to register cron job ${definition.id}`, error);
++          serverConsole.error(`[JOBS]: Failed to register cron job ${definition.id}`, error);
+         });
+     }
+   }
+@@ -218,12 +223,12 @@ export class BullMQJobProvider extends BaseJobProvider {
+     const definition = this._jobDefinitions[definitionId];
+ 
+     if (!definition) {
+-      console.error(`[JOBS]: No definition found for job ${definitionId}`);
++      serverConsole.error(`[JOBS]: No definition found for job ${definitionId}`);
+       throw new Error(`No definition found for job ${definitionId}`);
+     }
+ 
+     if (!definition.enabled) {
+-      console.log(`[JOBS]: Skipping disabled job ${definitionId}`);
++      serverConsole.log(`[JOBS]: Skipping disabled job ${definitionId}`);
+       return;
+     }
+ 
+@@ -239,7 +244,7 @@ export class BullMQJobProvider extends BaseJobProvider {
+       const result = definition.trigger.schema.safeParse(payload);
+ 
+       if (!result.success) {
+-        console.error(`[JOBS]: Payload validation failed for ${definitionId}`, result.error);
++        serverConsole.error(`[JOBS]: Payload validation failed for ${definitionId}`, result.error);
+         throw new Error(`Payload validation failed for ${definitionId}`);
+       }
+ 
+@@ -264,7 +269,7 @@ export class BullMQJobProvider extends BaseJobProvider {
+         .catch(() => null);
+     }
+ 
+-    console.log(`[JOBS]: Processing job ${definitionId} with payload`, payload);
++    serverConsole.info({ event: 'job.received', jobId: job.id });
+ 
+     try {
+       await definition.handler({
+@@ -364,19 +369,13 @@ export class BullMQJobProvider extends BaseJobProvider {
+             },
+           });
+ 
+-          console.log(`[JOBS:${task.id}] Task failed`, err);
++          serverConsole.log(`[JOBS:${task.id}] Task failed`, err);
+ 
+           throw err;
+         }
+       },
+       triggerJob: async (_cacheKey, payload) => await this.triggerJob(payload),
+-      logger: {
+-        debug: (...args) => console.debug(`[${jobId}]`, ...args),
+-        error: (...args) => console.error(`[${jobId}]`, ...args),
+-        info: (...args) => console.info(`[${jobId}]`, ...args),
+-        log: (...args) => console.log(`[${jobId}]`, ...args),
+-        warn: (...args) => console.warn(`[${jobId}]`, ...args),
+-      },
++      logger: createServerConsole('packages/lib/jobs/client/bullmq', { jobId }),
+       // eslint-disable-next-line @typescript-eslint/require-await
+       wait: async () => {
+         throw new Error('Not implemented');
+diff --git a/packages/lib/jobs/client/inngest.ts b/packages/lib/jobs/client/inngest.ts
+index ecee59579..dd12b86aa 100644
+--- a/packages/lib/jobs/client/inngest.ts
++++ b/packages/lib/jobs/client/inngest.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import type { Context as HonoContext } from 'hono';
+ import type { Context, Handler, InngestFunction, Logger } from 'inngest';
+ import { Inngest as InngestClient } from 'inngest';
+@@ -7,6 +9,8 @@ import { env } from '../../utils/env';
+ import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
+ import { BaseJobProvider } from './base';
+ 
++const serverConsole = createServerConsole('packages/lib/jobs/client/inngest');
++
+ export class InngestJobProvider extends BaseJobProvider {
+   private static _instance: InngestJobProvider;
+ 
+@@ -24,7 +28,7 @@ export class InngestJobProvider extends BaseJobProvider {
+       const client = new InngestClient({
+         id: env('NEXT_PRIVATE_INNGEST_APP_ID') || 'documenso-app',
+         eventKey: env('INNGEST_EVENT_KEY') || env('NEXT_PRIVATE_INNGEST_EVENT_KEY'),
+-        logger: console,
++        logger: serverConsole,
+       });
+ 
+       InngestJobProvider._instance = new InngestJobProvider({ client });
+@@ -89,11 +93,11 @@ export class InngestJobProvider extends BaseJobProvider {
+     return {
+       wait: step.sleep,
+       logger: {
+-        info: ctx.logger.info,
+-        debug: ctx.logger.debug,
+-        error: ctx.logger.error,
+-        warn: ctx.logger.warn,
+-        log: ctx.logger.info,
++        info: serverConsole.info,
++        debug: serverConsole.debug,
++        error: serverConsole.error,
++        warn: serverConsole.warn,
++        log: serverConsole.info,
+       },
+       runTask: async (cacheKey, callback) => {
+         const result = await step.run(cacheKey, callback);
+diff --git a/packages/lib/jobs/client/local.ts b/packages/lib/jobs/client/local.ts
+index 4ad9ab6f0..083af59eb 100644
+--- a/packages/lib/jobs/client/local.ts
++++ b/packages/lib/jobs/client/local.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import { sha256 } from '@noble/hashes/sha2';
+ import { BackgroundJobStatus, Prisma } from '@prisma/client';
+@@ -16,6 +18,8 @@ import {
+ import type { Json } from './_internal/json';
+ import { BaseJobProvider } from './base';
+ 
++const serverConsole = createServerConsole('packages/lib/jobs/client/local');
++
+ /**
+  * Build a deterministic BackgroundJob ID for a cron run so that multiple
+  * instances of the local provider racing to enqueue the same slot will
+@@ -75,7 +79,7 @@ export class LocalJobProvider extends BaseJobProvider {
+           lastTickAt: new Date(),
+         });
+ 
+-        console.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
++        serverConsole.log(`[JOBS]: Registered cron job ${definition.id} (${definition.trigger.cron})`);
+       }
+     }
+   }
+@@ -111,7 +115,7 @@ export class LocalJobProvider extends BaseJobProvider {
+ 
+     tick();
+ 
+-    console.log(`[JOBS]: Started cron poller for ${this._cronJobs.length} job(s)`);
++    serverConsole.log(`[JOBS]: Started cron poller for ${this._cronJobs.length} job(s)`);
+   }
+ 
+   private async processCronTick() {
+@@ -163,7 +167,7 @@ export class LocalJobProvider extends BaseJobProvider {
+           isRetry: false,
+         });
+       } catch (error) {
+-        console.error(`[JOBS]: Cron tick failed for ${cronJob.definition.id}`, error);
++        serverConsole.error(`[JOBS]: Cron tick failed for ${cronJob.definition.id}`, error);
+       }
+     }
+   }
+@@ -251,7 +255,7 @@ export class LocalJobProvider extends BaseJobProvider {
+       }
+ 
+       if (definition && !definition.enabled) {
+-        console.log('Attempted to trigger a disabled job', options.name);
++        serverConsole.log('Attempted to trigger a disabled job', options.name);
+ 
+         return c.text('Job not found', 404);
+       }
+@@ -272,7 +276,7 @@ export class LocalJobProvider extends BaseJobProvider {
+         payload = result.data;
+       }
+ 
+-      console.log(`[JOBS]: Triggering job ${options.name} with payload`, payload);
++      serverConsole.info({ event: 'job.received', jobId });
+ 
+       let backgroundJob = await prisma.backgroundJob
+         .update({
+@@ -311,7 +315,7 @@ export class LocalJobProvider extends BaseJobProvider {
+           },
+         });
+       } catch (error) {
+-        console.log(`[JOBS]: Job ${options.name} failed`, error);
++        serverConsole.log(`[JOBS]: Job ${options.name} failed`, error);
+ 
+         const taskHasExceededRetries = error instanceof BackgroundTaskExceededRetriesError;
+         const jobHasExceededRetries =
+@@ -375,7 +379,7 @@ export class LocalJobProvider extends BaseJobProvider {
+       headers['X-Job-Retry'] = '1';
+     }
+ 
+-    console.log('Submitting job to endpoint:', endpoint);
++    serverConsole.log('Submitting job to endpoint:', endpoint);
+     await Promise.race([
+       fetch(endpoint, {
+         method: 'POST',
+@@ -450,19 +454,13 @@ export class LocalJobProvider extends BaseJobProvider {
+             },
+           });
+ 
+-          console.log(`[JOBS:${task.id}] Task failed`, err);
++          serverConsole.log(`[JOBS:${task.id}] Task failed`, err);
+ 
+           throw new BackgroundTaskFailedError('Task failed');
+         }
+       },
+       triggerJob: async (_cacheKey, payload) => await this.triggerJob(payload),
+-      logger: {
+-        debug: (...args) => console.debug(`[${jobId}]`, ...args),
+-        error: (...args) => console.error(`[${jobId}]`, ...args),
+-        info: (...args) => console.info(`[${jobId}]`, ...args),
+-        log: (...args) => console.log(`[${jobId}]`, ...args),
+-        warn: (...args) => console.warn(`[${jobId}]`, ...args),
+-      },
++      logger: createServerConsole('packages/lib/jobs/client/local', { jobId }),
+       // eslint-disable-next-line @typescript-eslint/require-await
+       wait: async () => {
+         throw new Error('Not implemented');
+diff --git a/packages/lib/jobs/definitions/internal/bulk-send-template.handler.ts b/packages/lib/jobs/definitions/internal/bulk-send-template.handler.ts
+index cb57b42a2..79e1e4e94 100644
+--- a/packages/lib/jobs/definitions/internal/bulk-send-template.handler.ts
++++ b/packages/lib/jobs/definitions/internal/bulk-send-template.handler.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { BulkSendCompleteEmail } from '@documenso/email/templates/bulk-send-complete';
+ import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+ import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
+@@ -17,6 +19,8 @@ import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
+ import type { JobRunIO } from '../../client/_internal/job';
+ import type { TBulkSendTemplateJobDefinition } from './bulk-send-template';
+ 
++const serverConsole = createServerConsole('packages/lib/jobs/definitions/internal/bulk-send-template.handler');
++
+ const ZRecipientRowSchema = z.object({
+   name: z.string().optional(),
+   email: z.union([
+@@ -135,7 +139,7 @@ export const run = async ({ payload, io }: { payload: TBulkSendTemplateJobDefini
+               requestMetadata: requestMetadata || {},
+             },
+           }).catch((err) => {
+-            console.error(err);
++            serverConsole.error(err);
+ 
+             throw new AppError('DOCUMENT_SEND_FAILED');
+           });
+diff --git a/packages/lib/jobs/definitions/internal/cancel-organisation-subscription.handler.ts b/packages/lib/jobs/definitions/internal/cancel-organisation-subscription.handler.ts
+index 918fd70e6..80122dcc1 100644
+--- a/packages/lib/jobs/definitions/internal/cancel-organisation-subscription.handler.ts
++++ b/packages/lib/jobs/definitions/internal/cancel-organisation-subscription.handler.ts
+@@ -1,7 +1,13 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { Stripe, stripe } from '../../../server-only/stripe';
+ import type { JobRunIO } from '../../client/_internal/job';
+ import type { TCancelOrganisationSubscriptionJobDefinition } from './cancel-organisation-subscription';
+ 
++const serverConsole = createServerConsole(
++  'packages/lib/jobs/definitions/internal/cancel-organisation-subscription.handler',
++);
++
+ /**
+  * Marks the given Stripe subscription for cancellation at the end of the
+  * current billing period.
+@@ -25,7 +31,7 @@ export const run = async ({ payload }: { payload: TCancelOrganisationSubscriptio
+     // Subscription no longer exists in Stripe \u2014 nothing to cancel. Treat as
+     // success so the job doesn't retry indefinitely.
+     if (error instanceof Stripe.errors.StripeInvalidRequestError && error.code === 'resource_missing') {
+-      console.warn(
++      serverConsole.warn(
+         `[CANCEL_ORGANISATION_SUBSCRIPTION] Stripe subscription ${stripeSubscriptionId} no longer exists; skipping.`,
+       );
+ 
+diff --git a/packages/lib/server-only/ai/pdf-to-images.ts b/packages/lib/server-only/ai/pdf-to-images.ts
+index fb2ee13e8..d34497e04 100644
+--- a/packages/lib/server-only/ai/pdf-to-images.ts
++++ b/packages/lib/server-only/ai/pdf-to-images.ts
+@@ -1,7 +1,11 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { Canvas, Image, Path2D } from '@documenso/skia-canvas';
+ import pMap from 'p-map';
+ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/ai/pdf-to-images');
++
+ // @ts-expect-error napi-rs/canvas satisfies the requirements
+ globalThis.Path2D = Path2D;
+ // @ts-expect-error napi-rs/canvas satisfies the requirements
+@@ -90,8 +94,8 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
+     { concurrency: 10 },
+   );
+ 
+-  void pdf.destroy().catch((e) => console.error(e));
+-  void task.destroy().catch((e) => console.error(e));
++  void pdf.destroy().catch((e) => serverConsole.error(e));
++  void task.destroy().catch((e) => serverConsole.error(e));
+ 
+   return images;
+ };
+diff --git a/packages/lib/server-only/document/send-document.ts b/packages/lib/server-only/document/send-document.ts
+index 08bd9fcbc..aa17579f3 100644
+--- a/packages/lib/server-only/document/send-document.ts
++++ b/packages/lib/server-only/document/send-document.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { materializeTspAnchorsForEnvelope } from '@documenso/ee/server-only/signing/csc/materialize-anchors';
+ import { resolveExpiresAt } from '@documenso/lib/constants/envelope-expiration';
+ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+@@ -44,6 +46,8 @@ import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+ import { assertUserNotDisabledById } from '../user/assert-user-not-disabled';
+ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/document/send-document');
++
+ export type SendDocumentOptions = {
+   id: EnvelopeIdOptions;
+   userId: number;
+@@ -129,7 +133,7 @@ export const sendDocument = async ({ id, userId, teamId, sendEmail, requestMetad
+   let signingOrder = envelope.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+ 
+   if (isTspEnvelope(envelope) && signingOrder === DocumentSigningOrder.PARALLEL && envelope.documentMeta) {
+-    console.warn(
++    serverConsole.warn(
+       `[CSC] Coercing signingOrder=PARALLEL → SEQUENTIAL for ${envelope.signatureLevel} envelope ${envelope.id} at send time. The schema-layer guard should have caught this earlier.`,
+     );
+ 
+diff --git a/packages/lib/server-only/envelope-item/replace-envelope-item-pdf.ts b/packages/lib/server-only/envelope-item/replace-envelope-item-pdf.ts
+index fb305e311..d58f344ad 100644
+--- a/packages/lib/server-only/envelope-item/replace-envelope-item-pdf.ts
++++ b/packages/lib/server-only/envelope-item/replace-envelope-item-pdf.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+@@ -11,6 +13,8 @@ import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf
+ import { findRecipientByPlaceholder } from '../pdf/helpers';
+ import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/envelope-item/replace-envelope-item-pdf');
++
+ type UnsafeReplaceEnvelopeItemPdfOptions = {
+   envelope: Pick<Envelope, 'id' | 'type' | 'formValues'>;
+ 
+@@ -219,7 +223,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
+       });
+     } catch (err) {
+       // Do nothing.
+-      console.error(err);
++      serverConsole.error(err);
+     }
+   }
+ 
+diff --git a/packages/lib/server-only/envelope/get-envelope-by-id.ts b/packages/lib/server-only/envelope/get-envelope-by-id.ts
+index d2c282b54..04c22bf80 100644
+--- a/packages/lib/server-only/envelope/get-envelope-by-id.ts
++++ b/packages/lib/server-only/envelope/get-envelope-by-id.ts
+@@ -1,4 +1,7 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import { getApiTokenEnvelopeScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import type { EnvelopeType, Prisma } from '@prisma/client';
+ 
+@@ -8,6 +11,8 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
+ import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+ import { getTeamById } from '../team/get-team';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/envelope/get-envelope-by-id');
++
+ export type GetEnvelopeByIdOptions = {
+   id: EnvelopeIdOptions;
+ 
+@@ -129,7 +134,7 @@ export type GetEnvelopeWhereInputOptions = {
+ export const getEnvelopeWhereInput = async ({ id, userId, teamId, type }: GetEnvelopeWhereInputOptions) => {
+   // Backup validation incase something goes wrong.
+   if (!id.id || !userId || !teamId || type === undefined) {
+-    console.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
++    serverConsole.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
+ 
+     throw new AppError(AppErrorCode.NOT_FOUND, {
+       message: 'Envelope ID not found',
+diff --git a/packages/lib/server-only/envelope/get-envelopes-by-ids.ts b/packages/lib/server-only/envelope/get-envelopes-by-ids.ts
+index 12563c4a8..b52b6f8e9 100644
+--- a/packages/lib/server-only/envelope/get-envelopes-by-ids.ts
++++ b/packages/lib/server-only/envelope/get-envelopes-by-ids.ts
+@@ -1,4 +1,7 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import { getApiTokenEnvelopeScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import type { EnvelopeType, Prisma } from '@prisma/client';
+ 
+@@ -8,6 +11,8 @@ import type { EnvelopeIdsOptions } from '../../utils/envelope';
+ import { unsafeBuildEnvelopeIdsQuery } from '../../utils/envelope';
+ import { getTeamById } from '../team/get-team';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/envelope/get-envelopes-by-ids');
++
+ export type GetEnvelopesByIdsOptions = {
+   /**
+    * The envelope IDs to fetch with their type.
+@@ -144,7 +149,7 @@ export const getMultipleEnvelopeWhereInput = async ({
+ }: GetMultipleEnvelopeWhereInputOptions) => {
+   // Backup validation incase something goes wrong.
+   if (!ids.ids || !userId || !teamId || type === undefined) {
+-    console.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
++    serverConsole.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
+ 
+     throw new AppError(AppErrorCode.NOT_FOUND, {
+       message: 'Envelope IDs not found',
+diff --git a/packages/lib/server-only/folder/find-folders-internal.ts b/packages/lib/server-only/folder/find-folders-internal.ts
+index 5cb184516..16494f2b1 100644
+--- a/packages/lib/server-only/folder/find-folders-internal.ts
++++ b/packages/lib/server-only/folder/find-folders-internal.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import { EnvelopeType } from '@prisma/client';
+ 
+@@ -5,6 +7,8 @@ import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
+ import type { TFolderType } from '../../types/folder-type';
+ import { getTeamById } from '../team/get-team';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/folder/find-folders-internal');
++
+ export interface FindFoldersInternalOptions {
+   userId: number;
+   teamId: number;
+@@ -99,7 +103,7 @@ export const findFoldersInternal = async ({ userId, teamId, parentId, type }: Fi
+             },
+           };
+         } catch (error) {
+-          console.error('Error processing folder:', folder.id, error);
++          serverConsole.error('Error processing folder:', folder.id, error);
+           throw error;
+         }
+       }),
+@@ -107,7 +111,7 @@ export const findFoldersInternal = async ({ userId, teamId, parentId, type }: Fi
+ 
+     return foldersWithDetails;
+   } catch (error) {
+-    console.error('Error in findFolders:', error);
++    serverConsole.error('Error in findFolders:', error);
+     throw error;
+   }
+ };
+diff --git a/packages/lib/server-only/license/license-client.ts b/packages/lib/server-only/license/license-client.ts
+index f8eaf4615..1fe4b3560 100644
+--- a/packages/lib/server-only/license/license-client.ts
++++ b/packages/lib/server-only/license/license-client.ts
+@@ -1,5 +1,8 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import fs from 'node:fs/promises';
+ import path from 'node:path';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ 
+ import { prisma } from '@documenso/prisma';
+ 
+@@ -15,6 +18,8 @@ import {
+ import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '../../types/subscription';
+ import { env } from '../../utils/env';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/license/license-client');
++
+ const LICENSE_KEY = env('NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY');
+ const LICENSE_SERVER_URL = env('INTERNAL_OVERRIDE_LICENSE_SERVER_URL') || 'https://license.documenso.com';
+ 
+@@ -54,7 +59,7 @@ export class LicenseClient {
+       await instance.initialize();
+     } catch (err) {
+       // Do nothing.
+-      console.error('[License] Failed to verify license:', err);
++      serverConsole.error('[License] Failed to verify license:', err);
+     }
+   }
+ 
+@@ -88,7 +93,7 @@ export class LicenseClient {
+   }
+ 
+   private async initialize(): Promise<void> {
+-    console.log('[License] Checking license with server...');
++    serverConsole.log('[License] Checking license with server...');
+ 
+     const cachedLicense = await this.loadFromFile();
+ 
+@@ -102,8 +107,8 @@ export class LicenseClient {
+       response = await this.pingLicenseServer();
+     } catch (err) {
+       // If server is not responding, or erroring, use the cached license.
+-      console.warn('[License] License server not responding, using cached license.');
+-      console.error(err);
++      serverConsole.warn('[License] License server not responding, using cached license.');
++      serverConsole.error(err);
+       return;
+     }
+ 
+@@ -113,7 +118,7 @@ export class LicenseClient {
+     const unauthorizedFlagUsage = await this.checkUnauthorizedFlagUsage(allowedFlags);
+ 
+     if (unauthorizedFlagUsage) {
+-      console.warn('[License] Found unauthorized flag usage.');
++      serverConsole.warn('[License] Found unauthorized flag usage.');
+     }
+ 
+     let status: TCachedLicense['derivedStatus'] = 'NOT_FOUND';
+@@ -137,11 +142,11 @@ export class LicenseClient {
+     this.cachedLicense = data;
+     await this.saveToFile(data);
+ 
+-    console.log('[License] License check completed successfully.');
+-    console.log(`[License] Unauthorized Flag Usage: ${unauthorizedFlagUsage ? 'Yes' : 'No'}`);
+-    console.log(`[License] Derived Status: ${status}`);
+-    console.log(`[License] Status: ${response?.data?.status}`);
+-    console.log(`[License] Flags: ${JSON.stringify(allowedFlags)}`);
++    serverConsole.log('[License] License check completed successfully.');
++    serverConsole.log(`[License] Unauthorized Flag Usage: ${unauthorizedFlagUsage ? 'Yes' : 'No'}`);
++    serverConsole.log(`[License] Derived Status: ${status}`);
++    serverConsole.log(`[License] Status: ${response?.data?.status}`);
++    serverConsole.log(`[License] Flags: ${JSON.stringify(allowedFlags)}`);
+   }
+ 
+   /**
+@@ -179,7 +184,7 @@ export class LicenseClient {
+     try {
+       await fs.writeFile(licenseFilePath, JSON.stringify(data, null, 2), 'utf-8');
+     } catch (error) {
+-      console.error('[License] Failed to save license file:', error);
++      serverConsole.error('[License] Failed to save license file:', error);
+     }
+   }
+ 
+@@ -236,7 +241,7 @@ export class LicenseClient {
+         unauthorizedFlagUsage = true;
+       }
+     } catch (error) {
+-      console.error('[License] Failed to check unauthorized flag usage:', error);
++      serverConsole.error('[License] Failed to check unauthorized flag usage:', error);
+     }
+ 
+     return unauthorizedFlagUsage;
+diff --git a/packages/lib/server-only/organisation/create-organisation-member-invites.ts b/packages/lib/server-only/organisation/create-organisation-member-invites.ts
+index a31aafe6a..1516b619d 100644
+--- a/packages/lib/server-only/organisation/create-organisation-member-invites.ts
++++ b/packages/lib/server-only/organisation/create-organisation-member-invites.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
+ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+ import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
+@@ -18,6 +20,8 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+ import { getEmailContext } from '../email/get-email-context';
+ import { getMemberOrganisationRole } from '../team/get-member-roles';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/organisation/create-organisation-member-invites');
++
+ export type CreateOrganisationMemberInvitesOptions = {
+   userId: number;
+   userName: string;
+@@ -129,7 +133,7 @@ export const createOrganisationMemberInvites = async ({
+   );
+ 
+   if (sendEmailResultErrorList.length > 0) {
+-    console.error(JSON.stringify(sendEmailResultErrorList));
++    serverConsole.error(JSON.stringify(sendEmailResultErrorList));
+ 
+     throw new AppError('EmailDeliveryFailed', {
+       message: 'Failed to send invite emails to one or more users.',
+diff --git a/packages/lib/server-only/organisation/create-organisation.ts b/packages/lib/server-only/organisation/create-organisation.ts
+index 6d23b9465..3426a5411 100644
+--- a/packages/lib/server-only/organisation/create-organisation.ts
++++ b/packages/lib/server-only/organisation/create-organisation.ts
+@@ -1,5 +1,8 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ // BizRethink (overlay 041): trial bookkeeping for new external orgs.
+ import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
+ import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+ import { prisma } from '@documenso/prisma';
+@@ -13,6 +16,8 @@ import { generateDatabaseId, prefixedId } from '../../universal/id';
+ import { generateDefaultOrganisationSettings } from '../../utils/organisations';
+ import { createTeam } from '../team/create-team';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/organisation/create-organisation');
++
+ type CreateOrganisationOptions = {
+   userId: number;
+   name: string;
+@@ -44,7 +49,7 @@ export const createOrganisation = async ({ name, url, type, userId, customerId,
+     })
+       .then((customer) => customer.id)
+       .catch((err) => {
+-        console.error(err);
++        serverConsole.error(err);
+ 
+         return undefined;
+       });
+@@ -168,7 +173,7 @@ export const createPersonalOrganisation = async ({
+     type,
+     claim: proSubscriptionClaim,
+   }).catch((err) => {
+-    console.error(err);
++    serverConsole.error(err);
+ 
+     if (throwErrorOnOrganisationCreationFailure) {
+       throw err;
+@@ -183,7 +188,7 @@ export const createPersonalOrganisation = async ({
+   // is bookkeeping that defaults to "no row = external, no trial" downstream.
+   if (organisation) {
+     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
+-      console.error('[bizrethink] startTrialForNewOrg failed', err);
++      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
+     });
+   }
+ 
+@@ -195,7 +200,7 @@ export const createPersonalOrganisation = async ({
+       organisationId: organisation.id,
+       inheritMembers,
+     }).catch((err) => {
+-      console.error(err);
++      serverConsole.error(err);
+ 
+       // Todo: (LOGS)
+     });
+diff --git a/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts b/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts
+index db71e2f97..8e294260e 100644
+--- a/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts
++++ b/packages/lib/server-only/pdf/insert-field-in-pdf-v1.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
+ import type { PDFDocument, PDFFont, PDFTextField } from '@cantoo/pdf-lib';
+ import { degrees, RotationTypes, radiansToDegrees, rgb, setFontAndSize, TextAlignment } from '@cantoo/pdf-lib';
+@@ -27,6 +29,8 @@ import {
+ } from '../../types/field-meta';
+ import { getPageSize } from './get-page-size';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/pdf/insert-field-in-pdf-v1');
++
+ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
+   const [fontCaveat, fontNoto] = await Promise.all([
+     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+@@ -214,7 +218,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
+       const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
+ 
+       if (!meta.success) {
+-        console.error(meta.error);
++        serverConsole.error(meta.error);
+ 
+         throw new Error('Invalid checkbox field meta');
+       }
+@@ -304,7 +308,7 @@ export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSigna
+       const meta = ZRadioFieldMeta.safeParse(field.fieldMeta);
+ 
+       if (!meta.success) {
+-        console.error(meta.error);
++        serverConsole.error(meta.error);
+ 
+         throw new Error('Invalid radio field meta');
+       }
+diff --git a/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts b/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts
+index fdd5515e8..4ec0c01f7 100644
+--- a/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts
++++ b/packages/lib/server-only/pdf/legacy-insert-field-in-pdf.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
+ import type { PDFDocument } from '@cantoo/pdf-lib';
+ import { degrees, RotationTypes, radiansToDegrees, rgb } from '@cantoo/pdf-lib';
+@@ -27,6 +29,8 @@ import {
+ } from '../../types/field-meta';
+ import { getPageSize } from './get-page-size';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/pdf/legacy-insert-field-in-pdf');
++
+ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+   const [fontCaveat, fontNoto] = await Promise.all([
+     fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
+@@ -207,7 +211,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
+       const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
+ 
+       if (!meta.success) {
+-        console.error(meta.error);
++        serverConsole.error(meta.error);
+ 
+         throw new Error('Invalid checkbox field meta');
+       }
+@@ -248,7 +252,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
+       const meta = ZRadioFieldMeta.safeParse(field.fieldMeta);
+ 
+       if (!meta.success) {
+-        console.error(meta.error);
++        serverConsole.error(meta.error);
+ 
+         throw new Error('Invalid radio field meta');
+       }
+diff --git a/packages/lib/server-only/pdf/normalize-pdf.ts b/packages/lib/server-only/pdf/normalize-pdf.ts
+index 01e5ac108..7090da3c2 100644
+--- a/packages/lib/server-only/pdf/normalize-pdf.ts
++++ b/packages/lib/server-only/pdf/normalize-pdf.ts
+@@ -1,12 +1,16 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { PDF } from '@libpdf/core';
+ 
+ import { AppError } from '../../errors/app-error';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/pdf/normalize-pdf');
++
+ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean } = {}) => {
+   const shouldFlattenForm = options.flattenForm ?? true;
+ 
+   const pdfDoc = await PDF.load(pdf).catch((e) => {
+-    console.error(`PDF normalization error: ${e.message}`);
++    serverConsole.error(`PDF normalization error: ${e.message}`);
+ 
+     throw new AppError('INVALID_DOCUMENT_FILE', {
+       message: 'The document is not a valid PDF',
+diff --git a/packages/lib/server-only/rate-limit/check-monthly-quota.ts b/packages/lib/server-only/rate-limit/check-monthly-quota.ts
+index 9066a2c95..337d601a7 100644
+--- a/packages/lib/server-only/rate-limit/check-monthly-quota.ts
++++ b/packages/lib/server-only/rate-limit/check-monthly-quota.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import { AppError, AppErrorCode } from '../../errors/app-error';
+ import { jobsClient } from '../../jobs/client';
+@@ -6,6 +8,8 @@ import { currentMonthlyPeriod } from '../../universal/monthly-period';
+ import { getQuotaAlertKind } from './get-quota-alert-kind';
+ import type { LimitCounter } from './types';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/rate-limit/check-monthly-quota');
++
+ type CheckMonthlyQuotaOptions = {
+   organisationId: string;
+   counter: LimitCounter;
+@@ -82,7 +86,7 @@ export const checkMonthlyQuota = async (opts: CheckMonthlyQuotaOptions): Promise
+         },
+       })
+       .catch((error) => {
+-        console.error({
++        serverConsole.error({
+           msg: 'Failed to send organisation limit alert email',
+           error,
+         });
+diff --git a/packages/lib/server-only/team/create-team-email-verification.ts b/packages/lib/server-only/team/create-team-email-verification.ts
+index 12db8543b..0d706289d 100644
+--- a/packages/lib/server-only/team/create-team-email-verification.ts
++++ b/packages/lib/server-only/team/create-team-email-verification.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
+ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
+@@ -16,6 +18,8 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+ import { buildTeamWhereQuery } from '../../utils/teams';
+ import { getEmailContext } from '../email/get-email-context';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/team/create-team-email-verification');
++
+ export type CreateTeamEmailVerificationOptions = {
+   userId: number;
+   teamId: number;
+@@ -79,7 +83,7 @@ export const createTeamEmailVerification = async ({
+     // open during network I/O.
+     await sendTeamEmailVerificationEmail(data.email, token, team);
+   } catch (err) {
+-    console.error(err);
++    serverConsole.error(err);
+ 
+     if (!(err instanceof Prisma.PrismaClientKnownRequestError)) {
+       throw err;
+diff --git a/packages/lib/server-only/team/update-team.ts b/packages/lib/server-only/team/update-team.ts
+index 8672acdef..51cf64f4e 100644
+--- a/packages/lib/server-only/team/update-team.ts
++++ b/packages/lib/server-only/team/update-team.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { prisma } from '@documenso/prisma';
+@@ -6,6 +8,8 @@ import { z } from 'zod';
+ 
+ import { buildTeamWhereQuery } from '../../utils/teams';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/team/update-team');
++
+ export type UpdateTeamOptions = {
+   userId: number;
+   teamId: number;
+@@ -50,7 +54,7 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): P
+       },
+     });
+   } catch (err) {
+-    console.error(err);
++    serverConsole.error(err);
+ 
+     if (!(err instanceof Prisma.PrismaClientKnownRequestError)) {
+       throw err;
+diff --git a/packages/lib/server-only/telemetry/telemetry-client.ts b/packages/lib/server-only/telemetry/telemetry-client.ts
+index 541ab1c68..2e10466d8 100644
+--- a/packages/lib/server-only/telemetry/telemetry-client.ts
++++ b/packages/lib/server-only/telemetry/telemetry-client.ts
+@@ -1,7 +1,10 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ /* eslint-disable require-atomic-updates */
+ import fs from 'node:fs/promises';
+ import os from 'node:os';
+ import path from 'node:path';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { PostHog } from 'posthog-node';
+ 
+ import { version } from '../../../../package.json';
+@@ -10,6 +13,8 @@ import { getSiteSetting } from '../site-settings/get-site-setting';
+ import { SITE_SETTINGS_TELEMETRY_ID } from '../site-settings/schemas/telemetry';
+ import { upsertSiteSetting } from '../site-settings/upsert-site-setting';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/telemetry/telemetry-client');
++
+ const HAS_LICENSE_KEY = !!process.env.NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY;
+ 
+ const TELEMETRY_KEY = process.env.NEXT_PRIVATE_TELEMETRY_KEY;
+@@ -46,7 +51,7 @@ export class TelemetryClient {
+   public static async start(): Promise<void> {
+     if (TELEMETRY_DISABLED) {
+       if (!HAS_LICENSE_KEY) {
+-        console.log(
++        serverConsole.log(
+           '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
+         );
+       }
+@@ -55,7 +60,7 @@ export class TelemetryClient {
+     }
+ 
+     if (!TELEMETRY_KEY || !TELEMETRY_HOST) {
+-      console.log('[Telemetry] Telemetry credentials not configured. Telemetry will not be sent.');
++      serverConsole.log('[Telemetry] Telemetry credentials not configured. Telemetry will not be sent.');
+       return;
+     }
+ 
+@@ -103,16 +108,16 @@ export class TelemetryClient {
+     this.installationId = await this.getOrCreateInstallationId();
+     this.nodeId = await this.getOrCreateNodeId();
+ 
+-    console.log(
++    serverConsole.log(
+       '[Telemetry] Telemetry is enabled. Documenso collects anonymous usage data to help improve the product.',
+     );
+-    console.log(
++    serverConsole.log(
+       '[Telemetry] We collect: app version, installation ID, and node ID. No personal data, document contents, or user information is collected.',
+     );
+-    console.log(
++    serverConsole.log(
+       '[Telemetry] To disable telemetry, set DOCUMENSO_DISABLE_TELEMETRY=true in your environment variables.',
+     );
+-    console.log('[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry');
++    serverConsole.log('[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry');
+ 
+     // Capture startup event
+     this.captureEvent('telemetry_selfhoster_startup');
+diff --git a/packages/lib/server-only/template/create-document-from-direct-template.ts b/packages/lib/server-only/template/create-document-from-direct-template.ts
+index 5d2c8832b..4e5dd2462 100644
+--- a/packages/lib/server-only/template/create-document-from-direct-template.ts
++++ b/packages/lib/server-only/template/create-document-from-direct-template.ts
+@@ -1,4 +1,7 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ import { validateDirectTemplateFields } from '@bizrethink/customizations/server-only/direct-template-fields';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { nanoid, prefixedId } from '@documenso/lib/universal/id';
+ import { prisma } from '@documenso/prisma';
+ import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
+@@ -50,6 +53,8 @@ import { resolveSignatureLevel } from '../signature-level/resolve-signature-leve
+ import { getTeamSettings } from '../team/get-team-settings';
+ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/template/create-document-from-direct-template');
++
+ export type CreateDocumentFromDirectTemplateOptions = {
+   directRecipientName?: string;
+   directRecipientEmail: string;
+@@ -820,7 +825,7 @@ export const createDocumentFromDirectTemplate = async ({
+       teamId: refetchedEnvelope.teamId ?? undefined,
+     });
+   } catch (err) {
+-    console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
++    serverConsole.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
+ 
+     // Don't launch an error since the document has already been created.
+     // Log and reseal as required until we configure middleware.
+diff --git a/packages/lib/server-only/user/create-user.ts b/packages/lib/server-only/user/create-user.ts
+index ce80fc21f..aa2a3531f 100644
+--- a/packages/lib/server-only/user/create-user.ts
++++ b/packages/lib/server-only/user/create-user.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ // MODIFIED for BizRethink (overlay 048): auto-claim pending invites on
+ // signup + skip Personal Org creation when any invite was accepted.
+ //
+@@ -13,6 +15,7 @@ import {
+   autoClaimInvitesOnSignup,
+   hasPendingInvites,
+ } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import { hash } from '@node-rs/bcrypt';
+ import type { User } from '@prisma/client';
+@@ -21,6 +24,8 @@ import { SALT_ROUNDS } from '../../constants/auth';
+ import { AppError, AppErrorCode } from '../../errors/app-error';
+ import { createPersonalOrganisation } from '../organisation/create-organisation';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/user/create-user');
++
+ export interface CreateUserOptions {
+   name: string;
+   email: string;
+@@ -68,7 +73,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
+   // Not used at the moment, uncomment if required.
+   await onCreateUserHook(user).catch((err) => {
+     // Todo: (RR7) Add logging.
+-    console.error(err);
++    serverConsole.error(err);
+   });
+ 
+   return user;
+@@ -112,7 +117,7 @@ export const onCreateUserHook = async (user: User, options: OnCreateUserHookOpti
+         // Defensive: if auto-claim itself fails (DB blip, etc), still create
+         // Personal Org as the safety net. Better to give the user a blank
+         // workspace than no workspace at all.
+-        console.error('[onCreateUserHook] auto-claim invites failed:', err);
++        serverConsole.error('[onCreateUserHook] auto-claim invites failed:', err);
+         return [];
+       })
+     : [];
+@@ -122,7 +127,7 @@ export const onCreateUserHook = async (user: User, options: OnCreateUserHookOpti
+   const deferred =
+     !user.emailVerified &&
+     (await hasPendingInvites(user.email).catch((err) => {
+-      console.error('[onCreateUserHook] pending-invite check failed:', err);
++      serverConsole.error('[onCreateUserHook] pending-invite check failed:', err);
+       return false;
+     }));
+ 
+diff --git a/packages/lib/server-only/user/disable-user.ts b/packages/lib/server-only/user/disable-user.ts
+index 483df99b2..11be3e3fc 100644
+--- a/packages/lib/server-only/user/disable-user.ts
++++ b/packages/lib/server-only/user/disable-user.ts
+@@ -1,6 +1,10 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { AppError } from '@documenso/lib/errors/app-error';
+ import { prisma } from '@documenso/prisma';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/user/disable-user');
++
+ export type DisableUserOptions = {
+   id: number;
+ };
+@@ -63,7 +67,7 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
+       });
+     });
+   } catch (error) {
+-    console.error('Error disabling user', error);
++    serverConsole.error('Error disabling user', error);
+     throw error;
+   }
+ };
+diff --git a/packages/lib/server-only/user/forgot-password.ts b/packages/lib/server-only/user/forgot-password.ts
+index 86d1c1aaa..c39ded7bb 100644
+--- a/packages/lib/server-only/user/forgot-password.ts
++++ b/packages/lib/server-only/user/forgot-password.ts
+@@ -1,9 +1,13 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import crypto from 'crypto';
+ 
+ import { ONE_HOUR } from '../../constants/time';
+ import { sendForgotPassword } from '../auth/send-forgot-password';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/user/forgot-password');
++
+ export const forgotPassword = async ({ email }: { email: string }) => {
+   const user = await prisma.user.findFirst({
+     where: {
+@@ -42,5 +46,5 @@ export const forgotPassword = async ({ email }: { email: string }) => {
+ 
+   await sendForgotPassword({
+     userId: user.id,
+-  }).catch((err) => console.error(err));
++  }).catch((err) => serverConsole.error(err));
+ };
+diff --git a/packages/lib/server-only/user/send-confirmation-token.ts b/packages/lib/server-only/user/send-confirmation-token.ts
+index c24427328..ec2e4606c 100644
+--- a/packages/lib/server-only/user/send-confirmation-token.ts
++++ b/packages/lib/server-only/user/send-confirmation-token.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import crypto from 'crypto';
+ import { DateTime } from 'luxon';
+@@ -7,6 +9,8 @@ import { ONE_HOUR } from '../../constants/time';
+ import { sendConfirmationEmail } from '../auth/send-confirmation-email';
+ import { getMostRecentEmailVerificationToken } from './get-most-recent-email-verification-token';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/user/send-confirmation-token');
++
+ type SendConfirmationTokenOptions = { email: string; force?: boolean };
+ 
+ export const sendConfirmationToken = async ({ email, force = false }: SendConfirmationTokenOptions) => {
+@@ -59,7 +63,7 @@ export const sendConfirmationToken = async ({ email, force = false }: SendConfir
+ 
+     return { success: true };
+   } catch (err) {
+-    console.log(err);
++    serverConsole.log(err);
+     throw new Error(`Failed to send the confirmation email`);
+   }
+ };
+diff --git a/packages/lib/server-only/user/service-accounts/deleted-account.ts b/packages/lib/server-only/user/service-accounts/deleted-account.ts
+index 500718e5b..b0bdd7d99 100644
+--- a/packages/lib/server-only/user/service-accounts/deleted-account.ts
++++ b/packages/lib/server-only/user/service-accounts/deleted-account.ts
+@@ -1,5 +1,9 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/user/service-accounts/deleted-account');
++
+ const LEGACY_DELETED_ACCOUNT_EMAIL = 'deleted-account@documenso.com';
+ 
+ export const deletedServiceAccountEmail = () => {
+@@ -48,7 +52,7 @@ export const deletedAccountServiceAccount = async () => {
+ 
+ export const migrateDeletedAccountServiceAccount = async () => {
+   if (deletedServiceAccountEmail() !== LEGACY_DELETED_ACCOUNT_EMAIL) {
+-    console.log(`Migrating deleted account service account to new email: ${deletedServiceAccountEmail()}`);
++    serverConsole.log(`Migrating deleted account service account to new email: ${deletedServiceAccountEmail()}`);
+ 
+     await prisma.user.updateMany({
+       where: {
+diff --git a/packages/lib/server-only/user/service-accounts/legacy-service-account.ts b/packages/lib/server-only/user/service-accounts/legacy-service-account.ts
+index 3299c2a47..abe59b954 100644
+--- a/packages/lib/server-only/user/service-accounts/legacy-service-account.ts
++++ b/packages/lib/server-only/user/service-accounts/legacy-service-account.ts
+@@ -1,5 +1,9 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/user/service-accounts/legacy-service-account');
++
+ const LEGACY_SERVICE_ACCOUNT_EMAIL = 'serviceaccount@documenso.com';
+ 
+ export const legacyServiceAccountEmail = () => {
+@@ -20,7 +24,7 @@ export const legacyServiceAccountEmail = () => {
+ 
+ export const migrateLegacyServiceAccount = async () => {
+   if (legacyServiceAccountEmail() !== LEGACY_SERVICE_ACCOUNT_EMAIL) {
+-    console.log(`Migrating legacy service account to new email: ${legacyServiceAccountEmail()}`);
++    serverConsole.log(`Migrating legacy service account to new email: ${legacyServiceAccountEmail()}`);
+ 
+     await prisma.user.updateMany({
+       where: {
+diff --git a/packages/lib/server-only/webhooks/trigger/handler.ts b/packages/lib/server-only/webhooks/trigger/handler.ts
+index 7f1ebe6fd..5cc4e3722 100644
+--- a/packages/lib/server-only/webhooks/trigger/handler.ts
++++ b/packages/lib/server-only/webhooks/trigger/handler.ts
+@@ -1,8 +1,12 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { jobs } from '../../../jobs/client';
+ import { verify } from '../../crypto/verify';
+ import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
+ import { ZTriggerWebhookBodySchema } from './schema';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/webhooks/trigger/handler');
++
+ export type HandlerTriggerWebhooksResponse =
+   | {
+       success: true;
+@@ -18,7 +22,7 @@ export const handlerTriggerWebhooks = async (req: Request) => {
+   const signature = req.headers.get('x-webhook-signature');
+ 
+   if (typeof signature !== 'string') {
+-    console.log('Missing signature');
++    serverConsole.log('Missing signature');
+     return Response.json({ success: false, error: 'Missing signature' }, { status: 400 });
+   }
+ 
+@@ -27,14 +31,14 @@ export const handlerTriggerWebhooks = async (req: Request) => {
+   const valid = verify(body, signature);
+ 
+   if (!valid) {
+-    console.log('Invalid signature');
++    serverConsole.log('Invalid signature');
+     return Response.json({ success: false, error: 'Invalid signature' }, { status: 400 });
+   }
+ 
+   const result = ZTriggerWebhookBodySchema.safeParse(body);
+ 
+   if (!result.success) {
+-    console.log('Invalid request body');
++    serverConsole.log('Invalid request body');
+     return Response.json({ success: false, error: 'Invalid request body' }, { status: 400 });
+   }
+ 
+diff --git a/packages/lib/server-only/webhooks/trigger/trigger-webhook.ts b/packages/lib/server-only/webhooks/trigger/trigger-webhook.ts
+index 49c18e048..69a6f677f 100644
+--- a/packages/lib/server-only/webhooks/trigger/trigger-webhook.ts
++++ b/packages/lib/server-only/webhooks/trigger/trigger-webhook.ts
+@@ -1,8 +1,12 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import type { WebhookTriggerEvents } from '@prisma/client';
+ 
+ import { jobs } from '../../../jobs/client';
+ import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/webhooks/trigger/trigger-webhook');
++
+ export type TriggerWebhookOptions = {
+   event: WebhookTriggerEvents;
+   data: Record<string, unknown>;
+@@ -31,7 +35,7 @@ export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWeb
+       }),
+     );
+   } catch (err) {
+-    console.error(err);
++    serverConsole.error(err);
+     throw new Error(`Failed to trigger webhook`);
+   }
+ };
+diff --git a/packages/lib/server-only/webhooks/zapier/list-documents.ts b/packages/lib/server-only/webhooks/zapier/list-documents.ts
+index 70dc34c51..809f237de 100644
+--- a/packages/lib/server-only/webhooks/zapier/list-documents.ts
++++ b/packages/lib/server-only/webhooks/zapier/list-documents.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { prisma } from '@documenso/prisma';
+ import { EnvelopeType, type Webhook } from '@prisma/client';
+ 
+@@ -5,6 +7,8 @@ import { mapSecondaryIdToDocumentId } from '../../../utils/envelope';
+ import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
+ import { validateApiToken } from './validateApiToken';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/webhooks/zapier/list-documents');
++
+ export const listDocumentsHandler = async (req: Request) => {
+   try {
+     const authorization = req.headers.get('authorization');
+@@ -83,7 +87,7 @@ export const listDocumentsHandler = async (req: Request) => {
+ 
+     return Response.json([testWebhook]);
+   } catch (err) {
+-    console.error(err);
++    serverConsole.error(err);
+ 
+     return Response.json(
+       {
+diff --git a/packages/lib/server-only/webhooks/zapier/subscribe.ts b/packages/lib/server-only/webhooks/zapier/subscribe.ts
+index c05c99250..9b5e7892e 100644
+--- a/packages/lib/server-only/webhooks/zapier/subscribe.ts
++++ b/packages/lib/server-only/webhooks/zapier/subscribe.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
+@@ -6,6 +8,8 @@ import { prisma } from '@documenso/prisma';
+ import { assertNotPrivateUrl } from '../assert-webhook-url';
+ import { validateApiToken } from './validateApiToken';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/webhooks/zapier/subscribe');
++
+ export const subscribeHandler = async (req: Request) => {
+   try {
+     const authorization = req.headers.get('authorization');
+@@ -63,7 +67,7 @@ export const subscribeHandler = async (req: Request) => {
+       return Response.json({ message: err.message }, { status });
+     }
+ 
+-    console.error(err);
++    serverConsole.error(err);
+ 
+     return Response.json(
+       {
+diff --git a/packages/lib/server-only/webhooks/zapier/unsubscribe.ts b/packages/lib/server-only/webhooks/zapier/unsubscribe.ts
+index df21c0b65..c05b80e69 100644
+--- a/packages/lib/server-only/webhooks/zapier/unsubscribe.ts
++++ b/packages/lib/server-only/webhooks/zapier/unsubscribe.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
+@@ -5,6 +7,8 @@ import { prisma } from '@documenso/prisma';
+ 
+ import { validateApiToken } from './validateApiToken';
+ 
++const serverConsole = createServerConsole('packages/lib/server-only/webhooks/zapier/unsubscribe');
++
+ export const unsubscribeHandler = async (req: Request) => {
+   try {
+     const authorization = req.headers.get('authorization');
+@@ -46,7 +50,7 @@ export const unsubscribeHandler = async (req: Request) => {
+       return Response.json({ message: err.message }, { status });
+     }
+ 
+-    console.error(err);
++    serverConsole.error(err);
+ 
+     return Response.json(
+       {
+diff --git a/packages/lib/utils/logger.ts b/packages/lib/utils/logger.ts
+index dc059664f..5a4c44ae7 100644
+--- a/packages/lib/utils/logger.ts
++++ b/packages/lib/utils/logger.ts
+@@ -1,7 +1,8 @@
++// MODIFIED for BizRethink (overlay 090): sanitize before Pino serialization and child bindings.
++import { safeLoggingOptions } from '@bizrethink/customizations/server-only/logging/safe-log-data';
+ import { pino, type TransportTargetOptions } from 'pino';
+ 
+ import type { BaseApiLog } from '../types/api-logs';
+-import { extractRequestMetadata } from '../universal/extract-request-metadata';
+ import { env } from './env';
+ 
+ const transports: TransportTargetOptions[] = [];
+@@ -27,6 +28,7 @@ if (loggingFilePath) {
+ }
+ 
+ export const logger = pino({
++  ...safeLoggingOptions,
+   level: 'info',
+   transport:
+     transports.length > 0
+@@ -45,11 +47,7 @@ export const logDocumentAccess = ({
+   documentId: number;
+   userId: number;
+ }) => {
+-  const metadata = extractRequestMetadata(request);
+-
+   const data: BaseApiLog = {
+-    ipAddress: metadata.ipAddress,
+-    userAgent: metadata.userAgent,
+     path: new URL(request.url).pathname,
+     auth: 'session',
+     source: 'app',
+@@ -58,8 +56,7 @@ export const logDocumentAccess = ({
+ 
+   logger.info({
+     ...data,
+-    input: {
+-      documentId,
+-    },
++    event: 'document.access',
++    documentId,
+   });
+ };
+diff --git a/packages/prisma/index.ts b/packages/prisma/index.ts
+index fbfada22a..69afbcf1b 100644
+--- a/packages/prisma/index.ts
++++ b/packages/prisma/index.ts
+@@ -1,4 +1,6 @@
+ /// <reference types="@documenso/prisma/types/types.d.ts" />
++// MODIFIED for BizRethink (overlay 090): optional query diagnostics contain timings only.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { PrismaClient } from '@prisma/client';
+ import { readReplicas } from '@prisma/extension-read-replicas';
+ import { Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler } from 'kysely';
+@@ -48,23 +50,7 @@ export const prismaWithLogging = remember('prismaWithLogging', () => {
+   });
+ 
+   client.$on('query', (e) => {
+-    console.log('query:', e.query);
+-    console.log('params:', e.params);
+-    console.log('duration:', e.duration);
+-
+-    const params = JSON.parse(e.params) as unknown[];
+-
+-    const query = e.query.replace(/\$\d+/g, (match) => {
+-      const index = Number(match.replace('$', ''));
+-
+-      if (index > params.length) {
+-        return match;
+-      }
+-
+-      return String(params[index - 1]);
+-    });
+-
+-    console.log('formatted query:', query);
++    createServerConsole('packages/prisma/index').info({ durationMs: e.duration });
+   });
+ 
+   return client;
+diff --git a/packages/trpc/server/admin-router/create-admin-organisation.ts b/packages/trpc/server/admin-router/create-admin-organisation.ts
+index 135945fe9..8e78b281c 100644
+--- a/packages/trpc/server/admin-router/create-admin-organisation.ts
++++ b/packages/trpc/server/admin-router/create-admin-organisation.ts
+@@ -1,5 +1,8 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ // BizRethink (overlay 041): trial bookkeeping for new external orgs.
+ import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+ import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
+ import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
+@@ -10,6 +13,8 @@ import {
+   ZCreateAdminOrganisationResponseSchema,
+ } from './create-admin-organisation.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/admin-router/create-admin-organisation');
++
+ export const createAdminOrganisationRoute = adminProcedure
+   .input(ZCreateAdminOrganisationRequestSchema)
+   .output(ZCreateAdminOrganisationResponseSchema)
+@@ -36,7 +41,7 @@ export const createAdminOrganisationRoute = adminProcedure
+ 
+     // BizRethink (overlay 041): record the trial window for the new org.
+     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
+-      console.error('[bizrethink] startTrialForNewOrg failed', err);
++      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
+     });
+ 
+     return {
+diff --git a/packages/trpc/server/context.ts b/packages/trpc/server/context.ts
+index ae975a1bf..ea51f97b0 100644
+--- a/packages/trpc/server/context.ts
++++ b/packages/trpc/server/context.ts
+@@ -1,8 +1,10 @@
++// MODIFIED for BizRethink (overlay 090): routine diagnostics omit client addresses and user-agent headers.
++
++import { randomUUID } from 'node:crypto';
+ import type { SessionUser } from '@documenso/auth/server/lib/session/session';
+ import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+ import type { RootApiLog } from '@documenso/lib/types/api-logs';
+ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+-import { alphaid } from '@documenso/lib/universal/id';
+ import { logger } from '@documenso/lib/utils/logger';
+ // This is a bit nasty. Todo: Extract
+ import type { HonoEnv } from '@documenso/remix/server/router';
+@@ -33,9 +35,7 @@ export const createTrpcContext = async ({ c, requestSource }: CreateTrpcContextO
+   const rawTeamId = req.headers.get('x-team-id') || undefined;
+ 
+   const trpcLogger = logger.child({
+-    ipAddress: requestMetadata.ipAddress,
+-    userAgent: requestMetadata.userAgent,
+-    requestId: alphaid(),
++    requestId: c.var.requestId ?? randomUUID(),
+   } satisfies RootApiLog);
+ 
+   const teamId = z.coerce
+diff --git a/packages/trpc/server/document-router/access-auth-request-2fa-email.ts b/packages/trpc/server/document-router/access-auth-request-2fa-email.ts
+index deb78f5d3..e6091c082 100644
+--- a/packages/trpc/server/document-router/access-auth-request-2fa-email.ts
++++ b/packages/trpc/server/document-router/access-auth-request-2fa-email.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { TWO_FACTOR_EMAIL_EXPIRATION_MINUTES } from '@documenso/lib/server-only/2fa/email/constants';
+ import { send2FATokenEmail } from '@documenso/lib/server-only/2fa/email/send-2fa-token-email';
+ import { assertRateLimit } from '@documenso/lib/server-only/rate-limit/rate-limit-middleware';
+@@ -15,6 +17,8 @@ import {
+   ZAccessAuthRequest2FAEmailResponseSchema,
+ } from './access-auth-request-2fa-email.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/document-router/access-auth-request-2fa-email');
++
+ export const accessAuthRequest2FAEmailRoute = procedure
+   .input(ZAccessAuthRequest2FAEmailRequestSchema)
+   .output(ZAccessAuthRequest2FAEmailResponseSchema)
+@@ -90,7 +94,7 @@ export const accessAuthRequest2FAEmailRoute = procedure
+         expiresAt: expiresAt.toJSDate(),
+       };
+     } catch (error) {
+-      console.error('Error sending access auth 2FA email:', error);
++      serverConsole.error('Error sending access auth 2FA email:', error);
+ 
+       if (error instanceof TRPCError) {
+         throw error;
+diff --git a/packages/trpc/server/enterprise-router/manage-subscription.ts b/packages/trpc/server/enterprise-router/manage-subscription.ts
+index 75e3d6b8e..7db6e446f 100644
+--- a/packages/trpc/server/enterprise-router/manage-subscription.ts
++++ b/packages/trpc/server/enterprise-router/manage-subscription.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
+ import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
+ // MODIFIED for BizRethink (overlay 051): DB-aware billing gate.
+@@ -10,6 +12,8 @@ import { prisma } from '@documenso/prisma';
+ import { authenticatedProcedure } from '../trpc';
+ import { ZManageSubscriptionRequestSchema } from './manage-subscription.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/enterprise-router/manage-subscription');
++
+ export const manageSubscriptionRoute = authenticatedProcedure
+   .input(ZManageSubscriptionRequestSchema)
+   .mutation(async ({ ctx, input }) => {
+@@ -68,8 +72,8 @@ export const manageSubscriptionRoute = authenticatedProcedure
+         })
+         .catch((err) => {
+           // Todo: Logger
+-          console.error('Critical error, potential conflicting data');
+-          console.error(err.message);
++          serverConsole.error('Critical error, potential conflicting data');
++          serverConsole.error(err.message);
+ 
+           throw err;
+         });
+diff --git a/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts b/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts
+index d4b0de344..ccd3ad623 100644
+--- a/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts
++++ b/packages/trpc/server/envelope-router/get-envelope-items-by-token.ts
+@@ -1,3 +1,4 @@
++// MODIFIED for BizRethink (overlay 090): access tokens are never diagnostic input.
+ import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+@@ -22,10 +23,8 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
+     const { envelopeId, access } = input;
+ 
+     ctx.logger.info({
+-      input: {
+-        envelopeId,
+-        access,
+-      },
++      event: 'document.access.attempt',
++      envelopeId,
+     });
+ 
+     if (access.type === 'user') {
+diff --git a/packages/trpc/server/envelope-router/use-envelope.ts b/packages/trpc/server/envelope-router/use-envelope.ts
+index 2662db7d3..f4c970f7a 100644
+--- a/packages/trpc/server/envelope-router/use-envelope.ts
++++ b/packages/trpc/server/envelope-router/use-envelope.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
+ import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+@@ -12,6 +14,8 @@ import { match, P } from 'ts-pattern';
+ import { authenticatedProcedure } from '../trpc';
+ import { useEnvelopeMeta, ZUseEnvelopeRequestSchema, ZUseEnvelopeResponseSchema } from './use-envelope.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/envelope-router/use-envelope');
++
+ export const useEnvelopeRoute = authenticatedProcedure
+   .meta(useEnvelopeMeta)
+   .input(ZUseEnvelopeRequestSchema)
+@@ -149,7 +153,7 @@ export const useEnvelopeRoute = authenticatedProcedure
+         teamId,
+         requestMetadata: ctx.metadata,
+       }).catch((err) => {
+-        console.error(err);
++        serverConsole.error(err);
+ 
+         throw new AppError('DOCUMENT_SEND_FAILED');
+       });
+diff --git a/packages/trpc/server/field-router/router.ts b/packages/trpc/server/field-router/router.ts
+index 117d24604..89edcfb74 100644
+--- a/packages/trpc/server/field-router/router.ts
++++ b/packages/trpc/server/field-router/router.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { AppError } from '@documenso/lib/errors/app-error';
+ import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
+ import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
+@@ -41,6 +43,8 @@ import {
+   ZUpdateTemplateFieldsResponseSchema,
+ } from './schema';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/field-router/router');
++
+ export const fieldRouter = router({
+   /**
+    * @public
+@@ -639,8 +643,8 @@ export const fieldRouter = router({
+         error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
+       });
+ 
+-      // Raw console.log incase we're somehow deailing with a funky error object that doesn't serialize well.
+-      console.log('Error signing field with token', err);
++      // Preserve safe diagnostics even for unusual error objects.
++      serverConsole.log('Error signing field with token', err);
+ 
+       // Rethrow the error so that the client receives the appropriate error response.
+       throw err;
+@@ -676,7 +680,7 @@ export const fieldRouter = router({
+           error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
+         });
+ 
+-        console.log('Error removing signed field with token', err);
++        serverConsole.log('Error removing signed field with token', err);
+ 
+         // Rethrow the error so that the client receives the appropriate error response.
+         throw err;
+diff --git a/packages/trpc/server/organisation-router/create-organisation.ts b/packages/trpc/server/organisation-router/create-organisation.ts
+index 22519fda8..b54741f99 100644
+--- a/packages/trpc/server/organisation-router/create-organisation.ts
++++ b/packages/trpc/server/organisation-router/create-organisation.ts
+@@ -1,5 +1,8 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++
+ // BizRethink (overlay 041): trial bookkeeping for new external orgs.
+ import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
+ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
+ import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+@@ -12,6 +15,8 @@ import { OrganisationType, SubscriptionStatus } from '@prisma/client';
+ import { authenticatedProcedure } from '../trpc';
+ import { ZCreateOrganisationRequestSchema, ZCreateOrganisationResponseSchema } from './create-organisation.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/organisation-router/create-organisation');
++
+ export const createOrganisationRoute = authenticatedProcedure
+   // .meta(createOrganisationMeta)
+   .input(ZCreateOrganisationRequestSchema)
+@@ -133,7 +138,7 @@ export const createOrganisationRoute = authenticatedProcedure
+ 
+     // BizRethink (overlay 041): record the trial window for the new org.
+     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
+-      console.error('[bizrethink] startTrialForNewOrg failed', err);
++      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
+     });
+ 
+     return {
+diff --git a/packages/trpc/server/organisation-router/update-organisation-members.ts b/packages/trpc/server/organisation-router/update-organisation-members.ts
+index e2ee193e5..868ed4297 100644
+--- a/packages/trpc/server/organisation-router/update-organisation-members.ts
++++ b/packages/trpc/server/organisation-router/update-organisation-members.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { generateDatabaseId } from '@documenso/lib/universal/id';
+@@ -15,6 +17,8 @@ import {
+   ZUpdateOrganisationMemberResponseSchema,
+ } from './update-organisation-members.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/organisation-router/update-organisation-members');
++
+ export const updateOrganisationMemberRoute = authenticatedProcedure
+   //   .meta(updateOrganisationMemberMeta)
+   .input(ZUpdateOrganisationMemberRequestSchema)
+@@ -121,7 +125,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
+     const newMemberGroup = organisation.groups.find((group) => group.organisationRole === data.role);
+ 
+     if (!currentMemberGroup) {
+-      console.error('[CRITICAL]: Missing internal group');
++      serverConsole.error('[CRITICAL]: Missing internal group');
+ 
+       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+         message: 'Current member group not found',
+@@ -129,7 +133,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
+     }
+ 
+     if (!newMemberGroup) {
+-      console.error('[CRITICAL]: Missing internal group');
++      serverConsole.error('[CRITICAL]: Missing internal group');
+ 
+       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+         message: 'New member group not found',
+diff --git a/packages/trpc/server/organisation-router/update-organisation.ts b/packages/trpc/server/organisation-router/update-organisation.ts
+index e32b87d63..d9b12ae6c 100644
+--- a/packages/trpc/server/organisation-router/update-organisation.ts
++++ b/packages/trpc/server/organisation-router/update-organisation.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { stripe } from '@documenso/lib/server-only/stripe';
+@@ -9,6 +11,8 @@ import { z } from 'zod';
+ import { authenticatedProcedure } from '../trpc';
+ import { ZUpdateOrganisationRequestSchema, ZUpdateOrganisationResponseSchema } from './update-organisation.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/organisation-router/update-organisation');
++
+ export const updateOrganisationRoute = authenticatedProcedure
+   //   .meta(updateOrganisationMeta)
+   .input(ZUpdateOrganisationRequestSchema)
+@@ -49,7 +53,7 @@ export const updateOrganisationRoute = authenticatedProcedure
+         },
+       })
+       .catch((err) => {
+-        console.error(err);
++        serverConsole.error(err);
+ 
+         if (!(err instanceof Prisma.PrismaClientKnownRequestError)) {
+           throw err;
+diff --git a/packages/trpc/server/recipient-router/router.ts b/packages/trpc/server/recipient-router/router.ts
+index 84f3bd0d9..a3fb2b9cc 100644
+--- a/packages/trpc/server/recipient-router/router.ts
++++ b/packages/trpc/server/recipient-router/router.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
+ import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+@@ -46,6 +48,8 @@ import {
+   ZUpdateTemplateRecipientsResponseSchema,
+ } from './schema';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/recipient-router/router');
++
+ export const recipientRouter = router({
+   suggestions: {
+     find: findRecipientSuggestionsRoute,
+@@ -664,8 +668,8 @@ export const recipientRouter = router({
+           error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
+         });
+ 
+-        // Raw console.log incase we're somehow dealing with a funky error object that doesn't serialize well.
+-        console.log('Error completing document with token', err);
++        // Preserve safe diagnostics even for unusual error objects.
++        serverConsole.log('Error completing document with token', err);
+ 
+         // Rethrow the error so that the client receives the appropriate error response.
+         throw err;
+diff --git a/packages/trpc/server/team-router/create-team-members.ts b/packages/trpc/server/team-router/create-team-members.ts
+index 8820e764e..fd0391f80 100644
+--- a/packages/trpc/server/team-router/create-team-members.ts
++++ b/packages/trpc/server/team-router/create-team-members.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
+@@ -10,6 +12,8 @@ import { match } from 'ts-pattern';
+ import { authenticatedProcedure } from '../trpc';
+ import { ZCreateTeamMembersRequestSchema, ZCreateTeamMembersResponseSchema } from './create-team-members.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/team-router/create-team-members');
++
+ export const createTeamMembersRoute = authenticatedProcedure
+   .input(ZCreateTeamMembersRequestSchema)
+   .output(ZCreateTeamMembersResponseSchema)
+@@ -108,7 +112,7 @@ export const createTeamMembers = async ({ userId, teamId, membersToCreate }: Cre
+   );
+ 
+   if (!teamMemberGroup || !teamManagerGroup || !teamAdminGroup) {
+-    console.error({
++    serverConsole.error({
+       message: 'Team groups not found.',
+       teamMemberGroup: Boolean(teamMemberGroup),
+       teamManagerGroup: Boolean(teamManagerGroup),
+diff --git a/packages/trpc/server/team-router/delete-team-member.ts b/packages/trpc/server/team-router/delete-team-member.ts
+index db25a355a..a21782547 100644
+--- a/packages/trpc/server/team-router/delete-team-member.ts
++++ b/packages/trpc/server/team-router/delete-team-member.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
+@@ -8,6 +10,8 @@ import { OrganisationGroupType } from '@prisma/client';
+ import { authenticatedProcedure } from '../trpc';
+ import { ZDeleteTeamMemberRequestSchema, ZDeleteTeamMemberResponseSchema } from './delete-team-member.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/team-router/delete-team-member');
++
+ export const deleteTeamMemberRoute = authenticatedProcedure
+   // .meta(deleteTeamMemberMeta)
+   .input(ZDeleteTeamMemberRequestSchema)
+@@ -96,7 +100,7 @@ export const deleteTeamMemberRoute = authenticatedProcedure
+     // This means that the member was inherited (which means they should not be deleted directly)
+     // or it means that they are not part of any team groups relating to this?
+     if (team.teamGroups.length !== 1) {
+-      console.error('Member must have 1 one internal team group. This should not happen.');
++      serverConsole.error('Member must have 1 one internal team group. This should not happen.');
+ 
+       // Todo: Logging.
+     }
+diff --git a/packages/trpc/server/team-router/update-team-member.ts b/packages/trpc/server/team-router/update-team-member.ts
+index b0ddd0204..f82907f78 100644
+--- a/packages/trpc/server/team-router/update-team-member.ts
++++ b/packages/trpc/server/team-router/update-team-member.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
+@@ -10,6 +12,8 @@ import { match } from 'ts-pattern';
+ import { authenticatedProcedure } from '../trpc';
+ import { ZUpdateTeamMemberRequestSchema, ZUpdateTeamMemberResponseSchema } from './update-team-member.types';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/team-router/update-team-member');
++
+ export const updateTeamMemberRoute = authenticatedProcedure
+   //   .meta(updateTeamMemberMeta)
+   .input(ZUpdateTeamMemberRequestSchema)
+@@ -99,7 +103,7 @@ export const updateTeamMemberRoute = authenticatedProcedure
+     );
+ 
+     if (!teamMemberGroup || !teamManagerGroup || !teamAdminGroup) {
+-      console.error({
++      serverConsole.error({
+         message: 'Team groups not found.',
+         teamMemberGroup: Boolean(teamMemberGroup),
+         teamManagerGroup: Boolean(teamManagerGroup),
+diff --git a/packages/trpc/server/template-router/router.ts b/packages/trpc/server/template-router/router.ts
+index e11e1f25d..f52786eef 100644
+--- a/packages/trpc/server/template-router/router.ts
++++ b/packages/trpc/server/template-router/router.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
++import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
+ import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { jobs } from '@documenso/lib/jobs/client';
+@@ -65,6 +67,8 @@ import {
+ } from './schema';
+ import { searchTemplateRoute } from './search-template';
+ 
++const serverConsole = createServerConsole('packages/trpc/server/template-router/router');
++
+ export const templateRouter = router({
+   /**
+    * @public
+@@ -627,7 +631,7 @@ export const templateRouter = router({
+           teamId,
+           requestMetadata: ctx.metadata,
+         }).catch((err) => {
+-          console.error(err);
++          serverConsole.error(err);
+ 
+           if (err instanceof AppError) {
+             throw err;
+@@ -676,9 +680,7 @@ export const templateRouter = router({
+       } = input;
+ 
+       ctx.logger.info({
+-        input: {
+-          directTemplateToken,
+-        },
++        event: 'document.access.attempt',
+       });
+ 
+       return await createDocumentFromDirectTemplate({

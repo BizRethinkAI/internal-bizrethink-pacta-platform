@@ -1,4 +1,8 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
+
+const serverConsole = createServerConsole('packages/lib/server-only/user/service-accounts/legacy-service-account');
 
 const LEGACY_SERVICE_ACCOUNT_EMAIL = 'serviceaccount@documenso.com';
 
@@ -20,7 +24,7 @@ export const legacyServiceAccountEmail = () => {
 
 export const migrateLegacyServiceAccount = async () => {
   if (legacyServiceAccountEmail() !== LEGACY_SERVICE_ACCOUNT_EMAIL) {
-    console.log(`Migrating legacy service account to new email: ${legacyServiceAccountEmail()}`);
+    serverConsole.log(`Migrating legacy service account to new email: ${legacyServiceAccountEmail()}`);
 
     await prisma.user.updateMany({
       where: {

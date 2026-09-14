@@ -1,5 +1,6 @@
 import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -142,7 +143,7 @@ describe('autoClaimInvitesOnSignup', () => {
       .mockRejectedValueOnce(new Error('addUser failed'))
       .mockResolvedValueOnce({} as never);
 
-    const consoleErrSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleErrSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
     const result = await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' });
 
@@ -151,8 +152,7 @@ describe('autoClaimInvitesOnSignup', () => {
     expect(mockedUpdate).toHaveBeenCalledTimes(2);
     expect(result.map((r) => r.inviteId)).toEqual(['inv-a', 'inv-c']);
     expect(consoleErrSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[auto-claim-invites] Failed to accept invite inv-b'),
-      expect.any(Error),
+      expect.objectContaining({ event: 'invitation.claim-failed', err: { type: 'Error' } }),
     );
 
     consoleErrSpy.mockRestore();
@@ -165,7 +165,7 @@ describe('autoClaimInvitesOnSignup', () => {
     ] as never);
     mockedUpdate.mockRejectedValueOnce(new Error('update failed')).mockResolvedValueOnce({} as never);
 
-    const consoleErrSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleErrSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
     const result = await autoClaimInvitesOnSignup({ userId: 1, userEmail: 'jane@example.com' });
 
@@ -242,7 +242,7 @@ describe('claimInvitesOnVerification (overlay 071)', () => {
     mockedFindMany.mockResolvedValueOnce([inviteFixture()] as never);
     mockedAddUser.mockRejectedValueOnce(new Error('addUser failed'));
     mockedMemberCount.mockResolvedValueOnce(0);
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
     await claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' });
 
@@ -252,12 +252,11 @@ describe('claimInvitesOnVerification (overlay 071)', () => {
 
   it('swallows and logs errors so email verification never fails', async () => {
     mockedFindMany.mockRejectedValueOnce(new Error('DB down'));
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
     await expect(claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' })).resolves.toEqual([]);
     expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[claim-invites-on-verification]'),
-      expect.any(Error),
+      expect.objectContaining({ event: 'verification.claim-failed', err: { type: 'Error' } }),
     );
     errorSpy.mockRestore();
   });
@@ -266,7 +265,7 @@ describe('claimInvitesOnVerification (overlay 071)', () => {
     mockedFindMany.mockResolvedValueOnce([]);
     mockedMemberCount.mockResolvedValueOnce(0);
     mockedCreatePersonalOrg.mockRejectedValueOnce(new Error('org create failed'));
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
 
     await expect(claimInvitesOnVerification({ userId: 42, email: 'jane@example.com' })).resolves.toEqual([]);
     expect(errorSpy).toHaveBeenCalled();

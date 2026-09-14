@@ -1,3 +1,4 @@
+// MODIFIED for BizRethink (overlay 090): routine diagnostics omit client addresses and user-agent headers.
 import { withApiTokenTeamScope } from '@bizrethink/customizations/server-only/api-token-team-scope';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
@@ -38,8 +39,6 @@ export const authenticatedMiddleware = <
     const requestMetadata = extractRequestMetadata(request);
 
     const apiLogger = logger.child({
-      ipAddress: requestMetadata.ipAddress,
-      userAgent: requestMetadata.userAgent,
       requestId: nanoid(),
     } satisfies RootApiLog);
 

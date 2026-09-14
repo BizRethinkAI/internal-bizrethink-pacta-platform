@@ -63,3 +63,23 @@ it('preserves the fixed asset host and cache validation for static analytics fil
   expect(String(forward.mock.calls[0][0])).toBe('https://eu-assets.i.posthog.com/static/array.js?v=1');
   expect(new Headers(forward.mock.calls[0][1]?.headers).get('if-none-match')).toBe('synthetic-etag');
 });
+it('A-17 does not let a protocol-relative path select a different destination', async () => {
+  await call(new Request('https://app.example.invalid/ingest//attacker.example.invalid/e'));
+  expect(new URL(String(forward.mock.calls[0][0])).hostname).toBe('eu.i.posthog.com');
+});
+it('A-17 returns a generic provider failure without reflecting credentials from the provider error', async () => {
+  forward.mockRejectedValueOnce(new Error('synthetic-credential in upstream redirect'));
+  const response = await call(request());
+  expect(response.status).toBe(502);
+  expect(await response.text()).toBe('Analytics provider unavailable');
+});
+it('preserves an asset 304 cache response without a body or vendor cookies', async () => {
+  forward.mockResolvedValueOnce(
+    new Response(null, { status: 304, headers: { etag: 'stable', 'set-cookie': 'vendor=secret' } }),
+  );
+  const response = await call(new Request('https://app.example.invalid/ingest/static/array.js'));
+  expect(response.status).toBe(304);
+  expect(response.headers.get('etag')).toBe('stable');
+  expect(response.headers.get('set-cookie')).toBeNull();
+  expect(await response.text()).toBe('');
+});

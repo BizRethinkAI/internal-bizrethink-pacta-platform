@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { formatPath, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import {
   isDisposableEmail,
@@ -20,6 +22,8 @@ import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
 import { onAuthorize } from './authorizer';
 import { getOpenIdConfiguration } from './open-id';
+
+const serverConsole = createServerConsole('packages/auth/server/lib/utils/handle-oauth-callback-url');
 
 type HandleOAuthCallbackUrlOptions = {
   c: Context;
@@ -177,7 +181,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
 
   await onCreateUserHook(createdUser).catch((err) => {
     // Todo: (RR7) Add logging.
-    console.error(err);
+    serverConsole.error(err);
   });
 
   await onAuthorize({ userId: createdUser.id }, c);

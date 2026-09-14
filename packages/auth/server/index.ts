@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -15,6 +17,8 @@ import { sessionRoute } from './routes/session';
 import { signOutRoute } from './routes/sign-out';
 import { twoFactorRoute } from './routes/two-factor';
 import type { HonoAuthContext } from './types/context';
+
+const serverConsole = createServerConsole('packages/auth/server/index');
 
 // Note: You must chain routes for Hono RPC client to work.
 export const auth = new Hono<HonoAuthContext>()
@@ -80,7 +84,7 @@ auth.onError((err, c) => {
   }
 
   // Handle other errors
-  console.error('Unknown Error:', err);
+  serverConsole.error('Unknown Error:', err);
   return c.json(
     {
       code: AppErrorCode.UNKNOWN_ERROR,

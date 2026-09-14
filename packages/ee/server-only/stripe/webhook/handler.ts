@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 // MODIFIED for BizRethink (overlay 045b): billing-enabled and the webhook
 // secret come from the DB-backed instance Stripe config (admin UI) with env
 // fallback, and the Stripe SDK singleton is refreshed to the active
@@ -6,10 +8,13 @@ import {
   getInstanceStripeConfig,
   isBillingEnabled as isBillingEnabledFromConfig,
 } from '@bizrethink/customizations/server-only/instance-stripe-config';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { ensureStripeClient, stripe } from '@documenso/lib/server-only/stripe';
 import { env } from '@documenso/lib/utils/env';
 import { syncStripeCustomerSubscription } from '../sync-stripe-customer-subscription';
+
+const serverConsole = createServerConsole('packages/ee/server-only/stripe/webhook/handler');
 
 type StripeWebhookResponse = {
   success: boolean;
@@ -100,7 +105,7 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
     const customerId = typeof eventObject.customer === 'string' ? eventObject.customer : eventObject.customer?.id;
 
     if (!customerId) {
-      console.error(`No customer found on ${event.type} event ${event.id}, nothing to sync`);
+      serverConsole.error(`No customer found on ${event.type} event ${event.id}, nothing to sync`);
 
       return Response.json(
         {
@@ -121,7 +126,7 @@ export const stripeWebhookHandler = async (req: Request): Promise<Response> => {
       { status: 200 },
     );
   } catch (err) {
-    console.error(err);
+    serverConsole.error(err);
 
     return Response.json(
       {

@@ -1,7 +1,11 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import type { WebhookTriggerEvents } from '@prisma/client';
 
 import { jobs } from '../../../jobs/client';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
+
+const serverConsole = createServerConsole('packages/lib/server-only/webhooks/trigger/trigger-webhook');
 
 export type TriggerWebhookOptions = {
   event: WebhookTriggerEvents;
@@ -31,7 +35,7 @@ export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWeb
       }),
     );
   } catch (err) {
-    console.error(err);
+    serverConsole.error(err);
     throw new Error(`Failed to trigger webhook`);
   }
 };

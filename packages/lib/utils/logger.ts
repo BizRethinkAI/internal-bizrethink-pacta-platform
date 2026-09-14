@@ -1,7 +1,8 @@
+// MODIFIED for BizRethink (overlay 090): sanitize before Pino serialization and child bindings.
+import { safeLoggingOptions } from '@bizrethink/customizations/server-only/logging/safe-log-data';
 import { pino, type TransportTargetOptions } from 'pino';
 
 import type { BaseApiLog } from '../types/api-logs';
-import { extractRequestMetadata } from '../universal/extract-request-metadata';
 import { env } from './env';
 
 const transports: TransportTargetOptions[] = [];
@@ -27,6 +28,7 @@ if (loggingFilePath) {
 }
 
 export const logger = pino({
+  ...safeLoggingOptions,
   level: 'info',
   transport:
     transports.length > 0
@@ -45,11 +47,7 @@ export const logDocumentAccess = ({
   documentId: number;
   userId: number;
 }) => {
-  const metadata = extractRequestMetadata(request);
-
   const data: BaseApiLog = {
-    ipAddress: metadata.ipAddress,
-    userAgent: metadata.userAgent,
     path: new URL(request.url).pathname,
     auth: 'session',
     source: 'app',
@@ -58,8 +56,7 @@ export const logDocumentAccess = ({
 
   logger.info({
     ...data,
-    input: {
-      documentId,
-    },
+    event: 'document.access',
+    documentId,
   });
 };

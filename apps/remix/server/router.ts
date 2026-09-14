@@ -1,3 +1,4 @@
+// MODIFIED for BizRethink (overlay 090): server-generated request correlation and safe error diagnostics.
 import { isMalformedPath } from '@bizrethink/customizations/server-only/is-malformed-path';
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
@@ -21,6 +22,7 @@ import { openApiDocument } from '@documenso/trpc/server/open-api';
 import { Hono } from 'hono';
 import { contextStorage } from 'hono/context-storage';
 import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 import type { RequestIdVariables } from 'hono/request-id';
 import { requestId } from 'hono/request-id';
 import type { Logger } from 'pino';
@@ -34,6 +36,9 @@ import { securityHeadersMiddleware } from './security-headers';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
+// Include the owned early-instrumentation module in this existing Rollup entry.
+// instrument.mjs imports its generated file directly, without loading the app.
+export { safeSentryOptions } from '@bizrethink/customizations/server-only/logging/sentry-options';
 // Re-export so the rollup build (entry: server/router.ts) bundles
 // load-context.ts. server/main.js imports getLoadContext from the rolled-up
 // output to wire it into the React Router adapter.
@@ -50,6 +55,13 @@ export interface HonoEnv {
 const basePath = (env('NEXT_PUBLIC_BASE_PATH') ?? '').replace(/\/$/, '');
 
 const app = new Hono<HonoEnv>().basePath(basePath || '/');
+app.onError((err, c) => {
+  logger.error({ event: 'request.failed', err, requestId: c.var.requestId, requestPath: c.req.path });
+  if (err instanceof HTTPException) {
+    return err.getResponse();
+  }
+  return c.text('Internal Server Error', 500);
+});
 
 /**
  * Database-backed rate limiting for API routes.
@@ -96,15 +108,12 @@ app.use(securityHeadersMiddleware);
  * RR7 app middleware.
  */
 app.use('*', appMiddleware);
-app.use('*', requestId());
+app.use('*', requestId({ headerName: '' }));
 app.use(async (c, next) => {
-  const metadata = c.get('context').requestMetadata;
-
+  c.header('X-Request-Id', c.var.requestId);
   const honoLogger = logger.child({
     requestId: c.var.requestId,
     requestPath: c.req.path,
-    ipAddress: metadata.ipAddress,
-    userAgent: metadata.userAgent,
   });
 
   c.set('logger', honoLogger);

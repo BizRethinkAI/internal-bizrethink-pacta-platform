@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import type { Context as HonoContext } from 'hono';
 import type { Context, Handler, InngestFunction, Logger } from 'inngest';
 import { Inngest as InngestClient } from 'inngest';
@@ -6,6 +8,8 @@ import { serve as createHonoPagesRoute } from 'inngest/hono';
 import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
 import { BaseJobProvider } from './base';
+
+const serverConsole = createServerConsole('packages/lib/jobs/client/inngest');
 
 export class InngestJobProvider extends BaseJobProvider {
   private static _instance: InngestJobProvider;
@@ -24,7 +28,7 @@ export class InngestJobProvider extends BaseJobProvider {
       const client = new InngestClient({
         id: env('NEXT_PRIVATE_INNGEST_APP_ID') || 'documenso-app',
         eventKey: env('INNGEST_EVENT_KEY') || env('NEXT_PRIVATE_INNGEST_EVENT_KEY'),
-        logger: console,
+        logger: serverConsole,
       });
 
       InngestJobProvider._instance = new InngestJobProvider({ client });
@@ -89,11 +93,11 @@ export class InngestJobProvider extends BaseJobProvider {
     return {
       wait: step.sleep,
       logger: {
-        info: ctx.logger.info,
-        debug: ctx.logger.debug,
-        error: ctx.logger.error,
-        warn: ctx.logger.warn,
-        log: ctx.logger.info,
+        info: serverConsole.info,
+        debug: serverConsole.debug,
+        error: serverConsole.error,
+        warn: serverConsole.warn,
+        log: serverConsole.info,
       },
       runTask: async (cacheKey, callback) => {
         const result = await step.run(cacheKey, callback);

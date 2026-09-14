@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
@@ -64,6 +66,8 @@ import {
   ZUpdateTemplateResponseSchema,
 } from './schema';
 import { searchTemplateRoute } from './search-template';
+
+const serverConsole = createServerConsole('packages/trpc/server/template-router/router');
 
 export const templateRouter = router({
   /**
@@ -627,7 +631,7 @@ export const templateRouter = router({
           teamId,
           requestMetadata: ctx.metadata,
         }).catch((err) => {
-          console.error(err);
+          serverConsole.error(err);
 
           if (err instanceof AppError) {
             throw err;
@@ -676,9 +680,7 @@ export const templateRouter = router({
       } = input;
 
       ctx.logger.info({
-        input: {
-          directTemplateToken,
-        },
+        event: 'document.access.attempt',
       });
 
       return await createDocumentFromDirectTemplate({

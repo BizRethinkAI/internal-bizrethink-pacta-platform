@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 // MODIFIED for BizRethink (overlay 051): DB-aware billing gate.
@@ -9,6 +11,8 @@ import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZManageSubscriptionRequestSchema } from './manage-subscription.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/enterprise-router/manage-subscription');
 
 export const manageSubscriptionRoute = authenticatedProcedure
   .input(ZManageSubscriptionRequestSchema)
@@ -68,8 +72,8 @@ export const manageSubscriptionRoute = authenticatedProcedure
         })
         .catch((err) => {
           // Todo: Logger
-          console.error('Critical error, potential conflicting data');
-          console.error(err.message);
+          serverConsole.error('Critical error, potential conflicting data');
+          serverConsole.error(err.message);
 
           throw err;
         });

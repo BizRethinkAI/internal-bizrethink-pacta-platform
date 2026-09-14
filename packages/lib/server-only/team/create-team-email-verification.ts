@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
@@ -15,6 +17,8 @@ import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEmailContext } from '../email/get-email-context';
+
+const serverConsole = createServerConsole('packages/lib/server-only/team/create-team-email-verification');
 
 export type CreateTeamEmailVerificationOptions = {
   userId: number;
@@ -79,7 +83,7 @@ export const createTeamEmailVerification = async ({
     // open during network I/O.
     await sendTeamEmailVerificationEmail(data.email, token, team);
   } catch (err) {
-    console.error(err);
+    serverConsole.error(err);
 
     if (!(err instanceof Prisma.PrismaClientKnownRequestError)) {
       throw err;

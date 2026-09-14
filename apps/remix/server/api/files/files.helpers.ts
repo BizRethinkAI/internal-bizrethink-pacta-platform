@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
@@ -11,6 +13,8 @@ import type { Context } from 'hono';
 import { match } from 'ts-pattern';
 
 import type { HonoEnv } from '../../router';
+
+const serverConsole = createServerConsole('apps/remix/server/api/files/files.helpers');
 
 type DocumentDataInput = {
   type: DocumentDataType;
@@ -111,7 +115,7 @@ const handleStaticFileRequest = async ({
     type: documentData.type,
     data: documentDataToUse,
   }).catch((error) => {
-    console.error(error);
+    serverConsole.error(error);
 
     return null;
   });
@@ -215,7 +219,7 @@ const handlePendingFileRequest = async ({
     type: documentData.type,
     data: documentData.initialData,
   }).catch((error) => {
-    console.error(error);
+    serverConsole.error(error);
 
     return null;
   });

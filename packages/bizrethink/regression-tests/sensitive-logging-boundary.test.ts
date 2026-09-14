@@ -60,3 +60,39 @@ it('A-21 Error serialization, interpolated strings and arbitrary objects cannot 
   expect(captured.lines.join('')).not.toContain('SQL parameters');
   expect(JSON.parse(captured.lines[0])).toMatchObject({ err: { code: 'P2002' } });
 });
+it('A-21 nested child serializers, message prefixes and late bindings cannot reintroduce credentials', () => {
+  const nested = logger.child({ cookie: secret }).child(
+    { requestPath: `/d/${secret}` },
+    {
+      msgPrefix: secret,
+      serializers: { err: () => ({ token: secret, message: secret }) },
+    },
+  );
+  nested.setBindings({ authorization: secret, payload: { secret } });
+  nested.error({ err: new Error(secret), event: 'request.failed' }, secret);
+  const serialized = captured.lines.join('');
+  expect(serialized).not.toContain(secret);
+  expect(JSON.parse(captured.lines[0])).toMatchObject({ event: 'request.failed', level: 50 });
+});
+it('A-21 avoids getters/custom serialization and leaves original application data intact', () => {
+  const getter = vi.fn(() => secret);
+  const payload = { token: secret, toJSON: vi.fn(() => ({ token: secret })) };
+  const input = Object.defineProperty({ event: 'document.access', input: payload }, 'userId', { get: getter });
+  logger.info(input);
+  expect(captured.lines.join('')).not.toContain(secret);
+  expect(getter).not.toHaveBeenCalled();
+  expect(payload.toJSON).not.toHaveBeenCalled();
+  expect(payload.token).toBe(secret);
+});
+it('keeps stable non-bearer ID correlation and actionable error codes across log methods', () => {
+  const child = logger.child({ documentId: 'synthetic-document-id' });
+  child.info({ statusCode: 200 });
+  logger.error({
+    documentId: 'synthetic-document-id',
+    error: Object.assign(new Error(secret), { code: 'ECONNREFUSED' }),
+  });
+  const [left, right] = captured.lines.map((line) => JSON.parse(line));
+  expect(left.documentId).toBe(right.documentId);
+  expect(right.documentId).toMatch(/^sha256:/);
+  expect(right.error.code).toBe('ECONNREFUSED');
+});

@@ -1,9 +1,13 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { loadLogo } from '@documenso/lib/utils/images/logo';
 
 import type { Route } from './+types/branding.logo.team.$teamId';
+
+const serverConsole = createServerConsole('apps/remix/app/routes/api+/branding.logo.team.$teamId');
 
 const CACHE_CONTROL = 'public, max-age=0, stale-while-revalidate=86400';
 
@@ -57,7 +61,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   const file = await getFileServerSide(JSON.parse(settings.brandingLogo)).catch((e) => {
-    console.error(e);
+    serverConsole.error(e);
   });
 
   if (!file) {

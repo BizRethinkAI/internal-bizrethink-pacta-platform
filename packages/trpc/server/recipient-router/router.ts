@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { prepareCscRecipientSigning } from '@documenso/ee/server-only/signing/csc/prepare-recipient-signing';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -45,6 +47,8 @@ import {
   ZUpdateTemplateRecipientsRequestSchema,
   ZUpdateTemplateRecipientsResponseSchema,
 } from './schema';
+
+const serverConsole = createServerConsole('packages/trpc/server/recipient-router/router');
 
 export const recipientRouter = router({
   suggestions: {
@@ -664,8 +668,8 @@ export const recipientRouter = router({
           error: err instanceof AppError ? `[${err.code}]: ${err.message}` : String(err),
         });
 
-        // Raw console.log incase we're somehow dealing with a funky error object that doesn't serialize well.
-        console.log('Error completing document with token', err);
+        // Preserve safe diagnostics even for unusual error objects.
+        serverConsole.log('Error completing document with token', err);
 
         // Rethrow the error so that the client receives the appropriate error response.
         throw err;

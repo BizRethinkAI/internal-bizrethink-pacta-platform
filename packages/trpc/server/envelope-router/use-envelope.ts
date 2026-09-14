@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { recordPdfUpload } from '@bizrethink/customizations/server-only/template-pdf-sources';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -11,6 +13,8 @@ import { match, P } from 'ts-pattern';
 
 import { authenticatedProcedure } from '../trpc';
 import { useEnvelopeMeta, ZUseEnvelopeRequestSchema, ZUseEnvelopeResponseSchema } from './use-envelope.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/envelope-router/use-envelope');
 
 export const useEnvelopeRoute = authenticatedProcedure
   .meta(useEnvelopeMeta)
@@ -149,7 +153,7 @@ export const useEnvelopeRoute = authenticatedProcedure
         teamId,
         requestMetadata: ctx.metadata,
       }).catch((err) => {
-        console.error(err);
+        serverConsole.error(err);
 
         throw new AppError('DOCUMENT_SEND_FAILED');
       });

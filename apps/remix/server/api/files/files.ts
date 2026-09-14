@@ -1,7 +1,10 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 import {
   getEnvelopeFileWhereInput,
   privateEnvelopeFileCache,
 } from '@bizrethink/customizations/server-only/document-permissions';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { resolvePdfUploadOwner } from '@bizrethink/customizations/server-only/pdf-upload-owner';
 import { presignFileCache, resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
 import { recipientTokenFileAccess } from '@bizrethink/customizations/server-only/recipient-token-file-access';
@@ -27,6 +30,8 @@ import {
 } from './files.types';
 import getEnvelopeItemPdfRoute from './routes/get-envelope-item-pdf';
 import getEnvelopeItemPdfByTokenRoute from './routes/get-envelope-item-pdf-by-token';
+
+const serverConsole = createServerConsole('apps/remix/server/api/files/files');
 
 export const filesRoute = new Hono<HonoEnv>()
   // MODIFIED for BizRethink (overlay 084): role/visibility changes apply to every authenticated file read.
@@ -72,7 +77,7 @@ export const filesRoute = new Hono<HonoEnv>()
 
       return c.json(result);
     } catch (error) {
-      console.error('Upload failed:', error);
+      serverConsole.error('Upload failed:', error);
       return c.json({ error: 'Upload failed' }, 500);
     }
   })

@@ -83,6 +83,14 @@
     "../app-tests/e2e/api/bizrethink/document-team-permissions.spec.ts",
     "server-only/document-replacement.ts",
     "regression-tests/document-replacement-integrity.test.ts",
-    "../app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts"
+    "../app-tests/e2e/api/bizrethink/document-replacement-integrity.spec.ts",
+    "server-only/analytics-proxy.ts",
+    "server-only/logging/**/*.ts",
+    "regression-tests/analytics-credential-boundary.test.ts",
+    "regression-tests/sensitive-logging-boundary.test.ts",
+    "regression-tests/sensitive-job-logging.test.ts",
+    "regression-tests/sensitive-error-reporting.test.ts",
+    "regression-tests/sensitive-query-logging.test.ts",
+    "../app-tests/e2e/api/bizrethink/sensitive-information-boundary.spec.ts"
   ]
 }

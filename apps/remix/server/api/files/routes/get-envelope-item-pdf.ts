@@ -1,4 +1,7 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 import { getEnvelopeFileWhereInput } from '@bizrethink/customizations/server-only/document-permissions';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { resolvePresignFileActor } from '@bizrethink/customizations/server-only/presign-file-access';
 import type { DocumentDataVersion } from '@documenso/lib/types/document';
 import { sha256 } from '@documenso/lib/universal/crypto';
@@ -10,6 +13,8 @@ import { type Context, Hono } from 'hono';
 import { z } from 'zod';
 
 import type { HonoEnv } from '../../../router';
+
+const serverConsole = createServerConsole('apps/remix/server/api/files/routes/get-envelope-item-pdf');
 
 const route = new Hono<HonoEnv>();
 
@@ -113,7 +118,7 @@ export const handleEnvelopeItemPdfRequest = async ({
     type: envelopeItem.documentData.type,
     data: documentDataToUse,
   }).catch((error) => {
-    console.error(error);
+    serverConsole.error(error);
 
     return null;
   });

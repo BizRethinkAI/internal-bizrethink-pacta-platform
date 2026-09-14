@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
@@ -17,6 +19,8 @@ import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getMemberOrganisationRole } from '../team/get-member-roles';
+
+const serverConsole = createServerConsole('packages/lib/server-only/organisation/create-organisation-member-invites');
 
 export type CreateOrganisationMemberInvitesOptions = {
   userId: number;
@@ -129,7 +133,7 @@ export const createOrganisationMemberInvites = async ({
   );
 
   if (sendEmailResultErrorList.length > 0) {
-    console.error(JSON.stringify(sendEmailResultErrorList));
+    serverConsole.error(JSON.stringify(sendEmailResultErrorList));
 
     throw new AppError('EmailDeliveryFailed', {
       message: 'Failed to send invite emails to one or more users.',

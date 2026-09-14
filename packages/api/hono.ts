@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { ApiContractV1 } from '@documenso/api/v1/contract';
 import { ApiContractV1Implementation } from '@documenso/api/v1/implementation';
 import { OpenAPIV1 } from '@documenso/api/v1/openapi';
@@ -9,6 +11,8 @@ import { unsubscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/u
 import type { HonoEnv } from '@documenso/remix/server/router';
 import { fetchRequestHandler, TsRestHttpError } from '@ts-rest/serverless/fetch';
 import { Hono } from 'hono';
+
+const serverConsole = createServerConsole('packages/api/hono');
 
 // This is bad, ts-router will be created on each request.
 // But don't really have a choice here.
@@ -33,7 +37,7 @@ tsRestHonoApp.mount('/', async (request) => {
     options: {
       errorHandler: (err) => {
         if (err instanceof TsRestHttpError && err.statusCode === 500) {
-          console.error(err);
+          serverConsole.error(err);
         }
       },
     },

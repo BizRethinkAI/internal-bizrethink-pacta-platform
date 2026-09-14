@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { stripe } from '@documenso/lib/server-only/stripe';
@@ -8,6 +10,8 @@ import { z } from 'zod';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZUpdateOrganisationRequestSchema, ZUpdateOrganisationResponseSchema } from './update-organisation.types';
+
+const serverConsole = createServerConsole('packages/trpc/server/organisation-router/update-organisation');
 
 export const updateOrganisationRoute = authenticatedProcedure
   //   .meta(updateOrganisationMeta)
@@ -49,7 +53,7 @@ export const updateOrganisationRoute = authenticatedProcedure
         },
       })
       .catch((err) => {
-        console.error(err);
+        serverConsole.error(err);
 
         if (!(err instanceof Prisma.PrismaClientKnownRequestError)) {
           throw err;

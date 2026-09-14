@@ -1,3 +1,4 @@
+// MODIFIED for BizRethink (overlay 090): access tokens are never diagnostic input.
 import { assertRecipientTokenAccess } from '@bizrethink/customizations/server-only/recipient-access';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
@@ -22,10 +23,8 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
     const { envelopeId, access } = input;
 
     ctx.logger.info({
-      input: {
-        envelopeId,
-        access,
-      },
+      event: 'document.access.attempt',
+      envelopeId,
     });
 
     if (access.type === 'user') {

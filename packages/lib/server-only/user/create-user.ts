@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 // MODIFIED for BizRethink (overlay 048): auto-claim pending invites on
 // signup + skip Personal Org creation when any invite was accepted.
 //
@@ -13,6 +15,7 @@ import {
   autoClaimInvitesOnSignup,
   hasPendingInvites,
 } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 import { hash } from '@node-rs/bcrypt';
 import type { User } from '@prisma/client';
@@ -20,6 +23,8 @@ import type { User } from '@prisma/client';
 import { SALT_ROUNDS } from '../../constants/auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { createPersonalOrganisation } from '../organisation/create-organisation';
+
+const serverConsole = createServerConsole('packages/lib/server-only/user/create-user');
 
 export interface CreateUserOptions {
   name: string;
@@ -68,7 +73,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
   // Not used at the moment, uncomment if required.
   await onCreateUserHook(user).catch((err) => {
     // Todo: (RR7) Add logging.
-    console.error(err);
+    serverConsole.error(err);
   });
 
   return user;
@@ -112,7 +117,7 @@ export const onCreateUserHook = async (user: User, options: OnCreateUserHookOpti
         // Defensive: if auto-claim itself fails (DB blip, etc), still create
         // Personal Org as the safety net. Better to give the user a blank
         // workspace than no workspace at all.
-        console.error('[onCreateUserHook] auto-claim invites failed:', err);
+        serverConsole.error('[onCreateUserHook] auto-claim invites failed:', err);
         return [];
       })
     : [];
@@ -122,7 +127,7 @@ export const onCreateUserHook = async (user: User, options: OnCreateUserHookOpti
   const deferred =
     !user.emailVerified &&
     (await hasPendingInvites(user.email).catch((err) => {
-      console.error('[onCreateUserHook] pending-invite check failed:', err);
+      serverConsole.error('[onCreateUserHook] pending-invite check failed:', err);
       return false;
     }));
 

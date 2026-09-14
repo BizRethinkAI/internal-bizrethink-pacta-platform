@@ -1,8 +1,12 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 import crypto from 'crypto';
 
 import { ONE_HOUR } from '../../constants/time';
 import { sendForgotPassword } from '../auth/send-forgot-password';
+
+const serverConsole = createServerConsole('packages/lib/server-only/user/forgot-password');
 
 export const forgotPassword = async ({ email }: { email: string }) => {
   const user = await prisma.user.findFirst({
@@ -42,5 +46,5 @@ export const forgotPassword = async ({ email }: { email: string }) => {
 
   await sendForgotPassword({
     userId: user.id,
-  }).catch((err) => console.error(err));
+  }).catch((err) => serverConsole.error(err));
 };

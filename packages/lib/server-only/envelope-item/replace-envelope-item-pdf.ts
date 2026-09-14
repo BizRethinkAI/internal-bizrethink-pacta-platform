@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -10,6 +12,8 @@ import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { convertPlaceholdersToFieldInputs, extractPdfPlaceholders } from '../pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '../pdf/helpers';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+
+const serverConsole = createServerConsole('packages/lib/server-only/envelope-item/replace-envelope-item-pdf');
 
 type UnsafeReplaceEnvelopeItemPdfOptions = {
   envelope: Pick<Envelope, 'id' | 'type' | 'formValues'>;
@@ -219,7 +223,7 @@ export const UNSAFE_replaceEnvelopeItemPdf = async ({
       });
     } catch (err) {
       // Do nothing.
-      console.error(err);
+      serverConsole.error(err);
     }
   }
 

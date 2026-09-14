@@ -1,9 +1,13 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { validateApiToken } from './validateApiToken';
+
+const serverConsole = createServerConsole('packages/lib/server-only/webhooks/zapier/unsubscribe');
 
 export const unsubscribeHandler = async (req: Request) => {
   try {
@@ -46,7 +50,7 @@ export const unsubscribeHandler = async (req: Request) => {
       return Response.json({ message: err.message }, { status });
     }
 
-    console.error(err);
+    serverConsole.error(err);
 
     return Response.json(
       {

@@ -1,5 +1,8 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
 import { getSubscriptionClaim } from '@documenso/lib/server-only/subscription/get-subscription-claim';
 import { prisma } from '@documenso/prisma';
@@ -12,6 +15,8 @@ import { INTERNAL_CLAIM_ID } from '../../types/subscription';
 import { generateDatabaseId, prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
 import { createTeam } from '../team/create-team';
+
+const serverConsole = createServerConsole('packages/lib/server-only/organisation/create-organisation');
 
 type CreateOrganisationOptions = {
   userId: number;
@@ -44,7 +49,7 @@ export const createOrganisation = async ({ name, url, type, userId, customerId, 
     })
       .then((customer) => customer.id)
       .catch((err) => {
-        console.error(err);
+        serverConsole.error(err);
 
         return undefined;
       });
@@ -168,7 +173,7 @@ export const createPersonalOrganisation = async ({
     type,
     claim: proSubscriptionClaim,
   }).catch((err) => {
-    console.error(err);
+    serverConsole.error(err);
 
     if (throwErrorOnOrganisationCreationFailure) {
       throw err;
@@ -183,7 +188,7 @@ export const createPersonalOrganisation = async ({
   // is bookkeeping that defaults to "no row = external, no trial" downstream.
   if (organisation) {
     await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
-      console.error('[bizrethink] startTrialForNewOrg failed', err);
+      serverConsole.error('[bizrethink] startTrialForNewOrg failed', err);
     });
   }
 
@@ -195,7 +200,7 @@ export const createPersonalOrganisation = async ({
       organisationId: organisation.id,
       inheritMembers,
     }).catch((err) => {
-      console.error(err);
+      serverConsole.error(err);
 
       // Todo: (LOGS)
     });

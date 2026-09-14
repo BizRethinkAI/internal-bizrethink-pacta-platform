@@ -1,5 +1,8 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 
 import { prisma } from '@documenso/prisma';
 
@@ -14,6 +17,8 @@ import {
 } from '../../types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '../../types/subscription';
 import { env } from '../../utils/env';
+
+const serverConsole = createServerConsole('packages/lib/server-only/license/license-client');
 
 const LICENSE_KEY = env('NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY');
 const LICENSE_SERVER_URL = env('INTERNAL_OVERRIDE_LICENSE_SERVER_URL') || 'https://license.documenso.com';
@@ -54,7 +59,7 @@ export class LicenseClient {
       await instance.initialize();
     } catch (err) {
       // Do nothing.
-      console.error('[License] Failed to verify license:', err);
+      serverConsole.error('[License] Failed to verify license:', err);
     }
   }
 
@@ -88,7 +93,7 @@ export class LicenseClient {
   }
 
   private async initialize(): Promise<void> {
-    console.log('[License] Checking license with server...');
+    serverConsole.log('[License] Checking license with server...');
 
     const cachedLicense = await this.loadFromFile();
 
@@ -102,8 +107,8 @@ export class LicenseClient {
       response = await this.pingLicenseServer();
     } catch (err) {
       // If server is not responding, or erroring, use the cached license.
-      console.warn('[License] License server not responding, using cached license.');
-      console.error(err);
+      serverConsole.warn('[License] License server not responding, using cached license.');
+      serverConsole.error(err);
       return;
     }
 
@@ -113,7 +118,7 @@ export class LicenseClient {
     const unauthorizedFlagUsage = await this.checkUnauthorizedFlagUsage(allowedFlags);
 
     if (unauthorizedFlagUsage) {
-      console.warn('[License] Found unauthorized flag usage.');
+      serverConsole.warn('[License] Found unauthorized flag usage.');
     }
 
     let status: TCachedLicense['derivedStatus'] = 'NOT_FOUND';
@@ -137,11 +142,11 @@ export class LicenseClient {
     this.cachedLicense = data;
     await this.saveToFile(data);
 
-    console.log('[License] License check completed successfully.');
-    console.log(`[License] Unauthorized Flag Usage: ${unauthorizedFlagUsage ? 'Yes' : 'No'}`);
-    console.log(`[License] Derived Status: ${status}`);
-    console.log(`[License] Status: ${response?.data?.status}`);
-    console.log(`[License] Flags: ${JSON.stringify(allowedFlags)}`);
+    serverConsole.log('[License] License check completed successfully.');
+    serverConsole.log(`[License] Unauthorized Flag Usage: ${unauthorizedFlagUsage ? 'Yes' : 'No'}`);
+    serverConsole.log(`[License] Derived Status: ${status}`);
+    serverConsole.log(`[License] Status: ${response?.data?.status}`);
+    serverConsole.log(`[License] Flags: ${JSON.stringify(allowedFlags)}`);
   }
 
   /**
@@ -179,7 +184,7 @@ export class LicenseClient {
     try {
       await fs.writeFile(licenseFilePath, JSON.stringify(data, null, 2), 'utf-8');
     } catch (error) {
-      console.error('[License] Failed to save license file:', error);
+      serverConsole.error('[License] Failed to save license file:', error);
     }
   }
 
@@ -236,7 +241,7 @@ export class LicenseClient {
         unauthorizedFlagUsage = true;
       }
     } catch (error) {
-      console.error('[License] Failed to check unauthorized flag usage:', error);
+      serverConsole.error('[License] Failed to check unauthorized flag usage:', error);
     }
 
     return unauthorizedFlagUsage;

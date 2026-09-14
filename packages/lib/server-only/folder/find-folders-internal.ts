@@ -1,9 +1,13 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType } from '@prisma/client';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { TFolderType } from '../../types/folder-type';
 import { getTeamById } from '../team/get-team';
+
+const serverConsole = createServerConsole('packages/lib/server-only/folder/find-folders-internal');
 
 export interface FindFoldersInternalOptions {
   userId: number;
@@ -99,7 +103,7 @@ export const findFoldersInternal = async ({ userId, teamId, parentId, type }: Fi
             },
           };
         } catch (error) {
-          console.error('Error processing folder:', folder.id, error);
+          serverConsole.error('Error processing folder:', folder.id, error);
           throw error;
         }
       }),
@@ -107,7 +111,7 @@ export const findFoldersInternal = async ({ userId, teamId, parentId, type }: Fi
 
     return foldersWithDetails;
   } catch (error) {
-    console.error('Error in findFolders:', error);
+    serverConsole.error('Error in findFolders:', error);
     throw error;
   }
 };

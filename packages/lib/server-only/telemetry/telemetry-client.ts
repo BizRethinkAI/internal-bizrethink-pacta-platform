@@ -1,7 +1,10 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+
 /* eslint-disable require-atomic-updates */
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { PostHog } from 'posthog-node';
 
 import { version } from '../../../../package.json';
@@ -9,6 +12,8 @@ import { prefixedId } from '../../universal/id';
 import { getSiteSetting } from '../site-settings/get-site-setting';
 import { SITE_SETTINGS_TELEMETRY_ID } from '../site-settings/schemas/telemetry';
 import { upsertSiteSetting } from '../site-settings/upsert-site-setting';
+
+const serverConsole = createServerConsole('packages/lib/server-only/telemetry/telemetry-client');
 
 const HAS_LICENSE_KEY = !!process.env.NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY;
 
@@ -46,7 +51,7 @@ export class TelemetryClient {
   public static async start(): Promise<void> {
     if (TELEMETRY_DISABLED) {
       if (!HAS_LICENSE_KEY) {
-        console.log(
+        serverConsole.log(
           '[Telemetry] Telemetry is disabled. To enable, remove the DOCUMENSO_DISABLE_TELEMETRY environment variable.',
         );
       }
@@ -55,7 +60,7 @@ export class TelemetryClient {
     }
 
     if (!TELEMETRY_KEY || !TELEMETRY_HOST) {
-      console.log('[Telemetry] Telemetry credentials not configured. Telemetry will not be sent.');
+      serverConsole.log('[Telemetry] Telemetry credentials not configured. Telemetry will not be sent.');
       return;
     }
 
@@ -103,16 +108,16 @@ export class TelemetryClient {
     this.installationId = await this.getOrCreateInstallationId();
     this.nodeId = await this.getOrCreateNodeId();
 
-    console.log(
+    serverConsole.log(
       '[Telemetry] Telemetry is enabled. Documenso collects anonymous usage data to help improve the product.',
     );
-    console.log(
+    serverConsole.log(
       '[Telemetry] We collect: app version, installation ID, and node ID. No personal data, document contents, or user information is collected.',
     );
-    console.log(
+    serverConsole.log(
       '[Telemetry] To disable telemetry, set DOCUMENSO_DISABLE_TELEMETRY=true in your environment variables.',
     );
-    console.log('[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry');
+    serverConsole.log('[Telemetry] Learn more: https://documenso.com/docs/developers/self-hosting/telemetry');
 
     // Capture startup event
     this.captureEvent('telemetry_selfhoster_startup');

@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 090): redact server diagnostics before transport.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { sendOrganisationAccountLinkConfirmationEmail } from '@documenso/ee/server-only/lib/send-organisation-account-link-confirmation-email';
 import { formatPath } from '@documenso/lib/constants/app';
 import { isDisposableEmail, isSignupEnabledForProvider } from '@documenso/lib/constants/auth';
@@ -12,6 +14,8 @@ import { AuthenticationErrorCode } from '../errors/error-codes';
 import { onAuthorize } from './authorizer';
 import { validateOauth } from './handle-oauth-callback-url';
 import { getOrganisationAuthenticationPortalOptions } from './organisation-portal';
+
+const serverConsole = createServerConsole('packages/auth/server/lib/utils/handle-oauth-organisation-callback-url');
 
 type HandleOAuthOrganisationCallbackUrlOptions = {
   c: Context;
@@ -99,7 +103,7 @@ export const handleOAuthOrganisationCallbackUrl = async (options: HandleOAuthOrg
       skipPersonalOrganisation: !organisation.organisationAuthenticationPortal.allowPersonalOrganisations,
     }).catch((err) => {
       // Todo: (RR7) Add logging.
-      console.error(err);
+      serverConsole.error(err);
     });
   }
 

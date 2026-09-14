@@ -1,4 +1,6 @@
 /// <reference types="@documenso/prisma/types/types.d.ts" />
+// MODIFIED for BizRethink (overlay 090): optional query diagnostics contain timings only.
+import { createServerConsole } from '@bizrethink/customizations/server-only/logging/server-console';
 import { PrismaClient } from '@prisma/client';
 import { readReplicas } from '@prisma/extension-read-replicas';
 import { Kysely, PostgresAdapter, PostgresIntrospector, PostgresQueryCompiler } from 'kysely';
@@ -48,23 +50,7 @@ export const prismaWithLogging = remember('prismaWithLogging', () => {
   });
 
   client.$on('query', (e) => {
-    console.log('query:', e.query);
-    console.log('params:', e.params);
-    console.log('duration:', e.duration);
-
-    const params = JSON.parse(e.params) as unknown[];
-
-    const query = e.query.replace(/\$\d+/g, (match) => {
-      const index = Number(match.replace('$', ''));
-
-      if (index > params.length) {
-        return match;
-      }
-
-      return String(params[index - 1]);
-    });
-
-    console.log('formatted query:', query);
+    createServerConsole('packages/prisma/index').info({ durationMs: e.duration });
   });
 
   return client;
