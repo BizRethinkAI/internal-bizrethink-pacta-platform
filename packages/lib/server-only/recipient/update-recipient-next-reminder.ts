@@ -12,6 +12,7 @@ import { resolveNextReminderAt, ZEnvelopeReminderSettings } from '../../constant
  */
 export const updateRecipientNextReminder = async (options: {
   recipientId: number;
+  recipientToken: string;
   envelopeId: string;
   sentAt: Date;
   lastReminderSentAt: Date | null;
@@ -41,8 +42,9 @@ export const updateRecipientNextReminder = async (options: {
     reminderCount: resetReminderCount ? 0 : reminderCount,
   });
 
-  await prisma.recipient.update({
-    where: { id: recipientId },
+  // MODIFIED for BizRethink (overlay 088): delivery of an old link cannot alter its replacement.
+  await prisma.recipient.updateMany({
+    where: { id: recipientId, token: options.recipientToken },
     data: {
       nextReminderAt,
       ...(resetReminderCount ? { reminderCount: 0 } : {}),

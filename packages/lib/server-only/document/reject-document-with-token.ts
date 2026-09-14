@@ -1,7 +1,10 @@
+// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
+
 import {
   assertRecipientAccess,
   assertRecipientEnvelopeNotDeleted,
 } from '@bizrethink/customizations/server-only/recipient-access';
+import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
 // This is closely related to `reject-document-on-behalf-of.ts` but is intentionally
 // kept as a separate method rather than merged into one. This file focuses on
 // rejection from a recipient perspective (the recipient rejecting via their token),
@@ -69,8 +72,9 @@ export async function rejectDocumentWithToken({
   assertRecipientNotExpired(recipient);
 
   // Update the recipient status to rejected
-  const [updatedRecipient] = await prisma.$transaction([
-    prisma.recipient.update({
+  const updatedRecipient = await prisma.$transaction(async (tx) => {
+    await assertCurrentRecipientAuthority(tx, { recipient, envelope });
+    const updated = await tx.recipient.update({
       where: {
         id: recipient.id,
       },
@@ -79,8 +83,8 @@ export async function rejectDocumentWithToken({
         signingStatus: SigningStatus.REJECTED,
         rejectionReason: reason,
       },
-    }),
-    prisma.documentAuditLog.create({
+    });
+    await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         envelopeId: envelope.id,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED,
@@ -97,8 +101,9 @@ export async function rejectDocumentWithToken({
         },
         requestMetadata,
       }),
-    }),
-  ]);
+    });
+    return updated;
+  });
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 

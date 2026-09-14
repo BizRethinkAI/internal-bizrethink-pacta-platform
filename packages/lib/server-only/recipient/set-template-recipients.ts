@@ -1,8 +1,11 @@
+// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
+
+import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
+import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
-import { prisma } from '@documenso/prisma';
 import type { Recipient } from '@prisma/client';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
 
@@ -29,100 +32,79 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
     teamId,
   });
 
-  const envelope = await prisma.envelope.findFirst({
-    where: envelopeWhereInput,
-    include: {
-      directLink: true,
-      team: {
-        select: {
-          organisation: {
-            select: {
-              organisationClaim: true,
-            },
-          },
-        },
-      },
-      recipients: true,
-    },
-  });
+  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
+    const recipientsHaveActionAuth = recipients.some(
+      (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+    );
 
-  if (!envelope) {
-    throw new Error('Template not found');
-  }
+    // Check if user has permission to set the global action auth.
+    if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
+      });
+    }
 
-  const recipientsHaveActionAuth = recipients.some(
-    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
-  );
+    for (const recipient of recipients) {
+      assertCompatibleRecipientRole({
+        signatureLevel: envelope.signatureLevel,
+        role: recipient.role,
+      });
+    }
 
-  // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to set the action auth',
-    });
-  }
+    const normalizedRecipients = recipients.map((recipient) => {
+      // Force replace any changes to the name or email of the direct recipient.
+      if (envelope.directLink && recipient.id === envelope.directLink.directTemplateRecipientId) {
+        return {
+          ...recipient,
+          email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+          name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+        };
+      }
 
-  for (const recipient of recipients) {
-    assertCompatibleRecipientRole({
-      signatureLevel: envelope.signatureLevel,
-      role: recipient.role,
-    });
-  }
-
-  const normalizedRecipients = recipients.map((recipient) => {
-    // Force replace any changes to the name or email of the direct recipient.
-    if (envelope.directLink && recipient.id === envelope.directLink.directTemplateRecipientId) {
       return {
         ...recipient,
-        email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-        name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+        email: recipient.email.toLowerCase(),
       };
-    }
+    });
 
-    return {
-      ...recipient,
-      email: recipient.email.toLowerCase(),
-    };
-  });
+    const existingRecipients = envelope.recipients;
 
-  const existingRecipients = envelope.recipients;
-
-  const removedRecipients = existingRecipients.filter(
-    (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
-  );
-
-  if (envelope.directLink !== null) {
-    const updatedDirectRecipient = recipients.find(
-      (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
+    const removedRecipients = existingRecipients.filter(
+      (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
     );
 
-    const deletedDirectRecipient = removedRecipients.find(
-      (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
-    );
+    if (envelope.directLink !== null) {
+      const updatedDirectRecipient = recipients.find(
+        (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
+      );
 
-    if (updatedDirectRecipient?.role === RecipientRole.CC) {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'Cannot set direct recipient as CC',
-      });
+      const deletedDirectRecipient = removedRecipients.find(
+        (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
+      );
+
+      if (updatedDirectRecipient?.role === RecipientRole.CC) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Cannot set direct recipient as CC',
+        });
+      }
+
+      if (deletedDirectRecipient) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Cannot delete direct recipient while direct template exists',
+        });
+      }
     }
 
-    if (deletedDirectRecipient) {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: 'Cannot delete direct recipient while direct template exists',
-      });
-    }
-  }
+    const linkedRecipients = normalizedRecipients.map((recipient) => {
+      const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
 
-  const linkedRecipients = normalizedRecipients.map((recipient) => {
-    const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
+      return {
+        ...recipient,
+        _persisted: existing,
+      };
+    });
 
-    return {
-      ...recipient,
-      _persisted: existing,
-    };
-  });
-
-  const persistedRecipients = await prisma.$transaction(async (tx) => {
-    return await Promise.all(
+    const persistedRecipients = await Promise.all(
       linkedRecipients.map(async (recipient) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
 
@@ -139,6 +121,7 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
             envelopeId: envelope.id,
           },
           update: {
+            ...(await recipientIdentityReset(tx, recipient._persisted, recipient, envelope.fields)),
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
@@ -178,33 +161,33 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }: 
         };
       }),
     );
-  });
 
-  if (removedRecipients.length > 0) {
-    await prisma.recipient.deleteMany({
-      where: {
-        id: {
-          in: removedRecipients.map((recipient) => recipient.id),
+    if (removedRecipients.length > 0) {
+      await tx.recipient.deleteMany({
+        where: {
+          id: {
+            in: removedRecipients.map((recipient) => recipient.id),
+          },
         },
-      },
+      });
+    }
+
+    // Filter out recipients that have been removed or have been updated.
+    const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
+      const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
+      const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
+
+      return !isRemoved && !isUpdated;
     });
-  }
 
-  // Filter out recipients that have been removed or have been updated.
-  const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
-    const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
-    const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
-
-    return !isRemoved && !isUpdated;
+    return {
+      recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
+        ...recipient,
+        documentId: null,
+        templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+      })),
+    };
   });
-
-  return {
-    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
-      ...recipient,
-      documentId: null,
-      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
-    })),
-  };
 };
 
 type RecipientData = {
