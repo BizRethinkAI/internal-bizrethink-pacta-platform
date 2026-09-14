@@ -26,6 +26,9 @@ export const projectTemplateReading = <T extends McaTemplateSnapshot>(snapshot: 
           context,
           'Saved provider selection',
         );
+        // compileMcaTemplate receives resolved operative bodies from selectClauses,
+        // and resolves reusable bodies before placement. item.body therefore
+        // already contains numbers; keep this exact saved-wording comparison.
         if (segments.map((part) => part.text).join('') !== item.body) {
           throw new AppError(AppErrorCode.INVALID_REQUEST, {
             message: 'The reading projection no longer matches this saved wording.',

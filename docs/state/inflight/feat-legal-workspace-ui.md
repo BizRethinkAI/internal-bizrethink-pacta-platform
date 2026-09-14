@@ -88,3 +88,22 @@ remains in place. Homelab hosting and state consolidation are separate work.
   A failing extraction test reproduced the missing labels without a full build;
   it now verifies the real application catalog extracts reference and filter
   controls. The browser assertion remains unchanged.
+
+## Reference-projection review follow-up
+
+The independent review's claim that operative template bodies retain canonical
+reference tokens was not reproduced on `742ba4cae`. `selectClauses()` calls
+`resolveReferences(numbered, context)` before returning `selected`, so the
+compiler receives numeric bodies for operative clauses; reusable bodies are
+resolved separately before placement. The exact projection/body comparison is
+retained and no application behavior changes in this follow-up.
+
+New tests call the real authenticated preview and fill handlers with synthetic
+database/feature records, retaining the real service, compiler, projection and
+draft preparation. FRPA and all-instrument fixtures explicitly contain canonical
+clause/section references in their sources, numeric bodies in their compiled
+snapshots, and matching text/navigation targets in both responses. The latter
+also verifies cross-document references. A negative case replaces a compiled
+body with uncompiled source and confirms the integrity guard still refuses it.
+These tests passed before adding the explanatory implementation comment. Fresh
+CI and reviewer reassessment are required for the follow-up head.
