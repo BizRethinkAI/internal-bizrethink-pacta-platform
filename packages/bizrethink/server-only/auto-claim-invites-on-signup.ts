@@ -3,6 +3,7 @@ import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/a
 import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
 import { prisma } from '@documenso/prisma';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
+import { pendingVerifiedOnboarding } from './verified-onboarding-receipt';
 
 export type AutoClaimedInvite = {
   organisationId: string;
@@ -32,6 +33,11 @@ const reconcileVerifiedOnboarding = async ({
     await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
     const user = await tx.user.findUnique({ where: { id: userId } });
     if (!user || user.disabled || !user.emailVerified || user.email.toLowerCase() !== userEmail.toLowerCase()) {
+      return { accepted: [], joined: [] };
+    }
+
+    const receipt = await tx.bizrethinkVerifiedOnboarding.findUnique({ where: { userId } });
+    if (receipt?.completedAt) {
       return { accepted: [], joined: [] };
     }
 
@@ -75,8 +81,19 @@ const reconcileVerifiedOnboarding = async ({
         inviteId: invite.id,
       });
     }
-    if (createFallback && (await tx.organisationMember.count({ where: { userId } })) === 0) {
+    if (createFallback && receipt && (await tx.organisationMember.count({ where: { userId } })) === 0) {
       await createPersonalOrganisation({ userId, transaction: tx, throwErrorOnOrganisationCreationFailure: true });
+    }
+    // Completion shares the membership transaction. Without a known pending
+    // receipt, login repairs only concrete historical invitations; zero
+    // memberships alone never authorizes recreating a deleted workspace.
+    if (accepted.length > 0 || (receipt && createFallback)) {
+      const completedAt = new Date();
+      await tx.bizrethinkVerifiedOnboarding.upsert({
+        where: { userId },
+        create: { userId, completedAt },
+        update: { completedAt },
+      });
     }
     return { accepted, joined };
   });
@@ -113,7 +130,19 @@ export const hasPendingInvites = async (email: string): Promise<boolean> => {
  */
 export const claimInvitesOnVerification = async ({ userId, email }: { userId: number; email: string }) => {
   try {
-    return await reconcileVerifiedOnboarding({ userId, userEmail: email, createFallback: true });
+    // Normally already written atomically with email proof. A still-valid
+    // completed verification link also permits explicit historical recovery.
+    // Persist before reconciliation so a failed fallback remains retryable.
+    const allowed = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+      const user = await tx.user.findUnique({ where: { id: userId } });
+      if (!user || user.disabled || !user.emailVerified || user.email.toLowerCase() !== email.toLowerCase()) {
+        return false;
+      }
+      await pendingVerifiedOnboarding(userId, tx);
+      return true;
+    });
+    return allowed ? await reconcileVerifiedOnboarding({ userId, userEmail: email, createFallback: true }) : [];
   } catch {
     console.error('[verified-onboarding] reconciliation failed; retry available');
     return [];
@@ -124,7 +153,7 @@ export const recoverOnboardingOnLogin = async (userId: number) => {
   try {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
     if (user) {
-      await claimInvitesOnVerification({ userId, email: user.email });
+      await reconcileVerifiedOnboarding({ userId, userEmail: user.email, createFallback: true });
     }
   } catch {
     console.error('[verified-onboarding] login reconciliation unavailable');

@@ -19,6 +19,7 @@ vi.mock('@documenso/prisma', () => ({
       updateMany: vi.fn(),
       deleteMany: vi.fn(),
     },
+    bizrethinkVerifiedOnboarding: { upsert: vi.fn() },
     user: {
       update: vi.fn(),
     },

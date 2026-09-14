@@ -1057,3 +1057,12 @@ model BizrethinkMcaTemplateRevision {
 
   @@unique([templateId, version])
 }
+
+
+/// Durable distinction between unfinished verified onboarding and a user who
+/// deliberately left/deleted all workspaces. Scalar ID avoids upstream relations.
+model BizrethinkVerifiedOnboarding {
+  userId      Int       @id
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+}

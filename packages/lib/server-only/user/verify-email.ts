@@ -1,5 +1,6 @@
 // MODIFIED for BizRethink (overlay 071): claim pending invites on verification, not signup.
 import { claimInvitesOnVerification } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
+import { pendingVerifiedOnboarding } from '@bizrethink/customizations/server-only/verified-onboarding-receipt';
 import { prisma } from '@documenso/prisma';
 import { DateTime } from 'luxon';
 
@@ -87,6 +88,8 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
         completed: true,
       },
     }),
+    // MODIFIED for BizRethink (overlay 087): proof and pending recovery commit together.
+    pendingVerifiedOnboarding(verificationToken.userId),
     // Tidy up old expired tokens
     prisma.verificationToken.deleteMany({
       where: {

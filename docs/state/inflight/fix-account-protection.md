@@ -29,7 +29,10 @@ consolidation and shipping remain separate. No production operation occurred.
   Personal organisation, initial team and trial bookkeeping use the existing
   constructors within that same transaction; a failure leaves no partial unit.
   A still-valid completed verification link retries without verifying again.
-  Successful authentication also retries, including after the link expires.
+  Successful authentication retries recorded unfinished onboarding, including
+  after the link expires. A durable receipt is created atomically with email
+  proof and marked complete in the membership/fallback transaction. Completed
+  onboarding cannot recreate workspaces deliberately left or deleted.
 
 ## Decisions and limits
 
@@ -54,7 +57,15 @@ consolidation and shipping remain separate. No production operation occurred.
 - Existing auth routes represent several error codes with HTTP 500; the tests
   require the exact denial code and lack of authority, and preserve that existing
   response contract. New setup/conditional-write conflicts use HTTP 400.
-- No schema/dependency change, credential access, production query, host change,
+- Additive migration `20260914130000_add_verified_onboarding_receipt` creates
+  `BizrethinkVerifiedOnboarding` from owned schema additions. No upstream model
+  changes or existing-row backfill. Missing receipts on legacy orgless accounts
+  do not prove unfinished onboarding: login repairs concrete eligible pending
+  invites, but never guesses that a missing workspace should be recreated.
+  A still-valid completed verification link permits explicit historical retry.
+  Once recorded complete, that link also cannot recreate a deleted workspace.
+  Rolling back application code can leave the additive table in place.
+- No dependency change, credential access, production query, host change,
   state consolidation or deployment. No unrelated audit bucket is included.
 
 ## Fork durability
@@ -94,6 +105,16 @@ organisation refactor, retaining earlier overlays and the verified-email boundar
   Prisma config and `GHSA-87mf-gv2c-c62c` via OpenAPI generation, same paths as
   the accepted register; 3 high / 3 moderate / 0 critical. An advisory green
   check is not a zero-vulnerability claim.
+
+CI repair evidence: the first broad E2E run passed all 12 new HTTP/PostgreSQL
+cases but exposed unwanted workspace recreation in the existing settings test.
+TDD commit `6195ecf3a` adds five meaningful failures with 22 passing controls.
+The repair passes 75 focused owned tests and 17 upstream caller tests, plus
+separate type checking. The existing settings test is unchanged. The owned MCA
+disabled-session expectations now require the central 401 rejection (and no
+PDF), rather than its previous downstream 403. The new HTTP spec has 13 cases,
+including completed-onboarding deletion and receipt rollback/commit assertions.
+Final broad CI is pending after this repair; the initial failure is not called a pass.
 
 Next: author owns final-head CI through green, then fresh human-started
 adversarial review of auth/upstream/transaction behavior. The author continues

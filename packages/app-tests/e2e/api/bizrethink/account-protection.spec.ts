@@ -230,6 +230,9 @@ test('R-03 a failed claim leaves verification complete and no partial membership
   await expectOk(first);
   expect((await first.json()).state).toBe(EMAIL_VERIFICATION_STATE.VERIFIED);
   expect((await prisma.user.findUniqueOrThrow({ where: { id: user.id } })).emailVerified).not.toBeNull();
+  expect(
+    (await prisma.bizrethinkVerifiedOnboarding.findUniqueOrThrow({ where: { userId: user.id } })).completedAt,
+  ).toBeNull();
   expect(await prisma.organisationMember.count({ where: { userId: user.id } })).toBe(0);
   expect((await prisma.organisationMemberInvite.findUniqueOrThrow({ where: { id: failedInvite.id } })).status).toBe(
     'PENDING',
@@ -239,6 +242,9 @@ test('R-03 a failed claim leaves verification complete and no partial membership
   await expectOk(retry);
   expect((await retry.json()).state).toBe(EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED);
   expect(await prisma.organisationMember.count({ where: { userId: user.id } })).toBe(2);
+  expect(
+    (await prisma.bizrethinkVerifiedOnboarding.findUniqueOrThrow({ where: { userId: user.id } })).completedAt,
+  ).not.toBeNull();
 });
 
 test('R-03 login repairs a historical pending invitation with an existing membership without changing its role', async ({
@@ -327,4 +333,25 @@ test('R-03 login does not auto-accept invitations created after email verificati
       where: { userId: seed.user.id, organisationId: inviting.organisation.id },
     }),
   ).toBe(0);
+});
+
+test('R-03 completed onboarding does not recreate a deliberately deleted workspace on login or token retry', async ({
+  clients,
+}) => {
+  const user = await bareUser();
+  const token = await tokenFor(user.id);
+  const client = await clients.create();
+  await expectOk(await client.post('/api/auth/email-password/verify-email', { data: { token: token.token } }));
+  expect(await prisma.organisation.count({ where: { ownerUserId: user.id } })).toBe(1);
+  expect(
+    (await prisma.bizrethinkVerifiedOnboarding.findUniqueOrThrow({ where: { userId: user.id } })).completedAt,
+  ).not.toBeNull();
+  await prisma.organisation.deleteMany({ where: { ownerUserId: user.id } });
+  const login = await authorize(await clients.create(), user.email);
+  expect(login.status(), await login.text()).toBe(201);
+  const retry = await client.post('/api/auth/email-password/verify-email', { data: { token: token.token } });
+  await expectOk(retry);
+  expect((await retry.json()).state).toBe(EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED);
+  expect(await prisma.organisationMember.count({ where: { userId: user.id } })).toBe(0);
+  expect(await prisma.organisation.count({ where: { ownerUserId: user.id } })).toBe(0);
 });

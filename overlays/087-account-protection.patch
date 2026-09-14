@@ -1,4 +1,4 @@
-# Why: reject disabled session authority, prevent MFA replacement/recovery replay, and make verified onboarding retryable and atomic.
+# Why: reject disabled session authority, prevent MFA replacement/recovery replay, and make verified onboarding retryable and atomic without recreating deliberately deleted workspaces.
 # Why-not-additive: shared authentication and existing organisation/team constructors require small hooks; lifecycle policy and transaction composition live in packages/bizrethink.
 # Upstream-merge-fragility: high — recheck session primary reads, both MFA route families, verification/login hooks and constructor transaction propagation after auth or organisation refactors.
 
@@ -9,7 +9,7 @@ index 75d3830d7..dfd7528df 100644
 @@ -68,31 +68,35 @@ export const createSession = async (token: string, userId: number, metadata: Req
  export const validateSessionToken = async (token: string): Promise<SessionValidationResult> => {
    const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
- 
+
 -  const result = await prisma.session.findUnique({
 -    where: {
 -      id: sessionId,
@@ -57,13 +57,13 @@ index 75d3830d7..dfd7528df 100644
 -  });
 +    }),
 +  );
- 
+
 -  if (!result?.user) {
 +  // MODIFIED for BizRethink (overlay 087): disabled users have no session authority.
 +  if (!result?.user || result.user.disabled) {
      return { session: null, user: null, isAuthenticated: false };
    }
- 
+
 diff --git a/packages/auth/server/lib/utils/authorizer.ts b/packages/auth/server/lib/utils/authorizer.ts
 index bf6af7806..9cb22f49b 100644
 --- a/packages/auth/server/lib/utils/authorizer.ts
@@ -73,15 +73,15 @@ index bf6af7806..9cb22f49b 100644
 +import { recoverOnboardingOnLogin } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
  import { assertUserNotDisabledById } from '@documenso/lib/server-only/user/assert-user-not-disabled';
  import type { Context } from 'hono';
- 
+
 @@ -20,6 +22,8 @@ type AuthorizeUser = {
  export const onAuthorize = async (user: AuthorizeUser, c: Context<HonoAuthContext>) => {
    await assertUserNotDisabledById({ userId: user.userId });
- 
+
 +  await recoverOnboardingOnLogin(user.userId);
 +
    const metadata = c.get('requestMetadata');
- 
+
    const sessionToken = generateSessionToken();
 diff --git a/packages/lib/server-only/2fa/disable-2fa.ts b/packages/lib/server-only/2fa/disable-2fa.ts
 index ebbeab5a7..00ef0c780 100644
@@ -95,7 +95,7 @@ index ebbeab5a7..00ef0c780 100644
  import { UserSecurityAuditLogType } from '@prisma/client';
 @@ -36,16 +38,7 @@ export const disableTwoFactorAuthentication = async ({
    }
- 
+
    await prisma.$transaction(async (tx) => {
 -    await tx.user.update({
 -      where: {
@@ -108,7 +108,7 @@ index ebbeab5a7..00ef0c780 100644
 -      },
 -    });
 +    await removeAccountMfa(tx, user);
- 
+
      await tx.userSecurityAuditLog.create({
        data: {
 diff --git a/packages/lib/server-only/2fa/enable-2fa.ts b/packages/lib/server-only/2fa/enable-2fa.ts
@@ -120,10 +120,10 @@ index 4d6a86f1f..bfc6402ad 100644
 +import { activateAccountMfa } from '@bizrethink/customizations/server-only/account-mfa';
  import { prisma } from '@documenso/prisma';
  import { type User, UserSecurityAuditLogType } from '@prisma/client';
- 
+
 @@ -34,14 +36,7 @@ export const enableTwoFactorAuthentication = async ({
    let recoveryCodes: string[] = [];
- 
+
    await prisma.$transaction(async (tx) => {
 -    const updatedUser = await tx.user.update({
 -      where: {
@@ -134,9 +134,9 @@ index 4d6a86f1f..bfc6402ad 100644
 -      },
 -    });
 +    const updatedUser = await activateAccountMfa(tx, user);
- 
+
      recoveryCodes = getBackupCodes({ user: updatedUser }) ?? [];
- 
+
 diff --git a/packages/lib/server-only/2fa/setup-2fa.ts b/packages/lib/server-only/2fa/setup-2fa.ts
 index 515d01779..8685a7303 100644
 --- a/packages/lib/server-only/2fa/setup-2fa.ts
@@ -151,7 +151,7 @@ index 515d01779..8685a7303 100644
 @@ -31,21 +32,10 @@ export const setupTwoFactorAuthentication = async ({ user }: SetupTwoFactorAuthe
    const uri = createTOTPKeyURI(ISSUER, accountName, secret);
    const encodedSecret = base32.encode(new Uint8Array(secret));
- 
+
 -  await prisma.user.update({
 -    where: {
 -      id: user.id,
@@ -172,7 +172,7 @@ index 515d01779..8685a7303 100644
 +    secret: symmetricEncrypt({ data: encodedSecret, key }),
 +    backupCodes: symmetricEncrypt({ data: JSON.stringify(backupCodes), key }),
    });
- 
+
    return {
 diff --git a/packages/lib/server-only/2fa/verify-backup-code.ts b/packages/lib/server-only/2fa/verify-backup-code.ts
 index 4826da7bf..d85d5fc66 100644
@@ -182,14 +182,14 @@ index 4826da7bf..d85d5fc66 100644
 +// MODIFIED for BizRethink (overlay 087): atomically consume a current code.
 +import { consumeAccountRecoveryCode } from '@bizrethink/customizations/server-only/account-mfa';
  import type { User } from '@prisma/client';
- 
+
 -import { getBackupCodes } from './get-backup-code';
 -
  type VerifyBackupCodeParams = {
    user: Pick<User, 'id' | 'twoFactorEnabled' | 'twoFactorBackupCodes'>;
    backupCode: string;
  };
- 
+
 -export const verifyBackupCode = ({ user, backupCode }: VerifyBackupCodeParams) => {
 -  const userBackupCodes = getBackupCodes({ user });
 -
@@ -209,19 +209,19 @@ index 9ed75bde4..d88e5e8c0 100644
 +// MODIFIED for BizRethink (overlay 087): exclude consumed codes from the response.
 +import { readRemainingAccountRecoveryCodes } from '@bizrethink/customizations/server-only/account-mfa';
  import type { User } from '@prisma/client';
- 
+
  import { AppError } from '../../errors/app-error';
 -import { getBackupCodes } from './get-backup-code';
  import { validateTwoFactorAuthentication } from './validate-2fa';
- 
+
  type ViewBackupCodesOptions = {
 @@ -20,7 +21,7 @@ export const viewBackupCodes = async ({ token, user }: ViewBackupCodesOptions) =
      throw new AppError('INCORRECT_TWO_FACTOR_CODE');
    }
- 
+
 -  const backupCodes = getBackupCodes({ user });
 +  const backupCodes = await readRemainingAccountRecoveryCodes(user);
- 
+
    if (!backupCodes) {
      throw new AppError('MISSING_BACKUP_CODE');
 diff --git a/packages/lib/server-only/organisation/accept-organisation-invitation.ts b/packages/lib/server-only/organisation/accept-organisation-invitation.ts
@@ -235,7 +235,7 @@ index 130b5bbec..a0c6c4039 100644
 -import type { OrganisationGroup, OrganisationMemberRole } from '@prisma/client';
 +import type { OrganisationGroup, OrganisationMemberRole, Prisma } from '@prisma/client';
  import { OrganisationGroupType, OrganisationMemberInviteStatus, SubscriptionStatus } from '@prisma/client';
- 
+
  import { IS_BILLING_ENABLED } from '../../constants/app';
 @@ -130,12 +130,14 @@ export const addUserToOrganisation = async ({
    organisationGroups,
@@ -255,7 +255,7 @@ index 130b5bbec..a0c6c4039 100644
 @@ -148,7 +150,8 @@ export const addUserToOrganisation = async ({
      });
    }
- 
+
 -  await prisma.organisationMember.create({
 +  // MODIFIED for BizRethink (overlay 087): membership and invite consumption can commit together.
 +  await (transaction ?? prisma).organisationMember.create({
@@ -278,7 +278,7 @@ index 6d23b9465..6c729979a 100644
    claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 +  transaction?: Prisma.TransactionClient;
  };
- 
+
 -export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
 +export const createOrganisation = async ({
 +  name,
@@ -290,12 +290,12 @@ index 6d23b9465..6c729979a 100644
 +  transaction,
 +}: CreateOrganisationOptions) => {
    let customerIdToUse = customerId;
- 
+
    if (!customerId && IS_BILLING_ENABLED()) {
 @@ -50,7 +61,7 @@ export const createOrganisation = async ({ name, url, type, userId, customerId,
        });
    }
- 
+
 -  return await prisma.$transaction(async (tx) => {
 +  return await accountTransaction(transaction).$transaction(async (tx) => {
      const organisationSetting = await tx.organisationGlobalSettings.create({
@@ -307,7 +307,7 @@ index 6d23b9465..6c729979a 100644
    type?: OrganisationType;
 +  transaction?: Prisma.TransactionClient;
  };
- 
+
  export const createPersonalOrganisation = async ({
 @@ -152,6 +164,7 @@ export const createPersonalOrganisation = async ({
    throwErrorOnOrganisationCreationFailure = false,
@@ -324,12 +324,12 @@ index 6d23b9465..6c729979a 100644
 +    transaction,
    }).catch((err) => {
      console.error(err);
- 
+
 -    if (throwErrorOnOrganisationCreationFailure) {
 +    if (throwErrorOnOrganisationCreationFailure || transaction) {
        throw err;
      }
- 
+
 @@ -182,7 +196,10 @@ export const createPersonalOrganisation = async ({
    // silently — the org is already created and usable on PRO; the trial state
    // is bookkeeping that defaults to "no row = external, no trial" downstream.
@@ -352,7 +352,7 @@ index 6d23b9465..6c729979a 100644
 +        throw err;
 +      }
        console.error(err);
- 
+
        // Todo: (LOGS)
 diff --git a/packages/lib/server-only/team/create-team.ts b/packages/lib/server-only/team/create-team.ts
 index fd9c7138a..6e45509ae 100644
@@ -366,7 +366,7 @@ index fd9c7138a..6e45509ae 100644
  import { OrganisationGroupType, OrganisationMemberRole, Prisma, TeamMemberRole } from '@prisma/client';
 @@ -11,6 +13,7 @@ import { buildOrganisationWhereQuery } from '../../utils/organisations';
  import { generateDefaultTeamSettings } from '../../utils/teams';
- 
+
  export type CreateTeamOptions = {
 +  transaction?: Prisma.TransactionClient;
    /**
@@ -375,7 +375,7 @@ index fd9c7138a..6e45509ae 100644
 @@ -47,8 +50,16 @@ export type CreateTeamOptions = {
    }[];
  };
- 
+
 -export const createTeam = async ({ userId, teamName, teamUrl, organisationId, inheritMembers }: CreateTeamOptions) => {
 -  const organisation = await prisma.organisation.findFirst({
 +export const createTeam = async ({
@@ -392,7 +392,7 @@ index fd9c7138a..6e45509ae 100644
        organisationId,
        userId,
 @@ -76,7 +87,7 @@ export const createTeam = async ({ userId, teamName, teamUrl, organisationId, in
- 
+
    // Validate they have enough team slots. 0 means they can create unlimited teams.
    if (organisation.organisationClaim.teamCount !== 0 && IS_BILLING_ENABLED()) {
 -    const teamCount = await prisma.team.count({
@@ -403,7 +403,7 @@ index fd9c7138a..6e45509ae 100644
 @@ -121,7 +132,7 @@ export const createTeam = async ({ userId, teamName, teamUrl, organisationId, in
          .exhaustive(),
      );
- 
+
 -  await prisma
 +  await accountTransaction(transaction)
      .$transaction(
@@ -416,7 +416,7 @@ index 483df99b2..df39624ad 100644
 @@ -30,6 +30,9 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
          data: { disabled: true },
        });
- 
+
 +      // MODIFIED for BizRethink (overlay 087): revocation commits with disable.
 +      await tx.session.deleteMany({ where: { userId: id } });
 +
@@ -424,7 +424,7 @@ index 483df99b2..df39624ad 100644
          where: { userId: id },
          data: {
 diff --git a/packages/lib/server-only/user/verify-email.test.ts b/packages/lib/server-only/user/verify-email.test.ts
-index a07593825..7373cd6c9 100644
+index a07593825..a958b992b 100644
 --- a/packages/lib/server-only/user/verify-email.test.ts
 +++ b/packages/lib/server-only/user/verify-email.test.ts
 @@ -6,7 +6,7 @@ import { verifyEmail } from './verify-email';
@@ -433,32 +433,47 @@ index a07593825..7373cd6c9 100644
  // inviting org. These tests pin that the claim runs on a successful
 -// verification and on no other outcome.
 +// verification and a still-valid completed-token retry; never on an invalid token.
- 
+
  const mockedClaim = vi.fn();
  const mockedTriggerJob = vi.fn();
-@@ -95,13 +95,13 @@ describe('verifyEmail — overlay 071 invite claim', () => {
+@@ -19,6 +19,7 @@ vi.mock('@documenso/prisma', () => ({
+       updateMany: vi.fn(),
+       deleteMany: vi.fn(),
+     },
++    bizrethinkVerifiedOnboarding: { upsert: vi.fn() },
+     user: {
+       update: vi.fn(),
+     },
+@@ -95,13 +96,13 @@ describe('verifyEmail — overlay 071 invite claim', () => {
      expect(mockedTransaction).not.toHaveBeenCalled();
    });
- 
+
 -  it('does NOT claim on a second click (ALREADY_VERIFIED)', async () => {
 +  it('reconciles on a second valid click without repeating verification (overlay 087)', async () => {
      mockedFindFirst.mockResolvedValueOnce(tokenFixture({ completed: true }) as never);
- 
+
      const result = await verifyEmail({ token: 'tok' });
- 
+
      expect(result.state).toBe(EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED);
 -    expect(mockedClaim).not.toHaveBeenCalled();
 +    expect(mockedClaim).toHaveBeenCalledWith({ userId: 7, email: 'jane@example.com' });
      expect(mockedTransaction).not.toHaveBeenCalled();
    });
- 
+
 diff --git a/packages/lib/server-only/user/verify-email.ts b/packages/lib/server-only/user/verify-email.ts
-index 7f8f07b14..a928c5830 100644
+index 7f8f07b14..458e3f8b4 100644
 --- a/packages/lib/server-only/user/verify-email.ts
 +++ b/packages/lib/server-only/user/verify-email.ts
-@@ -60,6 +60,9 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
+@@ -1,5 +1,6 @@
+ // MODIFIED for BizRethink (overlay 071): claim pending invites on verification, not signup.
+ import { claimInvitesOnVerification } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
++import { pendingVerifiedOnboarding } from '@bizrethink/customizations/server-only/verified-onboarding-receipt';
+ import { prisma } from '@documenso/prisma';
+ import { DateTime } from 'luxon';
+
+@@ -60,6 +61,9 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
    }
- 
+
    if (verificationToken.completed) {
 +    // MODIFIED for BizRethink (overlay 087): retry only for a still-valid completed token.
 +    // The reconciler independently requires a currently active, verified user.
@@ -466,13 +481,22 @@ index 7f8f07b14..a928c5830 100644
      return {
        state: EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED,
        userId: null,
-@@ -101,8 +104,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
+@@ -84,6 +88,8 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
+         completed: true,
+       },
+     }),
++    // MODIFIED for BizRethink (overlay 087): proof and pending recovery commit together.
++    pendingVerifiedOnboarding(verificationToken.userId),
+     // Tidy up old expired tokens
+     prisma.verificationToken.deleteMany({
+       where: {
+@@ -101,8 +107,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
    }
- 
+
    // MODIFIED for BizRethink (overlay 071): claim pending org invites only now
 -  // that the email is proven. Never throws; runs once (a re-click returns
 -  // ALREADY_VERIFIED above).
 +  // that the email is proven. Reconciliation is idempotent and retryable.
    await claimInvitesOnVerification({ userId: updatedUser.id, email: updatedUser.email });
- 
+
    return {

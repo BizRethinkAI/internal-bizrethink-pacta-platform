@@ -176,11 +176,12 @@ test('filled preview and direct PDF export enforce the same live access, revisio
     await grant(own.user.id, 'mca-clause-draft-rendering', true);
     await prisma.user.update({ where: { id: own.user.id }, data: { disabled: true } });
     const disabledPreview = await post(page.request, 'fill', { ...input, version: 2 });
-    expect(disabledPreview.status()).toBe(403);
-    expect(await disabledPreview.text()).toContain('Account disabled');
+    expect(disabledPreview.status()).toBe(401);
+    expect(await disabledPreview.text()).toContain('UNAUTHORIZED');
     const disabledPdf = await pdf(page.request, { ...input, version: 2 });
-    expect(disabledPdf.status()).toBe(403);
-    expect(await disabledPdf.text()).toContain('Account disabled');
+    expect(disabledPdf.status()).toBe(401);
+    expect(await disabledPdf.json()).toEqual({ message: 'Sign in to prepare a draft.' });
+    expect(disabledPdf.headers()['content-type']).not.toContain('application/pdf');
   } finally {
     await prisma.user.update({ where: { id: own.user.id }, data: { disabled: false } });
     await cleanup(own.user.id);
