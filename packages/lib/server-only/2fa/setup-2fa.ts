@@ -1,4 +1,5 @@
-import { prisma } from '@documenso/prisma';
+// MODIFIED for BizRethink (overlay 087): setup cannot overwrite enabled MFA.
+import { stageAccountMfa } from '@bizrethink/customizations/server-only/account-mfa';
 import type { User } from '@prisma/client';
 import { base32 } from '@scure/base';
 import crypto from 'crypto';
@@ -31,21 +32,10 @@ export const setupTwoFactorAuthentication = async ({ user }: SetupTwoFactorAuthe
   const uri = createTOTPKeyURI(ISSUER, accountName, secret);
   const encodedSecret = base32.encode(new Uint8Array(secret));
 
-  await prisma.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      twoFactorEnabled: false,
-      twoFactorBackupCodes: symmetricEncrypt({
-        data: JSON.stringify(backupCodes),
-        key: key,
-      }),
-      twoFactorSecret: symmetricEncrypt({
-        data: encodedSecret,
-        key: key,
-      }),
-    },
+  await stageAccountMfa({
+    userId: user.id,
+    secret: symmetricEncrypt({ data: encodedSecret, key }),
+    backupCodes: symmetricEncrypt({ data: JSON.stringify(backupCodes), key }),
   });
 
   return {

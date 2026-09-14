@@ -1,5 +1,6 @@
 // MODIFIED for BizRethink (overlay 071): claim pending invites on verification, not signup.
 import { claimInvitesOnVerification } from '@bizrethink/customizations/server-only/auto-claim-invites-on-signup';
+import { pendingVerifiedOnboarding } from '@bizrethink/customizations/server-only/verified-onboarding-receipt';
 import { prisma } from '@documenso/prisma';
 import { DateTime } from 'luxon';
 
@@ -60,6 +61,9 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   }
 
   if (verificationToken.completed) {
+    // MODIFIED for BizRethink (overlay 087): retry only for a still-valid completed token.
+    // The reconciler independently requires a currently active, verified user.
+    await claimInvitesOnVerification({ userId: verificationToken.userId, email: verificationToken.user.email });
     return {
       state: EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED,
       userId: null,
@@ -84,6 +88,8 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
         completed: true,
       },
     }),
+    // MODIFIED for BizRethink (overlay 087): proof and pending recovery commit together.
+    pendingVerifiedOnboarding(verificationToken.userId),
     // Tidy up old expired tokens
     prisma.verificationToken.deleteMany({
       where: {
@@ -101,8 +107,7 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   }
 
   // MODIFIED for BizRethink (overlay 071): claim pending org invites only now
-  // that the email is proven. Never throws; runs once (a re-click returns
-  // ALREADY_VERIFIED above).
+  // that the email is proven. Reconciliation is idempotent and retryable.
   await claimInvitesOnVerification({ userId: updatedUser.id, email: updatedUser.email });
 
   return {
