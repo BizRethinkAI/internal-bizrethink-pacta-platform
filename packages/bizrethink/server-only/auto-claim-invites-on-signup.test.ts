@@ -27,6 +27,8 @@ const mocks = vi.hoisted(() => ({
   count: vi.fn(),
   query: vi.fn(),
   tx: vi.fn(),
+  receiptRead: vi.fn(),
+  receiptUpsert: vi.fn(),
 }));
 vi.mock('@documenso/lib/jobs/client', () => ({ jobs: { triggerJob: mocks.job } }));
 vi.mock('@documenso/lib/server-only/organisation/accept-organisation-invitation', () => ({
@@ -38,6 +40,7 @@ vi.mock('@documenso/lib/server-only/organisation/create-organisation', () => ({
 vi.mock('@documenso/prisma', () => ({
   prisma: {
     user: { findUnique: mocks.userRead },
+    bizrethinkVerifiedOnboarding: { findUnique: mocks.receiptRead, upsert: mocks.receiptUpsert },
     organisationMemberInvite: { findMany: mocks.inviteRead, findFirst: vi.fn(), update: mocks.update },
     organisationMember: { findUnique: mocks.memberRead, count: mocks.count },
     $queryRaw: mocks.query,
@@ -48,6 +51,7 @@ let user: { id: number; email: string; emailVerified: Date | null; disabled: boo
 let invites: Invite[];
 let members: string[];
 let workspaces: number;
+let receipt: { userId: number; completedAt: Date | null } | null;
 let tail: Promise<unknown>;
 const invite = (id: string): Invite => ({
   id,
@@ -67,6 +71,12 @@ beforeEach(() => {
   invites = [invite('a')];
   members = [];
   workspaces = 0;
+  receipt = null;
+  mocks.receiptRead.mockImplementation(async () => structuredClone(receipt));
+  mocks.receiptUpsert.mockImplementation(async ({ create, update }) => {
+    receipt = receipt ? { ...receipt, ...update } : { completedAt: null, ...create };
+    return structuredClone(receipt);
+  });
   tail = Promise.resolve();
   vi.spyOn(console, 'error').mockImplementation(() => undefined);
   mocks.job.mockResolvedValue(undefined);
@@ -100,11 +110,11 @@ beforeEach(() => {
   });
   mocks.tx.mockImplementation((work) => {
     const execution = tail.then(async () => {
-      const before = structuredClone({ invites, members, workspaces });
+      const before = structuredClone({ invites, members, workspaces, receipt });
       try {
         return await work(prisma);
       } catch (error) {
-        ({ invites, members, workspaces } = before);
+        ({ invites, members, workspaces, receipt } = before);
         throw error;
       }
     });
@@ -115,6 +125,51 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe('verified onboarding transaction and recovery (R-03)', () => {
+  it('leaves a legacy account without organisations alone when no onboarding work is recorded', async () => {
+    invites = [];
+    await recoverOnboardingOnLogin(7);
+    expect(mocks.personal).not.toHaveBeenCalled();
+    expect(members).toEqual([]);
+    expect(receipt).toBeNull();
+  });
+  it('does not recreate a deliberately deleted workspace on login or a completed-token retry', async () => {
+    invites = [];
+    await claimInvitesOnVerification(options);
+    expect(workspaces).toBe(1);
+    members = [];
+    await recoverOnboardingOnLogin(7);
+    await claimInvitesOnVerification(options);
+    expect(workspaces).toBe(1);
+    expect(members).toEqual([]);
+    expect(receipt?.completedAt).toBeInstanceOf(Date);
+  });
+  it('keeps a pending receipt after fallback rollback and completes it only after recovery commits', async () => {
+    invites = [];
+    mocks.personal.mockRejectedValueOnce(new Error('Team write failed'));
+    await claimInvitesOnVerification(options);
+    expect(receipt).toEqual({ userId: 7, completedAt: null });
+    expect(members).toEqual([]);
+    await recoverOnboardingOnLogin(7);
+    expect(members).toEqual(['personal']);
+    expect(receipt?.completedAt).toBeInstanceOf(Date);
+  });
+  it('rolls back membership and acceptance if recording completion fails', async () => {
+    mocks.receiptUpsert
+      .mockImplementationOnce(async ({ create }) => {
+        receipt = { completedAt: null, ...create };
+        return structuredClone(receipt);
+      })
+      .mockRejectedValueOnce(new Error('Completion unavailable'));
+    await claimInvitesOnVerification(options);
+    expect(members).toEqual([]);
+    expect(invites[0].status).toBe('PENDING');
+    expect(receipt?.completedAt).toBeNull();
+    expect(mocks.job).not.toHaveBeenCalled();
+    await recoverOnboardingOnLogin(7);
+    expect(members).toEqual(['org-a']);
+    expect(receipt?.completedAt).toBeInstanceOf(Date);
+  });
+
   it('commits membership and acceptance together, then notifies', async () => {
     expect((await claimInvitesOnVerification(options)).map((row) => row.inviteId)).toEqual(['a']);
     expect(members).toEqual(['org-a']);

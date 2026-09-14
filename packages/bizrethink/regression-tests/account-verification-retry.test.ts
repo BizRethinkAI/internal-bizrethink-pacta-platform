@@ -3,7 +3,7 @@ import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
 import { prisma } from '@documenso/prisma';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({ claim: vi.fn(), job: vi.fn() }));
+const mocks = vi.hoisted(() => ({ claim: vi.fn(), job: vi.fn(), receipt: vi.fn() }));
 vi.mock('@bizrethink/customizations/server-only/auto-claim-invites-on-signup', () => ({
   claimInvitesOnVerification: mocks.claim,
 }));
@@ -11,7 +11,14 @@ vi.mock('@documenso/lib/jobs/client', () => ({ jobsClient: { triggerJob: mocks.j
 vi.mock('@documenso/lib/server-only/user/get-most-recent-email-verification-token', () => ({
   getMostRecentEmailVerificationToken: vi.fn(),
 }));
-vi.mock('@documenso/prisma', () => ({ prisma: { verificationToken: { findFirst: vi.fn() }, $transaction: vi.fn() } }));
+vi.mock('@documenso/prisma', () => ({
+  prisma: {
+    user: { update: vi.fn() },
+    verificationToken: { findFirst: vi.fn(), updateMany: vi.fn(), deleteMany: vi.fn() },
+    bizrethinkVerifiedOnboarding: { upsert: mocks.receipt },
+    $transaction: vi.fn(),
+  },
+}));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -28,6 +35,22 @@ beforeEach(() => {
 });
 
 describe('retry verified onboarding (R-03)', () => {
+  it('persists the pending onboarding receipt in the email-proof transaction before reconciliation', async () => {
+    const token = await prisma.verificationToken.findFirst();
+    vi.mocked(prisma.verificationToken.findFirst).mockResolvedValue({ ...token, completed: false } as never);
+    const receiptWrite = Promise.resolve({ userId: 7, completedAt: null });
+    mocks.receipt.mockReturnValue(receiptWrite);
+    vi.mocked(prisma.$transaction).mockResolvedValue([{ id: 7, email: 'verified@example.test' }] as never);
+    expect((await verifyEmail({ token: 'synthetic-verification-token' })).state).toBe(
+      EMAIL_VERIFICATION_STATE.VERIFIED,
+    );
+    expect(mocks.receipt).toHaveBeenCalledWith({ where: { userId: 7 }, create: { userId: 7 }, update: {} });
+    expect(prisma.$transaction).toHaveBeenCalledWith(expect.arrayContaining([receiptWrite]));
+    expect(vi.mocked(prisma.$transaction).mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.claim.mock.invocationCallOrder[0],
+    );
+  });
+
   it('reconciles onboarding on a valid completed verification token without verifying the user again', async () => {
     expect((await verifyEmail({ token: 'synthetic-verification-token' })).state).toBe(
       EMAIL_VERIFICATION_STATE.ALREADY_VERIFIED,
