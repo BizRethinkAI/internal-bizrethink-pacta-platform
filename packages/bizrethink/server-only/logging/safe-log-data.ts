@@ -1,6 +1,7 @@
-import { createHash } from 'node:crypto';
 import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
+import { sha256 } from '@documenso/lib/universal/crypto';
+import { bytesToHex } from '@noble/ciphers/utils';
 import type { LoggerOptions } from 'pino';
 import { SERVER_LOG_SCOPES } from './log-scopes';
 
@@ -167,7 +168,9 @@ const correlation = (value: string, isRequestId: boolean) => {
     return value;
   }
   // Keep stable correlation without echoing an accidentally supplied bearer.
-  return `sha256:${createHash('sha256').update(value.slice(0, 4096)).digest('hex').slice(0, 24)}`;
+  // Shared constants retain lazy server-config modules in Vite's client graph.
+  // Use the existing universal primitive without importing a Node-only API.
+  return `sha256:${bytesToHex(sha256(value.slice(0, 4096))).slice(0, 24)}`;
 };
 export const safeLogRecord = (input: unknown): Record<string, unknown> => {
   const result: Record<string, unknown> = {};

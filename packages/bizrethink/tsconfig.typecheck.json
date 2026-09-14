@@ -94,6 +94,7 @@
     "log-render-error.ts",
     "regression-tests/sensitive-render-logging.test.ts",
     "regression-tests/sensitive-route-logging.test.ts",
+    "regression-tests/sensitive-logging-runtime.test.ts",
     "../app-tests/e2e/api/bizrethink/sensitive-information-boundary.spec.ts"
   ]
 }
