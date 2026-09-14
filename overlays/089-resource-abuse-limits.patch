@@ -133,16 +133,18 @@ index 5e67a6bdb..a49ae8957 100644
  app.use(appContext);
  
 diff --git a/packages/app-tests/e2e/organisations/manage-organisation.spec.ts b/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
-index 2e4621394..c10ad1565 100644
+index 2e4621394..e95410ab4 100644
 --- a/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
 +++ b/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
-@@ -1,3 +1,6 @@
+@@ -1,5 +1,8 @@
 +// MODIFIED for BizRethink (overlay 089): exercise first-trial creation, then deletion; deletion does not renew a trial.
 +import { hashSync } from '@documenso/lib/server-only/auth/hash';
-+import { prisma } from '@documenso/prisma';
  import { createTeam } from '@documenso/lib/server-only/team/create-team';
  import { nanoid } from '@documenso/lib/universal/id';
++import { prisma } from '@documenso/prisma';
  import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
+ import { seedUser } from '@documenso/prisma/seed/users';
+ import { expect, test } from '@playwright/test';
 @@ -8,35 +11,33 @@ import { apiSignin, apiSignout } from '../fixtures/authentication';
  import { expectTextToBeVisible, expectTextToNotBeVisible, openDropdownMenu } from '../fixtures/generic';
  
