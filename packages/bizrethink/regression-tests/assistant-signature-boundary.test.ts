@@ -19,6 +19,8 @@ const { db } = vi.hoisted(() => ({
     documentMeta: { findFirst: vi.fn() },
     signature: { upsert: vi.fn(), deleteMany: vi.fn() },
     documentAuditLog: { create: vi.fn() },
+    envelope: { findFirst: vi.fn() },
+    $queryRaw: vi.fn(),
     $transaction: vi.fn(),
   },
 }));
@@ -121,6 +123,11 @@ beforeEach(() => {
   db.signature.deleteMany.mockResolvedValue({ count: 1 });
   db.documentMeta.findFirst.mockImplementation(async () => envelope.documentMeta);
   db.documentAuditLog.create.mockResolvedValue({});
+  db.envelope.findFirst.mockImplementation(async () => ({
+    ...envelope,
+    fields: [{ ...field }],
+    recipients: [...new Map([actor, target].map((row) => [row.id, row])).values()].map((row) => ({ ...row })),
+  }));
   db.$transaction.mockImplementation(async (operation: (tx: typeof db) => unknown) => operation(db));
 });
 

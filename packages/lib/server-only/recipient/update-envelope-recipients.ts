@@ -1,10 +1,13 @@
+import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
+// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
+import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
+import { deliverReassignedRecipient } from '@bizrethink/customizations/server-only/recipient-identity-delivery';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffRecipientChanges } from '@documenso/lib/utils/document-audit-logs';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
-import { prisma } from '@documenso/prisma';
 import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -12,7 +15,6 @@ import { extractLegacyIds } from '../../universal/id';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified } from '../../utils/recipients';
-import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
 
@@ -46,84 +48,51 @@ export const updateEnvelopeRecipients = async ({
     teamId,
   });
 
-  const envelope = await prisma.envelope.findFirst({
-    where: envelopeWhereInput,
-    include: {
-      fields: true,
-      recipients: true,
-      team: {
-        select: {
-          organisation: {
-            select: {
-              organisationClaim: true,
-            },
-          },
-        },
-      },
-    },
-  });
+  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope, afterCommit }) => {
+    const recipientsHaveActionAuth = recipients.some(
+      (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+    );
 
-  if (!envelope) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope not found',
-    });
-  }
-
-  assertEnvelopeMutable(envelope);
-
-  if (envelope.completedAt) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Envelope already complete',
-    });
-  }
-
-  const recipientsHaveActionAuth = recipients.some(
-    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
-  );
-
-  // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to set the action auth',
-    });
-  }
-
-  for (const recipient of recipients) {
-    if (recipient.role === undefined) {
-      continue;
-    }
-
-    assertCompatibleRecipientRole({
-      signatureLevel: envelope.signatureLevel,
-      role: recipient.role,
-    });
-  }
-
-  const recipientsToUpdate = recipients.map((recipient) => {
-    const originalRecipient = envelope.recipients.find((existingRecipient) => existingRecipient.id === recipient.id);
-
-    if (!originalRecipient) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: `Recipient with id ${recipient.id} not found`,
+    // Check if user has permission to set the global action auth.
+    if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have permission to set the action auth',
       });
     }
 
-    if (!canRecipientBeModified(originalRecipient, envelope.fields)) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Cannot modify a recipient who has already interacted with the document',
+    for (const recipient of recipients) {
+      if (recipient.role === undefined) {
+        continue;
+      }
+
+      assertCompatibleRecipientRole({
+        signatureLevel: envelope.signatureLevel,
+        role: recipient.role,
       });
     }
 
-    return {
-      originalRecipient,
-      updateData: recipient,
-    };
-  });
+    const recipientsToUpdate = recipients.map((recipient) => {
+      const originalRecipient = envelope.recipients.find((existingRecipient) => existingRecipient.id === recipient.id);
 
-  const updatedRecipients = await prisma.$transaction(async (tx) => {
-    await assertEnvelopeMutable(envelope, tx);
+      if (!originalRecipient) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: `Recipient with id ${recipient.id} not found`,
+        });
+      }
 
-    return await Promise.all(
+      if (!canRecipientBeModified(originalRecipient, envelope.fields)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot modify a recipient who has already interacted with the document',
+        });
+      }
+
+      return {
+        originalRecipient,
+        updateData: recipient,
+      };
+    });
+
+    const updatedRecipients = await Promise.all(
       recipientsToUpdate.map(async ({ originalRecipient, updateData }) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(originalRecipient.authOptions);
 
@@ -145,6 +114,7 @@ export const updateEnvelopeRecipients = async ({
             envelopeId: envelope.id,
           },
           data: {
+            ...(await recipientIdentityReset(tx, originalRecipient, mergedRecipient, envelope.fields)),
             name: mergedRecipient.name,
             email: mergedRecipient.email,
             role: mergedRecipient.role,
@@ -196,13 +166,23 @@ export const updateEnvelopeRecipients = async ({
         return updatedRecipient;
       }),
     );
-  });
 
-  return {
-    recipients: updatedRecipients.map((recipient) => ({
-      ...recipient,
-      ...extractLegacyIds(envelope),
-      fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
-    })),
-  };
+    const currentRecipients = envelope.recipients.map(
+      (previous) => updatedRecipients.find((row) => row.id === previous.id) ?? previous,
+    );
+    for (const current of updatedRecipients) {
+      const previous = envelope.recipients.find((row) => row.id === current.id);
+      if (previous) {
+        afterCommit(() => deliverReassignedRecipient({ envelope, previous, current, recipients: currentRecipients }));
+      }
+    }
+
+    return {
+      recipients: updatedRecipients.map((recipient) => ({
+        ...recipient,
+        ...extractLegacyIds(envelope),
+        fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+      })),
+    };
+  });
 };

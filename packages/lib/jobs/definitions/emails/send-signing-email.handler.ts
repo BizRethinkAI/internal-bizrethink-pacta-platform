@@ -236,10 +236,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
 
   const sentAt = new Date();
 
-  await io.runTask('update-recipient', async () => {
-    await prisma.recipient.update({
+  const delivery = await io.runTask('update-recipient', async () => {
+    return await prisma.recipient.updateMany({
       where: {
         id: recipient.id,
+        token: recipient.token,
       },
       data: {
         sendStatus: SendStatus.SENT,
@@ -248,8 +249,13 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
     });
   });
 
+  if (delivery?.count !== 1) {
+    return;
+  }
+
   // Compute the first reminder time based on the envelope's effective settings.
   await updateRecipientNextReminder({
+    recipientToken: recipient.token,
     recipientId: recipient.id,
     envelopeId: envelope.id,
     sentAt,

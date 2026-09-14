@@ -1,8 +1,11 @@
+// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
+
 import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
 import {
   assertRecipientAccess,
   assertRecipientEnvelopeNotDeleted,
 } from '@bizrethink/customizations/server-only/recipient-access';
+import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
@@ -83,6 +86,7 @@ export const removeSignedFieldWithToken = async ({
   }
 
   await prisma.$transaction(async (tx) => {
+    await assertCurrentRecipientAuthority(tx, { recipient, envelope, field });
     await tx.field.update({
       where: {
         id: field.id,

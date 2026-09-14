@@ -1,0 +1,1648 @@
+# Why: changing recipient identity must revoke the old bearer and provider proof, including requests already doing validation or signing.
+# Why-not-additive: existing upstream recipient editors, signing transactions and CSC/delivery persistence must call the owned lifecycle guards; those are the authoritative write paths.
+# Upstream-merge-fragility: high — preserve parent/recipient/field lock order, current-token proof checks, immutable signed/AES-QES states, completion idempotence and email/reminder token predicates through signing/auth refactors.
+
+diff --git a/packages/ee/server-only/signing/csc/credential.ts b/packages/ee/server-only/signing/csc/credential.ts
+index ef0a8c7e2..185646a2e 100644
+--- a/packages/ee/server-only/signing/csc/credential.ts
++++ b/packages/ee/server-only/signing/csc/credential.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 088): bind provider proof writes to the current recipient bearer.
++import { withCurrentCscRecipient } from '@bizrethink/customizations/server-only/recipient-authority';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { prisma } from '@documenso/prisma';
+ import { Prisma } from '@prisma/client';
+@@ -39,6 +41,7 @@ export type CscCredentialRow = {
+ };
+
+ type UpsertCscCredentialInput = {
++  recipientToken: string;
+   recipientId: number;
+   providerId: string;
+   credentialId: string;
+@@ -79,36 +82,41 @@ export const upsertCscCredential = async (input: UpsertCscCredentialInput): Prom
+     serviceTokenExpiresAt,
+   } = input;
+
+-  const row = await prisma.cscCredential.upsert({
+-    where: { recipientId },
+-    create: {
+-      recipientId,
+-      providerId,
+-      credentialId,
+-      certCache,
+-      signatureAlgorithm,
+-      keyType,
+-      digestAlgorithm,
+-      keyLenBits,
+-      signAlgoParams: signAlgoParams ?? null,
+-      serviceTokenCiphertext,
+-      serviceTokenExpiresAt,
+-    },
+-    update: {
+-      providerId,
+-      credentialId,
+-      certCache,
+-      signatureAlgorithm,
+-      keyType,
+-      digestAlgorithm,
+-      keyLenBits,
+-      signAlgoParams: signAlgoParams ?? null,
+-      serviceTokenCiphertext,
+-      serviceTokenExpiresAt,
+-    },
+-  });
++  return withCurrentCscRecipient(input.recipientToken, async (tx, recipient) => {
++    if (recipient.id !== recipientId) {
++      throw new AppError(AppErrorCode.NOT_FOUND);
++    }
++    const row = await tx.cscCredential.upsert({
++      where: { recipientId },
++      create: {
++        recipientId,
++        providerId,
++        credentialId,
++        certCache,
++        signatureAlgorithm,
++        keyType,
++        digestAlgorithm,
++        keyLenBits,
++        signAlgoParams: signAlgoParams ?? null,
++        serviceTokenCiphertext,
++        serviceTokenExpiresAt,
++      },
++      update: {
++        providerId,
++        credentialId,
++        certCache,
++        signatureAlgorithm,
++        keyType,
++        digestAlgorithm,
++        keyLenBits,
++        signAlgoParams: signAlgoParams ?? null,
++        serviceTokenCiphertext,
++        serviceTokenExpiresAt,
++      },
++    });
+
+-  return toCscCredentialRow(row);
++    return toCscCredentialRow(row);
++  });
+ };
+
+ /**
+diff --git a/packages/ee/server-only/signing/csc/execute-tsp-sign.ts b/packages/ee/server-only/signing/csc/execute-tsp-sign.ts
+index 3c95720f6..6f8a90c92 100644
+--- a/packages/ee/server-only/signing/csc/execute-tsp-sign.ts
++++ b/packages/ee/server-only/signing/csc/execute-tsp-sign.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 088): provider results retain the bearer identity checked before signing.
++import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { jobs } from '@documenso/lib/jobs/client';
+ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+@@ -370,69 +372,81 @@ export const executeTspSign = async (opts: ExecuteTspSignOptions): Promise<Execu
+   // stays unsigned and the session row stays attached. `envelopeItem.
+   // documentDataId` is preserved across the run; only `documentData.{type,
+   // data}` changes. Mirrors `materializeTspAnchorsForEnvelope`.
+-  await prisma.$transaction(async (tx) => {
+-    for (const { envelopeItemDataId, uploadedType, uploadedData } of signedItemDataUpdates) {
+-      await tx.documentData.update({
+-        where: { id: envelopeItemDataId },
+-        data: { type: uploadedType, data: uploadedData },
++  const committed = await prisma
++    .$transaction(async (tx) => {
++      await assertCurrentRecipientAuthority(tx, { recipient, envelope });
++      for (const { envelopeItemDataId, uploadedType, uploadedData } of signedItemDataUpdates) {
++        await tx.documentData.update({
++          where: { id: envelopeItemDataId },
++          data: { type: uploadedType, data: uploadedData },
++        });
++      }
++
++      await tx.recipient.update({
++        where: { id: recipient.id },
++        data: {
++          signingStatus: SigningStatus.SIGNED,
++          signedAt: new Date(),
++        },
+       });
+-    }
+
+-    await tx.recipient.update({
+-      where: { id: recipient.id },
+-      data: {
+-        signingStatus: SigningStatus.SIGNED,
+-        signedAt: new Date(),
+-      },
+-    });
++      const authOptions = extractDocumentAuthMethods({
++        documentAuth: envelope.authOptions,
++        recipientAuth: recipient.authOptions,
++      });
+
+-    const authOptions = extractDocumentAuthMethods({
+-      documentAuth: envelope.authOptions,
+-      recipientAuth: recipient.authOptions,
+-    });
++      await tx.documentAuditLog.create({
++        data: createDocumentAuditLogData({
++          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
++          envelopeId: envelope.id,
++          user: {
++            name: recipient.name,
++            email: recipient.email,
++          },
++          requestMetadata,
++          data: {
++            recipientEmail: recipient.email,
++            recipientName: recipient.name,
++            recipientId: recipient.id,
++            recipientRole: recipient.role,
++            actionAuth: authOptions.derivedRecipientActionAuth,
++          },
++        }),
++      });
+
+-    await tx.documentAuditLog.create({
+-      data: createDocumentAuditLogData({
+-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
+-        envelopeId: envelope.id,
+-        user: {
+-          name: recipient.name,
+-          email: recipient.email,
+-        },
+-        requestMetadata,
+-        data: {
+-          recipientEmail: recipient.email,
+-          recipientName: recipient.name,
+-          recipientId: recipient.id,
+-          recipientRole: recipient.role,
+-          actionAuth: authOptions.derivedRecipientActionAuth,
+-        },
+-      }),
+-    });
++      await tx.documentAuditLog.create({
++        data: createDocumentAuditLogData({
++          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGNED,
++          envelopeId: envelope.id,
++          user: { name: recipient.name, email: recipient.email },
++          requestMetadata,
++          data: {
++            recipientEmail: recipient.email,
++            recipientName: recipient.name,
++            recipientId: recipient.id,
++            recipientRole: recipient.role,
++            providerId: credential.providerId,
++            credentialId: credential.credentialId,
++            sessionId,
++            numItemsSigned: signedItemDataUpdates.length,
++            signatureAlgorithm: credential.signatureAlgorithm,
++            digestAlgorithm: credential.digestAlgorithm,
++          },
++        }),
++      });
+
+-    await tx.documentAuditLog.create({
+-      data: createDocumentAuditLogData({
+-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_CSC_SIGNED,
+-        envelopeId: envelope.id,
+-        user: { name: recipient.name, email: recipient.email },
+-        requestMetadata,
+-        data: {
+-          recipientEmail: recipient.email,
+-          recipientName: recipient.name,
+-          recipientId: recipient.id,
+-          recipientRole: recipient.role,
+-          providerId: credential.providerId,
+-          credentialId: credential.credentialId,
+-          sessionId,
+-          numItemsSigned: signedItemDataUpdates.length,
+-          signatureAlgorithm: credential.signatureAlgorithm,
+-          digestAlgorithm: credential.digestAlgorithm,
+-        },
+-      }),
++      await consumeCscSession(sessionId, tx);
++      return true;
++    })
++    .catch((cause: unknown) => {
++      if (cause instanceof AppError && cause.code === AppErrorCode.RECIPIENT_ALREADY_SIGNED) {
++        return false;
++      }
++      throw cause;
+     });
+-
+-    await consumeCscSession(sessionId, tx);
+-  });
++  if (!committed) {
++    return { outcome: 'already_signed' };
++  }
+
+   // Post-tx side effects (webhooks, emails, next-signer advancement, seal
+   // job dispatch). Inlined rather than shared with the SES completion path —
+diff --git a/packages/ee/server-only/signing/csc/hono/oauth-callback.ts b/packages/ee/server-only/signing/csc/hono/oauth-callback.ts
+index d2549d0fb..cd1327664 100644
+--- a/packages/ee/server-only/signing/csc/hono/oauth-callback.ts
++++ b/packages/ee/server-only/signing/csc/hono/oauth-callback.ts
+@@ -146,6 +146,7 @@ export const cscOAuthCallbackRoute = new Hono<HonoCscEnv>().get(
+         const serviceTokenExpiresAt = tokens.accessTokenExpiresAt();
+
+         await upsertCscCredential({
++          recipientToken: cookie.recipientToken,
+           recipientId: recipient.id,
+           providerId: transport.serviceBaseUrl,
+           credentialId,
+@@ -254,6 +255,7 @@ export const cscOAuthCallbackRoute = new Hono<HonoCscEnv>().get(
+     const sadExpiresAt = tokens.accessTokenExpiresAt();
+
+     await updateCscSessionWithSad({
++      recipientToken: cookie.recipientToken,
+       sessionId: cookie.sessionId,
+       encryptedSad: sadCiphertext,
+       sadExpiresAt,
+diff --git a/packages/ee/server-only/signing/csc/prepare-recipient-signing.ts b/packages/ee/server-only/signing/csc/prepare-recipient-signing.ts
+index 38f671c42..ab95f9eec 100644
+--- a/packages/ee/server-only/signing/csc/prepare-recipient-signing.ts
++++ b/packages/ee/server-only/signing/csc/prepare-recipient-signing.ts
+@@ -214,6 +214,7 @@ export const prepareCscRecipientSigning = async (
+   }
+
+   const session = await upsertCscSession({
++    recipientToken,
+     recipientId: recipient.id,
+     envelopeId: envelope.id,
+     signingTime,
+diff --git a/packages/ee/server-only/signing/csc/sign-session.ts b/packages/ee/server-only/signing/csc/sign-session.ts
+index 5fe5fff99..9b3b5e176 100644
+--- a/packages/ee/server-only/signing/csc/sign-session.ts
++++ b/packages/ee/server-only/signing/csc/sign-session.ts
+@@ -1,3 +1,5 @@
++// MODIFIED for BizRethink (overlay 088): bind provider proof writes to the current recipient bearer.
++import { withCurrentCscRecipient } from '@bizrethink/customizations/server-only/recipient-authority';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { type TCscSessionItems, ZCscSessionItemsSchema } from '@documenso/lib/types/csc-session';
+ import { prisma } from '@documenso/prisma';
+@@ -34,6 +36,7 @@ export type CscSessionRow = {
+ };
+
+ type UpsertCscSessionInput = {
++  recipientToken: string;
+   recipientId: number;
+   envelopeId: string;
+   signingTime: Date;
+@@ -49,29 +52,35 @@ type UpsertCscSessionInput = {
+ export const upsertCscSession = async (input: UpsertCscSessionInput): Promise<CscSessionRow> => {
+   const { recipientId, envelopeId, signingTime, items } = input;
+
+-  const row = await prisma.cscSession.upsert({
+-    where: { recipientId },
+-    create: {
+-      recipientId,
+-      envelopeId,
+-      signingTime,
+-      itemsJson: items,
+-      encryptedSad: null,
+-      sadExpiresAt: null,
+-    },
+-    update: {
+-      envelopeId,
+-      signingTime,
+-      itemsJson: items,
+-      encryptedSad: null,
+-      sadExpiresAt: null,
+-    },
+-  });
++  return withCurrentCscRecipient(input.recipientToken, async (tx, recipient) => {
++    if (recipient.id !== recipientId || recipient.envelopeId !== envelopeId) {
++      throw new AppError(AppErrorCode.NOT_FOUND);
++    }
++    const row = await tx.cscSession.upsert({
++      where: { recipientId },
++      create: {
++        recipientId,
++        envelopeId,
++        signingTime,
++        itemsJson: items,
++        encryptedSad: null,
++        sadExpiresAt: null,
++      },
++      update: {
++        envelopeId,
++        signingTime,
++        itemsJson: items,
++        encryptedSad: null,
++        sadExpiresAt: null,
++      },
++    });
+
+-  return toCscSessionRow(row);
++    return toCscSessionRow(row);
++  });
+ };
+
+ type UpdateCscSessionWithSadInput = {
++  recipientToken: string;
+   sessionId: string;
+   encryptedSad: Uint8Array;
+   sadExpiresAt: Date;
+@@ -86,17 +95,21 @@ export const updateCscSessionWithSad = async (input: UpdateCscSessionWithSadInpu
+   const { sessionId, encryptedSad, sadExpiresAt } = input;
+
+   try {
+-    const row = await prisma.cscSession.update({
+-      where: {
+-        id: sessionId,
+-      },
+-      data: {
+-        encryptedSad: Buffer.from(encryptedSad),
+-        sadExpiresAt,
+-      },
+-    });
++    return await withCurrentCscRecipient(input.recipientToken, async (tx, recipient) => {
++      const row = await tx.cscSession.update({
++        where: {
++          id: sessionId,
++          recipientId: recipient.id,
++          envelopeId: recipient.envelopeId,
++        },
++        data: {
++          encryptedSad: Buffer.from(encryptedSad),
++          sadExpiresAt,
++        },
++      });
+
+-    return toCscSessionRow(row);
++      return toCscSessionRow(row);
++    });
+   } catch (err) {
+     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+       throw new AppError(AppErrorCode.NOT_FOUND, {
+diff --git a/packages/lib/jobs/definitions/emails/send-signing-email.handler.ts b/packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
+index 819baed98..a0cde8280 100644
+--- a/packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
++++ b/packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
+@@ -236,10 +236,11 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
+
+   const sentAt = new Date();
+
+-  await io.runTask('update-recipient', async () => {
+-    await prisma.recipient.update({
++  const delivery = await io.runTask('update-recipient', async () => {
++    return await prisma.recipient.updateMany({
+       where: {
+         id: recipient.id,
++        token: recipient.token,
+       },
+       data: {
+         sendStatus: SendStatus.SENT,
+@@ -248,8 +249,13 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
+     });
+   });
+
++  if (delivery?.count !== 1) {
++    return;
++  }
++
+   // Compute the first reminder time based on the envelope's effective settings.
+   await updateRecipientNextReminder({
++    recipientToken: recipient.token,
+     recipientId: recipient.id,
+     envelopeId: envelope.id,
+     sentAt,
+diff --git a/packages/lib/jobs/definitions/internal/process-signing-reminder.handler.ts b/packages/lib/jobs/definitions/internal/process-signing-reminder.handler.ts
+index 2d08d7c36..f32d23a1e 100644
+--- a/packages/lib/jobs/definitions/internal/process-signing-reminder.handler.ts
++++ b/packages/lib/jobs/definitions/internal/process-signing-reminder.handler.ts
+@@ -248,6 +248,7 @@ export const run = async ({ payload, io }: { payload: TProcessSigningReminderJob
+   // here includes the reminder we just sent and gates the next one.
+   if (recipient.sentAt) {
+     await updateRecipientNextReminder({
++      recipientToken: recipient.token,
+       recipientId: recipient.id,
+       envelopeId: envelope.id,
+       sentAt: recipient.sentAt,
+diff --git a/packages/lib/server-only/admin/update-recipient.ts b/packages/lib/server-only/admin/update-recipient.ts
+index 929bcfa0b..76dcb2624 100644
+--- a/packages/lib/server-only/admin/update-recipient.ts
++++ b/packages/lib/server-only/admin/update-recipient.ts
+@@ -1,3 +1,8 @@
++import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
++// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
++import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
++import { deliverReassignedRecipient } from '@bizrethink/customizations/server-only/recipient-identity-delivery';
++import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { prisma } from '@documenso/prisma';
+ import { type RecipientRole, SigningStatus } from '@prisma/client';
+
+@@ -15,18 +20,36 @@ export const updateRecipient = async ({ id, name, email, role }: UpdateRecipient
+     },
+   });
+
+-  if (recipient.signingStatus === SigningStatus.SIGNED) {
+-    throw new Error('Cannot update a recipient that has already signed.');
+-  }
++  return withDocumentReplacement({ id: recipient.envelopeId }, async ({ tx, envelope, afterCommit }) => {
++    const current = envelope.recipients.find((row) => row.id === id);
++    if (!current) {
++      throw new AppError(AppErrorCode.NOT_FOUND);
++    }
++    if (current.signingStatus === SigningStatus.SIGNED) {
++      throw new AppError(AppErrorCode.INVALID_REQUEST, {
++        message: 'Cannot update a recipient that has already signed.',
++      });
++    }
+
+-  return await prisma.recipient.update({
+-    where: {
+-      id,
+-    },
+-    data: {
+-      name,
+-      email,
+-      role,
+-    },
++    const updated = await tx.recipient.update({
++      where: {
++        id,
++      },
++      data: {
++        ...(await recipientIdentityReset(tx, current, { name, email, role }, envelope.fields)),
++        name,
++        email,
++        role,
++      },
++    });
++    afterCommit(() =>
++      deliverReassignedRecipient({
++        envelope,
++        previous: current,
++        current: updated,
++        recipients: envelope.recipients.map((row) => (row.id === updated.id ? updated : row)),
++      }),
++    );
++    return updated;
+   });
+ };
+diff --git a/packages/lib/server-only/document/complete-document-with-token.ts b/packages/lib/server-only/document/complete-document-with-token.ts
+index 56af0d626..307c50e4f 100644
+--- a/packages/lib/server-only/document/complete-document-with-token.ts
++++ b/packages/lib/server-only/document/complete-document-with-token.ts
+@@ -2,6 +2,9 @@ import {
+   assertRecipientAccess,
+   assertRecipientEnvelopeNotDeleted,
+ } from '@bizrethink/customizations/server-only/recipient-access';
++// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
++import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
++import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
+ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
+ import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+ import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '@documenso/lib/types/document-audit-logs';
+@@ -162,6 +165,7 @@ export const completeDocumentWithToken = async ({
+     recipientAuth: recipient.authOptions,
+   });
+
++  let wasAccess2faValidated = false;
+   if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
+     if (!accessAuthOptions) {
+       throw new AppError(AppErrorCode.UNAUTHORIZED, {
+@@ -184,9 +188,38 @@ export const completeDocumentWithToken = async ({
+     });
+
+     if (!isValid) {
+-      await prisma.documentAuditLog.create({
++      await prisma.$transaction(async (tx) => {
++        await assertCurrentRecipientAuthority(tx, { recipient, envelope });
++        await tx.documentAuditLog.create({
++          data: createDocumentAuditLogData({
++            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
++            envelopeId: envelope.id,
++            data: {
++              recipientId: recipient.id,
++              recipientName: recipient.name,
++              recipientEmail: recipient.email,
++            },
++          }),
++        });
++      });
++
++      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
++        message: 'Invalid 2FA authentication',
++      });
++    }
++
++    wasAccess2faValidated = true;
++  }
++
++  let recipientName = recipient.name;
++  let recipientEmail = recipient.email;
++
++  await prisma.$transaction(async (tx) => {
++    await assertCurrentRecipientAuthority(tx, { recipient, envelope });
++    if (wasAccess2faValidated) {
++      await tx.documentAuditLog.create({
+         data: createDocumentAuditLogData({
+-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
++          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
+           envelopeId: envelope.id,
+           data: {
+             recipientId: recipient.id,
+@@ -195,139 +228,121 @@ export const completeDocumentWithToken = async ({
+           },
+         }),
+       });
+-
+-      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
+-        message: 'Invalid 2FA authentication',
+-      });
+     }
+-
+-    await prisma.documentAuditLog.create({
+-      data: createDocumentAuditLogData({
+-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
++    let fields = await tx.field.findMany({
++      where: {
+         envelopeId: envelope.id,
+-        data: {
+-          recipientId: recipient.id,
+-          recipientName: recipient.name,
+-          recipientEmail: recipient.email,
+-        },
+-      }),
++        recipientId: recipient.id,
++      },
+     });
+-  }
+-
+-  let fields = await prisma.field.findMany({
+-    where: {
+-      envelopeId: envelope.id,
+-      recipientId: recipient.id,
+-    },
+-  });
+
+-  // This should be scoped to the current recipient.
+-  const uninsertedDateFields = fields.filter((field) => field.type === FieldType.DATE && !field.inserted);
++    // This should be scoped to the current recipient.
++    const uninsertedDateFields = fields.filter((field) => field.type === FieldType.DATE && !field.inserted);
+
+-  let recipientName = recipient.name;
+-  let recipientEmail = recipient.email;
++    recipientName = recipient.name;
++    recipientEmail = recipient.email;
+
+-  // Only trim the name if it's been derived.
+-  if (!recipientName) {
+-    recipientName = (
+-      recipientOverride?.name ||
+-      fields.find((field) => field.type === FieldType.NAME)?.customText ||
+-      ''
+-    ).trim();
+-  }
++    // Only trim the name if it's been derived.
++    if (!recipientName) {
++      recipientName = (
++        recipientOverride?.name ||
++        fields.find((field) => field.type === FieldType.NAME)?.customText ||
++        ''
++      ).trim();
++    }
+
+-  // Only trim the email if it's been derived.
+-  if (!recipient.email) {
+-    recipientEmail = (
+-      recipientOverride?.email ||
+-      fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
+-      ''
+-    )
+-      .trim()
+-      .toLowerCase();
+-  }
++    // Only trim the email if it's been derived.
++    if (!recipient.email) {
++      recipientEmail = (
++        recipientOverride?.email ||
++        fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
++        ''
++      )
++        .trim()
++        .toLowerCase();
++    }
+
+-  if (!recipientEmail) {
+-    throw new AppError(AppErrorCode.INVALID_BODY, {
+-      message: 'Recipient email is required',
+-    });
+-  }
++    if (!recipientEmail) {
++      throw new AppError(AppErrorCode.INVALID_BODY, {
++        message: 'Recipient email is required',
++      });
++    }
+
+-  // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
+-  if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
+-    const formattedDate = DateTime.now()
+-      .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+-      .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
++    // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
++    if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
++      const formattedDate = DateTime.now()
++        .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
++        .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+
+-    const newDateFieldValues = {
+-      customText: formattedDate,
+-      inserted: true,
+-    };
++      const newDateFieldValues = {
++        customText: formattedDate,
++        inserted: true,
++      };
+
+-    await prisma.field.updateMany({
+-      where: {
+-        id: {
+-          in: uninsertedDateFields.map((field) => field.id),
++      await tx.field.updateMany({
++        where: {
++          id: {
++            in: uninsertedDateFields.map((field) => field.id),
++          },
+         },
+-      },
+-      data: {
+-        ...newDateFieldValues,
+-      },
+-    });
++        data: {
++          ...newDateFieldValues,
++        },
++      });
+
+-    // Create audit log entries for each auto-inserted date field.
+-    await prisma.documentAuditLog.createMany({
+-      data: uninsertedDateFields.map((field) =>
+-        createDocumentAuditLogData({
+-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+-          envelopeId: envelope.id,
+-          user: {
+-            email: recipientEmail,
+-            name: recipientName,
+-          },
+-          requestMetadata,
+-          data: {
+-            recipientEmail: recipientEmail,
+-            recipientId: recipient.id,
+-            recipientName: recipientName,
+-            recipientRole: recipient.role,
+-            fieldId: field.secondaryId,
+-            field: {
+-              type: FieldType.DATE,
+-              data: formattedDate,
++      // Create audit log entries for each auto-inserted date field.
++      await tx.documentAuditLog.createMany({
++        data: uninsertedDateFields.map((field) =>
++          createDocumentAuditLogData({
++            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
++            envelopeId: envelope.id,
++            user: {
++              email: recipientEmail,
++              name: recipientName,
+             },
+-          },
+-        }),
+-      ),
+-    });
++            requestMetadata,
++            data: {
++              recipientEmail: recipientEmail,
++              recipientId: recipient.id,
++              recipientName: recipientName,
++              recipientRole: recipient.role,
++              fieldId: field.secondaryId,
++              field: {
++                type: FieldType.DATE,
++                data: formattedDate,
++              },
++            },
++          }),
++        ),
++      });
+
+-    // Update the local fields array so the subsequent validation check passes.
+-    fields = fields.map((field) => {
+-      if (field.type === FieldType.DATE && !field.inserted) {
+-        return {
+-          ...field,
+-          ...newDateFieldValues,
+-        };
+-      }
++      // Update the local fields array so the subsequent validation check passes.
++      fields = fields.map((field) => {
++        if (field.type === FieldType.DATE && !field.inserted) {
++          return {
++            ...field,
++            ...newDateFieldValues,
++          };
++        }
+
+-      return field;
+-    });
+-  }
++        return field;
++      });
++    }
+
+-  if (fieldsContainUnsignedRequiredField(fields)) {
+-    throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
+-      message: `Recipient ${recipient.id} has unsigned fields`,
+-      statusCode: 400,
+-    });
+-  }
++    if (fieldsContainUnsignedRequiredField(fields)) {
++      throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
++        message: `Recipient ${recipient.id} has unsigned fields`,
++        statusCode: 400,
++      });
++    }
+
+-  await prisma.$transaction(async (tx) => {
+     // Conditional update so two concurrent completion requests can't both
+     // proceed: only the request that transitions the recipient to SIGNED
+     // continues, the loser sees a count of 0 and aborts.
+     const { count: updatedRecipientCount } = await tx.recipient.updateMany({
+       where: {
+         id: recipient.id,
++        token,
+         signingStatus: {
+           not: SigningStatus.SIGNED,
+         },
+@@ -428,13 +443,6 @@ export const completeDocumentWithToken = async ({
+   });
+
+   const pendingRecipients = await prisma.recipient.findMany({
+-    select: {
+-      id: true,
+-      signingOrder: true,
+-      name: true,
+-      email: true,
+-      role: true,
+-    },
+     where: {
+       envelopeId: envelope.id,
+       signingStatus: {
+@@ -462,6 +470,11 @@ export const completeDocumentWithToken = async ({
+       const [nextRecipient] = pendingRecipients;
+
+       await prisma.$transaction(async (tx) => {
++        const currentEnvelope = await assertCurrentRecipientAuthority(tx, { recipient: nextRecipient, envelope });
++        const reset =
++          nextSigner && envelope.documentMeta?.allowDictateNextSigner
++            ? await recipientIdentityReset(tx, nextRecipient, nextSigner, currentEnvelope.fields)
++            : {};
+         if (nextSigner && envelope.documentMeta?.allowDictateNextSigner) {
+           await tx.documentAuditLog.create({
+             data: createDocumentAuditLogData({
+@@ -497,6 +510,7 @@ export const completeDocumentWithToken = async ({
+         await tx.recipient.update({
+           where: { id: nextRecipient.id },
+           data: {
++            ...reset,
+             sendStatus: SendStatus.SENT,
+             sentAt: new Date(),
+             ...(nextSigner && envelope.documentMeta?.allowDictateNextSigner
+diff --git a/packages/lib/server-only/document/reject-document-with-token.ts b/packages/lib/server-only/document/reject-document-with-token.ts
+index 710a6a0e2..2100b70e3 100644
+--- a/packages/lib/server-only/document/reject-document-with-token.ts
++++ b/packages/lib/server-only/document/reject-document-with-token.ts
+@@ -1,7 +1,10 @@
++// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
++
+ import {
+   assertRecipientAccess,
+   assertRecipientEnvelopeNotDeleted,
+ } from '@bizrethink/customizations/server-only/recipient-access';
++import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
+ // This is closely related to `reject-document-on-behalf-of.ts` but is intentionally
+ // kept as a separate method rather than merged into one. This file focuses on
+ // rejection from a recipient perspective (the recipient rejecting via their token),
+@@ -69,8 +72,9 @@ export async function rejectDocumentWithToken({
+   assertRecipientNotExpired(recipient);
+
+   // Update the recipient status to rejected
+-  const [updatedRecipient] = await prisma.$transaction([
+-    prisma.recipient.update({
++  const updatedRecipient = await prisma.$transaction(async (tx) => {
++    await assertCurrentRecipientAuthority(tx, { recipient, envelope });
++    const updated = await tx.recipient.update({
+       where: {
+         id: recipient.id,
+       },
+@@ -79,8 +83,8 @@ export async function rejectDocumentWithToken({
+         signingStatus: SigningStatus.REJECTED,
+         rejectionReason: reason,
+       },
+-    }),
+-    prisma.documentAuditLog.create({
++    });
++    await tx.documentAuditLog.create({
+       data: createDocumentAuditLogData({
+         envelopeId: envelope.id,
+         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED,
+@@ -97,8 +101,9 @@ export async function rejectDocumentWithToken({
+         },
+         requestMetadata,
+       }),
+-    }),
+-  ]);
++    });
++    return updated;
++  });
+
+   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+diff --git a/packages/lib/server-only/document/resend-document.ts b/packages/lib/server-only/document/resend-document.ts
+index 29b20ed15..241200140 100644
+--- a/packages/lib/server-only/document/resend-document.ts
++++ b/packages/lib/server-only/document/resend-document.ts
+@@ -149,6 +149,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
+   await Promise.all(
+     recipientsToRemind.map((recipient) =>
+       updateRecipientNextReminder({
++        recipientToken: recipient.token,
+         recipientId: recipient.id,
+         envelopeId: envelope.id,
+         sentAt: resentAt,
+diff --git a/packages/lib/server-only/field/remove-signed-field-with-token.ts b/packages/lib/server-only/field/remove-signed-field-with-token.ts
+index e652fa208..befa5d8df 100644
+--- a/packages/lib/server-only/field/remove-signed-field-with-token.ts
++++ b/packages/lib/server-only/field/remove-signed-field-with-token.ts
+@@ -1,8 +1,11 @@
++// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
++
+ import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
+ import {
+   assertRecipientAccess,
+   assertRecipientEnvelopeNotDeleted,
+ } from '@bizrethink/customizations/server-only/recipient-access';
++import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
+ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+ import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+@@ -83,6 +86,7 @@ export const removeSignedFieldWithToken = async ({
+   }
+
+   await prisma.$transaction(async (tx) => {
++    await assertCurrentRecipientAuthority(tx, { recipient, envelope, field });
+     await tx.field.update({
+       where: {
+         id: field.id,
+diff --git a/packages/lib/server-only/field/sign-field-with-token.ts b/packages/lib/server-only/field/sign-field-with-token.ts
+index e9cc2e193..39595bbbd 100644
+--- a/packages/lib/server-only/field/sign-field-with-token.ts
++++ b/packages/lib/server-only/field/sign-field-with-token.ts
+@@ -1,4 +1,7 @@
++// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
++
+ import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
++import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
+ import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+ import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
+ import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
+@@ -238,6 +241,7 @@ export const signFieldWithToken = async ({
+   const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
+
+   return await prisma.$transaction(async (tx) => {
++    await assertCurrentRecipientAuthority(tx, { recipient, envelope, field });
+     const updatedField = await tx.field.update({
+       where: {
+         id: field.id,
+diff --git a/packages/lib/server-only/recipient/set-document-recipients.ts b/packages/lib/server-only/recipient/set-document-recipients.ts
+index 20a2063d0..3a875281b 100644
+--- a/packages/lib/server-only/recipient/set-document-recipients.ts
++++ b/packages/lib/server-only/recipient/set-document-recipients.ts
+@@ -3,6 +3,9 @@ import {
+   assertRecipientReplacement,
+   withDocumentReplacement,
+ } from '@bizrethink/customizations/server-only/document-replacement';
++// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
++import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
++import { deliverReassignedRecipient } from '@bizrethink/customizations/server-only/recipient-identity-delivery';
+ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+ import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
+ import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+@@ -123,6 +126,7 @@ export const setDocumentRecipients = async ({
+             envelopeId: envelope.id,
+           },
+           update: {
++            ...(await recipientIdentityReset(tx, recipient._persisted, recipient, envelope.fields)),
+             name: recipient.name,
+             email: recipient.email,
+             role: recipient.role,
+@@ -207,6 +211,14 @@ export const setDocumentRecipients = async ({
+       }),
+     );
+
++    const currentRecipients = persistedRecipients;
++    for (const current of currentRecipients) {
++      const previous = envelope.recipients.find((row) => row.id === current.id);
++      if (previous) {
++        afterCommit(() => deliverReassignedRecipient({ envelope, previous, current, recipients: currentRecipients }));
++      }
++    }
++
+     if (removedRecipients.length > 0) {
+       await tx.recipient.deleteMany({
+         where: {
+diff --git a/packages/lib/server-only/recipient/set-template-recipients.ts b/packages/lib/server-only/recipient/set-template-recipients.ts
+index b177f3315..5138b5a6d 100644
+--- a/packages/lib/server-only/recipient/set-template-recipients.ts
++++ b/packages/lib/server-only/recipient/set-template-recipients.ts
+@@ -1,8 +1,11 @@
++// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
++
++import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
++import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
+ import {
+   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+   DIRECT_TEMPLATE_RECIPIENT_NAME,
+ } from '@documenso/lib/constants/direct-templates';
+-import { prisma } from '@documenso/prisma';
+ import type { Recipient } from '@prisma/client';
+ import { EnvelopeType, RecipientRole } from '@prisma/client';
+
+@@ -29,100 +32,79 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }:
+     teamId,
+   });
+
+-  const envelope = await prisma.envelope.findFirst({
+-    where: envelopeWhereInput,
+-    include: {
+-      directLink: true,
+-      team: {
+-        select: {
+-          organisation: {
+-            select: {
+-              organisationClaim: true,
+-            },
+-          },
+-        },
+-      },
+-      recipients: true,
+-    },
+-  });
+-
+-  if (!envelope) {
+-    throw new Error('Template not found');
+-  }
++  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
++    const recipientsHaveActionAuth = recipients.some(
++      (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
++    );
+
+-  const recipientsHaveActionAuth = recipients.some(
+-    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+-  );
++    // Check if user has permission to set the global action auth.
++    if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
++      throw new AppError(AppErrorCode.UNAUTHORIZED, {
++        message: 'You do not have permission to set the action auth',
++      });
++    }
+
+-  // Check if user has permission to set the global action auth.
+-  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'You do not have permission to set the action auth',
+-    });
+-  }
++    for (const recipient of recipients) {
++      assertCompatibleRecipientRole({
++        signatureLevel: envelope.signatureLevel,
++        role: recipient.role,
++      });
++    }
+
+-  for (const recipient of recipients) {
+-    assertCompatibleRecipientRole({
+-      signatureLevel: envelope.signatureLevel,
+-      role: recipient.role,
+-    });
+-  }
++    const normalizedRecipients = recipients.map((recipient) => {
++      // Force replace any changes to the name or email of the direct recipient.
++      if (envelope.directLink && recipient.id === envelope.directLink.directTemplateRecipientId) {
++        return {
++          ...recipient,
++          email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
++          name: DIRECT_TEMPLATE_RECIPIENT_NAME,
++        };
++      }
+
+-  const normalizedRecipients = recipients.map((recipient) => {
+-    // Force replace any changes to the name or email of the direct recipient.
+-    if (envelope.directLink && recipient.id === envelope.directLink.directTemplateRecipientId) {
+       return {
+         ...recipient,
+-        email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+-        name: DIRECT_TEMPLATE_RECIPIENT_NAME,
++        email: recipient.email.toLowerCase(),
+       };
+-    }
+-
+-    return {
+-      ...recipient,
+-      email: recipient.email.toLowerCase(),
+-    };
+-  });
+-
+-  const existingRecipients = envelope.recipients;
++    });
+
+-  const removedRecipients = existingRecipients.filter(
+-    (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+-  );
++    const existingRecipients = envelope.recipients;
+
+-  if (envelope.directLink !== null) {
+-    const updatedDirectRecipient = recipients.find(
+-      (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
++    const removedRecipients = existingRecipients.filter(
++      (existingRecipient) => !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
+     );
+
+-    const deletedDirectRecipient = removedRecipients.find(
+-      (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
+-    );
++    if (envelope.directLink !== null) {
++      const updatedDirectRecipient = recipients.find(
++        (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
++      );
+
+-    if (updatedDirectRecipient?.role === RecipientRole.CC) {
+-      throw new AppError(AppErrorCode.INVALID_BODY, {
+-        message: 'Cannot set direct recipient as CC',
+-      });
+-    }
++      const deletedDirectRecipient = removedRecipients.find(
++        (recipient) => recipient.id === envelope.directLink?.directTemplateRecipientId,
++      );
+
+-    if (deletedDirectRecipient) {
+-      throw new AppError(AppErrorCode.INVALID_BODY, {
+-        message: 'Cannot delete direct recipient while direct template exists',
+-      });
++      if (updatedDirectRecipient?.role === RecipientRole.CC) {
++        throw new AppError(AppErrorCode.INVALID_BODY, {
++          message: 'Cannot set direct recipient as CC',
++        });
++      }
++
++      if (deletedDirectRecipient) {
++        throw new AppError(AppErrorCode.INVALID_BODY, {
++          message: 'Cannot delete direct recipient while direct template exists',
++        });
++      }
+     }
+-  }
+
+-  const linkedRecipients = normalizedRecipients.map((recipient) => {
+-    const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
++    const linkedRecipients = normalizedRecipients.map((recipient) => {
++      const existing = existingRecipients.find((existingRecipient) => existingRecipient.id === recipient.id);
+
+-    return {
+-      ...recipient,
+-      _persisted: existing,
+-    };
+-  });
++      return {
++        ...recipient,
++        _persisted: existing,
++      };
++    });
+
+-  const persistedRecipients = await prisma.$transaction(async (tx) => {
+-    return await Promise.all(
++    const persistedRecipients = await Promise.all(
+       linkedRecipients.map(async (recipient) => {
+         let authOptions = ZRecipientAuthOptionsSchema.parse(recipient._persisted?.authOptions);
+
+@@ -139,6 +121,7 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }:
+             envelopeId: envelope.id,
+           },
+           update: {
++            ...(await recipientIdentityReset(tx, recipient._persisted, recipient, envelope.fields)),
+             name: recipient.name,
+             email: recipient.email,
+             role: recipient.role,
+@@ -178,33 +161,33 @@ export const setTemplateRecipients = async ({ userId, teamId, id, recipients }:
+         };
+       }),
+     );
+-  });
+
+-  if (removedRecipients.length > 0) {
+-    await prisma.recipient.deleteMany({
+-      where: {
+-        id: {
+-          in: removedRecipients.map((recipient) => recipient.id),
++    if (removedRecipients.length > 0) {
++      await tx.recipient.deleteMany({
++        where: {
++          id: {
++            in: removedRecipients.map((recipient) => recipient.id),
++          },
+         },
+-      },
+-    });
+-  }
++      });
++    }
+
+-  // Filter out recipients that have been removed or have been updated.
+-  const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
+-    const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
+-    const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
++    // Filter out recipients that have been removed or have been updated.
++    const filteredRecipients: RecipientDataWithClientId[] = existingRecipients.filter((recipient) => {
++      const isRemoved = removedRecipients.find((removedRecipient) => removedRecipient.id === recipient.id);
++      const isUpdated = persistedRecipients.find((persistedRecipient) => persistedRecipient.id === recipient.id);
+
+-    return !isRemoved && !isUpdated;
+-  });
++      return !isRemoved && !isUpdated;
++    });
+
+-  return {
+-    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
+-      ...recipient,
+-      documentId: null,
+-      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+-    })),
+-  };
++    return {
++      recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
++        ...recipient,
++        documentId: null,
++        templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
++      })),
++    };
++  });
+ };
+
+ type RecipientData = {
+diff --git a/packages/lib/server-only/recipient/update-envelope-recipients.ts b/packages/lib/server-only/recipient/update-envelope-recipients.ts
+index 553b30543..ee024694e 100644
+--- a/packages/lib/server-only/recipient/update-envelope-recipients.ts
++++ b/packages/lib/server-only/recipient/update-envelope-recipients.ts
+@@ -1,10 +1,13 @@
++import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
++// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
++import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
++import { deliverReassignedRecipient } from '@bizrethink/customizations/server-only/recipient-identity-delivery';
+ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+ import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
+ import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+ import { createDocumentAuditLogData, diffRecipientChanges } from '@documenso/lib/utils/document-audit-logs';
+ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
+-import { prisma } from '@documenso/prisma';
+ import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
+
+ import { AppError, AppErrorCode } from '../../errors/app-error';
+@@ -12,7 +15,6 @@ import { extractLegacyIds } from '../../universal/id';
+ import type { EnvelopeIdOptions } from '../../utils/envelope';
+ import { mapFieldToLegacyField } from '../../utils/fields';
+ import { canRecipientBeModified } from '../../utils/recipients';
+-import { assertEnvelopeMutable } from '../envelope/assert-envelope-mutable';
+ import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+ import { assertCompatibleRecipientRole } from '../signature-level/assert-compatible-recipient-role';
+
+@@ -46,84 +48,51 @@ export const updateEnvelopeRecipients = async ({
+     teamId,
+   });
+
+-  const envelope = await prisma.envelope.findFirst({
+-    where: envelopeWhereInput,
+-    include: {
+-      fields: true,
+-      recipients: true,
+-      team: {
+-        select: {
+-          organisation: {
+-            select: {
+-              organisationClaim: true,
+-            },
+-          },
+-        },
+-      },
+-    },
+-  });
+-
+-  if (!envelope) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, {
+-      message: 'Envelope not found',
+-    });
+-  }
+-
+-  assertEnvelopeMutable(envelope);
+-
+-  if (envelope.completedAt) {
+-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-      message: 'Envelope already complete',
+-    });
+-  }
+-
+-  const recipientsHaveActionAuth = recipients.some(
+-    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+-  );
+-
+-  // Check if user has permission to set the global action auth.
+-  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+-      message: 'You do not have permission to set the action auth',
+-    });
+-  }
++  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope, afterCommit }) => {
++    const recipientsHaveActionAuth = recipients.some(
++      (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
++    );
+
+-  for (const recipient of recipients) {
+-    if (recipient.role === undefined) {
+-      continue;
++    // Check if user has permission to set the global action auth.
++    if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
++      throw new AppError(AppErrorCode.UNAUTHORIZED, {
++        message: 'You do not have permission to set the action auth',
++      });
+     }
+
+-    assertCompatibleRecipientRole({
+-      signatureLevel: envelope.signatureLevel,
+-      role: recipient.role,
+-    });
+-  }
+-
+-  const recipientsToUpdate = recipients.map((recipient) => {
+-    const originalRecipient = envelope.recipients.find((existingRecipient) => existingRecipient.id === recipient.id);
++    for (const recipient of recipients) {
++      if (recipient.role === undefined) {
++        continue;
++      }
+
+-    if (!originalRecipient) {
+-      throw new AppError(AppErrorCode.NOT_FOUND, {
+-        message: `Recipient with id ${recipient.id} not found`,
++      assertCompatibleRecipientRole({
++        signatureLevel: envelope.signatureLevel,
++        role: recipient.role,
+       });
+     }
+
+-    if (!canRecipientBeModified(originalRecipient, envelope.fields)) {
+-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+-        message: 'Cannot modify a recipient who has already interacted with the document',
+-      });
+-    }
++    const recipientsToUpdate = recipients.map((recipient) => {
++      const originalRecipient = envelope.recipients.find((existingRecipient) => existingRecipient.id === recipient.id);
+
+-    return {
+-      originalRecipient,
+-      updateData: recipient,
+-    };
+-  });
++      if (!originalRecipient) {
++        throw new AppError(AppErrorCode.NOT_FOUND, {
++          message: `Recipient with id ${recipient.id} not found`,
++        });
++      }
++
++      if (!canRecipientBeModified(originalRecipient, envelope.fields)) {
++        throw new AppError(AppErrorCode.INVALID_REQUEST, {
++          message: 'Cannot modify a recipient who has already interacted with the document',
++        });
++      }
+
+-  const updatedRecipients = await prisma.$transaction(async (tx) => {
+-    await assertEnvelopeMutable(envelope, tx);
++      return {
++        originalRecipient,
++        updateData: recipient,
++      };
++    });
+
+-    return await Promise.all(
++    const updatedRecipients = await Promise.all(
+       recipientsToUpdate.map(async ({ originalRecipient, updateData }) => {
+         let authOptions = ZRecipientAuthOptionsSchema.parse(originalRecipient.authOptions);
+
+@@ -145,6 +114,7 @@ export const updateEnvelopeRecipients = async ({
+             envelopeId: envelope.id,
+           },
+           data: {
++            ...(await recipientIdentityReset(tx, originalRecipient, mergedRecipient, envelope.fields)),
+             name: mergedRecipient.name,
+             email: mergedRecipient.email,
+             role: mergedRecipient.role,
+@@ -196,13 +166,23 @@ export const updateEnvelopeRecipients = async ({
+         return updatedRecipient;
+       }),
+     );
+-  });
+
+-  return {
+-    recipients: updatedRecipients.map((recipient) => ({
+-      ...recipient,
+-      ...extractLegacyIds(envelope),
+-      fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+-    })),
+-  };
++    const currentRecipients = envelope.recipients.map(
++      (previous) => updatedRecipients.find((row) => row.id === previous.id) ?? previous,
++    );
++    for (const current of updatedRecipients) {
++      const previous = envelope.recipients.find((row) => row.id === current.id);
++      if (previous) {
++        afterCommit(() => deliverReassignedRecipient({ envelope, previous, current, recipients: currentRecipients }));
++      }
++    }
++
++    return {
++      recipients: updatedRecipients.map((recipient) => ({
++        ...recipient,
++        ...extractLegacyIds(envelope),
++        fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
++      })),
++    };
++  });
+ };
+diff --git a/packages/lib/server-only/recipient/update-recipient-next-reminder.ts b/packages/lib/server-only/recipient/update-recipient-next-reminder.ts
+index 117c149cb..cb0bbeff3 100644
+--- a/packages/lib/server-only/recipient/update-recipient-next-reminder.ts
++++ b/packages/lib/server-only/recipient/update-recipient-next-reminder.ts
+@@ -12,6 +12,7 @@ import { resolveNextReminderAt, ZEnvelopeReminderSettings } from '../../constant
+  */
+ export const updateRecipientNextReminder = async (options: {
+   recipientId: number;
++  recipientToken: string;
+   envelopeId: string;
+   sentAt: Date;
+   lastReminderSentAt: Date | null;
+@@ -41,8 +42,9 @@ export const updateRecipientNextReminder = async (options: {
+     reminderCount: resetReminderCount ? 0 : reminderCount,
+   });
+
+-  await prisma.recipient.update({
+-    where: { id: recipientId },
++  // MODIFIED for BizRethink (overlay 088): delivery of an old link cannot alter its replacement.
++  await prisma.recipient.updateMany({
++    where: { id: recipientId, token: options.recipientToken },
+     data: {
+       nextReminderAt,
+       ...(resetReminderCount ? { reminderCount: 0 } : {}),
+diff --git a/packages/lib/server-only/template/create-template-direct-link.ts b/packages/lib/server-only/template/create-template-direct-link.ts
+index 65543376d..35ec98b0b 100644
+--- a/packages/lib/server-only/template/create-template-direct-link.ts
++++ b/packages/lib/server-only/template/create-template-direct-link.ts
+@@ -1,8 +1,11 @@
++// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
++
++import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
++import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
+ import {
+   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+   DIRECT_TEMPLATE_RECIPIENT_NAME,
+ } from '@documenso/lib/constants/direct-templates';
+-import { prisma } from '@documenso/prisma';
+ import { EnvelopeType, type Recipient } from '@prisma/client';
+ import { nanoid } from 'nanoid';
+
+@@ -30,77 +33,73 @@ export const createTemplateDirectLink = async ({
+     teamId,
+   });
+
+-  const envelope = await prisma.envelope.findFirst({
+-    where: envelopeWhereInput,
+-    include: {
+-      recipients: true,
+-      directLink: true,
+-    },
+-  });
+-
+-  if (!envelope) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Template not found' });
+-  }
++  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
++    if (envelope.directLink) {
++      throw new AppError(AppErrorCode.ALREADY_EXISTS, { message: 'Direct template already exists' });
++    }
+
+-  if (envelope.directLink) {
+-    throw new AppError(AppErrorCode.ALREADY_EXISTS, { message: 'Direct template already exists' });
+-  }
++    if (directRecipientId && !envelope.recipients.find((recipient) => recipient.id === directRecipientId)) {
++      throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
++    }
+
+-  if (directRecipientId && !envelope.recipients.find((recipient) => recipient.id === directRecipientId)) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
+-  }
++    if (
++      !directRecipientId &&
++      envelope.recipients.find((recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL)
++    ) {
++      throw new AppError(AppErrorCode.INVALID_BODY, {
++        message: 'Cannot generate placeholder direct recipient',
++      });
++    }
+
+-  if (
+-    !directRecipientId &&
+-    envelope.recipients.find((recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL)
+-  ) {
+-    throw new AppError(AppErrorCode.INVALID_BODY, {
+-      message: 'Cannot generate placeholder direct recipient',
+-    });
+-  }
++    const createdDirectLink = await (async () => {
++      let recipient: Recipient | undefined;
+
+-  const createdDirectLink = await prisma.$transaction(async (tx) => {
+-    let recipient: Recipient | undefined;
++      if (directRecipientId) {
++        recipient = await tx.recipient.update({
++          where: {
++            envelopeId: envelope.id,
++            id: directRecipientId,
++          },
++          data: {
++            ...(await recipientIdentityReset(
++              tx,
++              envelope.recipients.find((row) => row.id === directRecipientId),
++              { name: DIRECT_TEMPLATE_RECIPIENT_NAME, email: DIRECT_TEMPLATE_RECIPIENT_EMAIL },
++              envelope.fields,
++            )),
++            name: DIRECT_TEMPLATE_RECIPIENT_NAME,
++            email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
++          },
++        });
++      } else {
++        recipient = await tx.recipient.create({
++          data: {
++            envelopeId: envelope.id,
++            name: DIRECT_TEMPLATE_RECIPIENT_NAME,
++            email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
++            token: nanoid(),
++          },
++        });
++      }
+
+-    if (directRecipientId) {
+-      recipient = await tx.recipient.update({
+-        where: {
+-          envelopeId: envelope.id,
+-          id: directRecipientId,
+-        },
+-        data: {
+-          name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+-          email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+-        },
+-      });
+-    } else {
+-      recipient = await tx.recipient.create({
++      return await tx.templateDirectLink.create({
+         data: {
+           envelopeId: envelope.id,
+-          name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+-          email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
++          enabled: true,
+           token: nanoid(),
++          directTemplateRecipientId: recipient.id,
+         },
+       });
+-    }
++    })();
+
+-    return await tx.templateDirectLink.create({
+-      data: {
+-        envelopeId: envelope.id,
+-        enabled: true,
+-        token: nanoid(),
+-        directTemplateRecipientId: recipient.id,
+-      },
+-    });
++    return {
++      id: createdDirectLink.id,
++      token: createdDirectLink.token,
++      createdAt: createdDirectLink.createdAt,
++      enabled: createdDirectLink.enabled,
++      directTemplateRecipientId: createdDirectLink.directTemplateRecipientId,
++      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
++      envelopeId: envelope.id,
++    };
+   });
+-
+-  return {
+-    id: createdDirectLink.id,
+-    token: createdDirectLink.token,
+-    createdAt: createdDirectLink.createdAt,
+-    enabled: createdDirectLink.enabled,
+-    directTemplateRecipientId: createdDirectLink.directTemplateRecipientId,
+-    templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+-    envelopeId: envelope.id,
+-  };
+ };
+diff --git a/packages/lib/server-only/template/delete-template-direct-link.ts b/packages/lib/server-only/template/delete-template-direct-link.ts
+index d3c583f7c..b997ce86c 100644
+--- a/packages/lib/server-only/template/delete-template-direct-link.ts
++++ b/packages/lib/server-only/template/delete-template-direct-link.ts
+@@ -1,8 +1,9 @@
++// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
++
++import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
++import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
+ import { generateAvaliableRecipientPlaceholder } from '@documenso/lib/utils/templates';
+-import { prisma } from '@documenso/prisma';
+ import { EnvelopeType } from '@prisma/client';
+-
+-import { AppError, AppErrorCode } from '../../errors/app-error';
+ import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+
+ export type DeleteTemplateDirectLinkOptions = {
+@@ -26,33 +27,25 @@ export const deleteTemplateDirectLink = async ({
+     teamId,
+   });
+
+-  const envelope = await prisma.envelope.findUnique({
+-    where: envelopeWhereInput,
+-    include: {
+-      directLink: true,
+-      recipients: true,
+-    },
+-  });
+-
+-  if (!envelope) {
+-    throw new AppError(AppErrorCode.NOT_FOUND, {
+-      message: 'Template not found',
+-    });
+-  }
+-
+-  const { directLink } = envelope;
++  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
++    const { directLink } = envelope;
+
+-  if (!directLink) {
+-    return;
+-  }
++    if (!directLink) {
++      return;
++    }
+
+-  await prisma.$transaction(async (tx) => {
+     await tx.recipient.update({
+       where: {
+         envelopeId: envelope.id,
+         id: directLink.directTemplateRecipientId,
+       },
+       data: {
++        ...(await recipientIdentityReset(
++          tx,
++          envelope.recipients.find((row) => row.id === directLink.directTemplateRecipientId),
++          generateAvaliableRecipientPlaceholder(envelope.recipients),
++          envelope.fields,
++        )),
+         ...generateAvaliableRecipientPlaceholder(envelope.recipients),
+       },
+     });
+diff --git a/packages/trpc/server/envelope-router/sign-envelope-field.ts b/packages/trpc/server/envelope-router/sign-envelope-field.ts
+index 53ea664bb..e034df1fd 100644
+--- a/packages/trpc/server/envelope-router/sign-envelope-field.ts
++++ b/packages/trpc/server/envelope-router/sign-envelope-field.ts
+@@ -1,5 +1,8 @@
++// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
++
+ import { authorizeAssistantFieldMutation } from '@bizrethink/customizations/server-only/assistant-field-permission';
+ import { assertRecipientAccess } from '@bizrethink/customizations/server-only/recipient-access';
++import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
+ import { isBase64Image } from '@documenso/lib/constants/signatures';
+ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+ import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
+@@ -134,6 +137,7 @@ export const signEnvelopeFieldRoute = procedure
+     // Early return for uninserting fields.
+     if (!insertionValues.inserted) {
+       return await prisma.$transaction(async (tx) => {
++        await assertCurrentRecipientAuthority(tx, { recipient, envelope, field });
+         const updatedField = await tx.field.update({
+           where: {
+             id: field.id,
+@@ -204,6 +208,7 @@ export const signEnvelopeFieldRoute = procedure
+     }
+
+     return await prisma.$transaction(async (tx) => {
++      await assertCurrentRecipientAuthority(tx, { recipient, envelope, field });
+       const updatedField = await tx.field.update({
+         where: {
+           id: field.id,

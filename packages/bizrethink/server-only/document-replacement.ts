@@ -9,6 +9,7 @@ const replacementInclude = {
   recipients: true,
   envelopeItems: { select: { id: true } },
   documentMeta: true,
+  directLink: true,
   team: { select: { organisation: { select: { organisationClaim: true } } } },
 } satisfies Prisma.EnvelopeInclude;
 

@@ -14,6 +14,8 @@ const { db, jobs } = vi.hoisted(() => ({
     recipient: { upsert: vi.fn(), deleteMany: vi.fn() },
     field: { upsert: vi.fn(), deleteMany: vi.fn() },
     documentAuditLog: { create: vi.fn(), createMany: vi.fn() },
+    cscSession: { deleteMany: vi.fn() },
+    cscCredential: { deleteMany: vi.fn() },
     $queryRaw: vi.fn(),
     $transaction: vi.fn(),
   },

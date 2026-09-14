@@ -10,6 +10,10 @@
     "skipLibCheck": true
   },
   "include": [
+    "../app-tests/e2e/api/bizrethink/recipient-identity.spec.ts",
+    "server-only/recipient-authority.ts",
+    "server-only/recipient-identity*.ts",
+    "regression-tests/recipient-identity*.test.ts",
     "server-only/account-*.ts",
     "regression-tests/account-*.test.ts",
     "server-only/auto-claim-invites-on-signup.ts",

@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 088): bind provider proof writes to the current recipient bearer.
+import { withCurrentCscRecipient } from '@bizrethink/customizations/server-only/recipient-authority';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { Prisma } from '@prisma/client';
@@ -39,6 +41,7 @@ export type CscCredentialRow = {
 };
 
 type UpsertCscCredentialInput = {
+  recipientToken: string;
   recipientId: number;
   providerId: string;
   credentialId: string;
@@ -79,36 +82,41 @@ export const upsertCscCredential = async (input: UpsertCscCredentialInput): Prom
     serviceTokenExpiresAt,
   } = input;
 
-  const row = await prisma.cscCredential.upsert({
-    where: { recipientId },
-    create: {
-      recipientId,
-      providerId,
-      credentialId,
-      certCache,
-      signatureAlgorithm,
-      keyType,
-      digestAlgorithm,
-      keyLenBits,
-      signAlgoParams: signAlgoParams ?? null,
-      serviceTokenCiphertext,
-      serviceTokenExpiresAt,
-    },
-    update: {
-      providerId,
-      credentialId,
-      certCache,
-      signatureAlgorithm,
-      keyType,
-      digestAlgorithm,
-      keyLenBits,
-      signAlgoParams: signAlgoParams ?? null,
-      serviceTokenCiphertext,
-      serviceTokenExpiresAt,
-    },
-  });
+  return withCurrentCscRecipient(input.recipientToken, async (tx, recipient) => {
+    if (recipient.id !== recipientId) {
+      throw new AppError(AppErrorCode.NOT_FOUND);
+    }
+    const row = await tx.cscCredential.upsert({
+      where: { recipientId },
+      create: {
+        recipientId,
+        providerId,
+        credentialId,
+        certCache,
+        signatureAlgorithm,
+        keyType,
+        digestAlgorithm,
+        keyLenBits,
+        signAlgoParams: signAlgoParams ?? null,
+        serviceTokenCiphertext,
+        serviceTokenExpiresAt,
+      },
+      update: {
+        providerId,
+        credentialId,
+        certCache,
+        signatureAlgorithm,
+        keyType,
+        digestAlgorithm,
+        keyLenBits,
+        signAlgoParams: signAlgoParams ?? null,
+        serviceTokenCiphertext,
+        serviceTokenExpiresAt,
+      },
+    });
 
-  return toCscCredentialRow(row);
+    return toCscCredentialRow(row);
+  });
 };
 
 /**
