@@ -1,6 +1,9 @@
+import { execFile } from 'node:child_process';
 /** A-21: real HTTP, PostgreSQL fixtures and the actual server log transport in CI. */
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocument } from '@documenso/prisma/seed/documents';
@@ -65,4 +68,32 @@ test('A-21 a rejected direct-template request keeps its bearer and recipient ema
   });
   expect(response.status(), await response.text()).toBe(404);
   await assertSafeRequestLog(response.headers()['x-request-id'], canary);
+});
+
+test('A-21 the built early-instrumentation entry loads in native Node without app or database configuration', async () => {
+  const result = await promisify(execFile)(
+    process.execPath,
+    [
+      '--import',
+      './build/server/instrument.mjs',
+      '--input-type=module',
+      '-e',
+      "process.stdout.write('instrumentation-loaded')",
+    ],
+    {
+      cwd: fileURLToPath(new URL('../../../../../apps/remix/', import.meta.url)),
+      // The repository's ProcessEnv declares these required; empty values
+      // deliberately prove this bootstrap needs none of their configuration.
+      env: {
+        NODE_ENV: 'test',
+        NEXT_PRIVATE_DATABASE_URL: '',
+        NEXT_PRIVATE_ENCRYPTION_KEY: '',
+        NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: '',
+        NEXT_PRIVATE_STRIPE_API_KEY: '',
+        NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: '',
+      },
+      timeout: 10_000,
+    },
+  );
+  expect(result.stdout).toBe('instrumentation-loaded');
 });

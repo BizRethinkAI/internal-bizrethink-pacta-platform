@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { AuthenticationErrorCode } from '@documenso/auth/server/lib/errors/error-codes';
 import { AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { LoggerOptions } from 'pino';
 import { SERVER_LOG_SCOPES } from './log-scopes';
@@ -42,6 +43,7 @@ const ERROR_NAMES = new Set([
 ]);
 const ERROR_CODES = new Set<string>([
   ...Object.values(AppErrorCode),
+  ...Object.values(AuthenticationErrorCode),
   'ECONNREFUSED',
   'ECONNRESET',
   'ETIMEDOUT',
@@ -239,9 +241,14 @@ export const safeLoggingOptions: Pick<LoggerOptions, 'hooks' | 'formatters'> = {
     streamWrite(serialized) {
       try {
         const record: unknown = JSON.parse(serialized);
-        return (
-          JSON.stringify({ level: own(record, 'level'), time: own(record, 'time'), ...safeLogRecord(record) }) + '\n'
-        );
+        const rawLevel = own(record, 'level');
+        const rawTime = own(record, 'time');
+        const level =
+          typeof rawLevel === 'number' && Number.isInteger(rawLevel) && rawLevel >= 10 && rawLevel <= 60
+            ? rawLevel
+            : 30;
+        const time = typeof rawTime === 'number' && Number.isFinite(rawTime) && rawTime >= 0 ? rawTime : Date.now();
+        return JSON.stringify({ level, time, ...safeLogRecord(record) }) + '\n';
       } catch {
         return '{"level":50,"event":"server.error"}\n';
       }

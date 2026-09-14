@@ -96,3 +96,13 @@ it('keeps stable non-bearer ID correlation and actionable error codes across log
   expect(right.documentId).toMatch(/^sha256:/);
   expect(right.error.code).toBe('ECONNREFUSED');
 });
+it('A-21 child bindings cannot smuggle strings through intrinsic Pino timestamp fields', () => {
+  logger.child({ time: secret }).info({ event: 'document.access' });
+  expect(captured.lines.join('')).not.toContain(secret);
+  expect(JSON.parse(captured.lines[0])).toMatchObject({ level: 30, time: expect.any(Number) });
+});
+it('retains fixed authentication error codes while omitting their sensitive messages', () => {
+  logger.error({ error: Object.assign(new Error(secret), { code: 'INVALID_CREDENTIALS' }) });
+  expect(captured.lines.join('')).not.toContain(secret);
+  expect(JSON.parse(captured.lines[0]).error.code).toBe('INVALID_CREDENTIALS');
+});
