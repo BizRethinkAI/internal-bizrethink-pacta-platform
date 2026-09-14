@@ -30,6 +30,9 @@ export const disableUser = async ({ id }: DisableUserOptions) => {
         data: { disabled: true },
       });
 
+      // MODIFIED for BizRethink (overlay 087): revocation commits with disable.
+      await tx.session.deleteMany({ where: { userId: id } });
+
       await tx.apiToken.updateMany({
         where: { userId: id },
         data: {

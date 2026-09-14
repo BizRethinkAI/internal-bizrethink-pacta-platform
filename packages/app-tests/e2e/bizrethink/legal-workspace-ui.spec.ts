@@ -177,6 +177,14 @@ test('counsel reads full business alternatives and retains finding drafts while 
     const counsel = await context.newPage();
     await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/mca-clause-review/${token}`);
     await expect(counsel.getByRole('heading', { name: 'Review brief', exact: true })).toBeVisible();
+    await counsel.getByRole('button', { name: 'Start reviewing', exact: true }).click();
+    await expect(counsel.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+    await expect(counsel.getByRole('heading', { name: '1.1 Estimated Daily Holdback', exact: true })).toBeVisible();
+    await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/mca-clause-review/${token}?view=all`);
+    await expect(counsel.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+    await expect(counsel.getByRole('heading', { name: '3. Purchase', exact: true })).toBeVisible();
+    await counsel.locator('[data-mca-section-heading="funding-terms"]').scrollIntoViewIfNeeded();
+    await counsel.screenshot({ path: testInfo.outputPath('counsel-parent-sections.png'), fullPage: false });
     await expect(counsel.getByText(/This review content has changed since the link was sent/)).toHaveCount(0);
     await expect(counsel.getByRole('complementary', { name: 'Review index' }).locator('..')).toHaveCSS(
       'grid-template-columns',

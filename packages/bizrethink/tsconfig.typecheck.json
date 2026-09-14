@@ -10,6 +10,11 @@
     "skipLibCheck": true
   },
   "include": [
+    "server-only/account-*.ts",
+    "regression-tests/account-*.test.ts",
+    "server-only/auto-claim-invites-on-signup.ts",
+    "server-only/auto-claim-invites-on-signup.test.ts",
+    "../app-tests/e2e/api/bizrethink/account-protection.spec.ts",
     "lease/**/*.ts",
     "lease/**/*.tsx",
     "legal-ui/**/*.ts",

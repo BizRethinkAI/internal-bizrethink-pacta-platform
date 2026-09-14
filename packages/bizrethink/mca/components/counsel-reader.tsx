@@ -3,11 +3,12 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Trans } from '@lingui/react/macro';
 import { BookOpenIcon, ListIcon } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { Fragment, type ReactNode, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { focusReadingItem, LegalText, LegalWorkspace, legalItemId, ReferenceWorkspace } from '../../legal-ui/reader';
 import { subjectLabel } from '../../legal-ui/reading';
 import { describeClauseVariance, describeWhyThisClause } from '../clauses/metadata';
+import { mcaSectionHeading } from '../engine/section-headings';
 import type { CounselReviewClause, CounselReviewView } from '../review/counsel-view';
 
 const withEmphasis = (paragraph: string) =>
@@ -38,6 +39,13 @@ export const McaCounselReader = ({
   const decision = decisions.find((fact) => fact === params.get('decision'));
   const showBrief = !subject && !decision && params.get('view') !== 'all';
   const context = params.get('context') ?? '';
+  const sectionTitle = (section: string) =>
+    mcaSectionHeading(
+      section,
+      clauses
+        .filter((clause) => clause.section === section)
+        .map((clause) => ({ number: (view.readingContexts[context]?.[clause.slug] ?? clause.reading).number })),
+    );
   const selected = decision
     ? clauses.filter((clause) => clause.variance.kind === 'offered' && clause.variance.fact === decision)
     : subject
@@ -66,6 +74,12 @@ export const McaCounselReader = ({
       });
     }
   }
+  // Keep business alternatives together. Add a parent whenever the displayed
+  // sequence enters a section, including an alternative in another section.
+  const displayed = groups.flatMap((group) => group.items);
+  const sectionStarts = new Set(
+    displayed.filter((clause, index) => clause.section !== displayed[index - 1]?.section).map((clause) => clause.slug),
+  );
   const go = (values: Record<string, string>) => {
     setParams(values, { preventScrollReset: true });
     setMobileIndex(false);
@@ -217,7 +231,7 @@ export const McaCounselReader = ({
                       className={`flex w-full justify-between gap-3 rounded px-2 py-2.5 text-left text-sm ${subject?.id === section.id ? 'bg-muted font-semibold' : 'hover:bg-muted'}`}
                       onClick={() => go({ subject: section.id })}
                     >
-                      {section.name}
+                      {sectionTitle(section.id)}
                       <span className="text-muted-foreground">{section.clauses.length}</span>
                     </button>
                   ))
@@ -242,13 +256,12 @@ export const McaCounselReader = ({
               <h2 id="counsel-reading-title" tabIndex={-1} className="mb-3 font-semibold text-3xl tracking-tight">
                 {showBrief ? (
                   <Trans>Review brief</Trans>
+                ) : subject ? (
+                  sectionTitle(subject.id)
+                ) : decision ? (
+                  subjectLabel(decision.replace(/([a-z])([A-Z])/g, '$1-$2'))
                 ) : (
-                  (subject?.name ??
-                  (decision ? (
-                    subjectLabel(decision.replace(/([a-z])([A-Z])/g, '$1-$2'))
-                  ) : (
-                    <Trans>All review items</Trans>
-                  )))
+                  <Trans>All review items</Trans>
                 )}
               </h2>
               {showBrief ? (
@@ -313,120 +326,134 @@ export const McaCounselReader = ({
                         <div className={group.title ? 'divide-y' : ''}>
                           {group.items.map((clause) => {
                             const reading = view.readingContexts[context]?.[clause.slug] ?? clause.reading;
+                            const showParent =
+                              sectionStarts.has(clause.slug) && (!subject || clause.section !== subject.id);
+                            const ClauseHeading = subject && clause.section === subject.id ? 'h3' : 'h4';
                             return (
-                              <article
-                                key={clause.slug}
-                                data-mca-slug={clause.slug}
-                                id={legalItemId(clause.slug)}
-                                tabIndex={-1}
-                                className={`scroll-mt-8 ${group.title ? 'p-5 sm:p-7' : 'border-b pb-8'}`}
-                              >
-                                <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-                                  <h3 className="font-semibold text-xl">
-                                    {reading.number && (
-                                      <button
-                                        className="mr-3 text-primary underline underline-offset-4"
-                                        type="button"
-                                        onClick={() => openItem(clause.slug)}
-                                      >
-                                        {reading.number}
-                                      </button>
-                                    )}
-                                    {clause.heading}
+                              <Fragment key={clause.slug}>
+                                {showParent && (
+                                  <h3
+                                    data-mca-section-heading={clause.section}
+                                    className={`mb-5 border-b pb-3 font-semibold text-2xl ${group.title ? 'px-5 pt-5' : ''}`}
+                                  >
+                                    {sectionTitle(clause.section)}
                                   </h3>
-                                  <Badge variant={clause.approved ? 'default' : 'neutral'}>
-                                    {clause.approved ? (
-                                      <Trans>Current approval</Trans>
-                                    ) : (
-                                      <Trans>No current approval</Trans>
-                                    )}
-                                  </Badge>
-                                </div>
-                                {clause.kind !== 'clause' && (
-                                  <p className="mb-3 text-muted-foreground text-xs">
-                                    {clause.kind === 'guidance' ? (
-                                      <Trans>Interview guidance — excluded from the contract</Trans>
-                                    ) : clause.kind === 'field-group' ? (
-                                      <Trans>Required document fields</Trans>
-                                    ) : (
-                                      <Trans>Required document block</Trans>
-                                    )}
-                                  </p>
                                 )}
-                                <p className="mb-5 text-muted-foreground text-xs">
-                                  {clause.selectionNote ?? (
-                                    <Trans>Example selection · shared wording where applicable</Trans>
+                                <article
+                                  data-mca-slug={clause.slug}
+                                  id={legalItemId(clause.slug)}
+                                  tabIndex={-1}
+                                  className={`scroll-mt-8 ${group.title ? 'p-5 sm:p-7' : 'border-b pb-8'}`}
+                                >
+                                  <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                                    <ClauseHeading className="font-semibold text-xl">
+                                      {reading.number && (
+                                        <button
+                                          className="mr-3 text-primary underline underline-offset-4"
+                                          type="button"
+                                          onClick={() => openItem(clause.slug)}
+                                        >
+                                          {reading.number}
+                                        </button>
+                                      )}
+                                      {clause.heading}
+                                    </ClauseHeading>
+                                    <Badge variant={clause.approved ? 'default' : 'neutral'}>
+                                      {clause.approved ? (
+                                        <Trans>Current approval</Trans>
+                                      ) : (
+                                        <Trans>No current approval</Trans>
+                                      )}
+                                    </Badge>
+                                  </div>
+                                  {clause.kind !== 'clause' && (
+                                    <p className="mb-3 text-muted-foreground text-xs">
+                                      {clause.kind === 'guidance' ? (
+                                        <Trans>Interview guidance — excluded from the contract</Trans>
+                                      ) : clause.kind === 'field-group' ? (
+                                        <Trans>Required document fields</Trans>
+                                      ) : (
+                                        <Trans>Required document block</Trans>
+                                      )}
+                                    </p>
                                   )}
-                                </p>
-                                <LegalText sourceId={clause.slug} segments={reading.segments} large={large} />
-                                {clause.fields && (
-                                  <dl className="my-5 grid gap-4 rounded-lg border p-4 sm:grid-cols-2">
-                                    {clause.fields.map((field) => (
-                                      <div key={field.widget}>
-                                        <dt className="font-medium text-sm">{field.label}</dt>
-                                        <dd className="my-1 break-all font-mono text-xs">{field.widget}</dd>
-                                        <dd className="text-muted-foreground text-xs">
-                                          {field.requiredWhen ? (
-                                            <Trans>Required for an entity guarantor</Trans>
-                                          ) : field.required ? (
-                                            <Trans>Required</Trans>
-                                          ) : (
-                                            <Trans>Optional</Trans>
-                                          )}
-                                        </dd>
-                                      </div>
-                                    ))}
-                                  </dl>
-                                )}
-                                {clause.repeatFor && (
-                                  <p className="my-3 text-sm">
-                                    <Trans>
-                                      A separate identity and signature block is required for each guarantor.
-                                    </Trans>
+                                  <p className="mb-5 text-muted-foreground text-xs">
+                                    {clause.selectionNote ?? (
+                                      <Trans>Example selection · shared wording where applicable</Trans>
+                                    )}
                                   </p>
-                                )}
-                                {clause.retiredFields && (
-                                  <p className="my-3 text-muted-foreground text-xs">
-                                    <Trans>Retired source fields are excluded from the document:</Trans>{' '}
-                                    {clause.retiredFields.map((field) => `${field.widget}: ${field.reason}`).join('; ')}
-                                  </p>
-                                )}
-                                <details className="mt-5 text-sm">
-                                  <summary className="cursor-pointer font-medium">
-                                    <Trans>Purpose & wording constraints</Trans>
-                                  </summary>
-                                  <p className="mt-2 text-muted-foreground">
-                                    {describeWhyThisClause(clause.whyThisClause)}
-                                  </p>
-                                  <p className="mt-2 text-muted-foreground">
-                                    {describeClauseVariance(clause.variance)}
-                                  </p>
-                                </details>
-                                <details className="mt-4 rounded-lg border bg-muted/20 p-4">
-                                  <summary className="cursor-pointer font-medium text-sm">
-                                    <Trans>Findings on this item</Trans>
-                                  </summary>
-                                  {renderFinding(clause)}
-                                </details>
-                                <label className="mt-4 flex items-center gap-2 text-muted-foreground text-xs">
-                                  <input
-                                    type="checkbox"
-                                    checked={read.has(clause.slug)}
-                                    onChange={(event) =>
-                                      setRead((old) => {
-                                        const next = new Set(old);
-                                        if (event.target.checked) {
-                                          next.add(clause.slug);
-                                        } else {
-                                          next.delete(clause.slug);
-                                        }
-                                        return next;
-                                      })
-                                    }
-                                  />
-                                  <Trans>Read this session</Trans>
-                                </label>
-                              </article>
+                                  <LegalText sourceId={clause.slug} segments={reading.segments} large={large} />
+                                  {clause.fields && (
+                                    <dl className="my-5 grid gap-4 rounded-lg border p-4 sm:grid-cols-2">
+                                      {clause.fields.map((field) => (
+                                        <div key={field.widget}>
+                                          <dt className="font-medium text-sm">{field.label}</dt>
+                                          <dd className="my-1 break-all font-mono text-xs">{field.widget}</dd>
+                                          <dd className="text-muted-foreground text-xs">
+                                            {field.requiredWhen ? (
+                                              <Trans>Required for an entity guarantor</Trans>
+                                            ) : field.required ? (
+                                              <Trans>Required</Trans>
+                                            ) : (
+                                              <Trans>Optional</Trans>
+                                            )}
+                                          </dd>
+                                        </div>
+                                      ))}
+                                    </dl>
+                                  )}
+                                  {clause.repeatFor && (
+                                    <p className="my-3 text-sm">
+                                      <Trans>
+                                        A separate identity and signature block is required for each guarantor.
+                                      </Trans>
+                                    </p>
+                                  )}
+                                  {clause.retiredFields && (
+                                    <p className="my-3 text-muted-foreground text-xs">
+                                      <Trans>Retired source fields are excluded from the document:</Trans>{' '}
+                                      {clause.retiredFields
+                                        .map((field) => `${field.widget}: ${field.reason}`)
+                                        .join('; ')}
+                                    </p>
+                                  )}
+                                  <details className="mt-5 text-sm">
+                                    <summary className="cursor-pointer font-medium">
+                                      <Trans>Purpose & wording constraints</Trans>
+                                    </summary>
+                                    <p className="mt-2 text-muted-foreground">
+                                      {describeWhyThisClause(clause.whyThisClause)}
+                                    </p>
+                                    <p className="mt-2 text-muted-foreground">
+                                      {describeClauseVariance(clause.variance)}
+                                    </p>
+                                  </details>
+                                  <details className="mt-4 rounded-lg border bg-muted/20 p-4">
+                                    <summary className="cursor-pointer font-medium text-sm">
+                                      <Trans>Findings on this item</Trans>
+                                    </summary>
+                                    {renderFinding(clause)}
+                                  </details>
+                                  <label className="mt-4 flex items-center gap-2 text-muted-foreground text-xs">
+                                    <input
+                                      type="checkbox"
+                                      checked={read.has(clause.slug)}
+                                      onChange={(event) =>
+                                        setRead((old) => {
+                                          const next = new Set(old);
+                                          if (event.target.checked) {
+                                            next.add(clause.slug);
+                                          } else {
+                                            next.delete(clause.slug);
+                                          }
+                                          return next;
+                                        })
+                                      }
+                                    />
+                                    <Trans>Read this session</Trans>
+                                  </label>
+                                </article>
+                              </Fragment>
                             );
                           })}
                         </div>
@@ -440,7 +467,7 @@ export const McaCounselReader = ({
                         .filter((section) => section !== subject)
                         .map((section) => (
                           <Button key={section.id} variant="outline" onClick={() => go({ subject: section.id })}>
-                            {section.name}
+                            {sectionTitle(section.id)}
                           </Button>
                         ))}
                     </nav>

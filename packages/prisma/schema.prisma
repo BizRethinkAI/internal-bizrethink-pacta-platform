@@ -2407,6 +2407,13 @@ model BizrethinkEmailDomainChallenge {
 model BizrethinkEmailDomainOwnership {
   emailDomainId String   @id
   verifiedAt    DateTime @default(now())
+
+/// Durable distinction between unfinished verified onboarding and a user who
+/// deliberately left/deleted all workspaces. Scalar ID avoids upstream relations.
+model BizrethinkVerifiedOnboarding {
+  userId      Int       @id
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
 }
 
 // BIZRETHINK_ADDITIONS_END

@@ -9,8 +9,22 @@ import { mcaLibrarySurface } from '../../clauses/surface/view';
 import { selectClauses } from '../../engine/select-clauses';
 import { contentForReview } from '../../reusable/review';
 import { counselReviewView } from '../counsel-view';
+import { toReadableAgreement } from '../readable-agreement';
 
 describe('counsel reads the numbered selection and its identified alternatives', () => {
+  it('names the parent sections using the existing clause numbers, including fields before the first clause', () => {
+    const sections = toReadableAgreement(contentForReview('frpa'));
+    expect(sections.slice(0, 4).map((section) => section.name)).toEqual([
+      '1. Funding Terms',
+      '2. Preamble',
+      '3. Purchase',
+      '4. Reconciliation',
+    ]);
+    expect(sections.find((section) => section.id === 'appendix')?.name).toBe('12. Fee Schedule');
+    expect(sections[0].clauses[0].number).toBeNull();
+    expect(sections[0].clauses.find((clause) => clause.number)?.number).toBe('1.1');
+  });
+
   it.each(
     MCA_INSTRUMENTS,
   )('%s shows every record once, with resolved references and visible field content', (instrument) => {
