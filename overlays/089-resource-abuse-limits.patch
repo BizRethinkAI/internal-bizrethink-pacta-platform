@@ -24,6 +24,23 @@ index abfd91b16..bd8e5db36 100644
        {
          label: <Trans>Billing & Stripe</Trans>,
          href: '/admin/stripe',
+diff --git a/apps/remix/app/routes/_authenticated+/admin+/resource-limits.tsx b/apps/remix/app/routes/_authenticated+/admin+/resource-limits.tsx
+new file mode 100644
+index 000000000..f7acb8001
+--- /dev/null
++++ b/apps/remix/app/routes/_authenticated+/admin+/resource-limits.tsx
+@@ -0,0 +1,11 @@
++// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
++// BizRethink overlay 089: owned trial-policy page with an independent leaf-loader gate.
++import { ResourcePolicyPage } from '@bizrethink/customizations/admin/resource-policy-page';
++import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
++import type { LoaderFunctionArgs } from 'react-router';
++
++export const loader = async ({ request }: LoaderFunctionArgs) => {
++  await requireAdminLoader(request);
++  return null;
++};
++export default ResourcePolicyPage;
 diff --git a/apps/remix/server/api/files/files.ts b/apps/remix/server/api/files/files.ts
 index fe497d01f..807e147e5 100644
 --- a/apps/remix/server/api/files/files.ts
@@ -115,6 +132,70 @@ index 5e67a6bdb..a49ae8957 100644
  app.use(contextStorage());
  app.use(appContext);
  
+diff --git a/packages/app-tests/e2e/organisations/manage-organisation.spec.ts b/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
+index 2e4621394..c10ad1565 100644
+--- a/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
++++ b/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
+@@ -1,3 +1,6 @@
++// MODIFIED for BizRethink (overlay 089): exercise first-trial creation, then deletion; deletion does not renew a trial.
++import { hashSync } from '@documenso/lib/server-only/auth/hash';
++import { prisma } from '@documenso/prisma';
+ import { createTeam } from '@documenso/lib/server-only/team/create-team';
+ import { nanoid } from '@documenso/lib/universal/id';
+ import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
+@@ -8,35 +11,33 @@ import { apiSignin, apiSignout } from '../fixtures/authentication';
+ import { expectTextToBeVisible, expectTextToNotBeVisible, openDropdownMenu } from '../fixtures/generic';
+ 
+ test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
+-  const { user, organisation } = await seedUser({
+-    isPersonalOrganisation: false,
+-  });
+-
+-  await apiSignin({
+-    page,
+-    email: user.email,
+-    redirectPath: `/settings/organisations`,
++  // Start before the account has received any trial organisation. The security
++  // HTTP suite separately proves that deleting it cannot reset this allowance.
++  const user = await prisma.user.create({
++    data: {
++      email: `create-org-${nanoid()}@test.documenso.com`,
++      password: hashSync('password'),
++      emailVerified: new Date(),
++    },
+   });
++  await apiSignin({ page, email: user.email, redirectPath: `/settings/organisations` });
++  await expectTextToBeVisible(page, 'No results found');
++  await page.getByRole('button', { name: 'Create organization' }).click();
++  await page.getByLabel('Organization Name*').fill('test');
++  await page.getByRole('button', { name: 'Create' }).click();
++  await expect(page.getByText('Your organization has been created').first()).toBeVisible();
++  await page.reload();
+ 
++  const organisation = await prisma.organisation.findFirstOrThrow({ where: { ownerUserId: user.id } });
+   await expect(page.getByRole('button', { name: 'Leave' })).toBeDisabled();
+-
+   await page.getByRole('link', { name: 'Manage' }).click();
+   await page.waitForURL(`/o/${organisation.url}/settings/general`);
+-
+   await page.getByRole('button', { name: 'Delete' }).click();
+   await page.getByLabel(`Confirm by typing delete ${organisation.name}`).fill(`delete ${organisation.name}`);
+   await page.getByRole('button', { name: 'Delete' }).click();
+-
+   await page.waitForURL(`/settings/organisations`);
+   await expectTextToBeVisible(page, 'No results found');
+-  await page.getByRole('button', { name: 'Create organization' }).click();
+-
+-  await page.getByLabel('Organization Name*').fill('test');
+-  await page.getByRole('button', { name: 'Create' }).click();
+-  await expect(page.getByText('Your organization has been created').first()).toBeVisible();
+-  await page.reload();
+-
+-  await page.getByRole('row').filter({ hasText: 'test' }).getByRole('link').nth(1).click();
++  expect(await prisma.organisation.count({ where: { ownerUserId: user.id } })).toBe(0);
+ });
+ 
+ test('[ORGANISATIONS]: manage general settings', async ({ page }) => {
 diff --git a/packages/ee/server-only/lib/create-email-domain.ts b/packages/ee/server-only/lib/create-email-domain.ts
 index 1011ac14d..a9d4eec8c 100644
 --- a/packages/ee/server-only/lib/create-email-domain.ts
@@ -1606,20 +1687,3 @@ index 22519fda8..22bae8a32 100644
        });
  
        let customerId = organisation.customerId;
-diff --git a/apps/remix/app/routes/_authenticated+/admin+/resource-limits.tsx b/apps/remix/app/routes/_authenticated+/admin+/resource-limits.tsx
-new file mode 100644
-index 000000000..f7acb8001
---- /dev/null
-+++ b/apps/remix/app/routes/_authenticated+/admin+/resource-limits.tsx
-@@ -0,0 +1,11 @@
-+// MODIFIED for BizRethink (overlay 089): bounded resource work and trial/domain policy.
-+// BizRethink overlay 089: owned trial-policy page with an independent leaf-loader gate.
-+import { ResourcePolicyPage } from '@bizrethink/customizations/admin/resource-policy-page';
-+import { requireAdminLoader } from '@bizrethink/customizations/server-only/require-admin-loader';
-+import type { LoaderFunctionArgs } from 'react-router';
-+
-+export const loader = async ({ request }: LoaderFunctionArgs) => {
-+  await requireAdminLoader(request);
-+  return null;
-+};
-+export default ResourcePolicyPage;

@@ -140,6 +140,14 @@ test('A-20 pending domain requests remain separate, visible only to their organi
 }) => {
   const first = await seedTrial();
   const second = await seedTrial();
+  // This scenario exercises authorised custom-sender onboarding. seedUser
+  // deliberately overrides feature flags, so grant this entitlement explicitly.
+  for (const fixture of [first, second]) {
+    await prisma.organisationClaim.update({
+      where: { id: fixture.organisation.organisationClaim.id },
+      data: { flags: { allowLegacyEnvelopes: true, emailDomains: true } },
+    });
+  }
   const a = await playwright.request.newContext();
   const b = await playwright.request.newContext();
   const domain = `proof-${randomUUID()}.example.invalid`;
