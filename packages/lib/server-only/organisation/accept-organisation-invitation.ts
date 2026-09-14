@@ -3,7 +3,7 @@ import {
   syncMemberCountWithStripeSeatPlan,
 } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { prisma } from '@documenso/prisma';
-import type { OrganisationGroup, OrganisationMemberRole } from '@prisma/client';
+import type { OrganisationGroup, OrganisationMemberRole, Prisma } from '@prisma/client';
 import { OrganisationGroupType, OrganisationMemberInviteStatus, SubscriptionStatus } from '@prisma/client';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
@@ -130,12 +130,14 @@ export const addUserToOrganisation = async ({
   organisationGroups,
   organisationMemberRole,
   bypassEmail = false,
+  transaction,
 }: {
   userId: number;
   organisationId: string;
   organisationGroups: OrganisationGroup[];
   organisationMemberRole: OrganisationMemberRole;
   bypassEmail?: boolean;
+  transaction?: Prisma.TransactionClient;
 }) => {
   const organisationGroupToUse = organisationGroups.find(
     (group) =>
@@ -148,7 +150,8 @@ export const addUserToOrganisation = async ({
     });
   }
 
-  await prisma.organisationMember.create({
+  // MODIFIED for BizRethink (overlay 087): membership and invite consumption can commit together.
+  await (transaction ?? prisma).organisationMember.create({
     data: {
       id: generateDatabaseId('member'),
       userId,

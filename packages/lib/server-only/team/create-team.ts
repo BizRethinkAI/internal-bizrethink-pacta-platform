@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 087): accept the onboarding transaction.
+import { accountTransaction } from '@bizrethink/customizations/server-only/account-transaction';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 import { OrganisationGroupType, OrganisationMemberRole, Prisma, TeamMemberRole } from '@prisma/client';
@@ -11,6 +13,7 @@ import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { generateDefaultTeamSettings } from '../../utils/teams';
 
 export type CreateTeamOptions = {
+  transaction?: Prisma.TransactionClient;
   /**
    * ID of the user creating the Team.
    */
@@ -47,8 +50,16 @@ export type CreateTeamOptions = {
   }[];
 };
 
-export const createTeam = async ({ userId, teamName, teamUrl, organisationId, inheritMembers }: CreateTeamOptions) => {
-  const organisation = await prisma.organisation.findFirst({
+export const createTeam = async ({
+  userId,
+  teamName,
+  teamUrl,
+  organisationId,
+  inheritMembers,
+  transaction,
+}: CreateTeamOptions) => {
+  const database = transaction ?? prisma;
+  const organisation = await database.organisation.findFirst({
     where: buildOrganisationWhereQuery({
       organisationId,
       userId,
@@ -76,7 +87,7 @@ export const createTeam = async ({ userId, teamName, teamUrl, organisationId, in
 
   // Validate they have enough team slots. 0 means they can create unlimited teams.
   if (organisation.organisationClaim.teamCount !== 0 && IS_BILLING_ENABLED()) {
-    const teamCount = await prisma.team.count({
+    const teamCount = await database.team.count({
       where: {
         organisationId,
       },
@@ -121,7 +132,7 @@ export const createTeam = async ({ userId, teamName, teamUrl, organisationId, in
         .exhaustive(),
     );
 
-  await prisma
+  await accountTransaction(transaction)
     .$transaction(
       async (tx) => {
         const teamSettings = await tx.teamGlobalSettings.create({

@@ -1,3 +1,5 @@
+// MODIFIED for BizRethink (overlay 087): compose verified onboarding in one transaction.
+import { accountTransaction } from '@bizrethink/customizations/server-only/account-transaction';
 // BizRethink (overlay 041): trial bookkeeping for new external orgs.
 import { startTrialForNewOrg } from '@bizrethink/customizations/server-only/billing/start-trial-for-new-org';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
@@ -20,9 +22,18 @@ type CreateOrganisationOptions = {
   url?: string;
   customerId?: string;
   claim: Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
+  transaction?: Prisma.TransactionClient;
 };
 
-export const createOrganisation = async ({ name, url, type, userId, customerId, claim }: CreateOrganisationOptions) => {
+export const createOrganisation = async ({
+  name,
+  url,
+  type,
+  userId,
+  customerId,
+  claim,
+  transaction,
+}: CreateOrganisationOptions) => {
   let customerIdToUse = customerId;
 
   if (!customerId && IS_BILLING_ENABLED()) {
@@ -50,7 +61,7 @@ export const createOrganisation = async ({ name, url, type, userId, customerId, 
       });
   }
 
-  return await prisma.$transaction(async (tx) => {
+  return await accountTransaction(transaction).$transaction(async (tx) => {
     const organisationSetting = await tx.organisationGlobalSettings.create({
       data: {
         ...generateDefaultOrganisationSettings(),
@@ -144,6 +155,7 @@ type CreatePersonalOrganisationOptions = {
   throwErrorOnOrganisationCreationFailure?: boolean;
   inheritMembers?: boolean;
   type?: OrganisationType;
+  transaction?: Prisma.TransactionClient;
 };
 
 export const createPersonalOrganisation = async ({
@@ -152,6 +164,7 @@ export const createPersonalOrganisation = async ({
   throwErrorOnOrganisationCreationFailure = false,
   inheritMembers = true,
   type = OrganisationType.PERSONAL,
+  transaction,
 }: CreatePersonalOrganisationOptions) => {
   // MODIFIED for BizRethink (overlay 041): route new external orgs to the PRO
   // claim with a 14-day trial instead of FREE. Internal orgs (BizRethink-operated)
@@ -167,10 +180,11 @@ export const createPersonalOrganisation = async ({
     url: orgUrl,
     type,
     claim: proSubscriptionClaim,
+    transaction,
   }).catch((err) => {
     console.error(err);
 
-    if (throwErrorOnOrganisationCreationFailure) {
+    if (throwErrorOnOrganisationCreationFailure || transaction) {
       throw err;
     }
 
@@ -182,7 +196,10 @@ export const createPersonalOrganisation = async ({
   // silently — the org is already created and usable on PRO; the trial state
   // is bookkeeping that defaults to "no row = external, no trial" downstream.
   if (organisation) {
-    await startTrialForNewOrg({ organisationId: organisation.id, internal: false }).catch((err) => {
+    await startTrialForNewOrg({ organisationId: organisation.id, internal: false, transaction }).catch((err) => {
+      if (transaction) {
+        throw err;
+      }
       console.error('[bizrethink] startTrialForNewOrg failed', err);
     });
   }
@@ -194,7 +211,11 @@ export const createPersonalOrganisation = async ({
       teamUrl: prefixedId('personal'),
       organisationId: organisation.id,
       inheritMembers,
+      transaction,
     }).catch((err) => {
+      if (transaction) {
+        throw err;
+      }
       console.error(err);
 
       // Todo: (LOGS)
