@@ -133,7 +133,7 @@ index 5e67a6bdb..a49ae8957 100644
  app.use(appContext);
  
 diff --git a/packages/app-tests/e2e/organisations/manage-organisation.spec.ts b/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
-index 2e4621394..e95410ab4 100644
+index 2e4621394..814e011cc 100644
 --- a/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
 +++ b/packages/app-tests/e2e/organisations/manage-organisation.spec.ts
 @@ -1,5 +1,8 @@
@@ -145,7 +145,7 @@ index 2e4621394..e95410ab4 100644
  import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
  import { seedUser } from '@documenso/prisma/seed/users';
  import { expect, test } from '@playwright/test';
-@@ -8,35 +11,33 @@ import { apiSignin, apiSignout } from '../fixtures/authentication';
+@@ -8,35 +11,36 @@ import { apiSignin, apiSignout } from '../fixtures/authentication';
  import { expectTextToBeVisible, expectTextToNotBeVisible, openDropdownMenu } from '../fixtures/generic';
  
  test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
@@ -161,12 +161,15 @@ index 2e4621394..e95410ab4 100644
 +  // HTTP suite separately proves that deleting it cannot reset this allowance.
 +  const user = await prisma.user.create({
 +    data: {
-+      email: `create-org-${nanoid()}@test.documenso.com`,
++      name: 'Synthetic organisation owner',
++      email: `create-org-${nanoid()}@test.documenso.com`.toLowerCase(),
 +      password: hashSync('password'),
 +      emailVerified: new Date(),
 +    },
    });
 +  await apiSignin({ page, email: user.email, redirectPath: `/settings/organisations` });
++  const session = await page.request.get('/api/auth/session');
++  expect((await session.json()).user?.id).toBe(user.id);
 +  await expectTextToBeVisible(page, 'No results found');
 +  await page.getByRole('button', { name: 'Create organization' }).click();
 +  await page.getByLabel('Organization Name*').fill('test');

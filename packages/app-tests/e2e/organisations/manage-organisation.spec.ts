@@ -15,12 +15,15 @@ test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
   // HTTP suite separately proves that deleting it cannot reset this allowance.
   const user = await prisma.user.create({
     data: {
-      email: `create-org-${nanoid()}@test.documenso.com`,
+      name: 'Synthetic organisation owner',
+      email: `create-org-${nanoid()}@test.documenso.com`.toLowerCase(),
       password: hashSync('password'),
       emailVerified: new Date(),
     },
   });
   await apiSignin({ page, email: user.email, redirectPath: `/settings/organisations` });
+  const session = await page.request.get('/api/auth/session');
+  expect((await session.json()).user?.id).toBe(user.id);
   await expectTextToBeVisible(page, 'No results found');
   await page.getByRole('button', { name: 'Create organization' }).click();
   await page.getByLabel('Organization Name*').fill('test');
