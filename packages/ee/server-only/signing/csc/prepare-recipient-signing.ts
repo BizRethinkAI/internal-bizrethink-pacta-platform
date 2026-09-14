@@ -214,6 +214,7 @@ export const prepareCscRecipientSigning = async (
   }
 
   const session = await upsertCscSession({
+    recipientToken,
     recipientId: recipient.id,
     envelopeId: envelope.id,
     signingTime,

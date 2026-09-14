@@ -2,6 +2,9 @@ import {
   assertRecipientAccess,
   assertRecipientEnvelopeNotDeleted,
 } from '@bizrethink/customizations/server-only/recipient-access';
+// MODIFIED for BizRethink (overlay 088): recheck bearer authority inside the write transaction.
+import { assertCurrentRecipientAuthority } from '@bizrethink/customizations/server-only/recipient-authority';
+import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import { DOCUMENT_AUDIT_LOG_TYPE, RECIPIENT_DIFF_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -162,6 +165,7 @@ export const completeDocumentWithToken = async ({
     recipientAuth: recipient.authOptions,
   });
 
+  let wasAccess2faValidated = false;
   if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
     if (!accessAuthOptions) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
@@ -184,9 +188,38 @@ export const completeDocumentWithToken = async ({
     });
 
     if (!isValid) {
-      await prisma.documentAuditLog.create({
+      await prisma.$transaction(async (tx) => {
+        await assertCurrentRecipientAuthority(tx, { recipient, envelope });
+        await tx.documentAuditLog.create({
+          data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
+            envelopeId: envelope.id,
+            data: {
+              recipientId: recipient.id,
+              recipientName: recipient.name,
+              recipientEmail: recipient.email,
+            },
+          }),
+        });
+      });
+
+      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
+        message: 'Invalid 2FA authentication',
+      });
+    }
+
+    wasAccess2faValidated = true;
+  }
+
+  let recipientName = recipient.name;
+  let recipientEmail = recipient.email;
+
+  await prisma.$transaction(async (tx) => {
+    await assertCurrentRecipientAuthority(tx, { recipient, envelope });
+    if (wasAccess2faValidated) {
+      await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
           envelopeId: envelope.id,
           data: {
             recipientId: recipient.id,
@@ -195,139 +228,121 @@ export const completeDocumentWithToken = async ({
           },
         }),
       });
+    }
+    let fields = await tx.field.findMany({
+      where: {
+        envelopeId: envelope.id,
+        recipientId: recipient.id,
+      },
+    });
 
-      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
-        message: 'Invalid 2FA authentication',
+    // This should be scoped to the current recipient.
+    const uninsertedDateFields = fields.filter((field) => field.type === FieldType.DATE && !field.inserted);
+
+    recipientName = recipient.name;
+    recipientEmail = recipient.email;
+
+    // Only trim the name if it's been derived.
+    if (!recipientName) {
+      recipientName = (
+        recipientOverride?.name ||
+        fields.find((field) => field.type === FieldType.NAME)?.customText ||
+        ''
+      ).trim();
+    }
+
+    // Only trim the email if it's been derived.
+    if (!recipient.email) {
+      recipientEmail = (
+        recipientOverride?.email ||
+        fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
+        ''
+      )
+        .trim()
+        .toLowerCase();
+    }
+
+    if (!recipientEmail) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Recipient email is required',
       });
     }
 
-    await prisma.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
-        envelopeId: envelope.id,
+    // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
+    if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
+      const formattedDate = DateTime.now()
+        .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
+        .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
+
+      const newDateFieldValues = {
+        customText: formattedDate,
+        inserted: true,
+      };
+
+      await tx.field.updateMany({
+        where: {
+          id: {
+            in: uninsertedDateFields.map((field) => field.id),
+          },
+        },
         data: {
-          recipientId: recipient.id,
-          recipientName: recipient.name,
-          recipientEmail: recipient.email,
-        },
-      }),
-    });
-  }
-
-  let fields = await prisma.field.findMany({
-    where: {
-      envelopeId: envelope.id,
-      recipientId: recipient.id,
-    },
-  });
-
-  // This should be scoped to the current recipient.
-  const uninsertedDateFields = fields.filter((field) => field.type === FieldType.DATE && !field.inserted);
-
-  let recipientName = recipient.name;
-  let recipientEmail = recipient.email;
-
-  // Only trim the name if it's been derived.
-  if (!recipientName) {
-    recipientName = (
-      recipientOverride?.name ||
-      fields.find((field) => field.type === FieldType.NAME)?.customText ||
-      ''
-    ).trim();
-  }
-
-  // Only trim the email if it's been derived.
-  if (!recipient.email) {
-    recipientEmail = (
-      recipientOverride?.email ||
-      fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
-      ''
-    )
-      .trim()
-      .toLowerCase();
-  }
-
-  if (!recipientEmail) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Recipient email is required',
-    });
-  }
-
-  // Auto-insert all un-inserted date fields for V2 envelopes at completion time.
-  if (envelope.internalVersion === 2 && uninsertedDateFields.length > 0) {
-    const formattedDate = DateTime.now()
-      .setZone(envelope.documentMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE)
-      .toFormat(envelope.documentMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT);
-
-    const newDateFieldValues = {
-      customText: formattedDate,
-      inserted: true,
-    };
-
-    await prisma.field.updateMany({
-      where: {
-        id: {
-          in: uninsertedDateFields.map((field) => field.id),
-        },
-      },
-      data: {
-        ...newDateFieldValues,
-      },
-    });
-
-    // Create audit log entries for each auto-inserted date field.
-    await prisma.documentAuditLog.createMany({
-      data: uninsertedDateFields.map((field) =>
-        createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-          envelopeId: envelope.id,
-          user: {
-            email: recipientEmail,
-            name: recipientName,
-          },
-          requestMetadata,
-          data: {
-            recipientEmail: recipientEmail,
-            recipientId: recipient.id,
-            recipientName: recipientName,
-            recipientRole: recipient.role,
-            fieldId: field.secondaryId,
-            field: {
-              type: FieldType.DATE,
-              data: formattedDate,
-            },
-          },
-        }),
-      ),
-    });
-
-    // Update the local fields array so the subsequent validation check passes.
-    fields = fields.map((field) => {
-      if (field.type === FieldType.DATE && !field.inserted) {
-        return {
-          ...field,
           ...newDateFieldValues,
-        };
-      }
+        },
+      });
 
-      return field;
-    });
-  }
+      // Create audit log entries for each auto-inserted date field.
+      await tx.documentAuditLog.createMany({
+        data: uninsertedDateFields.map((field) =>
+          createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+            envelopeId: envelope.id,
+            user: {
+              email: recipientEmail,
+              name: recipientName,
+            },
+            requestMetadata,
+            data: {
+              recipientEmail: recipientEmail,
+              recipientId: recipient.id,
+              recipientName: recipientName,
+              recipientRole: recipient.role,
+              fieldId: field.secondaryId,
+              field: {
+                type: FieldType.DATE,
+                data: formattedDate,
+              },
+            },
+          }),
+        ),
+      });
 
-  if (fieldsContainUnsignedRequiredField(fields)) {
-    throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
-      message: `Recipient ${recipient.id} has unsigned fields`,
-      statusCode: 400,
-    });
-  }
+      // Update the local fields array so the subsequent validation check passes.
+      fields = fields.map((field) => {
+        if (field.type === FieldType.DATE && !field.inserted) {
+          return {
+            ...field,
+            ...newDateFieldValues,
+          };
+        }
 
-  await prisma.$transaction(async (tx) => {
+        return field;
+      });
+    }
+
+    if (fieldsContainUnsignedRequiredField(fields)) {
+      throw new AppError(AppErrorCode.RECIPIENT_HAS_UNSIGNED_FIELDS, {
+        message: `Recipient ${recipient.id} has unsigned fields`,
+        statusCode: 400,
+      });
+    }
+
     // Conditional update so two concurrent completion requests can't both
     // proceed: only the request that transitions the recipient to SIGNED
     // continues, the loser sees a count of 0 and aborts.
     const { count: updatedRecipientCount } = await tx.recipient.updateMany({
       where: {
         id: recipient.id,
+        token,
         signingStatus: {
           not: SigningStatus.SIGNED,
         },
@@ -428,13 +443,6 @@ export const completeDocumentWithToken = async ({
   });
 
   const pendingRecipients = await prisma.recipient.findMany({
-    select: {
-      id: true,
-      signingOrder: true,
-      name: true,
-      email: true,
-      role: true,
-    },
     where: {
       envelopeId: envelope.id,
       signingStatus: {
@@ -462,6 +470,11 @@ export const completeDocumentWithToken = async ({
       const [nextRecipient] = pendingRecipients;
 
       await prisma.$transaction(async (tx) => {
+        const currentEnvelope = await assertCurrentRecipientAuthority(tx, { recipient: nextRecipient, envelope });
+        const reset =
+          nextSigner && envelope.documentMeta?.allowDictateNextSigner
+            ? await recipientIdentityReset(tx, nextRecipient, nextSigner, currentEnvelope.fields)
+            : {};
         if (nextSigner && envelope.documentMeta?.allowDictateNextSigner) {
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
@@ -497,6 +510,7 @@ export const completeDocumentWithToken = async ({
         await tx.recipient.update({
           where: { id: nextRecipient.id },
           data: {
+            ...reset,
             sendStatus: SendStatus.SENT,
             sentAt: new Date(),
             ...(nextSigner && envelope.documentMeta?.allowDictateNextSigner

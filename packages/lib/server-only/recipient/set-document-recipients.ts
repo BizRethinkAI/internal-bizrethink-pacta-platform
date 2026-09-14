@@ -3,6 +3,9 @@ import {
   assertRecipientReplacement,
   withDocumentReplacement,
 } from '@bizrethink/customizations/server-only/document-replacement';
+// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
+import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
+import { deliverReassignedRecipient } from '@bizrethink/customizations/server-only/recipient-identity-delivery';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import { type TRecipientActionAuthTypes, ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
@@ -123,6 +126,7 @@ export const setDocumentRecipients = async ({
             envelopeId: envelope.id,
           },
           update: {
+            ...(await recipientIdentityReset(tx, recipient._persisted, recipient, envelope.fields)),
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
@@ -206,6 +210,14 @@ export const setDocumentRecipients = async ({
         };
       }),
     );
+
+    const currentRecipients = persistedRecipients;
+    for (const current of currentRecipients) {
+      const previous = envelope.recipients.find((row) => row.id === current.id);
+      if (previous) {
+        afterCommit(() => deliverReassignedRecipient({ envelope, previous, current, recipients: currentRecipients }));
+      }
+    }
 
     if (removedRecipients.length > 0) {
       await tx.recipient.deleteMany({

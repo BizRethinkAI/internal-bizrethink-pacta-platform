@@ -36,6 +36,7 @@ const { db, job, webhook, executeTspSign } = vi.hoisted(() => ({
     documentMeta: { findFirst: vi.fn() },
     documentAuditLog: { create: vi.fn(), createMany: vi.fn() },
     envelopeAttachment: { findMany: vi.fn() },
+    $queryRaw: vi.fn(),
     $transaction: vi.fn(),
   },
   executeTspSign: vi.fn(),
@@ -138,7 +139,7 @@ beforeEach(() => {
   db.recipient.update.mockImplementation(async () => envelope.recipients[0]);
   db.recipient.updateMany.mockResolvedValue({ count: 1 });
   for (const method of ['findFirst', 'findFirstOrThrow', 'findUniqueOrThrow'] as const) {
-    db.envelope[method].mockImplementation(async () => envelope);
+    db.envelope[method].mockImplementation(async () => ({ ...envelope, fields: [{ ...field }] }));
   }
   db.field.findFirst.mockImplementation(async () => ({ ...field, envelope, recipient: envelope.recipients[0] }));
   db.field.findFirstOrThrow.mockImplementation(async () => ({ ...field, envelope, recipient: envelope.recipients[0] }));

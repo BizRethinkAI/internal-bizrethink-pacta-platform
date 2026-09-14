@@ -149,6 +149,7 @@ export const resendDocument = async ({ id, userId, recipients, teamId, requestMe
   await Promise.all(
     recipientsToRemind.map((recipient) =>
       updateRecipientNextReminder({
+        recipientToken: recipient.token,
         recipientId: recipient.id,
         envelopeId: envelope.id,
         sentAt: resentAt,

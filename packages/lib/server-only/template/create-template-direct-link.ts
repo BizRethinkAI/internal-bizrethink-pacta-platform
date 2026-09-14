@@ -1,8 +1,11 @@
+// MODIFIED for BizRethink (overlay 088): rotate reassigned bearer authority under the authoring lock.
+
+import { withDocumentReplacement } from '@bizrethink/customizations/server-only/document-replacement';
+import { recipientIdentityReset } from '@bizrethink/customizations/server-only/recipient-identity';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
 } from '@documenso/lib/constants/direct-templates';
-import { prisma } from '@documenso/prisma';
 import { EnvelopeType, type Recipient } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
@@ -30,77 +33,73 @@ export const createTemplateDirectLink = async ({
     teamId,
   });
 
-  const envelope = await prisma.envelope.findFirst({
-    where: envelopeWhereInput,
-    include: {
-      recipients: true,
-      directLink: true,
-    },
-  });
+  return withDocumentReplacement(envelopeWhereInput, async ({ tx, envelope }) => {
+    if (envelope.directLink) {
+      throw new AppError(AppErrorCode.ALREADY_EXISTS, { message: 'Direct template already exists' });
+    }
 
-  if (!envelope) {
-    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Template not found' });
-  }
+    if (directRecipientId && !envelope.recipients.find((recipient) => recipient.id === directRecipientId)) {
+      throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
+    }
 
-  if (envelope.directLink) {
-    throw new AppError(AppErrorCode.ALREADY_EXISTS, { message: 'Direct template already exists' });
-  }
-
-  if (directRecipientId && !envelope.recipients.find((recipient) => recipient.id === directRecipientId)) {
-    throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Recipient not found' });
-  }
-
-  if (
-    !directRecipientId &&
-    envelope.recipients.find((recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL)
-  ) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Cannot generate placeholder direct recipient',
-    });
-  }
-
-  const createdDirectLink = await prisma.$transaction(async (tx) => {
-    let recipient: Recipient | undefined;
-
-    if (directRecipientId) {
-      recipient = await tx.recipient.update({
-        where: {
-          envelopeId: envelope.id,
-          id: directRecipientId,
-        },
-        data: {
-          name: DIRECT_TEMPLATE_RECIPIENT_NAME,
-          email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-        },
-      });
-    } else {
-      recipient = await tx.recipient.create({
-        data: {
-          envelopeId: envelope.id,
-          name: DIRECT_TEMPLATE_RECIPIENT_NAME,
-          email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-          token: nanoid(),
-        },
+    if (
+      !directRecipientId &&
+      envelope.recipients.find((recipient) => recipient.email.toLowerCase() === DIRECT_TEMPLATE_RECIPIENT_EMAIL)
+    ) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Cannot generate placeholder direct recipient',
       });
     }
 
-    return await tx.templateDirectLink.create({
-      data: {
-        envelopeId: envelope.id,
-        enabled: true,
-        token: nanoid(),
-        directTemplateRecipientId: recipient.id,
-      },
-    });
-  });
+    const createdDirectLink = await (async () => {
+      let recipient: Recipient | undefined;
 
-  return {
-    id: createdDirectLink.id,
-    token: createdDirectLink.token,
-    createdAt: createdDirectLink.createdAt,
-    enabled: createdDirectLink.enabled,
-    directTemplateRecipientId: createdDirectLink.directTemplateRecipientId,
-    templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
-    envelopeId: envelope.id,
-  };
+      if (directRecipientId) {
+        recipient = await tx.recipient.update({
+          where: {
+            envelopeId: envelope.id,
+            id: directRecipientId,
+          },
+          data: {
+            ...(await recipientIdentityReset(
+              tx,
+              envelope.recipients.find((row) => row.id === directRecipientId),
+              { name: DIRECT_TEMPLATE_RECIPIENT_NAME, email: DIRECT_TEMPLATE_RECIPIENT_EMAIL },
+              envelope.fields,
+            )),
+            name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+            email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+          },
+        });
+      } else {
+        recipient = await tx.recipient.create({
+          data: {
+            envelopeId: envelope.id,
+            name: DIRECT_TEMPLATE_RECIPIENT_NAME,
+            email: DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+            token: nanoid(),
+          },
+        });
+      }
+
+      return await tx.templateDirectLink.create({
+        data: {
+          envelopeId: envelope.id,
+          enabled: true,
+          token: nanoid(),
+          directTemplateRecipientId: recipient.id,
+        },
+      });
+    })();
+
+    return {
+      id: createdDirectLink.id,
+      token: createdDirectLink.token,
+      createdAt: createdDirectLink.createdAt,
+      enabled: createdDirectLink.enabled,
+      directTemplateRecipientId: createdDirectLink.directTemplateRecipientId,
+      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+      envelopeId: envelope.id,
+    };
+  });
 };
