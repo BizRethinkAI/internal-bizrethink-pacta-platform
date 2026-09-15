@@ -1,5 +1,6 @@
 import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { McaCounselReader } from '@bizrethink/customizations/mca/components/counsel-reader';
+import { McaPackageCounselRoute } from '@bizrethink/customizations/mca/components/package-counsel-route';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -215,6 +216,11 @@ const _withEmphasis = (paragraph: string) =>
 
 export default function McaClauseReviewPage() {
   const { token = '' } = useParams();
+  return token.startsWith('mcpr_') ? <McaPackageCounselRoute token={token} /> : <LegacyMcaClauseReviewPage />;
+}
+
+const LegacyMcaClauseReviewPage = () => {
+  const { token = '' } = useParams();
   const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const query = trpc.bizrethink.mcaClauseLibrary.openLibrary.useQuery({ token });
@@ -259,4 +265,4 @@ export default function McaClauseReviewPage() {
       )}
     />
   );
-}
+};

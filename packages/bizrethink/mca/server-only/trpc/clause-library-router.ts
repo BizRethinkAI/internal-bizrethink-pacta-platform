@@ -126,10 +126,16 @@ export const mcaClauseLibraryRouter = router({
       const unansweredCounselFindings = await prisma.bizrethinkMcaLibraryFinding.count({
         where: { clauseSlug: { in: contentFindingSlugs(clause) }, answeredAt: null },
       });
+      const unansweredPackageFindings = await prisma.bizrethinkMcaPackageFinding.count({
+        where: {
+          targetIds: { hasSome: contentFindingSlugs(clause).map((slug) => `content:${slug}`) },
+          answeredAt: null,
+        },
+      });
 
       const blocked = approvalBlocks(clause, {
         admission,
-        unansweredCounselFindings,
+        unansweredCounselFindings: unansweredCounselFindings + unansweredPackageFindings,
         outstanding: outstandingFindingsFor(clause),
         /*
           An unreadable register returns an empty findings list, which is

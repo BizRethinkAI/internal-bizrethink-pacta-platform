@@ -75,6 +75,92 @@ test('ordinary members cannot load either MCA authored-content catalogue or the 
   }
 });
 
+test('a complete neutral counsel package preserves findings, source context and revocation', async ({
+  page,
+  browser,
+}, testInfo) => {
+  const { user } = await signedInAsAdmin({ page, redirectPath: '/admin/mca-library' });
+  const reviewerName = `Package counsel ${randomUUID()}`;
+  const counselContext = await browser.newContext();
+  try {
+    await page.getByText('Review links & counsel findings', { exact: false }).click();
+    await page.getByLabel('Package reviewer name', { exact: true }).fill(reviewerName);
+    await page.getByLabel('Package reviewer email', { exact: true }).fill('package-counsel@example.invalid');
+    await page.getByLabel('Business review contact', { exact: true }).fill('Legal operations · legal@example.invalid');
+    await page.getByRole('button', { name: 'Create complete package link', exact: true }).click();
+    const card = page.locator('[data-mca-package-review]').filter({ hasText: reviewerName });
+    const link = card.getByRole('link', { name: 'Open saved review', exact: true });
+    await expect(link).toBeVisible();
+    const href = await link.getAttribute('href');
+    const counsel = await counselContext.newPage();
+    await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${href}`);
+    await expect(counsel.getByRole('heading', { name: 'Shared MCA library — complete counsel package' })).toBeVisible();
+    await expect(counsel.locator('[data-mca-counsel-package]')).not.toContainText('Lombard');
+    await expect(counsel.getByRole('navigation', { name: 'Counsel package' }).getByRole('button')).toHaveCount(7);
+    await expect(counsel.locator('[data-mca-package-section="funding-terms"]')).toContainText('1. Funding Terms');
+    await expect(counsel.locator('[data-mca-package-item="frpa.merchant-and-funding-information"]')).toBeVisible();
+    await counsel.screenshot({ path: testInfo.outputPath('neutral-complete-counsel-package.png'), fullPage: false });
+
+    const item = counsel.locator('[data-mca-package-item="frpa.holdback-explainer"]');
+    await item.getByText('Findings for this item', { exact: false }).click();
+    await item
+      .getByLabel('Finding', { exact: true })
+      .fill('Synthetic review: reconcile payment wording across the package.');
+    await item.getByRole('button', { name: 'Record finding', exact: true }).click();
+    await expect(item.getByText('Unanswered — approval held', { exact: true })).toBeVisible();
+    await counsel.reload();
+    await item.getByText('Findings for this item', { exact: false }).click();
+    await expect(item).toContainText('Synthetic review: reconcile payment wording across the package.');
+
+    await counsel
+      .getByRole('navigation', { name: 'Counsel package' })
+      .getByRole('button', { name: 'Split Funding Authorization', exact: true })
+      .click();
+    await expect(counsel.locator('[data-mca-package-item="split-funding.fees-are-additional"]')).toContainText(
+      'Payzli',
+    );
+    await counsel.getByRole('button', { name: 'Disclosures & requirements', exact: true }).click();
+    const source = counsel.locator('[data-mca-review-requirement="va-disclosure"]');
+    await source.locator('summary').click();
+    await expect(source).toContainText('prescribed-form');
+    await expect(source).toContainText('Last source reading:');
+    await expect(source.getByRole('link').first()).toBeVisible();
+    await counsel.screenshot({ path: testInfo.outputPath('counsel-disclosure-source-context.png'), fullPage: false });
+
+    const forged = await counsel.request.post(
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/bizrethink.mcaPackageReview.recordFinding`,
+      {
+        data: dataTransformer.serialize({
+          token: href?.split('/').pop(),
+          targetIds: ['content:outside'],
+          body: 'Outside.',
+        }),
+      },
+    );
+    expect(forged.ok()).toBe(false);
+    const unauthorizedShare = await counsel.request.post(
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/bizrethink.mcaPackageReview.share`,
+      {
+        data: dataTransformer.serialize({
+          reviewerName: 'Other',
+          reviewerEmail: 'other@example.invalid',
+          contact: 'Other',
+        }),
+      },
+    );
+    expect(unauthorizedShare.ok()).toBe(false);
+    await page.reload();
+    await page.getByText('Review links & counsel findings', { exact: false }).click();
+    await card.getByRole('button', { name: 'Revoke package link', exact: true }).click();
+    await expect(card).toContainText('Revoked');
+    await counsel.reload();
+    await expect(counsel.getByRole('heading', { name: 'Review unavailable', exact: true })).toBeVisible();
+  } finally {
+    await counselContext.close();
+    await prisma.bizrethinkMcaPackageReview.deleteMany({ where: { createdByUserId: user.id } });
+  }
+});
+
 test('counsel can review extracted fields and an original unresolved finding still blocks their approval', async ({
   page,
   browser,

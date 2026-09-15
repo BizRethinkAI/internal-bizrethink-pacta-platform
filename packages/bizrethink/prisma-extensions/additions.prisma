@@ -961,6 +961,43 @@ model BizrethinkMcaLibraryReview {
   @@index([instrument])
 }
 
+/// ADR 0017: explicit package scope, separate from legacy single-instrument tokens.
+/// The snapshot and fingerprint are immutable. Revocation preserves review history.
+model BizrethinkMcaPackageReview {
+  id              String @id
+  token           String @unique
+  status          String @default("open")
+  reviewerName    String
+  reviewerEmail   String
+  snapshot        Json
+  fingerprint     String
+  createdByUserId Int
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  findings        BizrethinkMcaPackageFinding[]
+}
+
+/// Targets identify only items in this invitation's saved package.
+model BizrethinkMcaPackageFinding {
+  id                 String @id
+  reviewId           String
+  review             BizrethinkMcaPackageReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  targetIds          String[]
+  packageFingerprint String
+  body               String
+  authorName         String
+  authorEmail        String
+  answer             String?
+  answeredAt         DateTime?
+  answeredByUserId   Int?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([reviewId])
+  @@index([targetIds], type: Gin)
+}
+
 /// A defect counsel reported against one clause, through a review link.
 ///
 /// WHY THIS TABLE EXISTS WHEN THE PAGE ONCE REFUSED TO COLLECT FINDINGS. The
