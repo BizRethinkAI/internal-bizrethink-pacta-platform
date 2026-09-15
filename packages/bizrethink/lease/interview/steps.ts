@@ -291,19 +291,22 @@ export const FL_INTERVIEW: InterviewStep[] = [
         tenantCanAnswer: true,
         target: 'value',
         kind: 'textarea',
-        label: 'Anyone else living there, by name?',
+        label: 'Full names of everyone else who will live there',
         /*
           A real answer was "daughters and father", which identifies nobody and
-          printed into the lease exactly as typed. The label asked "who is
-          authorised to occupy it" and the word doing the work — "named" — was
-          buried mid-sentence in the help. Both now say names, and an example
-          shows the shape.
+          printed into the lease exactly as typed. So the label says names, and
+          an example shows the shape.
 
-          No longer required. The tenants are named automatically from the
-          party list, so a household with nobody else is an ordinary answer
-          rather than something to invent an entry for.
+          ASKED ONCE. This read "Anyone else living there, by name?" directly
+          under "Is anyone else going to live there?" — the same question twice —
+          with "leave blank if it is only the tenants" beneath a "yes". Shown
+          only after a yes, so what is left to ask is who, and it is required:
+          a yes with no names renders the clause with nobody in it. The label
+          also stands alone — in the outstanding-answers list and on the
+          tenant's review link — so it names what it wants in full.
         */
-        help: 'Full names of anyone beyond the signing tenants — children, a parent, a partner who is not signing. The tenants themselves are added automatically. Leave blank if it is only the tenants.',
+        help: 'Everyone who will live there besides the signing tenants — children, a parent, a partner who is not signing. The tenants are named automatically.',
+        required: true,
         placeholder: 'Ava Shetty, Rohan Shetty',
       },
       {

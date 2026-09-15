@@ -238,6 +238,16 @@ describe('the lease builder never sends on its own', () => {
     the envelope's status from the loader, and only the PENDING branch may say
     anyone was sent anything.
   */
+  /*
+    "After Prepare the envelope, I don't see a send option." A draft's summary
+    page offers only Edit; Send Document lives in the editor. The link goes
+    straight there, and says what the landlord will do on it.
+  */
+  it('takes the landlord to the editor, where Send Document is', () => {
+    expect(route).toContain('/documents/${envelopeId}/edit');
+    expect(route).toContain('Review and send the envelope');
+  });
+
   it('only claims signers were sent the lease when the envelope says so', () => {
     expect(route).toContain('envelopeStatus');
     expect(route).not.toContain('Every signer has been emailed');

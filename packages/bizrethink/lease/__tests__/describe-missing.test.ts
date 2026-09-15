@@ -110,7 +110,7 @@ describe('outstandingDelegations', () => {
     const outstanding = outstandingDelegations(['authorisedOccupants'], {});
 
     expect(outstanding).toHaveLength(1);
-    expect(outstanding[0].question).toContain('Anyone else living there');
+    expect(outstanding[0].question).toContain('everyone else who will live there');
     expect(outstanding[0].stepTitle).toBe('Who is renting it');
   });
 
