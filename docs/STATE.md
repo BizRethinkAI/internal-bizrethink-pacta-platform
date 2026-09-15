@@ -15,6 +15,40 @@ true *right now*.
 
 _Last updated: 2026-09-15_
 
+## 2026-09-15 — ADRs compacted; split funding letters settled (#271, #274)
+
+Two documentation PRs merged after the lease/MCA batch below: #271 at
+`bf5557c4b` and #274 at `315d742b3`. **Neither is deployed, and neither needs
+to be.** #271 changed only docs, code comments and a source-file header outside
+the body digest. #274 changed only docs and one CI pathspec. Production still
+runs `d51d9fb03`. PR #273 (ADR status lines) was closed unmerged; the index
+replaced it.
+
+**#271, ADR 0019:**
+- A split funding letter always belongs to a specific processor and is used
+  exactly as supplied. No generic letter exists, and a processor's form is never
+  edited.
+- Payzli is the first supported processor. The owner confirmed its original
+  format is the existing Payzli template in the `lombard-api` team.
+- A conflict with the FRPA is resolved in Pacta's documents, never in the
+  letter.
+- The retained library text carries `lombard-contracts` edits from 2026-09-05
+  and 09-07. Replacing it with the template's wording is the next MCA task.
+- Moving the letter out of the clause catalogue remains separate work.
+
+**#274, ADR compaction:**
+- **Read [`adr/README.md`](adr/README.md) first.** It is the living status index
+  and the one file the append-only guard exempts.
+- **[ADR 0020](adr/0020-mca-decisions-consolidated.md) is the MCA rulebook.**
+  ADRs 0008–0019 are superseded as current statements and stay as history.
+- **[ADR 0021](adr/0021-manual-batch-deploys-and-the-adr-index.md)** records
+  that Coolify auto-deploy is off (read 2026-09-15). `main` deploys manually
+  once per batch, after `State ready to ship` is green on the final SHA.
+- ADR 0007's AATL status was not re-checked (last confirmed 2026-08-29).
+
+**Still stale outside this repo:** the BizRethink master `CLAUDE.md` says a push
+to `main` auto-deploys every app. That is not true for Pacta.
+
 ## 2026-09-15 — lease send fixes and MCA counsel repairs deployed (#255, #258, #260, #261, #262, #267, #268, #270)
 
 Eight PRs merged in this order: #255 `7fefd87d3`, #261 `d5b93cd72`, #258
@@ -87,15 +121,6 @@ final deploy, the pilot matter `lease_matter_kdxfitilinkibbdw` was prepared
 again. Its envelope `envelope_xshdmvsmatnelkzv` was created at 06:42 ET
 [10:42 UTC] and is `PENDING` (sent for signature). All verified by read-only
 queries on 2026-09-15. Signing completion is not tracked here.
-
-### Open PR, not folded
-
-#271 (`docs/processor-controlled-split-letters`) records ADR 0019: a split
-funding letter is the processor's exact form, never generic or edited. Payzli is
-the first supported processor. The owner states that Payzli's original format is
-the existing Payzli template in the `lombard-api` team; aligning the retained
-library text with that template is the next task. Its note is folded when it
-merges.
 
 ## 2026-09-15 — lease and MCA review batch landed (#233, #234, #235, #236, #238, #239, #241)
 
@@ -521,7 +546,7 @@ contracts. Treat every production action accordingly.
 organisation was BizRethink's own; `lombard` is the first outside one. That
 changes the blast radius of instance-wide changes — see *Lombard tenancy* below.
 
-All customisation lives in `packages/bizrethink/` plus **57 overlay patches**,
+All customisation lives in `packages/bizrethink/` plus **68 overlay patches** (counted 2026-09-15),
 which are the only sanctioned way to modify upstream files (plus the paths declared in `overlays/BIZRETHINK-OWNED.txt`, which were never upstream). Upstream is merged
 weekly by `.github/workflows/upstream-sync.yml`. See
 [ADR 0002](adr/0002-additive-fork-over-hard-fork.md).
@@ -535,15 +560,14 @@ branding.
 **There are two verticals, and this file is mostly about one of them.**
 Everything below describes the **lease builder**, which is the finished product.
 The **MCA vertical** (merchant cash advance) is the second, is mid-build, and its
-architecture is recorded in ADRs rather than here:
+decisions are recorded in **[ADR 0020](adr/0020-mca-decisions-consolidated.md)**,
+which consolidates ADRs 0008–0019. In short:
 
-- [ADR 0008](adr/0008-mca-is-two-surfaces-not-one.md) — it is *two* surfaces with
-  two release paths: **conformity** (does a disclosure meet a state's statute)
-  and **the agreement** (our clauses, our contract). They share one provenance
-  gate and nothing else.
-- [ADR 0009](adr/0009-counsel-is-parallel-not-a-gate.md) — counsel is a parallel
-  track, not a prerequisite. `assertPublishable` gates text reaching a *third
-  party*, not text being written. Building the clause library is unblocked.
+- **Three kinds of text.** Regulator-prescribed disclosures are verified and
+  never approved. Our clauses need counsel approval before a merchant sees them.
+  Processor split funding letters are used exactly as the processor supplies
+  them.
+- **Counsel is parallel.** Only text reaching a merchant waits for an attorney.
 
 Where it stands, **2026-09-15** (production `d51d9fb03`):
 
@@ -553,7 +577,7 @@ Where it stands, **2026-09-15** (production `d51d9fb03`):
 | Conformity surface | **built** — instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, source strength and reading age (#134). Source corrections: CT/FL/MO (#176), UT/CA (#187), VA official form (#190). Open research limits: Georgia's current consolidated code (CAPTCHA) and Missouri's commencement-rule history (#202 source ledger) |
 | Clause library | **built** — **210 numbered clauses** plus **25 reusable records** (13 field groups, 10 document blocks, 2 interview-only guidance; #208, #212). Purpose and variance metadata on every clause (#180). **Every record is `draft` with `author: null`; zero counsel approvals exist** |
 | The FRPA | **rewritten in full, 2026-09-10** (#152) under [ADR 0012](adr/0012-the-baseline-document-is-input-not-specification.md) / [ADR 0013](adr/0013-a-funder-profile-describes-the-funder.md). Unreviewed |
-| Other instruments | **Equipment Lease and Subscription** rewritten as twins (#163), with equipment economics and limited recourse reconciled (#206). **Permission to Release** and equipment consents corrected (#194). **ISO PRA not rewritten**: Pasco County arbitration and a confidentiality bar with no regulator carve-out remain. **Split Funding** is the processor's form, not ours to rewrite (owner decision 2026-09-15, ADR 0019 in open #271) |
+| Other instruments | **Equipment Lease and Subscription** rewritten as twins (#163), with equipment economics and limited recourse reconciled (#206). **Permission to Release** and equipment consents corrected (#194). **ISO PRA not rewritten**: Pasco County arbitration and a confidentiality bar with no regulator carve-out remain. **Split Funding** is the processor's form, not ours to rewrite ([ADR 0019](adr/0019-split-funding-letters-are-processor-controlled.md), #271); the retained text still needs replacing with the `lombard-api` Payzli template's wording |
 | Selection engine | **built** — `selectClauses` with derived numbering (#171), `instrumentsFor`, twelve `McaFacts`. **Three gate nothing** (`settlementBase`, `venueRule`, `processorSplitAccepted`); `collectionMethod` gates no clause, only whether the split letter is in the package |
 | Provider interview | **built** (#210, [ADR 0016](adr/0016-mca-provider-template-revisions.md)) — team-owned templates with immutable revisions. **Accepts one bundle only:** split-only, net settlement, merchant-state venue, courts. Other values are rejected |
 | Transaction draft | **built** (#212) — a stateless team form fills a current revision and downloads an unsigned PDF marked internal draft; `readyToSend` is always `false`. **No Envelope, send or signing path**, and no deal-fill API from `lombard-platform` (ADR 0010/0011 intend one) |
@@ -591,9 +615,9 @@ separate `State ready to ship` workflow blocks deployment while any note remains
 Read [`session-workflow.md`](session-workflow.md) for assignment, handoff,
 independent-review and shipping rules.
 
-The 2026-09-15 consolidation folded the notes of #255, #258, #260, #261, #262,
-#267, #268 and #270. After it, the only note expected on main is #271's, once
-that PR merges. Future work creates its own branch note rather than editing this
+The 2026-09-15 consolidations folded the notes of #255, #258, #260, #261, #262,
+#267, #268 and #270, then #271 and #274. No notes remain on main after the
+second one. Future work creates its own branch note rather than editing this
 settled account directly.
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
@@ -868,6 +892,10 @@ Found only because the last cluster stated its property over **every instrument*
 rather than the FRPA.
 
 ### The Critical, answered on the paper
+
+*Corrected 2026-09-15: this letter is Payzli's form, not ours to change (ADR
+0019). Processor acceptance must be evidenced outside it, never by adding a
+block to the letter.*
 
 *Does the product work at all?* `Lombard_Payzli_Split_Funding_Authorization_v2`
 has **one signature widget and one date widget, both Seller's, and no processor
@@ -1383,12 +1411,14 @@ render count used as the library size.
 
 ## Decisions taken
 
-Reasoning lives in [`adr/`](adr/); this is the index of what is settled.
+Reasoning lives in [`adr/`](adr/), and [`adr/README.md`](adr/README.md) is the
+authoritative status index. This list is a short summary of it.
 
 - **Additive fork, not a hard fork** — [ADR 0002](adr/0002-additive-fork-over-hard-fork.md)
 - **Documenso, not DocuSeal** — [ADR 0003](adr/0003-documenso-over-docuseal.md). Five working days were lost to the wrong premise; the lesson is in the ADR.
 - **Instance config in the database, never Coolify env vars** — [ADR 0004](adr/0004-db-backed-instance-config.md)
-- **Coolify + Docker, auto-deploy from `main`** — [ADR 0005](adr/0005-coolify-hosting.md)
+- **Coolify + Docker, deployed manually from `main` once per batch** — [ADR 0005](adr/0005-coolify-hosting.md), with auto-deploy superseded by [ADR 0021](adr/0021-manual-batch-deploys-and-the-adr-index.md)
+- **MCA vertical** — [ADR 0020](adr/0020-mca-decisions-consolidated.md) consolidates ADRs 0008–0019
 - **npm, not pnpm** — [ADR 0006](adr/0006-npm-over-pnpm.md), a deliberate deviation from the house standard
 - **AATL trust via DigiCert + GCP Cloud HSM** — [ADR 0007](adr/0007-aatl-via-digicert-gcp-hsm.md). Confirmed still live 2026-08-29.
 - **Pacta is a product brand, not a legal entity.** No DBA filing; the Stripe statement descriptor `PACTA*BIZRETHINK` solves the customer-facing need.
