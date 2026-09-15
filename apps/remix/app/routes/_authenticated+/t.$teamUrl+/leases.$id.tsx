@@ -1029,7 +1029,7 @@ const EnvelopeStatePanel = ({
         return {
           title: 'The envelope is ready for you to check',
           description:
-            'Nothing has been sent. Open the envelope and go through every document: the wording, where each signature, initial and date sits, and who signs what. Add a subject and message, then send it from there. If anything is wrong, discard it — the lease reopens for editing and you can prepare a new one.',
+            'Nothing has been sent. Review the envelope: go through every document — the wording, where each signature, initial, date and checkbox sits, and who signs what. When it is right, press Send Document at the top right of the envelope, where you can add a subject and message. If anything is wrong, discard it — the lease reopens for editing and you can prepare a new one.',
           tone: 'default' as const,
           discardLabel: 'Discard and edit the lease',
         };
@@ -1079,7 +1079,20 @@ const EnvelopeStatePanel = ({
       <div className="flex flex-wrap items-center gap-3">
         {envelopeId && !('envelopeGone' in view) && (
           <Button asChild>
-            <a href={`/t/${teamUrl}/documents/${envelopeId}`}>Open the envelope</a>
+            {/*
+              A draft goes to the EDITOR, where Send Document is. The summary page
+              offers only "Edit", and "I don't see a send option" was the first
+              thing the owner said after preparing the pilot envelope.
+            */}
+            <a
+              href={
+                envelopeStatus === 'DRAFT'
+                  ? `/t/${teamUrl}/documents/${envelopeId}/edit`
+                  : `/t/${teamUrl}/documents/${envelopeId}`
+              }
+            >
+              {envelopeStatus === 'DRAFT' ? 'Review and send the envelope' : 'Open the envelope'}
+            </a>
           </Button>
         )}
 

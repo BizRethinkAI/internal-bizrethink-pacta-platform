@@ -487,7 +487,27 @@ const footer = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
   h(
     View,
     { style: styles.footer, fixed: true },
-    ...(spec.withInitials ? [initialsLine(parties, spec.key)] : []),
+    /*
+      NOT ON THE SIGNATURE PAGE. The last page carries the signature blocks, so a
+      row of initials under four signatures initialled the same page twice. The
+      sub-page counters count within this document's own Page, which is also
+      right in the combined reading copy.
+    */
+    ...(spec.withInitials
+      ? [
+          h(View, {
+            key: 'initials-slot',
+            // @react-pdf/layout passes subPageTotalPages to a View's render as it
+            // does to a Text's; its View typing omits it. document-layout.test.ts
+            // holds the behaviour on the rendered PDF.
+            render: (props: { pageNumber: number; subPageNumber: number }) => {
+              const { subPageNumber, subPageTotalPages } = props as typeof props & { subPageTotalPages: number };
+
+              return subPageNumber < subPageTotalPages ? initialsLine(parties, spec.key) : null;
+            },
+          }),
+        ]
+      : []),
     h(View, { style: styles.footerRule, key: 'rule' }),
     h(
       View,

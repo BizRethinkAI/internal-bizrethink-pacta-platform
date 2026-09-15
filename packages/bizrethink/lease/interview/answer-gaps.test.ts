@@ -77,6 +77,31 @@ describe('unansweredRequired', () => {
   });
 });
 
+/*
+  "Is anyone else going to live there?" then "Anyone else living there, by
+  name?" — the same question twice, and the second said "leave blank if it is
+  only the tenants" beneath a "yes". Once the answer is yes, what is left to ask
+  is who, and it must be answered.
+*/
+describe('the occupants questions', () => {
+  const field = (name: string) => allFields(FL).find((each) => each.name === name);
+
+  it('asks for the names without asking the question again', () => {
+    const names = field('authorisedOccupants');
+
+    expect(names?.label).toBe('Full names of everyone else who will live there');
+    expect(names?.label).not.toMatch(/\?$/);
+    expect(names?.help ?? '').not.toMatch(/leave (it )?blank/i);
+    expect(names?.required).toBe(true);
+  });
+
+  it('holds preparing the envelope on a "yes" with no names', () => {
+    expect(
+      unansweredRequired(answers({ facts: { hasNamedOccupants: true }, values: { authorisedOccupants: '' } }), FL),
+    ).toContain('authorisedOccupants');
+  });
+});
+
 describe('ignoredAnswers', () => {
   it('reports an answer the lease will not use, and where to look', () => {
     const ignored = ignoredAnswers(

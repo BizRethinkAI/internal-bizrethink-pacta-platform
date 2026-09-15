@@ -145,8 +145,13 @@ describe.each(Object.keys(FIXTURES))('the %s package', (name) => {
     Initialling exists to make a swapped page detectable; that needs a field on
     EVERY page, which is how the Florida Supreme Court form lease (SC09-250,
     Appendix B) sets them: in the page foot.
+
+    EXCEPT THE LAST PAGE. It carries the signature blocks, so a row of initials
+    directly under four signatures and four dates acknowledged the same page a
+    second time — the repository owner's first look at the prepared pilot
+    envelope (2026-09-15) asked why they were there.
   */
-  it("puts every signer's initials on every page of every addendum, and nowhere else", async () => {
+  it("puts every signer's initials on every page of every addendum but its signature page, and nowhere else", async () => {
     const { result } = rendered[name];
     const recipients = result.documents[0] ? FIXTURES[name as keyof typeof FIXTURES].parties.length : 0;
 
@@ -164,10 +169,9 @@ describe.each(Object.keys(FIXTURES))('the %s package', (name) => {
 
       for (let page = 1; page <= pageCount; page += 1) {
         const onPage = initials.filter((p) => p.page === page).map((p) => p.recipient.toLowerCase());
+        const expected = page === pageCount ? [] : Array.from({ length: recipients }, (_, i) => `r${i + 1}`);
 
-        expect(onPage.sort(), `${doc.key} p${page}`).toEqual(
-          Array.from({ length: recipients }, (_, i) => `r${i + 1}`).sort(),
-        );
+        expect(onPage.sort(), `${doc.key} p${page}`).toEqual(expected.sort());
       }
 
       // Big enough to initial, and inside the page foot rather than the body.
@@ -181,15 +185,17 @@ describe.each(Object.keys(FIXTURES))('the %s package', (name) => {
     }
   });
 
-  it('labels the initials', () => {
+  it('labels the initials, and prints no empty initials line on the signature page', () => {
     const { result, pages } = rendered[name];
 
     for (const doc of result.documents.filter((d) => d.withInitials)) {
-      for (const [at, page] of pages[doc.key].entries()) {
+      const docPages = pages[doc.key];
+
+      for (const [at, page] of docPages.entries()) {
         expect(
           page.some((line) => squash(line).startsWith(squash('INITIALS'))),
           `${doc.key} p${at + 1}`,
-        ).toBe(true);
+        ).toBe(at < docPages.length - 1);
       }
     }
   });
@@ -235,10 +241,11 @@ describe('initials with more signers than fit on one line', () => {
     const pageCount = (await pageLines(addendum.pdf)).length;
 
     // Counted, not iterated: six wrapped tokens produced NO fields, and a loop
-    // over the pages that have fields passed on that.
-    expect(fields).toHaveLength(parties.length * pageCount);
+    // over the pages that have fields passed on that. The signature page has none.
+    expect(pageCount).toBeGreaterThan(1);
+    expect(fields).toHaveLength(parties.length * (pageCount - 1));
 
-    for (let page = 1; page <= pageCount; page += 1) {
+    for (let page = 1; page < pageCount; page += 1) {
       expect(
         fields
           .filter((p) => p.page === page)
