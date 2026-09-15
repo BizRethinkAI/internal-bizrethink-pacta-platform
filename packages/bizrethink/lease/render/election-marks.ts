@@ -81,11 +81,19 @@ const LINK = /\[\[link ([^|\]]+)\|([^\]]+)\]\]/g;
  * NO HYPHENATION WHERE THERE IS A LINK. The pilot receipt printed "down-load"
  * across a line and split the download-all address with an inserted hyphen, so
  * a printed copy gave an address that does not exist — and every split link
- * became two click targets. Only text that carries a link is affected, so no
- * other clause's pagination moves.
+ * became two click targets.
+ *
+ * AND SCHEDULE LEADING. Text carrying links is the receipt's list of governing
+ * documents — sixteen instruments over some thirty-five lines on the pilot. At
+ * the body's 1.55 the list left too little of page 2 for the execution block,
+ * which is kept together, so the signatures went to a page of their own ("this
+ * can be done in 2 pages?"). 1.35 is the loosest leading that fits. Only text
+ * that carries a link is affected, so no other clause's pagination moves.
  */
 const runProps = (text: string, style: Style, key: string) =>
-  text.includes('[[link ') ? { style, key, hyphenationCallback: (word: string) => [word] } : { style, key };
+  text.includes('[[link ')
+    ? { style: [style, { lineHeight: 1.35 }], key, hyphenationCallback: (word: string) => [word] }
+    : { style, key };
 
 /** A run of text as Text children: strings, with each link marker made a Link. */
 const withLinks = (text: string, style: Style | undefined) => {

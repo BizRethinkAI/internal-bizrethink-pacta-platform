@@ -7,6 +7,7 @@ import { describeDocuments } from '../documents/derive-documents';
 import { PICANA_FACTS, PICANA_MONEY, PICANA_PARTIES, PICANA_VALUES } from '../matters/picana-ln';
 import { renderLease } from '../render/render-lease';
 import { whiteOutSigningTokens } from '../render/white-out-signing-tokens';
+import { PILOT_PACKAGE, pageLines } from './page-text';
 
 /**
  * "How does the tenant know the association documents are in the attachment
@@ -119,4 +120,39 @@ describe('the lease id reaches the receipt', () => {
   it('builds the list with links whenever the matter has an id', () => {
     expect(source).toMatch(/describeDocuments\(\s*documents,\s*'hoa-governing',[^)]*matterId/);
   });
+});
+
+/**
+ * "This can be done in 2 pages?" — the repository owner on the pilot receipt,
+ * 2026-09-15. Sixteen linked documents filled page 1 and a third of page 2; the
+ * execution block is kept together and did not fit the rest, so the signatures
+ * went to a page of their own. Same sixteen instruments, same four signers,
+ * from the anonymised pilot package.
+ */
+describe('the pilot receipt', () => {
+  it('fits its documents and every signature on two pages', async () => {
+    const lines = String(PILOT_PACKAGE.values.governingDocuments).split('\n');
+    const documents = lines.map((line, at) => ({
+      id: `bdoc_${at}`,
+      kind: 'hoa-governing' as const,
+      label: line.replace(/^\d+\.\s*/, ''),
+      reference: '',
+      documentDate: '',
+      pageCount: null,
+    }));
+
+    const { rendered } = await renderLease({
+      ...PILOT_PACKAGE,
+      values: {
+        ...PILOT_PACKAGE.values,
+        governingDocuments: describeDocuments(documents, 'hoa-governing', { matterId: 'lease_matter_pilotexample' }),
+      },
+    });
+
+    const receipt = rendered.find((doc) => doc.key.includes('governing-documents-receipt'));
+
+    expect(documents).toHaveLength(16);
+    expect(receipt).toBeDefined();
+    expect(await pageLines(receipt?.pdf ?? new Uint8Array())).toHaveLength(2);
+  }, 120_000);
 });
