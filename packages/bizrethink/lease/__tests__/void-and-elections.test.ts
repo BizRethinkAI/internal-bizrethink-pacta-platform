@@ -71,9 +71,17 @@ describe('a lease may not prohibit what the statute permits', () => {
 describe('the electronic-notice addendum records two real elections', () => {
   const addendum = () => body('notices.electronic-delivery');
 
+  /*
+    This counted four "[ ]" literals, and passed for as long as they were there
+    — while no signer could mark any of them. The same mistake the
+    early-termination test made and recorded. What makes an option markable is
+    a field, so this counts the markers `election-marks.ts` turns into a box
+    per person; `election-is-markable.test.ts` follows them into the PDF.
+  */
   it('gives each party both options', () => {
-    // Two parties, two boxes each.
-    expect((addendum().match(/\[ \]/g) ?? []).length).toBe(4);
+    expect(addendum().match(/^\[\[each landlord marks\]\] /gm) ?? []).toHaveLength(2);
+    expect(addendum().match(/^\[\[each tenant marks\]\] /gm) ?? []).toHaveLength(2);
+    expect(addendum(), 'a bracket is a character, not a field').not.toMatch(/\[\s*\]/);
   });
 
   it('lets either party decline', () => {

@@ -6,6 +6,7 @@ import type { Clause } from '../clauses/types';
 import { FL_SECTION_NAMES } from '../clauses/us-fl';
 import type { SelectedClause } from '../engine/select-clauses';
 import type { MoneyLine } from '../money/types';
+import { clauseBody } from './election-marks';
 import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_ITALIC, TINOS_REGULAR } from './fonts/font-data';
 import type { InterpolationValue } from './interpolate';
 import { interpolateClause } from './interpolate';
@@ -896,7 +897,14 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
         "1 PARTIES" as the section head and "1 PARTIES" again directly beneath.
       */
       ...(section.clauses.length === 1
-        ? [text(section.clauses[0].text, styles.bodyText, `b-${section.clauses[0].clause.slug}`)]
+        ? [
+            clauseBody(
+              section.clauses[0].text,
+              parties,
+              { body: styles.bodyText, name: styles.sigName },
+              `b-${section.clauses[0].clause.slug}`,
+            ),
+          ]
         : section.clauses.flatMap((rendered, at) => {
             const headingRow = h(
               View,
@@ -910,7 +918,12 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
               h(Text, { style: styles.sectionHeadingText }, rendered.clause.heading.toUpperCase()),
             );
 
-            const body = text(rendered.text, styles.bodyText, `b-${rendered.clause.slug}`);
+            const body = clauseBody(
+              rendered.text,
+              parties,
+              { body: styles.bodyText, name: styles.sigName },
+              `b-${rendered.clause.slug}`,
+            );
 
             /*
               KEEP A HEADING WITH ITS FIRST WORDS, WITHOUT `minPresenceAhead`.

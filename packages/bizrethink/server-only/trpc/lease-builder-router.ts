@@ -22,9 +22,12 @@ import { whyThisClause } from '../../lease/clauses/why-this-clause';
 import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
+import { ignoredAnswers, unansweredRequired } from '../../lease/interview/answer-gaps';
 import type { deriveFacts } from '../../lease/interview/derive-facts';
+import { describeMissingUnique } from '../../lease/interview/describe-missing';
 import { entryWindow } from '../../lease/interview/entry-hours';
-import { FL_INTERVIEW } from '../../lease/interview/steps';
+import type { InterviewAnswers } from '../../lease/interview/steps';
+import { FL_INTERVIEW, interviewFor } from '../../lease/interview/steps';
 import { applyTenantAnswers, tenantFieldsFor } from '../../lease/interview/tenant-answers';
 import { staleWriteMessage } from '../../lease/matters/concurrency';
 import { canDeleteMatter } from '../../lease/matters/lifecycle';
@@ -371,6 +374,17 @@ const hydrate = (matter: {
     parties: hydrated.partyInputs,
     yardTasks: hydrated.yardTasks,
   };
+};
+
+/**
+ * The interview's view of a matter, under the questions its property's state
+ * asks — for the checks the document cannot make on its own (`answer-gaps.ts`).
+ */
+const interviewGaps = (matter: { propertyState: string | null }, answers: ReturnType<typeof hydrate>) => {
+  const steps = interviewFor(jurisdictionForProperty(matter.propertyState));
+  const asked = { ...answers, customClauses: answers.customClauses } as unknown as InterviewAnswers;
+
+  return { unanswered: unansweredRequired(asked, steps), ignored: ignoredAnswers(asked, steps) };
 };
 
 /**
@@ -857,7 +871,7 @@ export const leaseBuilderRouter = router({
 
       const selection = selectClauses({ facts: answers.facts, library });
 
-      const { missing } = buildLeaseDocuments({
+      const { missing: documentMissing } = buildLeaseDocuments({
         facts: answers.facts,
         money: answers.money,
         values: answers.values,
@@ -865,6 +879,18 @@ export const leaseBuilderRouter = router({
         propertyAddress: String(answers.values.propertyAddress ?? ''),
         customClauses: answers.customClauses,
       });
+
+      /*
+        What the DOCUMENT is missing, plus the questions that leave no hole in
+        it. An unanswered yes/no selects a clause as if it were "no", so the
+        renderer cannot see it — see answer-gaps.ts for the pilot lease that
+        named two occupants instead of five.
+      */
+      const gaps = interviewGaps(matter, answers);
+      const missing = [
+        ...documentMissing,
+        ...gaps.unanswered.filter((name) => !documentMissing.some((entry) => entry.endsWith(`: ${name}`))),
+      ];
 
       const findings = validateAnswers({
         answers: statutoryInput(answers),
@@ -925,6 +951,8 @@ export const leaseBuilderRouter = router({
         clauseFindings,
         duplicateAssertions: selection.duplicateAssertions,
         unreviewedClauses: [...new Set(unreviewed)],
+        // Reported, never blocking: an answer behind a "no" may be rightly stale.
+        ignoredAnswers: gaps.ignored,
         blocking:
           findings.filter((f) => f.severity === 'blocks').length +
           missing.length +
@@ -1027,6 +1055,19 @@ export const leaseBuilderRouter = router({
       }
 
       const answers = hydrate(matter);
+
+      // Re-checked here, not merely reported by `validate`: an unanswered
+      // selecting question renders a complete, wrong clause, so nothing
+      // downstream of this line would notice.
+      const unanswered = interviewGaps(matter, answers).unanswered;
+
+      if (unanswered.length > 0) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: `Answer these first: ${describeMissingUnique(unanswered, (matter.delegatedFields ?? []) as string[])
+            .map((entry) => entry.question)
+            .join(' · ')}`,
+        });
+      }
 
       const partyFindings = validateParties(answers.parties);
 
