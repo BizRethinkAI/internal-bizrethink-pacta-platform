@@ -169,15 +169,16 @@ export const DocumentSigningPageViewV2 = () => {
                   <Trans>Actions</Trans>
                 </h4>
 
+                {/* MODIFIED for BizRethink (overlay 091): the count is the one hint a signer gets that there is something to open. */}
                 <DocumentSigningAttachmentsPopover
                   envelopeId={envelope.id}
                   token={recipient.token}
-                  trigger={
+                  trigger={(count) => (
                     <Button variant="ghost" size="sm" className="w-full justify-start">
                       <PaperclipIcon className="mr-2 h-4 w-4" />
-                      <Trans>Attachments</Trans>
+                      <Trans>Attachments</Trans> ({count})
                     </Button>
-                  }
+                  )}
                 />
 
                 <EnvelopeDownloadDialog

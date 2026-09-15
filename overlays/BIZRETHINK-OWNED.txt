@@ -94,6 +94,9 @@ apps/remix/app/routes/_recipient+/lease-review.$token.attachment.$documentId.tsx
 # as the envelope (so there is no envelope id yet). Listed individually, for the
 # reason the line above gives.
 apps/remix/app/routes/_recipient+/lease-attachment.$matterId.$documentId.tsx
+# Every governing document of a lease in one zip — same capability link, same
+# recorded-instruments-only scope as the single-document route above.
+apps/remix/app/routes/_recipient+/lease-attachment.$matterId.all.tsx
 
 # Counsel's side of the same loop. The clause library was always meant to be
 # read by an attorney — the approval form asks for a bar number — but the page

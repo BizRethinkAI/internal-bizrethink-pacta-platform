@@ -147,20 +147,22 @@ export const DocumentAttachmentsPopover = ({
             </p>
           </div>
 
+          {/* MODIFIED for BizRethink (overlay 091): a long list scrolls inside the panel instead of running off the screen. */}
           {attachments && attachments.data.length > 0 && (
-            <div className="space-y-2">
+            <div className="max-h-[50vh] space-y-2 overflow-y-auto pr-1">
               {attachments?.data.map((attachment) => (
                 <div
                   key={attachment.id}
                   className="flex items-center justify-between rounded-md border border-border p-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-sm">{attachment.label}</p>
+                    <p className="break-words font-medium text-sm">{attachment.label}</p>
                     <a
                       href={toSafeHref(attachment.data)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="truncate text-muted-foreground text-xs underline hover:text-foreground"
+                      // MODIFIED for BizRethink (overlay 091): `truncate` does nothing on an inline <a>; the URL ran past the panel edge.
+                      className="block truncate text-muted-foreground text-xs underline hover:text-foreground"
                     >
                       {attachment.data}
                     </a>

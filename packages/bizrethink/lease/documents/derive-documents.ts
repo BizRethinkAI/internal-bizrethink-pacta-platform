@@ -26,6 +26,7 @@
 
 import { formatLongDate } from '../render/long-date';
 import { pageLabel } from './count-pages';
+import { governingBundleUrl, governingDocumentUrl } from './document-urls';
 
 export type DocumentKind = 'hoa-governing' | 'move-in-report' | 'move-out-report';
 
@@ -52,24 +53,53 @@ export const hasGoverningDocuments = (documents: LeaseDocument[]): boolean =>
  * read as a sentence — because a receipt is referred to item by item when it is
  * ever argued about.
  */
-export const describeDocuments = (documents: LeaseDocument[], kind: DocumentKind = 'hoa-governing'): string =>
-  documents
-    .filter((document) => document.kind === kind)
-    .map((document, at) => {
-      const date = formatLongDate(document.documentDate);
+export type DocumentLinks = {
+  /** The lease the links are issued under; see `lease-attachment.$matterId.$documentId`. */
+  matterId: string;
+};
 
-      /*
+/**
+ * `links`: each governing document gets its own link and the list ends with one
+ * for all of them — rendered clickable by `clauseBody`. The signed receipt is
+ * what a tenant keeps; it said they had received sixteen documents and gave
+ * them no way back to one. Only governing documents: a move-in report is
+ * photographs of a home, never reachable by holding a link.
+ */
+export const describeDocuments = (
+  documents: LeaseDocument[],
+  kind: DocumentKind = 'hoa-governing',
+  links?: DocumentLinks,
+): string => {
+  const listed = documents.filter((document) => document.kind === kind);
+  const matterId = kind === 'hoa-governing' ? links?.matterId : undefined;
+
+  const lines = listed.map((document, at) => {
+    const date = formatLongDate(document.documentDate);
+
+    /*
         The bracket holds what identifies the physical document — where to find
         it, and how much of it there is — while the date reads as part of the
         name. One bracket either way, never two.
       */
-      const inBrackets = [
-        document.reference.trim(),
-        document.pageCount === null ? '' : pageLabel(document.pageCount),
-      ].filter((part) => part !== '');
+    const inBrackets = [
+      document.reference.trim(),
+      document.pageCount === null ? '' : pageLabel(document.pageCount),
+    ].filter((part) => part !== '');
 
-      const named = date === '' ? document.label.trim() : `${document.label.trim()}, dated ${date}`;
+    const named = date === '' ? document.label.trim() : `${document.label.trim()}, dated ${date}`;
 
-      return inBrackets.length === 0 ? `${at + 1}. ${named}` : `${at + 1}. ${named} (${inBrackets.join(', ')})`;
-    })
-    .join('\n');
+    const line = inBrackets.length === 0 ? `${at + 1}. ${named}` : `${at + 1}. ${named} (${inBrackets.join(', ')})`;
+
+    return matterId ? `${line} — [[link download|${governingDocumentUrl(matterId, document.id)}]]` : line;
+  });
+
+  if (!matterId || listed.length < 2) {
+    return lines.join('\n');
+  }
+
+  // The URL is the link's own text, on a line of its own so it is never split:
+  // a printed copy of the receipt still carries an address someone can type.
+  const all = governingBundleUrl(matterId);
+
+  return [...lines, `All ${listed.length} documents in one download:`, `[[link ${all}|${all}]]`].join('\n');
+};

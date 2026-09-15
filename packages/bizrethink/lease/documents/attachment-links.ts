@@ -1,6 +1,5 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-
 import type { LeaseDocument } from './derive-documents';
+import { governingBundleUrl, governingDocumentUrl } from './document-urls';
 
 export type LeaseAttachment = {
   label: string;
@@ -30,13 +29,29 @@ export type LeaseAttachment = {
  * other finds them identical.
  */
 export const attachmentLinks = (matterId: string, documents: LeaseDocument[]): LeaseAttachment[] => {
-  const base = NEXT_PUBLIC_WEBAPP_URL().replace(/\/$/, '');
+  const governing = documents.filter((document) => document.kind === 'hoa-governing');
 
-  return documents
-    .filter((document) => document.kind === 'hoa-governing')
-    .map((document) => ({
-      label: document.label,
-      data: `${base}/lease-attachment/${matterId}/${document.id}`,
+  const each = governing.map((document) => ({
+    label: document.label,
+    data: governingDocumentUrl(matterId, document.id),
+    type: 'link' as const,
+  }));
+
+  /*
+    ONE DOWNLOAD FOR ALL OF THEM, FIRST. Sixteen documents meant sixteen clicks,
+    and the repository owner's verdict on that was "not very user friendly". Only
+    where there is more than one — a single document is already one download.
+  */
+  if (governing.length < 2) {
+    return each;
+  }
+
+  return [
+    {
+      label: `All ${governing.length} documents, in one download`,
+      data: governingBundleUrl(matterId),
       type: 'link' as const,
-    }));
+    },
+    ...each,
+  ];
 };

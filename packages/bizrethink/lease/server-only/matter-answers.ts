@@ -34,6 +34,8 @@ import { renderYardDuties, splitByDoer } from '../yard/derive-yard';
  */
 
 export type StoredMatter = {
+  /** The lease's id, when the caller has one: it keys the governing-document links. */
+  id?: unknown;
   facts: unknown;
   money: unknown;
   values: unknown;
@@ -172,7 +174,11 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       yardDuties,
       // Same shape again: the rows are the answer, the numbered list is only
       // their rendering, and the clause interpolates one variable.
-      governingDocuments: describeDocuments(documents),
+      governingDocuments: describeDocuments(
+        documents,
+        'hoa-governing',
+        typeof matter.id === 'string' ? { matterId: matter.id } : undefined,
+      ),
       conditionReports: describeDocuments(matterDocuments, 'move-in-report'),
       /*
         Also last, and for the reason the party names are. These were SEEDED
