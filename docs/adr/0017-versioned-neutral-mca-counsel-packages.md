@@ -12,7 +12,7 @@ New complete-package links use separate `BizrethinkMcaPackageReview` records and
 
 Legacy review records, tokens, single-instrument payloads, findings and approval fingerprints remain unchanged. No legacy bearer can retrieve the new package merely by changing its route. New package records do not expose unrelated reviewers or internal historical review manifests.
 
-An explicit stored `kind` restricts this version's reads, management writes and approval holds to `library` invitations. Future provider scopes must be ignored by this application version, including after an application rollback; shared-library administration is not a grant to read provider findings.
+An explicit stored `kind` restricts this version's reads, management writes and approval holds to `library` invitations. Future provider scopes must be ignored by this application version, including after an application rollback; shared-library administration is not a grant to read provider findings. Approval holds also recognize package/instrument targets before this version can create them, so returning to this version cannot bypass broader findings recorded by the dependent release.
 
 The new reader supports cross-document references, parent headings, reusable fields and inline findings. `BizrethinkMcaPackageFinding` records the invitation, target IDs, saved package fingerprint and recipient identity. Outstanding content findings hold the affected source/derived content against a new approval. Answers are attributable, append-only staff responses. Answering is not approving. A saved package remains readable after library changes, with a visible change notice, until it expires or is revoked. Its findings remain findings against that saved version.
 

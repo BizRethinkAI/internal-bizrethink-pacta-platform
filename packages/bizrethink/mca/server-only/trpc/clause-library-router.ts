@@ -14,6 +14,7 @@ import { outstandingFindingsFor, REGISTER_AVAILABLE } from '../../clauses/examin
 import { MCA_INSTRUMENTS, type McaInstrument } from '../../clauses/instruments';
 import { LOMBARD, resolveClauses } from '../../clauses/parties';
 import { counselReviewView } from '../../review/counsel-view';
+import { libraryFindingHoldTargets } from '../../review/holds';
 import { isMcaReviewUsable, MCA_REVIEW_LINK_TTL_DAYS, type McaLibraryReview } from '../../review/link';
 import { loadMcaClauseApprovals } from '../clause-approvals';
 
@@ -129,7 +130,7 @@ export const mcaClauseLibraryRouter = router({
       const unansweredPackageFindings = await prisma.bizrethinkMcaPackageFinding.count({
         where: {
           review: { kind: 'library' },
-          targetIds: { hasSome: contentFindingSlugs(clause).map((slug) => `content:${slug}`) },
+          targetIds: { hasSome: libraryFindingHoldTargets(clause) },
           answeredAt: null,
         },
       });
