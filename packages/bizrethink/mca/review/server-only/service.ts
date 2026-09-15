@@ -11,8 +11,8 @@ import {
 } from '../package';
 
 const unavailable = () => new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
-const usable = <T extends { status: string; expiresAt: Date }>(row: T | null): T => {
-  if (!row || row.status !== 'open' || row.expiresAt <= new Date()) {
+const usable = <T extends { kind: string; status: string; expiresAt: Date }>(row: T | null): T => {
+  if (!row || row.kind !== 'library' || row.status !== 'open' || row.expiresAt <= new Date()) {
     throw unavailable();
   }
   return row;
@@ -28,6 +28,7 @@ export const shareLibraryPackage = (input: {
   return prisma.bizrethinkMcaPackageReview.create({
     data: {
       id: prefixedId('mca_package_review', 16),
+      kind: 'library',
       token: prefixedId('mcpr', 32),
       reviewerName: input.reviewerName,
       reviewerEmail: input.reviewerEmail,

@@ -16,6 +16,7 @@ export const mcaPackageReviewRouter = router({
     .mutation(({ input, ctx }) => shareLibraryPackage({ ...input, userId: ctx.user.id })),
   list: adminProcedure.query(() =>
     prisma.bizrethinkMcaPackageReview.findMany({
+      where: { kind: 'library' },
       orderBy: { createdAt: 'desc' },
       take: 100,
       select: {
@@ -46,7 +47,7 @@ export const mcaPackageReviewRouter = router({
     .mutation(({ input }) => recordPackageFinding(input)),
   revoke: adminProcedure.input(z.object({ reviewId: z.string() })).mutation(async ({ input }) => {
     await prisma.bizrethinkMcaPackageReview.updateMany({
-      where: { id: input.reviewId, status: 'open' },
+      where: { id: input.reviewId, status: 'open', kind: 'library' },
       data: { status: 'closed' },
     });
     return { revoked: true };
@@ -55,7 +56,7 @@ export const mcaPackageReviewRouter = router({
     .input(z.object({ findingId: z.string(), answer: z.string().trim().min(1).max(10000) }))
     .mutation(async ({ input, ctx }) => {
       const result = await prisma.bizrethinkMcaPackageFinding.updateMany({
-        where: { id: input.findingId, answeredAt: null },
+        where: { id: input.findingId, answeredAt: null, review: { kind: 'library' } },
         data: { answer: input.answer, answeredAt: new Date(), answeredByUserId: ctx.user.id },
       });
       if (result.count !== 1) {

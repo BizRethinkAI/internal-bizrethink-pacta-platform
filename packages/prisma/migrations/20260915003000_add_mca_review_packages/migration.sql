@@ -1,5 +1,5 @@
 CREATE TABLE "BizrethinkMcaPackageReview" (
-  "id" TEXT NOT NULL, "token" TEXT NOT NULL, "status" TEXT NOT NULL DEFAULT 'open',
+  "id" TEXT NOT NULL, "token" TEXT NOT NULL, "status" TEXT NOT NULL DEFAULT 'open', "kind" TEXT NOT NULL DEFAULT 'library',
   "reviewerName" TEXT NOT NULL, "reviewerEmail" TEXT NOT NULL,
   "snapshot" JSONB NOT NULL, "fingerprint" TEXT NOT NULL, "createdByUserId" INTEGER NOT NULL,
   "expiresAt" TIMESTAMP(3) NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
