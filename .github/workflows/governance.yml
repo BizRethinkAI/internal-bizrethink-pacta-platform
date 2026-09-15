@@ -105,14 +105,15 @@ jobs:
 
       # ── Guard 2: ADRs are append-only ──────────────────────────────────
       # A decision that changes is superseded by a new ADR, never edited in
-      # place. See ADR 0001.
+      # place. See ADR 0001. docs/adr/README.md is the living status index
+      # and is the one exclusion (ADR 0021).
       - name: ADRs are append-only
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           MODIFIED=$(git diff --name-only --diff-filter=MD "$BASE_SHA" "$HEAD_SHA" \
-            -- 'docs/adr/*.md' || true)
+            -- 'docs/adr/*.md' ':!docs/adr/README.md' || true)
 
           if [ -z "$MODIFIED" ]; then
             echo "✓ No existing ADR modified or deleted."
