@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-
+import { PILOT_PACKAGE } from '../lease/__tests__/page-text';
 import { PICANA_FACTS, PICANA_MONEY, PICANA_PARTIES, PICANA_VALUES } from '../lease/matters/picana-ln';
 import { renderLease } from '../lease/render/render-lease';
 
@@ -22,14 +22,18 @@ const pagesOf = async (pdf: Buffer): Promise<string[]> => {
     const lines: string[] = [];
 
     for (const item of content.items) {
-      if (!('str' in item)) continue;
+      if (!('str' in item)) {
+        continue;
+      }
       line += item.str;
       if (item.hasEOL) {
         lines.push(line);
         line = '';
       }
     }
-    if (line !== '') lines.push(line);
+    if (line !== '') {
+      lines.push(line);
+    }
 
     pages.push(lines.join('\n'));
   }
@@ -72,7 +76,7 @@ const HEADING_AT_FOOT = [
 */
 
 /** Running head, footer and blank lines are chrome, not content. */
-const CHROME = /^(PACTA|RE S ID EN TI AL|RESIDENTIAL LEASE|29090)/i;
+const CHROME = /^(PACTA|RE S ID EN TI AL|RESIDENTIAL LEASE|29090)|PAGE \d+ OF \d+$/i;
 
 /*
   THE CONTENTS PAGE IS A LIST OF HEADINGS, so its last line is a heading by
@@ -86,15 +90,27 @@ const CHROME = /^(PACTA|RE S ID EN TI AL|RESIDENTIAL LEASE|29090)/i;
 const isContentsPage = (content: string[]): boolean =>
   (content[0] ?? '').replace(/\s+/g, '').toLowerCase().startsWith('contents');
 
-describe('the rendered lease strands no heading at a page foot', () => {
+/*
+  THE PILOT PACKAGE TOO. Picana passed this test while the first real lease
+  printed "11.4 ASSOCIATION AMENITIES" alone at the foot of page 12: whether a
+  heading strands depends on the exact text above it, and the pilot's answers
+  are not Picana's. Its clause was longer than the binding threshold, which is
+  the path this test never exercised.
+*/
+const FIXTURES = {
+  picana: {
+    facts: PICANA_FACTS,
+    money: PICANA_MONEY,
+    values: PICANA_VALUES,
+    parties: PICANA_PARTIES,
+    propertyAddress: '29090 Picana Lane, Wesley Chapel, Florida 33543',
+  },
+  pilot: PILOT_PACKAGE,
+};
+
+describe.each(Object.entries(FIXTURES))('the rendered %s lease strands no heading at a page foot', (_name, input) => {
   it('ends no page with a heading and nothing under it', async () => {
-    const { rendered } = await renderLease({
-      facts: PICANA_FACTS,
-      money: PICANA_MONEY,
-      values: PICANA_VALUES,
-      parties: PICANA_PARTIES,
-      propertyAddress: '29090 Picana Lane, Wesley Chapel, Florida 33543',
-    });
+    const { rendered } = await renderLease(input);
 
     const offenders: string[] = [];
 

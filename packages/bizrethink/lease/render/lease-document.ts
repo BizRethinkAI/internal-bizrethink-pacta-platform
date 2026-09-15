@@ -124,6 +124,25 @@ const BASE_FONT_SIZE = 11;
   wrong place. See the set-equality assertion in render-lease.test.ts.
 */
 export const PAGE_WIDTH = 612;
+/** Body clearance above the foot on a page that is not initialled. */
+const PAGE_PADDING_BOTTOM = 84;
+/**
+ * Initials cells per line of the foot. Each cell is 90pt so its 9pt token
+ * never wraps; four and the label fill the 432pt measure.
+ */
+export const INITIALS_PER_LINE = 4;
+/** One line of initials: the token, its rule, and the gap above the foot's rule. */
+const INITIALS_LINE_HEIGHT = 23;
+
+/**
+ * How far an initialled page's body must stop above the sheet's foot.
+ *
+ * Grows by a line for every four signers. With a fixed 84pt, a fifth signer's
+ * cell was squeezed until its token wrapped — and a wrapped token produced no
+ * field at all and stayed on the page as raw text.
+ */
+export const initialledPaddingBottom = (signers: number): number =>
+  PAGE_PADDING_BOTTOM + INITIALS_LINE_HEIGHT * Math.max(1, Math.ceil(signers / INITIALS_PER_LINE));
 export const PAD_H = 90;
 export const MEASURE = PAGE_WIDTH - 2 * PAD_H;
 export const SIG_GUTTER = 24;
@@ -134,7 +153,7 @@ const styles = StyleSheet.create({
     // 1.25in sides. The old 64pt gave a ~98-character measure, which is why the
     // body read as an undifferentiated slab.
     paddingTop: 74,
-    paddingBottom: 84,
+    paddingBottom: PAGE_PADDING_BOTTOM,
     paddingHorizontal: PAD_H,
     fontFamily: SERIF,
     fontSize: BASE_FONT_SIZE,
@@ -324,6 +343,18 @@ const styles = StyleSheet.create({
     bold the row had just set, leaving a bold label beside a regular figure.
   */
   footerRule: { width: MEASURE, height: 0.5, backgroundColor: HAIRLINE, marginBottom: 6 },
+  /*
+    The initials line sits above the foot's rule. Cells are fixed-width so each
+    field lands in the same place on every page, and set wide enough that the
+    token never wraps — a wrapped token still extracts, as one field in the
+    wrong place.
+  */
+  initialsRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 9 },
+  initialsLabel: { width: 52, fontFamily: SANS, fontSize: 7, letterSpacing: 0.7, color: MUTED },
+  // flexShrink 0: a squeezed cell wraps its token, and a wrapped token is no field.
+  initialsCell: { width: 90, flexShrink: 0 },
+  initialsToken: { fontFamily: SERIF, fontSize: 9, letterSpacing: 0, color: INK },
+  initialsRule: { width: 76, height: 0.5, backgroundColor: MUTED, marginTop: 1 },
   footerRow: { flexDirection: 'row', justifyContent: 'space-between' },
   amount: { fontFamily: SERIF },
   amountTotal: { fontFamily: SANS_BOLD },
@@ -367,6 +398,11 @@ export type RenderedClause = {
 
 const text = (content: string, style?: Style | Style[], key?: string) => h(Text, { style, key }, content);
 
+/** Three lines of body text (10.5pt at 1.55): the least that reads as a clause begun. */
+const BODY_LINES_AHEAD = 49;
+/** A clause heading row: 17pt above it, the line, and 5pt below. */
+const CLAUSE_HEADING_HEIGHT = 34;
+
 /**
  * Running head. Names the instrument and the property on every page.
  *
@@ -382,16 +418,81 @@ const runningHead = (spec: LeaseDocumentSpec) =>
     h(Text, { style: styles.headRight }, spec.runningRef.toUpperCase()),
   );
 
-/** Running foot. `render` gives react-pdf the page numbers it computes itself. */
-const footer = (spec: LeaseDocumentSpec) =>
+/**
+ * One INITIALS field per signer, in recipient order, for the page foot.
+ *
+ * WHY IT FITS NOW. The token used to inherit the page's 11pt, where
+ * `{{INITIALS, rN}}` is ~82pt and four of them plus labels overran the 432pt
+ * measure. The widget is sized from the token's own text box, so the size the
+ * token is set at IS the size of the field: at 9pt each is ~68pt by ~10pt —
+ * room for two or three letters — and four fit in fixed cells with the label.
+ * `document-layout.test.ts` holds the size and the one-per-page-per-signer
+ * count on the rendered PDF.
+ *
+ * Tokens come from `buildSignatureBlocks`, the same source as the signature
+ * cells, so recipient numbering cannot drift between the two.
+ */
+const initialsLine = (parties: LeaseParty[], documentKey: string) => {
+  const tokens = buildSignatureBlocks({ parties, documentKey, withInitials: true })
+    .flatMap((block) => block.signers)
+    .sort((a, b) => Number(a.recipient.slice(1)) - Number(b.recipient.slice(1)))
+    .flatMap((signer) => signer.placeholders.filter((p) => p.token.includes('INITIALS')).map((p) => p.token));
+
+  const lines = Array.from({ length: Math.ceil(tokens.length / INITIALS_PER_LINE) }, (_, at) =>
+    tokens.slice(at * INITIALS_PER_LINE, (at + 1) * INITIALS_PER_LINE),
+  );
+
+  return h(
+    View,
+    { key: 'initials' },
+    ...lines.map((line, at) =>
+      h(
+        View,
+        { style: styles.initialsRow, key: `initials-${at}` },
+        h(Text, { style: styles.initialsLabel }, at === 0 ? 'INITIALS' : ''),
+        ...line.map((token) =>
+          h(
+            View,
+            { style: styles.initialsCell, key: token },
+            h(Text, { style: styles.initialsToken, hyphenationCallback: (word: string) => [word] }, token),
+            // Something to initial ON. The token is painted out before upload, so
+            // without a rule the line read as a label over nothing. A sibling View,
+            // not a border on the token's Text, so the extracted box does not move.
+            h(View, { style: styles.initialsRule, key: 'rule' }),
+          ),
+        ),
+      ),
+    ),
+  );
+};
+
+/** An initialled document's foot is taller, so its body stops that much higher. */
+const pageStyle = (spec: LeaseDocumentSpec, parties: LeaseParty[]): Style =>
+  spec.withInitials ? { ...styles.page, paddingBottom: initialledPaddingBottom(parties.length) } : styles.page;
+
+/**
+ * Running foot. `render` gives react-pdf the page numbers it computes itself.
+ *
+ * THE DOCUMENT'S NAME, NOT ITS KEY. This printed `PACTA · ${key}` — so every
+ * page a tenant initialled read "PACTA · ADDENDUM:HOA.GOVERNING-DOCUMENTS-RECEIPT",
+ * the renderer's own identifier and a product name, on a private landlord's
+ * instrument. A loose page is identified by what the document is called.
+ *
+ * And, on a document that is initialled, a line of initials fields ABOVE the
+ * rule. `fixed` repeats the foot on every page, which is exactly what per-page
+ * initials need: every placeholder in it is drawn once per page, and upstream's
+ * extractor makes one field per page per signer from them.
+ */
+const footer = (spec: LeaseDocumentSpec, parties: LeaseParty[]) =>
   h(
     View,
     { style: styles.footer, fixed: true },
+    ...(spec.withInitials ? [initialsLine(parties, spec.key)] : []),
     h(View, { style: styles.footerRule, key: 'rule' }),
     h(
       View,
       { style: styles.footerRow, key: 'row' },
-      h(Text, { style: styles.headLeft }, `PACTA · ${spec.key.toUpperCase()}`),
+      h(Text, { style: styles.headLeft }, spec.title),
       /*
         subPage, not page. Each spec is its own Page, and an addendum IS its own
         instrument — the whole reason renderLease keeps them separate. In the
@@ -589,8 +690,22 @@ const inPairs = <T>(items: T[]): T[][] =>
  * matters is "a signer's cell never splits across a page"; "a role never
  * splits" is both stricter than needed and unbounded in the number of signers.
  */
-const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitials: boolean) => {
-  const blocks = buildSignatureBlocks({ parties, documentKey, withInitials });
+/**
+ * What the testimonium calls the instrument it closes.
+ *
+ * It said "this Lease" on the addenda and on the flood disclosure too, which
+ * §83.512 requires to be a SEPARATE document.
+ */
+const INSTRUMENT: Record<LeaseDocumentSpec['kind'], string> = {
+  lease: 'Lease',
+  addendum: 'Addendum',
+  disclosure: 'Disclosure',
+};
+
+const signatureBlocks = (parties: LeaseParty[], spec: LeaseDocumentSpec) => {
+  const documentKey = spec.key;
+  // Initials are in the page foot, not the cells; the cells carry signature and date.
+  const blocks = buildSignatureBlocks({ parties, documentKey, withInitials: false });
 
   return [
     /*
@@ -619,8 +734,14 @@ const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitial
       { key: `${documentKey}-execution`, style: styles.sigSection, wrap: false },
       h(View, { style: styles.sigSectionRule, key: 'exec-rule' }),
       text('Execution', styles.blockLabel),
+      /*
+        "…as of the date first written above" — and no date is written above,
+        on any of the documents. Clause 1 defers the effective date to the
+        Execution clause, which makes it the date of the last signature. The
+        dates ARE the ones beside the signatures, so that is what this says.
+      */
       text(
-        'IN WITNESS WHEREOF, the parties have executed this Lease as of the date first written above.',
+        `IN WITNESS WHEREOF, the parties have signed this ${INSTRUMENT[spec.kind]} on the dates shown below their signatures.`,
         styles.testimonium,
       ),
       ...blocks.flatMap((block) => [
@@ -632,7 +753,6 @@ const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitial
             ...pair.flatMap((signer, column) => {
               const signature = signer.placeholders.find((p) => p.token.includes('SIGNATURE'));
               const date = signer.placeholders.find((p) => p.token.includes('DATE'));
-              const initials = signer.placeholders.filter((p) => p.token.includes('INITIALS'));
 
               const cell = h(
                 View,
@@ -663,23 +783,11 @@ const signatureBlocks = (parties: LeaseParty[], documentKey: string, withInitial
                   `Date: ${date?.token ?? ''}`,
                 ),
                 /*
-                  Initials, on addenda only, and still in the cell. They belong
-                  in the page margin — the Florida Supreme Court lease
-                  (SC09-250, Appendix B) sets them as a footer doing
-                  initialling, receipt and pagination in one line, which makes a
-                  swapped page detectable. Not done here because
-                  {{INITIALS, rN}} is 82pt at 11pt Times and four plus labels
-                  exceed the 432pt measure; moving them needs shorter tokens and
-                  its own proof. Left in the cell rather than dropped — the
-                  set-equality test caught exactly that when this layout landed.
+                  NO INITIALS HERE. They sat under "Date:" on the signature
+                  page — the one page that already carries the signature — so
+                  they acknowledged nothing. They are in every page's foot now;
+                  see `initialsLine`.
                 */
-                ...initials.map((placeholder, i) =>
-                  h(
-                    Text,
-                    { key: `initials-${i}`, style: styles.sigDate, hyphenationCallback: (word: string) => [word] },
-                    placeholder.token,
-                  ),
-                ),
               );
 
               // A lone signer keeps the column width; the rules line up down
@@ -758,9 +866,9 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
 
   const body = h(
     Page,
-    { size: 'LETTER', style: styles.page, key: `${spec.key}-body` },
+    { size: 'LETTER', style: pageStyle(spec, parties), key: `${spec.key}-body` },
     runningHead(spec),
-    footer(spec),
+    footer(spec, parties),
     ...(front ? [] : [coverBlock(spec, parties)]),
     ...(front || !spec.amountsDue ? [] : [amountsDueTable(spec.amountsDue.lines, spec.amountsDue.totalUsd)]),
     /*
@@ -775,7 +883,14 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
         rendered INSIDE the first clause's bound unit by `sectionHeadFor`, so
         the two cannot be separated by a page break.
       */
-      ...(section.clauses.length === 1 ? [sectionHeadFor(section)] : []),
+      /*
+        AN UNNUMBERED SECTION HAS NO HEAD. An addendum or disclosure is one
+        clause with no number, so its "section" is a clause-library category,
+        and this printed "RULES AND ASSOCIATION" over the governing-documents
+        receipt and "STATUTORY DISCLOSURES" over the flood disclosure — indented
+        by an empty number column, under the document's own title.
+      */
+      ...(section.clauses.length === 1 && section.number !== '' ? [sectionHeadFor(section)] : []),
       /*
         A SECTION WITH ONE CLAUSE DOES NOT REPEAT ITSELF. `numberClauses` gives
         a lone clause the bare section number, so the document printed
@@ -863,8 +978,48 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
             */
             const opensSection = at === 0;
 
+            /*
+              A LONG CLAUSE CANNOT BE BOUND, SO ITS HEADS ASK FOR ROOM INSTEAD.
+
+              Both arms of this used to return `[headingRow, body]`, so a section
+              whose first clause was long lost its head altogether — the pilot
+              lease ran 9.2 straight into 10.1 with no "10 DEFAULT AND
+              REMEDIES". And a long clause's heading was a free sibling, so it
+              could still land alone at a page foot: "11.4 ASSOCIATION
+              AMENITIES" did.
+
+              `minPresenceAhead` moves a head to the next page unless that much
+              room follows it. It was ruled out on 2026-09-05 because it made
+              react-pdf emit -2.2e+22 and render nothing; that sentinel was the
+              lineHeight-compounding bug, patched on 2026-09-06
+              (`patches/@react-pdf+layout+5.2.0.patch`), and it renders cleanly
+              on both checked-in packages now. Three body lines, plus the
+              clause heading below a section head.
+            */
             if (rendered.text.length > SHORT_ENOUGH) {
-              return opensSection ? [headingRow, body] : [headingRow, body];
+              const withRoom = h(
+                View,
+                {
+                  style: styles.sectionRow,
+                  key: `h-${rendered.clause.slug}`,
+                  wrap: false,
+                  minPresenceAhead: BODY_LINES_AHEAD,
+                },
+                h(Text, { style: styles.sectionNumber }, rendered.number ?? ''),
+                h(Text, { style: styles.sectionHeadingText }, rendered.clause.heading.toUpperCase()),
+              );
+
+              return opensSection
+                ? [
+                    h(
+                      View,
+                      { key: `sh-${rendered.clause.slug}`, minPresenceAhead: BODY_LINES_AHEAD + CLAUSE_HEADING_HEIGHT },
+                      sectionHeadFor(section),
+                    ),
+                    withRoom,
+                    body,
+                  ]
+                : [withRoom, body];
             }
 
             return [
@@ -878,7 +1033,7 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
             ];
           })),
     ]),
-    ...signatureBlocks(parties, spec.key, spec.withInitials),
+    ...signatureBlocks(parties, spec),
   );
 
   if (!front) {
@@ -889,8 +1044,8 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
     // The deal, alone. No running head — the title block says all of it.
     h(
       Page,
-      { size: 'LETTER', style: styles.page, key: `${spec.key}-front` },
-      footer(spec),
+      { size: 'LETTER', style: pageStyle(spec, parties), key: `${spec.key}-front` },
+      footer(spec, parties),
       coverBlock(spec, parties),
       ...(spec.amountsDue ? [amountsDueTable(spec.amountsDue.lines, spec.amountsDue.totalUsd)] : []),
     ),
@@ -898,9 +1053,9 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
       ? [
           h(
             Page,
-            { size: 'LETTER', style: styles.page, key: `${spec.key}-toc` },
+            { size: 'LETTER', style: pageStyle(spec, parties), key: `${spec.key}-toc` },
             runningHead(spec),
-            footer(spec),
+            footer(spec, parties),
             tableOfContents(spec.clauses),
           ),
         ]
