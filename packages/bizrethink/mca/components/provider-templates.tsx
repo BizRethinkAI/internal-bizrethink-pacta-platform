@@ -7,6 +7,7 @@ import { LegalSummary, LegalWorkspace } from '../../legal-ui/reader';
 import type { McaTemplateSnapshot } from '../templates/compile';
 import { McaPackageReader } from './package-reader';
 import { McaProviderInterview } from './provider-interview';
+import { McaProviderReviewManager } from './provider-review-manager';
 
 export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; canWrite: boolean }) => {
   const [search, setSearch] = useSearchParams();
@@ -204,6 +205,14 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
             {previewRequested && preview.data && workspaceView !== 'answers' && (
               <McaPackagePreview snapshot={preview.data} requirementsOnly={workspaceView === 'requirements'} />
             )}
+            <McaProviderReviewManager
+              key={`${saved.data.id}:${saved.data.version}`}
+              teamId={teamId}
+              id={saved.data.id}
+              version={saved.data.version}
+              canWrite={canWrite}
+              current={saved.data.current}
+            />
           </section>
         )}
         {((!id && canWrite) || saved.data) && (

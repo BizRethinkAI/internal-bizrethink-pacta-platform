@@ -11,6 +11,9 @@ export const McaPackageCounselReader = ({
   changedDocuments,
   requirementsChanged,
   renderFinding,
+  reviewTools,
+  providerRevisionCurrent = true,
+  providerSourcesCurrent = true,
 }: {
   snapshot: McaReviewPackage;
   reviewerName: string;
@@ -18,6 +21,9 @@ export const McaPackageCounselReader = ({
   changedDocuments: string[];
   requirementsChanged: boolean;
   renderFinding: (item: McaReviewItem) => ReactNode;
+  reviewTools?: ReactNode;
+  providerRevisionCurrent?: boolean;
+  providerSourcesCurrent?: boolean;
 }) => {
   const [selected, setSelected] = useState(snapshot.documents[0].id);
   const [context, setContext] = useState<string | null>(null);
@@ -43,7 +49,10 @@ export const McaPackageCounselReader = ({
             </Trans>
           </p>
         </header>
-        {(changedDocuments.length > 0 || requirementsChanged) && (
+        {(changedDocuments.length > 0 ||
+          requirementsChanged ||
+          !providerRevisionCurrent ||
+          !providerSourcesCurrent) && (
           <div role="status" className="rounded-lg border border-amber-500 bg-amber-50 p-4 text-amber-950">
             <Trans>
               The live library has changed. You are still reading the saved package originally shared. Findings remain
@@ -61,42 +70,96 @@ export const McaPackageCounselReader = ({
                 <Trans>Disclosure or requirement sources have changed.</Trans>
               </p>
             )}
+            {!providerRevisionCurrent && (
+              <p>
+                <Trans>
+                  A newer provider revision exists. This review applies only to the saved revision named here.
+                </Trans>
+              </p>
+            )}
+            {!providerSourcesCurrent && (
+              <p>
+                <Trans>
+                  The provider template’s source content or selection rules have changed. Create a new template revision
+                  and review link for current use.
+                </Trans>
+              </p>
+            )}
           </div>
         )}
         <details open className="space-y-3 rounded-lg border p-5">
           <summary className="cursor-pointer font-semibold text-xl">
             <Trans>Review brief</Trans>
           </summary>
-          <p>
-            <Trans>
-              This shared MCA library supports a provider interview, reusable provider templates, and then
-              transaction-specific packages. The buyer and equipment provider are roles awaiting a provider’s legal
-              identities. This review does not assume a particular funder’s business policy.
-            </Trans>
-          </p>
-          <p>
-            <Trans>
-              Review all six instruments together, including reusable field groups, document blocks and interview
-              guidance. Consider purchase characterization, collection and reconciliation, recourse, equipment
-              obligations, permissions, broker duties and contradictions across documents. Only operative clauses
-              receive numbers. Interview guidance is excluded from contracts.
-            </Trans>
-          </p>
-          <p>
-            <Trans>
-              Alternatives are review examples, not simultaneous obligations or confirmed commercial instructions. Each
-              alternative uses its own numbering context. Provider answers determine the final selection and recipient;
-              for example, the broker agreement is not a merchant agreement.
-            </Trans>
-          </p>
+          {snapshot.kind === 'library' ? (
+            <p>
+              <Trans>
+                This shared MCA library supports a provider interview, reusable provider templates, and then
+                transaction-specific packages. The buyer and equipment provider are roles awaiting a provider’s legal
+                identities. This review does not assume a particular funder’s business policy.
+              </Trans>
+            </p>
+          ) : (
+            <div className="space-y-2">
+              <p>
+                <Trans>
+                  This package contains the selected documents for a saved provider-template revision. Review the actual
+                  provider identities and policy, the remaining transaction elections, and the controlled processor form
+                  together. It is not a completed merchant transaction.
+                </Trans>
+              </p>
+              <p className="font-semibold">
+                {snapshot.provider.legalName} · <Trans>Saved provider revision</Trans> {snapshot.provider.revision}
+              </p>
+              <details>
+                <summary className="cursor-pointer">
+                  <Trans>Saved provider policy</Trans>
+                </summary>
+                {snapshot.provider.policy.map((line) => (
+                  <p key={line} className="text-sm">
+                    {line}
+                  </p>
+                ))}
+              </details>
+            </div>
+          )}
+          {snapshot.kind === 'library' && (
+            <p>
+              <Trans>
+                Review all six instruments together, including reusable field groups, document blocks and interview
+                guidance. Consider purchase characterization, collection and reconciliation, recourse, equipment
+                obligations, permissions, broker duties and contradictions across documents. Only operative clauses
+                receive numbers. Interview guidance is excluded from contracts.
+              </Trans>
+            </p>
+          )}
+          {snapshot.kind === 'library' && (
+            <p>
+              <Trans>
+                Alternatives are review examples, not simultaneous obligations or confirmed commercial instructions.
+                Each alternative uses its own numbering context. Provider answers determine the final selection and
+                recipient; for example, the broker agreement is not a merchant agreement.
+              </Trans>
+            </p>
+          )}
           <p className="text-sm">{snapshot.profileDescription}</p>
-          <p>
-            <Trans>
-              The split-funding material is Payzli-specific processor-controlled context. Providers generally have
-              limited ability to change processor forms. Record contradictions for review with the processor; this
-              library cannot establish processor acceptance. Additional processors require their own forms.
-            </Trans>
-          </p>
+          {snapshot.kind === 'library' ? (
+            <p>
+              <Trans>
+                The split-funding material is Payzli-specific processor-controlled context. Providers generally have
+                limited ability to change processor forms. Record contradictions for review with the processor; this
+                library cannot establish processor acceptance. Additional processors require their own forms.
+              </Trans>
+            </p>
+          ) : (
+            <p>
+              <Trans>
+                The processor form remains controlled by the named processor. Its title, version and reference come from
+                this provider revision. Supplied text is preserved as submitted for review. Missing text is explicitly
+                flagged and prevents review completion; no processor acceptance is inferred.
+              </Trans>
+            </p>
+          )}
           <p>
             <Trans>
               Disclosures and requirements are included with their source records and verification limitations. Some
@@ -116,6 +179,7 @@ export const McaPackageCounselReader = ({
             <Trans>Review contact:</Trans> {snapshot.contact}
           </p>
         </details>
+        {reviewTools}
         <nav aria-label="Counsel package" className="flex flex-wrap gap-2">
           {snapshot.documents.map((document) => (
             <Button
@@ -130,6 +194,19 @@ export const McaPackageCounselReader = ({
               {document.title}
             </Button>
           ))}
+          {snapshot.kind === 'provider' &&
+            snapshot.externalDocuments.map((document) => (
+              <Button
+                key={document.id}
+                variant={selected === `processor:${document.id}` ? 'default' : 'outline'}
+                onClick={() => {
+                  setSelected(`processor:${document.id}`);
+                  setQuery('');
+                }}
+              >
+                {document.processor} · {document.title}
+              </Button>
+            ))}
           <Button
             variant={selected === 'requirements' ? 'default' : 'outline'}
             onClick={() => {
@@ -178,7 +255,11 @@ export const McaPackageCounselReader = ({
                 <p className="rounded border p-3 text-sm">
                   <Trans>Reference context:</Trans> {context}{' '}
                   <Button variant="ghost" onClick={() => setContext(null)}>
-                    <Trans>Return to example numbering</Trans>
+                    {snapshot.kind === 'provider' ? (
+                      <Trans>Return to saved selection</Trans>
+                    ) : (
+                      <Trans>Return to example numbering</Trans>
+                    )}
                   </Button>
                 </p>
               )}
@@ -213,7 +294,9 @@ export const McaPackageCounselReader = ({
                           <p className="text-muted-foreground text-sm">
                             {item.kind === 'clause'
                               ? item.included
-                                ? 'Example selection'
+                                ? snapshot.kind === 'provider'
+                                  ? 'Saved provider selection'
+                                  : 'Example selection'
                                 : 'Alternative — separate selection'
                               : item.kind === 'guidance'
                                 ? 'Interview guidance — excluded from contracts'
@@ -257,6 +340,37 @@ export const McaPackageCounselReader = ({
             </section>
           )}
         </ReferenceWorkspace>
+        {snapshot.kind === 'provider' &&
+          snapshot.externalDocuments
+            .filter((document) => selected === `processor:${document.id}`)
+            .map((document) => (
+              <section
+                key={document.id}
+                className="space-y-4 rounded-lg border p-5"
+                data-mca-processor-review={document.id}
+              >
+                <h2 className="font-semibold text-2xl">{document.title}</h2>
+                <p>
+                  {document.processor} · {document.version}
+                </p>
+                <p>{document.reference}</p>
+                <p className="text-muted-foreground text-sm">
+                  <Trans>
+                    Processor-controlled text supplied for this saved review; acceptance must be confirmed separately.
+                  </Trans>
+                </p>
+                {document.content ? (
+                  <p className="whitespace-pre-wrap leading-relaxed">{document.content}</p>
+                ) : (
+                  <p role="alert">
+                    <Trans>
+                      The controlled processor form is missing. Request a new package containing the required text
+                      before completing review.
+                    </Trans>
+                  </p>
+                )}
+              </section>
+            ))}
         {selected === 'requirements' && (
           <section className="space-y-5">
             <h2 className="font-semibold text-2xl">

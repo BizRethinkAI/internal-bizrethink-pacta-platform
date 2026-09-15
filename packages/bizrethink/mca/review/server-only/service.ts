@@ -1,6 +1,9 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+import type { BizrethinkMcaPackageReview, Prisma } from '@prisma/client';
+import { compileMcaTemplate } from '../../templates/compile';
+import { ZMcaProviderProfile } from '../../templates/profile';
 import { MCA_REVIEW_LINK_TTL_DAYS } from '../link';
 import {
   buildLibraryReviewPackage,
@@ -9,6 +12,8 @@ import {
   reviewPackageFingerprint,
   reviewRequirements,
 } from '../package';
+import type { McaReviewPackage } from '../package-schema';
+import { reviewCompletionBlockers, reviewTargets, validateFindingTargets } from '../targets';
 
 const unavailable = () => new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
 const usable = <T extends { status: string; expiresAt: Date }>(row: T | null): T => {
@@ -50,9 +55,22 @@ const publicFinding = {
   answeredAt: true,
 } as const;
 
+export const inspectPackageReview = async (where: Prisma.BizrethinkMcaPackageReviewWhereInput) => {
+  const row = await prisma.bizrethinkMcaPackageReview.findFirst({ where });
+  if (!row) {
+    throw unavailable();
+  }
+  return {
+    snapshot: readReviewPackage(row.snapshot, row.fingerprint),
+    reviewerName: row.reviewerName,
+    expiresAt: row.expiresAt,
+  };
+};
+
 export const openPackageReview = async (token: string) => {
   const row = usable(await prisma.bizrethinkMcaPackageReview.findUnique({ where: { token } }));
   const snapshot = readReviewPackage(row.snapshot, row.fingerprint);
+  const providerState = await providerSnapshotState(prisma, row, snapshot);
   const findings = await prisma.bizrethinkMcaPackageFinding.findMany({
     where: { reviewId: row.id },
     orderBy: { createdAt: 'asc' },
@@ -64,31 +82,92 @@ export const openPackageReview = async (token: string) => {
     reviewerName: row.reviewerName,
     expiresAt: row.expiresAt,
     changedDocuments: changedReviewDocuments(snapshot),
-    requirementsChanged: JSON.stringify(snapshot.requirements) !== JSON.stringify(reviewRequirements()),
+    requirementsChanged:
+      JSON.stringify(snapshot.requirements) !==
+      JSON.stringify(
+        reviewRequirements().filter(
+          (requirement) =>
+            snapshot.kind === 'library' || snapshot.requirements.some((saved) => saved.slug === requirement.slug),
+        ),
+      ),
+    ...providerState,
+    reviewedTargetIds: row.reviewedTargetIds ?? [],
+    completedAt: row.completedAt ?? null,
+    completionBlockers: reviewCompletionBlockers(
+      snapshot,
+      row.reviewedTargetIds ?? [],
+      findings.filter((finding) => !finding.answeredAt).length,
+    ),
     findings,
   };
 };
 
-export const recordPackageFinding = async (input: { token: string; targetIds: string[]; body: string }) =>
-  prisma.$transaction(async (tx) => {
-    const row = usable(await tx.bizrethinkMcaPackageReview.findUnique({ where: { token: input.token } }));
-    const snapshot = readReviewPackage(row.snapshot, row.fingerprint);
-    const allowed = new Set(
-      snapshot.documents.flatMap((document) =>
-        document.sections.flatMap((section) => section.items.map((item) => `content:${item.slug}`)),
-      ),
-    );
-    if (input.targetIds.length !== 1 || !allowed.has(input.targetIds[0])) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Select a content target in this saved package.' });
+const providerSnapshotState = async (
+  tx: Prisma.TransactionClient,
+  row: BizrethinkMcaPackageReview,
+  snapshot: McaReviewPackage,
+) => {
+  if (snapshot.kind === 'library') {
+    if (row.teamId != null) {
+      throw unavailable();
     }
+    return { providerRevisionCurrent: true, providerSourcesCurrent: true };
+  }
+  if (
+    row.teamId == null ||
+    !row.organisationId ||
+    row.templateId !== snapshot.provider.templateId ||
+    row.templateVersion !== snapshot.provider.revision
+  ) {
+    throw unavailable();
+  }
+  const template = await tx.bizrethinkMcaTemplate.findFirst({
+    where: { id: row.templateId, teamId: row.teamId, organisationId: row.organisationId },
+    select: {
+      currentRevision: true,
+      revisions: { where: { version: row.templateVersion }, select: { profile: true, fingerprint: true }, take: 1 },
+    },
+  });
+  const revision = template?.revisions[0];
+  if (!template || !revision || revision.fingerprint !== snapshot.provider.templateFingerprint) {
+    throw unavailable();
+  }
+  const parsed = ZMcaProviderProfile.safeParse(revision.profile);
+  let providerSourcesCurrent = false;
+  if (parsed.success) {
+    try {
+      providerSourcesCurrent = compileMcaTemplate(parsed.data).fingerprint === revision.fingerprint;
+    } catch {
+      // Saved text remains available even when current selection rules no longer accept this profile.
+      providerSourcesCurrent = false;
+    }
+  }
+  return { providerRevisionCurrent: template.currentRevision === row.templateVersion, providerSourcesCurrent };
+};
+
+const withReviewWrite = <T>(
+  token: string,
+  work: (tx: Prisma.TransactionClient, row: BizrethinkMcaPackageReview, snapshot: McaReviewPackage) => Promise<T>,
+) =>
+  prisma.$transaction(async (tx) => {
     // Lock the same row revocation changes, then recheck the live capability before writing.
     const locked = await tx.bizrethinkMcaPackageReview.updateMany({
-      where: { id: row.id, status: 'open', expiresAt: { gt: new Date() } },
+      where: { token, status: 'open', expiresAt: { gt: new Date() } },
       data: { updatedAt: new Date() },
     });
     if (locked.count !== 1) {
       throw unavailable();
     }
+    const row = usable(await tx.bizrethinkMcaPackageReview.findUnique({ where: { token } }));
+    const snapshot = readReviewPackage(row.snapshot, row.fingerprint);
+    await providerSnapshotState(tx, row, snapshot);
+    return work(tx, row, snapshot);
+  });
+
+export const recordPackageFinding = (input: { token: string; targetIds: string[]; body: string }) =>
+  withReviewWrite(input.token, async (tx, row, snapshot) => {
+    validateFindingTargets(snapshot, input.targetIds);
+    await tx.bizrethinkMcaPackageReview.updateMany({ where: { id: row.id }, data: { completedAt: null } });
     return tx.bizrethinkMcaPackageFinding.create({
       data: {
         id: prefixedId('mca_package_finding', 16),
@@ -101,4 +180,36 @@ export const recordPackageFinding = async (input: { token: string; targetIds: st
       },
       select: publicFinding,
     });
+  });
+
+export const markPackageReviewUnit = (input: { token: string; targetId: string; reviewed: boolean }) =>
+  withReviewWrite(input.token, async (tx, row, snapshot) => {
+    if (!reviewTargets(snapshot).some((target) => target.reviewUnit && target.id === input.targetId)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Select a review unit in this saved package.' });
+    }
+    const reviewed = new Set(row.reviewedTargetIds ?? []);
+    if (input.reviewed) {
+      reviewed.add(input.targetId);
+    } else {
+      reviewed.delete(input.targetId);
+    }
+    await tx.bizrethinkMcaPackageReview.updateMany({
+      where: { id: row.id },
+      data: { reviewedTargetIds: [...reviewed], completedAt: null },
+    });
+    return { recorded: true };
+  });
+
+export const completePackageReview = (token: string) =>
+  withReviewWrite(token, async (tx, row, snapshot) => {
+    const findings = await tx.bizrethinkMcaPackageFinding.findMany({
+      where: { reviewId: row.id, answeredAt: null },
+      select: { answeredAt: true },
+    });
+    const blockers = reviewCompletionBlockers(snapshot, row.reviewedTargetIds ?? [], findings.length);
+    if (blockers.length > 0) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, { message: blockers.join(' ') });
+    }
+    await tx.bizrethinkMcaPackageReview.updateMany({ where: { id: row.id }, data: { completedAt: new Date() } });
+    return { completed: true };
   });

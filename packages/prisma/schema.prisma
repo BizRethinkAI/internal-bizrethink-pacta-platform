@@ -2252,11 +2252,20 @@ model BizrethinkMcaPackageReview {
   reviewerEmail   String
   snapshot        Json
   fingerprint     String
+  /// All four scope fields are null for shared-library invitations (ADR 0018).
+  teamId          Int?
+  organisationId  String?
+  templateId      String?
+  templateVersion Int?
+  reviewedTargetIds String[] @default([])
+  completedAt     DateTime?
   createdByUserId Int
   expiresAt       DateTime
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   findings        BizrethinkMcaPackageFinding[]
+
+  @@index([teamId, templateId, templateVersion])
 }
 
 /// Targets identify only items in this invitation's saved package.
