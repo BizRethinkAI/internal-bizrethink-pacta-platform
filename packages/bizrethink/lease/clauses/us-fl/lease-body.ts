@@ -737,18 +737,26 @@ export const FL_LEASE_BODY: Clause[] = [
       together (`describeDocuments`), and this paragraph names every route,
       plus a paper copy on request.
     */
-    version: 2,
+    /*
+      v3: GROUPED AND DESCRIBED. Sixteen legal titles in one run told the pilot's
+      tenants nothing about which document was for what, and "governing documents
+      of {{hoaName}}" attributed the Community Development District's two
+      resolutions to the association. The list now groups by issuer, leads each
+      document with what it covers, nests amendments, and keeps the recording
+      reference on a quieter line (`describeGoverningDocuments`). A landlord
+      writes the descriptions, so the receipt says the documents control.
+    */
+    version: 3,
     jurisdiction: 'generic',
     placement: 'addendum',
     section: 'rules',
     sortKey: 63,
     heading: 'Receipt of Governing Documents',
-    body: 'Tenant acknowledges having received a copy of each of the following governing documents of {{hoaName}}, and has had the opportunity to read them:\n\n{{governingDocuments}}\n\nLandlord delivers these documents electronically with this Lease. Each can be opened or downloaded from its link above, all of them together from the single download link, and from Attachments on the signing page. Tenant may ask Landlord for a paper copy of any of them at any time.\n\nTenant is bound by these documents as provided in this Lease. Landlord shall give Tenant a copy of any amendment adopted during the term that changes what Tenant must do.',
+    body: 'Tenant acknowledges having received a copy of each of the following documents, and has had the opportunity to read them. They are grouped by the body that issued them, with any amendment listed beneath the document it amends. The description beside each document is for convenience only; the documents themselves control.\n\n{{governingDocuments}}\n\nLandlord delivers these documents electronically with this Lease. Each can be opened or downloaded from its link above, all of them together from the single download link, and from Attachments on the signing page. Tenant may ask Landlord for a paper copy of any of them at any time.\n\nTenant is bound by these documents as provided in this Lease. Landlord shall give Tenant a copy of any amendment adopted during the term that changes what Tenant must do.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa && facts.hasHoaGoverningDocuments,
     variables: [
-      { name: 'hoaName', type: 'string', label: 'Association name', required: true },
       {
         name: 'governingDocuments',
         type: 'string',

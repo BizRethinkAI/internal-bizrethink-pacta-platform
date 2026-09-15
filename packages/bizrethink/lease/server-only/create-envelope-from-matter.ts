@@ -5,7 +5,6 @@ import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { prisma } from '@documenso/prisma';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../../server-only/feature-access';
 import { DEFAULT_LEASE_JURISDICTION } from '../clauses/approval-jurisdiction';
@@ -17,6 +16,7 @@ import { renderLease } from '../render/render-lease';
 import type { LeaseParty } from '../render/signature-blocks';
 import { whiteOutSigningTokens } from '../render/white-out-signing-tokens';
 import { loadClauseApprovals, statusWithApproval } from './clause-approvals';
+import { findGoverningDocuments } from './governing-documents';
 
 /**
  * Hand the rendered lease to upstream's signing platform.
@@ -265,34 +265,11 @@ export const createEnvelopeFromMatter = async ({
     Read here rather than passed in, and ordered exactly as the receipt recites
     them, so the popover and the addendum cannot drift apart.
   */
-  const matter = await prisma.bizrethinkLeaseMatter.findUnique({
-    where: { id: matterId },
-    select: { propertyId: true },
-  });
-
-  const governingDocuments = await prisma.bizrethinkDocument.findMany({
-    where: {
-      kind: 'hoa-governing',
-      archivedAt: null,
-      OR: [{ propertyId: matter?.propertyId ?? '' }, { matterId }],
-    },
-    select: { id: true, kind: true, label: true, reference: true, documentDate: true, pageCount: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-  });
+  const governing = await findGoverningDocuments(matterId);
 
   return await createEnvelope({
     ...envelopeInput,
-    attachments: attachmentLinks(
-      matterId,
-      governingDocuments.map((document) => ({
-        id: document.id,
-        kind: 'hoa-governing' as const,
-        label: document.label,
-        reference: document.reference ?? '',
-        documentDate: document.documentDate?.toISOString() ?? '',
-        pageCount: document.pageCount,
-      })),
-    ),
+    attachments: attachmentLinks(matterId, governing?.documents ?? []),
     requestMetadata,
   });
 };

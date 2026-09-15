@@ -389,6 +389,11 @@ const styles = StyleSheet.create({
   sigName: { fontFamily: SANS_BOLD, fontSize: 9, color: INK, marginTop: 4 },
   // Links in a clause (the receipt's governing documents): the accent, underlined, so a printed copy still shows them as links.
   link: { color: ACCENT, textDecoration: 'underline' },
+  // A list entry's quieter second line — a governing document's recording reference and extent.
+  listNote: { fontSize: 9, lineHeight: 1.4, color: MUTED },
+  // A structured list's group heading — the body that issued a receipt's documents. Plain bold, not the
+  // tracked-out signature-block heading: an association's full name letter-spaced reads as noise.
+  listGroup: { fontFamily: SANS_BOLD, fontSize: 9.5, color: ACCENT },
   sigDate: { fontSize: 10, marginTop: 6 },
 });
 
@@ -923,7 +928,13 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
             clauseBody(
               section.clauses[0].text,
               parties,
-              { body: styles.bodyText, name: styles.sigName, link: styles.link },
+              {
+                body: styles.bodyText,
+                name: styles.sigName,
+                link: styles.link,
+                group: styles.listGroup,
+                note: styles.listNote,
+              },
               `b-${section.clauses[0].clause.slug}`,
             ),
           ]
@@ -943,7 +954,13 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
             const body = clauseBody(
               rendered.text,
               parties,
-              { body: styles.bodyText, name: styles.sigName, link: styles.link },
+              {
+                body: styles.bodyText,
+                name: styles.sigName,
+                link: styles.link,
+                group: styles.listGroup,
+                note: styles.listNote,
+              },
               `b-${rendered.clause.slug}`,
             );
 
