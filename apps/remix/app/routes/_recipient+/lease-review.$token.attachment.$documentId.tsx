@@ -1,3 +1,4 @@
+import { inlineContentDisposition } from '@bizrethink/customizations/lease/documents/content-disposition';
 import { isReviewUsable } from '@bizrethink/customizations/lease/review/disposition';
 import type { ReviewAudience, ReviewStatus } from '@bizrethink/customizations/lease/review/types';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
@@ -87,7 +88,8 @@ export async function loader({ params }: Route.LoaderArgs) {
       // Inline: a reviewer reading a declaration alongside the lease should not
       // have to find it in a downloads folder to answer the question in front
       // of them.
-      'Content-Disposition': `inline; filename="${document.label.replace(/["\\]/g, '')}.pdf"`,
+      // Encoded, not interpolated: a label with an em dash threw here and served a 500.
+      'Content-Disposition': inlineContentDisposition(document.label),
       'Cache-Control': 'no-store, private',
       'X-Robots-Tag': 'noindex, nofollow',
     },
