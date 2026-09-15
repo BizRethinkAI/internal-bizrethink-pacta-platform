@@ -57,7 +57,11 @@ export const McaPackageCounselRoute = ({ token }: { token: string }) => {
                       </p>
                     ) : (
                       <p>
-                        <Trans>Unanswered — approval held</Trans>
+                        {data.snapshot.kind === 'provider' ? (
+                          <Trans>Unanswered — review completion held</Trans>
+                        ) : (
+                          <Trans>Unanswered — approval held</Trans>
+                        )}
                       </p>
                     )}
                   </div>

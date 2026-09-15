@@ -55,8 +55,9 @@ export const McaPackageCounselReader = ({
           !providerSourcesCurrent) && (
           <div role="status" className="rounded-lg border border-amber-500 bg-amber-50 p-4 text-amber-950">
             <Trans>
-              The live library has changed. You are still reading the saved package originally shared. Findings remain
-              attached to this copy; request a new link to review the updated package.
+              You are reading the saved package originally shared. The changes listed below concern the current library
+              or provider template. Findings remain attached to this copy; request a new link to review the updated
+              package.
             </Trans>
             {changedDocuments.length > 0 && (
               <p>
