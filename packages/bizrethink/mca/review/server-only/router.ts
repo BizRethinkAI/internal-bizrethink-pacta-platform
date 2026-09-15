@@ -96,7 +96,7 @@ export const mcaPackageReviewRouter = router({
     .mutation(({ input }) => markPackageReviewUnit(input)),
   inspect: adminProcedure
     .input(z.object({ reviewId: z.string() }))
-    .query(({ input }) => inspectPackageReview({ id: input.reviewId, teamId: null })),
+    .query(({ input }) => inspectPackageReview({ id: input.reviewId, kind: 'library', teamId: null })),
   inspectProvider: authenticatedProcedure
     .input(ZProviderScope.extend({ reviewId: z.string() }))
     .query(async ({ input, ctx }) =>

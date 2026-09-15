@@ -33,6 +33,7 @@
     "../app-tests/e2e/bizrethink/legal-workspace-ui.spec.ts",
     "../app-tests/e2e/bizrethink/mca-template-use.spec.ts",
     "../app-tests/e2e/bizrethink/mca-provider-templates.spec.ts",
+    "../app-tests/e2e/bizrethink/mca-review-kind-migration.spec.ts",
     "server-only/require-admin-loader.ts",
     "server-only/require-admin-loader.test.ts",
     "regression-tests/admin-loaders-gated.test.ts",

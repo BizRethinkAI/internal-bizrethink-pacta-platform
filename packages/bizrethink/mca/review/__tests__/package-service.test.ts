@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const db = vi.hoisted(() => ({
-  bizrethinkMcaPackageReview: { findUnique: vi.fn(), updateMany: vi.fn(), create: vi.fn() },
+  bizrethinkMcaPackageReview: { findUnique: vi.fn(), findFirst: vi.fn(), updateMany: vi.fn(), create: vi.fn() },
   bizrethinkMcaPackageFinding: { create: vi.fn(), findMany: vi.fn() },
   bizrethinkMcaTemplate: { findFirst: vi.fn() },
   $transaction: vi.fn(),
@@ -14,6 +14,7 @@ import { buildLibraryReviewPackage, reviewPackageFingerprint } from '../package'
 import { buildProviderReviewPackage } from '../provider-package';
 import {
   completePackageReview,
+  inspectPackageReview,
   markPackageReviewUnit,
   openPackageReview,
   recordPackageFinding,
@@ -109,6 +110,52 @@ describe('package bearer scope and saved findings', () => {
     expect(db.bizrethinkMcaPackageReview.updateMany.mock.calls.at(-1)?.[0].data).toMatchObject({ completedAt: null });
   });
 
+  it.each([
+    'library',
+    'unknown',
+  ])('rejects provider snapshots incorrectly labelled %s before reading or recording findings', async (kind) => {
+    const profile = providerFixture();
+    const compiled = compileMcaTemplate(profile);
+    const provider = buildProviderReviewPackage({
+      compiled,
+      templateId: 'template-a',
+      revision: 1,
+      contact: 'Review desk',
+      processorText: 'Controlled text',
+    });
+    const mislabelled = {
+      ...row,
+      kind,
+      snapshot: provider,
+      fingerprint: reviewPackageFingerprint(provider),
+      teamId: 17,
+      organisationId: 'org-a',
+      templateId: 'template-a',
+      templateVersion: 1,
+    };
+    db.bizrethinkMcaPackageReview.findUnique.mockResolvedValue(mislabelled);
+    db.bizrethinkMcaPackageReview.findFirst.mockResolvedValue(mislabelled);
+    db.bizrethinkMcaTemplate.findFirst.mockResolvedValue({
+      currentRevision: 1,
+      revisions: [{ profile, fingerprint: compiled.fingerprint }],
+    });
+    const result = (operation: Promise<unknown>) =>
+      operation.then(
+        () => 'unexpectedly accepted',
+        (error: Error) => error.message,
+      );
+    expect(await result(openPackageReview('mcpr_a'))).toMatch(/no longer active/);
+    expect(await result(recordPackageFinding({ token: 'mcpr_a', targetIds: ['package'], body: 'Concern' }))).toMatch(
+      /no longer active/,
+    );
+    expect(await result(inspectPackageReview({ id: row.id, kind: 'provider', teamId: 17 }))).toMatch(
+      /no longer active/,
+    );
+    expect(db.bizrethinkMcaTemplate.findFirst).not.toHaveBeenCalled();
+    expect(db.bizrethinkMcaPackageFinding.findMany).not.toHaveBeenCalled();
+    expect(db.bizrethinkMcaPackageFinding.create).not.toHaveBeenCalled();
+  });
+
   it('binds public provider access to the saved team and revision and reports a superseding revision without replacing text', async () => {
     const profile = providerFixture();
     const compiled = compileMcaTemplate(profile);
@@ -121,6 +168,7 @@ describe('package bearer scope and saved findings', () => {
     });
     db.bizrethinkMcaPackageReview.findUnique.mockResolvedValue({
       ...row,
+      kind: 'provider',
       snapshot: provider,
       fingerprint: reviewPackageFingerprint(provider),
       teamId: 17,

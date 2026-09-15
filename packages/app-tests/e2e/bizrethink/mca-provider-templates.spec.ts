@@ -67,6 +67,8 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
     const review = await prisma.bizrethinkMcaPackageReview.findFirstOrThrow({
       where: { templateId: template.id, templateVersion: 1 },
     });
+    expect(review.kind).toBe('provider');
+    expect((review.snapshot as { kind: string }).kind).toBe(review.kind);
     const counsel = await counselContext.newPage();
     await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/mca-clause-review/${review.token}`);
     await expect(counsel.locator('[data-mca-counsel-package]')).toContainText('Example Receipts Inc.');

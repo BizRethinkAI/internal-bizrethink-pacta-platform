@@ -17,10 +17,18 @@ import { reviewCompletionBlockers, reviewTargets, validateFindingTargets } from 
 
 const unavailable = () => new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
 const usable = <T extends { kind: string; status: string; expiresAt: Date }>(row: T | null): T => {
-  if (!row || row.kind !== 'library' || row.status !== 'open' || row.expiresAt <= new Date()) {
+  if (!row || row.status !== 'open' || row.expiresAt <= new Date()) {
     throw unavailable();
   }
   return row;
+};
+
+const readStoredReviewPackage = (row: Pick<BizrethinkMcaPackageReview, 'kind' | 'snapshot' | 'fingerprint'>) => {
+  const snapshot = readReviewPackage(row.snapshot, row.fingerprint);
+  if (row.kind !== snapshot.kind) {
+    throw unavailable();
+  }
+  return snapshot;
 };
 
 export const shareLibraryPackage = (input: {
@@ -62,7 +70,7 @@ export const inspectPackageReview = async (where: Prisma.BizrethinkMcaPackageRev
     throw unavailable();
   }
   return {
-    snapshot: readReviewPackage(row.snapshot, row.fingerprint),
+    snapshot: readStoredReviewPackage(row),
     reviewerName: row.reviewerName,
     expiresAt: row.expiresAt,
   };
@@ -70,7 +78,7 @@ export const inspectPackageReview = async (where: Prisma.BizrethinkMcaPackageRev
 
 export const openPackageReview = async (token: string) => {
   const row = usable(await prisma.bizrethinkMcaPackageReview.findUnique({ where: { token } }));
-  const snapshot = readReviewPackage(row.snapshot, row.fingerprint);
+  const snapshot = readStoredReviewPackage(row);
   const providerState = await providerSnapshotState(prisma, row, snapshot);
   const findings = await prisma.bizrethinkMcaPackageFinding.findMany({
     where: { reviewId: row.id },
@@ -160,7 +168,7 @@ const withReviewWrite = <T>(
       throw unavailable();
     }
     const row = usable(await tx.bizrethinkMcaPackageReview.findUnique({ where: { token } }));
-    const snapshot = readReviewPackage(row.snapshot, row.fingerprint);
+    const snapshot = readStoredReviewPackage(row);
     await providerSnapshotState(tx, row, snapshot);
     return work(tx, row, snapshot);
   });
