@@ -182,3 +182,17 @@ describe('refusing to send an unfinished lease', () => {
     ).toThrow(/Ambika Prabhat/);
   });
 });
+
+/**
+ * THE DATE A SIGNER SEES IS THE DATE THE LEASE KEEPS.
+ *
+ * The first pilot envelope (2026-09-15) went out with upstream's defaults —
+ * `yyyy-MM-dd hh:mm a` in UTC — and each signing date showed as "2026-09": the
+ * rest of "2026-09-15 10:30 AM" was cut off by a field sized for `{{DATE, r1}}`.
+ * UTC also dates a Florida signature made in the evening on the following day.
+ */
+describe('signing dates', () => {
+  it("reads as a US date, in the property's time zone", () => {
+    expect(build().meta).toEqual(expect.objectContaining({ dateFormat: 'MM/dd/yyyy', timezone: 'America/New_York' }));
+  });
+});
