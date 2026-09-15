@@ -172,6 +172,8 @@ packages/app-tests/e2e/bizrethink/mca-workspace.spec.ts
 apps/remix/app/routes/_authenticated+/t.$teamUrl+/mca*.tsx
 apps/remix/app/routes/_authenticated+/admin+/mca-templates.tsx
 packages/app-tests/e2e/bizrethink/mca-provider-templates.spec.ts
+# MCA-specific PostgreSQL regression for the additive review-kind repair. No upstream counterpart.
+packages/app-tests/e2e/bizrethink/mca-review-kind-migration.spec.ts
 
 # Stateless MCA internal-draft POST output (task #211).
 apps/remix/app/routes/api+/bizrethink.mca-draft.ts
