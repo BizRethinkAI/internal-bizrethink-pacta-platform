@@ -24,11 +24,163 @@ const grant = async (userId: number, feature: string, enabled: boolean) => {
   });
 };
 const cleanup = async (userId: number) => {
+  await prisma.bizrethinkMcaPackageReview.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkMcaTemplate.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkFeatureAccess.deleteMany({
     where: { scope: 'user', scopeId: String(userId), feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] } },
   });
 };
+
+test('counsel reviews a pinned provider revision, raises holistic findings and completes explicit coverage', async ({
+  page,
+  browser,
+}, testInfo) => {
+  const { user, organisation } = await seedUser();
+  const team = organisation.teams[0];
+  const peer = await seedUser({ isAdmin: true });
+  const peerTeam = peer.organisation.teams[0];
+  const counselContext = await browser.newContext();
+  const peerContext = await browser.newContext();
+  const profile = providerFixture();
+  const reviewEndpoint = (route: string) => `${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/bizrethink.mcaPackageReview.${route}`;
+  try {
+    await grant(user.id, 'mca-builder', true);
+    await grant(user.id, 'mca-clause-draft-rendering', true);
+    await grant(peer.user.id, 'mca-builder', true);
+    await grant(peer.user.id, 'mca-clause-draft-rendering', true);
+    await apiSignin({ page, email: user.email });
+    const created = await post(page.request, 'create', { teamId: team.id, data: profile });
+    expect(created.ok()).toBe(true);
+    const template = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: user.id } });
+    const scope = { teamId: team.id, id: template.id, version: 1 };
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca?template=${template.id}&revision=1`);
+    await page.locator('summary').filter({ hasText: 'Counsel review of this revision' }).click();
+    await page.getByLabel('Provider reviewer name', { exact: true }).fill('Synthetic provider counsel');
+    await page.getByLabel('Provider reviewer email', { exact: true }).fill('provider-counsel@example.invalid');
+    await page.getByLabel('Provider review contact', { exact: true }).fill('Provider legal operations');
+    await page
+      .getByLabel('Controlled processor form text', { exact: true })
+      .fill('Synthetic controlled processor terms. Settlement requires separately confirmed processor acceptance.');
+    await page.getByRole('button', { name: 'Create provider review link', exact: true }).click();
+    const card = page.locator('[data-mca-provider-review]').filter({ hasText: 'Synthetic provider counsel' });
+    await expect(card.getByRole('link', { name: 'Open provider review', exact: true })).toBeVisible();
+    const review = await prisma.bizrethinkMcaPackageReview.findFirstOrThrow({
+      where: { templateId: template.id, templateVersion: 1 },
+    });
+    const counsel = await counselContext.newPage();
+    await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/mca-clause-review/${review.token}`);
+    await expect(counsel.locator('[data-mca-counsel-package]')).toContainText('Example Receipts Inc.');
+    await expect(counsel.locator('[data-mca-counsel-package]')).not.toContainText('Payzli');
+    await counsel
+      .getByRole('navigation', { name: 'Counsel package' })
+      .getByRole('button', { name: /Example Processor Inc/ })
+      .click();
+    await expect(counsel.locator('[data-mca-processor-review]')).toContainText('Synthetic controlled processor terms.');
+
+    await counsel.locator('summary').filter({ hasText: 'Record a holistic finding' }).click();
+    await counsel.getByLabel('Whole package', { exact: true }).check();
+    await counsel.getByLabel('Future Receivables Purchase Agreement', { exact: true }).check();
+    await counsel
+      .getByLabel('Holistic finding', { exact: true })
+      .fill('Synthetic conflict between processor settlement and FRPA collection terms.');
+    await counsel.getByRole('button', { name: 'Record holistic finding', exact: true }).click();
+    await expect(counsel.getByRole('region', { name: 'Holistic review' })).toContainText('1 unanswered findings');
+    const finding = await prisma.bizrethinkMcaPackageFinding.findFirstOrThrow({ where: { reviewId: review.id } });
+    expect(finding.targetIds).toEqual(['package', 'document:frpa']);
+    const forged = await counsel.request.post(reviewEndpoint('recordFinding'), {
+      data: dataTransformer.serialize({
+        token: review.token,
+        targetIds: ['document:equipment-lease'],
+        body: 'Outside this selected package.',
+      }),
+    });
+    expect(forged.ok()).toBe(false);
+    const premature = await counsel.request.post(reviewEndpoint('complete'), {
+      data: dataTransformer.serialize({ token: review.token }),
+    });
+    expect(premature.ok()).toBe(false);
+
+    const peerPage = await peerContext.newPage();
+    await apiSignin({ page: peerPage, email: peer.user.email });
+    const peerScope = { teamId: peerTeam.id, id: template.id, version: 1 };
+    const foreignInspect = await peerPage.request.get(reviewEndpoint('inspectProvider'), {
+      params: { input: JSON.stringify(dataTransformer.serialize({ ...peerScope, reviewId: review.id })) },
+    });
+    expect(foreignInspect.ok()).toBe(false);
+    const foreignAnswer = await peerPage.request.post(reviewEndpoint('answerProvider'), {
+      data: dataTransformer.serialize({ ...peerScope, findingId: finding.id, answer: 'Unauthorized' }),
+    });
+    expect(foreignAnswer.ok()).toBe(false);
+    const globalList = await peerPage.request.get(reviewEndpoint('list'));
+    expect(globalList.ok()).toBe(true);
+    expect(await globalList.text()).not.toContain(review.id);
+    const globalInspect = await peerPage.request.get(reviewEndpoint('inspect'), {
+      params: { input: JSON.stringify(dataTransformer.serialize({ reviewId: review.id })) },
+    });
+    expect(globalInspect.ok()).toBe(false);
+
+    await page.reload();
+    await page.locator('summary').filter({ hasText: 'Counsel review of this revision' }).click();
+    await card.locator('summary').filter({ hasText: 'Unanswered' }).click();
+    await card
+      .getByLabel('Provider finding response', { exact: true })
+      .fill(
+        'Synthetic response: retain the recorded concern for this revision; processor acceptance remains separate.',
+      );
+    await card.getByRole('button', { name: 'Record provider response', exact: true }).click();
+    await expect(card).toContainText('0 unanswered findings');
+    await counsel.reload();
+    await counsel.locator('summary').filter({ hasText: 'Review checklist' }).click();
+    const checklist = counsel.getByRole('checkbox', { name: /^Reviewed:/ });
+    for (let index = 0; index < (await checklist.count()); index++) {
+      await checklist.nth(index).check();
+      await expect(checklist.nth(index)).toBeChecked();
+    }
+    await expect(counsel.getByRole('button', { name: 'Complete review of saved copy', exact: true })).toBeEnabled();
+    await counsel.getByRole('button', { name: 'Complete review of saved copy', exact: true }).click();
+    await expect(counsel.getByText(/Review complete for saved copy/)).toBeVisible();
+    await counsel.screenshot({ path: testInfo.outputPath('provider-holistic-review-complete.png'), fullPage: false });
+
+    const revised = await post(page.request, 'update', {
+      teamId: team.id,
+      id: template.id,
+      data: {
+        expectedVersion: 1,
+        profile: { ...profile, buyer: { ...profile.buyer, legalName: 'Revised Example Receipts Inc.' } },
+      },
+    });
+    expect(revised.ok()).toBe(true);
+    await counsel.reload();
+    await expect(counsel.getByText(/A newer provider revision exists/)).toBeVisible();
+    await expect(counsel.locator('[data-mca-counsel-package]')).not.toContainText('Revised Example Receipts Inc.');
+    const reopened = await counsel.request.post(reviewEndpoint('recordFinding'), {
+      data: dataTransformer.serialize({
+        token: review.token,
+        targetIds: ['package'],
+        body: 'Synthetic follow-up on the saved copy.',
+      }),
+    });
+    expect(reopened.ok()).toBe(true);
+    expect(
+      (await prisma.bizrethinkMcaPackageReview.findUniqueOrThrow({ where: { id: review.id } })).completedAt,
+    ).toBeNull();
+    const revoked = await page.request.post(reviewEndpoint('revokeProvider'), {
+      data: dataTransformer.serialize({ ...scope, reviewId: review.id }),
+    });
+    expect(revoked.ok()).toBe(true);
+    await counsel.reload();
+    await expect(counsel.getByRole('heading', { name: 'Review unavailable' })).toBeVisible();
+    await page.reload();
+    await page.locator('summary').filter({ hasText: 'Counsel review of this revision' }).click();
+    await card.getByRole('button', { name: 'Inspect saved review copy', exact: true }).click();
+    await expect(card.locator('[data-mca-counsel-package]')).toContainText('Example Receipts Inc.');
+  } finally {
+    await counselContext.close();
+    await peerContext.close();
+    await cleanup(user.id);
+    await cleanup(peer.user.id);
+  }
+});
 
 test('a provider interview saves, reopens and revises a real team template with immutable history', async ({
   page,
