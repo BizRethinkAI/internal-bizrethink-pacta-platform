@@ -41,6 +41,7 @@ export const McaPackageCounselReader = ({
   const [large, setLarge] = useState(false);
   const titleId = useId();
   const indexId = useId();
+  const documentSelectId = useId();
   const active = snapshot.documents.find((document) => document.id === selected);
   const items = packageReviewIndex(snapshot);
   const units = reviewTargets(snapshot).filter((target) => target.reviewUnit);
@@ -173,27 +174,28 @@ export const McaPackageCounselReader = ({
                 )}
               </nav>
               <nav aria-label="Counsel package">
-                <label className="block font-medium text-xs">
+                <label htmlFor={documentSelectId} className="block font-medium text-xs">
                   <Trans>Review document</Trans>
-                  <select
-                    className="my-2 h-10 w-full min-w-0 rounded-md border bg-background px-2 text-sm"
-                    value={selected}
-                    onChange={(event) => go(event.target.value)}
-                  >
-                    {snapshot.documents.map((document) => (
-                      <option key={document.id} value={document.id}>
-                        {document.title}
+                </label>
+                <select
+                  id={documentSelectId}
+                  className="my-2 h-10 w-full min-w-0 rounded-md border bg-background px-2 text-sm"
+                  value={selected}
+                  onChange={(event) => go(event.target.value)}
+                >
+                  {snapshot.documents.map((document) => (
+                    <option key={document.id} value={document.id}>
+                      {document.title}
+                    </option>
+                  ))}
+                  {snapshot.kind === 'provider' &&
+                    snapshot.externalDocuments.map((document) => (
+                      <option key={document.id} value={`processor:${document.id}`}>
+                        {document.processor} · {document.title}
                       </option>
                     ))}
-                    {snapshot.kind === 'provider' &&
-                      snapshot.externalDocuments.map((document) => (
-                        <option key={document.id} value={`processor:${document.id}`}>
-                          {document.processor} · {document.title}
-                        </option>
-                      ))}
-                    <option value="requirements">Disclosures & requirements</option>
-                  </select>
-                </label>
+                  <option value="requirements">Disclosures & requirements</option>
+                </select>
               </nav>
               <Input
                 aria-label="Search review index"
