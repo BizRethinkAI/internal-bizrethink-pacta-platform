@@ -34,6 +34,7 @@ export const McaHolisticReviewTools = ({
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState('');
   const [body, setBody] = useState('');
+  const [pendingReview, setPendingReview] = useState<{ targetId: string; reviewed: boolean } | null>(null);
   const targets = reviewTargets(snapshot);
   const units = targets.filter((target) => target.reviewUnit);
   const record = trpc.bizrethink.mcaPackageReview.recordFinding.useMutation({
@@ -43,7 +44,10 @@ export const McaHolisticReviewTools = ({
       await onChanged();
     },
   });
-  const mark = trpc.bizrethink.mcaPackageReview.markUnit.useMutation({ onSuccess: onChanged });
+  const mark = trpc.bizrethink.mcaPackageReview.markUnit.useMutation({
+    onSuccess: onChanged,
+    onSettled: () => setPendingReview(null),
+  });
   const complete = trpc.bizrethink.mcaPackageReview.complete.useMutation({ onSuccess: onChanged });
   return (
     <section className="space-y-4 rounded-lg border p-5" aria-label="Holistic review">
@@ -76,9 +80,15 @@ export const McaHolisticReviewTools = ({
               <input
                 type="checkbox"
                 className="mt-1"
-                disabled={mark.isPending || complete.isPending}
-                checked={reviewedTargetIds.includes(unit.id)}
-                onChange={(event) => mark.mutate({ token, targetId: unit.id, reviewed: event.target.checked })}
+                disabled={pendingReview !== null || mark.isPending || complete.isPending}
+                checked={
+                  pendingReview?.targetId === unit.id ? pendingReview.reviewed : reviewedTargetIds.includes(unit.id)
+                }
+                onChange={(event) => {
+                  const change = { targetId: unit.id, reviewed: event.target.checked };
+                  setPendingReview(change);
+                  mark.mutate({ token, ...change });
+                }}
               />
               <span>
                 <Trans>Reviewed:</Trans> {unit.label}
