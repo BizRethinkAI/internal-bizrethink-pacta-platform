@@ -2248,6 +2248,8 @@ model BizrethinkMcaPackageReview {
   id              String @id
   token           String @unique
   status          String @default("open")
+  /// Older application versions must ignore scopes they do not implement.
+  kind            String @default("library")
   reviewerName    String
   reviewerEmail   String
   snapshot        Json

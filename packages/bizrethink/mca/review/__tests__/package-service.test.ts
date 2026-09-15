@@ -23,6 +23,7 @@ import { reviewTargets } from '../targets';
 describe('package bearer scope and saved findings', () => {
   const snapshot = buildLibraryReviewPackage({ contact: 'Legal operations' });
   const row = {
+    kind: 'library',
     id: 'review-a',
     token: 'mcpr_a',
     status: 'open',
@@ -50,6 +51,7 @@ describe('package bearer scope and saved findings', () => {
   });
   it.each([
     null,
+    { ...row, kind: 'provider' },
     { ...row, status: 'closed' },
     { ...row, expiresAt: new Date('2000-01-01') },
   ])('refuses unavailable links before returning content', async (unavailable) => {
@@ -120,6 +122,7 @@ describe('package bearer scope and saved findings', () => {
     db.bizrethinkMcaPackageReview.findUnique.mockResolvedValue({
       ...row,
       snapshot: provider,
+      kind: 'provider',
       fingerprint: reviewPackageFingerprint(provider),
       teamId: 17,
       organisationId: 'org-a',

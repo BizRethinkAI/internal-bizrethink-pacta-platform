@@ -76,6 +76,7 @@ describe('provider counsel invitations are isolated by team and revision', () =>
   it('constrains management reads and writes by authorized team, organization, template and revision', async () => {
     await listProviderReviews(input);
     expect(mocks.db.bizrethinkMcaPackageReview.findMany.mock.calls[0][0].where).toEqual({
+      kind: 'provider',
       teamId: 17,
       organisationId: 'org-a',
       templateId: 'template-a',
@@ -83,6 +84,7 @@ describe('provider counsel invitations are isolated by team and revision', () =>
     });
     await answerProviderFinding({ ...input, findingId: 'foreign-finding', answer: 'Response' });
     expect(mocks.db.bizrethinkMcaPackageFinding.updateMany.mock.calls[0][0].where.review).toEqual({
+      kind: 'provider',
       teamId: 17,
       organisationId: 'org-a',
       templateId: 'template-a',

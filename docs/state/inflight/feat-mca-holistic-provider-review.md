@@ -1,6 +1,6 @@
 # Holistic MCA findings and provider review
 
-Task: #230. Author session: `mca-package-review-20260915`. Depends on PR #234; starts from its corrected `e7dbbd62e` package implementation. Own changes are intended for the second PR in that order. This note does not supersede the first PR's note.
+Task: #230. Author session: `mca-package-review-20260915`. Depends on PR #234; starts from its corrected package implementation, including JSONB integrity and the stored library/provider kind boundary. Own changes are intended for the second PR in that order. This note does not supersede the first PR's note.
 
 ## Durable behavior
 

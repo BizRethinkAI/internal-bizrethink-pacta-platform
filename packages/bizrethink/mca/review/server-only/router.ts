@@ -41,7 +41,7 @@ export const mcaPackageReviewRouter = router({
     .mutation(({ input, ctx }) => shareLibraryPackage({ ...input, userId: ctx.user.id })),
   list: adminProcedure.query(() =>
     prisma.bizrethinkMcaPackageReview.findMany({
-      where: { teamId: null },
+      where: { kind: 'library', teamId: null },
       orderBy: { createdAt: 'desc' },
       take: 100,
       select: {
@@ -74,7 +74,7 @@ export const mcaPackageReviewRouter = router({
     .mutation(({ input }) => recordPackageFinding(input)),
   revoke: adminProcedure.input(z.object({ reviewId: z.string() })).mutation(async ({ input }) => {
     await prisma.bizrethinkMcaPackageReview.updateMany({
-      where: { id: input.reviewId, status: 'open', teamId: null },
+      where: { id: input.reviewId, status: 'open', kind: 'library', teamId: null },
       data: { status: 'closed' },
     });
     return { revoked: true };
@@ -83,7 +83,7 @@ export const mcaPackageReviewRouter = router({
     .input(z.object({ findingId: z.string(), answer: z.string().trim().min(1).max(10000) }))
     .mutation(async ({ input, ctx }) => {
       const result = await prisma.bizrethinkMcaPackageFinding.updateMany({
-        where: { id: input.findingId, answeredAt: null, review: { teamId: null } },
+        where: { id: input.findingId, answeredAt: null, review: { kind: 'library', teamId: null } },
         data: { answer: input.answer, answeredAt: new Date(), answeredByUserId: ctx.user.id },
       });
       if (result.count !== 1) {
@@ -96,7 +96,7 @@ export const mcaPackageReviewRouter = router({
     .mutation(({ input }) => markPackageReviewUnit(input)),
   inspect: adminProcedure
     .input(z.object({ reviewId: z.string() }))
-    .query(({ input }) => inspectPackageReview({ id: input.reviewId, teamId: null })),
+    .query(({ input }) => inspectPackageReview({ id: input.reviewId, kind: 'library', teamId: null })),
   inspectProvider: authenticatedProcedure
     .input(ZProviderScope.extend({ reviewId: z.string() }))
     .query(async ({ input, ctx }) =>
