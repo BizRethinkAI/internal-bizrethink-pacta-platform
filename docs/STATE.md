@@ -13,7 +13,88 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-14_
+_Last updated: 2026-09-15_
+
+## 2026-09-15 — lease send fixes and MCA counsel repairs deployed (#255, #258, #260, #261, #262, #267, #268, #270)
+
+Eight PRs merged in this order: #255 `7fefd87d3`, #261 `d5b93cd72`, #258
+`8a94d355e`, #262 `1e5aeb62c`, #260 `8f62e1744`, #267 `51d49c935`, #268
+`466b0f71c`, #270 `d51d9fb03`. **Production runs `d51d9fb03`**: Coolify
+deployment `njchiojmk1yuirag6l07kshu` finished at 06:34 ET [10:34 UTC], app
+healthy. Earlier batch entries that say a deployment "remains required" are
+superseded: every merge through #270, including #212's transaction drafts, is
+in that revision.
+
+**Process deviation.** `State ready to ship` was red on each of the last five
+main revisions when they were deployed, because merged notes had not yet been
+consolidated. This PR is that missing consolidation. Deploy only after the gate
+is green on the final main SHA.
+
+**Migrations applied in production** (read-only `_prisma_migrations` check,
+none rolled back): `20260915003000_add_mca_review_packages`,
+`20260915003100_add_mca_package_review_progress`,
+`20260915060000_restore_mca_review_kinds` (#258) and
+`20260915090000_bizrethink_document_issuer_description` (#267).
+
+### MCA counsel review (#258, #260, #268)
+
+- **#258:** provider invitations are explicitly `kind: provider`, and
+  shared-library inspection requires `kind: library`. Reads, findings,
+  progress and archive inspection reject a stored kind that disagrees with the
+  fingerprinted snapshot. The migration relabelled only provider snapshots
+  whose scope agreed and updated only `kind`. A database constraint now binds
+  kind, snapshot kind and scope. Never revert corrected rows to `library`.
+- **#260:** complete library and provider packages use the agreed reader: a
+  250px review index, bounded reading column, five-section brief, larger-text
+  control and a mobile index. It reads only the saved snapshot. Opening an item
+  records no coverage or approval.
+- **#268:** field placeholders show labels from the saved field catalogue, and
+  alternatives get distinct labels. Disclosure entries separate source wording,
+  layout, authority and evidence. Search covers fields, sources and processor
+  forms. Payzli field labels apply only to three fingerprint-pinned passages;
+  unknown processor forms get none. No legal wording, fingerprint, target ID or
+  permission changed.
+
+Limits unchanged: every MCA clause is draft with a null author, and no counsel
+approval exists. Review completion is coverage of a saved copy, not approval or
+send/sign authority.
+
+### Lease send flow (#255, #261, #262, #267, #270)
+
+- **#255:** occupants are asked once, and names are required after a yes. No
+  initials line on a signature page. The lease page links to the envelope.
+- **#262:** a draft envelope shows **Review the envelope** (summary) and
+  **Send the envelope** (editor).
+- **#261:** Receipt v2 names every route to the governing documents, with a
+  linked list and one download for all (`/lease-attachment/:matterId/all`, a
+  zip built per request). Overlay **091** fixes both attachment panels. Link
+  annotations are not verified through upstream sealing; the download URL is
+  also printed.
+- **#267:** governing documents carry `issuer`, `description` and
+  `amendsDocumentId`. Receipt v3 groups them by association, CDD and other, with
+  amendments nested. A document missing issuer or description blocks `prepare`.
+  Future AI-drafted descriptions are task #265.
+- **#270:** signing dates use `MM/dd/yyyy` in `America/New_York` (Florida's
+  western panhandle is on Central time, a recorded limit). DATE widgets are
+  96 × 16. Overlay **092** parses width/height as numbers for every field type.
+
+**Owner actions in the UI, still open.** Envelopes prepared before these merges
+carry the old attachments, receipt, initials and dates. For the pilot matter
+(`lease_matter_kdxfitilinkibbdw`, back in draft with no envelope):
+
+1. Enter issuer, description and amends for its sixteen governing documents.
+2. Correct item 12's date (revised 3/26/18) and item 14's (approved 2/28/23).
+3. Clear the CDD name and dates from items 15–16's reference fields.
+4. Prepare, review (check a date field is full width), then send.
+
+### Open PR, not folded
+
+#271 (`docs/processor-controlled-split-letters`) records ADR 0019: a split
+funding letter is the processor's exact form, never generic or edited. Payzli is
+the first supported processor. The owner states that Payzli's original format is
+the existing Payzli template in the `lombard-api` team; aligning the retained
+library text with that template is the next task. Its note is folded when it
+merges.
 
 ## 2026-09-15 — lease and MCA review batch landed (#233, #234, #235, #236, #238, #239, #241)
 
@@ -463,19 +544,20 @@ architecture is recorded in ADRs rather than here:
   track, not a prerequisite. `assertPublishable` gates text reaching a *third
   party*, not text being written. Building the clause library is unblocked.
 
-Where it stands, **2026-09-12**:
+Where it stands, **2026-09-15** (production `d51d9fb03`):
 
 | | |
 |---|---|
-| Conformity surface | **built** — `/admin/mca`, instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, CT/VA primary text sourced, source strength and reading age on every card (#134) |
-| Clause library | **built** — `packages/bizrethink/mca/clauses/`, **211 clause records across all six instruments**, every one carrying an examination record plus explicit purpose and variance metadata; every record remains draft/null-author |
-| The FRPA | **rewritten in full, 2026-09-10** — all **100** records authored from the counsel memo and the 254 findings, under [ADR 0012](adr/0012-the-baseline-document-is-input-not-specification.md) and [ADR 0013](adr/0013-a-funder-profile-describes-the-funder.md). **Unreviewed:** every record is `status: 'draft'` with `author: null` and zero counsel approvals exist |
-| The other five instruments | **NOT rewritten** — Equipment Lease, Subscription, ISO PRA, Split Funding, Permission to Release. A merchant signs **five of the six**, and two of them undo the FRPA's protections in the same envelope. See *The day of 2026-09-10* |
-| Selection engine | **built** — `selectClauses`, `instrumentsFor`, `McaFacts` with a Lombard profile. Twelve facts; **three still gate nothing** (`settlementBase`, `venueRule`, `processorSplitAccepted`) |
-| `/admin/mca-library` | **built** (#132) — per-clause approval (#135), a `From counsel` section (#140) |
-| Counsel review link | **built** — `/mca-clause-review/:token`, scoped by instrument, with a derived briefing (#139) and a findings box (#140) |
-| Agreement builder | **not started — and it is still the deliverable.** [ADR 0011](adr/0011-the-mca-clause-library-is-a-library.md) settles its shape |
-| Interview / Section 1 | **not started.** The merchant and funding grid is captured nowhere in Pacta |
+| Workspace | **built** — one MCA workspace with separate catalogues ([ADR 0015](adr/0015-one-mca-workspace-with-separate-content-catalogues.md), #208, #215): `/admin/mca` conformity, `/admin/mca-library`, `/admin/mca-templates`, team `/t/:teamUrl/mca` |
+| Conformity surface | **built** — instance conformity (#112), 7 content statutes (FL GA KS LA MO TX UT), prescribed-form conformity, source strength and reading age (#134). Source corrections: CT/FL/MO (#176), UT/CA (#187), VA official form (#190). Open research limits: Georgia's current consolidated code (CAPTCHA) and Missouri's commencement-rule history (#202 source ledger) |
+| Clause library | **built** — **210 numbered clauses** plus **25 reusable records** (13 field groups, 10 document blocks, 2 interview-only guidance; #208, #212). Purpose and variance metadata on every clause (#180). **Every record is `draft` with `author: null`; zero counsel approvals exist** |
+| The FRPA | **rewritten in full, 2026-09-10** (#152) under [ADR 0012](adr/0012-the-baseline-document-is-input-not-specification.md) / [ADR 0013](adr/0013-a-funder-profile-describes-the-funder.md). Unreviewed |
+| Other instruments | **Equipment Lease and Subscription** rewritten as twins (#163), with equipment economics and limited recourse reconciled (#206). **Permission to Release** and equipment consents corrected (#194). **ISO PRA not rewritten**: Pasco County arbitration and a confidentiality bar with no regulator carve-out remain. **Split Funding** is the processor's form, not ours to rewrite (owner decision 2026-09-15, ADR 0019 in open #271) |
+| Selection engine | **built** — `selectClauses` with derived numbering (#171), `instrumentsFor`, twelve `McaFacts`. **Three gate nothing** (`settlementBase`, `venueRule`, `processorSplitAccepted`); `collectionMethod` gates no clause, only whether the split letter is in the package |
+| Provider interview | **built** (#210, [ADR 0016](adr/0016-mca-provider-template-revisions.md)) — team-owned templates with immutable revisions. **Accepts one bundle only:** split-only, net settlement, merchant-state venue, courts. Other values are rejected |
+| Transaction draft | **built** (#212) — a stateless team form fills a current revision and downloads an unsigned PDF marked internal draft; `readyToSend` is always `false`. **No Envelope, send or signing path**, and no deal-fill API from `lombard-platform` (ADR 0010/0011 intend one) |
+| Counsel review | **built** — legacy `/mca-clause-review/:token` per instrument (#135–#140); complete neutral packages ([ADR 0017](adr/0017-versioned-neutral-mca-counsel-packages.md), #234); holistic findings and provider review ([ADR 0018](adr/0018-holistic-mca-findings-and-provider-review.md), #236); repairs #258/#260/#268 |
+| Still not built | Merchant send path that refuses unapproved text; processor acceptance as a deal fact; ACH-only/backstop, gross-settlement and funder-state-venue alternatives; the guaranty as its own numbering series (ADR 0011 phase 5; today it is a section inside each instrument's numbering); state prescribed disclosures joined to the package |
 
 **That paragraph used to read "the library is text with provenance, not an
 engine — there is no `includeWhen`, no `variables`, no selection."** Two of the
@@ -484,11 +566,14 @@ three arrived on 2026-09-10: `includeWhen` gates clauses on `McaFacts`, and
 **`variables` is still absent**, and its absence is now load-bearing — it is why
 §7.5 could not be split on `venueRule` (see *The day of 2026-09-10*).
 
-**There is still no render or assembly path.** Nothing in `mca/` turns selected
-clauses into a document, which is the only reason unreviewed text cannot reach a
-merchant. `assertPublishable` **reports, it does not refuse** — it returns early
-on anything not `published`, and both surfaces call it on a hypothetical. **The
-first thing the render path must do is fail closed on it**, test written first.
+**There is an internal render path, and no merchant path.** Since #212 a saved
+provider revision renders into an unsigned PDF marked internal draft, behind the
+`mca-builder` and `mca-clause-draft-rendering` grants. Nothing creates an
+Envelope or delivers to a merchant, and that is still the only reason unreviewed
+text cannot reach one. `assertPublishable` **reports, it does not refuse**. It
+returns early on anything not `published`, and the surfaces call it on a
+hypothetical. **The first thing a merchant send path must do is fail closed on
+it**, test written first.
 
 ## Session state and in-flight work
 
@@ -505,10 +590,10 @@ separate `State ready to ship` workflow blocks deployment while any note remains
 Read [`session-workflow.md`](session-workflow.md) for assignment, handoff,
 independent-review and shipping rules.
 
-The #178/#180/#182/#183 notes are folded by this consolidation. There were no
-other open PRs and no competing consolidation assignment when it began. After
-these deletions the folder is empty except for its README; future work creates
-its own branch note rather than editing this settled account directly.
+The 2026-09-15 consolidation folded the notes of #255, #258, #260, #261, #262,
+#267, #268 and #270. After it, the only note expected on main is #271's, once
+that PR merges. Future work creates its own branch note rather than editing this
+settled account directly.
 
 Merged 2026-08-29: **#18** (engine, clause library, renderer, signing handoff),
 **#21** (route), **#22** (preview link), **#23** (custom clauses + interview
