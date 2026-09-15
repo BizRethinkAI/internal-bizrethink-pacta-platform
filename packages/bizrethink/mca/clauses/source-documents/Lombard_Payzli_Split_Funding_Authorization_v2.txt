@@ -6,12 +6,15 @@ docx sha256: f94d8b5dd6b3f061abda56b2b652e4c705d62666ef779eee956b1343b9617d20
 Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
            that repository at the commit above.
 
-WHAT THIS IS. Lombard's own executed-form agreement -- primary text in the only
-sense that matters here, because the words are ours and this file is the
-document they were published in. It is not a statute and no regulator wrote it,
-so the primary/secondary-publisher question `sources-are-primary.test.ts` asks
-of `mca/sources/` does not arise; the question this header answers instead is
-WHICH document, at WHICH revision.
+WHAT THIS IS. The split funding letter as retained in lombard-contracts. The
+letter is PAYZLI'S FORM, NOT OURS: under docs/adr/0019 a processor's split
+funding letter is used exactly as the processor supplies it and is never edited.
+This retained revision includes lombard-contracts edits made on 2026-09-05 and
+2026-09-07 (listed in ADR 0019), so it is NOT verified as Payzli's own form and
+must be replaced with the form Payzli issues. It is not a statute and no
+regulator wrote it, so the primary/secondary-publisher question
+`sources-are-primary.test.ts` asks of `mca/sources/` does not arise; the
+question this header answers instead is WHICH document, at WHICH revision.
 
 HOW IT WAS EXTRACTED. word/document.xml, in document order: every <w:p> as one
 line with runs joined and whitespace collapsed, every <w:tbl> as one line

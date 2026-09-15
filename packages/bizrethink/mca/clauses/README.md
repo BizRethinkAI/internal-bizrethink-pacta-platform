@@ -61,15 +61,23 @@ Actual merchant PDFs and stored templates require a separate rebuild/migration.
 
 ### Processor-controlled forms and ancillary consent corrections
 
-**Owner clarification, 2026-09-12:** Split Funding Letters are processor-specific;
-we commonly have limited or no ability to change them. Their presence in this
-library does not make their terms ours to rewrite. The retained processor letter
-is unchanged. Its fee, collection-base and stopping-rule differences from the
-FRPA remain unresolved for a **future review session** using the particular
-processor's required form and operational requirements. A future reviewer must
-determine an agreed, workable resolution; an FRPA priority clause alone is not
-evidence that a processor accepted it or can implement it. Do not treat the
-deferral as approval, a waiver, or permission to silently alter the form.
+**Settled by [ADR 0019](../../../../docs/adr/0019-split-funding-letters-are-processor-controlled.md),
+2026-09-15. Do not reopen it.** A split funding letter always belongs to a
+specific processor and is used exactly as that processor supplies it. There is
+no generic letter. Nobody edits a processor's form, whether to match the FRPA, to
+fix a finding or to generalize it; only its own blanks are filled. Payzli is the
+first supported processor, and each processor added later brings its own form.
+
+The `split-funding.*` records below hold the retained Payzli text, but they are
+not ours to draft. Their `attorney-drafted` source, approval state and variance
+metadata predate ADR 0019, and moving the letter out of this catalogue is
+separate work. **The retained text is not verified as Payzli's form:**
+`lombard-contracts` edited it on 2026-09-05 and 2026-09-07 (ADR 0019 lists the
+changes), and it must be replaced with the form Payzli issues. Its fee,
+collection-base and stopping-rule differences from the FRPA are resolved in the
+FRPA, the deal facts or the processor choice, never in the letter. An FRPA
+priority clause is not evidence that a processor accepted the split or can
+implement it.
 
 Merged #194 corrected fourteen source records for individual report use, contact
 consent and signer capacity in the Permission to Release and equipment agreements.
