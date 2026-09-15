@@ -15,6 +15,35 @@ true *right now*.
 
 _Last updated: 2026-09-14_
 
+## 2026-09-15 — lease and MCA review batch landed (#233, #234, #235, #236, #238, #239, #241)
+
+The stacked lease/MCA follow-ups were promoted to `main` in dependency order.
+The reviewed lease prepare → review → send flow and signing-token redaction
+landed with #233; the neutral MCA counsel package and holistic provider review
+landed with #234/#236; the lease elections, occupants validation and safe
+attachment filenames landed with #238; the document execution line, headings,
+footers and per-page initials landed with #239; and the final US-English,
+single-date-format and lawn-list punctuation pass landed with #241.
+
+Promotion PRs #249, #250 and #251 carried the original reviewed scopes onto
+`main`; dependent #241 was rebased after #238 and promoted as #252. Their
+final heads passed the required current-head checks, including application and
+Docker builds, Governance, lint, audit, CodeQL, metadata validation and
+Playwright. The final promotion merge is #252 at `636d14f49` on `main`.
+
+The MCA router mismatch comment on #235 was independently reassessed and
+withdrawn: the reported payload belonged to `mcaClauseLibrary`, while #235
+changed `leaseBuilder.clauseLibrary`; the registered routes and negative
+control did not reproduce a defect. The MCA package work remains a review
+workflow and does not claim attorney approval, legal currency, publication or
+merchant clearance. Lease wording changes intentionally preserve stored
+identifiers and do not rewrite existing data.
+
+The processed in-flight notes are folded by this consolidation. Remaining
+operational follow-up is limited to the documented pilot draft/token handling
+after deployment and any author-noted product/legal limitations; no additional
+deployment is implied by the implementation merges.
+
 ## 2026-09-14 — security queue and MCA headings shipped
 
 Fresh review-and-ship batch PRs #221, #223, #224, #225 and #226 landed in
