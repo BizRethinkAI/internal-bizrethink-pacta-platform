@@ -185,3 +185,5 @@ packages/app-tests/e2e/api/bizrethink/resource-abuse-boundary.spec.ts
 packages/app-tests/e2e/api/bizrethink/recipient-identity.spec.ts
 # Account protection HTTP/PostgreSQL regressions (overlay 087).
 packages/app-tests/e2e/api/bizrethink/account-protection.spec.ts
+# A-18/A-22 actual HTTP and PostgreSQL regression coverage, authored in this fork.
+packages/app-tests/e2e/api/bizrethink/approval-review-integrity.spec.ts
