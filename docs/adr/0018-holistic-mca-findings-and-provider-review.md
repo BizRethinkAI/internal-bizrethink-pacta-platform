@@ -1,6 +1,6 @@
 # ADR 0018 — Holistic MCA findings and provider review
 
-Status: Accepted for implementation under task #230. Depends on ADR 0017 / PR #234.
+Status: Accepted. Implemented under task #230 (#236, promoted to main in #250 on 2026-09-15); kind repair in #258. Migrations `20260915003100_add_mca_package_review_progress` and `20260915060000_restore_mca_review_kinds` are applied in production. Depends on ADR 0017 / PR #234. _Status corrected 2026-09-15._
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ADR 0015 — One MCA workspace with separate content catalogues
 
-- **Status:** Accepted design; application implementation pending.
+- **Status:** Accepted. Catalogue separation implemented in #208 (2026-09-13); the unified workspace in #208 and #215 (2026-09-14). The Templates view is provided by #210/#212. The package readiness view and merchant-output enforcement are not implemented. _Status corrected 2026-09-15._
 - **Decision date:** 2026-09-13.
 - **Authority:** The repository owner approved separate catalogues with shared
   infrastructure, then approved bringing conformity into one MCA workspace.

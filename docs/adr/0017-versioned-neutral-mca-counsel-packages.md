@@ -1,6 +1,6 @@
 # ADR 0017 — Versioned neutral MCA counsel packages
 
-Status: Accepted for implementation under task #229.
+Status: Accepted. Implemented under task #229 and merged to main in #234 (2026-09-15); reader repairs in #260 and #268. Migration `20260915003000_add_mca_review_packages` is applied in production. _Status corrected 2026-09-15._
 
 ## Context
 

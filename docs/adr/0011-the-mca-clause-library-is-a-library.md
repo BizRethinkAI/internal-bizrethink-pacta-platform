@@ -1,6 +1,6 @@
 # ADR 0011 — The MCA clause library is a library, not a document
 
-- **Status:** Proposed
+- **Status:** Accepted (owner, 2026-09-09). Phases 1–4 implemented on main in #171 (2026-09-12). Phase 5's separate guaranty numbering series is not implemented. [ADR 0015](0015-one-mca-workspace-with-separate-content-catalogues.md) partially supersedes this ADR's handling of helpers and unnumbered blocks. _Status corrected 2026-09-15._
 - **Date recorded:** 2026-09-09
 - **Decision date:** 2026-09-09 (owner)
 - **Supersedes:** rule 3 of [`mca/clauses/README.md`](../../packages/bizrethink/mca/clauses/README.md)

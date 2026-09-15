@@ -1,6 +1,6 @@
 # ADR 0016 — Provider templates have immutable, team-owned revisions
 
-Status: proposed implementation; independent review and merge pending.
+Status: Accepted. Implemented and merged to main in #210 (2026-09-13); migration `20260913120000_add_mca_provider_templates` is applied in production. _Status corrected 2026-09-15._
 Date: 2026-09-13. Task #209. Depends on ADRs 0010–0014 and the unified-workspace
 design in #200 / ADR 0015.
 
