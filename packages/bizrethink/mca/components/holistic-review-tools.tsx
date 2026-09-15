@@ -1,7 +1,7 @@
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { McaReviewPackage } from '../review/package-schema';
 import { reviewTargets } from '../review/targets';
 
@@ -31,6 +31,7 @@ export const McaHolisticReviewTools = ({
   completionBlockers: string[];
   onChanged: () => Promise<unknown>;
 }) => {
+  const findingInputId = useId();
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState('');
   const [body, setBody] = useState('');
@@ -155,15 +156,16 @@ export const McaHolisticReviewTools = ({
           <p className="text-sm">
             {selected.length} <Trans>targets selected</Trans>
           </p>
-          <label className="block text-sm">
+          <label htmlFor={findingInputId} className="block text-sm">
             <Trans>Holistic finding</Trans>
-            <textarea
-              className="mt-1 min-h-28 w-full rounded border p-2"
-              maxLength={10000}
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-            />
           </label>
+          <textarea
+            id={findingInputId}
+            className="mt-1 min-h-28 w-full rounded border p-2"
+            maxLength={10000}
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+          />
           <Button
             disabled={record.isPending || !body.trim() || selected.length === 0}
             onClick={() => record.mutate({ token, targetIds: selected, body })}
