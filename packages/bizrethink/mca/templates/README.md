@@ -25,8 +25,10 @@ There is no verified Lombard or Circular profile preset. The example profile in
   instructions and ISO channel execution are separate events. They do not turn
   into merchant facts just because the provider offers them.
 - The processor form/version/reference remains an external requirement with
-  transaction-specific acceptance. Processor contradictions and actual form
-  review remain outstanding; no generic Split Funding Letter is fabricated.
+  transaction-specific acceptance. Per [ADR 0019](../../../../docs/adr/0019-split-funding-letters-are-processor-controlled.md),
+  each processor's split funding letter is used exactly as that processor
+  supplies it. No generic letter is generated, and a processor's form is never
+  edited. Contradictions with the FRPA are resolved in Pacta's own documents.
 - `server-only/service.ts` stores immutable revisions and performs actual team
   access, manager writes, stale-editor rejection and separate internal-draft
   preview authorization. Profile/list endpoints do not return archived text.

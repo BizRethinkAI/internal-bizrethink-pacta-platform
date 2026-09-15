@@ -2,6 +2,12 @@ import type { McaClause } from '../types';
 
 /**
  * The Payzli Split Funding Authorization — a letter, and it has no numbered clauses at all.
+ *
+ * PAYZLI'S FORM, NOT OURS (ADR 0019). A split funding letter is used exactly as
+ * its processor supplies it: never edited, never generalized, and no generic
+ * letter exists. These bodies are the retained lombard-contracts revision,
+ * which carries our own 2026-09 edits and is not verified as Payzli's form. Do
+ * not "fix" a body here to match the FRPA; resolve conflicts in the FRPA.
  */
 export const PAYZLI_LETTER: McaClause[] = [
   {

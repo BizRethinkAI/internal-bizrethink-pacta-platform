@@ -118,10 +118,13 @@ and calculations under ADR 0010; no duplicate disclosure calculator is proposed.
 Readiness must show missing or inconsistent supplied figures and any checks that
 cannot run, rather than treating an empty findings list as complete validation.
 
-Split Funding Letters are processor-specific and usually offer limited or no
-ability for Pacta to change their terms. Preserve that external-document
-constraint and surface relevant contradictions in package review. Do not
-silently rewrite a processor form or call those contradictions resolved.
+Split funding letters always belong to a specific processor and are used
+exactly as that processor supplies them. Pacta never generates a generic letter
+or edits a processor's form
+([ADR 0019](../adr/0019-split-funding-letters-are-processor-controlled.md)).
+Surface contradictions with the FRPA in package review and resolve them in
+Pacta's own documents, the deal facts or the processor choice. Do not call them
+resolved by altering the letter.
 
 ## Migration boundaries and acceptance criteria
 

@@ -18,6 +18,11 @@ import { PAYZLI_LETTER } from './letter';
  * read `3.15`."* That is why the addressee block is declared non-clause here
  * with the reason attached, rather than merely omitted.
  *
+ * IT IS ALSO NOT OURS TO EDIT (ADR 0019). A split funding letter is the
+ * processor's form, used exactly as supplied. The findings below are history:
+ * the edits change note 16 made in response are why the retained text is not
+ * verified as Payzli's own form.
+ *
  * THE SECOND PARAGRAPH CARRIES SIX FINDINGS, more than any other clause in the
  * corpus. It is the operative instruction — what Payzli is told to withhold,
  * from what, and until when — and three of REVIEW-02's fixes land on it: it
