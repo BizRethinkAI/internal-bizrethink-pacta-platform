@@ -16,6 +16,15 @@ export type LeaseStateInput = {
   status: string;
   /** Review links still open on this matter. */
   openReviews: number;
+  /**
+   * The envelope's own status, when the matter points at one.
+   *
+   * Omitted: no envelope, or the caller did not look. `null`: the matter points
+   * at an envelope that no longer exists — deleted from the documents list.
+   * The landlord sends from the envelope, so once one exists this is the fact
+   * and `status` is only what the lease builder last did to it.
+   */
+  envelopeStatus?: 'DRAFT' | 'PENDING' | 'COMPLETED' | 'REJECTED' | 'CANCELLED' | null;
 };
 
 export type LeaseState = {
@@ -30,7 +39,38 @@ export type LeaseState = {
   tone: 'quiet' | 'active' | 'done';
 };
 
-export const leaseState = ({ status, openReviews }: LeaseStateInput): LeaseState => {
+export const leaseState = ({ status, openReviews, envelopeStatus }: LeaseStateInput): LeaseState => {
+  /*
+    THE ENVELOPE BEFORE THE STAMP. On 2026-09-14 the pilot lease was stamped
+    `sent` over a draft nobody had received, and this list said "Out for
+    signature". Nothing on the matter moves when the landlord sends, a signer
+    signs or one declines — only the envelope does.
+  */
+  if (envelopeStatus === 'COMPLETED') {
+    return { label: 'Signed', tone: 'done' };
+  }
+
+  if (envelopeStatus === 'PENDING') {
+    return { label: 'Out for signature', tone: 'active' };
+  }
+
+  if (envelopeStatus === 'REJECTED') {
+    return { label: 'Declined by a signer', tone: 'quiet' };
+  }
+
+  if (envelopeStatus === 'CANCELLED') {
+    return { label: 'Cancelled', tone: 'quiet' };
+  }
+
+  // Waiting on the landlord to check it and send it, so not `active`.
+  if (envelopeStatus === 'DRAFT') {
+    return { label: 'Ready to send', tone: 'quiet' };
+  }
+
+  if (envelopeStatus === null) {
+    return { label: 'Envelope deleted', tone: 'quiet' };
+  }
+
   /*
     TERMINAL STATES FIRST, and that ordering is load-bearing. A review link
     left open after the lease went out for signature must not drag the row

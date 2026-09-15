@@ -3,20 +3,19 @@ import type { CreateEnvelopeOptions } from '@documenso/lib/server-only/envelope/
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
-
-import { attachmentLinks } from '../documents/attachment-links';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
-
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../../server-only/feature-access';
 import { DEFAULT_LEASE_JURISDICTION } from '../clauses/approval-jurisdiction';
 import { libraryFor } from '../clauses/library';
+import { attachmentLinks } from '../documents/attachment-links';
 import { selectClauses } from '../engine/select-clauses';
 import type { RenderedDocument, RenderLeaseInput } from '../render/render-lease';
 import { renderLease } from '../render/render-lease';
 import type { LeaseParty } from '../render/signature-blocks';
+import { whiteOutSigningTokens } from '../render/white-out-signing-tokens';
 import { loadClauseApprovals, statusWithApproval } from './clause-approvals';
 
 /**
@@ -99,8 +98,8 @@ export const buildEnvelopeInput = ({
       title: doc.title,
       documentDataId,
       order,
-      // Upstream converts these into fields at their extracted coordinates and
-      // whites the tokens out of the PDF.
+      // Upstream converts these into fields at their extracted coordinates. It
+      // does NOT paint the tokens out — that happens before upload, below.
       placeholders: placeholdersByKey[doc.key] ?? [],
     };
   });
@@ -229,7 +228,16 @@ export const createEnvelopeFromMatter = async ({
   const placeholdersByKey: Record<string, PlaceholderInfo[]> = {};
 
   for (const doc of rendered.rendered) {
-    const file = new File([new Uint8Array(doc.pdf)], `${doc.title}.pdf`, { type: 'application/pdf' });
+    /*
+      THE CLEANED PDF IS WHAT A SIGNER SEES, AND WHAT GETS SEALED. This uploaded
+      the raw render, on the belief that `createEnvelope` paints the tokens out.
+      It does not — upstream does that at upload time — so the 2026-09-14 pilot
+      lease showed `{{SIGNATURE, r1, width=160, height=44}}` behind every
+      widget. Painting leaves the text in place, so the placeholders read from
+      the raw render position the fields exactly as before.
+    */
+    const pdf = await whiteOutSigningTokens(doc.pdf);
+    const file = new File([new Uint8Array(pdf)], `${doc.title}.pdf`, { type: 'application/pdf' });
     const { documentData } = await putPdfFileServerSide(file);
 
     documentDataIds[doc.key] = documentData.id;

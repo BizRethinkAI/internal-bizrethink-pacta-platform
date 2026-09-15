@@ -304,8 +304,8 @@ describe('the send mutation re-checks everything advisory', () => {
   const router = readFileSync(new URL('../../server-only/trpc/lease-builder-router.ts', import.meta.url), 'utf8');
 
   const sendBody = router.slice(
-    router.indexOf('const envelope = await createEnvelopeFromMatter') - 6000,
-    router.indexOf('const envelope = await createEnvelopeFromMatter'),
+    router.indexOf('await prepareEnvelopeFromMatter(') - 6000,
+    router.indexOf('await prepareEnvelopeFromMatter('),
   );
 
   for (const check of [
