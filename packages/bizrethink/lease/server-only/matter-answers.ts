@@ -1,7 +1,7 @@
 import { jurisdictionForProperty } from '../clauses/approval-jurisdiction';
 import type { CustomClauseInput } from '../clauses/custom';
 import type { LeaseDocument } from '../documents/derive-documents';
-import { describeDocuments, hasGoverningDocuments } from '../documents/derive-documents';
+import { describeDocuments, describeGoverningDocuments, hasGoverningDocuments } from '../documents/derive-documents';
 import { deriveFacts } from '../interview/derive-facts';
 import { propertyTypeLabelFor } from '../interview/property-type';
 import type { LeasePartyInput } from '../parties/derive-parties';
@@ -174,11 +174,13 @@ export const hydrateMatter = (matter: StoredMatter): HydratedMatter => {
       yardDuties,
       // Same shape again: the rows are the answer, the numbered list is only
       // their rendering, and the clause interpolates one variable.
-      governingDocuments: describeDocuments(
-        documents,
-        'hoa-governing',
-        typeof matter.id === 'string' ? { matterId: matter.id } : undefined,
-      ),
+      governingDocuments: describeGoverningDocuments(documents, {
+        names: {
+          association: typeof values.hoaName === 'string' ? values.hoaName : undefined,
+          cdd: facts.hasCdd && typeof values.cddName === 'string' ? values.cddName : undefined,
+        },
+        matterId: typeof matter.id === 'string' ? matter.id : undefined,
+      }),
       conditionReports: describeDocuments(matterDocuments, 'move-in-report'),
       /*
         Also last, and for the reason the party names are. These were SEEDED

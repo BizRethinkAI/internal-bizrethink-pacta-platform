@@ -1,5 +1,6 @@
 import type { LeaseDocument } from './derive-documents';
 import { governingBundleUrl, governingDocumentUrl } from './document-urls';
+import { structureGoverningDocuments } from './governing-structure';
 
 export type LeaseAttachment = {
   label: string;
@@ -31,11 +32,23 @@ export type LeaseAttachment = {
 export const attachmentLinks = (matterId: string, documents: LeaseDocument[]): LeaseAttachment[] => {
   const governing = documents.filter((document) => document.kind === 'hoa-governing');
 
-  const each = governing.map((document) => ({
-    label: document.label,
-    data: governingDocumentUrl(matterId, document.id),
-    type: 'link' as const,
-  }));
+  /*
+    In the receipt's order, with its numbers and descriptions: "1a. Ninth
+    Amendment to the Declaration — leasing rules". Seven amendments share their
+    first forty characters; the number and the description are what tell them
+    apart on a signing screen.
+  */
+  const each = structureGoverningDocuments(governing, {}).flatMap((group) =>
+    group.entries.map(({ document, number }) => {
+      const description = (document.description ?? '').trim();
+
+      return {
+        label: `${number}. ${document.label.trim()}${description === '' ? '' : ` — ${description}`}`,
+        data: governingDocumentUrl(matterId, document.id),
+        type: 'link' as const,
+      };
+    }),
+  );
 
   /*
     ONE DOWNLOAD FOR ALL OF THEM, FIRST. Sixteen documents meant sixteen clicks,

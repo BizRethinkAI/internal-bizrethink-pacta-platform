@@ -23,20 +23,30 @@ const doc = (over: Partial<LeaseDocument> = {}): LeaseDocument => ({
   reference: 'Instr# 2021271188',
   documentDate: '2021-12-16',
   pageCount: 5,
+  issuer: 'association',
+  description: 'leasing rules',
+  amendsDocumentId: null,
   ...over,
 });
 
 describe('the governing documents reach a signer as links', () => {
-  it('gives one link per document, labelled as the receipt recites it — after one for all of them', () => {
+  /*
+    Numbered, described and ordered exactly as the receipt lists them, so "1a"
+    on the signing screen is "1a" on the page — and a signer can tell a Ninth
+    Amendment from a Second without opening either.
+  */
+  it('gives one link per document, numbered and described as the receipt lists it — after one for all of them', () => {
     const links = attachmentLinks('lease_matter_abc', [
-      doc({ id: 'bdoc_a', label: 'Amended and Restated Master Declaration' }),
-      doc({ id: 'bdoc_b', label: 'Ninth Amendment to the Declaration' }),
+      doc({ id: 'bdoc_res', label: 'Resolution 2026-04', issuer: 'cdd', description: 'amenity fees' }),
+      doc({ id: 'bdoc_a', label: 'Amended and Restated Master Declaration', description: 'community rules' }),
+      doc({ id: 'bdoc_b', label: 'Ninth Amendment to the Declaration', amendsDocumentId: 'bdoc_a' }),
     ]);
 
     expect(links.map((link) => link.label)).toEqual([
-      'All 2 documents, in one download',
-      'Amended and Restated Master Declaration',
-      'Ninth Amendment to the Declaration',
+      'All 3 documents, in one download',
+      '1. Amended and Restated Master Declaration — community rules',
+      '1a. Ninth Amendment to the Declaration — leasing rules',
+      '2. Resolution 2026-04 — amenity fees',
     ]);
   });
 

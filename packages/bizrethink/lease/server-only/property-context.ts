@@ -38,6 +38,9 @@ const toLeaseDocument = (document: {
   reference: string | null;
   documentDate: Date | null;
   pageCount: number | null;
+  issuer: string | null;
+  description: string | null;
+  amendsDocumentId: string | null;
 }): LeaseDocument => ({
   id: document.id,
   kind: document.kind as LeaseDocument['kind'],
@@ -50,6 +53,9 @@ const toLeaseDocument = (document: {
   */
   documentDate: document.documentDate ? document.documentDate.toISOString().slice(0, 10) : '',
   pageCount: document.pageCount,
+  issuer: document.issuer as LeaseDocument['issuer'],
+  description: document.description,
+  amendsDocumentId: document.amendsDocumentId,
 });
 
 const DOCUMENT_FIELDS = {
@@ -59,6 +65,9 @@ const DOCUMENT_FIELDS = {
   reference: true,
   documentDate: true,
   pageCount: true,
+  issuer: true,
+  description: true,
+  amendsDocumentId: true,
 } as const;
 
 export const loadPropertyContext = async (propertyId: string, matterId?: string): Promise<PropertyContext> => {

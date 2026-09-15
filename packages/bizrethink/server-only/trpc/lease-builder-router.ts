@@ -19,6 +19,8 @@ import { toCustomClause } from '../../lease/clauses/custom';
 import { findingsBlock } from '../../lease/clauses/findings';
 import { ALL_CLAUSES, inReviewOrder, libraryFor } from '../../lease/clauses/library';
 import { whyThisClause } from '../../lease/clauses/why-this-clause';
+import type { LeaseDocument } from '../../lease/documents/derive-documents';
+import { amendsProblem, governingDocumentGaps } from '../../lease/documents/governing-structure';
 import { scanCustomClauses } from '../../lease/engine/guardrails';
 import { selectClauses } from '../../lease/engine/select-clauses';
 import { validateAnswers } from '../../lease/engine/validate';
@@ -375,6 +377,15 @@ const hydrate = (matter: {
     yardTasks: hydrated.yardTasks,
   };
 };
+
+/**
+ * Governing documents the receipt cannot describe yet, as sentences for the
+ * review step and the prepare refusal.
+ */
+const describeDocumentGaps = (documents: LeaseDocument[]): string[] =>
+  governingDocumentGaps(documents).map(
+    (gap) => `Say ${gap.missing.join(' and ')} for "${gap.label}" on the Association documents step.`,
+  );
 
 /**
  * The interview's view of a matter, under the questions its property's state
@@ -912,6 +923,13 @@ export const leaseBuilderRouter = router({
       const partyFindings = validateParties(answers.parties);
 
       /*
+        Governing documents the receipt cannot describe yet. Blocking, at the
+        owner's instruction: a receipt listing a document with no issuer or no
+        description is the undifferentiated run of sixteen titles it replaced.
+      */
+      const documentFindings = describeDocumentGaps(matter.propertyDocuments);
+
+      /*
         Also its own list, and for the same kind of reason: a yard job nobody
         has been given produces a document that is not visibly wrong. It reads
         perfectly — it simply never mentions who trims the palms, which is a
@@ -946,6 +964,7 @@ export const leaseBuilderRouter = router({
         findings,
         missing,
         partyFindings,
+        documentFindings,
         yardFindings,
         reviewFindings,
         clauseFindings,
@@ -957,6 +976,7 @@ export const leaseBuilderRouter = router({
           findings.filter((f) => f.severity === 'blocks').length +
           missing.length +
           partyFindings.length +
+          documentFindings.length +
           yardFindings.length +
           /*
             It was computed here and then left out of both totals, while
@@ -971,6 +991,7 @@ export const leaseBuilderRouter = router({
           findings.every((f) => f.severity !== 'blocks') &&
           missing.length === 0 &&
           partyFindings.length === 0 &&
+          documentFindings.length === 0 &&
           yardFindings.length === 0 &&
           unreviewed.length === 0 &&
           reviewFindings.length === 0 &&
@@ -1073,6 +1094,13 @@ export const leaseBuilderRouter = router({
 
       if (partyFindings.length > 0) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, { message: partyFindings.join(' ') });
+      }
+
+      // Re-checked here, not only reported by `validate`: see `describeDocumentGaps`.
+      const documentFindings = describeDocumentGaps(matter.propertyDocuments);
+
+      if (documentFindings.length > 0) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, { message: documentFindings.join(' ') });
       }
 
       /*
@@ -2368,6 +2396,9 @@ export const leaseBuilderRouter = router({
             pageCount: true,
             sizeBytes: true,
             sortOrder: true,
+            issuer: true,
+            description: true,
+            amendsDocumentId: true,
           },
         });
       }),
@@ -2386,10 +2417,55 @@ export const leaseBuilderRouter = router({
           reference: z.string().optional(),
           documentDate: z.string().optional(),
           sortOrder: z.number().int().min(0).optional(),
+          /** Who issued a governing document — its receipt heading. */
+          issuer: z.enum(['association', 'cdd', 'other']).nullable().optional(),
+          /** What it covers, in a few words. The receipt prints it; keep it a phrase. */
+          description: z.string().max(160).optional(),
+          /** The document this one amends or supplements; checked by `amendsProblem`. */
+          amendsDocumentId: z.string().nullable().optional(),
         }),
       )
       .mutation(async ({ ctx, input }) => {
         const scope = await documentScope(ctx.user.id);
+
+        if (input.amendsDocumentId !== undefined) {
+          const current = await prisma.bizrethinkDocument.findFirst({
+            where: { id: input.id, organisationId: { in: scope }, archivedAt: null },
+            select: { propertyId: true, matterId: true },
+          });
+
+          if (!current) {
+            throw new AppError(AppErrorCode.NOT_FOUND, { message: 'Document not found' });
+          }
+
+          const siblings = await prisma.bizrethinkDocument.findMany({
+            where: {
+              organisationId: { in: scope },
+              archivedAt: null,
+              kind: 'hoa-governing',
+              ...(current.propertyId ? { propertyId: current.propertyId } : { matterId: current.matterId }),
+            },
+            select: { id: true, label: true, amendsDocumentId: true },
+          });
+
+          const problem = amendsProblem(
+            input.id,
+            input.amendsDocumentId,
+            siblings.map((sibling) => ({
+              id: sibling.id,
+              kind: 'hoa-governing' as const,
+              label: sibling.label,
+              reference: '',
+              documentDate: '',
+              pageCount: null,
+              amendsDocumentId: sibling.amendsDocumentId,
+            })),
+          );
+
+          if (problem) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, { message: problem });
+          }
+        }
 
         const { count } = await prisma.bizrethinkDocument.updateMany({
           where: { id: input.id, organisationId: { in: scope }, archivedAt: null },
@@ -2400,6 +2476,9 @@ export const leaseBuilderRouter = router({
               ? {}
               : { documentDate: input.documentDate ? new Date(`${input.documentDate}T00:00:00Z`) : null }),
             ...(input.sortOrder === undefined ? {} : { sortOrder: input.sortOrder }),
+            ...(input.issuer === undefined ? {} : { issuer: input.issuer }),
+            ...(input.description === undefined ? {} : { description: input.description.trim() || null }),
+            ...(input.amendsDocumentId === undefined ? {} : { amendsDocumentId: input.amendsDocumentId }),
           },
         });
 

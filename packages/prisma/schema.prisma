@@ -2071,6 +2071,19 @@ model BizrethinkDocument {
   /// county recorder and pull the same instrument. "Instr# 2021271188".
   reference String?
 
+  /// Who issued a governing document: 'association' | 'cdd' | 'other'. Its receipt
+  /// heading, named from the property record. Null until the landlord says; a
+  /// governing document without it blocks preparing an envelope.
+  issuer String?
+
+  /// What the document covers, in a few words ("leasing rules and tenant
+  /// registration"). Printed on the receipt ahead of the recording reference.
+  description String?
+
+  /// The document this one amends or supplements; the receipt lists it beneath.
+  /// A plain id, not a relation — see ADR 0002.
+  amendsDocumentId String?
+
   /// The date on the face of the document, which is rarely the upload date.
   documentDate DateTime?
 

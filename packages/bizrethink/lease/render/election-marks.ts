@@ -65,7 +65,24 @@ export type ClauseBodyStyles = {
   name: Style;
   /** A link's text, where the clause carries `[[link text|url]]`. */
   link?: Style;
+  /** A `[[group …]]` heading in a structured list — the receipt's issuing bodies. */
+  group?: Style;
+  /** A `[[ref]]` line beneath a list entry — its recording reference and extent. */
+  note?: Style;
 };
+
+/*
+  STRUCTURED LIST LINES, for the governing-documents receipt
+  (`describeGoverningDocuments`):
+
+    [[group NAME]]      a heading for one issuing body
+    [[doc]]TEXT         an entry; `[[doc sub]]` indents it under the one above
+    [[ref]]TEXT         a quieter line kept with the entry before it
+
+  One entry and its reference line never part at a page break.
+*/
+const ROW = /^\[\[(group|doc|ref)( sub)?(?: ([^\]]*))?\]\]/;
+const SUB_INDENT = 18;
 
 /*
   `[[link text|url]]` — a clickable link inside a clause's text. Used by the
@@ -112,12 +129,20 @@ const withLinks = (text: string, style: Style | undefined) => {
 export const clauseBody = (content: string, parties: LeaseParty[], styles: ClauseBodyStyles, key: string) => {
   const lines = content.split('\n');
 
-  if (!lines.some((line) => MARK.test(line))) {
+  if (!lines.some((line) => MARK.test(line) || ROW.test(line))) {
     return h(Text, runProps(content, styles.body, key), ...withLinks(content, styles.link));
   }
 
   const blocks: ReturnType<typeof h>[] = [];
   let run: string[] = [];
+  let entry: ReturnType<typeof h>[] | null = null;
+
+  const closeEntry = () => {
+    if (entry) {
+      blocks.push(h(View, { key: `${key}-entry-${blocks.length}`, wrap: false, style: { marginBottom: 4 } }, ...entry));
+      entry = null;
+    }
+  };
 
   const flush = () => {
     const kept = trimBlankLines(run);
@@ -136,14 +161,55 @@ export const clauseBody = (content: string, parties: LeaseParty[], styles: Claus
   };
 
   for (const line of lines) {
+    const row = line.match(ROW);
+
+    if (row) {
+      const [marker, kind, sub, name] = row;
+      const text = line.slice(marker.length);
+      const indent = sub ? { paddingLeft: SUB_INDENT } : {};
+
+      if (kind === 'ref' && entry) {
+        entry.push(h(Text, { key: `ref-${entry.length}`, style: [styles.note ?? styles.body, indent] }, text));
+        continue;
+      }
+
+      flush();
+      closeEntry();
+
+      if (kind === 'group') {
+        blocks.push(
+          h(
+            Text,
+            {
+              key: `${key}-group-${blocks.length}`,
+              style: [styles.group ?? styles.body, { marginTop: 10, marginBottom: 4 }],
+            },
+            name ?? '',
+          ),
+        );
+        continue;
+      }
+
+      const props = runProps(text, styles.body, `doc-${blocks.length}`);
+      entry = [
+        h(Text, { ...props, style: [props.style, { textAlign: 'left' }, indent] }, ...withLinks(text, styles.link)),
+      ];
+      continue;
+    }
+
     const marked = line.match(MARK);
 
     if (!marked) {
+      if (entry && line.trim() !== '') {
+        closeEntry();
+      }
+
       run.push(line);
       continue;
     }
 
     flush();
+    closeEntry();
 
     blocks.push(
       h(
@@ -170,6 +236,7 @@ export const clauseBody = (content: string, parties: LeaseParty[], styles: Claus
     );
   }
 
+  closeEntry();
   flush();
 
   return h(View, { key }, ...blocks);

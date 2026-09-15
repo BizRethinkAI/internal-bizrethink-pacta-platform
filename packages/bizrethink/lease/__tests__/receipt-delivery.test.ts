@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { libraryFor } from '../clauses/library';
-import { describeDocuments } from '../documents/derive-documents';
+import { describeGoverningDocuments } from '../documents/derive-documents';
 import { PICANA_FACTS, PICANA_MONEY, PICANA_PARTIES, PICANA_VALUES } from '../matters/picana-ln';
 import { renderLease } from '../render/render-lease';
 import { whiteOutSigningTokens } from '../render/white-out-signing-tokens';
@@ -27,6 +27,17 @@ describe('the receipt says where the documents are', () => {
     expect(body).toMatch(/Attachments/);
     expect(body).toMatch(/paper copy/i);
   });
+
+  // A description is a summary a landlord wrote. It must not be read as the document.
+  it('says the documents control over their descriptions', () => {
+    expect(receipt()?.body ?? '').toMatch(/descriptions? .*for convenience/i);
+    expect(receipt()?.body ?? '').toMatch(/documents themselves control/i);
+  });
+
+  // Two of the pilot's documents are the CDD's; "governing documents of {{hoaName}}" said otherwise.
+  it('no longer attributes every document to the association', () => {
+    expect(receipt()?.body ?? '').not.toContain('{{hoaName}}');
+  });
 });
 
 describe('the rendered receipt', () => {
@@ -36,9 +47,11 @@ describe('the rendered receipt', () => {
         id: 'bdoc_a',
         kind: 'hoa-governing' as const,
         label: 'Declaration',
-        reference: '',
+        reference: 'Instr# 1111',
         documentDate: '',
         pageCount: 3,
+        issuer: 'association' as const,
+        description: 'community rules',
       },
       {
         id: 'bdoc_b',
@@ -47,6 +60,19 @@ describe('the rendered receipt', () => {
         reference: '',
         documentDate: '',
         pageCount: 5,
+        issuer: 'association' as const,
+        description: 'leasing rules',
+        amendsDocumentId: 'bdoc_a',
+      },
+      {
+        id: 'bdoc_c',
+        kind: 'hoa-governing' as const,
+        label: 'Resolution 2026-04',
+        reference: '',
+        documentDate: '',
+        pageCount: 4,
+        issuer: 'cdd' as const,
+        description: 'amenity fees and deposits',
       },
     ];
 
@@ -56,7 +82,10 @@ describe('the rendered receipt', () => {
       values: {
         ...PICANA_VALUES,
         hoaName: 'Example Master Association',
-        governingDocuments: describeDocuments(documents, 'hoa-governing', { matterId: 'lease_matter_abc' }),
+        governingDocuments: describeGoverningDocuments(documents, {
+          names: { association: 'Example Master Association', cdd: 'Example Community Development District' },
+          matterId: 'lease_matter_abc',
+        }),
       },
       parties: PICANA_PARTIES,
       propertyAddress: '29090 Picana Lane, Wesley Chapel, Florida 33543',
@@ -105,18 +134,35 @@ describe('the rendered receipt', () => {
     expect(text).not.toContain('[[');
   }, 120_000);
 
+  it('prints each group heading, each description, and each reference line', async () => {
+    const { text } = await linksAndText((await render()).pdf);
+    const squashed = text.replace(/\s+/g, '').toLowerCase();
+
+    for (const expected of [
+      'Example Master Association',
+      'Example Community Development District',
+      '1. Declaration — community rules',
+      '1a. Ninth Amendment — leasing rules',
+      '2. Resolution 2026-04 — amenity fees and deposits',
+      'Instr# 1111 · 3 pages',
+    ]) {
+      expect(squashed, expected).toContain(expected.replace(/\s+/g, '').toLowerCase());
+    }
+  }, 120_000);
+
   // The envelope gets the painted copy; a link that did not survive that is no link.
   it('keeps the links through painting out the signing tokens', async () => {
     const { urls } = await linksAndText(await whiteOutSigningTokens((await render()).pdf));
 
-    expect(urls.filter((url) => url.includes('/lease-attachment/lease_matter_abc/'))).toHaveLength(3);
+    expect(urls.filter((url) => url.includes('/lease-attachment/lease_matter_abc/'))).toHaveLength(4);
   }, 120_000);
 });
 
 describe('the lease id reaches the receipt', () => {
   const source = readFileSync(new URL('../server-only/matter-answers.ts', import.meta.url), 'utf8');
 
-  it('builds the list with links whenever the matter has an id', () => {
-    expect(source).toMatch(/describeDocuments\(\s*documents,\s*'hoa-governing',[^)]*matterId/);
+  it('builds the grouped list, with links whenever the matter has an id', () => {
+    expect(source).toMatch(/describeGoverningDocuments\(documents,[\s\S]{0,500}matterId/);
+    expect(source).toMatch(/describeGoverningDocuments\(documents,[\s\S]{0,500}cddName/);
   });
 });

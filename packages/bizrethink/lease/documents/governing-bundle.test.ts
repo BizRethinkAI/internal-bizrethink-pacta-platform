@@ -14,19 +14,25 @@ import { bundleEntryName, zipDocuments } from './governing-bundle';
  * item 12 against file 12 finds the same instrument.
  */
 describe('bundleEntryName', () => {
-  it('numbers each file in receipt order and keeps its name', () => {
-    expect(bundleEntryName(0, 'Amended and Restated Master Declaration')).toBe(
-      '01 Amended and Restated Master Declaration.pdf',
+  // A folder per issuing body, and the receipt's own numbers — "1a" sorts under "1".
+  it('files each document under its issuer, numbered as the receipt numbers it', () => {
+    expect(bundleEntryName('Example Master Association', '1', 'Amended and Restated Master Declaration')).toBe(
+      'Example Master Association/01 Amended and Restated Master Declaration.pdf',
     );
-    expect(bundleEntryName(15, 'Resolution 2026-05 — Adopting Amenity Suspension and Termination Rules')).toBe(
-      '16 Resolution 2026-05 — Adopting Amenity Suspension and Termination Rules.pdf',
+    expect(bundleEntryName('Example Master Association', '1a', 'Ninth Amendment')).toBe(
+      'Example Master Association/01a Ninth Amendment.pdf',
+    );
+    expect(bundleEntryName('Example Community Development District', '12', 'Resolution 2026-05 — Suspension')).toBe(
+      'Example Community Development District/12 Resolution 2026-05 — Suspension.pdf',
     );
   });
 
   // A label is typed by a landlord; a file name has to survive every OS.
-  it('removes what a file system will not accept', () => {
-    expect(bundleEntryName(2, 'Rules: "Pool" / Spa <v2> | draft?*')).toBe('03 Rules Pool Spa v2 draft.pdf');
-    expect(bundleEntryName(3, '   ')).toBe('04 Document.pdf');
+  it('removes what a file system will not accept, from the folder and the name', () => {
+    expect(bundleEntryName('HOA: "North" / South', '3', 'Rules: "Pool" / Spa <v2> | draft?*')).toBe(
+      'HOA North South/03 Rules Pool Spa v2 draft.pdf',
+    );
+    expect(bundleEntryName('  ', '4', '   ')).toBe('Documents/04 Document.pdf');
   });
 });
 

@@ -5,8 +5,8 @@ import { zipSync } from 'fflate';
  *
  * "Clicking 16 links does not make it very user friendly" — the repository
  * owner, on the pilot lease, 2026-09-15. One zip, each document still its own
- * file under the name the receipt recites, numbered in the receipt's order so
- * item 12 on the page is file 12 in the folder.
+ * file under the name the receipt recites, in a folder for the body that issued
+ * it and numbered as the receipt numbers it, so item 1a on the page is file 01a.
  *
  * A zip rather than one merged PDF: sixteen instruments stay sixteen
  * instruments, and nothing is re-encoded — a merge rewrites every file and can
@@ -19,11 +19,17 @@ const UNSAFE = /[\\/:*?"<>|]/g;
 const withoutControlCharacters = (value: string) =>
   [...value].filter((character) => character.charCodeAt(0) >= 32 && character.charCodeAt(0) !== 127).join('');
 
-export const bundleEntryName = (index: number, label: string): string => {
-  const name =
-    withoutControlCharacters(label).replace(UNSAFE, '').replace(/\s+/g, ' ').trim().slice(0, 150) || 'Document';
+const safe = (value: string, fallback: string, max: number) =>
+  withoutControlCharacters(value).replace(UNSAFE, '').replace(/\s+/g, ' ').trim().slice(0, max) || fallback;
 
-  return `${String(index + 1).padStart(2, '0')} ${name}.pdf`;
+/**
+ * `Issuer/01a Label.pdf` — a folder per issuing body and the receipt's own
+ * number, zero-padded so "01a" sorts under "01" and "12" after "02".
+ */
+export const bundleEntryName = (folder: string, number: string, label: string): string => {
+  const padded = number.replace(/^(\d+)/, (digits) => digits.padStart(2, '0'));
+
+  return `${safe(folder, 'Documents', 100)}/${padded} ${safe(label, 'Document', 150)}.pdf`;
 };
 
 export type BundleFile = { name: string; bytes: Uint8Array };

@@ -27,6 +27,8 @@
 import { formatLongDate } from '../render/long-date';
 import { pageLabel } from './count-pages';
 import { governingBundleUrl, governingDocumentUrl } from './document-urls';
+import type { GoverningNames } from './governing-structure';
+import { structureGoverningDocuments } from './governing-structure';
 
 export type DocumentKind = 'hoa-governing' | 'move-in-report' | 'move-out-report';
 
@@ -41,7 +43,15 @@ export type LeaseDocument = {
   documentDate: string;
   /** Null when not yet counted. */
   pageCount: number | null;
+  /** Who issued a governing document; its receipt heading. Null until the landlord says. */
+  issuer?: GoverningIssuer | null;
+  /** What it covers, in a few words: "leasing rules and tenant registration". */
+  description?: string | null;
+  /** The document this one amends or supplements; it is listed beneath it. */
+  amendsDocumentId?: string | null;
 };
+
+export type GoverningIssuer = 'association' | 'cdd' | 'other';
 
 export const hasGoverningDocuments = (documents: LeaseDocument[]): boolean =>
   documents.some((document) => document.kind === 'hoa-governing');
@@ -53,53 +63,95 @@ export const hasGoverningDocuments = (documents: LeaseDocument[]): boolean =>
  * read as a sentence — because a receipt is referred to item by item when it is
  * ever argued about.
  */
-export type DocumentLinks = {
-  /** The lease the links are issued under; see `lease-attachment.$matterId.$documentId`. */
-  matterId: string;
-};
-
 /**
- * `links`: each governing document gets its own link and the list ends with one
- * for all of them — rendered clickable by `clauseBody`. The signed receipt is
- * what a tenant keeps; it said they had received sixteen documents and gave
- * them no way back to one. Only governing documents: a move-in report is
- * photographs of a home, never reachable by holding a link.
+ * A numbered list of uploaded documents, one per line — for the condition
+ * report acknowledgement. Governing documents have their own grouped form,
+ * `describeGoverningDocuments`, because a receipt of sixteen instruments needs
+ * structure a one-page inspection report does not.
  */
-export const describeDocuments = (
-  documents: LeaseDocument[],
-  kind: DocumentKind = 'hoa-governing',
-  links?: DocumentLinks,
-): string => {
-  const listed = documents.filter((document) => document.kind === kind);
-  const matterId = kind === 'hoa-governing' ? links?.matterId : undefined;
+export const describeDocuments = (documents: LeaseDocument[], kind: DocumentKind = 'hoa-governing'): string =>
+  documents
+    .filter((document) => document.kind === kind)
+    .map((document, at) => {
+      const date = formatLongDate(document.documentDate);
 
-  const lines = listed.map((document, at) => {
-    const date = formatLongDate(document.documentDate);
-
-    /*
+      /*
         The bracket holds what identifies the physical document — where to find
         it, and how much of it there is — while the date reads as part of the
         name. One bracket either way, never two.
       */
-    const inBrackets = [
-      document.reference.trim(),
-      document.pageCount === null ? '' : pageLabel(document.pageCount),
-    ].filter((part) => part !== '');
+      const inBrackets = [
+        document.reference.trim(),
+        document.pageCount === null ? '' : pageLabel(document.pageCount),
+      ].filter((part) => part !== '');
 
-    const named = date === '' ? document.label.trim() : `${document.label.trim()}, dated ${date}`;
+      const named = date === '' ? document.label.trim() : `${document.label.trim()}, dated ${date}`;
 
-    const line = inBrackets.length === 0 ? `${at + 1}. ${named}` : `${at + 1}. ${named} (${inBrackets.join(', ')})`;
+      return inBrackets.length === 0 ? `${at + 1}. ${named}` : `${at + 1}. ${named} (${inBrackets.join(', ')})`;
+    })
+    .join('\n');
 
-    return matterId ? `${line} — [[link download|${governingDocumentUrl(matterId, document.id)}]]` : line;
-  });
+export type GoverningListOptions = {
+  /** Heading names from the property record. */
+  names: GoverningNames;
+  /** The lease the download links are issued under. Without it the list carries no links. */
+  matterId?: string;
+};
 
-  if (!matterId || listed.length < 2) {
+/**
+ * The receipt's list of governing documents, as line markup `clauseBody` renders:
+ *
+ *   [[group Estancia at Wiregrass Master Property Owners Association]]
+ *   [[doc]]1. Amended and Restated Master Declaration — community rules (July 20, 2015) · [[link download|…]]
+ *   [[ref]]Instr# 2015115091, OR 9227/2447 · 155 pages
+ *   [[doc sub]]1a. Ninth Amendment — leasing rules (December 16, 2021) · [[link download|…]]
+ *   [[ref sub]]Instr# 2021271188, OR 10509/675 · 5 pages
+ *
+ * WHAT IT COVERS LEADS; THE RECORDING REFERENCE FOLLOWS, QUIETER. The pilot
+ * printed "Second Amendment to the Amended and Restated Master Declaration, dated
+ * November 3, 2015 (Instr# 2015176914, OR 9279/3728, 5 pages)" and nobody could
+ * tell what it was for. The reference is not dropped — it is what lets a tenant
+ * pull the same instrument from the county recorder, which is the receipt's
+ * legal point — it is set beneath, where it identifies without crowding.
+ *
+ * Links only for governing documents, which are public records; a single
+ * download for all of them ends the list, its URL on a line of its own so a
+ * printed copy carries an address someone can type.
+ */
+export const describeGoverningDocuments = (
+  documents: LeaseDocument[],
+  { names, matterId }: GoverningListOptions,
+): string => {
+  const groups = structureGoverningDocuments(documents, names);
+  const count = groups.reduce((total, group) => total + group.entries.length, 0);
+
+  const lines = groups.flatMap((group) => [
+    `[[group ${group.heading}]]`,
+    ...group.entries.flatMap(({ document, number, depth }) => {
+      const sub = depth === 1 ? ' sub' : '';
+      const description = (document.description ?? '').trim();
+      const date = formatLongDate(document.documentDate);
+
+      const main = [
+        `${number}. ${document.label.trim()}`,
+        description === '' ? '' : ` — ${description}`,
+        date === '' ? '' : ` (${date})`,
+        matterId ? ` · [[link download|${governingDocumentUrl(matterId, document.id)}]]` : '',
+      ].join('');
+
+      const reference = [document.reference.trim(), document.pageCount === null ? '' : pageLabel(document.pageCount)]
+        .filter((part) => part !== '')
+        .join(' · ');
+
+      return [`[[doc${sub}]]${main}`, ...(reference === '' ? [] : [`[[ref${sub}]]${reference}`])];
+    }),
+  ]);
+
+  if (!matterId || count < 2) {
     return lines.join('\n');
   }
 
-  // The URL is the link's own text, on a line of its own so it is never split:
-  // a printed copy of the receipt still carries an address someone can type.
   const all = governingBundleUrl(matterId);
 
-  return [...lines, `All ${listed.length} documents in one download:`, `[[link ${all}|${all}]]`].join('\n');
+  return [...lines, `All ${count} documents in one download:`, `[[link ${all}|${all}]]`].join('\n');
 };

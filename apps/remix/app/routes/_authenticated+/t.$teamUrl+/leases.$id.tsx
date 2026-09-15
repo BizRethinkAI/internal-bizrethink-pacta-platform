@@ -463,7 +463,14 @@ export default function LeaseInterviewPage() {
             )}
 
             {step.id === 'governing-documents' && (
-              <GoverningDocumentEditor propertyId={matter.propertyId} kind="hoa-governing" />
+              <GoverningDocumentEditor
+                propertyId={matter.propertyId}
+                kind="hoa-governing"
+                names={{
+                  association: typeof values.hoaName === 'string' ? values.hoaName : undefined,
+                  cdd: facts.hasCdd && typeof values.cddName === 'string' ? values.cddName : undefined,
+                }}
+              />
             )}
 
             {step.id === 'condition' && <GoverningDocumentEditor matterId={matter.id} kind="move-in-report" />}
@@ -568,6 +575,8 @@ type ValidationResult = {
   findings: { code: string; severity: 'blocks' | 'warns'; citation: string; message: string }[];
   missing: string[];
   partyFindings: string[];
+  /** Governing documents the receipt cannot describe yet. Blocking. */
+  documentFindings: string[];
   yardFindings: string[];
   reviewFindings: string[];
   clauseFindings: {
@@ -748,6 +757,20 @@ const ReviewPanel = ({
                     <span className="block text-muted-foreground text-xs">{entry.stepTitle}</span>
                   )}
                 </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {(data?.documentFindings.length ?? 0) > 0 && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>The association documents need describing</AlertTitle>
+          <AlertDescription>
+            <ul className="mt-2 list-disc space-y-1 pl-4 text-sm">
+              {data?.documentFindings.map((finding) => (
+                <li key={finding}>{finding}</li>
               ))}
             </ul>
           </AlertDescription>
