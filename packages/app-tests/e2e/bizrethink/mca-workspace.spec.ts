@@ -117,7 +117,7 @@ test('a complete neutral counsel package preserves findings, source context and 
       .getByRole('button', { name: 'Split Funding Authorization', exact: true })
       .click();
     await expect(counsel.locator('[data-mca-package-item="split-funding.fees-are-additional"]')).toContainText(
-      'Payzli',
+      'PAYZLI',
     );
     await counsel.getByRole('button', { name: 'Disclosures & requirements', exact: true }).click();
     const source = counsel.locator('[data-mca-review-requirement="va-disclosure"]');
