@@ -132,7 +132,7 @@ export const NC_USE_AND_REMEDIES: Clause[] = [
       reproduce a statutory procedure that the General Assembly amends and this
       library would then carry stale.
     */
-    body: 'Landlord shall deal with any personal property Tenant leaves at the Premises only as Article 2A of Chapter 42 of the General Statutes permits. Nothing in this Lease authorises Landlord to seize, hold, sell or dispose of Tenant’s personal property, or to interfere with Tenant’s access to it, in any other manner, and Landlord shall not distrain upon it.',
+    body: 'Landlord shall deal with any personal property Tenant leaves at the Premises only as Article 2A of Chapter 42 of the General Statutes permits. Nothing in this Lease authorizes Landlord to seize, hold, sell or dispose of Tenant’s personal property, or to interfere with Tenant’s access to it, in any other manner, and Landlord shall not distrain upon it.',
     source: drafted(),
     status: 'draft',
     requiredBy: 'N.C. Gen. Stat. §42-25.7',

@@ -37,7 +37,7 @@ export const NC_BOILERPLATE: Clause[] = [
       Civil Procedure, not by what a lease agrees between the parties, and a
       clause that did not say so would read as though it were.
     */
-    body: 'A notice under this Lease must be in writing and is validly given if delivered by hand, sent by post to the address given for that party in this Lease, or sent by e-mail to the address given for that party in this Lease. A notice sent by post is treated as received on the fifth day after posting. A notice sent by e-mail is treated as received on the day it is sent, unless it is returned to the sender as undeliverable. Either party may change its address for notices by giving notice in the manner set out in this section. Nothing in this section affects the manner of service required by Chapter 42 of the General Statutes in a proceeding for summary ejectment.',
+    body: 'A notice under this Lease must be in writing and is validly given if delivered by hand, sent by mail to the address given for that party in this Lease, or sent by e-mail to the address given for that party in this Lease. A notice sent by mail is treated as received on the fifth day after mailing. A notice sent by e-mail is treated as received on the day it is sent, unless it is returned to the sender as undeliverable. Either party may change its address for notices by giving notice in the manner set out in this section. Nothing in this section affects the manner of service required by Chapter 42 of the General Statutes in a proceeding for summary ejectment.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,

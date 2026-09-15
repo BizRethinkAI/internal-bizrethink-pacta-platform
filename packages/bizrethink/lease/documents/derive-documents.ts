@@ -24,6 +24,7 @@
  * reference survives unedited, so it is stored and printed as typed.
  */
 
+import { formatLongDate } from '../render/long-date';
 import { pageLabel } from './count-pages';
 
 export type DocumentKind = 'hoa-governing' | 'move-in-report' | 'move-out-report';
@@ -41,40 +42,6 @@ export type LeaseDocument = {
   pageCount: number | null;
 };
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-/*
-  Formatted here rather than with toLocaleDateString: the renderer runs on the
-  server, where the locale is the container's rather than the reader's, and a
-  Florida lease reading "18/04/2023" to one signer and "4/18/2023" to another
-  is the kind of divergence the shared render mapping exists to prevent.
-*/
-const longDate = (iso: string): string => {
-  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso.trim());
-
-  if (!match) {
-    return '';
-  }
-
-  const [, year, month, day] = match;
-  const name = MONTHS[Number(month) - 1];
-
-  return name ? `${Number(day)} ${name} ${year}` : '';
-};
-
 export const hasGoverningDocuments = (documents: LeaseDocument[]): boolean =>
   documents.some((document) => document.kind === 'hoa-governing');
 
@@ -89,7 +56,7 @@ export const describeDocuments = (documents: LeaseDocument[], kind: DocumentKind
   documents
     .filter((document) => document.kind === kind)
     .map((document, at) => {
-      const date = longDate(document.documentDate);
+      const date = formatLongDate(document.documentDate);
 
       /*
         The bracket holds what identifies the physical document — where to find

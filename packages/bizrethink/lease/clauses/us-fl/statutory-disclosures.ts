@@ -276,8 +276,8 @@ export const FL_STATUTORY_DISCLOSURES: Clause[] = [
     placement: 'lease-body',
     section: 'notices',
     sortKey: 130,
-    heading: 'Landlord and Authorised Agent',
-    body: "The name and address of the Landlord, or of the person authorised to receive notices and demands on the Landlord's behalf, is: {{noticeName}}, {{noticeAddress}}.",
+    heading: 'Landlord and Authorized Agent',
+    body: "The name and address of the Landlord, or of the person authorized to receive notices and demands on the Landlord's behalf, is: {{noticeName}}, {{noticeAddress}}.",
     source: {
       kind: 'statute',
       citation: 'Fla. Stat. §83.50',

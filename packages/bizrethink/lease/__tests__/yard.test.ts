@@ -59,9 +59,11 @@ describe('renderYardList', () => {
     expect(renderYardList([rows[1], rows[3]])).toBe('irrigation and watering and fertilisation and pest treatment');
   });
 
-  it('serial-commas three or more', () => {
+  // A row with a frequency carries a comma of its own, so the list takes
+  // semicolons; us-english.test.ts covers the plain serial-comma case.
+  it('separates three or more with semicolons when an item has a comma', () => {
     expect(renderYardList([rows[0], rows[1], rows[3]])).toBe(
-      'mowing and edging, weekly, irrigation and watering, and fertilisation and pest treatment',
+      'mowing and edging, weekly; irrigation and watering; and fertilisation and pest treatment',
     );
   });
 

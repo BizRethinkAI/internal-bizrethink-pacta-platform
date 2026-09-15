@@ -39,7 +39,7 @@ export const FL_BOILERPLATE: Clause[] = [
       on it. Electing electronic delivery now selects
       `notices.electronic-delivery`, which is that addendum.
     */
-    body: 'A notice under this Lease must be in writing and is validly given if delivered by hand or sent by post to the address given for that party in this Lease. A notice sent by post is treated as received on the fifth day after posting. Notices may be delivered by email only where the parties have signed the electronic delivery addendum required by Fla. Stat. §83.505. Either party may change its address for notices by giving notice in the manner set out in this section. Nothing in this section affects the manner of service required by Fla. Stat. §83.56 for a statutory notice.',
+    body: 'A notice under this Lease must be in writing and is validly given if delivered by hand or sent by mail to the address given for that party in this Lease. A notice sent by mail is treated as received on the fifth day after mailing. Notices may be delivered by email only where the parties have signed the electronic delivery addendum required by Fla. Stat. §83.505. Either party may change its address for notices by giving notice in the manner set out in this section. Nothing in this section affects the manner of service required by Fla. Stat. §83.56 for a statutory notice.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -188,7 +188,7 @@ export const FL_BOILERPLATE: Clause[] = [
     section: 'general',
     sortKey: 20,
     heading: 'Severability',
-    body: 'If any provision of this Lease is held to be invalid or unenforceable, that provision is to be read down to the extent necessary to make it valid, or if it cannot be, severed. The remaining provisions continue in full force.',
+    body: 'If any provision of this Lease is held to be invalid or unenforceable, that provision is to be limited to the extent necessary to make it valid, or if it cannot be, severed. The remaining provisions continue in full force.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
