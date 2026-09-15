@@ -78,14 +78,15 @@ send/sign authority.
   western panhandle is on Central time, a recorded limit). DATE widgets are
   96 × 16. Overlay **092** parses width/height as numbers for every field type.
 
-**Owner actions in the UI, still open.** Envelopes prepared before these merges
-carry the old attachments, receipt, initials and dates. For the pilot matter
-(`lease_matter_kdxfitilinkibbdw`, back in draft with no envelope):
-
-1. Enter issuer, description and amends for its sixteen governing documents.
-2. Correct item 12's date (revised 3/26/18) and item 14's (approved 2/28/23).
-3. Clear the CDD name and dates from items 15–16's reference fields.
-4. Prepare, review (check a date field is full width), then send.
+**Pilot lease: data corrected and envelope sent.** The #267 author ran the
+pilot data script at the owner's request. Production now has issuer and
+description on all 16 active governing documents of the pilot property, ten of
+them nested as amendments, with the four reference/date corrections applied. The
+seventeenth row, `bdoc_d9cbcb6215ed413cb2b0`, is archived and excluded. After the
+final deploy, the pilot matter `lease_matter_kdxfitilinkibbdw` was prepared
+again. Its envelope `envelope_xshdmvsmatnelkzv` was created at 06:42 ET
+[10:42 UTC] and is `PENDING` (sent for signature). All verified by read-only
+queries on 2026-09-15. Signing completion is not tracked here.
 
 ### Open PR, not folded
 
