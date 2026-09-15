@@ -76,3 +76,43 @@ describe('leaseState', () => {
     expect(leaseState({ status: 'abandoned', openReviews: 0 }).tone).toBe('quiet');
   });
 });
+
+/**
+ * Once an envelope exists, IT is the fact.
+ *
+ * The lease builder prepares a draft envelope and the landlord sends it from
+ * the envelope itself, so nothing on the matter moves when it goes out, is
+ * signed, or is declined. On 2026-09-14 the pilot lease read "sent" over a
+ * draft nobody had received — a stamp standing in for the envelope's status.
+ */
+describe('leaseState with an envelope', () => {
+  it('reads the envelope, not the stamp on the matter', () => {
+    // The pilot lease: stamped `sent`, envelope still a draft.
+    expect(leaseState({ status: 'sent', openReviews: 0, envelopeStatus: 'DRAFT' }).label).toBe('Ready to send');
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: 'PENDING' }).label).toBe('Out for signature');
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: 'COMPLETED' }).label).toBe('Signed');
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: 'REJECTED' }).label).toBe(
+      'Declined by a signer',
+    );
+  });
+
+  it('does not let a review link pull a prepared or sent lease back to "In review"', () => {
+    expect(leaseState({ status: 'ready', openReviews: 2, envelopeStatus: 'DRAFT' }).label).toBe('Ready to send');
+    expect(leaseState({ status: 'ready', openReviews: 2, envelopeStatus: 'PENDING' }).label).toBe('Out for signature');
+  });
+
+  it('says when the envelope was cancelled after it went out', () => {
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: 'CANCELLED' }).label).toBe('Cancelled');
+  });
+
+  // Deleted from the documents list: the matter still points at it.
+  it('says when the envelope it points at no longer exists', () => {
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: null }).label).toBe('Envelope deleted');
+  });
+
+  it('marks a draft waiting on the landlord quiet, and one out with signers active', () => {
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: 'DRAFT' }).tone).toBe('quiet');
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: 'PENDING' }).tone).toBe('active');
+    expect(leaseState({ status: 'ready', openReviews: 0, envelopeStatus: 'COMPLETED' }).tone).toBe('done');
+  });
+});

@@ -9,6 +9,8 @@ import {
 import type { InterviewAnswers } from '@bizrethink/customizations/lease/interview/steps';
 import { interviewFor, visibleSteps } from '@bizrethink/customizations/lease/interview/steps';
 import { delegableFieldNames } from '@bizrethink/customizations/lease/interview/tenant-answers';
+import type { LeaseStateInput } from '@bizrethink/customizations/lease/matters/lease-state';
+import { leaseState } from '@bizrethink/customizations/lease/matters/lease-state';
 import type { LeasePartyInput } from '@bizrethink/customizations/lease/parties/derive-parties';
 import type { UtilityRow } from '@bizrethink/customizations/lease/utilities/derive-utilities';
 import { canAccessLeaseBuilder } from '@bizrethink/customizations/server-only/feature-access';
@@ -19,7 +21,16 @@ import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { msg } from '@lingui/core/macro';
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, FileText, Loader2, MessageSquarePlus, Send } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  FileCheck,
+  FileText,
+  Loader2,
+  MessageSquarePlus,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useLoaderData, useRevalidator } from 'react-router';
 import { CustomClauseEditor } from '~/components/general/lease/custom-clause-editor';
@@ -82,6 +93,19 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     select: { utilities: true, state: true },
   });
 
+  /*
+    THE ENVELOPE'S STATUS, NOT THE MATTER'S. The landlord sends from the
+    envelope, so nothing on the matter moves when it goes out. On 2026-09-14
+    this page told the landlord every signer had been emailed, over a draft nobody had
+    received, because it read a stamp instead of this.
+  */
+  const envelope = matter.envelopeId
+    ? await prisma.envelope.findFirst({
+        where: { id: matter.envelopeId, teamId: matter.teamId },
+        select: { status: true },
+      })
+    : null;
+
   return {
     teamUrl,
     organisationId: team.organisationId,
@@ -110,6 +134,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       parties: matter.parties as LeasePartyInput[],
       delegatedFields: (matter.delegatedFields ?? []) as string[],
       envelopeId: matter.envelopeId,
+      // Absent with no envelope; null when the one it points at was deleted.
+      envelopeStatus: matter.envelopeId ? (envelope?.status ?? null) : undefined,
       // Carried into every save so a write built on a stale read is refused
       // rather than silently overwriting a tenant's returned answers.
       updatedAt: matter.updatedAt.toISOString(),
@@ -308,7 +334,11 @@ export default function LeaseInterviewPage() {
     <div className="mx-auto w-full max-w-screen-xl px-4 pb-24 md:px-8">
       <div className="mt-8 border-b pb-5">
         <h1 className="font-semibold text-2xl">{matter.title}</h1>
-        <p className="mt-1 text-muted-foreground text-sm">Draft · progress saves as you move between steps</p>
+        <p className="mt-1 text-muted-foreground text-sm">
+          {matter.status === 'draft' && !matter.envelopeId
+            ? 'Draft · progress saves as you move between steps'
+            : `${leaseState({ status: matter.status, openReviews: 0, envelopeStatus: matter.envelopeStatus }).label} · the answers are locked while this lease has an envelope`}
+        </p>
       </div>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12">
@@ -455,6 +485,7 @@ export default function LeaseInterviewPage() {
                 matterId={matter.id}
                 status={matter.status}
                 envelopeId={matter.envelopeId}
+                envelopeStatus={matter.envelopeStatus}
                 parties={parties}
                 delegatedFields={delegatedFields}
                 values={values}
@@ -565,6 +596,7 @@ const ReviewPanel = ({
   matterId,
   status,
   envelopeId,
+  envelopeStatus,
   parties,
   delegatedFields,
   values,
@@ -574,6 +606,7 @@ const ReviewPanel = ({
   matterId: string;
   status: string;
   envelopeId: string | null;
+  envelopeStatus: LeaseStateInput['envelopeStatus'];
   parties: LeasePartyInput[];
   /** So a question put to the tenant is not reported as one the landlord skipped. */
   delegatedFields: string[];
@@ -584,10 +617,10 @@ const ReviewPanel = ({
   const revalidator = useRevalidator();
   const [confirming, setConfirming] = useState(false);
 
-  const send = trpc.bizrethink.leaseBuilder.matter.send.useMutation({
+  const prepare = trpc.bizrethink.leaseBuilder.matter.prepare.useMutation({
     onSuccess: () => {
       setConfirming(false);
-      revalidator.revalidate();
+      void revalidator.revalidate();
     },
   });
   if (query.isLoading) {
@@ -599,29 +632,20 @@ const ReviewPanel = ({
   }
 
   /*
-    A sent lease is done being edited here. Showing the findings panel again
-    would invite changes to a document that recipients are already signing —
-    the answers would drift from the PDF in their inbox with nothing to
-    reconcile the two.
+    An envelope exists, so the answers are done being edited here. Editing them
+    would let the PDF in the envelope drift from the answers with nothing to
+    reconcile the two — the way back is to discard a draft envelope, which
+    reopens the lease.
   */
   if (status !== 'draft' || envelopeId) {
     return (
-      <div className="mt-6 space-y-4">
-        <Alert>
-          <Check className="h-4 w-4" />
-          <AlertTitle>This lease has been sent for signature</AlertTitle>
-          <AlertDescription>
-            Every signer has been emailed their own link. The lease can no longer be edited here — track it from the
-            documents list.
-          </AlertDescription>
-        </Alert>
-
-        {envelopeId && (
-          <Button asChild variant="outline">
-            <a href={`/t/${teamUrl}/documents/${envelopeId}`}>Open the envelope</a>
-          </Button>
-        )}
-      </div>
+      <EnvelopeStatePanel
+        teamUrl={teamUrl}
+        matterId={matterId}
+        status={status}
+        envelopeId={envelopeId}
+        envelopeStatus={envelopeStatus}
+      />
     );
   }
 
@@ -868,26 +892,25 @@ const ReviewPanel = ({
           </a>
         </Button>
 
-        <Button disabled={!data?.readyToSend || send.isPending} onClick={() => setConfirming(true)}>
-          <Send className="mr-2 h-4 w-4" />
-          Send for signature
+        <Button disabled={!data?.readyToSend || prepare.isPending} onClick={() => setConfirming(true)}>
+          <FileCheck className="mr-2 h-4 w-4" />
+          Prepare the envelope
         </Button>
       </div>
 
       {/*
-        A confirmation step rather than a direct send, because this is the one
-        irreversible action in the feature: the moment it succeeds, a real
-        document is in other people's inboxes and the answers are frozen.
-        Naming every recipient here is the point — a mistyped address is
-        invisible on the parties step and obvious in a list headed "these
-        people will receive it".
+        A confirmation step, because preparing locks the answers and names who
+        will receive the lease. Naming every recipient here is the point — a
+        mistyped address is invisible on the parties step and obvious in a list
+        headed "these people will receive it". Nothing is sent from here: the
+        landlord checks the envelope and sends it from there.
       */}
       {confirming && (
         <div className="rounded-lg border border-foreground/20 bg-muted/40 p-5">
-          <h3 className="font-semibold">Send this lease to {parties.length} people?</h3>
+          <h3 className="font-semibold">Prepare the envelope for these {parties.length} signers?</h3>
           <p className="mt-1 text-muted-foreground text-sm">
-            Each person receives their own signing link. Once sent, the answers are frozen and the lease can no longer
-            be edited.
+            Nothing is sent yet. The envelope is created as a draft for you to check, and you send it from there. While
+            it exists the answers are locked; discarding it reopens them.
           </p>
 
           <ul className="mt-4 space-y-1.5 text-sm">
@@ -900,28 +923,176 @@ const ReviewPanel = ({
             ))}
           </ul>
 
-          {send.error && (
+          {prepare.error && (
             <Alert variant="destructive" className="mt-4">
               <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>The lease was not sent</AlertTitle>
-              <AlertDescription>{send.error.message}</AlertDescription>
+              <AlertTitle>The envelope was not prepared</AlertTitle>
+              <AlertDescription>{prepare.error.message}</AlertDescription>
             </Alert>
           )}
 
           <div className="mt-5 flex items-center gap-3">
-            <Button disabled={send.isPending} onClick={() => send.mutate({ id: matterId })}>
-              {send.isPending ? (
+            <Button disabled={prepare.isPending} onClick={() => prepare.mutate({ id: matterId })}>
+              {prepare.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sending…
+                  Preparing…
                 </>
               ) : (
-                'Yes, send it'
+                'Yes, prepare it'
               )}
             </Button>
 
-            <Button variant="ghost" disabled={send.isPending} onClick={() => setConfirming(false)}>
+            <Button variant="ghost" disabled={prepare.isPending} onClick={() => setConfirming(false)}>
               Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * What happens to a lease once it has an envelope.
+ *
+ * The lease builder prepares the envelope and stops; the landlord checks it and
+ * sends it from the envelope. So every sentence here follows the ENVELOPE's
+ * status. The one this replaced told the landlord every signer had been emailed
+ * whenever an envelope existed — including over the pilot lease's draft, which
+ * nobody had received.
+ */
+const EnvelopeStatePanel = ({
+  teamUrl,
+  matterId,
+  status,
+  envelopeId,
+  envelopeStatus,
+}: {
+  teamUrl: string;
+  matterId: string;
+  status: string;
+  envelopeId: string | null;
+  envelopeStatus: LeaseStateInput['envelopeStatus'];
+}) => {
+  const revalidator = useRevalidator();
+  const [discarding, setDiscarding] = useState(false);
+
+  const discard = trpc.bizrethink.leaseBuilder.matter.discardEnvelope.useMutation({
+    onSuccess: () => {
+      setDiscarding(false);
+      void revalidator.revalidate();
+    },
+  });
+
+  const view = (() => {
+    if (!envelopeId) {
+      return {
+        title: 'This lease can no longer be edited here',
+        description: `It is marked ${status}, and has no envelope.`,
+        tone: 'warning' as const,
+      };
+    }
+
+    switch (envelopeStatus) {
+      case 'DRAFT':
+        return {
+          title: 'The envelope is ready for you to check',
+          description:
+            'Nothing has been sent. Open the envelope and go through every document: the wording, where each signature, initial and date sits, and who signs what. Add a subject and message, then send it from there. If anything is wrong, discard it — the lease reopens for editing and you can prepare a new one.',
+          tone: 'default' as const,
+          discardLabel: 'Discard and edit the lease',
+        };
+      case 'PENDING':
+        return {
+          title: 'Out for signature',
+          description: 'The envelope has been sent. Track each signer, and resend or cancel, from the envelope.',
+          tone: 'default' as const,
+        };
+      case 'COMPLETED':
+        return {
+          title: 'Signed by everyone',
+          description: 'The signed lease is on the envelope.',
+          tone: 'default' as const,
+        };
+      case 'REJECTED':
+        return {
+          title: 'A signer declined to sign',
+          description: 'See who declined, and why, on the envelope.',
+          tone: 'warning' as const,
+        };
+      case 'CANCELLED':
+        return {
+          title: 'The envelope was cancelled',
+          description: 'It was sent and then cancelled. The cancelled envelope stays on record in the documents list.',
+          tone: 'warning' as const,
+        };
+      default:
+        return {
+          title: "This lease's envelope was deleted",
+          description: 'Reopen the lease to change the answers or prepare a new envelope.',
+          tone: 'warning' as const,
+          discardLabel: 'Reopen the lease',
+          envelopeGone: true,
+        };
+    }
+  })();
+
+  return (
+    <div className="mt-6 space-y-4">
+      <Alert variant={view.tone}>
+        {view.tone === 'warning' ? <AlertTriangle className="h-4 w-4" /> : <Check className="h-4 w-4" />}
+        <AlertTitle>{view.title}</AlertTitle>
+        <AlertDescription>{view.description}</AlertDescription>
+      </Alert>
+
+      <div className="flex flex-wrap items-center gap-3">
+        {envelopeId && !('envelopeGone' in view) && (
+          <Button asChild>
+            <a href={`/t/${teamUrl}/documents/${envelopeId}`}>Open the envelope</a>
+          </Button>
+        )}
+
+        {'discardLabel' in view && !discarding && (
+          <Button variant="outline" onClick={() => setDiscarding(true)}>
+            {view.discardLabel}
+          </Button>
+        )}
+      </div>
+
+      {discarding && (
+        <div className="rounded-lg border border-foreground/20 bg-muted/40 p-5">
+          <h3 className="font-semibold">
+            {'envelopeGone' in view ? 'Reopen this lease?' : 'Discard this envelope and reopen the lease?'}
+          </h3>
+          <p className="mt-1 text-muted-foreground text-sm">
+            {'envelopeGone' in view
+              ? 'The answers unlock so you can change them and prepare a new envelope.'
+              : 'The draft envelope is deleted. Nobody has been sent anything. The answers unlock so you can change them and prepare a new envelope.'}
+          </p>
+
+          {discard.error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Nothing was changed</AlertTitle>
+              <AlertDescription>{discard.error.message}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="mt-5 flex items-center gap-3">
+            <Button disabled={discard.isPending} onClick={() => discard.mutate({ id: matterId })}>
+              {discard.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Working…
+                </>
+              ) : (
+                'Yes, reopen the lease'
+              )}
+            </Button>
+
+            <Button variant="ghost" disabled={discard.isPending} onClick={() => setDiscarding(false)}>
+              Keep it
             </Button>
           </div>
         </div>

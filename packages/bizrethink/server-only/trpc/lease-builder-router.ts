@@ -44,9 +44,9 @@ import type { Disposition, LeaseReview, ReviewAudience, ReviewComment, ReviewSta
 import { US_FL } from '../../lease/rule-packs/us-fl';
 import { FL_NON_WAIVABLE } from '../../lease/rule-packs/us-fl-non-waivable';
 import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only/clause-approvals';
-import { sendEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { draftClause } from '../../lease/server-only/draft-clause';
 import { hydrateMatter } from '../../lease/server-only/matter-answers';
+import { discardPreparedEnvelope, prepareEnvelopeFromMatter } from '../../lease/server-only/prepared-envelope';
 import { loadPropertyContext } from '../../lease/server-only/property-context';
 import { seedMatterFromProperty } from '../../lease/server-only/seed-from-property';
 import type { UtilityRow } from '../../lease/utilities/derive-utilities';
@@ -995,10 +995,15 @@ export const leaseBuilderRouter = router({
     }),
 
     /**
-     * Send the lease for signature.
+     * Prepare the envelope: everything short of sending it.
      *
-     * The last thing standing between a draft and a signer, and deliberately
-     * the narrowest gate in the feature. Everything here is re-derived and
+     * The lease is rendered, its signing tokens painted out, its fields placed
+     * and its recipients set, as a DRAFT envelope. Nobody is emailed. The
+     * landlord checks the envelope and sends it from there, with upstream's own
+     * send — see `prepared-envelope.ts` for why.
+     *
+     * Still the last gate the lease builder controls before a signer, and
+     * deliberately the narrowest in the feature. Everything here is re-derived and
      * re-checked from stored answers rather than accepted from the client: the
      * caller supplies an id and nothing else, so there is no field on this
      * mutation through which a validated document could be swapped for another.
@@ -1007,18 +1012,17 @@ export const leaseBuilderRouter = router({
      * duplication is intentional — it is the narrowest point every caller must
      * pass through, and this router is not the only conceivable caller.
      */
-    send: authenticatedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+    prepare: authenticatedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
       const matter = await loadMatter(input.id, ctx.user.id);
 
       /*
-          Idempotency, not just tidiness. Two clicks on a slow connection would
-          otherwise create two envelopes, and every signer would receive two
-          links to two different documents with no way to tell which is the
-          real lease.
+          Idempotency, not just tidiness. Two envelopes for one lease is two
+          documents with no way to tell which is the real one. Checked here for
+          a clear message, and again as a condition of the write for the race.
         */
       if (matter.status !== 'draft' || matter.envelopeId) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: 'This lease has already been sent.',
+          message: 'This lease already has an envelope.',
         });
       }
 
@@ -1088,7 +1092,7 @@ export const leaseBuilderRouter = router({
         });
       }
 
-      const { envelopeId, errorAfterSending } = await sendEnvelopeFromMatter({
+      return await prepareEnvelopeFromMatter({
         // Keys the signer-facing links to the governing documents.
         matterId: matter.id,
         input: {
@@ -1106,40 +1110,27 @@ export const leaseBuilderRouter = router({
         organisationId: matter.organisationId,
         title: matter.title,
         requestMetadata: ctx.metadata,
+        rulePackVersion: US_FL.version,
       });
+    }),
 
-      /*
-          Stamped only after the envelope has gone OUT, not merely been created
-          — until 2026-09-14 this followed a bare create, and the pilot lease
-          read "sent" over a draft nobody had received. The rule pack version is
-          recorded here because statutes move: a lease signed today must still
-          be explainable against the rules that produced it in five years.
-        */
-      await prisma.bizrethinkLeaseMatter.update({
-        where: { id: matter.id },
-        data: {
-          status: 'sent',
-          envelopeId,
-          rulePackVersion: US_FL.version,
-          generatedAt: new Date(),
-        },
-      });
+    /**
+     * Discard a prepared envelope nobody has received, and reopen the lease.
+     *
+     * The way back when reviewing the envelope finds something wrong. Refused
+     * once the envelope has gone out — that is a cancellation, and it belongs to
+     * the documents list, where recipients are told.
+     */
+    discardEnvelope: authenticatedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+      const matter = await loadMatter(input.id, ctx.user.id);
 
-      // Recorded first, then reported: the envelope is live, and the page must
-      // not claim every signer was emailed when that is exactly what is unknown.
-      if (errorAfterSending) {
-        console.error('[lease-builder] envelope sent but a later step failed', {
-          envelopeId,
-          error: errorAfterSending instanceof Error ? errorAfterSending.message : String(errorAfterSending),
-        });
-
-        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-          message:
-            'The lease was sent, but a step after sending failed, so some signers may not have been emailed. Open the envelope to check each recipient and resend where needed.',
-        });
+      if (!matter.envelopeId) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'This lease has no envelope to discard.' });
       }
 
-      return { envelopeId };
+      await discardPreparedEnvelope({ matterId: matter.id, envelopeId: matter.envelopeId, teamId: matter.teamId });
+
+      return { ok: true };
     }),
   }),
   /**

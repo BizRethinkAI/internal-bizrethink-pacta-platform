@@ -277,7 +277,7 @@ describe('the send gate', () => {
     and the party list already follow.
   */
   it('re-checks in the mutation, not only in the query', () => {
-    const send = router.slice(router.indexOf('= await sendEnvelopeFromMatter(') - 4000);
+    const send = router.slice(router.indexOf('await prepareEnvelopeFromMatter(') - 4000);
 
     expect(send.slice(0, 4000)).toMatch(/unassignedYardTasks\(/);
   });

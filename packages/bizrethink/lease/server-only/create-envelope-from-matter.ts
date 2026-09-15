@@ -1,5 +1,4 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import type { CreateEnvelopeOptions } from '@documenso/lib/server-only/envelope/create-envelope';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import type { PlaceholderInfo } from '@documenso/lib/server-only/pdf/auto-place-fields';
@@ -7,7 +6,7 @@ import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { canAccessLeaseBuilder, canRenderClause, canRenderDraftClauses } from '../../server-only/feature-access';
 import { DEFAULT_LEASE_JURISDICTION } from '../clauses/approval-jurisdiction';
 import { libraryFor } from '../clauses/library';
@@ -296,59 +295,4 @@ export const createEnvelopeFromMatter = async ({
     ),
     requestMetadata,
   });
-};
-
-export type SendEnvelopeFromMatterResult = {
-  envelopeId: string;
-  /**
-   * Set when the envelope went out but a step after that failed — queueing a
-   * signing email, or the webhook. The envelope is live: the caller must still
-   * record it against the matter, then surface this.
-   */
-  errorAfterSending: unknown;
-};
-
-/**
- * Create the envelope AND send it.
- *
- * `createEnvelope` makes a draft. On 2026-09-14 the pilot lease was marked
- * sent, the page told the landlord every signer had been emailed, and the
- * envelope sat in DRAFT with every recipient NOT_SENT — nothing ever called
- * `sendDocument`.
- *
- * A failed send is split on whether anything went out, and the envelope's own
- * status decides it — inside the delete, so there is no gap between reading
- * the status and acting on it:
- *
- * - Still a draft: nobody has a link. The draft is discarded and the error
- *   thrown, so the matter stays a draft that can be fixed and sent again
- *   without leaving a stray envelope behind.
- * - No longer a draft: it is out. It is returned, not thrown, because a matter
- *   that does not record it gets sent a second time on the next click.
- */
-export const sendEnvelopeFromMatter = async (
-  options: CreateEnvelopeFromMatterOptions,
-): Promise<SendEnvelopeFromMatterResult> => {
-  const envelope = await createEnvelopeFromMatter(options);
-
-  try {
-    await sendDocument({
-      id: { type: 'envelopeId', id: envelope.id },
-      userId: options.userId,
-      teamId: options.teamId,
-      requestMetadata: options.requestMetadata,
-    });
-  } catch (error) {
-    const discarded = await prisma.envelope.deleteMany({
-      where: { id: envelope.id, status: DocumentStatus.DRAFT },
-    });
-
-    if (discarded.count > 0) {
-      throw error;
-    }
-
-    return { envelopeId: envelope.id, errorAfterSending: error };
-  }
-
-  return { envelopeId: envelope.id, errorAfterSending: null };
 };

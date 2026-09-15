@@ -1,4 +1,4 @@
-# Lease send distributes, and signers see no tokens — author handoff
+# Lease envelopes: prepare, review, send — author handoff
 
 Author `lease-send-20260914`; branch `fix/lease-send-distributes`, from main
 `602e54599`. Assigned directly by the repository owner after the pilot lease
@@ -10,79 +10,95 @@ repair production data.
 Found on the first real lease (29090 Picana Ln, 2026-09-14). Both defects date
 from when sending was wired; neither is a regression.
 
-1. **Send never sent.** The `matter.send` mutation called
-   `createEnvelopeFromMatter`, which ends in upstream `createEnvelope` — a
-   DRAFT — then stamped the matter `sent`. Nothing called `sendDocument`. The
-   review step said "Every signer has been emailed their own link"; in
-   production the envelope was DRAFT, every recipient NOT_SENT, and the audit
-   log held only DOCUMENT_CREATED.
+1. **"Sent" over a draft.** The `matter.send` mutation created an envelope with
+   upstream `createEnvelope` — a DRAFT — and stamped the matter `sent`. Nothing
+   called `sendDocument`. The review step told the landlord every signer had
+   been emailed; in production the envelope was DRAFT, every recipient NOT_SENT,
+   the audit log only DOCUMENT_CREATED.
 2. **Signing tokens visible to signers.** The envelope's PDFs were the raw
    render. `buildEnvelopeInput` and `signature-blocks.ts` both said
-   `createEnvelope` "whites the tokens out"; it does not. Upstream paints them at
-   upload (`extractPdfPlaceholders`), a path the lease never used. So
+   `createEnvelope` "whites the tokens out"; it does not — upstream paints them
+   at upload (`extractPdfPlaceholders`), a path the lease never used. So
    `{{SIGNATURE, r1, width=160, height=44}}` and `{{DATE, r1}}` showed behind
-   every widget, and would have been sealed into the signed PDF. The review copy
-   (`renderLeaseForReview`, read by counsel and by tenants) had them too.
+   every widget and would have been sealed into the signed PDF. The review copy
+   (`renderLeaseForReview`, read by counsel and tenants) had them too.
+
+## The decision: prepare, review, send
+
+The first version of this PR sent the envelope on the button press. The
+repository owner wants to check an envelope before it goes out, so the lease
+builder now **prepares** a draft and stops; the landlord sends it from the
+envelope with upstream's own send. Nothing on the lease-builder path can call
+`sendDocument`, and a source-level test holds that.
 
 ## What changed
 
-- `lease/render/white-out-signing-tokens.ts` paints every **signing** token
-  (`{{TYPE, rN, …}}`) with a white box over the token's own text. Clause
-  variables such as `{{repairThresholdUsd}}` are left: on a review copy they are
-  how a reader sees an answer is missing.
-- **Not upstream's `removePlaceholdersFromPDF`.** That paints the box upstream
-  reports for the field, which for a sized signature is the 160pt widget; the
-  token is ~200pt, so `ght=44}}` stayed. Measured: ~300 ink pixels left per
-  signature line with upstream's paint-out, 0 with this.
-- `createEnvelopeFromMatter` uploads the cleaned PDF; placeholders are still
-  read from the raw render (painting leaves the text, so positions match to
-  1e-3pt).
-- `renderLeaseForReview` returns the cleaned PDF.
-- `sendEnvelopeFromMatter` creates, then `sendDocument`s. On failure the
-  envelope's own status decides, inside a conditional delete:
-  still DRAFT → discarded and the error thrown, matter stays a draft;
-  no longer DRAFT (a step after distribution failed — email job, webhook) →
-  returned as `errorAfterSending`, because a matter that does not record a live
-  envelope gets a second one on the next click.
-- The router stamps `sent` only after that, then reports `errorAfterSending` as
-  an UNKNOWN_ERROR telling the landlord to check recipients on the envelope. The
-  log line carries the envelope id and error message only.
+- **Tokens.** `lease/render/white-out-signing-tokens.ts` paints each signing
+  token (`{{TYPE, rN, …}}`) over its own text box. Clause variables such as
+  `{{repairThresholdUsd}}` stay visible — on a review copy they show an answer is
+  missing. Not upstream's `removePlaceholdersFromPDF`: that paints the field's
+  box, which for a sized signature is the 160pt widget, and the token is ~200pt,
+  so `ght=44}}` stayed (309 ink pixels per line measured; 0 with this). Used by
+  `createEnvelopeFromMatter` before upload and by `renderLeaseForReview`.
+  Placeholders are still read from the raw render; positions match to 1e-3pt.
+- **Prepare.** `matter.prepare` (was `send`) keeps every gate, then
+  `prepareEnvelopeFromMatter` creates the draft and records it on the matter —
+  `status: 'ready'`, `envelopeId`, rule pack version — as a conditional write on
+  `status: 'draft', envelopeId: null`. The loser of a double click deletes its
+  own draft and is refused.
+- **Discard.** `matter.discardEnvelope` → `discardPreparedEnvelope`, in one
+  transaction: delete the envelope only `WHERE status = DRAFT` (a condition of
+  the delete, so a send in another tab cannot be erased), then reopen the matter
+  (`draft`, `envelopeId`/`rulePackVersion`/`generatedAt` null) conditional on it
+  still pointing at that envelope. An envelope already deleted from the
+  documents list reopens the lease too. Anything not a draft is refused.
+- **Status follows the envelope.** `leaseState` takes `envelopeStatus` and
+  resolves it before the matter stamp: DRAFT "Ready to send", PENDING "Out for
+  signature", COMPLETED "Signed", REJECTED "Declined by a signer", CANCELLED
+  "Cancelled", missing "Envelope deleted". The Leases list and the lease page
+  header both read it. The review step's panel shows per-status copy; only the
+  PENDING branch says anything was sent.
 
-No overlay, schema, migration or dependency change. `@libpdf/core` and
+No overlay, schema, migration or dependency change. The two route files are
+owned (added by the lease builder), not upstream. `@libpdf/core` and
 `pdfjs-dist` are imported without being declared in `packages/bizrethink`,
-following the existing `@prisma/client`/`zod` precedent; both are hoisted from
-upstream packages.
+following the existing `@prisma/client`/`zod` precedent.
 
 ## Validation
 
-- Red first. Whiteout tests failed against a pass-through stub (1,559 ink
-  pixels in the first token box) and against upstream's
-  `removePlaceholdersFromPDF` (309 left per signature tail). Send tests failed
-  against a create-only stub (4/4). Router source tests failed against the
-  unchanged router (2/2).
-- Tests rasterise the page (pdfjs + @napi-rs/canvas) because a painted token
-  still extracts — no text-level assertion can tell the two PDFs apart.
-- `lease/` suite: 93 files, 1,059 tests pass. `typecheck:lease` clean. Two
-  existing source-scan tests re-anchored from `const envelope = await
-  createEnvelopeFromMatter` to `= await sendEnvelopeFromMatter(`; their
-  assertions are unchanged.
-- Rendered the cleaned execution pages of the lease and an addendum for four
-  parties and inspected them: rules, printed names and `Date:` labels only.
-- No Playwright scenario sends a lease, before or after; none added. CI runs the
-  existing E2E suite.
+- Red first at each step: whiteout (pass-through stub, then upstream's
+  paint-out), prepare/discard (9 of 10 against no-op stubs; the upload test
+  already passed from the whiteout work), `leaseState` envelope cases (5), router
+  and route source checks.
+- Tests rasterise pages (pdfjs + @napi-rs/canvas): a painted token still
+  extracts, so no text assertion can tell the PDFs apart.
+- `lease/` suite 93 files, 1,068 tests. `typecheck:lease` clean; `apps/remix`
+  `tsc` 0 errors. Biome clean on changed files apart from warnings already in
+  `lease-document.ts`.
+- Two existing source-scan tests re-anchored to `await
+  prepareEnvelopeFromMatter(`; assertions unchanged.
+- No Playwright scenario prepares or sends a lease; none added.
 
-## Production — not done here, needs the owner
+## Limits
 
-The pilot matter `lease_matter_kdxfitilinkibbdw` is `sent` against envelope
-`envelope_xuhhhrcmcudvihov` (document 687), which is DRAFT with raw tokens in
-its PDFs. **Do not send that envelope from the document editor** — it would go
-out with the tokens. After this deploys: delete the draft envelope (a draft
-nobody received), set the matter back to `draft` with `envelopeId = null`, then
-press Send on the review step.
+- A CANCELLED envelope cannot be discarded, so its lease stays locked with no
+  way to prepare a new one from the lease builder.
+- A lease prepared before this deploy may hold PDFs with visible tokens. Discard
+  it and prepare again; the page cannot tell an old draft from a new one.
 
-## Seen, not fixed
+## Production — after deploy, done by the owner in the UI
 
-- The page footer prints the document key, e.g.
-  `PACTA · ADDENDUM:TERMINATION.EARLY-ELECTION`.
-- Every document's execution block says "executed this **Lease**", including
-  addenda and the flood disclosure.
+The pilot matter `lease_matter_kdxfitilinkibbdw` is `sent` against DRAFT
+envelope `envelope_xuhhhrcmcudvihov` (document 687), whose PDFs have raw tokens.
+After deploy its review step reads "The envelope is ready for you to check" —
+**do not send that one.** Press *Discard and edit the lease*, then *Prepare the
+envelope*, check the new draft, send it from the envelope. No database write.
+
+## Seen, not fixed here
+
+A full page-by-page review of the pilot package (7 documents, 29 pages) was done
+outside this PR and reported to the owner. Content and layout defects it found —
+including an occupancy clause that omits stored occupants, e-notice elections
+with no markable fields, an execution line that refers to a date not written
+above, a dropped section heading, and internal document keys in footers — are
+for separate PRs.

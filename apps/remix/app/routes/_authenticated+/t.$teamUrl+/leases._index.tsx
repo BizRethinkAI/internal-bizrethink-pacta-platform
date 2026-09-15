@@ -75,6 +75,23 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   const openReviewsByMatter = new Map(openReviews.map((row) => [row.matterId, row._count._all]));
 
+  /*
+    The envelope's status, because the landlord sends from the envelope and
+    nothing on the matter moves when it goes out. One query for the same reason
+    as the review counts above.
+  */
+  const envelopeIds = matters.flatMap((matter) => (matter.envelopeId ? [matter.envelopeId] : []));
+
+  const envelopes =
+    envelopeIds.length === 0
+      ? []
+      : await prisma.envelope.findMany({
+          where: { id: { in: envelopeIds }, team: { organisationId: team.organisationId } },
+          select: { id: true, status: true },
+        });
+
+  const envelopeStatusById = new Map(envelopes.map((envelope) => [envelope.id, envelope.status]));
+
   return {
     teamUrl,
     organisationId: team.organisationId,
@@ -103,6 +120,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       ...m,
       updatedAt: m.updatedAt.toISOString(),
       openReviews: openReviewsByMatter.get(m.id) ?? 0,
+      // Absent with no envelope; null when the one it points at was deleted.
+      envelopeStatus: m.envelopeId ? (envelopeStatusById.get(m.envelopeId) ?? null) : undefined,
     })),
   };
 }
