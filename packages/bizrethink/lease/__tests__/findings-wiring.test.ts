@@ -45,7 +45,7 @@ const proc = (source: string, name: string) => {
     constant picked.
   */
   const rest = source.slice(start + name.length);
-  const next = rest.search(/\n {4}\w+: (?:authenticatedProcedure|procedure)/);
+  const next = rest.search(/\n {4}\w+: (?:adminProcedure|authenticatedProcedure|procedure)/);
 
   return name + (next === -1 ? rest : rest.slice(0, next));
 };
@@ -87,17 +87,13 @@ describe('an outstanding finding blocks approval', () => {
   });
 });
 
-describe('answerFinding cannot reach another organisation', () => {
-  /*
-    `assertAccess` proves the caller belongs to the organisation they NAMED. It
-    says nothing about the finding: the id came from the caller too, and
-    `update({ where: { id } })` would answer a finding on any other tenant's
-    review. Pacta hosts a second tenant as of 2026-08-31.
-  */
-  it('scopes the write by the review, not just by the named organisation', () => {
-    const body = proc(router, 'answerFinding');
-
-    expect(body).toMatch(/review: \{ organisationId/);
+describe('global findings require instance-admin authority', () => {
+  // Actual middleware authorization and cross-organisation coverage are
+  // exercised in approval-authority.test.ts; keep the staff wiring guarded.
+  it('uses the admin boundary for the global read, answer and approval paths', () => {
+    for (const name of ['listFindings', 'answerFinding', 'approve']) {
+      expect(proc(router, name)).toContain(`${name}: adminProcedure`);
+    }
   });
 
   it('tells the caller when nothing matched instead of reporting success', () => {

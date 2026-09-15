@@ -3,7 +3,7 @@ import { prefixedId } from '@documenso/lib/universal/id';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-import { authenticatedProcedure, procedure, router } from '@documenso/trpc/server/trpc';
+import { adminProcedure, authenticatedProcedure, procedure, router } from '@documenso/trpc/server/trpc';
 import { z } from 'zod';
 
 import { lookupAddress } from '../../lease/address/census';
@@ -1238,10 +1238,14 @@ export const leaseBuilderRouter = router({
           });
         }
 
-        await prisma.bizrethinkLeaseReview.update({
-          where: { id: review.id },
+        const { count } = await prisma.bizrethinkLeaseReview.updateMany({
+          where: { id: review.id, matterId: matter.id, status: 'open' },
           data: { status: 'closed' },
         });
+
+        if (count !== 1) {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'That link is already closed.' });
+        }
 
         return { revoked: true };
       }),
@@ -1547,31 +1551,60 @@ export const leaseBuilderRouter = router({
           answers: z.record(z.string(), z.unknown()).default({}),
         }),
       )
-      .mutation(async ({ input }) => {
-        const review = await prisma.bizrethinkLeaseReview.findUnique({ where: { token: input.token } });
+      .mutation(async ({ input }) =>
+        prisma.$transaction(async (tx) => {
+          const inactive = () =>
+            new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
+          const review = await tx.bizrethinkLeaseReview.findUnique({ where: { token: input.token } });
 
-        if (!review || !isReviewUsable(toDomainReview(review), new Date())) {
-          throw new AppError(AppErrorCode.NOT_FOUND, { message: 'This review link is no longer active.' });
-        }
+          if (!review || !isReviewUsable(toDomainReview(review), new Date())) {
+            throw inactive();
+          }
 
-        /*
-          Written only for a tenant review, and only through the allowlist. An
-          attorney's link carries no questions, so it may not write answers
-          either — the narrower the write, the less a leaked link is worth.
-        */
-        if (review.audience === 'tenant' && Object.keys(input.answers).length > 0) {
-          const matter = await prisma.bizrethinkLeaseMatter.findUnique({
-            where: { id: review.matterId },
-            select: { values: true, delegatedFields: true, status: true },
+          // Claim the link before any answers or comments. A competing submit
+          // or revoke waits on this row and must still match the open state.
+          const claimedAt = new Date();
+          const claim = await tx.bizrethinkLeaseReview.updateMany({
+            where: {
+              id: review.id,
+              token: input.token,
+              status: 'open',
+              OR: [{ expiresAt: null }, { expiresAt: { gt: claimedAt } }],
+            },
+            data: { status: 'returned', returnedAt: claimedAt },
           });
 
-          // A sent lease is frozen. Its answers must not move under signers.
-          if (matter && matter.status === 'draft') {
+          if (claim.count !== 1) {
+            throw inactive();
+          }
+
+          // Lock the draft before reading its current answers. Different
+          // review links share this row too; merging a pre-lock copy would
+          // lose the other reviewer's answers. The revision bump also makes
+          // a stale interview reload after comments-only submissions.
+          const draft = await tx.bizrethinkLeaseMatter.updateMany({
+            where: { id: review.matterId, status: 'draft', envelopeId: null },
+            data: { updatedAt: new Date() },
+          });
+
+          // Either lock may have waited past expiry. Roll the claim back as
+          // well as every effect if the link or draft is no longer usable.
+          if (draft.count !== 1 || !isReviewUsable(toDomainReview(review), new Date())) {
+            throw inactive();
+          }
+
+          // Only delegated tenant fields may change. An attorney link never
+          // writes answers; a sent or missing matter cannot be submitted.
+          if (review.audience === 'tenant' && Object.keys(input.answers).length > 0) {
+            const matter = await tx.bizrethinkLeaseMatter.findUniqueOrThrow({
+              where: { id: review.matterId },
+              select: { values: true, delegatedFields: true },
+            });
             const delegated = ((matter.delegatedFields ?? []) as unknown[]).filter(
               (name): name is string => typeof name === 'string',
             );
 
-            await prisma.bizrethinkLeaseMatter.update({
+            await tx.bizrethinkLeaseMatter.update({
               where: { id: review.matterId },
               data: {
                 values: applyTenantAnswers({
@@ -1582,10 +1615,8 @@ export const leaseBuilderRouter = router({
               },
             });
           }
-        }
 
-        await prisma.$transaction([
-          prisma.bizrethinkReviewComment.createMany({
+          await tx.bizrethinkReviewComment.createMany({
             data: input.comments.map((comment) => ({
               id: prefixedId('lease_comment', 16),
               reviewId: review.id,
@@ -1593,20 +1624,11 @@ export const leaseBuilderRouter = router({
               body: comment.body,
               authorName: review.reviewerName,
             })),
-          }),
-          /*
-            Closing the link is in the same transaction as recording the
-            comments. A submit that stored comments and left the link open
-            would let a second submission double every comment.
-          */
-          prisma.bizrethinkLeaseReview.updateMany({
-            where: { id: review.id, status: 'open' },
-            data: { status: 'returned', returnedAt: new Date() },
-          }),
-        ]);
+          });
 
-        return { submitted: true, commentCount: input.comments.length };
-      }),
+          return { submitted: true, commentCount: input.comments.length };
+        }),
+      ),
   }),
 
   /**
@@ -2081,7 +2103,7 @@ export const leaseBuilderRouter = router({
      * Staff answer a finding. Both halves required — a timestamp with no text
      * would make this as fast to bypass as to satisfy.
      */
-    answerFinding: authenticatedProcedure
+    answerFinding: adminProcedure
       .input(
         z.object({
           organisationId: z.string(),
@@ -2093,15 +2115,13 @@ export const leaseBuilderRouter = router({
         await assertAccess(input.organisationId, ctx.user.id);
 
         /*
-          SCOPED BY THE REVIEW, not only by the organisation the caller named.
-          `assertAccess` proves the caller belongs to that organisation; it says
-          nothing about the finding, whose id also came from the caller. An
-          `update` keyed on the id alone would answer a finding on another
-          tenant's review — and Pacta has hosted a second tenant since
-          2026-08-31.
+          Library approvals are global. Only instance admins may answer the
+          findings that hold them, with the same scope as listFindings and
+          approve. Organisation membership or a lease feature grant alone is
+          not authority to clear a global library blocker.
         */
         const { count } = await prisma.bizrethinkLibraryFinding.updateMany({
-          where: { id: input.findingId, review: { organisationId: input.organisationId } },
+          where: { id: input.findingId },
           data: {
             answer: input.answer,
             answeredAt: new Date(),
@@ -2117,28 +2137,25 @@ export const leaseBuilderRouter = router({
       }),
 
     /** Every finding on the library, newest first, for the staff page. */
-    listFindings: authenticatedProcedure
-      .input(z.object({ organisationId: z.string() }))
-      .query(async ({ ctx, input }) => {
-        await assertAccess(input.organisationId, ctx.user.id);
+    listFindings: adminProcedure.input(z.object({ organisationId: z.string() })).query(async ({ ctx, input }) => {
+      await assertAccess(input.organisationId, ctx.user.id);
 
-        return await prisma.bizrethinkLibraryFinding.findMany({
-          where: { review: { organisationId: input.organisationId } },
-          orderBy: { createdAt: 'desc' },
-          select: {
-            id: true,
-            clauseSlug: true,
-            body: true,
-            authorName: true,
-            clauseFingerprint: true,
-            answeredAt: true,
-            answer: true,
-            createdAt: true,
-          },
-        });
-      }),
+      return await prisma.bizrethinkLibraryFinding.findMany({
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          clauseSlug: true,
+          body: true,
+          authorName: true,
+          clauseFingerprint: true,
+          answeredAt: true,
+          answer: true,
+          createdAt: true,
+        },
+      });
+    }),
 
-    approve: authenticatedProcedure
+    approve: adminProcedure
       .input(
         z.object({
           organisationId: z.string(),
@@ -2215,17 +2232,13 @@ export const leaseBuilderRouter = router({
           both-halves answer rule already exists to prevent. Clearing a finding
           is answering it, and there is no other way.
 
-          SCOPED TO THIS ORGANISATION, matching `listFindings` and
-          `answerFinding` exactly. The library is instance content and an
-          approval is instance-wide, so an argument exists for blocking on
-          every organisation's findings — but the staff page can only list and
-          answer its own, and a guard that cites work the person cannot reach
-          is a dead end they will route around. Same scope in, same scope out.
-          The durable fix is the one the admin loader already names: drop
-          organisationId from BizrethinkLibraryReview, which is a migration.
+          GLOBAL, matching the approval it protects. The admin-only findings
+          read and answer procedures use the same scope, so the staff page can
+          resolve every blocker. Organisation-scoped share links and their
+          history remain intact; their tokens still expose only their findings.
         */
         const findings = await prisma.bizrethinkLibraryFinding.findMany({
-          where: { clauseSlug: clause.slug, review: { organisationId: input.organisationId } },
+          where: { clauseSlug: clause.slug },
           orderBy: { createdAt: 'asc' },
           select: { id: true, clauseSlug: true, body: true, answeredAt: true, answer: true },
         });
