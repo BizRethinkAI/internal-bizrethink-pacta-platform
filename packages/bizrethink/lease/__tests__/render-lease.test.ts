@@ -6,7 +6,7 @@ import { PICANA_FACTS, PICANA_MONEY, PICANA_PARTIES, PICANA_VALUES } from '../ma
 import { markCells } from '../render/election-marks';
 import type { RenderLeaseResult } from '../render/render-lease';
 import { renderLease } from '../render/render-lease';
-import { buildSignatureBlocks } from '../render/signature-blocks';
+import { buildSignatureBlocks, DATE_WIDGET } from '../render/signature-blocks';
 
 /**
  * The end-to-end test: a real lease for 29090 Picana Ln, rendered to PDF and
@@ -156,6 +156,24 @@ describe('every placeholder survives into the PDF', () => {
     const signatures = allPlaceholders.filter((p) => p.fieldAndMeta.type === FieldType.SIGNATURE);
 
     expect(signatures).toHaveLength(PICANA_PARTIES.length * result.documents.length);
+  });
+
+  /*
+    A date field was sized from the text "{{DATE, r1}}", about 58pt, and a
+    filled date did not fit: the pilot envelope showed "2026-09". Overlay 034's
+    width/height meta is now parsed for every field type, so the date field is
+    sized from its meta like the signature.
+  */
+  it('sizes every date field wide enough for a whole date', () => {
+    const dates = allPlaceholders.filter((p) => p.fieldAndMeta.type === FieldType.DATE);
+
+    // A token that wrapped is not extracted at all, so first: every signer has one.
+    expect([...new Set(dates.map((date) => date.recipient.toLowerCase()))].sort()).toEqual(['r1', 'r2', 'r3', 'r4']);
+
+    for (const date of dates) {
+      expect(date.width, date.placeholder).toBe(DATE_WIDGET.width);
+      expect(date.height, date.placeholder).toBe(DATE_WIDGET.height);
+    }
   });
 
   it('sizes every signature widget from its meta rather than its text', async () => {

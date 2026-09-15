@@ -129,7 +129,13 @@ export const parseFieldMetaFromPlaceholder = (
       property === 'fontSize' ||
       property === 'maxValue' ||
       property === 'minValue' ||
-      property === 'characterLimit'
+      property === 'characterLimit' ||
+      // MODIFIED for BizRethink (overlay 092): width/height as numbers for every
+      // field type, so auto-place-fields' overlay-034 size override applies to a
+      // DATE placeholder too. Left as strings they sized a lease's date fields
+      // from their token text — too narrow for a whole date.
+      property === 'width' ||
+      property === 'height'
     ) {
       const numValue = Number(value);
 

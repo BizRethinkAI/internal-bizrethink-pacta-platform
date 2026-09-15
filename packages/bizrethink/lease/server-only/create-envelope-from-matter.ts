@@ -36,6 +36,10 @@ import { findGoverningDocuments } from './governing-documents';
  * database.
  */
 
+/** Upstream validates `dateFormat` against `VALID_DATE_FORMAT_VALUES`; this is one of them. */
+export const LEASE_DATE_FORMAT = 'MM/dd/yyyy';
+export const LEASE_TIME_ZONE = 'America/New_York';
+
 export type BuildEnvelopeInputOptions = {
   rendered: RenderedDocument[];
   /** Placeholders extracted from each rendered PDF, keyed by document key. */
@@ -121,6 +125,17 @@ export const buildEnvelopeInput = ({
     // a default signer on top of them, which would shift no indices but would
     // add a signature nobody asked for.
     bypassDefaultRecipients: true,
+    /*
+      SIGNING DATES AS A US LEASE WRITES THEM, IN EASTERN TIME. Upstream's
+      defaults — `yyyy-MM-dd hh:mm a`, UTC — put "2026-09-15 10:30 AM" into each
+      date field of the first pilot envelope, cut off to "2026-09", and would
+      date a Florida signature made in the evening on the following day.
+
+      Eastern for every lease the builder supports today: Florida (bar the
+      western panhandle, on Central time) and North Carolina. A property in a
+      Central county needs this derived from the county before it goes out.
+    */
+    meta: { dateFormat: LEASE_DATE_FORMAT, timezone: LEASE_TIME_ZONE },
   };
 };
 

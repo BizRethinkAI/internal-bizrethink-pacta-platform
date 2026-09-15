@@ -1,0 +1,23 @@
+# Why: A lease's signing dates printed "2026-09" — upstream sized each DATE widget from its token text (~58pt), too narrow for a whole date. The lease sizes it with `width=`/`height=` meta, which overlay 034's override in auto-place-fields already honours, but only if the values are numbers.
+# Why-not-additive: `parseFieldMetaFromPlaceholder` is upstream's placeholder parser; it turned only fontSize/min/max/characterLimit into numbers, so `width=96` arrived as the string "96".
+# Upstream-merge-fragility: low; two names added to one condition. Re-apply if upstream rewrites the numeric-property list or moves the parser.
+
+diff --git a/packages/lib/server-only/pdf/helpers.ts b/packages/lib/server-only/pdf/helpers.ts
+index 97665304e..bdda30328 100644
+--- a/packages/lib/server-only/pdf/helpers.ts
++++ b/packages/lib/server-only/pdf/helpers.ts
+@@ -129,7 +129,13 @@ export const parseFieldMetaFromPlaceholder = (
+       property === 'fontSize' ||
+       property === 'maxValue' ||
+       property === 'minValue' ||
+-      property === 'characterLimit'
++      property === 'characterLimit' ||
++      // MODIFIED for BizRethink (overlay 092): width/height as numbers for every
++      // field type, so auto-place-fields' overlay-034 size override applies to a
++      // DATE placeholder too. Left as strings they sized a lease's date fields
++      // from their token text — too narrow for a whole date.
++      property === 'width' ||
++      property === 'height'
+     ) {
+       const numValue = Number(value);
+ 

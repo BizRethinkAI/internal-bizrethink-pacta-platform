@@ -79,7 +79,7 @@ export const inkIn = async (pdf: Uint8Array, regions: Region[]): Promise<number[
 /**
  * Where a token's TEXT sits, which is not where its widget sits.
  *
- * A sized signature placeholder reports the widget — 160 × 44, centred on the
+ * A sized placeholder (a signature, or a date) reports the widget — 160 × 44, centred on the
  * line — while `{{SIGNATURE, r1, width=160, height=44}}` is about 200pt of
  * 11pt type. Checking only the widget's box is exactly how the last 40pt of the
  * token (`ght=44}}`) stayed on the page. So a sized token is checked along its
@@ -87,7 +87,7 @@ export const inkIn = async (pdf: Uint8Array, regions: Region[]): Promise<number[
  * signature rule beneath is not mistaken for a leftover.
  */
 export const tokenTextRegion = (placeholder: PlaceholderInfo, lineWidth: number): Region => {
-  const sized = placeholder.fieldAndMeta.type === 'SIGNATURE' && placeholder.placeholder.includes('width=');
+  const sized = placeholder.placeholder.includes('width=');
 
   if (!sized) {
     return {

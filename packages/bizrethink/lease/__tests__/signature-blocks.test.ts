@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { LeaseParty } from '../render/signature-blocks';
-import { buildSignatureBlocks, SIGNATURE_WIDGET } from '../render/signature-blocks';
+import { buildSignatureBlocks, DATE_WIDGET, SIGNATURE_WIDGET } from '../render/signature-blocks';
 
 /**
  * Signature blocks are not clauses. They are generated from the party list, so
@@ -82,7 +82,7 @@ describe('the placeholders each signer gets', () => {
     */
     expect(signer.placeholders.map((p) => p.token)).toEqual([
       `{{SIGNATURE, r1, width=${SIGNATURE_WIDGET.width}, height=${SIGNATURE_WIDGET.height}}}`,
-      '{{DATE, r1}}',
+      `{{DATE, r1, width=${DATE_WIDGET.width}, height=${DATE_WIDGET.height}}}`,
     ]);
   });
 

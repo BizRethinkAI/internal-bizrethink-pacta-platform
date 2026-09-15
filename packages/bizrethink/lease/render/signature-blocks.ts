@@ -15,6 +15,17 @@
 /** Default widget size in PDF points, proven end-to-end by the Phase 0 spike. */
 export const SIGNATURE_WIDGET = { width: 160, height: 44 } as const;
 
+/**
+ * The signing-date field, sized from its meta like the signature.
+ *
+ * Sized from the text "{{DATE, r1}}" it was about 58pt, and the first pilot
+ * envelope (2026-09-15) showed each date as "2026-09" — the rest was cut off.
+ * Upstream draws the date at 12pt with 6pt of padding each side; 96pt leaves
+ * 84pt, room for "09/15/2026" with margin. Height 16 fits 12pt type. Needs
+ * overlay 092 (width/height parsed for every field type, not only SIGNATURE).
+ */
+export const DATE_WIDGET = { width: 96, height: 16 } as const;
+
 /** Point size of a rendered placeholder line. Matches the renderer's base font. */
 export const LINE_TEXT_HEIGHT = 11;
 
@@ -116,7 +127,7 @@ export const buildSignatureBlocks = ({
               token: `{{SIGNATURE, ${recipient}, width=${widget.width}, height=${widget.height}}}`,
               reservedLeadingPt: leading,
             },
-            plain(`{{DATE, ${recipient}}}`),
+            plain(`{{DATE, ${recipient}, width=${DATE_WIDGET.width}, height=${DATE_WIDGET.height}}}`),
             ...(withInitials ? [plain(`{{INITIALS, ${recipient}}}`)] : []),
           ],
         })),
