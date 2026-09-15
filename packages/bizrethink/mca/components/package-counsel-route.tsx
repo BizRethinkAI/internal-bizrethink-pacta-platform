@@ -2,6 +2,7 @@ import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
+import { McaHolisticReviewTools } from './holistic-review-tools';
 import { McaPackageCounselReader } from './package-counsel-reader';
 
 export const McaPackageCounselRoute = ({ token }: { token: string }) => {
@@ -34,6 +35,7 @@ export const McaPackageCounselRoute = ({ token }: { token: string }) => {
   return (
     <McaPackageCounselReader
       {...data}
+      reviewTools={<McaHolisticReviewTools {...data} token={token} onChanged={() => view.refetch()} />}
       renderFinding={(item) => {
         const target = `content:${item.slug}`;
         return (
@@ -55,7 +57,11 @@ export const McaPackageCounselRoute = ({ token }: { token: string }) => {
                       </p>
                     ) : (
                       <p>
-                        <Trans>Unanswered — approval held</Trans>
+                        {data.snapshot.kind === 'provider' ? (
+                          <Trans>Unanswered — review completion held</Trans>
+                        ) : (
+                          <Trans>Unanswered — approval held</Trans>
+                        )}
                       </p>
                     )}
                   </div>
