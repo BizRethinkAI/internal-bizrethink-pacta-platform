@@ -77,6 +77,16 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
       'grid-template-columns',
       /^250px /,
     );
+    await counsel.getByRole('button', { name: 'Start reviewing', exact: true }).click();
+    await counsel.getByLabel('Review document', { exact: true }).selectOption('frpa');
+    const party = counsel.locator('[data-mca-package-item="frpa.party-identification"]');
+    await expect(party.locator('[data-mca-review-text] > .font-serif')).not.toContainText('{{field:');
+    await expect(party.locator('[data-mca-review-text] > .font-serif')).toContainText('Example Receipts Inc.');
+    await expect(party.locator('[data-review-field]')).not.toHaveCount(0);
+    await counsel.getByLabel('Search review index', { exact: true }).fill('Synthetic controlled processor terms');
+    const index = counsel.getByRole('complementary', { name: 'Review index' });
+    await index.getByRole('navigation', { name: 'Review contents' }).getByRole('button').click();
+    await expect(counsel.locator('[data-mca-processor-review]')).toBeFocused();
     const processorOption = counsel
       .getByLabel('Review document', { exact: true })
       .locator('option')

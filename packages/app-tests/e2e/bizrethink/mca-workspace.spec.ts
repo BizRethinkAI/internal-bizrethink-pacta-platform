@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import { contentFor } from '@bizrethink/customizations/mca/catalogue';
 import { mcaClauseFingerprint, mcaLibraryFingerprint } from '@bizrethink/customizations/mca/clauses/approval';
+import { ZReviewPackage } from '@bizrethink/customizations/mca/review/package-schema';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -92,6 +93,10 @@ test('a complete neutral counsel package preserves findings, source context and 
     const link = card.getByRole('link', { name: 'Open saved review', exact: true });
     await expect(link).toBeVisible();
     const href = await link.getAttribute('href');
+    const saved = await prisma.bizrethinkMcaPackageReview.findFirstOrThrow({
+      where: { createdByUserId: user.id, reviewerName },
+    });
+    const snapshot = ZReviewPackage.parse(saved.snapshot);
     const counsel = await counselContext.newPage();
     await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${href}`);
     await expect(counsel.getByRole('heading', { name: 'Shared MCA library — complete counsel package' })).toBeVisible();
@@ -132,6 +137,69 @@ test('a complete neutral counsel package preserves findings, source context and 
     await item.getByText('Findings for this item', { exact: false }).click();
     await expect(item).toContainText('Synthetic review: reconcile payment wording across the package.');
 
+    // Every rendered passage must reconstruct the exact saved words and references.
+    // The only substitutions are visibly annotated blanks with recoverable notation.
+    for (const savedDocument of snapshot.documents) {
+      await counsel.getByLabel('Review document', { exact: true }).selectOption(savedDocument.id);
+      const expectedItems = savedDocument.sections.flatMap((section) => section.items);
+      await expect(counsel.locator('[data-mca-package-item]')).toHaveCount(expectedItems.length);
+      const rendered = await counsel.locator('[data-mca-package-item]').evaluateAll((elements) =>
+        elements.map((element) => {
+          const prose = element.querySelector('[data-mca-review-text] > .font-serif')!;
+          const copy = prose.cloneNode(true) as HTMLElement;
+          for (const field of copy.querySelectorAll('[data-original-text]')) {
+            field.replaceWith(document.createTextNode(field.getAttribute('data-original-text')!));
+          }
+          return {
+            slug: element.getAttribute('data-mca-package-item'),
+            original: copy.textContent,
+            displayed: prose.textContent,
+          };
+        }),
+      );
+      expect(rendered.map((entry) => ({ slug: entry.slug, original: entry.original }))).toEqual(
+        expectedItems.map((entry) => ({
+          slug: entry.slug,
+          original: entry.reading.segments.map((segment) => segment.text).join(''),
+        })),
+      );
+      expect(rendered.every((entry) => !/\{\{field:|«\d+»/.test(entry.displayed ?? ''))).toBe(true);
+    }
+    await counsel.getByLabel('Review document', { exact: true }).selectOption('frpa');
+    const party = counsel.locator('[data-mca-package-item="frpa.party-identification"]');
+    await expect(party.locator('[data-review-field]').last()).toHaveText('[Merchant — Legal Name]');
+    await party.getByText('Field details', { exact: false }).click();
+    await expect(party.locator('[data-mca-field-annotations]')).toContainText('{{field:merchant.legalName}}');
+    const guarantorFields = counsel.locator('[data-mca-package-item="frpa.guarantor-fields"] [data-mca-review-fields]');
+    await expect(guarantorFields.getByText('Required when the guarantor is an entity', { exact: false })).toHaveCount(
+      2,
+    );
+    await expect(guarantorFields).not.toContainText('guarantor.kind = entity');
+    const fundingFields = counsel.locator(
+      '[data-mca-package-item="frpa.merchant-and-funding-information"] [data-mca-review-fields]',
+    );
+    await expect(fundingFields.locator('> section')).not.toHaveCount(1);
+    await expect(fundingFields.locator('dt').first()).toHaveCSS('font-size', '16px');
+    await counsel.getByLabel('Larger text', { exact: true }).check();
+    await expect(fundingFields.locator('dt').first()).toHaveCSS('font-size', '18px');
+    await expect(fundingFields.locator('dd').first()).toHaveCSS('font-size', '18px');
+    await counsel.getByLabel('Larger text', { exact: true }).uncheck();
+    const definitions = counsel.locator(
+      '[data-mca-package-item="frpa.definitions"] [data-mca-review-text] > .font-serif > p',
+    );
+    expect(await definitions.count()).toBeGreaterThan(1);
+    await party.scrollIntoViewIfNeeded();
+    await counsel.screenshot({ path: testInfo.outputPath('counsel-readable-field-annotations.png'), fullPage: false });
+    await counsel.getByLabel('Search review index', { exact: true }).fill('Guaranty of Performance');
+    const alternatives = index
+      .getByRole('navigation', { name: 'Review contents' })
+      .getByRole('button')
+      .filter({ hasText: 'Guaranty of Performance' })
+      .filter({ hasText: 'Future Receivables Purchase Agreement' });
+    await expect(alternatives).toHaveCount(2);
+    expect(new Set(await alternatives.allTextContents()).size).toBe(2);
+    await expect(alternatives.filter({ hasText: 'Full performance guaranty' })).toHaveCount(1);
+
     await counsel.getByLabel('Search review index', { exact: true }).fill('Processor Fees');
     await index.getByRole('button', { name: /Processor Fees.*Split Funding Authorization/i }).click();
     await expect(counsel.getByLabel('Review document', { exact: true })).toHaveValue('split-funding');
@@ -140,10 +208,35 @@ test('a complete neutral counsel package preserves findings, source context and 
     );
     await counsel.getByLabel('Review document', { exact: true }).selectOption('requirements');
     const source = counsel.locator('[data-mca-review-requirement="va-disclosure"]');
-    await source.locator('summary').click();
-    await expect(source).toContainText('prescribed-form');
+    await index
+      .getByRole('navigation', { name: 'Review contents' })
+      .getByRole('button', { name: /Virginia/ })
+      .click();
+    await expect(source).toHaveAttribute('open', '');
+    await expect(source).toContainText('Prescribed form');
     await expect(source).toContainText('Last source reading:');
     await expect(source.getByRole('link').first()).toBeVisible();
+    await counsel.getByLabel('Search review index', { exact: true }).fill('10 CCR §914');
+    await index.getByRole('button', { name: /California.*10 CCR §914/ }).click();
+    const california = counsel.locator('[data-mca-review-requirement="ca-offer-summary"]');
+    await expect(california).toHaveAttribute('open', '');
+    await expect(california).toBeFocused();
+    const quote = california.locator('[data-mca-source-wording]').first();
+    await expect(quote).toBeVisible();
+    await expect(quote).toHaveCSS('font-size', '16px');
+    await counsel.getByLabel('Larger text', { exact: true }).check();
+    await expect(quote).toHaveCSS('font-size', '18px');
+    await counsel.getByLabel('Larger text', { exact: true }).uncheck();
+    await expect(california.getByText('Prescribed content only', { exact: true }).first()).toBeVisible();
+    await expect(california.getByText('Only Prescribed Content: true', { exact: true }).first()).not.toBeVisible();
+    await expect(california.locator('[data-mca-source-specification] > div').first()).not.toBeVisible();
+    const exactWording = snapshot.requirements
+      .find((requirement) => requirement.slug === 'ca-offer-summary')!
+      .entries.flatMap((entry) => entry.paragraphs)
+      .find((paragraph) => paragraph.startsWith('Verbatim: '))!
+      .slice('Verbatim: '.length);
+    await expect(quote).toHaveText(exactWording);
+    await quote.scrollIntoViewIfNeeded();
     await counsel.screenshot({ path: testInfo.outputPath('counsel-disclosure-source-context.png'), fullPage: false });
     await counsel.setViewportSize({ width: 390, height: 844 });
     await expect(index).not.toBeVisible();

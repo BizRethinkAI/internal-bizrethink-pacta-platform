@@ -30,7 +30,7 @@ export const focusReadingItem = (id: string) => {
   const focus = () => {
     const element = document.getElementById(id);
     if (element) {
-      for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+      for (let parent: HTMLElement | null = element; parent; parent = parent.parentElement) {
         if (parent instanceof HTMLDetailsElement) {
           parent.open = true;
         }
@@ -63,11 +63,15 @@ export const LegalText = ({
   segments,
   large = false,
   sourceId,
+  paragraphs,
+  renderText,
 }: {
   text?: string;
   segments?: LegalSegment[];
   large?: boolean;
   sourceId?: string;
+  paragraphs?: LegalSegment[][];
+  renderText?: (text: string) => ReactNode;
 }) => {
   const follow = useContext(ReferenceContext);
   const fallbackId = useId();
@@ -76,29 +80,31 @@ export const LegalText = ({
     <div
       className={`max-w-[78ch] break-words font-serif text-foreground leading-[1.85] ${large ? 'text-xl' : 'text-[17px]'}`}
     >
-      {readingParagraphs(segments ?? [{ kind: 'text', text: text ?? '' }]).map((paragraph, paragraphIndex) => (
-        <p
-          key={`${id}-${paragraphIndex}`}
-          className={`whitespace-pre-wrap ${paragraphIndex ? 'mt-5' : ''} ${/^\s*\([a-z0-9]+\)/i.test(paragraph[0]?.text ?? '') ? 'pl-7 -indent-7' : ''}`}
-        >
-          {paragraph.map((part, index) =>
-            part.kind === 'reference' && follow ? (
-              <button
-                key={`${id}-${paragraphIndex}-${index}`}
-                id={`${id}-${paragraphIndex}-${index}`}
-                type="button"
-                className="inline rounded-sm text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-                aria-label={`${part.targetKind === 'section' ? 'Section' : 'Clause'} ${part.text}, open reference`}
-                onClick={(event) => follow(part, event.currentTarget)}
-              >
-                {part.text}
-              </button>
-            ) : (
-              <span key={`${id}-${paragraphIndex}-${index}`}>{part.text}</span>
-            ),
-          )}
-        </p>
-      ))}
+      {(paragraphs ?? readingParagraphs(segments ?? [{ kind: 'text', text: text ?? '' }])).map(
+        (paragraph, paragraphIndex) => (
+          <p
+            key={`${id}-${paragraphIndex}`}
+            className={`whitespace-pre-wrap ${paragraphIndex ? 'mt-5' : ''} ${/^\s*\([a-z0-9]+\)/i.test(paragraph[0]?.text ?? '') ? 'pl-7 -indent-7' : ''}`}
+          >
+            {paragraph.map((part, index) =>
+              part.kind === 'reference' && follow ? (
+                <button
+                  key={`${id}-${paragraphIndex}-${index}`}
+                  id={`${id}-${paragraphIndex}-${index}`}
+                  type="button"
+                  className="inline rounded-sm text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                  aria-label={`${part.targetKind === 'section' ? 'Section' : 'Clause'} ${part.text}, open reference`}
+                  onClick={(event) => follow(part, event.currentTarget)}
+                >
+                  {part.text}
+                </button>
+              ) : (
+                <span key={`${id}-${paragraphIndex}-${index}`}>{renderText ? renderText(part.text) : part.text}</span>
+              ),
+            )}
+          </p>
+        ),
+      )}
     </div>
   );
 };
@@ -109,12 +115,14 @@ export const ReferenceWorkspace = ({
   contexts,
   onNavigate,
   captureReturn,
+  renderReading,
   children,
 }: {
   items: ReadingItem[];
   contexts: Record<string, Record<string, LegalReading>>;
   onNavigate: (reference: LegalReference) => void;
   captureReturn?: () => () => void;
+  renderReading?: (item: ReadingItem, reading: LegalReading) => ReactNode;
   children: ReactNode;
 }) => {
   const [peek, setPeek] = useState<{
@@ -220,10 +228,14 @@ export const ReferenceWorkspace = ({
                         {contexts[peek?.reference.context ?? '']?.[item.slug]?.number} {item.heading}
                       </h3>
                     )}
-                    <LegalText
-                      sourceId={`peek-${item.slug}`}
-                      segments={contexts[peek?.reference.context ?? '']?.[item.slug]?.segments}
-                    />
+                    {renderReading ? (
+                      renderReading(item, contexts[peek?.reference.context ?? ''][item.slug])
+                    ) : (
+                      <LegalText
+                        sourceId={`peek-${item.slug}`}
+                        segments={contexts[peek?.reference.context ?? '']?.[item.slug]?.segments}
+                      />
+                    )}
                   </div>
                 ))}
               </div>

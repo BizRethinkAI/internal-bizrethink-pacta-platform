@@ -4,9 +4,12 @@ import { Trans } from '@lingui/react/macro';
 import { BookOpenIcon, ListIcon } from 'lucide-react';
 import { type ReactNode, useId, useState } from 'react';
 import { focusReadingItem, LegalText, LegalWorkspace, legalItemId, ReferenceWorkspace } from '../../legal-ui/reader';
-import { packageReviewIndex, searchPackageReviewIndex } from '../review/package-navigation';
+import { packageReviewIndex } from '../review/package-navigation';
 import type { McaReviewItem, McaReviewPackage } from '../review/package-schema';
+import { readableReviewMetadata, reviewParagraphs, searchSavedPackage, selectionLabel } from '../review/presentation';
 import { reviewTargets } from '../review/targets';
+import { McaReviewRequirements, reviewDate } from './review-requirements';
+import { McaReviewFields, McaReviewText } from './review-text';
 
 export const McaPackageCounselReader = ({
   snapshot,
@@ -45,10 +48,7 @@ export const McaPackageCounselReader = ({
   const active = snapshot.documents.find((document) => document.id === selected);
   const items = packageReviewIndex(snapshot);
   const units = reviewTargets(snapshot).filter((target) => target.reviewUnit);
-  const results = searchPackageReviewIndex(
-    query.trim() ? items : items.filter((item) => item.instrument === selected),
-    query,
-  );
+  const results = searchSavedPackage(snapshot, query).filter((item) => query.trim() || item.documentId === selected);
   const go = (documentId: string, sectionId: string | null = null) => {
     setSelected(documentId);
     setSubject(sectionId);
@@ -73,8 +73,7 @@ export const McaPackageCounselReader = ({
             </p>
             <h1 className="font-semibold text-2xl tracking-tight sm:text-3xl">{snapshot.title}</h1>
             <p className="mt-2 text-muted-foreground text-sm">
-              <Trans>Prepared for</Trans> {reviewerName} · <Trans>Link expires</Trans>{' '}
-              {new Date(expiresAt).toLocaleDateString()}
+              <Trans>Prepared for</Trans> {reviewerName} · <Trans>Link expires</Trans> {reviewDate(expiresAt)}
             </p>
           </div>
           <Button variant="outline" onClick={() => openPanel('brief')}>
@@ -125,6 +124,17 @@ export const McaPackageCounselReader = ({
         <ReferenceWorkspace
           items={items}
           contexts={snapshot.contexts}
+          renderReading={(entry, reading) => {
+            const document = snapshot.documents.find((document) => document.id === entry.instrument);
+            const item = document?.sections
+              .flatMap((section) => section.items)
+              .find((item) => item.slug === entry.slug);
+            return document && item ? (
+              <McaReviewText document={document} item={item} reading={reading} large={large} preview />
+            ) : (
+              <LegalText segments={reading.segments} large={large} />
+            );
+          }}
           captureReturn={() => {
             const saved = { selected, subject, panel, context, query };
             return () => {
@@ -152,6 +162,16 @@ export const McaPackageCounselReader = ({
               <p className="my-2 text-muted-foreground text-xs">
                 {units.filter((unit) => reviewedTargetIds.includes(unit.id)).length} / {units.length}{' '}
                 <Trans>units marked reviewed · coverage is not approval</Trans>
+              </p>
+              <p className="text-muted-foreground text-xs">
+                {snapshot.documents.length} <Trans>instruments</Trans> · {snapshot.requirements.length}{' '}
+                <Trans>source records</Trans>
+                {snapshot.kind === 'provider' && snapshot.externalDocuments.length > 0 && (
+                  <>
+                    {' '}
+                    · {snapshot.externalDocuments.length} <Trans>processor forms</Trans>
+                  </>
+                )}
               </p>
               <nav aria-label="Review overview" className="my-4 space-y-1">
                 <Button
@@ -240,19 +260,16 @@ export const McaPackageCounselReader = ({
                     {results.map((item) => (
                       <button
                         type="button"
-                        key={item.slug}
+                        key={item.id}
                         className="block w-full rounded px-2 py-2 text-left text-sm hover:bg-muted"
                         onClick={() => {
-                          go(item.instrument, item.section);
+                          go(item.documentId, item.section);
                           focusReadingItem(legalItemId(item.slug));
                         }}
                       >
-                        {item.reading.number && (
-                          <span className="mr-2 text-muted-foreground">{item.reading.number}</span>
-                        )}
-                        {item.heading}
+                        {item.label}
                         {query.trim() && (
-                          <span className="mt-1 block text-muted-foreground text-xs">{item.documentTitle}</span>
+                          <span className="mt-1 block text-muted-foreground text-xs">{item.detail}</span>
                         )}
                       </button>
                     ))}
@@ -325,7 +342,7 @@ export const McaPackageCounselReader = ({
                   <Trans>Processor form</Trans>
                 )}
               </h2>
-              <p className="mb-6 max-w-[78ch] text-muted-foreground text-sm leading-relaxed">
+              <p className={`mb-6 max-w-[78ch] text-muted-foreground leading-relaxed ${large ? 'text-lg' : 'text-sm'}`}>
                 <Trans>
                   Saved review copy. No merchant or partner may sign or receive this as an executed transaction.
                 </Trans>
@@ -342,19 +359,30 @@ export const McaPackageCounselReader = ({
                     </Button>
                   </>
                 )}
-                <div hidden={panel !== 'progress'}>{reviewTools}</div>
+                <div
+                  hidden={panel !== 'progress'}
+                  className={large ? '[&_.text-sm]:text-lg [&_.text-xs]:text-base' : ''}
+                >
+                  {reviewTools}
+                </div>
                 {panel === 'reading' && active && (
                   <section className="space-y-5">
-                    <p className="font-medium text-muted-foreground text-sm">{active.title}</p>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="font-medium text-muted-foreground">{active.title}</p>
+                    <p className={`text-muted-foreground ${large ? 'text-lg' : 'text-sm'}`}>
                       {active.counterparty} ·{' '}
                       {active.control === 'processor-controlled'
                         ? 'Payzli processor-controlled context; acceptance required separately'
                         : 'Authored provisions and reusable content'}
                     </p>
+                    <p className={large ? 'text-lg' : 'text-sm'}>
+                      <Trans>
+                        Bracketed field labels are unfilled blanks, not supplied values. Field details retain the
+                        original notation.
+                      </Trans>
+                    </p>
                     {context && (
                       <p className="rounded border p-3 text-sm">
-                        <Trans>Reference context:</Trans> {context}{' '}
+                        <Trans>Reference context:</Trans> {readableReviewMetadata(context)}{' '}
                         <Button variant="ghost" onClick={() => setContext(null)}>
                           {snapshot.kind === 'provider' ? (
                             <Trans>Return to saved selection</Trans>
@@ -383,49 +411,35 @@ export const McaPackageCounselReader = ({
                                   className="scroll-mt-6 space-y-4 border-b pb-6 last:border-0"
                                 >
                                   <ItemHeading className="font-semibold text-xl">
-                                    {reading.number && <span className="mr-2">{reading.number}</span>}
+                                    {reading.number && <span>{reading.number} </span>}
                                     {item.heading}
                                   </ItemHeading>
-                                  <p className="text-muted-foreground text-sm">
+                                  <p className={`text-muted-foreground ${large ? 'text-lg' : 'text-sm'}`}>
                                     {item.kind === 'clause'
-                                      ? item.included
-                                        ? snapshot.kind === 'provider'
-                                          ? 'Saved provider selection'
-                                          : 'Example selection'
-                                        : 'Alternative — separate selection'
+                                      ? selectionLabel(item)
                                       : item.kind === 'guidance'
                                         ? 'Interview guidance — excluded from contracts'
                                         : 'Reusable content — no clause number'}
-                                    {item.selectionNote ? ` · ${item.selectionNote}` : ''}
                                   </p>
-                                  <LegalText sourceId={item.slug} segments={reading.segments} large={large} />
-                                  {item.fields.length > 0 && (
-                                    <dl className="grid gap-3 rounded bg-muted/20 p-4 sm:grid-cols-2">
-                                      {item.fields.map((field) => (
-                                        <div key={field.binding}>
-                                          <dt className="font-medium">{field.label}</dt>
-                                          <dd className="text-muted-foreground text-sm">
-                                            {field.kind} · {field.required ? 'Required' : 'Optional'}
-                                            {field.condition ? ` when ${field.condition}` : ''}
-                                          </dd>
-                                        </div>
-                                      ))}
-                                    </dl>
-                                  )}
+                                  <McaReviewText document={active} item={item} reading={reading} large={large} />
+                                  {item.fields.length > 0 && <McaReviewFields fields={item.fields} large={large} />}
                                   {item.repeatFor && (
-                                    <p className="text-sm">
+                                    <p className={large ? 'text-lg' : 'text-sm'}>
                                       <Trans>Repeat this field group for each</Trans> {item.repeatFor}.
                                     </p>
                                   )}
-                                  <details className="text-muted-foreground text-sm">
+                                  <details className={`text-muted-foreground ${large ? 'text-lg' : 'text-sm'}`}>
                                     <summary className="cursor-pointer">
                                       <Trans>Provision context</Trans>
                                     </summary>
                                     <p>{item.rationale}</p>
-                                    <p>{item.variation}</p>
+                                    <p>{readableReviewMetadata(item.variation)}</p>
+                                    {item.selectionNote && <p>{readableReviewMetadata(item.selectionNote)}</p>}
                                     {item.states.length > 0 && <p>{item.states.join(', ')}</p>}
                                   </details>
-                                  {renderFinding(item)}
+                                  <div className={large ? '[&_.text-sm]:text-lg [&_.text-xs]:text-base' : ''}>
+                                    {renderFinding(item)}
+                                  </div>
                                 </article>
                               );
                             })}
@@ -441,7 +455,9 @@ export const McaPackageCounselReader = ({
                     .map((document) => (
                       <section
                         key={document.id}
-                        className="space-y-4 rounded-lg border p-5"
+                        id={legalItemId(`processor:${document.id}`)}
+                        tabIndex={-1}
+                        className={`space-y-4 rounded-lg border p-5 ${large ? 'text-lg' : 'text-base'}`}
                         data-mca-processor-review={document.id}
                       >
                         <h2 className="font-semibold text-2xl">{document.title}</h2>
@@ -456,7 +472,10 @@ export const McaPackageCounselReader = ({
                           </Trans>
                         </p>
                         {document.content ? (
-                          <LegalText text={document.content} large={large} />
+                          <LegalText
+                            paragraphs={reviewParagraphs([{ kind: 'text', text: document.content }])}
+                            large={large}
+                          />
                         ) : (
                           <p role="alert">
                             <Trans>
@@ -468,76 +487,7 @@ export const McaPackageCounselReader = ({
                       </section>
                     ))}
                 {panel === 'reading' && selected === 'requirements' && (
-                  <section className="space-y-5">
-                    <p>
-                      <Trans>
-                        Determine coverage, exemptions, effective dates and required forms for each provider and
-                        transaction. These saved source records do not certify current law.
-                      </Trans>
-                    </p>
-                    {snapshot.requirements.map((requirement) => (
-                      <details
-                        key={requirement.slug}
-                        id={legalItemId(`requirement:${requirement.slug}`)}
-                        tabIndex={-1}
-                        className="rounded-lg border p-4"
-                        data-mca-review-requirement={requirement.slug}
-                      >
-                        <summary className="cursor-pointer font-semibold">
-                          {requirement.jurisdictionName} · {requirement.citation}
-                        </summary>
-                        <div className="mt-4 space-y-3 text-sm">
-                          <p>
-                            {requirement.kind} · {requirement.transaction}
-                          </p>
-                          <p>
-                            <Trans>Last source reading:</Trans> {requirement.lastReadAt ?? 'Not recorded'} ·{' '}
-                            <Trans>Words verified:</Trans> {requirement.verbatimVerifiedAt ?? 'Not recorded'} ·{' '}
-                            <Trans>Structure verified:</Trans>{' '}
-                            {requirement.structureVerifiedAt ?? 'Not applicable / not recorded'}
-                          </p>
-                          <p className="whitespace-pre-wrap">{requirement.sourceEvidence}</p>
-                          {requirement.sourceUrls.map((url) => (
-                            <a
-                              key={url}
-                              href={url}
-                              rel="noreferrer"
-                              target="_blank"
-                              className="block break-all underline"
-                            >
-                              {url}
-                            </a>
-                          ))}
-                          <p>
-                            <Trans>Saved source digest:</Trans>{' '}
-                            <span className="break-all font-mono">{requirement.sourceDigest}</span>
-                          </p>
-                          {requirement.observedDigest !== requirement.sourceDigest && (
-                            <p role="alert">
-                              <Trans>The source is missing or no longer matches the recorded verification.</Trans>
-                            </p>
-                          )}
-                          {requirement.limitations.map((limitation, index) => (
-                            <p key={`${index}:${limitation}`} className="text-amber-800 dark:text-amber-300">
-                              {limitation}
-                            </p>
-                          ))}
-                          {requirement.entries.map((entry, index) => (
-                            <div key={`${entry.label}:${index}`} className="space-y-2 border-t pt-3">
-                              <h3 className="font-semibold">
-                                {index + 1}. {entry.label}
-                              </h3>
-                              {entry.paragraphs.map((paragraph, part) => (
-                                <p key={`${part}:${paragraph}`} className="whitespace-pre-wrap">
-                                  {paragraph}
-                                </p>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    ))}
-                  </section>
+                  <McaReviewRequirements requirements={snapshot.requirements} large={large} />
                 )}
               </div>
             </div>
@@ -580,8 +530,8 @@ const PackageReviewBrief = ({ snapshot, large }: { snapshot: McaReviewPackage; l
               <Trans>Saved provider policy</Trans>
             </summary>
             {snapshot.provider.policy.map((line) => (
-              <p key={line} className="text-sm">
-                {line}
+              <p key={line} className={large ? 'text-lg' : 'text-[15px]'}>
+                {readableReviewMetadata(line)}
               </p>
             ))}
           </details>
@@ -612,7 +562,11 @@ const PackageReviewBrief = ({ snapshot, large }: { snapshot: McaReviewPackage; l
           </Trans>
         </p>
       )}
-      <p className="text-sm">{snapshot.profileDescription}</p>
+      <ul className="list-disc space-y-1 pl-5" aria-label="Saved selection context">
+        {snapshot.profileDescription.split('; ').map((description, index) => (
+          <li key={index}>{readableReviewMetadata(description)}</li>
+        ))}
+      </ul>
     </section>
     <section className="space-y-3 py-6 first:pt-0" key="processor">
       <p className="font-mono text-muted-foreground text-xs">03</p>
