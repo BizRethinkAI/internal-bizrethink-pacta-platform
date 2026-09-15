@@ -46,11 +46,17 @@ describe('the early-termination addendum offers a real election', () => {
     What makes it an election is a FIELD, so that is what is asserted now, and
     `election-is-markable.test.ts` carries it through to the extracted PDF.
   */
-  it('gives the tenant something to mark', () => {
-    const boxes = addendum().match(/\{\{tenantElectionBox\}\}/g) ?? [];
+  it('gives every tenant something to mark, on both options', () => {
+    const marks = addendum().match(/^\[\[each tenant marks\]\] /gm) ?? [];
 
-    expect(boxes).toHaveLength(2);
+    expect(marks).toHaveLength(2);
+    expect(addendum(), 'a derived box for the first tenant only').not.toContain('{{tenantElectionBox}}');
     expect(addendum(), 'a bracket is a character, not a field').not.toMatch(/\[\s*\]/);
+  });
+
+  // Joint and several liability means one tenant's mark cannot speak for another.
+  it('says what happens when the tenants mark different options', () => {
+    expect(addendum()).toMatch(/or the marks differ/);
   });
 
   it('states the consequence of declining, as the statute does', () => {
@@ -68,5 +74,27 @@ describe('the early-termination addendum offers a real election', () => {
 
   it('still prevails over the body', () => {
     expect(addendum()).toMatch(/This Addendum prevails/);
+  });
+});
+
+/*
+  §83.505: each party elects separately and gives an address. The addendum
+  printed "[ ]" for every option — nothing any of the four signers could mark,
+  so the election the notice clause depends on could never be made.
+*/
+describe('the electronic-notice addendum offers real elections', () => {
+  const addendum = () => body('notices.electronic-delivery');
+
+  it('gives each landlord and each tenant both options', () => {
+    expect(addendum().match(/^\[\[each landlord marks\]\] /gm) ?? []).toHaveLength(2);
+    expect(addendum().match(/^\[\[each tenant marks\]\] /gm) ?? []).toHaveLength(2);
+    expect(addendum(), 'a bracket is a character, not a field').not.toMatch(/\[\s*\]/);
+  });
+
+  it('keeps what §83.505 requires the form to say', () => {
+    expect(addendum()).toMatch(/THIS ELECTION IS VOLUNTARY/);
+    expect(addendum()).toMatch(/I may revoke my agreement/);
+    expect(addendum()).toContain('{{landlordNoticeEmails}}');
+    expect(addendum()).toContain('{{tenantNoticeEmails}}');
   });
 });

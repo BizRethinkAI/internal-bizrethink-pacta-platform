@@ -3,111 +3,149 @@ import { FieldType } from '@prisma/client';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { PICANA_FACTS, PICANA_MONEY, PICANA_PARTIES, PICANA_VALUES } from '../matters/picana-ln';
-import { tenantElectionBox } from '../parties/derive-parties';
+import { markCells } from '../render/election-marks';
+import { PAD_H } from '../render/lease-document';
+import type { RenderLeaseResult } from '../render/render-lease';
 import { renderLease } from '../render/render-lease';
 
 /**
- * THE ELECTION §83.595(4) PRESCRIBES MUST BE MAKEABLE.
+ * AN ELECTION IS ONLY AN ELECTION IF EVERY PERSON WHO MAKES IT CAN MARK IT.
  *
- * The addendum offered two options as the literal characters "[ ]" — no field,
- * no widget, nothing to click. On its own terms ("If neither is marked, no
- * early termination fee is agreed") that lost the landlord the
- * liquidated-damages remedy by default, on every lease, silently.
+ * §83.595(4)'s early-termination addendum first shipped as the literal
+ * characters "[ ]". Fixed with a checkbox — for the FIRST tenant only, so on
+ * the 2026-09-15 pilot lease one of two jointly liable tenants had nothing to
+ * mark. The §83.505 electronic-notice addendum still printed "[ ]" for both
+ * landlords and both tenants: nothing a signer could click, so the election the
+ * lease's notice clause relies on could never be made.
  *
- * Nothing caught it: the text was right, the statute was cited correctly, the
- * addendum rendered and signed. Only opening the signing view — or reading the
- * PDF for fields rather than for words — shows that the choice cannot be made.
+ * And where there was a box, blanking its token left a wide gap before the
+ * option's words. Options now run full width, with a row of marks beneath —
+ * one cell per person, their name over their own box.
  */
 
-let addendum: Awaited<ReturnType<typeof extractPlaceholdersFromPDF>>;
+type Placeholders = Awaited<ReturnType<typeof extractPlaceholdersFromPDF>>;
+
+let result: RenderLeaseResult;
+const fieldsByDocument: Record<string, Placeholders> = {};
 
 beforeAll(async () => {
-  const { rendered } = await renderLease({
-    facts: PICANA_FACTS,
+  result = await renderLease({
+    facts: { ...PICANA_FACTS, earlyTerminationOffered: true, electronicNoticesElected: true },
     money: PICANA_MONEY,
     values: PICANA_VALUES,
     parties: PICANA_PARTIES,
     propertyAddress: '29090 Picana Lane, Wesley Chapel, Florida 33543',
   });
 
-  const doc = rendered.find((each) => each.key.includes('early-election'));
-
-  expect(doc, 'the early-termination addendum must render').toBeDefined();
-
-  addendum = await extractPlaceholdersFromPDF(doc!.pdf);
+  for (const doc of result.rendered) {
+    fieldsByDocument[doc.key] = await extractPlaceholdersFromPDF(Buffer.from(doc.pdf));
+  }
 }, 120_000);
 
-describe('the early-termination election can be marked', () => {
-  it('places exactly two checkboxes — an election needs two options', () => {
-    const boxes = addendum.filter((field) => field.fieldAndMeta.type === FieldType.CHECKBOX);
+const recipientsOf = (role: 'landlord' | 'tenant') =>
+  PICANA_PARTIES.flatMap((party, index) => (party.role === role ? [`r${index + 1}`] : []));
 
-    expect(boxes).toHaveLength(2);
-  });
+const checkboxesIn = (key: string) =>
+  (fieldsByDocument[Object.keys(fieldsByDocument).find((each) => each.includes(key)) ?? ''] ?? []).filter(
+    (field) => field.fieldAndMeta.type === FieldType.CHECKBOX,
+  );
 
-  /*
-    AND THEY BELONG TO THE TENANT. §83.595(4) is the tenant's election to make;
-    a box in front of a landlord is not one. The recipient index is positional,
-    so this is the assertion that would have caught a hard-coded "r2".
-  */
-  it('assigns them to a tenant, not to a landlord', () => {
-    const firstTenantAt = PICANA_PARTIES.findIndex((party) => party.role === 'tenant');
+const countBy = (fields: Placeholders) =>
+  fields.reduce<Record<string, number>>((counts, field) => {
+    counts[field.recipient] = (counts[field.recipient] ?? 0) + 1;
 
-    for (const box of addendum.filter((field) => field.fieldAndMeta.type === FieldType.CHECKBOX)) {
-      expect(box.recipient).toBe(`r${firstTenantAt + 1}`);
-    }
-  });
+    return counts;
+  }, {});
 
-  it('leaves no dead "[ ]" bracket behind', async () => {
-    const { rendered } = await renderLease({
-      facts: PICANA_FACTS,
-      money: PICANA_MONEY,
-      values: PICANA_VALUES,
-      parties: PICANA_PARTIES,
-      propertyAddress: '29090 Picana Lane, Wesley Chapel, Florida 33543',
-    });
+const textOf = async (key: string) => {
+  const doc = result.rendered.find((each) => each.key.includes(key));
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const parsed = await pdfjs.getDocument({ data: new Uint8Array(doc!.pdf) }).promise;
+  const items: { str: string; x: number }[] = [];
 
-    const doc = rendered.find((each) => each.key.includes('early-election'))!;
-    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
-    const parsed = await pdfjs.getDocument({ data: new Uint8Array(doc.pdf), useSystemFonts: false }).promise;
+  for (let n = 1; n <= parsed.numPages; n += 1) {
+    const content = await (await parsed.getPage(n)).getTextContent();
 
-    let text = '';
-
-    for (let n = 1; n <= parsed.numPages; n += 1) {
-      const content = await (await parsed.getPage(n)).getTextContent();
-
-      for (const item of content.items) {
-        if ('str' in item) {
-          text += item.str;
-        }
+    for (const item of content.items) {
+      if ('str' in item) {
+        items.push({ str: item.str, x: item.transform[4] });
       }
     }
+  }
 
-    expect(text).not.toMatch(/\[\s*\]/);
-  }, 120_000);
+  return items;
+};
+
+describe('the early-termination election (§83.595(4))', () => {
+  it('gives EVERY tenant a box on both options, and no landlord any', () => {
+    const counts = countBy(checkboxesIn('early-election'));
+
+    expect(Object.keys(counts).sort()).toEqual(recipientsOf('tenant').sort());
+
+    for (const recipient of recipientsOf('tenant')) {
+      expect(counts[recipient], recipient).toBe(2);
+    }
+  });
 });
 
-describe('the election token is derived from the party order, never literal', () => {
-  /*
-    `signature-blocks` numbers signers r1..rN over the party list, so the
-    tenant's index moves with the order the parties were entered in.
-  */
-  it('follows the tenant wherever they sit in the list', () => {
-    expect(
-      tenantElectionBox([
-        { name: 'L', role: 'landlord', email: 'l@example.com' },
-        { name: 'T', role: 'tenant', email: 't@example.com' },
-      ]),
-    ).toBe('{{CHECKBOX, r2}}');
+describe('the electronic-notice elections (§83.505)', () => {
+  it('gives every landlord and every tenant a box on both options of their own election', () => {
+    const counts = countBy(checkboxesIn('electronic-delivery'));
 
-    expect(
-      tenantElectionBox([
-        { name: 'T', role: 'tenant', email: 't@example.com' },
-        { name: 'L', role: 'landlord', email: 'l@example.com' },
-      ]),
-    ).toBe('{{CHECKBOX, r1}}');
+    expect(Object.keys(counts).sort()).toEqual([...recipientsOf('landlord'), ...recipientsOf('tenant')].sort());
+
+    for (const recipient of Object.keys(counts)) {
+      expect(counts[recipient], recipient).toBe(2);
+    }
   });
+});
 
-  it('renders nothing rather than a broken token when there is no tenant', () => {
-    expect(tenantElectionBox([{ name: 'L', role: 'landlord', email: 'l@example.com' }])).toBe('');
+describe('what a signer reads', () => {
+  for (const key of ['early-election', 'electronic-delivery']) {
+    it(`${key}: no bracket, no marker, and every option starts at the margin`, async () => {
+      const items = await textOf(key);
+      const text = items.map((item) => item.str).join('');
+
+      expect(text).not.toMatch(/\[\s*\]/);
+      expect(text).not.toContain('[[');
+
+      const options = items.filter((item) => /^I (do not )?agree/.test(item.str.trim()));
+
+      expect(options.length).toBeGreaterThan(0);
+
+      for (const option of options) {
+        expect(option.x, option.str).toBeLessThan(PAD_H + 2);
+      }
+    });
+  }
+
+  it('names each person over their own box', async () => {
+    const text = (await textOf('early-election')).map((item) => item.str).join(' ');
+
+    for (const cell of markCells(PICANA_PARTIES, 'tenant')) {
+      expect(text).toContain(cell.name);
+    }
+  });
+});
+
+describe('markCells', () => {
+  /*
+    A recipient index is POSITIONAL: `signature-blocks.ts` numbers signers
+    r1..rN over the party list, so a person's box must follow them wherever
+    they sit in it. A hard-coded r2 puts the tenant's election in front of a
+    landlord on the next lease.
+  */
+  it('follows each person wherever they sit in the party list', () => {
+    const parties = [
+      { name: 'Tenant A', role: 'tenant' as const },
+      { name: 'Landlord', role: 'landlord' as const },
+      { name: 'Tenant B', role: 'tenant' as const },
+    ];
+
+    expect(markCells(parties, 'tenant')).toEqual([
+      { name: 'Tenant A', token: '{{CHECKBOX, r1}}' },
+      { name: 'Tenant B', token: '{{CHECKBOX, r3}}' },
+    ]);
+    expect(markCells(parties, 'landlord')).toEqual([{ name: 'Landlord', token: '{{CHECKBOX, r2}}' }]);
   });
 });
