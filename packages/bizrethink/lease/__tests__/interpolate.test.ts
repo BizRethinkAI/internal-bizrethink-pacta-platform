@@ -57,7 +57,7 @@ describe('formatting by type', () => {
       values: { startDate: '2026-10-01' },
     });
 
-    expect(result.text).toBe('begins on 1 October 2026');
+    expect(result.text).toBe('begins on October 1, 2026');
   });
 
   it('leaves numbers unformatted', () => {

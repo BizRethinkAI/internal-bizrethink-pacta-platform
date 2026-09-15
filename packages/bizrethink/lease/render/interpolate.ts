@@ -1,5 +1,7 @@
 import type { ClauseVariable } from '../clauses/types';
 
+import { formatLongDate } from './long-date';
+
 /**
  * Substitute answer values into clause text.
  *
@@ -48,35 +50,13 @@ const usd = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
 
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-/** `2026-10-01` -> `1 October 2026`. Parsed by hand to avoid a timezone shift. */
-const formatDate = (iso: string): string => {
-  const [year, month, day] = iso.split('-').map(Number);
-
-  return `${day} ${MONTHS[month - 1]} ${year}`;
-};
-
 const format = (value: InterpolationValue, type: ClauseVariable['type']): string => {
   if (type === 'usd') {
     return usd.format(Number(value));
   }
 
   if (type === 'date') {
-    return formatDate(String(value));
+    return formatLongDate(String(value));
   }
 
   return String(value);

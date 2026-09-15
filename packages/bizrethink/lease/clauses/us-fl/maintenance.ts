@@ -197,7 +197,7 @@ export const FL_MAINTENANCE: Clause[] = [
       rather than open-ended, and the non-waivable carve-out is stated in the
       clause instead of being left to inference.
     */
-    body: "Tenant shall carry out and pay for minor repairs and replacements to non-structural items at the Premises where the cost of the individual repair does not exceed {{repairThresholdUsd}}, including items such as tap washers and similar plumbing hardware, water filters, air-conditioning filters, and light bulbs. Smoke and carbon monoxide alarms are dealt with separately, and the devices themselves remain Landlord's responsibility. Tenant's total liability under this clause may not exceed {{repairAnnualCapUsd}} in any 12-month period, and a single defect is a single repair however many parts or visits it takes to put right. This obligation does not extend to any matter falling within Fla. Stat. §83.51(1), which remains Landlord's responsibility regardless of cost, and does not limit Tenant's liability for damage caused by Tenant's negligence or misuse, which is not capped by that figure.",
+    body: "Tenant shall carry out and pay for minor repairs and replacements to non-structural items at the Premises where the cost of the individual repair does not exceed {{repairThresholdUsd}}, including items such as faucet washers and similar plumbing hardware, water filters, air-conditioning filters, and light bulbs. Smoke and carbon monoxide alarms are dealt with separately, and the devices themselves remain Landlord's responsibility. Tenant's total liability under this clause may not exceed {{repairAnnualCapUsd}} in any 12-month period, and a single defect is a single repair however many parts or visits it takes to put right. This obligation does not extend to any matter falling within Fla. Stat. §83.51(1), which remains Landlord's responsibility regardless of cost, and does not limit Tenant's liability for damage caused by Tenant's negligence or misuse, which is not capped by that figure.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => alterableUnder8351(facts.propertyType),
@@ -217,7 +217,7 @@ export const FL_MAINTENANCE: Clause[] = [
     section: 'maintenance',
     sortKey: 35,
     heading: 'Air Conditioning',
-    body: "Tenant shall replace the air-conditioning filters at least once each month and shall keep the condensate drain line clear. Mechanical failure of the air-conditioning system is Landlord's responsibility, save that Tenant is liable for the cost of any repair shown to have been caused by failure to carry out these obligations. Tenant shall report any unusual noise, odour or performance to Landlord in writing without delay.",
+    body: "Tenant shall replace the air-conditioning filters at least once each month and shall keep the condensate drain line clear. Mechanical failure of the air-conditioning system is Landlord's responsibility, except that Tenant is liable for the cost of any repair shown to have been caused by failure to carry out these obligations. Tenant shall report any unusual noise, odor or performance to Landlord in writing without delay.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => alterableUnder8351(facts.propertyType),

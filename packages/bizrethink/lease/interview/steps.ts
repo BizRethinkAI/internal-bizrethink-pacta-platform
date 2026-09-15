@@ -823,10 +823,10 @@ export const FL_INTERVIEW: InterviewStep[] = [
         target: 'value',
         kind: 'text',
         label: 'Who receives notices for the landlord?',
-        help: 'Florida requires the lease to name the landlord, or whoever is authorised to receive notices on their behalf.',
+        help: 'Florida requires the lease to name the landlord, or whoever is authorized to receive notices on their behalf.',
         statute: {
           cite: 'Fla. Stat. §83.50',
-          note: 'The name and address of the landlord, or of a person authorised to receive notices and demands, must be disclosed in writing.',
+          note: 'The name and address of the landlord, or of a person authorized to receive notices and demands, must be disclosed in writing.',
         },
         required: true,
       },

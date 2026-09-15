@@ -47,7 +47,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
       from a house. Association documents still win, because they can forbid
       home occupation outright and this Lease cannot licence what they prohibit.
     */
-    body: 'Tenant shall use the Premises as a private residence only. Tenant shall not use the Premises for any business or commercial purpose, nor for any unlawful purpose, and shall not offer the Premises or any part of it for short-term letting through any platform or otherwise. Remote work by Tenant using the Premises as a private residence is permitted, provided that no client, customer or member of the public attends the Premises for that work, no employee of Tenant works at the Premises, no signage is displayed, no stock or inventory is kept for sale, and the work is permitted by any governing documents of an association to which the Premises are subject.',
+    body: 'Tenant shall use the Premises as a private residence only. Tenant shall not use the Premises for any business or commercial purpose, nor for any unlawful purpose, and shall not offer the Premises or any part of it for short-term rental through any platform or otherwise. Remote work by Tenant using the Premises as a private residence is permitted, provided that no client, customer or member of the public attends the Premises for that work, no employee of Tenant works at the Premises, no signage is displayed, no stock or inventory is kept for sale, and the work is permitted by any governing documents of an association to which the Premises are subject.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -74,7 +74,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'use',
     sortKey: 20,
     heading: 'Occupants',
-    body: "The Premises may be occupied by no more than {{occupantLimit}} people. The people authorised to occupy the Premises are {{tenantNames}}. Any other person staying at the Premises for more than {{guestNightsLimit}} nights in any calendar month requires Landlord's prior written consent.",
+    body: "The Premises may be occupied by no more than {{occupantLimit}} people. The people authorized to occupy the Premises are {{tenantNames}}. Any other person staying at the Premises for more than {{guestNightsLimit}} nights in any calendar month requires Landlord's prior written consent.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => !facts.hasNamedOccupants,
@@ -95,14 +95,14 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'use',
     sortKey: 20,
     heading: 'Occupants',
-    body: "The Premises may be occupied by no more than {{occupantLimit}} people. The people authorised to occupy the Premises are {{tenantNames}}, together with {{authorisedOccupants}}. Any other person staying at the Premises for more than {{guestNightsLimit}} nights in any calendar month requires Landlord's prior written consent.",
+    body: "The Premises may be occupied by no more than {{occupantLimit}} people. The people authorized to occupy the Premises are {{tenantNames}}, together with {{authorisedOccupants}}. Any other person staying at the Premises for more than {{guestNightsLimit}} nights in any calendar month requires Landlord's prior written consent.",
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasNamedOccupants,
     variables: [
       { name: 'occupantLimit', type: 'number', label: 'Maximum occupants', required: true },
       { name: 'tenantNames', type: 'string', label: 'Tenant name(s)', required: true },
-      { name: 'authorisedOccupants', type: 'string', label: 'Other authorised occupants', required: true },
+      { name: 'authorisedOccupants', type: 'string', label: 'Other authorized occupants', required: true },
       { name: 'guestNightsLimit', type: 'number', label: 'Guest nights before consent needed', required: true },
     ],
     supersedes: [],
@@ -298,7 +298,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'default',
     sortKey: 20,
     heading: 'Vacating the Premises',
-    body: 'On the end of the term Tenant shall remove all belongings and rubbish, return every key, remote and access device, and leave the Premises clean and in the condition in which they were received, fair wear and tear excepted. Landlord may recover from the deposit the cost of cleaning or repair beyond fair wear and tear, and shall account for any such deduction under the deposit sections of this Lease.',
+    body: 'On the end of the term Tenant shall remove all belongings and trash, return every key, remote and access device, and leave the Premises clean and in the condition in which they were received, fair wear and tear excepted. Landlord may recover from the deposit the cost of cleaning or repair beyond fair wear and tear, and shall account for any such deduction under the deposit sections of this Lease.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -350,8 +350,8 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     placement: 'lease-body',
     section: 'default',
     sortKey: 30,
-    heading: 'Moisture and Mould',
-    body: 'Tenant shall maintain reasonable climate control in the Premises, keep them clean and dry, use extractor fans when bathing or cooking, and avoid conditions that promote mould growth. Tenant shall report to Landlord in writing, without delay, any water leak, excessive moisture, or visible mould, and any failure or malfunction of the heating, ventilation or air-conditioning system. Landlord shall address any reported condition promptly.',
+    heading: 'Moisture and Mold',
+    body: 'Tenant shall maintain reasonable climate control in the Premises, keep them clean and dry, use extractor fans when bathing or cooking, and avoid conditions that promote mold growth. Tenant shall report to Landlord in writing, without delay, any water leak, excessive moisture, or visible mold, and any failure or malfunction of the heating, ventilation or air-conditioning system. Landlord shall address any reported condition promptly.',
     source: drafted(),
     status: 'draft',
     includeWhen: null,
@@ -474,7 +474,7 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     heading: 'House Rules',
     // Real rules with real content, replacing three headings that read "N/A"
     // and one labelled "Others" holding six substantive clauses.
-    body: "Tenant shall observe the following rules, which form part of this Lease:\n\n1. No garage, yard or estate sale may be held at the Premises without Landlord's prior written consent.\n2. Locks may not be changed, added or removed without Landlord's prior written consent; where consent is given, Tenant shall provide Landlord with a key.\n3. Nothing may be fixed to walls, woodwork or floors other than small nails or hooks for hanging pictures. Tenant is responsible for making good.\n4. A flotation bedding system may be used only if it complies with applicable building codes. Tenant shall carry flotation insurance in Tenant's name, as is standard in the industry, in an amount reasonable to protect Tenant and Landlord against personal injury and property damage, and the policy shall carry a loss payable clause to the owner of the building.\n5. Windows may not be covered with foil, paper or other reflective material.\n6. Water hoses must be fitted with an automatic shut-off nozzle. Leaks must be reported without delay.\n7. Patios, balconies, entrances and walkways may not be used for storage.\n8. No antenna or satellite dish may be installed without Landlord's prior written consent.\n9. The landscaping may not be altered without Landlord's prior written consent.\n10. No window-mounted air-conditioning unit or window-mounted fan may be installed, except temporarily while the central system is out of order and on notice to Landlord.\n11. Tenant, occupants and guests shall not cause a nuisance or unreasonably disturb neighbours.\n12. Waste must be placed in the receptacles provided and put out for collection at the times set by the collection service.",
+    body: "Tenant shall observe the following rules, which form part of this Lease:\n\n1. No garage, yard or estate sale may be held at the Premises without Landlord's prior written consent.\n2. Locks may not be changed, added or removed without Landlord's prior written consent; where consent is given, Tenant shall provide Landlord with a key.\n3. Nothing may be fixed to walls, woodwork or floors other than small nails or hooks for hanging pictures. Tenant is responsible for repairing any damage.\n4. A flotation bedding system may be used only if it complies with applicable building codes. Tenant shall carry flotation insurance in Tenant's name, as is standard in the industry, in an amount reasonable to protect Tenant and Landlord against personal injury and property damage, and the policy shall carry a loss payable clause to the owner of the building.\n5. Windows may not be covered with foil, paper or other reflective material.\n6. Water hoses must be fitted with an automatic shut-off nozzle. Leaks must be reported without delay.\n7. Patios, balconies, entrances and walkways may not be used for storage.\n8. No antenna or satellite dish may be installed without Landlord's prior written consent.\n9. The landscaping may not be altered without Landlord's prior written consent.\n10. No window-mounted air-conditioning unit or window-mounted fan may be installed, except temporarily while the central system is out of order and on notice to Landlord.\n11. Tenant, occupants and guests shall not cause a nuisance or unreasonably disturb neighbors.\n12. Waste must be placed in the receptacles provided and put out for collection at the times set by the collection service.",
     source: drafted(),
     status: 'draft',
     includeWhen: null,
