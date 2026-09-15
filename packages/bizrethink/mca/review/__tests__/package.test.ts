@@ -52,6 +52,26 @@ describe('the complete neutral counsel package', () => {
     snapshot.documents[0].sections[0].items[0].text += ' changed';
     expect(() => readReviewPackage(snapshot, fingerprint)).toThrow(/snapshot/i);
   });
+  it('survives JSONB object-key reordering without changing array order or weakening content integrity', () => {
+    const snapshot = build();
+    const reorder = (value: unknown): unknown => {
+      if (Array.isArray(value)) {
+        return value.map(reorder);
+      }
+      if (value && typeof value === 'object') {
+        return Object.fromEntries(
+          Object.entries(value)
+            .sort(([left], [right]) => right.localeCompare(left))
+            .map(([key, child]) => [key, reorder(child)]),
+        );
+      }
+      return value;
+    };
+    expect(readReviewPackage(reorder(snapshot), reviewPackageFingerprint(snapshot))).toEqual(snapshot);
+    const fingerprint = reviewPackageFingerprint(snapshot);
+    snapshot.documents.reverse();
+    expect(() => readReviewPackage(snapshot, fingerprint)).toThrow(/snapshot/i);
+  });
 
   it('provides reference contexts across the package without dropping target documents', () => {
     const snapshot = build();

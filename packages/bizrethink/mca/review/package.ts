@@ -18,7 +18,24 @@ const NEUTRAL_ROLES: McaTenant = {
   parties: { funder: '[Buyer legal name]', equipmentAffiliate: '[Equipment provider legal name]', processor: 'Payzli' },
   documents: {},
 };
-const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+// JSONB reorders object keys. Legal reading order lives in arrays and stays significant.
+const canonical = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(canonical);
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value)
+        .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+        .map(([key, child]) => [key, canonical(child)]),
+    );
+  }
+  return value;
+};
+const hash = (value: unknown) =>
+  createHash('sha256')
+    .update(JSON.stringify(canonical(value)))
+    .digest('hex');
 export const reviewPackageFingerprint = (snapshot: McaReviewPackage) => hash(snapshot);
 
 export const readReviewPackage = (value: unknown, fingerprint: string): McaReviewPackage => {
