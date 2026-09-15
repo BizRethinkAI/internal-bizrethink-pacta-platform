@@ -1,3 +1,4 @@
+import { inlineContentDisposition } from '@bizrethink/customizations/lease/documents/content-disposition';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
 
@@ -84,7 +85,8 @@ export async function loader({ params }: Route.LoaderArgs) {
       'Content-Type': document.contentType,
       // Inline: a signer reading a declaration beside the lease should not have
       // to find it in a downloads folder to answer the question in front of them.
-      'Content-Disposition': `inline; filename="${document.label.replace(/["\\]/g, '')}.pdf"`,
+      // Encoded, not interpolated: a label with an em dash threw here and served a 500.
+      'Content-Disposition': inlineContentDisposition(document.label),
       'Cache-Control': 'no-store, private',
       'X-Robots-Tag': 'noindex, nofollow',
     },
