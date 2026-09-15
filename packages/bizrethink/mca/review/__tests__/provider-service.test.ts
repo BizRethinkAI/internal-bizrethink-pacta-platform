@@ -49,6 +49,7 @@ describe('provider counsel invitations are isolated by team and revision', () =>
     expect(mocks.access).toHaveBeenCalledWith({ teamId: 17, userId: 12, write: true });
     expect(mocks.preview).toHaveBeenCalledWith(input);
     expect(mocks.db.bizrethinkMcaPackageReview.create.mock.calls[0][0].data).toMatchObject({
+      kind: 'provider',
       teamId: 17,
       organisationId: 'org-a',
       templateId: 'template-a',
@@ -76,6 +77,7 @@ describe('provider counsel invitations are isolated by team and revision', () =>
   it('constrains management reads and writes by authorized team, organization, template and revision', async () => {
     await listProviderReviews(input);
     expect(mocks.db.bizrethinkMcaPackageReview.findMany.mock.calls[0][0].where).toEqual({
+      kind: 'provider',
       teamId: 17,
       organisationId: 'org-a',
       templateId: 'template-a',
@@ -83,6 +85,7 @@ describe('provider counsel invitations are isolated by team and revision', () =>
     });
     await answerProviderFinding({ ...input, findingId: 'foreign-finding', answer: 'Response' });
     expect(mocks.db.bizrethinkMcaPackageFinding.updateMany.mock.calls[0][0].where.review).toEqual({
+      kind: 'provider',
       teamId: 17,
       organisationId: 'org-a',
       templateId: 'template-a',
@@ -91,6 +94,7 @@ describe('provider counsel invitations are isolated by team and revision', () =>
     await revokeProviderReview({ ...input, reviewId: 'foreign-review' });
     expect(mocks.db.bizrethinkMcaPackageReview.updateMany.mock.calls[0][0].where).toMatchObject({
       id: 'foreign-review',
+      kind: 'provider',
       teamId: 17,
       organisationId: 'org-a',
       templateId: 'template-a',

@@ -15,7 +15,13 @@ export const providerReviewScope = async (input: ProviderReviewScope, write = fa
   ) {
     throw new AppError(AppErrorCode.FORBIDDEN, { message: 'Internal draft review access is required.' });
   }
-  return { teamId: team.id, organisationId: team.organisationId, templateId: input.id, templateVersion: input.version };
+  return {
+    kind: 'provider' as const,
+    teamId: team.id,
+    organisationId: team.organisationId,
+    templateId: input.id,
+    templateVersion: input.version,
+  };
 };
 
 export const shareProviderReview = async (
