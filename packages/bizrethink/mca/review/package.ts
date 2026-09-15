@@ -5,6 +5,7 @@ import { mcaClauseFingerprint } from '../clauses/approval';
 import { INSTRUMENTS, MCA_INSTRUMENTS } from '../clauses/instruments';
 import { type McaTenant, resolveClauses, resolveParties } from '../clauses/parties';
 import { MCA_JURISDICTIONS } from '../jurisdictions';
+import { readSourceText, sourceExists } from '../provenance/source-text';
 import { disclosuresFor } from '../registry';
 import { contentForReview } from '../reusable/review';
 import { entryFor } from '../surface/view';
@@ -71,7 +72,20 @@ export const reviewRequirements = (): McaReviewPackage['requirements'] =>
       // Age is displayed relative to these dates by the reader. It must not mutate a snapshot each midnight.
       const entry = entryFor(spec);
       const rows = 'rows' in spec ? spec.rows : 'lines' in spec ? spec.lines : spec.requirements;
-      const evidence = entry.originEvidence ?? entry.originWhy;
+      const header = sourceExists(spec.sourceFile) ? readSourceText(spec.sourceFile).split('\n').slice(0, 80) : [];
+      // Preserve recorded fetch locations/dates without exposing internal editorial history.
+      const retrieval = header.filter((line) =>
+        /^\s*(?:Retrieved from|Retrieved at[^:]*|Source URL|Fetched from|Official link context)\s*:/i.test(line),
+      );
+      const evidence = [
+        ...retrieval,
+        entry.originEvidence ?? entry.originWhy,
+        ...(retrieval.some((line) => /(?:Retrieved from|Source URL|Fetched from)\s*:\s*https?:/i.test(line))
+          ? []
+          : [
+              'The exact retrieval URL is not recorded in this source header; publisher links identify the publisher, not the original fetch.',
+            ]),
+      ].join('\n');
       return {
         slug: spec.slug,
         jurisdiction: spec.jurisdiction,

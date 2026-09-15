@@ -55,6 +55,12 @@ describe('the complete neutral counsel package', () => {
     ).toBeGreaterThan(8);
   });
 
+  it('includes recorded retrieval URLs, not just a publisher homepage', () => {
+    const requirement = build().requirements.find((item) => item.slug === 'va-disclosure');
+    expect(requirement?.sourceUrls.some((url) => url.includes('/uploads/10VAC5/forms/'))).toBe(true);
+    expect(requirement?.sourceEvidence).toContain('Retrieved at (UTC)');
+  });
+
   it('preserves the exact saved package, rejects changed payloads, and does not depend on the current date', () => {
     const snapshot = build();
     const fingerprint = reviewPackageFingerprint(snapshot);
