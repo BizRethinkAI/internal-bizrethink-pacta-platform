@@ -71,18 +71,31 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
     await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/mca-clause-review/${review.token}`);
     await expect(counsel.locator('[data-mca-counsel-package]')).toContainText('Example Receipts Inc.');
     await expect(counsel.locator('[data-mca-counsel-package]')).not.toContainText('Payzli');
+    await expect(counsel.getByRole('complementary', { name: 'Review index' }).locator('..')).toHaveCSS(
+      'grid-template-columns',
+      /^250px /,
+    );
+    const processorOption = counsel
+      .getByLabel('Review document', { exact: true })
+      .locator('option')
+      .filter({ hasText: 'Example Processor Inc' });
     await counsel
-      .getByRole('navigation', { name: 'Counsel package' })
-      .getByRole('button', { name: /Example Processor Inc/ })
-      .click();
+      .getByLabel('Review document', { exact: true })
+      .selectOption((await processorOption.getAttribute('value'))!);
     await expect(counsel.locator('[data-mca-processor-review]')).toContainText('Synthetic controlled processor terms.');
 
+    await counsel.getByRole('button', { name: 'Progress & findings', exact: true }).click();
     await counsel.locator('summary').filter({ hasText: 'Record a holistic finding' }).click();
     await counsel.getByLabel('Whole package', { exact: true }).check();
     await counsel.getByLabel('Future Receivables Purchase Agreement', { exact: true }).check();
     await counsel
       .getByLabel('Holistic finding', { exact: true })
       .fill('Synthetic conflict between processor settlement and FRPA collection terms.');
+    await counsel.getByRole('button', { name: 'Review brief', exact: true }).click();
+    await counsel.getByRole('button', { name: 'Progress & findings', exact: true }).click();
+    await expect(counsel.getByLabel('Holistic finding', { exact: true })).toHaveValue(
+      'Synthetic conflict between processor settlement and FRPA collection terms.',
+    );
     await counsel.getByRole('button', { name: 'Record holistic finding', exact: true }).click();
     await expect(counsel.getByRole('region', { name: 'Holistic review' })).toContainText('1 unanswered findings');
     const finding = await prisma.bizrethinkMcaPackageFinding.findFirstOrThrow({ where: { reviewId: review.id } });
@@ -130,6 +143,7 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
     await card.getByRole('button', { name: 'Record provider response', exact: true }).click();
     await expect(card).toContainText('0 unanswered findings');
     await counsel.reload();
+    await counsel.getByRole('button', { name: 'Progress & findings', exact: true }).click();
     await counsel.locator('summary').filter({ hasText: 'Review checklist' }).click();
     const checklist = counsel.getByRole('checkbox', { name: /^Reviewed:/ });
     for (let index = 0; index < (await checklist.count()); index++) {
