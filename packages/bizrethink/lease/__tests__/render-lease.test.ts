@@ -3,6 +3,7 @@ import { FieldType } from '@prisma/client';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { PICANA_FACTS, PICANA_MONEY, PICANA_PARTIES, PICANA_VALUES } from '../matters/picana-ln';
+import { markCells } from '../render/election-marks';
 import type { RenderLeaseResult } from '../render/render-lease';
 import { renderLease } from '../render/render-lease';
 import { buildSignatureBlocks } from '../render/signature-blocks';
@@ -129,16 +130,16 @@ describe('every placeholder survives into the PDF', () => {
     /*
       THE SIGNATURE BLOCKS ARE NO LONGER THE ONLY SOURCE OF TOKENS.
 
-      The §83.595(4) election puts two CHECKBOX placeholders in the body of the
-      early-termination addendum — derived from the party order rather than
-      emitted by `buildSignatureBlocks` — so the extracted set is the emitted
-      set PLUS those. Kept as set equality rather than relaxed to a subset: the
+      The §83.595(4) election puts a CHECKBOX per tenant under each option of
+      the early-termination addendum — derived from the party order by
+      `markCells`, not emitted by `buildSignatureBlocks` — so the extracted set
+      is the emitted set PLUS those. Kept as set equality rather than relaxed to a subset: the
       wrapped-token defect described above is exactly what a subset check stops
       catching.
     */
-    const election = PICANA_VALUES.tenantElectionBox;
+    const election = markCells(PICANA_PARTIES, 'tenant').map((cell) => cell.token);
 
-    expect(new Set(allPlaceholders.map((p) => p.placeholder))).toEqual(new Set([...emitted, election]));
+    expect(new Set(allPlaceholders.map((p) => p.placeholder))).toEqual(new Set([...emitted, ...election]));
   });
 
   /*

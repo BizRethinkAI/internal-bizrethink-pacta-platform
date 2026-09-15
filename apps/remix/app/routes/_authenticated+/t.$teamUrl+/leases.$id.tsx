@@ -581,6 +581,8 @@ type ValidationResult = {
   }[];
   duplicateAssertions: { assertion: string; slugs: string[] }[];
   unreviewedClauses: string[];
+  /** Answers the lease will not use, because their question is not shown. */
+  ignoredAnswers: { question: string; stepTitle: string | null; raw: string }[];
   blocking: number;
   readyToSend: boolean;
   rulePackVersion: number;
@@ -716,6 +718,34 @@ const ReviewPanel = ({
                         ? `${entry.stepTitle} · asked of the tenant, not yet answered`
                         : entry.stepTitle}
                     </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/*
+        An answer the lease will not use. Not blocking — a value behind a "no"
+        can be rightly stale — but said, because on the pilot lease it was a
+        tenant's list of occupants and nobody was told it had gone nowhere.
+      */}
+      {(data?.ignoredAnswers.length ?? 0) > 0 && (
+        <Alert variant="warning">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Answers the lease does not use</AlertTitle>
+          <AlertDescription>
+            <p className="text-sm">
+              These have an answer, but an earlier answer hides the question, so the lease leaves them out. Check them
+              before preparing the envelope.
+            </p>
+            <ul className="mt-2 space-y-2 pl-4">
+              {data?.ignoredAnswers.map((entry) => (
+                <li key={entry.raw} className="list-disc text-sm">
+                  {entry.question}
+                  {entry.stepTitle !== null && (
+                    <span className="block text-muted-foreground text-xs">{entry.stepTitle}</span>
                   )}
                 </li>
               ))}
