@@ -1029,7 +1029,7 @@ const EnvelopeStatePanel = ({
         return {
           title: 'The envelope is ready for you to check',
           description:
-            'Nothing has been sent. Review the envelope: go through every document — the wording, where each signature, initial, date and checkbox sits, and who signs what. When it is right, press Send Document at the top right of the envelope, where you can add a subject and message. If anything is wrong, discard it — the lease reopens for editing and you can prepare a new one.',
+            'Nothing has been sent. Review the envelope: open each document tab and check the wording, where each signature, initial, date and checkbox sits, and who signs what. When it is right, choose Send the envelope and press Send Document at the top right, where you can add a subject and message. If anything is wrong, discard it — the lease reopens for editing and you can prepare a new one.',
           tone: 'default' as const,
           discardLabel: 'Discard and edit the lease',
         };
@@ -1077,22 +1077,25 @@ const EnvelopeStatePanel = ({
       </Alert>
 
       <div className="flex flex-wrap items-center gap-3">
+        {/*
+          REVIEW AND SEND ARE TWO PLACES. The envelope page shows each document
+          in its own tab with every signature, initial, date and checkbox drawn
+          on it — the owner's way to check a prepared lease. Send Document lives
+          in the editor, which opens on its upload-and-recipients step. One
+          button pointing at the editor ("I don't see a send option", then
+          "where did the review page go?") lost the review; two buttons keep both.
+        */}
         {envelopeId && !('envelopeGone' in view) && (
           <Button asChild>
-            {/*
-              A draft goes to the EDITOR, where Send Document is. The summary page
-              offers only "Edit", and "I don't see a send option" was the first
-              thing the owner said after preparing the pilot envelope.
-            */}
-            <a
-              href={
-                envelopeStatus === 'DRAFT'
-                  ? `/t/${teamUrl}/documents/${envelopeId}/edit`
-                  : `/t/${teamUrl}/documents/${envelopeId}`
-              }
-            >
-              {envelopeStatus === 'DRAFT' ? 'Review and send the envelope' : 'Open the envelope'}
+            <a href={`/t/${teamUrl}/documents/${envelopeId}`}>
+              {envelopeStatus === 'DRAFT' ? 'Review the envelope' : 'Open the envelope'}
             </a>
+          </Button>
+        )}
+
+        {envelopeId && envelopeStatus === 'DRAFT' && (
+          <Button asChild variant="outline">
+            <a href={`/t/${teamUrl}/documents/${envelopeId}/edit`}>Send the envelope</a>
           </Button>
         )}
 
