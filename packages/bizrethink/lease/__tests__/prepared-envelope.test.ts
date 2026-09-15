@@ -243,9 +243,19 @@ describe('the lease builder never sends on its own', () => {
     page offers only Edit; Send Document lives in the editor. The link goes
     straight there, and says what the landlord will do on it.
   */
-  it('takes the landlord to the editor, where Send Document is', () => {
-    expect(route).toContain('/documents/${envelopeId}/edit');
-    expect(route).toContain('Review and send the envelope');
+  /*
+    REVIEW AND SEND ARE TWO PLACES. #255 pointed one "Review and send" button at
+    the editor, which opens on its upload-and-recipients step — and the page the
+    owner used to check the envelope, the summary with a tab per document and
+    every field drawn on it, was no longer reachable from the lease. Review goes
+    to that page; sending goes to the editor, where Send Document is.
+  */
+  it('reviews on the envelope page and sends from the editor, as two buttons', () => {
+    expect(route).toMatch(/href=\{`\/t\/\$\{teamUrl\}\/documents\/\$\{envelopeId\}`\}[\s\S]{0,80}Review the envelope/);
+    expect(route).toMatch(
+      /href=\{`\/t\/\$\{teamUrl\}\/documents\/\$\{envelopeId\}\/edit`\}[\s\S]{0,80}Send the envelope/,
+    );
+    expect(route).not.toContain('Review and send the envelope');
   });
 
   it('only claims signers were sent the lease when the envelope says so', () => {
