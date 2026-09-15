@@ -82,6 +82,6 @@ describe('the condition report is listed apart from the governing documents', ()
     ];
 
     expect(describeDocuments(rows, 'hoa-governing')).toBe('1. Declaration (90 pages)');
-    expect(describeDocuments(rows, 'move-in-report')).toBe('1. Move-in Inspection, dated 6 January 2025 (418 pages)');
+    expect(describeDocuments(rows, 'move-in-report')).toBe('1. Move-in Inspection, dated January 6, 2025 (418 pages)');
   });
 });

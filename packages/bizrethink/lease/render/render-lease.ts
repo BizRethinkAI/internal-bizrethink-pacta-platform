@@ -10,6 +10,7 @@ import type { MoneyAnswers } from '../money/types';
 import type { InterpolationValue } from './interpolate';
 import type { LeaseDocumentSpec } from './lease-document';
 import { buildClauseText, renderCombinedPdf, renderDocumentPdf } from './lease-document';
+import { formatLongDate } from './long-date';
 import type { LeaseParty } from './signature-blocks';
 import { whiteOutSigningTokens } from './white-out-signing-tokens';
 
@@ -96,10 +97,8 @@ const keyTermsFor = ({
   propertyAddress: string;
 }): { label: string; value: string }[] => {
   const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-  const date = (iso: unknown) =>
-    typeof iso === 'string' && iso !== ''
-      ? new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
-      : '—';
+  // The package's one date format — see long-date.ts for why there is only one.
+  const date = (iso: unknown) => (typeof iso === 'string' && formatLongDate(iso) !== '' ? formatLongDate(iso) : '—');
 
   const start = money.term.startDate;
   const end = values.endDate;

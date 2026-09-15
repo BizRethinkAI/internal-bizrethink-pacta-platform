@@ -40,7 +40,7 @@ describe('describeDocuments', () => {
   it('states the date and the page count when known', () => {
     const text = describeDocuments([doc({ label: 'Community Guidelines', documentDate: '2023-04-18', pageCount: 30 })]);
 
-    expect(text).toBe('1. Community Guidelines, dated 18 April 2023 (30 pages)');
+    expect(text).toBe('1. Community Guidelines, dated April 18, 2023 (30 pages)');
   });
 
   it('carries reference, date and extent together without duplicating the brackets', () => {
@@ -53,7 +53,7 @@ describe('describeDocuments', () => {
       }),
     ]);
 
-    expect(text).toBe('1. Ninth Amendment, dated 2 September 2021 (Instr# 2021271188, 12 pages)');
+    expect(text).toBe('1. Ninth Amendment, dated September 2, 2021 (Instr# 2021271188, 12 pages)');
   });
 
   it('says "1 page" rather than "1 pages"', () => {

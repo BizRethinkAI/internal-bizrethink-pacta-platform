@@ -84,6 +84,17 @@ const join = (parts: string[]): string => {
     return parts[0];
   }
 
+  /*
+    SEMICOLONS ONCE AN ITEM HAS A COMMA OF ITS OWN. Every row carries one —
+    "mowing and edging, as needed" — so the pilot lease's 8.9 read "mowing and
+    edging, as needed, irrigation and watering, as needed, shrubs, hedges and
+    beds, as needed", and nobody could tell where one duty ended. A comma cannot
+    separate items that already contain commas.
+  */
+  if (parts.some((part) => part.includes(','))) {
+    return `${parts.slice(0, -1).join('; ')}; and ${parts[parts.length - 1]}`;
+  }
+
   if (parts.length === 2) {
     return `${parts[0]} and ${parts[1]}`;
   }
@@ -161,7 +172,7 @@ export const DEFAULT_YARD_TASKS: { task: string; frequency: string; example: str
   */
   {
     task: 'Mowing and edging',
-    frequency: 'Weekly March to October, fortnightly otherwise',
+    frequency: 'Weekly March to October, every two weeks otherwise',
     example: 'lawn, verges and edging along paths and beds',
   },
   {
@@ -172,7 +183,7 @@ export const DEFAULT_YARD_TASKS: { task: string; frequency: string; example: str
   { task: 'Shrubs, hedges and beds', frequency: 'Quarterly', example: 'trimming, weeding and mulch' },
   { task: 'Palm and tree trimming', frequency: 'Twice yearly', example: 'dead fronds and seed heads' },
   {
-    task: 'Fertilisation and lawn pest treatment',
+    task: 'Fertilization and lawn pest treatment',
     frequency: 'Quarterly',
     example: 'lawn feed, chinch bug and grub treatment',
   },

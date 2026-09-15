@@ -56,11 +56,11 @@ describe('the charges clause survives an out-of-state landlord', () => {
 });
 
 describe('notice clauses that work across a state line', () => {
-  it('allows post the time post actually takes', () => {
+  it('allows mail the time mail actually takes', () => {
     const body = clause('notices.method')?.body ?? '';
 
-    expect(body).not.toMatch(/third day after posting/i);
-    expect(body).toMatch(/fifth day after posting/i);
+    expect(body).not.toMatch(/third day after mailing/i);
+    expect(body).toMatch(/fifth day after mailing/i);
   });
 
   it('still leaves statutory service alone', () => {
