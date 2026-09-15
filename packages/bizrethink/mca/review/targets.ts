@@ -1,5 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { McaReviewPackage } from './package-schema';
+import { reviewItemLabel } from './presentation';
 
 export type ReviewTarget = { id: string; label: string; reviewUnit: boolean };
 
@@ -10,7 +11,7 @@ export const reviewTargets = (snapshot: McaReviewPackage): ReviewTarget[] => [
     ...document.sections.flatMap((section) =>
       section.items.map((item) => ({
         id: `content:${item.slug}`,
-        label: `${document.title} · ${item.number ?? 'Reusable'} ${item.heading}`,
+        label: `${document.title} · ${reviewItemLabel(item)}`,
         reviewUnit: false,
       })),
     ),
