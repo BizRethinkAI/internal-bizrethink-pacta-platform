@@ -248,6 +248,13 @@ export const FL_INTERVIEW: InterviewStep[] = [
         name: 'hasNamedOccupants',
         target: 'fact',
         kind: 'boolean',
+        /*
+          REQUIRED, because an unanswered yes/no reads as "no". The pilot lease
+          was started before this question existed, so it was never asked; the
+          lease named only the tenants while the tenant's answer listing three
+          more occupants went unused. `unansweredRequired` makes the gap block.
+        */
+        required: true,
         label: 'Is anyone else going to live there?',
         help: 'Anyone beyond the signing tenants — children, a parent, a partner who is not signing. Answer no and the lease says the occupants are the tenants.',
       },
