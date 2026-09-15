@@ -1,10 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_MCA_CONTENT } from '../../catalogue';
 import { MCA_INSTRUMENTS } from '../../clauses/instruments';
+import { libraryFindingHoldTargets } from '../holds';
 import { buildLibraryReviewPackage, readReviewPackage, reviewPackageFingerprint } from '../package';
 
 describe('the complete neutral counsel package', () => {
   const build = () => buildLibraryReviewPackage({ contact: 'Legal operations · legal@example.test' });
+
+  it('keeps package and instrument findings effective even before this version can create those target types', () => {
+    const item = ALL_MCA_CONTENT.find((entry) => entry.slug === 'frpa.holdback-explainer');
+    if (!item) {
+      throw new Error('The shared payment provision is required for this regression.');
+    }
+    expect(libraryFindingHoldTargets(item)).toEqual(
+      expect.arrayContaining(['package', 'document:frpa', `content:${item.slug}`]),
+    );
+  });
 
   it('contains every instrument and every clause and reusable item exactly once', () => {
     const snapshot = build();
