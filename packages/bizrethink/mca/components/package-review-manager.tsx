@@ -7,6 +7,7 @@ import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { SavedReviewInspection } from './saved-review-inspection';
 
 const ZInvitation = z.object({
   reviewerName: z.string().trim().min(1).max(200),
@@ -110,6 +111,11 @@ export const McaPackageReviewManager = () => {
       {list.data?.map((review) => (
         <article key={review.id} className="space-y-3 rounded border p-4" data-mca-package-review={review.id}>
           <p className="font-semibold">{review.reviewerName}</p>
+          <p className="text-sm">
+            {review.completedAt ? 'Review complete for saved copy' : 'Review in progress'} ·{' '}
+            {review.reviewedTargetIds.length} <Trans>review units marked reviewed</Trans>
+          </p>
+          <SavedReviewInspection reviewId={review.id} />
           <p className="break-all text-sm">
             {review.reviewerEmail} ·{' '}
             {review.status === 'closed' ? 'Revoked' : new Date(review.expiresAt) <= new Date() ? 'Expired' : 'Active'} ·{' '}

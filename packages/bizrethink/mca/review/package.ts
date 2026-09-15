@@ -176,10 +176,15 @@ export const changedReviewDocuments = (snapshot: McaReviewPackage): string[] =>
         document.sections.some((section) =>
           section.items.some((item) => {
             const current = ALL_MCA_CONTENT.find((candidate) => candidate.slug === item.slug);
-            return !current || mcaClauseFingerprint(current) !== item.sourceFingerprint;
+            return (
+              !current ||
+              mcaClauseFingerprint(snapshot.kind === 'provider' ? { ...current, includeWhen: null } : current) !==
+                item.sourceFingerprint
+            );
           }),
         ) ||
-        contentFor(document.id as (typeof MCA_INSTRUMENTS)[number]).length !==
-          document.sections.flatMap((section) => section.items).length,
+        (snapshot.kind === 'library' &&
+          contentFor(document.id as (typeof MCA_INSTRUMENTS)[number]).length !==
+            document.sections.flatMap((section) => section.items).length),
     )
     .map((document) => document.id);

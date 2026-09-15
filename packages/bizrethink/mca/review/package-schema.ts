@@ -19,7 +19,7 @@ const ZReading = z.object({
   ),
 });
 
-export const ZReviewPackage = z.object({
+const ZLibraryReviewPackage = z.object({
   schemaVersion: z.literal(1),
   kind: z.literal('library'),
   title: z.string(),
@@ -87,6 +87,30 @@ export const ZReviewPackage = z.object({
     }),
   ),
 });
+
+export const ZProviderReviewPackage = ZLibraryReviewPackage.extend({
+  schemaVersion: z.literal(2),
+  kind: z.literal('provider'),
+  provider: z.object({
+    templateId: z.string(),
+    revision: z.number().int().positive(),
+    templateFingerprint: z.string(),
+    legalName: z.string(),
+    policy: z.array(z.string()),
+  }),
+  externalDocuments: z.array(
+    z.object({
+      id: z.string(),
+      processor: z.string(),
+      title: z.string(),
+      version: z.string(),
+      reference: z.string(),
+      content: z.string().nullable(),
+    }),
+  ),
+});
+
+export const ZReviewPackage = z.discriminatedUnion('schemaVersion', [ZLibraryReviewPackage, ZProviderReviewPackage]);
 
 export type McaReviewPackage = z.infer<typeof ZReviewPackage>;
 export type McaReviewItem = McaReviewPackage['documents'][number]['sections'][number]['items'][number];
