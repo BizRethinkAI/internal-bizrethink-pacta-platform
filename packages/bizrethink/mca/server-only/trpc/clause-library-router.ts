@@ -129,8 +129,8 @@ export const mcaClauseLibraryRouter = router({
       });
       const unansweredPackageFindings = await prisma.bizrethinkMcaPackageFinding.count({
         where: {
-          review: { kind: 'library' },
           targetIds: { hasSome: libraryFindingHoldTargets(clause) },
+          review: { kind: 'library', teamId: null },
           answeredAt: null,
         },
       });
