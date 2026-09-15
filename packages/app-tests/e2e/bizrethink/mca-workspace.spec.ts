@@ -96,12 +96,31 @@ test('a complete neutral counsel package preserves findings, source context and 
     await counsel.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${href}`);
     await expect(counsel.getByRole('heading', { name: 'Shared MCA library — complete counsel package' })).toBeVisible();
     await expect(counsel.locator('[data-mca-counsel-package]')).not.toContainText('Lombard');
-    await expect(counsel.getByRole('navigation', { name: 'Counsel package' }).getByRole('button')).toHaveCount(7);
-    await expect(counsel.locator('[data-mca-package-section="funding-terms"]')).toContainText('1. Funding Terms');
-    await expect(counsel.locator('[data-mca-package-item="frpa.merchant-and-funding-information"]')).toBeVisible();
+    const index = counsel.getByRole('complementary', { name: 'Review index' });
+    await expect(index.locator('..')).toHaveCSS('grid-template-columns', /^250px /);
+    await expect(counsel.getByLabel('Review document', { exact: true }).locator('option')).toHaveCount(7);
+    await expect(counsel.getByRole('heading', { name: 'Review brief', exact: true })).toBeVisible();
+    await expect(counsel.locator('[data-mca-review-brief] > section')).toHaveCount(5);
+    const column = await counsel.locator('[data-mca-reading-column]').boundingBox();
+    expect(column?.width).toBeLessThan(850);
     await counsel.screenshot({ path: testInfo.outputPath('neutral-complete-counsel-package.png'), fullPage: false });
+    await counsel.getByRole('button', { name: 'Start reviewing', exact: true }).click();
+    await expect(counsel.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+    await expect(counsel.locator('[data-mca-package-item="frpa.merchant-and-funding-information"]')).toBeVisible();
+    await counsel.screenshot({ path: testInfo.outputPath('neutral-counsel-reading-column.png'), fullPage: false });
 
     const item = counsel.locator('[data-mca-package-item="frpa.holdback-explainer"]');
+    await expect(item.locator('.font-serif')).toHaveCSS('font-size', '17px');
+    await counsel.getByLabel('Larger text', { exact: true }).check();
+    await expect(item.locator('.font-serif')).toHaveCSS('font-size', '20px');
+    await counsel.getByLabel('Larger text', { exact: true }).uncheck();
+    const reference = item.getByRole('button', { name: /open reference/ }).first();
+    await reference.click();
+    await expect(counsel.getByRole('dialog')).toContainText('Citation context');
+    await counsel.getByRole('button', { name: 'Open in reading context', exact: true }).click();
+    await expect(counsel.getByRole('heading', { name: '3. Purchase', exact: true })).toBeVisible();
+    await counsel.getByRole('button', { name: 'Return to passage', exact: true }).click();
+    await expect(reference).toBeFocused();
     await item.getByText('Findings for this item', { exact: false }).click();
     await item
       .getByLabel('Finding', { exact: true })
@@ -109,23 +128,33 @@ test('a complete neutral counsel package preserves findings, source context and 
     await item.getByRole('button', { name: 'Record finding', exact: true }).click();
     await expect(item.getByText('Unanswered — approval held', { exact: true })).toBeVisible();
     await counsel.reload();
+    await counsel.getByRole('button', { name: 'Start reviewing', exact: true }).click();
     await item.getByText('Findings for this item', { exact: false }).click();
     await expect(item).toContainText('Synthetic review: reconcile payment wording across the package.');
 
-    await counsel
-      .getByRole('navigation', { name: 'Counsel package' })
-      .getByRole('button', { name: 'Split Funding Authorization', exact: true })
-      .click();
+    await counsel.getByLabel('Search review index', { exact: true }).fill('Processor Fees');
+    await index.getByRole('button', { name: /Processor Fees.*Split Funding Authorization/i }).click();
+    await expect(counsel.getByLabel('Review document', { exact: true })).toHaveValue('split-funding');
     await expect(counsel.locator('[data-mca-package-item="split-funding.fees-are-additional"]')).toContainText(
       'PAYZLI',
     );
-    await counsel.getByRole('button', { name: 'Disclosures & requirements', exact: true }).click();
+    await counsel.getByLabel('Review document', { exact: true }).selectOption('requirements');
     const source = counsel.locator('[data-mca-review-requirement="va-disclosure"]');
     await source.locator('summary').click();
     await expect(source).toContainText('prescribed-form');
     await expect(source).toContainText('Last source reading:');
     await expect(source.getByRole('link').first()).toBeVisible();
     await counsel.screenshot({ path: testInfo.outputPath('counsel-disclosure-source-context.png'), fullPage: false });
+    await counsel.setViewportSize({ width: 390, height: 844 });
+    await expect(index).not.toBeVisible();
+    await counsel.getByRole('button', { name: 'Index', exact: true }).click();
+    await expect(index).toBeVisible();
+    await index.scrollIntoViewIfNeeded();
+    await counsel.screenshot({ path: testInfo.outputPath('neutral-counsel-mobile-index.png'), fullPage: false });
+    await counsel.getByLabel('Review document', { exact: true }).selectOption('frpa');
+    await expect(index).not.toBeVisible();
+    expect(await counsel.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    await counsel.screenshot({ path: testInfo.outputPath('neutral-counsel-mobile-reading.png'), fullPage: false });
 
     const forged = await counsel.request.post(
       `${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/bizrethink.mcaPackageReview.recordFinding`,
