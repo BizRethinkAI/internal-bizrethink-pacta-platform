@@ -5,8 +5,9 @@
  *
  * This is where the lease builder meets the signing platform. Every token here
  * is consumed by upstream's `extractPlaceholdersFromPDF`, which scans the
- * rendered PDF for `{{TYPE, rN, key=value}}`, converts each match into a field
- * at those coordinates, and whites the token out. A token that falls outside
+ * rendered PDF for `{{TYPE, rN, key=value}}` and converts each match into a
+ * field at those coordinates. It does not paint the token out; that is
+ * `whiteOutSigningTokens`, before upload. A token that falls outside
  * that grammar is skipped **silently** — no error, just a missing signature
  * field on a real lease — so there is a test asserting every token matches it.
  */

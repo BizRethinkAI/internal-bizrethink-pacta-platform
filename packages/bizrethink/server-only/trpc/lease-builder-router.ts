@@ -44,7 +44,7 @@ import type { Disposition, LeaseReview, ReviewAudience, ReviewComment, ReviewSta
 import { US_FL } from '../../lease/rule-packs/us-fl';
 import { FL_NON_WAIVABLE } from '../../lease/rule-packs/us-fl-non-waivable';
 import { loadClauseApprovals, statusWithApproval } from '../../lease/server-only/clause-approvals';
-import { createEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
+import { sendEnvelopeFromMatter } from '../../lease/server-only/create-envelope-from-matter';
 import { draftClause } from '../../lease/server-only/draft-clause';
 import { hydrateMatter } from '../../lease/server-only/matter-answers';
 import { loadPropertyContext } from '../../lease/server-only/property-context';
@@ -1088,7 +1088,7 @@ export const leaseBuilderRouter = router({
         });
       }
 
-      const envelope = await createEnvelopeFromMatter({
+      const { envelopeId, errorAfterSending } = await sendEnvelopeFromMatter({
         // Keys the signer-facing links to the governing documents.
         matterId: matter.id,
         input: {
@@ -1109,7 +1109,9 @@ export const leaseBuilderRouter = router({
       });
 
       /*
-          Stamped only after the envelope exists. The rule pack version is
+          Stamped only after the envelope has gone OUT, not merely been created
+          — until 2026-09-14 this followed a bare create, and the pilot lease
+          read "sent" over a draft nobody had received. The rule pack version is
           recorded here because statutes move: a lease signed today must still
           be explainable against the rules that produced it in five years.
         */
@@ -1117,13 +1119,27 @@ export const leaseBuilderRouter = router({
         where: { id: matter.id },
         data: {
           status: 'sent',
-          envelopeId: envelope.id,
+          envelopeId,
           rulePackVersion: US_FL.version,
           generatedAt: new Date(),
         },
       });
 
-      return { envelopeId: envelope.id };
+      // Recorded first, then reported: the envelope is live, and the page must
+      // not claim every signer was emailed when that is exactly what is unknown.
+      if (errorAfterSending) {
+        console.error('[lease-builder] envelope sent but a later step failed', {
+          envelopeId,
+          error: errorAfterSending instanceof Error ? errorAfterSending.message : String(errorAfterSending),
+        });
+
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message:
+            'The lease was sent, but a step after sending failed, so some signers may not have been emailed. Open the envelope to check each recipient and resend where needed.',
+        });
+      }
+
+      return { envelopeId };
     }),
   }),
   /**

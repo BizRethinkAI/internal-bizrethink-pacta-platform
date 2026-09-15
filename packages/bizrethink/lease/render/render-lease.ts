@@ -11,6 +11,7 @@ import type { InterpolationValue } from './interpolate';
 import type { LeaseDocumentSpec } from './lease-document';
 import { buildClauseText, renderCombinedPdf, renderDocumentPdf } from './lease-document';
 import type { LeaseParty } from './signature-blocks';
+import { whiteOutSigningTokens } from './white-out-signing-tokens';
 
 /**
  * Facts and answers in, PDF out.
@@ -279,5 +280,8 @@ export const renderLease = async (input: RenderLeaseInput): Promise<RenderLeaseR
 export const renderLeaseForReview = async (input: RenderLeaseInput): Promise<Buffer> => {
   const { documents } = buildLeaseDocuments(input);
 
-  return await renderCombinedPdf(documents, input.parties);
+  // Nobody signs this copy, so a signing token on it is only noise — and the
+  // reviewer is often the tenant. Clause variables are left for the reason
+  // `whiteOutSigningTokens` gives.
+  return await whiteOutSigningTokens(await renderCombinedPdf(documents, input.parties));
 };
