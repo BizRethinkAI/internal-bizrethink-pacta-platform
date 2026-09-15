@@ -159,6 +159,7 @@ test('counsel reads full business alternatives and retains finding drafts while 
   const { user } = await signedInAsAdmin({ page, redirectPath: '/admin/mca-library' });
   const entries = contentFor('frpa');
   await page.locator('summary').filter({ hasText: 'Review links & counsel findings' }).click();
+  await page.locator('summary').filter({ hasText: 'Legacy single-instrument links' }).click();
   await page.getByRole('button', { name: 'Send one to counsel', exact: true }).click();
   await page.locator('#mca-counsel-name').fill('Synthetic legal UI reviewer');
   await page.locator('#mca-counsel-email').fill('ui-review@example.invalid');

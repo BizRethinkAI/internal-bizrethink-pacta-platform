@@ -18,6 +18,7 @@ import { subjectLabel } from '@bizrethink/customizations/legal-ui/reading';
 import legalStyles from '@bizrethink/customizations/legal-ui/reading.css?url';
 import { INSTRUMENTS, MCA_INSTRUMENTS, type McaInstrument } from '@bizrethink/customizations/mca/clauses/instruments';
 import { describeClauseVariance, describeWhyThisClause } from '@bizrethink/customizations/mca/clauses/metadata';
+import { McaPackageReviewManager } from '@bizrethink/customizations/mca/components/package-review-manager';
 import { McaWorkspaceNav } from '@bizrethink/customizations/mca/components/workspace-nav';
 import { groupMcaSections } from '@bizrethink/customizations/mca/engine/section-headings';
 import { JURISDICTION_NAMES } from '@bizrethink/customizations/mca/jurisdictions';
@@ -185,10 +186,15 @@ export default function AdminMcaLibraryPage() {
           />
           <details className="mb-4 rounded-lg border bg-muted/20 p-4">
             <summary className="cursor-pointer font-medium text-sm">
-              <Trans>Review links & counsel findings</Trans> · {reviews.length} links ·{' '}
-              {counselFindings.filter((finding) => finding.answeredAt === null).length} unanswered
+              <Trans>Review links & counsel findings</Trans>
             </summary>
-            <CounselLinks reviews={reviews} onChanged={reload} />
+            <McaPackageReviewManager />
+            <details className="mt-5">
+              <summary className="cursor-pointer text-sm">
+                <Trans>Legacy single-instrument links</Trans>
+              </summary>
+              <CounselLinks reviews={reviews} onChanged={reload} />
+            </details>
             <CounselFindings findings={counselFindings} onAnswered={reload} />
           </details>
           <details className="text-muted-foreground text-xs leading-relaxed">
