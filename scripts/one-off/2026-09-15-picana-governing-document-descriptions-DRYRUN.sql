@@ -57,3 +57,11 @@ WHERE "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND kind = 'hoa-governing
     'bdoc_3ebc0022706a4f258cdb',
     'bdoc_fcccc07afd1840b6944f'
   );
+
+\echo ''
+\echo '=== CORRECTIONS: current values the script expects to replace ==='
+SELECT "sortOrder", id, label, "documentDate"::date AS dated, coalesce(reference, '') AS reference
+FROM "BizrethinkDocument"
+WHERE "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND kind = 'hoa-governing' AND "archivedAt" IS NULL
+  AND "sortOrder" BETWEEN 1 AND 16 AND "sortOrder" NOT IN (11)
+ORDER BY "sortOrder", "createdAt";

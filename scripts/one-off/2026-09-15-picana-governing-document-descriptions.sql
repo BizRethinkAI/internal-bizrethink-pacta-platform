@@ -18,13 +18,26 @@
 -- AMENDS. The nine amendments and the Second Supplement amend or supplement the
 -- Amended and Restated Master Declaration, so they are listed beneath it.
 --
--- WHAT THIS DOES NOT TOUCH: labels, dates and references. In particular the
--- Community Amenity Guidelines stay dated 2020-01-31 — the 2026-09-10 script set
--- that deliberately from the attached file's creation date and page count.
+-- REGISTER CORRECTIONS, also accepted by the owner on 2026-09-15 (second block):
+--   a. Items 2–11: short titles. They are listed beneath the Declaration now, so
+--      "First Amendment" reads fully; the recording reference still identifies
+--      each one on the line beneath.
+--   b. Item 13: its own heading is "Usage Policies from the Community Amenity
+--      Guidelines" — a one-page excerpt, not a separate set of guidelines.
+--   c. Item 14: dated 2023-02-28, the board approval on the document.
+--   d. Items 15–16: reference cleared. Those resolutions are not recorded
+--      instruments; the reference held the District's name (now the issuer
+--      heading) and a statutory citation.
+-- Each correction is guarded on the value it replaces, so a row edited in the
+-- UI since this was written aborts the run instead of being overwritten.
+--
+-- NOT CHANGED: the Community Amenity Guidelines stay dated 2020-01-31 — the
+-- 2026-09-10 script set that deliberately from the attached file's creation date
+-- and page count.
 --
 -- Every UPDATE is scoped to this property, to archivedAt IS NULL and to one id,
 -- and guarded on an exact row count; a failed guard rolls everything back.
--- Re-running is harmless: it writes the same values.
+-- Re-running aborts at the first correction (its old value is gone): run once.
 
 BEGIN;
 
@@ -178,11 +191,157 @@ BEGIN
 
 END $$;
 
+DO $$
+DECLARE
+  touched integer;
+BEGIN
+  -- a. Item 2: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'First Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_f01907e7ea4c4e8ea0a1' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'First Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 2 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 3: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Second Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_5874a2109437438bbe15' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Second Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 3 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 4: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Third Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_5f23e4eaa35a4d5da6cf' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Third Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 4 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 5: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Second Supplement (Phase 2B1)', "updatedAt" = NOW()
+   WHERE id = 'bdoc_6278e811f0af42d0be93' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Second Supplement to the Amended and Restated Master Declaration (Phase 2B1)';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 5 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 6: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Fourth Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_151f844c72d94318890f' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Fourth Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 6 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 7: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Fifth Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_11c6989661f54d23b7fb' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Fifth Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 7 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 8: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Sixth Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_f00a0c0d17c44307bbd6' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Sixth Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 8 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 9: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Seventh Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_3f89cd72c72447c0884c' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Seventh Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 9 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 10: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Eighth Amendment', "updatedAt" = NOW()
+   WHERE id = 'bdoc_93bf7ab408494fe6818f' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Eighth Amendment to the Amended and Restated Master Declaration';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 10 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- a. Item 11: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Ninth Amendment (Leasing)', "updatedAt" = NOW()
+   WHERE id = 'bdoc_d998893ee04d45dc8fb8' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'Ninth Amendment to the Amended and Restated Master Declaration (Leasing)';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 11 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- b. Item 13: title
+  UPDATE "BizrethinkDocument"
+     SET label = 'Usage Policies from the Community Amenity Guidelines', "updatedAt" = NOW()
+   WHERE id = 'bdoc_95edddc1f6664a9a8b19' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND label = 'MPOA Community Facility Guidelines';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Title fix for item 13 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- c. Item 14: approval date
+  UPDATE "BizrethinkDocument"
+     SET "documentDate" = TIMESTAMP '2023-02-28 00:00:00', "updatedAt" = NOW()
+   WHERE id = 'bdoc_e2f9db259ccc40789969' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND "documentDate" IS NULL;
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Date fix for item 14 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- d. Item 15: reference cleared
+  UPDATE "BizrethinkDocument"
+     SET reference = NULL, "updatedAt" = NOW()
+   WHERE id = 'bdoc_3ebc0022706a4f258cdb' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND reference LIKE 'Estancia at Wiregrass Community Development District%';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Reference fix for item 15 matched % rows, expected 1.', touched;
+  END IF;
+
+  -- d. Item 16: reference cleared
+  UPDATE "BizrethinkDocument"
+     SET reference = NULL, "updatedAt" = NOW()
+   WHERE id = 'bdoc_fcccc07afd1840b6944f' AND "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND "archivedAt" IS NULL
+     AND reference LIKE 'Estancia at Wiregrass Community Development District%';
+  GET DIAGNOSTICS touched = ROW_COUNT;
+  IF touched <> 1 THEN
+    RAISE EXCEPTION 'Reference fix for item 16 matched % rows, expected 1.', touched;
+  END IF;
+
+END $$;
+
 COMMIT;
 
 -- What the receipt will now group and describe.
 SELECT "sortOrder", issuer, CASE WHEN "amendsDocumentId" IS NULL THEN '' ELSE 'nested' END AS amends,
-       left(label, 45) AS label, description
+       left(label, 55) AS label, "documentDate"::date AS dated, coalesce(reference, '') AS reference, description
 FROM "BizrethinkDocument"
 WHERE "propertyId" = 'lease_property_iaicbumzvyrfnmzl' AND kind = 'hoa-governing' AND "archivedAt" IS NULL
 ORDER BY "sortOrder", "createdAt";
