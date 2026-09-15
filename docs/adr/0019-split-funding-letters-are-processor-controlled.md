@@ -68,16 +68,19 @@ added:
 - the remittance-instructions block;
 - the SELLER signer label and the signer date field.
 
-Neither repository establishes that even the 2026-09-02 text is the form Payzli
-issues. Under this decision:
+**Where Payzli's original format lives.** The repository owner confirmed on
+2026-09-15 that Payzli's original format is the existing Payzli template in the
+`lombard-api` team, and that it can be used as is. That template is the reference
+text. Which template id it is, and whether its text predates the edits above,
+is still to be checked read-only before anything changes. Under this decision:
 
-- Obtain Payzli's current split funding form from Payzli. Replace the retained
-  text with it verbatim, recording its title, version and where it came from.
+- Compare the retained library text with the `lombard-api` Payzli template.
+  Replace the library text with the template's wording verbatim, recording the
+  template id and its source.
 - Re-check the FRPA against that form, including the Completion Threshold,
   deposit-account and acceptance provisions, and resolve any conflicts in the
   FRPA.
-- Rebuild the published Payzli template from the verified form before a Payzli
-  letter is next sent.
+- Leave the `lombard-api` Payzli template itself unchanged. It is the original.
 
 These are follow-up tasks. This ADR changes no legal wording, stored record,
 fingerprint or template.

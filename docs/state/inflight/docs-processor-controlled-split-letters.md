@@ -50,12 +50,15 @@ form either.
 
 Follow-ups for the owner or coordinator to assign:
 
-1. Obtain Payzli's current split funding form and replace the retained text
-   verbatim.
-2. Re-check the FRPA against it and resolve conflicts in the FRPA.
-3. Rebuild the published Payzli template.
+The owner confirmed on 2026-09-15 that Payzli's original format is the
+existing Payzli template in the `lombard-api` team.
+
+1. Read that template (read-only), identify its id, and compare its text with
+   the retained library text.
+2. Replace the library text with the template's wording verbatim.
+3. Re-check the FRPA against it and resolve conflicts in the FRPA.
 4. Move the letter out of the clause catalogue without carrying over any
-   approval.
+   approval. The template itself stays unchanged.
 
 `processorSplitAccepted` is unaffected and still separate.
 
