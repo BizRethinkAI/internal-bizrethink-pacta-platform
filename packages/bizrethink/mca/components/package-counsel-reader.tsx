@@ -282,6 +282,9 @@ export const McaPackageCounselReader = ({
                       }}
                     >
                       {requirement.jurisdictionName}
+                      <span className="mt-1 block break-words text-muted-foreground text-xs">
+                        {requirement.citation}
+                      </span>
                     </button>
                   ))
                 ) : null}
