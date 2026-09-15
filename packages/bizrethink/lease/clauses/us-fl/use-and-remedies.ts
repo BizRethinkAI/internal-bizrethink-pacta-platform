@@ -411,7 +411,13 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
       hard-coding r2 would put the election in front of a landlord on any lease
       that lists its parties in another order.
     */
-    version: 3,
+    /*
+      v4: EVERY TENANT MARKS. v3's box went to the first tenant only, so on a
+      lease with two jointly liable tenants the second had nothing to mark. Each
+      option now carries `[[each tenant marks]]`, which `election-marks.ts`
+      renders as a box per tenant; the text says what happens if they differ.
+    */
+    version: 4,
     jurisdiction: 'US-FL',
     // A SEPARATE addendum, because §83.595(4) makes the remedy available only
     // where the tenant signed one containing the election. Folding it into the
@@ -420,18 +426,12 @@ export const FL_USE_AND_REMEDIES: Clause[] = [
     section: 'termination',
     sortKey: 10,
     heading: 'Early Termination Addendum',
-    body: "Fla. Stat. §83.595 gives Landlord a choice of remedies where Tenant breaches the Lease and vacates before the end of the term. This Addendum records the parties' election under §83.595(4). Tenant must mark ONE of the two options below. If neither is marked, no early termination fee is agreed and Landlord's remedies are those in Fla. Stat. §83.595(1)-(3).\n\n{{tenantElectionBox}} I agree, as provided in the rental agreement, to pay {{earlyTerminationFeeUsd}} as liquidated damages or an early termination fee if I elect to terminate the rental agreement, and Landlord waives the right to seek additional rent beyond the month in which Landlord retakes possession.\n\n{{tenantElectionBox}} I do not agree to liquidated damages or an early termination fee, and I acknowledge that Landlord may seek damages as provided by law.\n\nTenant shall give Landlord at least {{earlyTerminationNoticeDays}} days' written notice of a termination under this Addendum. This Addendum does not release Tenant from liability for unpaid rent accrued before the termination date, or for damage to the Premises beyond fair wear and tear. The early termination fee is payable on the termination date and is separate from the security deposit and the advance rent. It is not the security deposit and is not satisfied by it: the security deposit is returned, or claimed against, under Fla. Stat. §83.49 and the sections of this Lease governing it, and the advance rent is applied to the last month of Tenant's occupancy in the ordinary way. This Addendum prevails over any conflicting provision in the body of this Lease.",
+    body: "Fla. Stat. §83.595 gives Landlord a choice of remedies where Tenant breaches the Lease and vacates before the end of the term. This Addendum records the parties' election under §83.595(4). Each person signing as Tenant must mark ONE of the two options below, and every Tenant must mark the same one. If none is marked, or the marks differ, no early termination fee is agreed and Landlord's remedies are those in Fla. Stat. §83.595(1)-(3).\n\n[[each tenant marks]] I agree, as provided in the rental agreement, to pay {{earlyTerminationFeeUsd}} as liquidated damages or an early termination fee if I elect to terminate the rental agreement, and Landlord waives the right to seek additional rent beyond the month in which Landlord retakes possession.\n\n[[each tenant marks]] I do not agree to liquidated damages or an early termination fee, and I acknowledge that Landlord may seek damages as provided by law.\n\nTenant shall give Landlord at least {{earlyTerminationNoticeDays}} days' written notice of a termination under this Addendum. This Addendum does not release Tenant from liability for unpaid rent accrued before the termination date, or for damage to the Premises beyond fair wear and tear. The early termination fee is payable on the termination date and is separate from the security deposit and the advance rent. It is not the security deposit and is not satisfied by it: the security deposit is returned, or claimed against, under Fla. Stat. §83.49 and the sections of this Lease governing it, and the advance rent is applied to the last month of Tenant's occupancy in the ordinary way. This Addendum prevails over any conflicting provision in the body of this Lease.",
     source: drafted(),
     status: 'draft',
     requiredBy: 'Fla. Stat. §83.595(4)',
     includeWhen: (facts) => facts.earlyTerminationOffered,
     variables: [
-      {
-        name: 'tenantElectionBox',
-        type: 'string',
-        label: 'Election checkbox for the tenant (derived from the party order)',
-        required: true,
-      },
       {
         name: 'earlyTerminationFeeUsd',
         type: 'usd',

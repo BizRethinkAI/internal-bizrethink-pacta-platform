@@ -92,7 +92,16 @@ export const FL_BOILERPLATE: Clause[] = [
   */
   {
     slug: 'notices.electronic-delivery',
-    version: 1,
+    /*
+      v2: THE ELECTIONS COULD NOT BE MADE. Every option printed as the literal
+      characters "[ ]" — nothing any signer could mark — so the election the
+      notice clause relies on was never made on any lease. Each option now
+      carries `[[each landlord marks]]` or `[[each tenant marks]]`, rendered as a
+      box per person by `election-marks.ts`. "I, {{landlordNames}}" read "I,
+      [both landlords]"; with a box per person the form speaks for whoever
+      marks it, and the addresses follow the options.
+    */
+    version: 2,
     jurisdiction: 'US-FL',
     // Its own signed addendum, because the statute requires exactly that.
     placement: 'addendum',
@@ -107,7 +116,7 @@ export const FL_BOILERPLATE: Clause[] = [
       Offered only when elected. A landlord who does not want email notice
       should not be handed an addendum inviting it.
     */
-    body: "Fla. Stat. §83.505 permits notices required under Part II of Chapter 83 to be delivered by e-mail only where both parties have signed an addendum agreeing to it and each has given a valid e-mail address. This is that addendum. THIS ELECTION IS VOLUNTARY. Either party may revoke it, or update the address given, at any time.\n\nLANDLORD ELECTION. Notices from a tenant may contain time-sensitive information about the tenant's housing. The election to receive notices from the tenant by e-mail is voluntary.\n[ ] I, {{landlordNames}}, the landlord or the landlord's agent, agree to receive notices required by this Lease or under Part II of Chapter 83, Florida Statutes, from the tenant by e-mail. I designate the following e-mail address for receipt of notices from the tenant: {{landlordNoticeEmails}}.\n[ ] I do not agree to receive notices by e-mail.\nI may revoke my agreement to receive notices by e-mail by providing written notice to the tenant, which is effective upon delivery and does not affect the validity of any notice already sent by e-mail. I may update my e-mail address at any time by providing written notice to the tenant specifying the new address, which takes effect upon delivery.\n\nTENANT ELECTION. Notices from a landlord may contain time-sensitive information about your housing. The election to receive notices from the landlord by e-mail is voluntary.\n[ ] I, {{tenantNames}}, the tenant, agree to receive notices required by this Lease or under Part II of Chapter 83, Florida Statutes, from the landlord by e-mail. I designate the following e-mail address for receipt of notices from the landlord: {{tenantNoticeEmails}}.\n[ ] I do not agree to receive notices by e-mail.\nI may revoke my agreement to receive notices by e-mail by providing written notice to the landlord, which is effective upon delivery and does not affect the validity of any notice already sent by e-mail. I may update my e-mail address at any time by providing written notice to the landlord specifying the new address, which takes effect upon delivery.\n\nA notice sent by e-mail is delivered when sent, unless it is returned to the sender as undeliverable. The sender shall keep a copy of the notice and evidence of its transmission.",
+    body: "Fla. Stat. §83.505 permits notices required under Part II of Chapter 83 to be delivered by e-mail only where both parties have signed an addendum agreeing to it and each has given a valid e-mail address. This is that addendum. THIS ELECTION IS VOLUNTARY. Either party may revoke it, or update the address given, at any time.\n\nLANDLORD ELECTION. Notices from a tenant may contain time-sensitive information about the tenant's housing. The election to receive notices from the tenant by e-mail is voluntary.\n[[each landlord marks]] I, the landlord or the landlord's agent, agree to receive notices required by this Lease or under Part II of Chapter 83, Florida Statutes, from the tenant by e-mail. I designate my e-mail address listed below for receipt of notices from the tenant.\n[[each landlord marks]] I do not agree to receive notices by e-mail.\nE-mail addresses for notices to Landlord: {{landlordNoticeEmails}}.\nI may revoke my agreement to receive notices by e-mail by providing written notice to the tenant, which is effective upon delivery and does not affect the validity of any notice already sent by e-mail. I may update my e-mail address at any time by providing written notice to the tenant specifying the new address, which takes effect upon delivery.\n\nTENANT ELECTION. Notices from a landlord may contain time-sensitive information about your housing. The election to receive notices from the landlord by e-mail is voluntary.\n[[each tenant marks]] I, the tenant, agree to receive notices required by this Lease or under Part II of Chapter 83, Florida Statutes, from the landlord by e-mail. I designate my e-mail address listed below for receipt of notices from the landlord.\n[[each tenant marks]] I do not agree to receive notices by e-mail.\nE-mail addresses for notices to Tenant: {{tenantNoticeEmails}}.\nI may revoke my agreement to receive notices by e-mail by providing written notice to the landlord, which is effective upon delivery and does not affect the validity of any notice already sent by e-mail. I may update my e-mail address at any time by providing written notice to the landlord specifying the new address, which takes effect upon delivery.\n\nA notice sent by e-mail is delivered when sent, unless it is returned to the sender as undeliverable. The sender shall keep a copy of the notice and evidence of its transmission.",
 
     source: drafted(),
     status: 'draft',
@@ -121,8 +130,6 @@ export const FL_BOILERPLATE: Clause[] = [
         nothing. One address per signer already exists, and the party list
         already refuses two people sharing one.
       */
-      { name: 'landlordNames', type: 'string', label: 'Landlord name(s)', required: true },
-      { name: 'tenantNames', type: 'string', label: 'Tenant name(s)', required: true },
       { name: 'landlordNoticeEmails', type: 'string', label: 'Landlord notice addresses', required: true },
       { name: 'tenantNoticeEmails', type: 'string', label: 'Tenant notice addresses', required: true },
     ],
