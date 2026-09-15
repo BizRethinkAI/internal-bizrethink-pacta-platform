@@ -387,6 +387,8 @@ const styles = StyleSheet.create({
   // merges into the widget's bbox.
   sigRule: { width: SIG_COL, height: 0.75, backgroundColor: INK, marginTop: 4 },
   sigName: { fontFamily: SANS_BOLD, fontSize: 9, color: INK, marginTop: 4 },
+  // Links in a clause (the receipt's governing documents): the accent, underlined, so a printed copy still shows them as links.
+  link: { color: ACCENT, textDecoration: 'underline' },
   sigDate: { fontSize: 10, marginTop: 6 },
 });
 
@@ -921,7 +923,7 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
             clauseBody(
               section.clauses[0].text,
               parties,
-              { body: styles.bodyText, name: styles.sigName },
+              { body: styles.bodyText, name: styles.sigName, link: styles.link },
               `b-${section.clauses[0].clause.slug}`,
             ),
           ]
@@ -941,7 +943,7 @@ const renderDocument = (spec: LeaseDocumentSpec, parties: LeaseParty[]) => {
             const body = clauseBody(
               rendered.text,
               parties,
-              { body: styles.bodyText, name: styles.sigName },
+              { body: styles.bodyText, name: styles.sigName, link: styles.link },
               `b-${rendered.clause.slug}`,
             );
 

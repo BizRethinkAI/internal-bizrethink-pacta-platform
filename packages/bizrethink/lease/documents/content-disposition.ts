@@ -11,9 +11,7 @@
  * client can read, and the exact name as UTF-8 in `filename*`, which every
  * current browser prefers.
  */
-export const inlineContentDisposition = (label: string): string => {
-  const name = `${label}.pdf`;
-
+const disposition = (type: 'inline' | 'attachment', name: string): string => {
   const fallback = name
     .normalize('NFKD')
     .replace(/[\u2012-\u2015]/g, '-')
@@ -30,5 +28,10 @@ export const inlineContentDisposition = (label: string): string => {
     (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
   );
 
-  return `inline; filename="${fallback}"; filename*=UTF-8''${encoded}`;
+  return `${type}; filename="${fallback}"; filename*=UTF-8''${encoded}`;
 };
+
+export const inlineContentDisposition = (label: string): string => disposition('inline', `${label}.pdf`);
+
+/** For a file the browser should save rather than show — the download-all zip. `name` carries its extension. */
+export const attachmentContentDisposition = (name: string): string => disposition('attachment', name);

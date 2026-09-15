@@ -1,4 +1,4 @@
-import { Text, View } from '@react-pdf/renderer';
+import { Link, Text, View } from '@react-pdf/renderer';
 import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
 
@@ -63,6 +63,44 @@ export type ClauseBodyStyles = {
   body: Style;
   /** A signer's name, as the signature blocks set it. */
   name: Style;
+  /** A link's text, where the clause carries `[[link text|url]]`. */
+  link?: Style;
+};
+
+/*
+  `[[link text|url]]` — a clickable link inside a clause's text. Used by the
+  receipt addendum so each governing document, and all of them together, can be
+  opened from the signed PDF a tenant keeps. Like the election marker it reads
+  as what it is wherever the raw text is shown.
+*/
+const LINK = /\[\[link ([^|\]]+)\|([^\]]+)\]\]/g;
+
+/**
+ * Props for a run of text that may carry links.
+ *
+ * NO HYPHENATION WHERE THERE IS A LINK. The pilot receipt printed "down-load"
+ * across a line and split the download-all address with an inserted hyphen, so
+ * a printed copy gave an address that does not exist — and every split link
+ * became two click targets. Only text that carries a link is affected, so no
+ * other clause's pagination moves.
+ */
+const runProps = (text: string, style: Style, key: string) =>
+  text.includes('[[link ') ? { style, key, hyphenationCallback: (word: string) => [word] } : { style, key };
+
+/** A run of text as Text children: strings, with each link marker made a Link. */
+const withLinks = (text: string, style: Style | undefined) => {
+  const children: (string | ReturnType<typeof h>)[] = [];
+  let at = 0;
+
+  for (const match of text.matchAll(LINK)) {
+    children.push(text.slice(at, match.index));
+    children.push(h(Link, { key: `link-${match.index}`, src: match[2], style }, match[1]));
+    at = (match.index ?? 0) + match[0].length;
+  }
+
+  children.push(text.slice(at));
+
+  return children;
 };
 
 /**
@@ -75,7 +113,7 @@ export const clauseBody = (content: string, parties: LeaseParty[], styles: Claus
   const lines = content.split('\n');
 
   if (!lines.some((line) => MARK.test(line))) {
-    return h(Text, { style: styles.body, key }, content);
+    return h(Text, runProps(content, styles.body, key), ...withLinks(content, styles.link));
   }
 
   const blocks: ReturnType<typeof h>[] = [];
@@ -85,7 +123,13 @@ export const clauseBody = (content: string, parties: LeaseParty[], styles: Claus
     const kept = trimBlankLines(run);
 
     if (kept.length > 0) {
-      blocks.push(h(Text, { style: styles.body, key: `${key}-text-${blocks.length}` }, kept.join('\n')));
+      blocks.push(
+        h(
+          Text,
+          runProps(kept.join('\n'), styles.body, `${key}-text-${blocks.length}`),
+          ...withLinks(kept.join('\n'), styles.link),
+        ),
+      );
     }
 
     run = [];

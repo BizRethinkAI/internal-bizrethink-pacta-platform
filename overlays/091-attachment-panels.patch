@@ -1,0 +1,110 @@
+# Why: A lease's sixteen governing documents made both attachment panels unusable — URLs ran past the sender's panel, neither list scrolled, the signer's labels were cut to one line, and the signing sidebar's trigger gave no count.
+# Why-not-additive: The panels and the signing sidebar are upstream components rendered by upstream routes; the fix is class names, a function-trigger variant and one trigger.
+# Upstream-merge-fragility: low; presentation only. Re-apply if upstream restyles either popover or the v2 signing sidebar's Actions block.
+
+diff --git a/apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx b/apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
+index 0ab921a59..0c8a333d4 100644
+--- a/apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
++++ b/apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
+@@ -8,7 +8,8 @@ import { ExternalLink, PaperclipIcon } from 'lucide-react';
+ export type DocumentSigningAttachmentsPopoverProps = {
+   envelopeId: string;
+   token: string;
+-  trigger?: React.ReactNode;
++  // MODIFIED for BizRethink (overlay 091): a function trigger receives the count, so a custom trigger can show it.
++  trigger?: React.ReactNode | ((count: number) => React.ReactNode);
+ };
+ 
+ export const DocumentSigningAttachmentsPopover = ({
+@@ -28,7 +29,11 @@ export const DocumentSigningAttachmentsPopover = ({
+   return (
+     <Popover>
+       <PopoverTrigger asChild>
+-        {trigger ?? (
++        {typeof trigger === 'function' ? (
++          trigger(attachments.data.length)
++        ) : trigger ? (
++          trigger
++        ) : (
+           <Button variant="outline" className="gap-2">
+             <PaperclipIcon className="h-4 w-4" />
+             <span>
+@@ -50,7 +55,8 @@ export const DocumentSigningAttachmentsPopover = ({
+             </p>
+           </div>
+ 
+-          <div className="space-y-2">
++          {/* MODIFIED for BizRethink (overlay 091): full names, and a list that scrolls — sixteen governing documents fell below the screen. */}
++          <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
+             {attachments?.data.map((attachment) => (
+               <a
+                 key={attachment.id}
+@@ -60,12 +66,12 @@ export const DocumentSigningAttachmentsPopover = ({
+                 rel="noopener noreferrer"
+                 className="group flex items-center justify-between rounded-md border border-border px-3 py-2.5 transition duration-200 hover:bg-muted/50"
+               >
+-                <div className="flex flex-1 items-center gap-2.5">
++                <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                   <div className="rounded bg-muted p-2">
+                     <PaperclipIcon className="h-4 w-4" />
+                   </div>
+ 
+-                  <span className="block truncate text-muted-foreground text-sm underline hover:text-foreground">
++                  <span className="block break-words text-muted-foreground text-sm underline hover:text-foreground">
+                     {attachment.label}
+                   </span>
+                 </div>
+diff --git a/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx b/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+index 46ff0d89f..aef3f20a8 100644
+--- a/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
++++ b/apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+@@ -169,15 +169,16 @@ export const DocumentSigningPageViewV2 = () => {
+                   <Trans>Actions</Trans>
+                 </h4>
+ 
++                {/* MODIFIED for BizRethink (overlay 091): the count is the one hint a signer gets that there is something to open. */}
+                 <DocumentSigningAttachmentsPopover
+                   envelopeId={envelope.id}
+                   token={recipient.token}
+-                  trigger={
++                  trigger={(count) => (
+                     <Button variant="ghost" size="sm" className="w-full justify-start">
+                       <PaperclipIcon className="mr-2 h-4 w-4" />
+-                      <Trans>Attachments</Trans>
++                      <Trans>Attachments</Trans> ({count})
+                     </Button>
+-                  }
++                  )}
+                 />
+ 
+                 <EnvelopeDownloadDialog
+diff --git a/apps/remix/app/components/general/document/document-attachments-popover.tsx b/apps/remix/app/components/general/document/document-attachments-popover.tsx
+index 4fd3f385c..2747f78fe 100644
+--- a/apps/remix/app/components/general/document/document-attachments-popover.tsx
++++ b/apps/remix/app/components/general/document/document-attachments-popover.tsx
+@@ -147,20 +147,22 @@ export const DocumentAttachmentsPopover = ({
+             </p>
+           </div>
+ 
++          {/* MODIFIED for BizRethink (overlay 091): a long list scrolls inside the panel instead of running off the screen. */}
+           {attachments && attachments.data.length > 0 && (
+-            <div className="space-y-2">
++            <div className="max-h-[50vh] space-y-2 overflow-y-auto pr-1">
+               {attachments?.data.map((attachment) => (
+                 <div
+                   key={attachment.id}
+                   className="flex items-center justify-between rounded-md border border-border p-2"
+                 >
+                   <div className="min-w-0 flex-1">
+-                    <p className="truncate font-medium text-sm">{attachment.label}</p>
++                    <p className="break-words font-medium text-sm">{attachment.label}</p>
+                     <a
+                       href={toSafeHref(attachment.data)}
+                       target="_blank"
+                       rel="noopener noreferrer"
+-                      className="truncate text-muted-foreground text-xs underline hover:text-foreground"
++                      // MODIFIED for BizRethink (overlay 091): `truncate` does nothing on an inline <a>; the URL ran past the panel edge.
++                      className="block truncate text-muted-foreground text-xs underline hover:text-foreground"
+                     >
+                       {attachment.data}
+                     </a>

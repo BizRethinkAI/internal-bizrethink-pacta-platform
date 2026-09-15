@@ -729,13 +729,21 @@ export const FL_LEASE_BODY: Clause[] = [
   */
   {
     slug: 'hoa.governing-documents-receipt',
-    version: 1,
+    /*
+      v2: SAYS WHERE THE DOCUMENTS ARE. The tenant acknowledged receiving
+      sixteen documents and was never told how: the only route to them was an
+      unlabelled "Attachments" item in the signing sidebar, and the signed PDF
+      they keep led nowhere. The list now links each document and all of them
+      together (`describeDocuments`), and this paragraph names every route,
+      plus a paper copy on request.
+    */
+    version: 2,
     jurisdiction: 'generic',
     placement: 'addendum',
     section: 'rules',
     sortKey: 63,
     heading: 'Receipt of Governing Documents',
-    body: 'Tenant acknowledges having received a copy of each of the following governing documents of {{hoaName}}, and has had the opportunity to read them:\n\n{{governingDocuments}}\n\nTenant is bound by these documents as provided in this Lease. Landlord shall give Tenant a copy of any amendment adopted during the term that changes what Tenant must do.',
+    body: 'Tenant acknowledges having received a copy of each of the following governing documents of {{hoaName}}, and has had the opportunity to read them:\n\n{{governingDocuments}}\n\nLandlord delivers these documents electronically with this Lease. Each can be opened or downloaded from its link above, all of them together from the single download link, and from Attachments on the signing page. Tenant may ask Landlord for a paper copy of any of them at any time.\n\nTenant is bound by these documents as provided in this Lease. Landlord shall give Tenant a copy of any amendment adopted during the term that changes what Tenant must do.',
     source: drafted(),
     status: 'draft',
     includeWhen: (facts) => facts.hasHoa && facts.hasHoaGoverningDocuments,

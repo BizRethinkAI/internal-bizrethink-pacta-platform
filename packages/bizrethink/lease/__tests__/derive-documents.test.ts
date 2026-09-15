@@ -90,3 +90,35 @@ describe('hasGoverningDocuments', () => {
     expect(hasGoverningDocuments([doc()])).toBe(true);
   });
 });
+
+/*
+  The signed receipt is what a tenant keeps. It said they had received sixteen
+  documents and gave no way to reach one, and the signing screen's Attachments
+  control does not travel with the PDF. With the lease's id, every item carries
+  its own link and the list ends with one for all of them.
+*/
+describe('describeDocuments with links', () => {
+  const two = [doc({ id: 'bdoc_a', label: 'Declaration' }), doc({ id: 'bdoc_b', label: 'Ninth Amendment' })];
+
+  it('links each document, and all of them at the end', () => {
+    const lines = describeDocuments(two, 'hoa-governing', { matterId: 'lease_matter_abc' }).split('\n');
+
+    expect(lines[0]).toMatch(
+      /^1\. Declaration — \[\[link download\|https?:\/\/.+\/lease-attachment\/lease_matter_abc\/bdoc_a\]\]$/,
+    );
+    expect(lines[1]).toMatch(/^2\. Ninth Amendment — \[\[link download\|.+\/bdoc_b\]\]$/);
+    expect(lines[2]).toBe('All 2 documents in one download:');
+    expect(lines[3]).toMatch(/^\[\[link (\S+)\|\1\]\]$/);
+    expect(lines[3]).toMatch(/\/lease-attachment\/lease_matter_abc\/all\]\]$/);
+  });
+
+  it('never links a move-in report, which is not a public record', () => {
+    expect(
+      describeDocuments([doc({ kind: 'move-in-report' })], 'move-in-report', { matterId: 'lease_matter_abc' }),
+    ).not.toContain('[[link');
+  });
+
+  it('prints the plain list without a lease id, as before', () => {
+    expect(describeDocuments(two)).toBe('1. Declaration\n2. Ninth Amendment');
+  });
+});

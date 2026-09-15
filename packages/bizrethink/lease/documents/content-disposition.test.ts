@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 import { describe, expect, it } from 'vitest';
 
-import { inlineContentDisposition } from './content-disposition';
+import { attachmentContentDisposition, inlineContentDisposition } from './content-disposition';
 
 /**
  * 2026-09-15: two of the sixteen governing documents on the pilot lease
@@ -40,6 +40,15 @@ describe('inlineContentDisposition', () => {
     const header = inlineContentDisposition('evil"; filename="x.exe\\');
 
     expect(header.split(';')[1]).toBe(' filename="evil filename=x.exe.pdf"');
+  });
+});
+
+describe('attachmentContentDisposition', () => {
+  it('asks the browser to save the file, under the exact name it is given', () => {
+    const header = attachmentContentDisposition('Governing documents — 29090 Picana Ln.zip');
+
+    expect(header).toMatch(/^attachment; filename="Governing documents - 29090 Picana Ln\.zip"; /);
+    expect(() => new Response('x', { headers: { 'Content-Disposition': header } })).not.toThrow();
   });
 });
 

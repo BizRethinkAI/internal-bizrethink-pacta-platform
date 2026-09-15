@@ -27,17 +27,30 @@ const doc = (over: Partial<LeaseDocument> = {}): LeaseDocument => ({
 });
 
 describe('the governing documents reach a signer as links', () => {
-  it('gives one link per document, labelled as the receipt recites it', () => {
+  it('gives one link per document, labelled as the receipt recites it — after one for all of them', () => {
     const links = attachmentLinks('lease_matter_abc', [
       doc({ id: 'bdoc_a', label: 'Amended and Restated Master Declaration' }),
       doc({ id: 'bdoc_b', label: 'Ninth Amendment to the Declaration' }),
     ]);
 
-    expect(links).toHaveLength(2);
     expect(links.map((link) => link.label)).toEqual([
+      'All 2 documents, in one download',
       'Amended and Restated Master Declaration',
       'Ninth Amendment to the Declaration',
     ]);
+  });
+
+  /*
+    "Clicking 16 links does not make it very user friendly." The first entry
+    downloads every document at once; the rest stay for opening one.
+  */
+  it('puts the download-all link first, and only when there is more than one', () => {
+    const [all] = attachmentLinks('lease_matter_abc', [doc({ id: 'bdoc_a' }), doc({ id: 'bdoc_b' })]);
+
+    expect(all.data).toMatch(/^https?:\/\/.+\/lease-attachment\/lease_matter_abc\/all$/);
+    expect(attachmentLinks('lease_matter_abc', [doc({ id: 'bdoc_a' })]).map((link) => link.data)).not.toContainEqual(
+      expect.stringMatching(/\/all$/),
+    );
   });
 
   it('is a link, which is the only thing an EnvelopeAttachment can carry', () => {
