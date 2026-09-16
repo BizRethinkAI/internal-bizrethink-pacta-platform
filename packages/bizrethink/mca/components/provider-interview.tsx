@@ -100,13 +100,21 @@ export const McaProviderInterview = ({
               </h2>
               <p className="text-muted-foreground text-sm">
                 <Trans>
-                  This release supports net card receipts, collection through processor splits, merchant-state venue and
-                  court proceedings. Unsupported alternatives need additional drafting before use.
+                  This release supports net card receipts, collection through processor splits and merchant-state venue.
+                  Choose how disputes are resolved below. Unsupported alternatives need additional drafting before use.
                 </Trans>
               </p>
               <CheckAnswer
                 name="policy.supportedTermsConfirmed"
                 label={msg`I confirm this provider uses these supported terms`}
+              />
+              <SelectAnswer
+                name="policy.disputeResolution"
+                label={msg`Dispute resolution`}
+                options={[
+                  ['courts', msg`Court proceedings, with the jury, class and counterclaim waivers`],
+                  ['arbitration', msg`Binding arbitration, with the authored arbitration clause`],
+                ]}
               />
               <SelectAnswer
                 name="policy.guarantyScope"
