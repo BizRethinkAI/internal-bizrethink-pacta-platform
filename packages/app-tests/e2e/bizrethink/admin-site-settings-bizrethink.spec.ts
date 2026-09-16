@@ -1,10 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import { prisma } from '@documenso/prisma';
-import {
-  resetAllBizRethinkSingletons,
-  seedSiteSettingsSignup,
-} from '@documenso/prisma/seed/bizrethink';
+import { resetAllBizRethinkSingletons, seedSiteSettingsSignup } from '@documenso/prisma/seed/bizrethink';
 
 import { signedInAsAdmin } from '../fixtures/bizrethink-auth';
 
@@ -28,16 +25,12 @@ test.describe('BizRethink admin site-settings', () => {
     await resetAllBizRethinkSingletons();
   });
 
-  test('admin can navigate to /admin/site-settings and the BizRethink sections render', async ({
-    page,
-  }) => {
+  test('admin can navigate to /admin/site-settings and the BizRethink sections render', async ({ page }) => {
     await signedInAsAdmin({ page, redirectPath: '/admin/site-settings' });
 
     // All four BizRethink sections + the upstream Banner section should be present.
     await expect(page.getByRole('heading', { name: 'Signup gating' })).toBeVisible();
-    await expect(
-      page.getByRole('heading', { name: 'Captcha (Cloudflare Turnstile)' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Captcha (Cloudflare Turnstile)' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Webhook SSRF bypass hosts' })).toBeVisible();
   });
 

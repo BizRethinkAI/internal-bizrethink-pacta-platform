@@ -29,12 +29,18 @@ process, and `default` printed "Default" for events of default and remedies.
 Presentation only. No clause text, field, fingerprint, approval or review-link
 change; numbering is untouched.
 
-## Six existing assertions changed, and why
+## Sixteen existing assertions changed, and why
 
 The display format changed, so tests pinning the old one were updated rather than
 worked around: `section-headings` (three), `numbered-review`, `package-navigation`
-and `pdf` (two). Each keeps its original intent — the same section, the same
-citation, the new name.
+and `pdf` (two) in vitest, then **ten Playwright assertions** across
+`mca-workspace`, `legal-workspace-ui`, `mca-provider-templates` and
+`mca-template-use`, which CI caught after the first push. Each keeps its original
+intent — the same section, the same citation, the new name.
+
+**The local suite could not have caught the browser ones**, which is why CI is
+the gate: `npx vitest run mca` passes while five browser flows assert
+`1. Funding Terms` in the rendered page.
 
 ## Validation
 

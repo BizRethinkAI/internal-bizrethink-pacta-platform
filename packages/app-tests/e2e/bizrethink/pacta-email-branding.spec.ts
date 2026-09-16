@@ -39,9 +39,7 @@ const purgeInbucketMailbox = async (localPart: string) => {
 };
 
 test.describe('BizRethink overlay 023 + 021 — Pacta email branding', () => {
-  test('forgot-password email contains Pacta-branded footer (not Documenso)', async ({
-    request,
-  }) => {
+  test('forgot-password email contains Pacta-branded footer (not Documenso)', async ({ request }) => {
     // Seed a user with a deterministic local-part so we can fetch from Inbucket.
     const localPart = `e8-${Date.now()}`;
     const email = `${localPart}@test.documenso.com`;

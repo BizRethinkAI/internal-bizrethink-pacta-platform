@@ -80,7 +80,9 @@ test('a saved provider template opens a stateless transaction interview and down
     const preview = page.locator('[data-mca-filled-preview]');
     await expect(preview).toContainText('Internal transaction draft');
     await preview.getByLabel('Package document', { exact: true }).selectOption('frpa');
-    await expect(preview.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+    await expect(
+      preview.getByRole('heading', { name: 'Section 1: Merchant and Funding Information', exact: true }),
+    ).toBeVisible();
     await expect(
       preview.locator('[data-mca-section="funding-terms"] [data-mca-template-item="frpa.holdback-explainer"]'),
     ).toBeVisible();
