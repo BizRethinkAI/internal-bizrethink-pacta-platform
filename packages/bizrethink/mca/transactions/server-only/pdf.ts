@@ -3,6 +3,7 @@ import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
 import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/render/fonts/font-data';
 import { groupMcaSections } from '../../engine/section-headings';
+import { fieldRows } from '../../render/field-layout';
 import type { McaTemplateItem } from '../../templates/compile';
 import type { McaFilledDraft } from '../fill';
 
@@ -47,6 +48,12 @@ const styles = StyleSheet.create({
   heading: { fontFamily: 'McaSansBold', fontSize: 11, marginBottom: 5, marginTop: 13 },
   paragraph: { fontSize: 11, marginBottom: 6, lineHeight: 1.35 },
   field: { borderBottomWidth: 0.4, borderBottomColor: '#d5d9df', paddingVertical: 5 },
+  // Two fields to a row, as the real documents print them. The cell keeps its
+  // own rule so a short answer gets a short rule, not the width of the page.
+  fieldRow: { flexDirection: 'row' },
+  fieldCell: { flexBasis: '50%', flexGrow: 0, flexShrink: 1, paddingRight: 14 },
+  fieldCellLast: { flexBasis: '50%', flexGrow: 0, flexShrink: 1 },
+  fieldCellFull: { flexBasis: '100%', flexGrow: 0, flexShrink: 1 },
   label: { fontFamily: 'McaSans', fontSize: 8.5, color: '#667085' },
   value: { fontFamily: 'McaSans', fontSize: 10 },
   warning: { fontFamily: 'McaSans', fontSize: 9, color: '#935d17', marginBottom: 9 },
@@ -163,16 +170,31 @@ export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number)
 const itemElements = (item: McaTemplateItem) => {
   const heading = `${item.number ? `${item.number}  ` : ''}${item.heading}`;
   const paragraphs = item.body.split('\n').filter(Boolean);
-  const fields = item.fields
-    .filter((field) => field.kind !== 'signature' && !field.binding.endsWith('.signedDate'))
-    .map((field) =>
-      h(
-        View,
-        { key: `${item.slug}:${field.widget}`, style: styles.field, wrap: false },
-        text(field.label, styles.label),
-        text(field.value || (field.required ? '[to complete]' : '[not designated]'), styles.value),
+  const printable = item.fields.filter((field) => field.kind !== 'signature' && !field.binding.endsWith('.signedDate'));
+  const fields = fieldRows(printable).map((row, index) =>
+    h(
+      View,
+      { key: `${item.slug}:row${index}`, style: styles.fieldRow, wrap: false },
+      ...row.map((field, column) =>
+        h(
+          View,
+          {
+            key: `${item.slug}:${field.widget}`,
+            style: [
+              row.length === 1
+                ? styles.fieldCellFull
+                : column === row.length - 1
+                  ? styles.fieldCellLast
+                  : styles.fieldCell,
+              styles.field,
+            ],
+          },
+          text(field.label, styles.label),
+          text(field.value || (field.required ? '[to complete]' : '[not designated]'), styles.value),
+        ),
       ),
-    );
+    ),
+  );
   if (!paragraphs.length) {
     return [
       h(View, { key: `${item.slug}:first-field`, wrap: false }, text(heading, styles.heading), fields[0]),

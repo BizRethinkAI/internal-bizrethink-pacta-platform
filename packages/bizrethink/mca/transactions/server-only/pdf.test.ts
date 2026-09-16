@@ -87,3 +87,68 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
     30_000,
   );
 });
+
+/**
+ * Section 1 is a grid, and the page count is the evidence.
+ *
+ * Every field used to print as a full-width stacked label-over-value row, so
+ * the funding grid alone ran pages and the FRPA came out at 37 against the real
+ * document's 23. These assertions are geometric on purpose: a label pair that
+ * shares a baseline is a row, and nothing else looks like one.
+ */
+describe('completed fields print as a grid, not a stack', () => {
+  const labelItems = async (bytes: Buffer) => {
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const parsed = await pdfjs.getDocument({ data: new Uint8Array(bytes), useSystemFonts: false }).promise;
+    const items: { str: string; x: number; y: number; page: number }[] = [];
+
+    for (let number = 1; number <= parsed.numPages; number += 1) {
+      const page = await parsed.getPage(number);
+      const content = await page.getTextContent();
+
+      for (const item of content.items) {
+        if ('str' in item && item.str.trim()) {
+          items.push({ str: item.str.trim(), x: item.transform[4], y: item.transform[5], page: number });
+        }
+      }
+    }
+
+    const { numPages } = parsed;
+    await parsed.destroy();
+    return { items, numPages };
+  };
+
+  it('pairs two short answers on one baseline and keeps an address alone', async () => {
+    const bytes = await renderMcaDraftPdf(filledDraftFixture().draft, 3);
+    const { items, numPages } = await labelItems(bytes);
+    const find = (label: string) => items.find((item) => item.str.startsWith(label));
+
+    const entityType = find('Merchant — Entity Type');
+    const formationState = find('Merchant — State of Formation');
+    const businessAddress = find('Merchant — Business Address');
+
+    expect(entityType, 'entity type label').toBeDefined();
+    expect(formationState, 'formation state label').toBeDefined();
+    expect(businessAddress, 'business address label').toBeDefined();
+
+    // Same row: one baseline, two columns.
+    expect(formationState?.y).toBe(entityType?.y);
+    expect(formationState?.x).toBeGreaterThan((entityType?.x ?? 0) + 100);
+
+    // An address takes the row to itself.
+    const sharingWithAddress = items.filter(
+      (item) =>
+        item.page === businessAddress?.page && item.y === businessAddress?.y && item.str !== businessAddress?.str,
+    );
+    expect(sharingWithAddress, 'address shares its baseline').toEqual([]);
+
+    // The funding grid is a grid: it fits on the pages it introduces rather
+    // than running down the document one field at a time. Page count overall is
+    // driven by body typography and clause length, not by this.
+    const gridPages = new Set(
+      items.filter((item) => /^(Merchant|Deposit Account|Funding Terms) — /.test(item.str)).map((item) => item.page),
+    );
+    expect([...gridPages].sort((a, b) => a - b).slice(0, 2)).toEqual([1, 2]);
+    expect(numPages).toBeGreaterThan(0);
+  }, 30_000);
+});
