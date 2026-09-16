@@ -105,6 +105,11 @@ export const providerValues = (profile: McaProviderProfile): Record<string, stri
   'provider.reconciliationEmail': profile.buyer.reconciliationEmail,
   'provider.reconciliationAddress': profile.buyer.reconciliationAddress,
   ...(profile.buyer.servicingPhone ? { 'provider.servicingPhone': profile.buyer.servicingPhone } : {}),
+  ...(profile.buyer.venueState
+    ? {
+        'provider.venueForum': [profile.buyer.venueCounty, profile.buyer.venueState].filter(Boolean).join(', '),
+      }
+    : {}),
   'processor.approvedProcessors': profile.processor.legalName,
   ...(profile.equipmentProvider
     ? {

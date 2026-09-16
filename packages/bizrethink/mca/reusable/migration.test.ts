@@ -13,7 +13,7 @@ const bySlug = new Map(ALL_MCA_CONTENT.map((entry) => [entry.slug, entry]));
 describe('the MCA catalogue extraction accounts for every input record', () => {
   it('keeps disjoint catalogues and every historical identity', () => {
     expect(migration.records).toHaveLength(211);
-    expect(ALL_MCA_CLAUSES).toHaveLength(210);
+    expect(ALL_MCA_CLAUSES).toHaveLength(212);
     expect(ALL_MCA_REUSABLE).toHaveLength(25);
     expect(bySlug.size).toBe(ALL_MCA_CONTENT.length);
     expect(migration.records.every((row) => bySlug.has(row.sourceSlug))).toBe(true);

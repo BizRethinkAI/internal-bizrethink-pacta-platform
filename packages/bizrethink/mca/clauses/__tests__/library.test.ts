@@ -89,7 +89,7 @@ describe('the MCA clause library', () => {
     // 208 until §6.1 became an exhaustive pair on 2026-09-11. That one adds a
     // record and no section:  chooses between two §6.1s, so every
     // assembled document still holds exactly one. Same shape as §4.15 and §8.2.
-    expect(ALL_MCA_CLAUSES).toHaveLength(210);
+    expect(ALL_MCA_CLAUSES).toHaveLength(212);
 
     const perInstrument = MCA_INSTRUMENTS.map((id) => libraryFor(id).length);
 

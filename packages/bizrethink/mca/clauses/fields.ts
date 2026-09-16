@@ -107,6 +107,7 @@ export const MCA_FUNDING_FIELDS: ClauseField[] = [
   field('provider.principalAddress', 'Buyer — Principal Address'),
   field('provider.noticeAddress', 'Buyer — Mailing Address for Notices'),
   field('provider.noticeEmail', 'Buyer — Email for Notices'),
+  field('provider.venueForum', 'Buyer — Forum for actions under the Agreement', 'text', false),
   field('provider.reconciliationEmail', 'Buyer — Reconciliation Request Email'),
   field('provider.reconciliationAddress', 'Buyer — Reconciliation Request Mailing Address'),
   field('provider.servicingPhone', 'Buyer — Servicing Phone'),

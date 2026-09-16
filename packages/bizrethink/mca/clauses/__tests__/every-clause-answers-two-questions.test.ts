@@ -5,7 +5,7 @@ import { LOMBARD_FACTS, type McaFacts } from '../facts';
 
 describe('ADR 0014 clause metadata', () => {
   it('requires an explicit legal classification and variance on all current clause and reusable records', () => {
-    expect(ALL_MCA_CONTENT).toHaveLength(235);
+    expect(ALL_MCA_CONTENT).toHaveLength(237);
     for (const clause of ALL_MCA_CONTENT) {
       expect(clause.whyThisClause, clause.slug).toBeDefined();
       expect(clause.variance, clause.slug).toBeDefined();
@@ -52,7 +52,9 @@ describe('ADR 0014 clause metadata', () => {
       'frpa.negative-pledge-4-11': 'misattributed',
       'frpa.financial-condition-4-3': 'misattributed',
       'frpa.merchant-deposit-agreement-4-1': 'no-alternative',
-      'frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5': 'unwritable',
+      // Venue left this clause and became an exhaustive pair on `venueRule`;
+      // what remains applies under every programme.
+      'frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5': 'load-bearing',
       'frpa.primary-collection-split-funding-via-approved-processor-2-3': 'load-bearing',
     };
     for (const [slug, because] of Object.entries(reasons)) {
@@ -67,6 +69,7 @@ describe('ADR 0014 clause metadata', () => {
       concurrentPositions: [false, true],
       guarantyScope: ['none', 'limited-conduct', 'full-performance'],
       disputeResolution: ['courts', 'arbitration'],
+      venueRule: ['merchant-state', 'funder-state'],
     } satisfies Partial<{ [K in keyof McaFacts]: McaFacts[K][] }>;
     const offered = ALL_MCA_CONTENT.filter((clause) => clause.variance?.kind === 'offered');
     expect(offered.length).toBeGreaterThan(0);

@@ -163,8 +163,8 @@ const GAPS = [
   */
   'processorSplitAccepted:false',
   'processorSplitAccepted:true',
-  'venueRule:funder-state',
-  'venueRule:merchant-state',
+  // `venueRule` closed on 2026-09-16: §7.5 split, venue became an exhaustive
+  // pair, and the provider interview collects the funder's forum.
 ];
 
 describe('every fact value the interview offers', () => {

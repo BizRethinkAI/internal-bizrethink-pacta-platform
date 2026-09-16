@@ -25,7 +25,8 @@ describe('the provider interview describes the provider, not a future merchant t
     ['collectionMethod', 'ach-only'],
     ['collectionMethod', 'split-with-ach-backstop'],
     ['settlementBase', 'gross'],
-    ['venueRule', 'funder-state'],
+    // `venueRule: 'funder-state'` left this list when §7.5 split and the
+    // interview began collecting the funder's forum.
     ['disputeResolution', 'arbitration'],
     ['supportedTermsConfirmed', false],
   ])('does not substitute the baseline for unsupported %s=%s', (key, value) => {
@@ -66,5 +67,46 @@ describe('the provider interview describes the provider, not a future merchant t
       ZMcaProviderProfile.safeParse({ ...profile, buyer: { ...profile.buyer, entityType: '', organizationState: '' } })
         .success,
     ).toBe(false);
+  });
+});
+
+/**
+ * A funder-state forum needs a forum, and Virginia will not have one.
+ *
+ * Va. Code §6.2-2234(A) makes a provision mandating a forum outside the
+ * Commonwealth unenforceable for a covered transaction, and a Virginia
+ * recipient is defined by its principal place of business. A merchant-state
+ * rule satisfies that by construction, which is why the base form has no
+ * Virginia variant; a funder-state rule does not.
+ */
+describe('a funder-state forum is validated, not assumed', () => {
+  const withVenue = (policy: Record<string, unknown>, buyer: Record<string, unknown> = {}) => {
+    const base = providerFixture();
+    return { ...base, buyer: { ...base.buyer, ...buyer }, policy: { ...base.policy, ...policy } };
+  };
+
+  it('refuses funder-state venue with no forum named', () => {
+    expect(ZMcaProviderProfile.safeParse(withVenue({ venueRule: 'funder-state' })).success).toBe(false);
+  });
+
+  it('accepts a named forum', () => {
+    const profile = withVenue({ venueRule: 'funder-state' }, { venueState: 'Florida', venueCounty: 'Pasco County' });
+
+    expect(ZMcaProviderProfile.safeParse(profile).success).toBe(true);
+  });
+
+  it('refuses a funder forum for a programme offered into Virginia', () => {
+    const profile = withVenue(
+      { venueRule: 'funder-state', recipientStates: ['US-FL', 'US-VA'] },
+      { venueState: 'Florida' },
+    );
+
+    expect(ZMcaProviderProfile.safeParse(profile).success).toBe(false);
+  });
+
+  it('leaves merchant-state programmes alone, Virginia included', () => {
+    const profile = withVenue({ venueRule: 'merchant-state', recipientStates: ['US-FL', 'US-VA'] });
+
+    expect(ZMcaProviderProfile.safeParse(profile).success).toBe(true);
   });
 });

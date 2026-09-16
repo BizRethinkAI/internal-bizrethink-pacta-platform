@@ -461,17 +461,17 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     },
     variance: {
       kind: 'fixed',
-      because: 'unwritable',
-      note: 'A funder-state alternative needs the funder’s state, which the facts do not collect. Removing this clause would also remove governing-law and service rules that the venue preference does not decide.',
+      because: 'load-bearing',
+      note: 'Binding effect, governing law, the UCC rules and the service pointer apply under every programme. Venue was the one answer a funder varies, and it is now its own clause with an exhaustive pair behind it.',
     },
-    version: 1,
+    version: 2,
     instrument: 'frpa',
     kind: 'clause',
     includeWhen: null,
     section: 'miscellaneous',
     sortKey: 50,
-    heading: 'Binding Effect; Governing Law, Venue, and Jurisdiction',
-    body: 'This Agreement binds the parties and their permitted successors and assigns, and is for their benefit. Section [[clause:frpa.assignment-7-2]] states when an interest under this Agreement may be transferred, by whom, and on what terms, and nothing in this Section permits a transfer that Section does not.\nSubject to mandatory federal law and to applicable conflict-of-laws rules, the substantive law of the state of Merchant’s principal place of business stated in the Merchant and Funding Information grid governs this Agreement. An action arising under this Agreement shall be brought in a state court of competent jurisdiction in that state, or in a federal court of competent jurisdiction sitting in that state. Neither party may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction. Section [[clause:frpa.state-law-riders-7-24]] states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it.\nPerfection, the effect of perfection or non-perfection, and the priority of a security interest are governed by the mandatory rules of the Uniform Commercial Code that apply to them. This Section does not vary those rules and does not choose the law that decides them.\nService of a summons, a complaint or other judicial process is governed by Section [[clause:frpa.section-10-1]]. Nothing in this Section makes a mailing, an email or any other communication into service of process. This Section is not a waiver of valid service, of a jurisdictional objection, of a mandatory rule about where an action must be brought, or of any protection applicable law does not permit to be given up.',
+    heading: 'Binding Effect; Governing Law',
+    body: 'This Agreement binds the parties and their permitted successors and assigns, and is for their benefit. Section [[clause:frpa.assignment-7-2]] states when an interest under this Agreement may be transferred, by whom, and on what terms, and nothing in this Section permits a transfer that Section does not.\nSubject to mandatory federal law and to applicable conflict-of-laws rules, the substantive law of the state of Merchant’s principal place of business stated in the Merchant and Funding Information grid governs this Agreement. Section [[clause:frpa.venue-7-5]] states where an action arising under this Agreement is brought.\nPerfection, the effect of perfection or non-perfection, and the priority of a security interest are governed by the mandatory rules of the Uniform Commercial Code that apply to them. This Section does not vary those rules and does not choose the law that decides them.\nService of a summons, a complaint or other judicial process is governed by Section [[clause:frpa.section-10-1]]. Nothing in this Section makes a mailing, an email or any other communication into service of process. This Section is not a waiver of valid service, of a jurisdictional objection, of a mandatory rule about where an action must be brought, or of any protection applicable law does not permit to be given up.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
     appliesInStates: ['US-VA'],
@@ -483,6 +483,83 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
           'frpa-arbitration-clauses-with-no-arbitration-agreement',
           'ny-law-below-gol-5-1401-threshold',
         ],
+      },
+      { review: 'REVIEW-02', findings: ['frpa-7-24-does-not-name-the-statute-that-actually-bites'] },
+    ],
+  },
+  /*
+    VENUE IS ITS OWN CLAUSE, AND THE FACT GATES THE WHOLE OF IT.
+
+    §7.5 answered three questions — who is bound, which law governs, and where an
+    action is brought — so `venueRule` decided a limb of it. ADR 0013's rule for
+    that case is not limb granularity: the clause is carrying two rules and they
+    separate. These two records are the exhaustive pair, sharing one reference
+    identity so a cross-reference resolves to whichever is selected.
+
+    WHAT THE EARLIER REFUSAL SAID, AND WHAT CHANGED. The refusal recorded on the
+    governing-law clause gave three grounds. Two are answered by the split: the
+    fact now gates a whole clause, and the two arms no longer share every word.
+    The third — *"the funder-state arm cannot be drafted at all"*, because
+    `McaFacts` had no field naming the funder's state — is answered by the
+    provider interview, which now asks where the funder litigates. Owner's
+    decision, 2026-09-16: an explicit venue state and county, not the state of
+    organisation, because a funder organised in Delaware litigates where it
+    works.
+
+    GOVERNING LAW DOES NOT MOVE WITH VENUE. A funder choosing its own courts may
+    also expect its own law; this pair does not offer that, and no clause here
+    changes which state's substantive law governs. That is a separate question
+    and a real gap, recorded rather than assumed.
+  */
+  {
+    slug: 'frpa.venue-7-5',
+    whyThisClause: {
+      kind: 'implements',
+      citation: 'Va. Code §6.2-2234(A) (Virginia forum for covered sales-based financing)',
+    },
+    variance: { kind: 'offered', fact: 'venueRule' },
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    includeWhen: (facts) => facts.venueRule === 'merchant-state',
+    section: 'miscellaneous',
+    sortKey: 51,
+    heading: 'Venue and Jurisdiction',
+    body: 'An action arising under this Agreement shall be brought in a state court of competent jurisdiction in the state of Merchant’s principal place of business stated in the Merchant and Funding Information grid, or in a federal court of competent jurisdiction sitting in that state. Neither party may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction.\nSection [[clause:frpa.state-law-riders-7-24]] states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it. This Section is not a waiver of a jurisdictional objection, of a mandatory rule about where an action must be brought, or of any protection applicable law does not permit to be given up.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: ['US-VA'],
+    examinedBy: [
+      {
+        review: 'REVIEW-01',
+        findings: ['counterclaim-waiver-flips-by-forum', 'ny-law-below-gol-5-1401-threshold'],
+      },
+      { review: 'REVIEW-02', findings: ['frpa-7-24-does-not-name-the-statute-that-actually-bites'] },
+    ],
+  },
+  {
+    slug: 'frpa.venue-funder-state-7-5',
+    referenceId: 'frpa.venue-7-5',
+    whyThisClause: {
+      kind: 'implements',
+      citation: 'Va. Code §6.2-2234(A) (Virginia forum for covered sales-based financing)',
+    },
+    variance: { kind: 'offered', fact: 'venueRule' },
+    version: 1,
+    instrument: 'frpa',
+    kind: 'clause',
+    includeWhen: (facts) => facts.venueRule === 'funder-state',
+    section: 'miscellaneous',
+    sortKey: 51,
+    heading: 'Venue and Jurisdiction',
+    body: 'An action arising under this Agreement shall be brought in a state court of competent jurisdiction sitting in {{field:provider.venueForum}}, or in a federal court of competent jurisdiction sitting in that state. Neither party may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction.\nSection [[clause:frpa.state-law-riders-7-24]] states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it. Where the law of the state in which Merchant’s principal place of business is located fixes a forum for this transaction, that rule governs and this Section does not apply. This Section is not a waiver of a jurisdictional objection, of a mandatory rule about where an action must be brought, or of any protection applicable law does not permit to be given up.',
+    source: { kind: 'attorney-drafted', author: null },
+    status: 'draft',
+    appliesInStates: ['US-VA'],
+    examinedBy: [
+      {
+        review: 'REVIEW-01',
+        findings: ['counterclaim-waiver-flips-by-forum', 'ny-law-below-gol-5-1401-threshold'],
       },
       { review: 'REVIEW-02', findings: ['frpa-7-24-does-not-name-the-statute-that-actually-bites'] },
     ],

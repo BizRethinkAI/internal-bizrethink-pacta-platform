@@ -68,7 +68,10 @@ import type { McaContent } from '../types';
  */
 const FRPA = libraryFor('frpa');
 
-const FORUM = 'frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5';
+const GOVERNING_LAW = 'frpa.binding-effect-governing-law-venue-and-jurisdiction-7-5';
+// Venue left §7.5 when `venueRule` became a choice: a fact gates a whole clause,
+// so the forum rules are their own record with an exhaustive pair behind them.
+const FORUM = 'frpa.venue-7-5';
 const SEVERABILITY = 'frpa.severability-7-7';
 const JURY = 'frpa.jury-trial-waiver-7-10';
 const CLASS = 'frpa.class-action-waiver-7-11';
@@ -321,7 +324,7 @@ describe('no provision of any instrument manufactures service of process', () =>
       running the union BEFORE pushing — which is the whole point of doing it
       that way, and is what the queue skipped.
     */
-    expect(ALL_MCA_CONTENT.length).toBe(235);
+    expect(ALL_MCA_CONTENT.length).toBe(237);
   });
 });
 
@@ -436,7 +439,7 @@ describe('one forum rule, and it is the merchant’s own state', () => {
    * Two rules over one subject, and this one was already live.
    */
   it('states the assignment rule once, in Section 7.2', () => {
-    const body = clause(FORUM).body;
+    const body = clause(GOVERNING_LAW).body;
 
     expect(body).toContain('Section [[clause:frpa.assignment-7-2]]');
     expect(body).not.toMatch(/sole discretion/i);
@@ -453,12 +456,23 @@ describe('one forum rule, and it is the merchant’s own state', () => {
     expect(clause(FORUM).body).toContain('Section [[clause:frpa.state-law-riders-7-24]]');
   });
 
-  /** And §7.5 hands judicial process to Section 10.1 rather than supplying it. */
+  /**
+   * And the governing-law clause hands judicial process to Section 10.1 rather
+   * than supplying it. The service pointer stayed with §7.5 when venue left it:
+   * where an action is brought and how a defendant is served are different
+   * questions, and only the first is a funder's choice.
+   */
   it('sends judicial process out of the governing-law clause', () => {
-    const body = clause(FORUM).body;
+    const body = clause(GOVERNING_LAW).body;
 
     expect(body).toContain('Section [[clause:frpa.section-10-1]]');
     expect(deemsService(body)).toBe(false);
+  });
+
+  it('keeps neither venue clause in the business of service', () => {
+    for (const slug of [FORUM, 'frpa.venue-funder-state-7-5']) {
+      expect(deemsService(clause(slug).body), slug).toBe(false);
+    }
   });
 
   /**
