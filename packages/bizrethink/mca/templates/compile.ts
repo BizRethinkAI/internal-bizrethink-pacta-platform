@@ -36,6 +36,12 @@ export type McaTemplateDocument = {
   counterparty: string;
   transactionSelection: 'always' | 'equipment-lease' | 'subscription' | 'individual-report' | 'broker-channel';
   items: McaTemplateItem[];
+  /**
+   * The completed Appendix A this document's fee clause refers to. Empty means
+   * the funder charges nothing, which the clause reads as $0.00 — not that the
+   * schedule is missing.
+   */
+  feeSchedule: McaFee[];
 };
 
 /** Stable structural placement. Missing/cyclic anchors fail instead of dropping required content. */
@@ -175,6 +181,10 @@ export const compileMcaTemplate = (input: McaProviderProfile) => {
             : instrument === 'iso-pra'
               ? 'broker-channel'
               : 'always',
+      // Fees belong to the agreement whose Appendix states them. The equipment
+      // and subscription documents charge under their own terms, and the
+      // processor's letter is not ours to price.
+      feeSchedule: instrument === 'frpa' ? profile.policy.fees : [],
       items: placeReusableContent(clauses, resolved).map((entry) => {
         const source = sourceBySlug.get(entry.slug);
         if (!source || source.status === 'retired') {

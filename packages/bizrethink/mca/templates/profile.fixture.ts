@@ -17,6 +17,9 @@ export const providerFixture = (): McaProviderProfile => ({
     settlementBase: 'net',
     venueRule: 'merchant-state',
     supportedTermsConfirmed: true,
+    // The synthetic provider charges nothing, which the Appendix clause reads
+    // as $0.00 rather than as an unanswered question.
+    fees: [],
     guarantyScope: 'limited-conduct',
     equipment: 'none',
     renewalModel: 'payoff-only',

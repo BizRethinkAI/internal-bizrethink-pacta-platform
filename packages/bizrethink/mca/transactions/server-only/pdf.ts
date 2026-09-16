@@ -4,6 +4,7 @@ import { createElement as h } from 'react';
 import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/render/fonts/font-data';
 import { groupMcaSections } from '../../engine/section-headings';
 import type { McaTemplateItem } from '../../templates/compile';
+import type { McaFee } from '../../templates/profile';
 import type { McaFilledDraft } from '../fill';
 
 Font.register({ family: 'McaBody', src: TINOS_REGULAR });
@@ -51,9 +52,55 @@ const styles = StyleSheet.create({
   value: { fontFamily: 'McaSans', fontSize: 10 },
   warning: { fontFamily: 'McaSans', fontSize: 9, color: '#935d17', marginBottom: 9 },
   signature: { marginTop: 14, padding: 12, borderWidth: 0.5, borderColor: '#abb3bd' },
+  // Appendix A: what a fee costs on the right, what it is for underneath.
+  feeRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 9 },
+  feeName: { flexGrow: 1, flexShrink: 1, fontFamily: 'McaSansBold', fontSize: 10 },
+  feeAmount: { flexBasis: 200, flexGrow: 0, flexShrink: 0, fontFamily: 'McaSans', fontSize: 10, textAlign: 'right' },
+  feeDetail: {
+    fontFamily: 'McaSans',
+    fontSize: 9,
+    color: '#475467',
+    paddingBottom: 6,
+    borderBottomWidth: 0.4,
+    borderBottomColor: '#d5d9df',
+  },
   signatureLine: { marginTop: 20, fontFamily: 'McaSans', fontSize: 10 },
 });
 const text = (value: string, style: Style | Style[] = styles.paragraph) => h(Text, { style }, value);
+
+/**
+ * The completed Appendix A.
+ *
+ * `frpa.appendix-a-fees-collectible` says a fee may be charged only where the
+ * completed Appendix identifies it by name, amount or calculation method,
+ * payee, purpose and timing, and that anything unlisted is $0.00. So an empty
+ * schedule prints as a statement that none is identified rather than as an
+ * empty table: the blank is the operative fact.
+ */
+const feeScheduleElements = (fees: McaFee[] | undefined) => {
+  if (!fees) {
+    return [];
+  }
+
+  return [
+    h(Text, { key: 'fees:heading', style: styles.heading, minPresenceAhead: 80 }, 'Appendix A — Permitted Fees'),
+    ...(fees.length
+      ? fees.map((fee, index) =>
+          h(
+            View,
+            { key: `fee:${index}`, wrap: false },
+            h(
+              View,
+              { style: styles.feeRow },
+              text(fee.name, styles.feeName),
+              text(fee.basis === 'amount' ? fee.amount : fee.method, styles.feeAmount),
+            ),
+            text(`Paid to ${fee.payee} · ${fee.purpose} · ${fee.when}`, styles.feeDetail),
+          ),
+        )
+      : [text('No fee is identified in this Appendix.', styles.warning)]),
+  ];
+};
 
 /** Review output only. No AcroForms, signing tokens, delivery artifacts or regulator-form imitations. */
 export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number): Promise<Buffer> => {
@@ -81,6 +128,7 @@ export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number)
         h(Text, { key: `section:${index}`, style: styles.sectionHeading, minPresenceAhead: 90 }, section.heading),
         ...section.items.flatMap(itemElements),
       ]),
+      ...feeScheduleElements(document.feeSchedule),
       h(Text, { style: styles.heading, minPresenceAhead: 100 }, 'Separate execution locations — unsigned'),
       ...document.signatures.map((signature, index) =>
         h(
