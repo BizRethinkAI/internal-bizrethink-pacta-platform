@@ -90,6 +90,10 @@ export const ZMcaProviderProfile = z
         renewalModel: z.enum(['none', 'payoff-only', 'carry']),
         concurrentPositions: z.boolean(),
         // The funder's own fees. Twenty is a ceiling on a form, not a policy.
+        //
+        // A default, so a revision saved before this release still opens and
+        // reads as charging nothing — which is what the Appendix clause says an
+        // unlisted fee costs.
         fees: z.array(ZMcaFee).max(20).default([]),
         // The current provider-template release supports the court bundle. The
         // authored arbitration alternative remains available for legal review.

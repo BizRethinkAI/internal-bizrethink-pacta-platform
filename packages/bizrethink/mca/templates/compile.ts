@@ -12,7 +12,7 @@ import { instrumentsFor, selectClauses } from '../engine/select-clauses';
 import { normalisedDigest, readSourceText } from '../provenance/source-text';
 import { disclosuresFor } from '../registry';
 import { reusableFor } from '../reusable/library';
-import { type McaProviderProfile, providerSelectionFacts, ZMcaProviderProfile } from './profile';
+import { type McaFee, type McaProviderProfile, providerSelectionFacts, ZMcaProviderProfile } from './profile';
 
 export type McaTemplateItem = {
   /** Ephemeral presentation only, added after compiling/hashing a saved recipe. */

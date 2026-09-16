@@ -72,3 +72,32 @@ describe('a funder states its own fees', () => {
     expect(frpa?.feeSchedule).toEqual([]);
   });
 });
+
+/**
+ * A revision saved before fees existed still opens.
+ *
+ * `fees` cannot be a zod `.default()`: that makes the schema's input and output
+ * types differ, and the saved-profile boundaries carry the input type, so the
+ * components stopped typechecking. Making it required instead means a stored
+ * revision without the key has to be normalised explicitly — which is a thing
+ * somebody can read, unlike a default that silently rewrites what was saved.
+ */
+describe('a profile saved before this release', () => {
+  const legacy = () => {
+    const { fees: _fees, ...policy } = providerFixture().policy;
+    return { ...providerFixture(), policy };
+  };
+
+  it('compiles, and charges nothing', () => {
+    const snapshot = compileMcaTemplate(legacy());
+    const frpa = snapshot.documents.find((document) => document.instrument === 'frpa');
+
+    expect(frpa?.feeSchedule).toEqual([]);
+  });
+
+  it('parses, and reads as charging nothing', () => {
+    const parsed = ZMcaProviderProfile.parse(legacy());
+
+    expect(parsed.policy.fees).toEqual([]);
+  });
+});
