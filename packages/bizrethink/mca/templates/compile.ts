@@ -12,7 +12,13 @@ import { instrumentsFor, selectClauses } from '../engine/select-clauses';
 import { normalisedDigest, readSourceText } from '../provenance/source-text';
 import { disclosuresFor } from '../registry';
 import { reusableFor } from '../reusable/library';
-import { type McaFee, type McaProviderProfile, providerSelectionFacts, ZMcaProviderProfile } from './profile';
+import {
+  type McaFee,
+  type McaProviderProfile,
+  type McaProviderProfileInput,
+  providerSelectionFacts,
+  ZMcaProviderProfile,
+} from './profile';
 
 export type McaTemplateItem = {
   /** Ephemeral presentation only, added after compiling/hashing a saved recipe. */
@@ -150,7 +156,7 @@ export const populateProvider = (body: string, profile: McaProviderProfile, valu
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
 /** A reusable recipe, not a filled transaction or authority to send legal text. */
-export const compileMcaTemplate = (input: McaProviderProfile) => {
+export const compileMcaTemplate = (input: McaProviderProfileInput) => {
   const profile = ZMcaProviderProfile.parse(input);
   profile.policy.recipientStates.sort();
   const facts = providerSelectionFacts(profile);

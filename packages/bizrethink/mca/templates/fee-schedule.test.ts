@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { compileMcaTemplate } from './compile';
-import { ZMcaProviderProfile } from './profile';
+import { type McaProviderProfileInput, ZMcaProviderProfile } from './profile';
 import { providerFixture } from './profile.fixture';
 
 /**
@@ -16,7 +16,7 @@ import { providerFixture } from './profile.fixture';
  * These rows are the funder's, not a fixed list: the next funder charges
  * different fees, and the clause binds whatever they enter.
  */
-const withFees = (fees: unknown) => {
+const withFees = (fees: McaProviderProfileInput['policy']['fees']) => {
   const base = providerFixture();
   return { ...base, policy: { ...base.policy, fees } };
 };
@@ -48,8 +48,11 @@ describe('a funder states its own fees', () => {
 
   it('refuses a fee that states neither an amount nor a method', () => {
     const { amount: _amount, ...bare } = ORIGINATION;
+    // The type already refuses this, which is why the cast is here: the point
+    // is that validation refuses it too, for input arriving as JSON.
+    const fees = [bare] as McaProviderProfileInput['policy']['fees'];
 
-    expect(ZMcaProviderProfile.safeParse(withFees([bare])).success).toBe(false);
+    expect(ZMcaProviderProfile.safeParse(withFees(fees)).success).toBe(false);
   });
 
   it('refuses a fee that does not say who is paid, what for, or when', () => {

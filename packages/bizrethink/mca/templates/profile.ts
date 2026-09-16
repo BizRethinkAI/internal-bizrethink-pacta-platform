@@ -161,6 +161,15 @@ export const ZMcaProviderProfile = z
 
 export type McaProviderProfile = z.infer<typeof ZMcaProviderProfile>;
 
+/**
+ * What may be handed to the compiler, as opposed to what comes back parsed.
+ *
+ * `fees` has a default, so a revision saved before it existed is valid input
+ * and gains an empty schedule on the way through. Typing the compiler's
+ * parameter as the parsed profile would reject exactly those saved rows.
+ */
+export type McaProviderProfileInput = z.input<typeof ZMcaProviderProfile>;
+
 /** Legacy selection accepts one additional transaction fact; it is never an interview answer. */
 export const providerSelectionFacts = (profile: McaProviderProfile): McaFacts => ({
   collectionMethod: profile.policy.collectionMethod,
