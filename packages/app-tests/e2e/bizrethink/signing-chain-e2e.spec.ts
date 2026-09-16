@@ -62,9 +62,8 @@ import { test } from '@playwright/test';
  * before observable failure, so manual periodic-validation is acceptable
  * for the short term.
  */
-test.describe
-  .skip('BizRethink signing chain end-to-end (thick PKCS#7)', () => {
-    test('TODO: sealed PDF has verification footer + PAdES signature + TSA + audit log', () => {
-      // See file header for full implementation plan.
-    });
+test.describe.skip('BizRethink signing chain end-to-end (thick PKCS#7)', () => {
+  test('TODO: sealed PDF has verification footer + PAdES signature + TSA + audit log', () => {
+    // See file header for full implementation plan.
   });
+});

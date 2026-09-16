@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 import { prisma } from '@documenso/prisma';
-import { resetAllBizRethinkSingletons, seedInstanceSigningConfig } from '@documenso/prisma/seed/bizrethink';
+import {
+  resetAllBizRethinkSingletons,
+  seedInstanceSigningConfig,
+} from '@documenso/prisma/seed/bizrethink';
 
 import { signedInAsAdmin } from '../fixtures/bizrethink-auth';
 
