@@ -291,3 +291,71 @@ describe('funding figures align on one edge', () => {
     expect(edges.size, `figure right edges: ${[...edges].join(',')}`).toBe(1);
   }, 30_000);
 });
+
+/**
+ * The execution page is a grid of parties, not a stack of boxes.
+ *
+ * The real FRPA sets `B U Y E R` and `M E R C H A N T` side by side, each with
+ * Signature / Printed Name / Title / Date, then gives the personal guarantor a
+ * full-width block of its own. Pacta stacked one bordered box per signer down
+ * the page. The draft stays unsigned either way: rules, never signing tokens.
+ */
+describe('parties execute side by side', () => {
+  it('pairs buyer with merchant and gives a guarantor its own block', async () => {
+    const bytes = await renderMcaDraftPdf(allOptionsDraftFixture().draft, 3);
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const parsed = await pdfjs.getDocument({ data: new Uint8Array(bytes), useSystemFonts: false }).promise;
+    // Letter-spaced labels come back one glyph per item, so rows are the unit.
+    const rows: { page: number; y: number; runs: { str: string; x: number }[] }[] = [];
+
+    for (let number = 1; number <= parsed.numPages; number += 1) {
+      const content = await (await parsed.getPage(number)).getTextContent();
+      for (const item of content.items) {
+        if (!('str' in item) || !item.str.trim()) {
+          continue;
+        }
+        const y = Math.round(item.transform[5] * 10) / 10;
+        const row = rows.find((entry) => entry.page === number && entry.y === y);
+        const run = { str: item.str.trim(), x: item.transform[4] };
+        if (row) {
+          row.runs.push(run);
+        } else {
+          rows.push({ page: number, y, runs: [run] });
+        }
+      }
+    }
+
+    await parsed.destroy();
+
+    const squashed = (row: (typeof rows)[number]) =>
+      row.runs
+        .map((run) => run.str)
+        .join('')
+        .toUpperCase();
+    const roleRow = (role: string) => rows.find((row) => squashed(row).replace(/\s+/g, '') === role);
+
+    const buyerRow = roleRow('BUYERMERCHANT') ?? roleRow('MERCHANTBUYER');
+    const guarantorRow = rows.find((row) => squashed(row).replace(/\s+/g, '').startsWith('GUARANTOR'));
+
+    // Buyer and merchant share one baseline, in two columns.
+    expect(buyerRow, 'buyer and merchant on one row').toBeDefined();
+    const columns = (buyerRow?.runs ?? []).map((run) => run.x);
+    expect(Math.max(...columns) - Math.min(...columns)).toBeGreaterThan(150);
+
+    // The guarantor takes the width: its row holds only its own label.
+    expect(guarantorRow, 'guarantor role label').toBeDefined();
+    // One column: its runs all sit in the left column, with no second block
+    // beside it, which is what a full-width guaranty block looks like.
+    const guarantorColumns = (guarantorRow?.runs ?? []).map((run) => run.x);
+    expect(Math.max(...guarantorColumns) - Math.min(...guarantorColumns)).toBeLessThan(150);
+
+    // Each block still offers the four lines a signer completes.
+    const executionPage = rows
+      .filter((row) => row.page === buyerRow?.page)
+      .flatMap((row) => row.runs.map((run) => run.str))
+      .join(' ');
+    for (const line of ['Signature', 'Printed Name', 'Title', 'Date']) {
+      expect(executionPage, `${line} line`).toContain(line);
+    }
+  }, 30_000);
+});
