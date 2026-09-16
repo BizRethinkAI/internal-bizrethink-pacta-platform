@@ -82,19 +82,28 @@ describe('the provider interview describes the provider, not a future merchant t
  */
 describe('the funder chooses courts or arbitration', () => {
   it('accepts arbitration', () => {
-    const profile = { ...providerFixture(), policy: { ...providerFixture().policy, disputeResolution: 'arbitration' } };
+    const profile = {
+      ...providerFixture(),
+      policy: { ...providerFixture().policy, disputeResolution: 'arbitration' as const },
+    };
 
     expect(() => ZMcaProviderProfile.parse(profile)).not.toThrow();
   });
 
   it('still refuses a value with no clauses behind it', () => {
-    const profile = { ...providerFixture(), policy: { ...providerFixture().policy, disputeResolution: 'mediation' } };
+    const profile = {
+      ...providerFixture(),
+      policy: { ...providerFixture().policy, disputeResolution: 'mediation' as unknown as 'courts' },
+    };
 
     expect(() => ZMcaProviderProfile.parse(profile)).toThrow();
   });
 
   it('selects the arbitration clause and drops the court waivers', () => {
-    const profile = { ...providerFixture(), policy: { ...providerFixture().policy, disputeResolution: 'arbitration' } };
+    const profile = {
+      ...providerFixture(),
+      policy: { ...providerFixture().policy, disputeResolution: 'arbitration' as const },
+    };
     const slugs = compileMcaTemplate(profile)
       .documents.flatMap((document) => document.items)
       .map((item) => item.slug);
