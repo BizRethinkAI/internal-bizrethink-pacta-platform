@@ -30,12 +30,26 @@ is what makes Virginia need no variant. A funder-state forum reintroduces that
 risk: Va. Code §6.2-2234(A) makes a forum outside the Commonwealth unenforceable
 for a covered transaction.
 
-Three things hold the line, and none of them is counsel's approval:
+Four things hold the line, and none of them is counsel's approval:
 
 1. The profile **refuses** `funder-state` when the programme lists Virginia.
-2. The funder-state body **yields** where the merchant's state fixes a forum,
+2. **A deal is checked too.** `recipientStates` is the states a funder offers
+   into, never a determination of merchant nexus, so a Florida-only programme
+   could still sign a Virginia merchant. Filling a deal whose merchant's
+   principal-place state fixes its own forum raises a **`venue-conflict`
+   blocker** under a funder-forum template. `FORUM_FIXED_BY_STATE` holds
+   Virginia alone, sourced to Va. Code §6.2-2234(A) and §6.2-2228; it grows by
+   statutory walk, not by guess.
+3. The funder-state body **yields** where the merchant's state fixes a forum,
    and §7.24's riders keep their precedence claim.
-3. Merchant-state remains the default, and `LOMBARD_FACTS` is unchanged.
+4. Merchant-state remains the default, and `LOMBARD_FACTS` is unchanged.
+
+**A field both venue clauses needed did not exist.** Each names "the state of
+Merchant's principal place of business stated in the grid", and the grid held a
+free-text business address and a state of *formation* — a different fact, since
+a Delaware company trading in Virginia is a Virginia recipient. The grid now
+collects `merchant.principalState`. That adds one blank to Section 1, and it is
+what makes the deal-level check possible at all.
 
 **Counsel has not reviewed the new clause.** Both venue records are `draft` with
 `author: null`, like everything else in the library.

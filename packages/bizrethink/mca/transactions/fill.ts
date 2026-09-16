@@ -23,6 +23,17 @@ const invalid = (message: string): never => {
 };
 const unsigned = (field: ClauseField) => field.kind === 'signature' || field.binding.endsWith('.signedDate');
 
+/**
+ * States whose own law fixes where an action under a covered contract is brought.
+ *
+ * Virginia is the one a vendored source establishes: Va. Code §6.2-2234(A)
+ * makes a provision mandating a forum outside the Commonwealth unenforceable,
+ * and §6.2-2228 defines a recipient by its principal place of business. The
+ * list is deliberately short and sourced; it grows when a statutory walk finds
+ * another, not when someone guesses.
+ */
+const FORUM_FIXED_BY_STATE = [{ jurisdiction: 'US-VA', names: ['virginia', 'va'] }];
+
 /** The form exposes current semantic bindings only. Repeated guarantors have their own input path. */
 export const mcaDraftControls = (template: McaTemplateSnapshot) => {
   const byBinding = new Map<string, ClauseField & { instrument: McaInstrument }>();
@@ -323,7 +334,20 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
       documents.push({ ...document, id, items, signatures });
     }
   }
+  const principalState = (values['merchant.principalState'] ?? '').trim().toLowerCase();
+  const venueConflict =
+    template.profile.policy.venueRule === 'funder-state' &&
+    FORUM_FIXED_BY_STATE.some((state) => state.names.includes(principalState));
   const blockers = [
+    ...(venueConflict
+      ? [
+          {
+            kind: 'venue-conflict',
+            detail:
+              'This merchant’s state fixes the forum for a covered transaction, and this template names the provider’s forum. Use a merchant-state template for this deal, or obtain advice before proceeding.',
+          },
+        ]
+      : []),
     {
       kind: 'legal-review',
       detail:

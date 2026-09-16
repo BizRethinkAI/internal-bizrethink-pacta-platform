@@ -24,6 +24,11 @@ export const MCA_FUNDING_FIELDS: ClauseField[] = [
   field('merchant.documentTaxIdentifier', 'Merchant — EIN or masked tax identifier', 'text', false, '«2»'),
   field('merchant.entityType', 'Merchant — Entity Type', 'text', true, '«3»'),
   field('merchant.formationState', 'Merchant — State of Formation', 'text', true, '«4»'),
+  // Both venue clauses name the state of the merchant's principal place of
+  // business, and it lived only inside the free-text business address, where
+  // no check could read it. State of formation is a different fact: a Delaware
+  // company trading in Virginia is a Virginia recipient.
+  field('merchant.principalState', 'Merchant — State of Principal Place of Business', 'text', true),
   field('merchant.signerCapacity', 'Merchant — Authorized Signer Capacity', 'text', true, '«5»'),
   field('merchant.contactName', 'Merchant — Primary Contact', 'text', true, '«6»'),
   field('merchant.phone', 'Merchant — Phone', 'text', true, '«7»'),
