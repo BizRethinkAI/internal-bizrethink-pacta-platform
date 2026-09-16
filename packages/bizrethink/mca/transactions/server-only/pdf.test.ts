@@ -148,7 +148,85 @@ describe('completed fields print as a grid, not a stack', () => {
     const gridPages = new Set(
       items.filter((item) => /^(Merchant|Deposit Account|Funding Terms) — /.test(item.str)).map((item) => item.page),
     );
-    expect([...gridPages].sort((a, b) => a - b).slice(0, 2)).toEqual([1, 2]);
+    const ordered = [...gridPages].sort((a, b) => a - b);
+    expect(ordered.slice(0, 2)).toEqual([ordered[0], ordered[0] + 1]);
     expect(numPages).toBeGreaterThan(0);
+  }, 30_000);
+});
+
+/**
+ * The document carries the funder's identity, and is set like a contract.
+ *
+ * Lombard's real FRPA opens on a cover — display title, PREPARED BY, DOCUMENT
+ * TYPE, CONFIDENTIALITY — and every page after it carries `Lombard Capital LLC
+ * • 29090 Picana Ln…` on the left and `lombardpay.com` on the right, with a
+ * PAGE stack top right. Its body is justified over a 468pt measure inside 72pt
+ * margins. Pacta opened straight into body text at 11pt ragged-right over
+ * 516pt, with chrome that named Pacta and the template revision.
+ */
+describe('an assembled document carries the funder identity', () => {
+  const pageItems = async (bytes: Buffer) => {
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const parsed = await pdfjs.getDocument({ data: new Uint8Array(bytes), useSystemFonts: false }).promise;
+    const pages: { str: string; x: number; right: number; y: number }[][] = [];
+
+    for (let number = 1; number <= parsed.numPages; number += 1) {
+      const content = await (await parsed.getPage(number)).getTextContent();
+      pages.push(
+        content.items
+          .filter((item) => 'str' in item && item.str.trim())
+          .map((item) =>
+            'str' in item
+              ? {
+                  str: item.str.trim(),
+                  x: item.transform[4],
+                  right: item.transform[4] + item.width,
+                  y: item.transform[5],
+                }
+              : { str: '', x: 0, right: 0, y: 0 },
+          ),
+      );
+    }
+
+    await parsed.destroy();
+    return pages;
+  };
+
+  it('opens on a cover naming the funder, then sets the body like the real documents', async () => {
+    const bytes = await renderMcaDraftPdf(filledDraftFixture().draft, 3);
+    const pages = await pageItems(bytes);
+    const cover = pages[0].map((item) => item.str).join(' ');
+
+    expect(cover).toContain('Future Receivables Purchase Agreement');
+    // The cover sets its labels letter-spaced, as the real document does.
+    const squashed = cover.replace(/\s+/g, '');
+    expect(squashed).toContain('PREPAREDBY');
+    expect(cover).toContain('Example Receipts Inc.');
+    expect(squashed).toContain('Private&Confidential');
+    // Still an internal draft on every page, cover included.
+    expect(cover).toMatch(/INTERNAL DRAFT/);
+    // The cover is a cover: no clause text on it.
+    expect(cover).not.toContain('Merchant — Legal Name');
+
+    // Every page of the funder's own documents carries their identity. The
+    // internal worksheet at the end is Pacta's page and carries none.
+    const body = pages.slice(1).filter((items) => !items[0]?.str.startsWith('INTERNAL WORKSHEET'));
+    expect(body.length).toBeGreaterThan(20);
+    for (const [index, items] of body.entries()) {
+      const text = items.map((item) => item.str).join(' ');
+      expect(text, `funder footer on body page ${index + 2}`).toContain('Example Receipts Inc.');
+    }
+
+    // 72pt margins, 468pt measure, as the real document sets it.
+    for (const [index, items] of pages.entries()) {
+      for (const item of items) {
+        expect(item.x, `left edge on page ${index + 1}`).toBeGreaterThanOrEqual(71);
+        expect(item.right, `right edge on page ${index + 1}`).toBeLessThanOrEqual(541);
+      }
+    }
+
+    // Justified: body lines end flush on the measure, not ragged.
+    const flush = body.flat().filter((item) => item.right > 538 && item.right <= 541 && item.str.length > 20);
+    expect(flush.length, 'flush-right body lines').toBeGreaterThan(20);
   }, 30_000);
 });

@@ -34,6 +34,10 @@ export const ZMcaProviderProfile = z
       reconciliationEmail: email,
       reconciliationAddress: line(600),
       servicingPhone: z.union([z.literal(''), line(80)]).optional(),
+      // Printed on the cover and in the page footer, as the funder's own
+      // documents carry it. Optional: an older saved revision has none and
+      // renders with the line absent rather than a placeholder.
+      website: z.union([z.literal(''), line(120)]).optional(),
     }).strict(),
     policy: z
       .object({
