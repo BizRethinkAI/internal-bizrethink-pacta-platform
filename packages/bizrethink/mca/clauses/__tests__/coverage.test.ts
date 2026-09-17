@@ -98,7 +98,22 @@ const historicalIsoContent = () =>
       .replace('{{field:iso.companyLegalName}}', '________«10»________')
       .replace('{{field:iso.partnerLegalName}}', '_____________«1»______________')
       .replace('{{field:iso.commissionPercentage}}', '_«2»_')
-      .replace('{{field:iso.portalUrl}}', 'app.lombardpay.com'),
+      .replace('{{field:iso.portalUrl}}', 'app.lombardpay.com')
+      /*
+        ADR 0026 reworded this to name the Right to Cancel provision instead of
+        citing "Section 4.14" of the FRPA, because an ISO PRA compiled on its own
+        has no FRPA in scope to resolve a number against — and the number moved
+        anyway whenever the FRPA renumbered (ADR 0011).
+
+        Mapped back to the source wording here for the same reason the field
+        anchors above are: coverage exists to notice PROSE going missing, and it
+        can only do that if a deliberate divergence is declared rather than left
+        to read as a loss.
+      */
+      .replace(
+        'under the Right to Cancel provision of the Future Receivables Purchase Agreement',
+        'under Section 4.14 of the Future Receivables Purchase Agreement',
+      ),
   }));
 
 describe.each(STILL_A_TRANSCRIPTION)('%s holds every line of its document', (instrument, nonClause) => {
