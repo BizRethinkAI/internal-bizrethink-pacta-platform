@@ -112,7 +112,21 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          MODIFIED=$(git diff --name-only --diff-filter=MD "$BASE_SHA" "$HEAD_SHA" \
+          # THREE DOTS, NOT TWO, AND THE DIFFERENCE IS A FALSE ACCUSATION.
+          #
+          # `git diff A B` compares the two trees, so it reports a file the
+          # BRANCH never touched as "modified" whenever main has moved ahead on
+          # it — the branch is simply behind. That is not an in-place edit, and
+          # the merge would keep main's newer text.
+          #
+          # Comparing against the MERGE BASE asks the question this guard means
+          # to ask: what did this branch do. It bit a stacked PR in 2026-09, and
+          # the failure message below sent the reader toward the override — an
+          # override granted for a false positive is how an append-only rule
+          # stops meaning anything.
+          MERGE_BASE=$(git merge-base "$BASE_SHA" "$HEAD_SHA" || echo "$BASE_SHA")
+
+          MODIFIED=$(git diff --name-only --diff-filter=MD "$MERGE_BASE" "$HEAD_SHA" \
             -- 'docs/adr/*.md' ':!docs/adr/README.md' || true)
 
           if [ -z "$MODIFIED" ]; then
@@ -124,6 +138,12 @@ jobs:
           echo "$MODIFIED" | sed 's/^/  /'
           echo ""
           echo "  ADRs are append-only. Supersede with a new numbered ADR."
+          echo ""
+          echo "  This compares against the merge base, so a branch merely"
+          echo "  behind main is NOT reported here. If you did not edit these,"
+          echo "  say so rather than overriding — the guard is wrong and wants"
+          echo "  fixing, not excusing."
+          echo ""
           echo "  Fixing a typo or a broken link? Say so in the PR description"
           echo "  and a human can override this check."
           exit 1
