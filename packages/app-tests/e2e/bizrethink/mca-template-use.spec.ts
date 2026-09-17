@@ -133,8 +133,18 @@ test('previewing enforces the same live access, revision and account restriction
     expect((await pdf(page.request, { ...input, instrument: 'split-funding' })).status()).toBe(400);
     expect((await pdf(page.request, { ...input, instrument: 'not-an-instrument' })).status()).toBe(400);
 
-    // A superseded revision is not previewable. A stale render is how a
-    // reviewer comes to read words that are no longer current.
+    /*
+      A SUPERSEDED REVISION IS STILL PREVIEWABLE, and that is deliberate.
+
+      The old rule — refuse anything but the latest — belonged to DRAFTING A
+      TRANSACTION, where using stale wording for a live deal is the hazard. It
+      died with the deal path. Reading an earlier revision is the point of the
+      revision-history control on the templates page: a reviewer comparing what
+      changed between two revisions has to be able to render both.
+
+      Asserted rather than assumed, because the first version of this test
+      carried the old rule over and CI caught it.
+    */
     expect(
       (
         await post(page.request, 'update', {
@@ -144,7 +154,11 @@ test('previewing enforces the same live access, revision and account restriction
         })
       ).ok(),
     ).toBe(true);
-    expect((await pdf(page.request, input)).status()).toBe(400);
+    expect((await pdf(page.request, input)).ok()).toBe(true);
+    expect((await pdf(page.request, { ...input, version: 2 })).ok()).toBe(true);
+
+    // A revision that does not exist is still refused.
+    expect((await pdf(page.request, { ...input, version: 99 })).status()).toBeGreaterThanOrEqual(400);
 
     await grant(own.user.id, 'mca-clause-draft-rendering', false);
     expect((await pdf(page.request, { ...input, version: 2 })).status()).toBe(403);

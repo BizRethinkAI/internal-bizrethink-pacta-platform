@@ -64,3 +64,23 @@ tests passed; `tsc` failed on four lines.
 **Biome reformatted an unrelated file** — an import reorder in
 `venue-is-a-choice.test.ts`, which this change does not touch. Reverted. Same
 noise that tripped the fork-discipline guard in an earlier batch.
+
+## A rule that died with the deal, found by E2E
+
+The first version of the rewritten spec asserted that a **superseded revision
+cannot be previewed**. CI disagreed: the request returns 200.
+
+It was right to. That rule belonged to *drafting a transaction* — using stale
+wording for a live deal is the hazard, and `prepareMcaDraft` enforced it
+explicitly. Previewing an earlier revision is the **point** of the
+revision-history control on the templates page: a reviewer comparing what
+changed between two revisions has to be able to render both.
+
+So the assertion is now that both revisions preview, and that a revision which
+does not exist is still refused. Worth recording because it is the one place
+this change nearly carried a deal-shaped rule forward into a vertical that no
+longer has deals — and only an end-to-end test could have caught it, since every
+unit test in the path was already passing.
+
+The same run had 3 flaky tests unrelated to this change, all of which recovered
+on retry, and 1,177 passing.
