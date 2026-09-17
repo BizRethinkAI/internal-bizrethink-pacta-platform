@@ -11,7 +11,7 @@ describe('holistic findings and saved provider review', () => {
   const library = buildLibraryReviewPackage({ contact: 'Review desk' });
   const provider = (processorText: string | null = 'Controlled processor terms supplied for this review.') =>
     buildProviderReviewPackage({
-      compiled: compileMcaTemplate(providerFixture()),
+      compiled: compileMcaTemplate(providerFixture(), 'frpa'),
       templateId: 'template-a',
       revision: 2,
       contact: 'Provider review desk',

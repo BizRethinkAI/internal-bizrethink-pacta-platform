@@ -1095,6 +1095,18 @@ model BizrethinkMcaTemplate {
   organisationId    String
   teamId            Int
   label             String
+
+  /// WHICH DOCUMENT THIS TEMPLATE IS. An `McaInstrument`.
+  ///
+  /// ADR 0026: entity + type = one template. A template used to compile
+  /// whichever set of documents the policy selected, and that set existed
+  /// nowhere else — `lombard-api` holds five separate published templates, each
+  /// with its own id, each sent on its own. The caller has never seen a package.
+  ///
+  /// Never 'split-funding': a processor's letter is supplied fixed and the
+  /// builder produces none (ADR 0019).
+  instrument        String   @default("frpa")
+
   currentRevision   Int      @default(1)
   createdByUserId    Int
   createdAt         DateTime @default(now())

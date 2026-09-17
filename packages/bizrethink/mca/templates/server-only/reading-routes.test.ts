@@ -60,25 +60,29 @@ beforeEach(() => {
  * ROUTE as a real number pointing at a real clause, across documents.
  */
 describe('referenced clauses through provider preview', () => {
-  it.each([
-    { label: 'FRPA', fixture: () => compileMcaTemplate(providerFixture()), hasCrossDocumentReferences: false },
-    /*
-      FALSE SINCE ADR 0026. The ISO PRA was the only document citing another,
-      and it now names the FRPA's Right to Cancel provision rather than
-      numbering it — which is what lets each document be compiled on its own.
+  /*
+    SCENARIOS OVER SAVED TEMPLATES, NOT OVER A PACKAGE (ADR 0026).
+    `allOptionsTemplateFixture` is the programme that offers every document;
+    each one it is entitled to is compiled and previewed on its own, which is
+    what the route now serves.
 
-      Kept as a scenario rather than deleted: the reference MACHINERY is
-      untouched, and this asserts the library no longer uses it. A clause that
-      reintroduced a cross-document citation would flip this back to true and
-      fail here.
-    */
-    { label: 'all offered instruments', fixture: allOptionsTemplateFixture, hasCrossDocumentReferences: false },
+    Every scenario expects NO crossing. The ISO PRA was the only document
+    citing another, and ADR 0026 reworded it to name the FRPA's Right to Cancel
+    provision rather than number it — which is what lets a document be compiled
+    without its siblings present at all. The reference machinery is untouched,
+    so a clause that reintroduced a crossing still fails here.
+  */
+  it.each([
+    { label: 'FRPA', fixture: () => compileMcaTemplate(providerFixture(), 'frpa') },
+    { label: 'FRPA, every option offered', fixture: () => allOptionsTemplateFixture('frpa') },
+    { label: 'ISO PRA', fixture: () => allOptionsTemplateFixture('iso-pra') },
   ])('$label retains readable clause and section references through the route', async (scenario) => {
     const template = scenario.fixture();
     const before = JSON.stringify(template);
     mocks.db.bizrethinkMcaTemplate.findFirst.mockResolvedValue({
       id: 'synthetic-template',
       label: template.profile.label,
+      instrument: template.instrument,
       currentRevision: 1,
       revisions: [{ version: 1, profile: template.profile, fingerprint: template.fingerprint }],
     });
@@ -121,7 +125,7 @@ describe('referenced clauses through provider preview', () => {
     }
     expect(referencedClauses).toBeGreaterThan(0);
     expect([...referenceKinds].sort()).toEqual(['clause', 'section']);
-    expect(hasCrossDocumentReference).toBe(scenario.hasCrossDocumentReferences);
+    expect(hasCrossDocumentReference).toBe(false);
     expect(preview.fingerprint).toBe(template.fingerprint);
 
     expect(JSON.stringify(template)).toBe(before);

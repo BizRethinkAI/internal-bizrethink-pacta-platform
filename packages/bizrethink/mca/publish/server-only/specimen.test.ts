@@ -1,7 +1,7 @@
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { PDF } from '@libpdf/core';
 import { describe, expect, it, vi } from 'vitest';
-
+import type { McaInstrument } from '../../clauses/instruments';
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
 import { fieldPlanFor } from '../field-plan';
@@ -27,7 +27,7 @@ import { renderMcaTemplatePdf } from './template-pdf';
 // nature, and one case renders the template AND its preview to compare them.
 vi.setConfig({ testTimeout: 60_000 });
 
-const snapshot = () => compileMcaTemplate(providerFixture());
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
 
 /** Render each artifact once per file rather than once per assertion. */
 const rendered = new Map<string, Promise<Buffer>>();
@@ -46,8 +46,8 @@ const once = (key: string, make: () => Promise<Buffer>): Promise<Buffer> => {
   return pending;
 };
 
-const previewOf = () => once('preview', () => renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3));
-const templateOf = () => once('template', () => renderMcaTemplatePdf(snapshot(), 'frpa', 3));
+const previewOf = () => once('preview', () => renderMcaTemplatePreviewPdf(snapshot('frpa'), 'frpa', 3));
+const templateOf = () => once('template', () => renderMcaTemplatePdf(snapshot('frpa'), 'frpa', 3));
 
 const textOf = async (pdf: Buffer): Promise<string> => {
   const doc = await PDF.load(new Uint8Array(pdf));

@@ -2,6 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { BizrethinkMcaPackageReview, Prisma } from '@prisma/client';
+import type { McaInstrument } from '../../clauses/instruments';
 import { compileMcaTemplate } from '../../templates/compile';
 import { ZMcaProviderProfile } from '../../templates/profile';
 import { MCA_REVIEW_LINK_TTL_DAYS } from '../link';
@@ -134,6 +135,9 @@ const providerSnapshotState = async (
     where: { id: row.templateId, teamId: row.teamId, organisationId: row.organisationId },
     select: {
       currentRevision: true,
+      // ADR 0026: recompiling to test freshness needs the document this
+      // template is, or the comparison is against something else entirely.
+      instrument: true,
       revisions: { where: { version: row.templateVersion }, select: { profile: true, fingerprint: true }, take: 1 },
     },
   });
@@ -145,7 +149,8 @@ const providerSnapshotState = async (
   let providerSourcesCurrent = false;
   if (parsed.success) {
     try {
-      providerSourcesCurrent = compileMcaTemplate(parsed.data).fingerprint === revision.fingerprint;
+      providerSourcesCurrent =
+        compileMcaTemplate(parsed.data, template.instrument as McaInstrument).fingerprint === revision.fingerprint;
     } catch {
       // Saved text remains available even when current selection rules no longer accept this profile.
       providerSourcesCurrent = false;

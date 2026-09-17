@@ -241,11 +241,21 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
   );
 };
 
+/**
+ * Takes ONLY THE THREE PARTS IT RENDERS, not a whole snapshot.
+ *
+ * It asked for `McaTemplateSnapshot`, which made every field of a compiled
+ * template a prop requirement — including the fingerprint, which this shows
+ * nowhere. That broke when `instrument` became required: the tRPC client's
+ * inferred output type for the preview route does not carry every field the
+ * server's does, so a component demanding the full shape fails on a field it
+ * never reads. Asking for what it uses is both narrower and true.
+ */
 export const McaPackagePreview = ({
   snapshot,
   requirementsOnly = false,
 }: {
-  snapshot: McaTemplateSnapshot;
+  snapshot: Pick<McaTemplateSnapshot, 'documents' | 'externalDocuments' | 'requirements'>;
   requirementsOnly?: boolean;
 }) => {
   return (

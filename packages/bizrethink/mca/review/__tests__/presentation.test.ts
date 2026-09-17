@@ -167,7 +167,7 @@ describe('readable saved MCA review content', () => {
       searchSavedPackage(saved, '10 CCR §914').some((result) => result.id === 'requirement:ca-offer-summary'),
     ).toBe(true);
     const provider = buildProviderReviewPackage({
-      compiled: compileMcaTemplate(providerFixture()),
+      compiled: compileMcaTemplate(providerFixture(), 'frpa'),
       templateId: 'saved',
       revision: 1,
       contact: 'Legal operations',

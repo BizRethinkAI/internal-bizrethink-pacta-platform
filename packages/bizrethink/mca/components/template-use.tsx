@@ -81,7 +81,14 @@ const McaTemplatePreview = ({
   teamId: number;
   templateId: string;
   version: number;
-  template: McaTemplateSnapshot;
+  /*
+    ONLY WHAT IT RENDERS. Demanding a whole `McaTemplateSnapshot` made every
+    field of a compiled template a prop requirement, and the tRPC client's
+    inferred output for the preview route does not carry all of them — so this
+    failed on `instrument`, which this component reads off each document rather
+    than off the template.
+  */
+  template: Pick<McaTemplateSnapshot, 'documents'>;
 }) => {
   const [downloading, setDownloading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
