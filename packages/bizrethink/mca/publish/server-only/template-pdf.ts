@@ -29,10 +29,11 @@ import { markerFor } from './acroform';
  *                        sender-writable only, so a signature built as one
  *                        ships permanently blank
  *
- * It is a separate module from `transactions/server-only/pdf.ts` rather than a
- * mode inside it, because the two produce different artifacts for different
- * readers and sharing one function would mean a flag deciding whether a
- * merchant may be handed the output.
+ * There is no second renderer beside it. The internal-draft renderer this
+ * replaced took a filled deal and produced a review copy; ADR 0025 retired
+ * both, and a preview is now this same function with specimen values in the
+ * slots (`specimen.ts`) rather than a separate document that could disagree
+ * with the one it previews.
  */
 
 Font.register({ family: 'McaBody', src: TINOS_REGULAR });

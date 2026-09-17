@@ -179,7 +179,6 @@ packages/app-tests/e2e/bizrethink/mca-provider-templates.spec.ts
 packages/app-tests/e2e/bizrethink/mca-review-kind-migration.spec.ts
 
 # Stateless MCA internal-draft POST output (task #211).
-apps/remix/app/routes/api+/bizrethink.mca-draft.ts
 packages/app-tests/e2e/bizrethink/mca-template-use.spec.ts
 
 # Legal workspace interaction and responsive regression coverage.

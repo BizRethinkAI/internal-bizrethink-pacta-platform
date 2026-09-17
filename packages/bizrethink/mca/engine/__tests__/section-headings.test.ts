@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { LOMBARD_FACTS } from '../../clauses/facts';
 import { MCA_INSTRUMENTS } from '../../clauses/instruments';
 import { contentForReview } from '../../reusable/review';
+import { allOptionsTemplateFixture } from '../../templates/all-options.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
-import { allOptionsDraftFixture } from '../../transactions/draft.fixture';
 import { groupMcaSections, hasMcaSectionName, mcaSectionHeading, mcaSectionName } from '../section-headings';
 import { selectClauses } from '../select-clauses';
 
@@ -65,11 +65,28 @@ describe('MCA parent headings use the displayed selection without changing its c
     }
     expect(snapshot).toEqual(before);
     expect(compileMcaTemplate(profile).fingerprint).toBe(before.fingerprint);
-    const documents = allOptionsDraftFixture().draft.documents;
+    const documents = allOptionsTemplateFixture().documents;
+
     for (const document of documents) {
       expect(groupMcaSections(document.items)[0].heading).toMatch(/^Section 1: /);
     }
-    expect(documents.filter((document) => document.instrument === 'permission-to-release')).toHaveLength(2);
+
+    /*
+      ONE DOCUMENT PER INSTRUMENT, which is new.
+
+      This used to assert TWO permission-to-release documents, because the
+      fixture carried two report subjects and a filled draft expanded one
+      document per subject. ADR 0025 retired the deal path: a template compiles
+      the document once, and how many copies a transaction needs is the
+      entity's business, decided with the entity's own data.
+
+      The property under test is unchanged — headings restart at Section 1 for
+      every document — and it is now checked over a set with no duplicates in
+      it, which is a weaker input, so the count is asserted to keep that
+      explicit rather than silently lost.
+    */
+    expect(new Set(documents.map((document) => document.instrument)).size).toBe(documents.length);
+    expect(documents.some((document) => document.instrument === 'permission-to-release')).toBe(true);
   });
 });
 
