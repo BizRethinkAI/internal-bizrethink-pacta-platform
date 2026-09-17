@@ -106,3 +106,30 @@ describe('team-owned provider template revisions and independent draft access', 
     });
   });
 });
+
+/**
+ * `BizrethinkMcaTemplate.instrument` is a `String` column, so reading it back
+ * proves nothing on its own and every call site used to cast. A cast asserts
+ * what nothing checked, on the path that decides whether a template can be
+ * published — so the read parses instead, and these are the two halves of that.
+ */
+describe('a stored row that names a document we do not produce', () => {
+  it.each([
+    ['a processor form no builder produces', 'split-funding'],
+    ['a value from outside the enum entirely', 'not-an-instrument'],
+    ['an empty column', ''],
+  ])('refuses %s rather than casting it', async (_label, instrument) => {
+    mocks.db.bizrethinkMcaTemplate.findFirst.mockResolvedValue({ ...existing(), instrument });
+
+    await expect(getMcaTemplate({ ...identity, id: 'mca-existing' })).rejects.toThrow(/does not produce/i);
+  });
+
+  /**
+   * ADR 0019 is why `split-funding` is in that list. The letter is the
+   * processor's, used exactly as supplied, so a template claiming to be one is
+   * a state to report rather than one to render a publish control for.
+   */
+  it('reads a produced document back without complaint', async () => {
+    expect((await getMcaTemplate({ ...identity, id: 'mca-existing' })).instrument).toBe('frpa');
+  });
+});
