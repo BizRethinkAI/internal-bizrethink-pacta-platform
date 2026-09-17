@@ -2,9 +2,9 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 
 import { assertPublishable } from '../../provenance/types';
 import { approvalBlocks, approvedMcaClause, type McaClauseApproval } from '../clauses/approval';
+import type { ReviewFinding } from '../clauses/examination';
 import type { McaContent } from '../clauses/types';
 import type { McaJurisdiction } from '../jurisdictions';
-import type { ReviewFinding } from '../clauses/examination';
 
 export type McaPublishRefusal = { slug: string; reason: string };
 

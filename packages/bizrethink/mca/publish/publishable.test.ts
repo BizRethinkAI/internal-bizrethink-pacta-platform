@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { libraryFor } from '../clauses/library';
 import type { McaClauseApproval } from '../clauses/approval';
 import { mcaClauseFingerprint } from '../clauses/approval';
-import { mcaPublicationRefusals, assertMcaPackagePublishable } from './publishable';
+import { libraryFor } from '../clauses/library';
+import { assertMcaPackagePublishable, mcaPublicationRefusals } from './publishable';
 
 /**
  * The gate that has to exist before a recipe becomes a published template.
