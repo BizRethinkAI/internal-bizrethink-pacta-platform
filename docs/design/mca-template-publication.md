@@ -1,7 +1,8 @@
 # MCA template publication: what the builder must produce
 
-**Status:** scope, not a decision. The open questions at the end need the
-repository owner before any of this is built.
+**Status:** scope. The ownership questions it raised were answered on 2026-09-17
+and are recorded in [ADR 0023](../adr/0023-pacta-produces-mca-templates.md); the
+work items below are current and unstarted.
 
 **Why this exists:** the MCA builder stops at an internal draft PDF. The funder's
 platform sends by calling a **published template**. Nothing connects those two
@@ -93,21 +94,27 @@ true for `lombard-contracts`, which publishes over REST from another repository.
    any clause lacks a current approval. It ships shut and stays shut until
    counsel.
 
-## Open questions for the owner
+## Decided, 2026-09-17
 
-1. **Who owns the published-template registry?** Today `lombard-contracts`
-   emits `*.published.json` and `lombard-platform` reads `templateId` from it.
-   If Pacta publishes, that record should come from Pacta — which changes a file
-   another repository consumes.
-2. **Does publication replace the `lombard-contracts` pipeline for MCA, or sit
-   beside it?** Both produce templates for the same team. Two producers of one
-   artifact is the twin problem this vertical has paid for twice.
-3. **Which team does the MCA builder publish into?** Lombard's templates live in
-   `lombard-api`. A second funder implies a team per funder, and that is an
-   organisation decision, not an engineering one.
-4. **What happens to the templates already published** (FRPA 121, Payzli 102 and
-   the rest) when the builder can produce equivalents? Replacement is a
-   re-publication with new ids that the platform must be told about.
+Recorded as [ADR 0023](../adr/0023-pacta-produces-mca-templates.md):
 
-Nothing here should be built until 1 and 2 are answered: they decide whether
-this path is additive or a replacement, and that changes what it must produce.
+1. **The Pacta builder becomes the only producer** of MCA agreement templates,
+   once it reaches parity. `lombard-contracts` keeps the historical documents,
+   the change notes and the state disclosures. One producer, because a second
+   route to publication is a route around the approval gate.
+2. **Pacta owns the record**: the `templateId` is kept against the provider
+   revision that produced it and exposed over the API, rather than in a JSON
+   file in a third repository.
+3. **Parity first.** The builder's output matches the documents in use — same
+   labels, same recipient roles, same signer fields — before anything it
+   produces is published, because `lombard-platform` prefills by label.
+
+Still undecided, and not blocking: which team a second funder publishes into,
+and when the existing templates are retired. Both can wait for parity and
+counsel.
+
+## What parity means, concretely
+
+The first piece of work is measuring it: extract the label and recipient set
+from the templates in use, and pin it as the contract the builder's output must
+satisfy. Until that set is written down as a test, "parity" is an opinion.

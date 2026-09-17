@@ -58,3 +58,4 @@ before it got there.
 | [0018](0018-holistic-mca-findings-and-provider-review.md) | Holistic findings and provider review | Superseded by 0020 | §3.4. Implemented (#236 via #250; repair #258) |
 | [0019](0019-split-funding-letters-are-processor-controlled.md) | Split funding letters are processor-controlled | Superseded by 0020 | §2.3. Replacing the retained Payzli text is not done |
 | [0020](0020-mca-decisions-consolidated.md) | MCA decisions, consolidated | Current | |
+| [0023](0023-pacta-produces-mca-templates.md) | Pacta produces MCA templates and owns the record of them | Current | Completes 0016; retires the `lombard-contracts` pipeline for MCA agreements once parity is met |

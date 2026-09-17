@@ -78,9 +78,13 @@ TDD: 11 assertions failed with no module, then passed.
   Documenso fields, and an AcroForm widget can never be signer-written.
 - Field labels are an interface contract: the funder's platform prefills by
   label, so a rename breaks a caller we do not deploy.
-- Four questions are open for the owner, two of which decide whether this path
-  replaces the `lombard-contracts` pipeline or sits beside it. Nothing should be
-  built until those two are answered.
+- The two blocking questions were answered the same day and are recorded as
+  **ADR 0023**: the Pacta builder becomes the only producer of MCA agreement
+  templates, and Pacta owns the record of what was published, exposed over the
+  API rather than kept in a JSON file in a third repository. Parity with the
+  documents in use comes before the first publication, because
+  `lombard-platform` prefills by label and a renamed label breaks a caller this
+  repository does not deploy.
 
 ## Not in this change
 
