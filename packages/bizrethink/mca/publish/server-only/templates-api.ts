@@ -43,6 +43,8 @@ type PublishedRow = {
   envelopeId: string;
   widgets: unknown;
   recipients: unknown;
+  recipientStates: unknown;
+  venueRule: string;
   fingerprint: string;
   publishedAt: Date;
 };
@@ -60,6 +62,13 @@ const asResponse = (row: PublishedRow) => ({
       { id: party.recipientId, signingOrder: party.signingOrder },
     ]),
   ),
+  /**
+   * WHAT THIS TEMPLATE IS FOR. Pacta labels the goods; the caller chooses.
+   * Nothing here refuses anything — a caller holding two templates simply
+   * cannot pick between them unless each says what it was built for.
+   */
+  builtForStates: row.recipientStates as string[],
+  venueRule: row.venueRule,
   /** Which recipe produced it, so a caller can say what it is sending. */
   providerTemplateId: row.templateId,
   providerTemplateRevision: row.templateRevision,
@@ -111,6 +120,8 @@ export const listMcaTemplatesForApi = async (request: Request): Promise<Response
       envelopeId: true,
       widgets: true,
       recipients: true,
+      recipientStates: true,
+      venueRule: true,
       fingerprint: true,
       publishedAt: true,
     },

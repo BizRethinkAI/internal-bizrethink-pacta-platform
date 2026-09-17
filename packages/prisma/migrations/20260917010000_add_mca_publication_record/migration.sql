@@ -17,6 +17,8 @@ CREATE TABLE "BizrethinkMcaPublication" (
     "envelopeId" TEXT NOT NULL,
     "widgets" JSONB NOT NULL,
     "recipients" JSONB NOT NULL,
+    "recipientStates" JSONB NOT NULL,
+    "venueRule" TEXT NOT NULL,
     "fingerprint" TEXT NOT NULL,
     "publishedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "publishedByUserId" INTEGER NOT NULL,
