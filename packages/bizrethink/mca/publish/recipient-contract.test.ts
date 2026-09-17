@@ -13,8 +13,11 @@ import { PRODUCED_INSTRUMENTS, RECIPIENTS } from './recipient-contract';
  * names recipients by **role key** — `{ merchant: {...}, guarantor: {...} }` —
  * and `sendDocument` throws `recipient "x" expected by template but not
  * provided` when a key it expects is missing. Compare the widget names in
- * `template-parity.ts`, where a rename is a silent blank. Both are interfaces
- * this repository does not deploy; only one of them shouts.
+ * `template-parity.ts`, where a renamed widget produces no error at all — only a
+ * blank in the document, caught by a CI spec on their side that cannot see a
+ * template republished from here, plus a runtime warning (lombard-platform
+ * #262). Both are interfaces this repository does not deploy; only one of them
+ * refuses to proceed.
  *
  * The role key is load-bearing in the other direction too: the platform reads
  * `recipientTokens.merchant` and `signingUrls.merchant` back out by the same
