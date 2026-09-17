@@ -1,7 +1,7 @@
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { PDF } from '@libpdf/core';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
@@ -19,7 +19,35 @@ import { renderMcaTemplatePdf, templatePlacement } from './template-pdf';
  * them at publication.
  */
 
+// These tests render a real 37-page PDF and read it back through two different
+// PDF libraries. That is legitimately slower than the 5s default, and shaving
+// assertions to fit a budget would be the wrong trade.
+vi.setConfig({ testTimeout: 60_000 });
+
 const snapshot = () => compileMcaTemplate(providerFixture());
+
+/**
+ * Render each document once per file, not once per assertion.
+ *
+ * The FRPA is 37 pages and react-pdf is not fast. Rendering it eight times over
+ * took this file past CI's 5s per-test budget while passing locally, which is
+ * the least interesting way for a test to be red.
+ */
+const rendered = new Map<string, Promise<Buffer>>();
+
+const templateOf = (instrument: Parameters<typeof renderMcaTemplatePdf>[1]): Promise<Buffer> => {
+  const existing = rendered.get(instrument);
+
+  if (existing) {
+    return existing;
+  }
+
+  const pending = renderMcaTemplatePdf(snapshot(), instrument, 3);
+
+  rendered.set(instrument, pending);
+
+  return pending;
+};
 
 /**
  * Read the page with `@libpdf/core`, NOT with pdfjs.
@@ -54,7 +82,7 @@ const findAll = async (pdf: Buffer, pattern: RegExp): Promise<string[]> => {
 
 describe('what a published template carries', () => {
   it('marks every field the plan says it can fill', async () => {
-    const rendered = await renderMcaTemplatePdf(snapshot(), 'frpa', 3);
+    const rendered = await templateOf('frpa');
     const found = new Set(await findAll(rendered, /«[a-z][a-z0-9_]*»/g));
     const plan = fieldPlanFor('frpa');
 
@@ -70,7 +98,7 @@ describe('what a published template carries', () => {
    * what the sans face did here before this was caught.
    */
   it('reads every marker back intact, spelled as the contract spells it', async () => {
-    const rendered = await renderMcaTemplatePdf(snapshot(), 'frpa', 3);
+    const rendered = await templateOf('frpa');
     const names = (await findAll(rendered, /«[a-z][a-z0-9_]*»/g)).map((marker) => marker.slice(1, -1));
     const known = new Set(fieldPlanFor('frpa').expect);
 
@@ -83,7 +111,7 @@ describe('what a published template carries', () => {
    * merchant must never be handed one.
    */
   it('carries none of the review copy', async () => {
-    const text = await textOf(await renderMcaTemplatePdf(snapshot(), 'frpa', 3));
+    const text = await textOf(await templateOf('frpa'));
 
     expect(text).not.toMatch(/INTERNAL DRAFT/i);
     expect(text).not.toContain('[to complete]');
@@ -97,7 +125,7 @@ describe('what a published template carries', () => {
    * per deal for something that never changes between deals.
    */
   it('sets the funder’s own facts in type, with no widget for them', async () => {
-    const text = await textOf(await renderMcaTemplatePdf(snapshot(), 'frpa', 3));
+    const text = await textOf(await templateOf('frpa'));
     const profile = providerFixture();
 
     expect(text).toContain(profile.buyer.legalName);
@@ -106,7 +134,7 @@ describe('what a published template carries', () => {
   });
 
   it('prints a signer placeholder for each party, numbered in signing order', async () => {
-    const rendered = await renderMcaTemplatePdf(snapshot(), 'frpa', 3);
+    const rendered = await templateOf('frpa');
     const tokens = await findAll(rendered, /\{\{(SIGNATURE|DATE), r\d\}\}/g);
 
     expect([...tokens].sort()).toEqual([
@@ -125,7 +153,7 @@ describe('what a published template carries', () => {
    * disjoint by construction, and this checks the renderer keeps them so.
    */
   it('never marks a widget where a party signs', async () => {
-    const text = await textOf(await renderMcaTemplatePdf(snapshot(), 'frpa', 3));
+    const text = await textOf(await templateOf('frpa'));
 
     expect(text).not.toMatch(/«[a-z_]*signature[a-z_]*»/);
     expect(text).not.toMatch(/«[a-z_]*sign_date[a-z_]*»/);
@@ -143,7 +171,7 @@ describe('what a published template carries', () => {
 describe('the rendered template survives the whole publication chain', () => {
   it('injects exactly the widgets the plan named, and no others', async () => {
     const plan = fieldPlanFor('frpa');
-    const rendered = await renderMcaTemplatePdf(snapshot(), 'frpa', 3);
+    const rendered = await templateOf('frpa');
 
     const injected = await injectMcaWidgets(rendered, { expect: plan.expect });
     const fields = (await PDFDocument.load(injected)).getForm().getFields();
@@ -153,7 +181,7 @@ describe('the rendered template survives the whole publication chain', () => {
 
   it('still hands Documenso every signer field it must make at upload', async () => {
     const plan = fieldPlanFor('frpa');
-    const injected = await injectMcaWidgets(await renderMcaTemplatePdf(snapshot(), 'frpa', 3), {
+    const injected = await injectMcaWidgets(await templateOf('frpa'), {
       expect: plan.expect,
     });
 
@@ -181,7 +209,7 @@ describe('the rendered template survives the whole publication chain', () => {
    */
   it('gives a fact said twice one field with two widgets', async () => {
     const plan = fieldPlanFor('frpa');
-    const injected = await injectMcaWidgets(await renderMcaTemplatePdf(snapshot(), 'frpa', 3), {
+    const injected = await injectMcaWidgets(await templateOf('frpa'), {
       expect: plan.expect,
     });
 
