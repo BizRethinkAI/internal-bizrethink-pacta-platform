@@ -1237,6 +1237,20 @@ model BizrethinkMcaPublication {
   widgets    Json
   recipients Json
 
+  /// WHAT THIS TEMPLATE IS FOR, so a caller holding several can choose.
+  ///
+  /// Pacta labels the goods; the entity runs the business. Which template suits
+  /// a given merchant is the entity's decision with the entity's deal data, and
+  /// nothing here refuses anything — but an entity cannot choose between two
+  /// templates that do not say what they are for. Stored rather than read from
+  /// the profile, because the profile moves and this is a record of what was
+  /// published.
+  ///
+  /// `recipientStates` is an `McaJurisdiction[]`; `venueRule` is
+  /// 'merchant-state' or 'funder-state'.
+  recipientStates Json
+  venueRule       String
+
   /// The compiled snapshot's fingerprint at the moment of publication.
   ///
   /// Lets a later reader ask whether the recipe still compiles to what was

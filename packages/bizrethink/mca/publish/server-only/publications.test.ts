@@ -26,6 +26,8 @@ const published = (over: Record<string, unknown> = {}) => ({
   envelopeId: 'envelope_abc',
   widgets: ['merchant_legal_name', 'purchase_price'],
   recipients: [{ role: 'merchant', signingOrder: 1, recipientId: 1250 }],
+  recipientStates: ['US-VA', 'US-NY'],
+  venueRule: 'merchant-state',
   fingerprint: 'fp-1',
   publishedAt: new Date('2026-09-17T10:00:00Z'),
   publishedByUserId: 41,
@@ -41,6 +43,8 @@ const input = {
   envelopeId: 'envelope_abc',
   widgets: ['merchant_legal_name', 'purchase_price'],
   recipients: [{ role: 'merchant', signingOrder: 1, recipientId: 1250 }],
+  recipientStates: ['US-VA', 'US-NY'],
+  venueRule: 'merchant-state',
   fingerprint: 'fp-1',
 };
 

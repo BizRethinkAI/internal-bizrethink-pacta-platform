@@ -28,6 +28,8 @@ const row = (over: Record<string, unknown> = {}) => ({
   envelopeId: 'envelope_abc',
   widgets: ['merchant_legal_name', 'purchase_price'],
   recipients: [{ role: 'merchant', signingOrder: 1, recipientId: 1250 }],
+  recipientStates: ['US-VA', 'US-NY'],
+  venueRule: 'merchant-state',
   fingerprint: 'fp-1',
   publishedAt: new Date('2026-09-17T10:00:00Z'),
   ...over,
@@ -99,6 +101,21 @@ describe('a caller reads what is published from the producer', () => {
       merchant: { id: 1250, signingOrder: 1 },
       guarantor: { id: 1251, signingOrder: 2 },
     });
+  });
+
+  /**
+   * PACTA LABELS THE GOODS; THE ENTITY RUNS THE BUSINESS.
+   *
+   * Which template suits a given merchant is the entity's decision, made with
+   * the entity's own deal data — none of which reaches this vertical. Nothing
+   * here refuses anything. But an entity holding two templates cannot choose
+   * between them unless each says what it was built for, so the record says.
+   */
+  it('says what each template was built for, so a caller can choose', async () => {
+    const body = await (await listMcaTemplatesForApi(request('secret'))).json();
+
+    expect(body.templates[0].builtForStates).toEqual(['US-VA', 'US-NY']);
+    expect(body.templates[0].venueRule).toBe('merchant-state');
   });
 
   it('is an empty list before anything is published, not an error', async () => {

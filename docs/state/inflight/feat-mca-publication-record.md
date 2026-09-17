@@ -40,6 +40,20 @@ It matters more from here, not less: ADR 0024 makes republication routine.
   `*.published.json` already has — so adopting it is a change of source rather
   than a rewrite of `sendDocument`.
 
+## It says what each template is for
+
+`builtForStates` and `venueRule` travel with the id and the widget names.
+
+**Pacta labels the goods; the entity runs the business.** Which template suits a
+given merchant is the entity's decision, made with the entity's own deal data —
+none of which reaches this vertical, and none of which this endpoint refuses
+anything on the basis of. But an entity holding two templates cannot choose
+between them unless each says what it was built for.
+
+Added after the deal-time venue guard was examined for removal: that check
+belonged to the business, not to the goods, and the honest replacement is not a
+refusal anywhere in Pacta but an accurate label the caller reads.
+
 ## Authorisation is the token, not a membership
 
 `ApiToken` has a required `teamId` and a **nullable** `userId`, so a team token
