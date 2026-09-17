@@ -81,7 +81,12 @@ const McaTemplatePreview = ({
   teamId: number;
   templateId: string;
   version: number;
-  template: McaTemplateSnapshot;
+  /*
+    ONLY WHAT IT RENDERS. Demanding a whole `McaTemplateSnapshot` made every
+    field of a compiled template a prop requirement; this reads the instrument
+    off each document and nothing else off the template.
+  */
+  template: Pick<McaTemplateSnapshot, 'documents'>;
 }) => {
   const [downloading, setDownloading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

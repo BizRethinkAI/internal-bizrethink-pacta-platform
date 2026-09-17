@@ -62,14 +62,14 @@ describe('a funder states its own fees', () => {
   });
 
   it('carries the schedule onto the agreement it belongs to', () => {
-    const snapshot = compileMcaTemplate(withFees([ORIGINATION]));
+    const snapshot = compileMcaTemplate(withFees([ORIGINATION]), 'frpa');
     const frpa = snapshot.documents.find((document) => document.instrument === 'frpa');
 
     expect(frpa?.feeSchedule).toEqual([ORIGINATION]);
   });
 
   it('gives an instrument that charges no fee an empty schedule, not a missing one', () => {
-    const snapshot = compileMcaTemplate(withFees([]));
+    const snapshot = compileMcaTemplate(withFees([]), 'frpa');
     const frpa = snapshot.documents.find((document) => document.instrument === 'frpa');
 
     expect(frpa?.feeSchedule).toEqual([]);
@@ -92,7 +92,7 @@ describe('a profile saved before this release', () => {
   };
 
   it('compiles, and charges nothing', () => {
-    const snapshot = compileMcaTemplate(legacy());
+    const snapshot = compileMcaTemplate(legacy(), 'frpa');
     const frpa = snapshot.documents.find((document) => document.instrument === 'frpa');
 
     expect(frpa?.feeSchedule).toEqual([]);

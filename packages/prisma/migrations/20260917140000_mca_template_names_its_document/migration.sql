@@ -1,0 +1,13 @@
+-- A template is one entity's version of ONE document (ADR 0026).
+--
+-- THE DEFAULT IS FOR THE MIGRATION, NOT FOR THE CODE. Adding a required column
+-- to a table with rows needs one, and every row in this table today is test
+-- data that ADR 0026 §8 says will be superseded. New templates always set this
+-- explicitly; nothing reads the default.
+--
+-- Labelling existing rows 'frpa' is a guess, and it is only safe because those
+-- rows are being replaced rather than relied on.
+--
+-- Additive: one column, no data rewritten, no other table touched.
+-- Rollback: drop the column.
+ALTER TABLE "BizrethinkMcaTemplate" ADD COLUMN "instrument" TEXT NOT NULL DEFAULT 'frpa';

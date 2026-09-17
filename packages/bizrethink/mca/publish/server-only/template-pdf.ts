@@ -182,12 +182,27 @@ export const templatePlacement = (snapshot: McaTemplateSnapshot, instrument: Pro
   const plan = fieldPlanFor(instrument);
   const widgetFor = new Map(plan.marked.map((field) => [field.binding, field.widget]));
   const document = snapshot.documents.find((candidate) => candidate.instrument === instrument);
+
+  /*
+    FAILS CLOSED, like the renderer below it.
+
+    It used to read `document?.items ?? []`, which reported a placement of
+    nothing at all for a snapshot that does not carry this document — and a
+    caller cannot tell that apart from a document with no fields to place. ADR
+    0026 made the mismatch reachable: a template is one document now, so a
+    snapshot and an instrument can disagree where before the package held them
+    all.
+  */
+  if (!document) {
+    throw new Error(`This template compiles no ${instrument}, so it places nothing.`);
+  }
+
   const marked: { binding: string; widget: string }[] = [];
   const printed: string[] = [];
   const unplaced: string[] = [];
   const seen = new Set<string>();
 
-  for (const item of document?.items ?? []) {
+  for (const item of document.items) {
     for (const field of item.fields) {
       if (seen.has(field.binding) || field.kind === 'signature' || field.binding.endsWith('.signedDate')) {
         continue;

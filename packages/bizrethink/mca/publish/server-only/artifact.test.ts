@@ -2,7 +2,7 @@ import { PDFDocument } from '@cantoo/pdf-lib';
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { PDF } from '@libpdf/core';
 import { describe, expect, it, vi } from 'vitest';
-
+import type { McaInstrument } from '../../clauses/instruments';
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
 import { fieldPlanFor } from '../field-plan';
@@ -32,13 +32,13 @@ vi.setConfig({ testTimeout: 60_000 });
  * learn this; `white-out-signing-tokens.ts` carries that scar.
  */
 
-const snapshot = () => compileMcaTemplate(providerFixture());
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
 
 const built = (() => {
   let pending: ReturnType<typeof buildMcaTemplateArtifact> | null = null;
 
   return () => {
-    pending ??= buildMcaTemplateArtifact(snapshot(), 'frpa', 3);
+    pending ??= buildMcaTemplateArtifact(snapshot('frpa'), 'frpa', 3);
 
     return pending;
   };
@@ -115,12 +115,27 @@ describe('a signer never sees the token that placed their field', () => {
 });
 
 describe('it refuses to build something half-formed', () => {
-  it('refuses an instrument this template does not compile', async () => {
-    const withoutEquipment = compileMcaTemplate({
-      ...providerFixture(),
-      policy: { ...providerFixture().policy, equipment: 'none' as const },
-    });
+  /**
+   * ADR 0026 moved this refusal EARLIER. A template is one document, so asking
+   * for a document the programme does not run now fails where the template is
+   * compiled — there is no longer a package that quietly omits it and an
+   * artifact step left to notice.
+   */
+  it('refuses to compile a document this programme does not run', () => {
+    expect(() =>
+      compileMcaTemplate(
+        { ...providerFixture(), policy: { ...providerFixture().policy, equipment: 'none' as const } },
+        'equipment-lease',
+      ),
+    ).toThrow(/does not run/i);
+  });
 
-    await expect(buildMcaTemplateArtifact(withoutEquipment, 'equipment-lease', 3)).rejects.toThrow();
+  /**
+   * The failure mode the earlier refusal creates: a snapshot naming one
+   * document, asked to produce another. Nothing upstream stops the two
+   * arguments disagreeing, and a mismatch must not render whatever it can find.
+   */
+  it('refuses a snapshot compiled for a different document', async () => {
+    await expect(buildMcaTemplateArtifact(snapshot('frpa'), 'equipment-lease', 3)).rejects.toThrow();
   });
 });

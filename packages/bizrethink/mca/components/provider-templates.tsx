@@ -4,6 +4,8 @@ import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { LegalSummary, LegalWorkspace } from '../../legal-ui/reader';
+import { INSTRUMENTS } from '../clauses/instruments';
+import { PRODUCED_INSTRUMENTS, type ProducedInstrument } from '../publish/recipient-contract';
 import type { McaTemplateSnapshot } from '../templates/compile';
 import { McaPackageReader } from './package-reader';
 import { McaProviderInterview } from './provider-interview';
@@ -24,6 +26,14 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
   const [previewRequested, setPreviewRequested] = useState(false);
   const [workspaceView, setWorkspaceView] = useState('answers');
   const [templateQuery, setTemplateQuery] = useState('');
+  /*
+    WHICH DOCUMENT A NEW TEMPLATE IS. ADR 0026: entity + type = one template.
+
+    Asked only when creating one. A template does not change which document it
+    is, so an existing one has no control for this and `updateMcaTemplate`
+    refuses to accept the field at all.
+  */
+  const [instrument, setInstrument] = useState<ProducedInstrument>('frpa');
   const preview = trpc.bizrethink.mcaTemplates.preview.useQuery(
     { teamId, id: id ?? '', version: saved.data?.version ?? 1 },
     { enabled: previewRequested && Boolean(saved.data), retry: false, staleTime: 0 },
@@ -217,6 +227,31 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
         )}
         {((!id && canWrite) || saved.data) && (
           <section hidden={Boolean(id) && workspaceView !== 'answers'} className="rounded-lg border p-4 sm:p-6">
+            {!id && canWrite && (
+              <div className="mb-4 space-y-1">
+                <label className="font-medium text-sm" htmlFor="mca-template-instrument">
+                  <Trans>Which document is this template?</Trans>
+                </label>
+                <select
+                  id="mca-template-instrument"
+                  className="w-full rounded-md border p-2 text-sm"
+                  value={instrument}
+                  onChange={(event) => setInstrument(event.target.value as ProducedInstrument)}
+                >
+                  {PRODUCED_INSTRUMENTS.map((produced) => (
+                    <option key={produced} value={produced}>
+                      {INSTRUMENTS[produced].title}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-muted-foreground text-sm">
+                  <Trans>
+                    One template is one document. Chosen now and fixed afterwards — a template that changed which
+                    document it was would invalidate every revision behind it.
+                  </Trans>
+                </p>
+              </div>
+            )}
             <McaProviderInterview
               key={`${id ?? 'new'}:${saved.data?.version ?? 0}`}
               initial={saved.data?.profile}
@@ -228,7 +263,7 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                       id: saved.data.id,
                       data: { expectedVersion: saved.data.version, profile },
                     })
-                  : await create.mutateAsync({ teamId, data: profile });
+                  : await create.mutateAsync({ teamId, data: profile, instrument });
                 setPreviewRequested(false);
                 setSearch({ template: result.id, revision: String(result.currentRevision) });
                 await list.refetch();
@@ -241,11 +276,19 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
   );
 };
 
+/**
+ * Takes ONLY THE THREE PARTS IT RENDERS, not a whole snapshot.
+ *
+ * It asked for `McaTemplateSnapshot`, which made every field of a compiled
+ * template a prop requirement — including the fingerprint, which this renders
+ * nowhere. Asking for what it uses means adding a field to a compiled template
+ * cannot break a component that never reads it.
+ */
 export const McaPackagePreview = ({
   snapshot,
   requirementsOnly = false,
 }: {
-  snapshot: McaTemplateSnapshot;
+  snapshot: Pick<McaTemplateSnapshot, 'documents' | 'externalDocuments' | 'requirements'>;
   requirementsOnly?: boolean;
 }) => {
   return (

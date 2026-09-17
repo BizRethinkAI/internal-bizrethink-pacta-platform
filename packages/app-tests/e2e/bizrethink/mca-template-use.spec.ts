@@ -57,7 +57,9 @@ test('a saved provider template previews the document it produces, as a PDF', as
     await grant(own.user.id, 'mca-clause-draft-rendering', true);
     await apiSignin({ page, email: own.user.email });
 
-    expect((await post(page.request, 'create', { teamId: team.id, data: providerFixture() })).ok()).toBe(true);
+    expect(
+      (await post(page.request, 'create', { teamId: team.id, data: providerFixture(), instrument: 'frpa' })).ok(),
+    ).toBe(true);
 
     const saved = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({
       where: { createdByUserId: own.user.id },
@@ -115,7 +117,7 @@ test('previewing enforces the same live access, revision and account restriction
 
     const profile = providerFixture();
 
-    expect((await post(page.request, 'create', { teamId, data: profile })).ok()).toBe(true);
+    expect((await post(page.request, 'create', { teamId, data: profile, instrument: 'frpa' })).ok()).toBe(true);
 
     const row = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: own.user.id } });
     const input = { teamId, id: row.id, version: 1, instrument: 'frpa' };

@@ -146,7 +146,7 @@ describe('the funder chooses courts or arbitration', () => {
       ...providerFixture(),
       policy: { ...providerFixture().policy, disputeResolution: 'arbitration' as const },
     };
-    const slugs = compileMcaTemplate(profile)
+    const slugs = compileMcaTemplate(profile, 'frpa')
       .documents.flatMap((document) => document.items)
       .map((item) => item.slug);
 
@@ -157,7 +157,7 @@ describe('the funder chooses courts or arbitration', () => {
   });
 
   it('keeps the court programme exactly as it was', () => {
-    const slugs = compileMcaTemplate(providerFixture())
+    const slugs = compileMcaTemplate(providerFixture(), 'frpa')
       .documents.flatMap((document) => document.items)
       .map((item) => item.slug);
 
