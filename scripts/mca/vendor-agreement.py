@@ -52,6 +52,27 @@ sha = hashlib.sha256(docx.read_bytes()).hexdigest()
 commit = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'],
                         capture_output=True, text=True).stdout.strip()
 
+# A processor's form is not ours, and its header must not say it is.
+# docs/adr/0019 settles that a split funding letter belongs to its processor and
+# is used exactly as supplied. Without this map a re-vendor silently restores
+# the "the words are ours" header and undoes that correction.
+PROCESSOR_CONTROLLED = {
+    'Lombard_Payzli_Split_Funding_Authorization_v2':
+        "the split funding letter as retained in lombard-contracts. The letter is the\n"
+        "PROCESSOR'S FORM, NOT OURS: under docs/adr/0019 a split funding letter is used\n"
+        "exactly as the processor supplies it and is never edited to match another\n"
+        "document. This copy matches the published lombard-api template.",
+}
+
+whose = PROCESSOR_CONTROLLED.get(name)
+what_this_is = (
+    f"WHAT THIS IS. {whose}"
+    if whose
+    else """WHAT THIS IS. Lombard's own executed-form agreement -- primary text in the only
+sense that matters here, because the words are ours and this file is the
+document they were published in."""
+)
+
 header = f"""\
 {name}.docx -- body text, extracted
 
@@ -61,9 +82,7 @@ docx sha256: {sha}
 Retrieved: from the working copy at ~/github/lombard/lombard-contracts, which is
            that repository at the commit above.
 
-WHAT THIS IS. Lombard's own executed-form agreement -- primary text in the only
-sense that matters here, because the words are ours and this file is the
-document they were published in. It is not a statute and no regulator wrote it,
+{what_this_is} It is not a statute and no regulator wrote it,
 so the primary/secondary-publisher question `sources-are-primary.test.ts` asks
 of `mca/sources/` does not arise; the question this header answers instead is
 WHICH document, at WHICH revision.
