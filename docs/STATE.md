@@ -13,7 +13,169 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-16_
+_Last updated: 2026-09-17_
+
+## 2026-09-17 — Pacta becomes the producer of MCA templates, and measures the distance (#288–#294)
+
+Seven PRs merged in this order: #288 `cf7c1a1c9`, #291 `c3178f441`, #289
+`ad81198b6`, #290 `854c97749`, #292 `3fd26dc43`, #293 `1fcfad1c0`, #294
+`11c3c5b15`. **Main is `11c3c5b15`. Production runs `a615747ab`** — yesterday's
+batch — and this one is not deployed at the time of writing.
+
+One authoring session wrote all seven; an independent shipping session reviewed
+and merged them. No session merged its own work.
+
+**Nothing here publishes anything.** The gate refuses everything, no publication
+path exists, every clause remains `status: 'draft'` with `author: null`, and
+zero counsel approvals exist. This batch decides *who produces templates* and
+*measures how far the builder is from being able to*.
+
+### The decisions (#288, #294)
+
+**[ADR 0023](adr/0023-pacta-produces-mca-templates.md)** makes the Pacta builder
+the only producer of MCA **agreements**, and makes Pacta own the record of what
+was published. The argument is that a second route to publication is a route
+around `assertMcaPackagePublishable`, and **a gate that can be walked around is
+not a gate**.
+
+**[ADR 0024](adr/0024-pacta-is-custodian-of-every-mca-template.md)** amends it
+within hours, and the amendment is the more honest document. Asked why
+`lombard-contracts` was in the path at all, the answer turned out not to be
+architectural but chronological: `lombard-contracts` first committed 2026-09-02,
+`packages/bizrethink/mca` on 2026-09-06. **Four days.** It is the bootstrap
+pipeline that produced today's templates and was never retired. ADR 0023 retired
+it for agreements and parked the prescribed disclosures giving no reason; 0024
+records that the absence of a reason was the defect, and stages the move:
+agreements publish, then Pacta owns the record and serves it over the API, then
+disclosures, then `lombard-contracts` becomes an archive.
+
+The second argument is stronger than the first: that repository is client-scoped
+at every level — the `lombardpay` organisation, `Lombard_FRPA_v4.pdf`, a widget
+literally called **`lombard_signer_name`**. A per-client repository cannot sit in
+the path of a builder meant to serve any funder.
+
+### The gate, built before its caller on purpose (#288)
+
+`assertMcaPackagePublishable` refuses on every unknown: a missing approval, an
+approval that no longer matches the words, an unreadable review register, a
+standing blocker, a missing input, an unanswered counsel finding. It **inverts
+`assertPublishable`'s default deliberately** — that function returns early on
+anything not `published`, which is right for a report and wrong for a gate.
+
+**Nothing calls it yet, and that is the decision rather than an oversight.** ADR
+0004 records what forward scaffolding cost this repo, and the PR argues against
+itself on those grounds before distinguishing the case: every input exists today,
+the positive path is exercised rather than hypothetical, and ADR 0020 §3.2
+requires the gate be written test-first. Built while nothing is approved, it
+ships shut — so on the day approvals exist it is already in the way, rather than
+being written later, under pressure, by whoever wants to publish.
+
+Approvals arrive as a **`Map`, not an object**, because a plain object answers
+for its prototype and a truthy non-approval is exactly the shape that gets past a
+gate. That is the `usStateCode` bug from #283 — found in review yesterday —
+designed out of a different module today.
+
+### The step that makes a page fillable (#291)
+
+`injectMcaWidgets` finds a visible `«name»` marker on a rendered page and puts a
+named, sender-fillable AcroForm widget over it. It ports
+`lombard-contracts/pipeline/inject_acroform_widgets.py` without Poppler or
+Python, because `@libpdf/core` already returns text bounding boxes.
+
+**A `{{SIGNATURE, rN}}` or `{{DATE, rN}}` placeholder must come through
+untouched** — a widget is sender-writable only, so a signature built as one ships
+permanently blank. The marker syntax is deliberately nothing like Documenso's,
+so the two cannot collide by construction rather than by a check that could rot.
+The tests prove both directions **using upstream's own extractor**, not a
+re-implementation, and assert the signer fields come back with non-zero geometry.
+
+**Publication fails closed.** `refuseMismatch` throws on a marker nobody expected
+*and* on an expected name the page never marked, reporting every problem at once.
+
+### The measurement, in both directions (#289, #290, #292, #293)
+
+**The interface is the AcroForm widget name, not the field label.** ADR 0023 and
+the design document both said "labels are an interface contract" and both were
+wrong on the mechanism: `lombard-platform` sends `formValues` keyed by the names
+in `acroformFields`, with `prefillFields: []`.
+
+**The two halves of the contract fail differently, and that asymmetry is the
+point.** A missing recipient **role key** throws at send time
+(`recipient "x" expected by template but not provided`). A widget name that stops
+matching raises nothing — it is a blank in a signed document.
+
+**Forwards: 72 of 89 widget names are produced.** Seventeen values a caller sends
+today would go nowhere — six because the builder sets them in type at
+publication, eleven because it cannot produce them.
+
+**Backwards, which is larger and was the flattering omission: 41 deal fields the
+builder's documents carry have no live widget at all.** Publish today and a
+merchant gets blanks nothing could fill. Reclassified: **12 programme** (into the
+provider profile, set in type), **27 per-deal** (needing new widget names — the
+only part that costs the caller anything, printed on their own by
+`newWidgetNames()`), **1 control** (`guarantor.kind`, never printed), **1
+duplicate**.
+
+**A signer's email stopped being a document field.** It is how the envelope
+reaches the person, supplied per send in the recipients payload, and no live
+template has a widget for one. It is still collected and still reported when
+missing — a party with no address cannot be sent to — it is simply no longer
+printed into a document the merchant signs.
+
+Every count here is derived by a test from `live-template-contract.json`, which
+`scripts/mca/extract-template-contract.mjs` writes from the published records
+themselves. **None comes from a message, a regex over source, or a hand-kept
+list** — two sessions had previously got arithmetic wrong under a claim like this.
+
+### Verified rather than accepted
+
+- **`lombard-platform` #262 is merged and live at `1066bfc`** (confirmed against
+  that repository, not inferred). It reads `acroformFields` — the key the records
+  actually carry — and **warns and drops** an unrecognised name rather than
+  throwing, because a drifted name leaves the document equally blank either way
+  and throwing at send time would turn a cosmetic drift into an outage.
+  **Dropping is only safe because something else proves the names match**: their
+  `pacta-v2-registry.test.ts`, whose sample map was hand-maintained and
+  `Partial`-typed until their reviewer found a newly published kind could escape
+  it silently. It now asserts its own completeness.
+- **#289's and #290's branch point.** The two branched from a common commit
+  rather than one from the other, each then correcting the same overstated claim
+  in its own files. Both divergent commits were confirmed present on main after
+  the merges — the one place in this batch where content could have gone quietly
+  missing.
+
+### Guard 2 accuses a branch that changed no ADR
+
+The append-only ADR guard diffs `BASE_SHA HEAD_SHA` — **two dots** — which cannot
+distinguish "this branch modified the file" from "this branch is behind main on
+the file". #294 branched before a late amendment to ADR 0023 inside #288; once
+#288 merged, the guard reported #294 as modifying an ADR it never touched. The
+three-dot diff was empty and a real merge would have reverted nothing.
+
+**It was fixed by refreshing the branch, not by taking the override the failure
+message offers.** An override is for a guard that is right about the facts and a
+human accepts it anyway; granting one because the rule misread a stale branch is
+how an append-only rule protecting decision history stops meaning anything. The
+guard itself is being corrected separately.
+
+### Open, and deliberately not in this batch
+
+- **Publishable output does not exist.** The renderer produces internal drafts —
+  an `INTERNAL DRAFT` banner, printed rules where signature fields belong. It is
+  the largest remaining piece of the vertical.
+- **`lombard-platform` still resolves a `templateId` from a vendored file.**
+  Changing that is work in a repository this session does not own and must not
+  happen before the builder can actually publish.
+- **The 27 per-deal widget names are an ask on the caller** that has not been made.
+- **Parity is not met.** Green CI on these PRs means every live widget is
+  *answered* — by a binding or by an explicitly typed gap — which is a different
+  claim, and the gaps are checked against the library so a gap that closes fails
+  the test.
+- Four PRs opened during this batch and were deliberately excluded from it: the
+  publication record (#295), ADR 0025 (#296), the template renderer (#297) and
+  the Guard 2 fix (#298). **#295 is a Prisma migration plus a team-scoped API
+  endpoint touching the `lombard-platform` integration**, which this repo's rules
+  put in the class needing a fresh adversarial review of its own.
 
 ## 2026-09-16 — MCA document fidelity, three funder choices, and the Payzli wording (#277–#285)
 
