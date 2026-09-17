@@ -2478,4 +2478,72 @@ model BizrethinkVerifiedOnboarding {
   createdAt   DateTime  @default(now())
 }
 
+/// What was published, by whom, from which recipe — ADR 0023 §2 and ADR 0024.
+///
+/// THE RECORD LIVES WITH THE PRODUCER. `lombard-platform` today vendors a COPY
+/// of every published template into `src/templates/*.published.json`, and its
+/// own widget-totality spec compares its builders against that copy. Both sides
+/// of that comparison come from one snapshot, so nothing there can see the
+/// snapshot going stale against what is actually published: republish without
+/// refreshing the copy and CI stays green while production drifts. Serving this
+/// row from the producer is what removes the copy.
+///
+/// APPEND-ONLY, like `BizrethinkMcaTemplateRevision`. Re-publishing an
+/// instrument writes a new row; the current one is simply the newest. A row is
+/// the record of what a merchant was actually sent, so it is never edited and
+/// never deleted — an earlier publication stays readable after it is replaced.
+model BizrethinkMcaPublication {
+  id             String @id
+  organisationId String
+  teamId         Int
+
+  /// The provider recipe that produced this, and the exact revision of it.
+  templateId       String
+  templateRevision Int
+
+  /// An `McaInstrument`. Stored, not derived: the Equipment Lease and the
+  /// Subscription compile to identical clause numbering, so a row naming
+  /// neither would be a record of "a template".
+  instrument String
+
+  /// What `POST /api/v2/template/use` needs, and what the caller asks us for.
+  documensoTemplateId Int
+  envelopeId          String
+
+  /// The AcroForm widget names as published, and the signing parties.
+  ///
+  /// Kept because they are the interface the caller prefills and addresses
+  /// against, and because a caller that reads them from here cannot hold a
+  /// stale copy of them. `recipients` is [{ role, signingOrder, recipientId }].
+  widgets    Json
+  recipients Json
+
+  /// WHAT THIS TEMPLATE IS FOR, so a caller holding several can choose.
+  ///
+  /// Pacta labels the goods; the entity runs the business. Which template suits
+  /// a given merchant is the entity's decision with the entity's deal data, and
+  /// nothing here refuses anything — but an entity cannot choose between two
+  /// templates that do not say what they are for. Stored rather than read from
+  /// the profile, because the profile moves and this is a record of what was
+  /// published.
+  ///
+  /// `recipientStates` is an `McaJurisdiction[]`; `venueRule` is
+  /// 'merchant-state' or 'funder-state'.
+  recipientStates Json
+  venueRule       String
+
+  /// The compiled snapshot's fingerprint at the moment of publication.
+  ///
+  /// Lets a later reader ask whether the recipe still compiles to what was
+  /// published, without storing the assembled text — the same discipline
+  /// ADR 0016 sets for revisions and ADR 0022 for deals.
+  fingerprint String
+
+  publishedAt       DateTime @default(now())
+  publishedByUserId Int
+
+  @@index([teamId, instrument, publishedAt])
+  @@index([templateId, templateRevision])
+}
+
 // BIZRETHINK_ADDITIONS_END
