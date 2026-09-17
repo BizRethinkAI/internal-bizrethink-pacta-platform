@@ -195,3 +195,6 @@ packages/app-tests/e2e/api/bizrethink/approval-review-integrity.spec.ts
 
 # ADR 0023 §2 / ADR 0024: a caller reads what is published from the producer.
 apps/remix/app/routes/api+/bizrethink.mca-templates.ts
+
+# ADR 0025: preview a template rendered with specimen values.
+apps/remix/app/routes/api+/bizrethink.mca-template-preview.ts
