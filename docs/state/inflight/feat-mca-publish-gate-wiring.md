@@ -51,3 +51,23 @@ not export it.
 Nothing calls this either. The shell that uploads, creates the
 `EnvelopeType.TEMPLATE` and writes the record is the last piece, and this stands
 in front of it.
+
+## A fail-open closed, raised in review
+
+`clausesIn` silently dropped any item whose slug the library could not resolve,
+so the gate would have judged a **subset**. A gate that judges a subset can pass
+a package whose dropped clause is exactly the one no attorney approved — which is
+a merchant signing unapproved text, the single failure this vertical exists to
+prevent.
+
+It now throws, naming every unresolved slug.
+
+**Unreachable today**, and the reviewer said so having tried to reach it:
+`contentFor` is the clause library plus its reusable content filtered by
+instrument, so everything the compiler placed is in it; the twin does not share
+records; and a missing document returns `[]`, which the gate already refuses.
+
+Fixed anyway, for the reason #292 gives about its own partition: *unreachable*
+is a fact about the code as it stands, not a property of it. Two tests now hold
+the line — one asserting the package's slugs equal the document's exactly, one
+asserting the refusal.

@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
 import { contentFindingSlugs, contentFor } from '../../catalogue';
@@ -31,6 +32,18 @@ import { templatePlacement } from './template-pdf';
  * gate needs the real `McaContent`, because what it checks is the approval
  * fingerprint over the authored words. Matching by slug against the
  * instrument's own catalogue keeps those two from drifting.
+ *
+ * A SLUG WITH NO CLAUSE BEHIND IT THROWS, and that is the whole point of this
+ * function. Skipping it would hand the gate a SUBSET — and a gate that judges a
+ * subset can pass a package whose dropped clause is exactly the one no attorney
+ * approved. Fail-open here means a merchant signing unapproved text, which is
+ * the single failure this vertical exists to prevent.
+ *
+ * Unreachable today: `contentFor` is the clause library plus its reusable
+ * content filtered by instrument, so everything the compiler placed is in it.
+ * "Unreachable" is a fact about the code as it stands, not a property of it,
+ * and #292 already holds that a partition must be asserted total rather than
+ * assumed. This is the same rule applied to the package the gate judges.
  */
 const clausesIn = (
   snapshot: McaTemplateSnapshot,
@@ -39,16 +52,26 @@ const clausesIn = (
   const document = snapshot.documents.find((candidate) => candidate.instrument === instrument);
 
   if (!document) {
+    // The gate throws on an empty package, so this direction already fails
+    // closed; returning nothing is what says "there is no such document".
     return [];
   }
 
   const bySlug = new Map(contentFor(instrument).map((entry) => [entry.slug, entry]));
+  const missing = document.items.filter((item) => !bySlug.has(item.slug)).map((item) => item.slug);
 
-  return document.items.flatMap((item) => {
-    const content = bySlug.get(item.slug);
+  if (missing.length) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: `This ${instrument} package contains content the library cannot produce, so it cannot be judged: ${missing.join(', ')}.`,
+    });
+  }
 
-    return content ? [{ slug: item.slug, content }] : [];
-  });
+  return document.items.map((item) => ({
+    slug: item.slug,
+    // Present by the check above; the assertion is what keeps the type honest
+    // rather than reintroducing a silent skip.
+    content: bySlug.get(item.slug) as McaContent,
+  }));
 };
 
 export const mcaPublishablePackageFor = async (
