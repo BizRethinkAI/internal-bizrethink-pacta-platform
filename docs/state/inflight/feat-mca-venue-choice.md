@@ -91,6 +91,13 @@ merchant and a funder's forum.
   merchant-state template asks nothing, because the question does not arise.
 - Nine near-miss cases and both unreadable-state cases are pinned.
 
+A second pass found the matcher itself fail-open: `US_STATES` is a plain object,
+so `US_STATES['constructor']` answered with `Object.prototype.constructor` —
+truthy, not a state code, and therefore past **both** guards. The lookup now
+asks `Object.hasOwn`, and the prototype keys are pinned as unreadable. Nobody
+types "constructor" into a state field, but it is the exact shape this function
+exists to remove.
+
 The same review asked why the funder-state arm carried
 `whyThisClause: 'implements'` with `appliesInStates: ['US-VA']`, on the arm a
 Virginia programme is refused. It was wrong: `appliesInStates` drives the

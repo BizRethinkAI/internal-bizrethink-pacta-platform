@@ -97,6 +97,12 @@ const US_STATES: Record<string, string> = {
  * Returning `null` for anything unrecognised is the point: an unreadable answer
  * raises its own blocker rather than passing as "not Virginia". "West Virginia"
  * is a different state and must not match Virginia's prefix.
+ *
+ * The lookup asks `Object.hasOwn` rather than indexing straight into the record:
+ * a plain object answers for its prototype, so "constructor" returned
+ * `Object.prototype.constructor` — truthy, not a state code, and therefore past
+ * both guards, which is exactly the fail-open shape this function exists to
+ * remove.
  */
 export const usStateCode = (value: string): string | null => {
   const cleaned = value
@@ -108,7 +114,7 @@ export const usStateCode = (value: string): string | null => {
     .replace(/\s+/g, ' ')
     .trim();
 
-  if (US_STATES[cleaned]) {
+  if (Object.hasOwn(US_STATES, cleaned)) {
     return US_STATES[cleaned];
   }
 

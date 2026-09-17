@@ -64,6 +64,11 @@ describe('a deal cannot take a funder forum into a state that fixes its own', ()
     ['  VIRGINIA  ', true],
     ['West Virginia', false],
     ['Florida', false],
+    // A plain object answers for its prototype: 'constructor' used to return
+    // Object.prototype.constructor, which is truthy and not a state code, so it
+    // slipped past both the conflict and the unverified guard.
+    ['constructor', false],
+    ['toString', false],
   ])('reads %s as a Virginia merchant: %s', (state, conflicts) => {
     const kinds = draftIn(funderVenueTemplate(), state).blockers.map((blocker) => blocker.kind);
 
@@ -88,5 +93,20 @@ describe('a deal cannot take a funder forum into a state that fixes its own', ()
     const fields = draft.documents.flatMap((document) => document.items).flatMap((item) => item.fields);
 
     expect(fields.map((field) => field.binding)).toContain('merchant.principalState');
+  });
+});
+
+describe('the state lookup answers only for states', () => {
+  it.each([
+    'constructor',
+    'toString',
+    'valueOf',
+    'hasOwnProperty',
+    '__proto__',
+  ])('reads %s as unreadable, not as a state', (value) => {
+    const kinds = draftIn(funderVenueTemplate(), value).blockers.map((blocker) => blocker.kind);
+
+    expect(kinds).toContain('venue-unverified');
+    expect(kinds).not.toContain('venue-conflict');
   });
 });
