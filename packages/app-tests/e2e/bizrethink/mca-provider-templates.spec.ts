@@ -263,8 +263,12 @@ test('a provider interview saves, reopens and revises a real team template with 
     const preview = page.locator('[data-mca-template-preview]');
     await expect(preview).toContainText('Internal draft — transaction fields remain unfilled');
     await preview.getByLabel('Package document', { exact: true }).selectOption('frpa');
-    await expect(preview.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
-    await expect(preview.getByRole('heading', { name: '3. Purchase', exact: true })).toBeVisible();
+    await expect(
+      preview.getByRole('heading', { name: 'Section 1: Merchant and Funding Information', exact: true }),
+    ).toBeVisible();
+    await expect(
+      preview.getByRole('heading', { name: 'Section 3: Purchase and Sale of Future Receivables', exact: true }),
+    ).toBeVisible();
     await expect(preview.locator('[data-mca-template-item="frpa.party-identification"]')).toContainText(
       'Example Receipts Inc., a corporation organized under the laws of DE',
     );

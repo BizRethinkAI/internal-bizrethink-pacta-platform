@@ -49,6 +49,22 @@ TDD: seven schema/compile assertions failed first, then two rendered-PDF ones.
   the raw fixture and would otherwise have been loosened instead.
 - Changed files formatted; `git diff --check` clean.
 
+## Refreshed onto the merged batch
+
+Merged main at `13ef4786f` (the renderer stack plus #282). Three conflicts:
+
+- `profile.ts` — the fee field beside #282's `disputeResolution` enum, kept both.
+- `pdf.ts` — my fee styles and helper against the stack's execution grid and
+  cover chrome. Rather than splicing conflict markers through a renderer, I took
+  main's file and re-applied the three fee changes onto it: the styles, the
+  helper, and one call site before the execution section.
+- `pdf.test.ts` — both sides appended describes. Rebuilt from main's file plus my
+  fee block and its three imports, for the same reason.
+
+Verified by rendering, not only by the suite: the Appendix prints its fee with
+the payee/purpose/timing line, and the stack's cover page is still there. 104
+files / 3,409 tests pass on the merged revision.
+
 ## Not in this change
 
 Fee amounts are fixed at template time, which is what the clause requires

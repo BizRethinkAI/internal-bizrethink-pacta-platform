@@ -77,6 +77,10 @@ export const ZMcaProviderProfile = z
       reconciliationEmail: email,
       reconciliationAddress: line(600),
       servicingPhone: z.union([z.literal(''), line(80)]).optional(),
+      // Printed on the cover and in the page footer, as the funder's own
+      // documents carry it. Optional: an older saved revision has none and
+      // renders with the line absent rather than a placeholder.
+      website: z.union([z.literal(''), line(120)]).optional(),
     }).strict(),
     policy: z
       .object({
@@ -95,9 +99,11 @@ export const ZMcaProviderProfile = z
         // reads as charging nothing — which is what the Appendix clause says an
         // unlisted fee costs.
         fees: z.array(ZMcaFee).max(20).default([]),
-        // The current provider-template release supports the court bundle. The
-        // authored arbitration alternative remains available for legal review.
-        disputeResolution: z.literal('courts'),
+        // Both answers are authored and selectable: the court programme carries
+        // the jury, class and counterclaim waivers, arbitration carries §7.26.
+        // ADR 0020 §5.6 — a lawful term a funder wants is one the platform
+        // supports; Pacta holds no position on which a funder should choose.
+        disputeResolution: z.enum(['courts', 'arbitration']),
         recipientStates: z
           .array(
             z.custom<McaJurisdiction>(
