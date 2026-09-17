@@ -3,6 +3,7 @@ import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
 
 import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/render/fonts/font-data';
+import type { ClauseField } from '../../clauses/types';
 import { groupMcaSections } from '../../engine/section-headings';
 import { fieldBlocks, fieldRows } from '../../render/field-layout';
 import type { McaTemplateItem, McaTemplateSnapshot } from '../../templates/compile';
@@ -69,6 +70,18 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: '#667085',
   },
+  banner: {
+    position: 'absolute',
+    top: 25,
+    left: 72,
+    right: 72,
+    fontFamily: 'McaSansBold',
+    fontSize: 8,
+    color: '#935d17',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#d5c5ae',
+    paddingBottom: 7,
+  },
   title: { fontFamily: 'McaSansBold', fontSize: 19, lineHeight: 1.2, marginBottom: 14 },
   sectionHeading: { fontFamily: 'McaSansBold', fontSize: 14, lineHeight: 1.2, marginTop: 18, marginBottom: 8 },
   heading: { fontFamily: 'McaSansBold', fontSize: 11, marginBottom: 5, marginTop: 13 },
@@ -112,6 +125,33 @@ const styles = StyleSheet.create({
 });
 
 const text = (value: string, style: Style | Style[] = styles.paragraph) => h(Text, { style }, value);
+
+/**
+ * What fills each kind of slot.
+ *
+ * ONE LAYOUT, TWO FILLINGS. A preview built by a second code path is a preview
+ * that can disagree with the thing it previews — and it would disagree exactly
+ * when somebody is relying on it, while reviewing a document before publishing
+ * it. So the layout is this module's, and only the filling differs.
+ */
+export type TemplateRenderMode = {
+  /** Where a caller would prefill: a marker, or a specimen value. */
+  slotFor: (widget: string, field: { binding: string; kind: ClauseField['kind']; label: string }) => string;
+  /** A field the plan can neither mark nor print. */
+  unplaced: (field: { binding: string; kind: ClauseField['kind']; label: string }) => string;
+  /** Where a party signs: a native placeholder, or a printed rule. */
+  signature: (signer: { signature: string; date: string }) => { signature: string; date: string };
+  /** Printed at the top of every page, when the artifact must not be mistaken. */
+  banner: string | null;
+};
+
+/** The publishable template: markers and native signer placeholders. */
+export const PUBLISH_MODE: TemplateRenderMode = {
+  slotFor: (widget) => markerFor(widget),
+  unplaced: () => '—',
+  signature: (signer) => ({ signature: signer.signature, date: `Date: ${signer.date}` }),
+  banner: null,
+};
 
 export type TemplatePlacement = {
   /** Bindings rendered as a `«name»` slot, with the name each will carry. */
@@ -177,17 +217,21 @@ export const templatePlacement = (snapshot: McaTemplateSnapshot, instrument: Pro
  * document as something not yet provided, which is the honest rendering of a
  * field nobody can currently fill.
  */
-const slot = (field: { binding: string; value: string | null }, widgetFor: Map<string, string>): string => {
+const slot = (
+  field: { binding: string; value: string | null; kind: ClauseField['kind']; label: string },
+  widgetFor: Map<string, string>,
+  mode: TemplateRenderMode,
+): string => {
   const widget = widgetFor.get(field.binding);
 
   if (widget) {
-    return markerFor(widget);
+    return mode.slotFor(widget, field);
   }
 
-  return field.value ?? '—';
+  return field.value ?? mode.unplaced(field);
 };
 
-const itemElements = (item: McaTemplateItem, widgetFor: Map<string, string>) => {
+const itemElements = (item: McaTemplateItem, widgetFor: Map<string, string>, mode: TemplateRenderMode) => {
   const heading = `${item.number ? `${item.number}  ` : ''}${item.heading}`;
   const paragraphs = item.body.split('\n').filter(Boolean);
   // Signature and date are native placeholders in the execution block, never
@@ -200,7 +244,7 @@ const itemElements = (item: McaTemplateItem, widgetFor: Map<string, string>) => 
             View,
             { key: `${item.slug}:${field.binding}`, style: styles.moneyRow, wrap: false },
             text(field.label, styles.moneyLabel),
-            text(slot(field, widgetFor), styles.moneyValue),
+            text(slot(field, widgetFor, mode), styles.moneyValue),
           ),
         )
       : fieldRows(block.fields).map((row, index) =>
@@ -222,7 +266,7 @@ const itemElements = (item: McaTemplateItem, widgetFor: Map<string, string>) => 
                   ],
                 },
                 text(field.label, styles.label),
-                text(slot(field, widgetFor), styles.value),
+                text(slot(field, widgetFor, mode), styles.value),
               ),
             ),
           ),
@@ -253,10 +297,11 @@ const itemElements = (item: McaTemplateItem, widgetFor: Map<string, string>) => 
   ];
 };
 
-export const renderMcaTemplatePdf = async (
+export const renderTemplateDocument = async (
   snapshot: McaTemplateSnapshot,
   instrument: ProducedInstrument,
   revision: number,
+  mode: TemplateRenderMode,
 ): Promise<Buffer> => {
   const document = snapshot.documents.find((candidate) => candidate.instrument === instrument);
 
@@ -271,6 +316,7 @@ export const renderMcaTemplatePdf = async (
   const page = h(
     Page,
     { size: 'LETTER', style: styles.page },
+    ...(mode.banner ? [h(Text, { key: 'banner', style: styles.banner, fixed: true }, mode.banner)] : []),
     h(
       Text,
       { key: 'party', style: styles.footerParty, fixed: true },
@@ -289,7 +335,7 @@ export const renderMcaTemplatePdf = async (
     text(document.title, styles.title),
     ...groupMcaSections(document.items, document.instrument).flatMap((section, index) => [
       h(Text, { key: `section:${index}`, style: styles.sectionHeading, minPresenceAhead: 90 }, section.heading),
-      ...section.items.flatMap((item) => itemElements(item, widgetFor)),
+      ...section.items.flatMap((item) => itemElements(item, widgetFor, mode)),
     ]),
     h(Text, { style: styles.heading, minPresenceAhead: 120 }, 'Execution'),
     // Two parties to a row, each block carrying the native placeholders
@@ -315,8 +361,8 @@ export const renderMcaTemplatePdf = async (
                 style: column === row.length - 1 ? styles.executionCellLast : styles.executionCell,
               },
               text(signer.role.replace(/_/g, ' ').toUpperCase().split('').join(' '), styles.executionRole),
-              text(signer.signature, styles.executionParty),
-              text(`Date: ${signer.date}`, styles.executionLine),
+              text(mode.signature(signer).signature, styles.executionParty),
+              text(mode.signature(signer).date, styles.executionLine),
             ),
           ),
         ),
@@ -332,3 +378,10 @@ export const renderMcaTemplatePdf = async (
 
   return Buffer.concat(chunks);
 };
+
+/** The publishable template. */
+export const renderMcaTemplatePdf = (
+  snapshot: McaTemplateSnapshot,
+  instrument: ProducedInstrument,
+  revision: number,
+): Promise<Buffer> => renderTemplateDocument(snapshot, instrument, revision, PUBLISH_MODE);
