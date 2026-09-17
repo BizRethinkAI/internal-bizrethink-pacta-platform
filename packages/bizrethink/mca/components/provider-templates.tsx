@@ -7,6 +7,7 @@ import { LegalSummary, LegalWorkspace } from '../../legal-ui/reader';
 import { INSTRUMENTS } from '../clauses/instruments';
 import { PRODUCED_INSTRUMENTS, type ProducedInstrument } from '../publish/recipient-contract';
 import type { McaTemplateSnapshot } from '../templates/compile';
+import { McaOperatingRequirements } from './operating-requirements';
 import { McaPackageReader } from './package-reader';
 import { McaProviderInterview } from './provider-interview';
 import { McaProviderReviewManager } from './provider-review-manager';
@@ -159,6 +160,9 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                 <Trans>Preview document package</Trans>
               </Button>
             </div>
+            {saved.data.profile?.policy?.recipientStates && (
+              <McaOperatingRequirements states={saved.data.profile.policy.recipientStates} />
+            )}
             {saved.data.current && !isOldRevision && (
               <Link
                 className="inline-block rounded border px-3 py-2 font-medium text-sm"
