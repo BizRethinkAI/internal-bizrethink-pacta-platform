@@ -226,10 +226,15 @@ export const mcaExecutionFields = (
       isoCompany: 'ISO Company',
       isoPartner: 'ISO Partner',
     };
+    // A SIGNER'S EMAIL IS NOT A DOCUMENT FIELD. It is how the envelope reaches
+    // the person, supplied per send in the recipients payload, and no live
+    // template has a widget for one. It is still collected (`McaDraftInput`)
+    // and still reported when absent, because a party with no address cannot
+    // be sent to — but printing it into the page would duplicate a fact the
+    // envelope owns, in a document the merchant signs.
     return [
       field(`signers.${role}.name`, `${labels[role]} — Authorized Signer Printed Name`),
       field(`signers.${role}.capacity`, `${labels[role]} — Signer Capacity`),
-      field(`signers.${role}.email`, `${labels[role]} — Signer Email`),
       field(`signers.${role}.signature`, `${labels[role]} — Separate Signature`, 'signature'),
       field(`signers.${role}.signedDate`, `${labels[role]} — Signature Date`, 'date'),
     ];
