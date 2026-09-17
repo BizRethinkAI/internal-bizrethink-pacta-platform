@@ -17,11 +17,24 @@ import { WIDGET_PARITY, type WidgetParity } from './template-parity';
  * sends `prefillFields: []`. Field labels are not the interface; widget names
  * are. A name this repository renames breaks a caller it does not deploy.
  *
- * AND NOTHING THERE CATCHES IT. `buildFormValues` warns on an unknown name only
- * when the published record carries `formFields`, and none of the live records
- * do — they carry `acroformFields`. So a rename fails silently: the value is
- * sent, no widget takes it, the merchant signs a document with a blank where a
- * figure belonged. That is why this test is a diff rather than a warning.
+ * WHAT CATCHES A DRIFT TODAY, AND WHAT DOES NOT — corrected on 2026-09-17 after
+ * the platform session checked rather than taking this file's word for it.
+ *
+ * Their CI does catch one: `pacta-v2-registry.test.ts` asserts every kind emits
+ * exactly its template's widgets, and it is clean — 6,283 tests, not one
+ * unknown-field warning. So nothing is being dropped silently today, and an
+ * earlier draft of this comment overstated the exposure.
+ *
+ * What that spec cannot see is a template **republished from outside their
+ * repository** — which is exactly what ADR 0023 introduces by making this
+ * builder the producer. Their runtime backstop for it is lombard-platform #262
+ * (it warns rather than throws, deliberately: a drifted name leaves the document
+ * equally blank either way, and throwing at send time would turn a cosmetic
+ * drift into an outage).
+ *
+ * So the risk this test answers is the one neither of those covers: a name
+ * renamed HERE, in a template produced HERE. A diff is the right shape for it,
+ * because it fails before anything is published rather than after.
  */
 
 const bindingsFor = (instrument: McaInstrument): Set<string> => {
