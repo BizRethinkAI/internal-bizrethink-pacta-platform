@@ -111,9 +111,13 @@ export const mcaPublicationRefusals = (input: McaPublishablePackage): McaPublish
 /**
  * The same question, asked where a caller cannot ignore the answer.
  *
- * A gate that returns a list is a gate somebody forgets to read. The template
- * publication path calls this; the workspace calls `mcaPublicationRefusals` to show
- * the list while a funder is still deciding.
+ * A gate that returns a list is a gate somebody forgets to read.
+ *
+ * NOTHING CALLS THIS YET, and it is written before its caller on purpose —
+ * ADR 0020 §3.2, so the gate is not written later, under pressure, by whoever
+ * wants to publish. The template publication path WILL call it; the workspace
+ * will call `mcaPublicationRefusals` instead, to show the list while a funder
+ * is still deciding. Neither exists today.
  */
 export const assertMcaPackagePublishable = (input: McaPublishablePackage): void => {
   if (!input.items.length) {
