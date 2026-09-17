@@ -29,6 +29,19 @@ throwing at send time would turn a cosmetic drift into an outage.
 The risk this test answers is the one neither covers — a name renamed *here*, in
 a template produced *here* — and it fails before publication rather than after.
 
+**Where the numbers come from, since two sessions have now got arithmetic wrong
+under a claim like this one.** Every count in this branch and the ones stacked on
+it is derived by a test from `live-template-contract.json`, which
+`scripts/mca/extract-template-contract.mjs` writes from the published records
+themselves. None of them comes from a message, a regex over source, or a
+hand-kept list.
+
+Re-verified directly: of the 23 records `lombard-platform` vendors, **22 carry
+widgets** and one (`processor2-v1`, unpublished) carries none; **17 of the 22 are
+state disclosures or itemizations**, which ADR 0024 stages for later; the
+remaining five files are exactly the set extracted here — six instruments,
+because the lease and the subscription share one template.
+
 **`acroformFieldCount` is not the number of fields.** It counts widget
 annotations: `merchant_legal_name` is one field with three widgets on the FRPA,
 and one `formValues` entry fills all three. Confirmed by loading the PDFs with
