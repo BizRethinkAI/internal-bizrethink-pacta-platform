@@ -131,9 +131,22 @@ two sides adding distinct blocks, resolved keep-both:
   its clauses became selectable. `collectionMethod` and `settlementBase` still
   have none.
 
-The first keep-both join spliced mid-structure and dropped two closing braces;
-the suite caught it as a parse error, and it is repaired. 105 files / 3,439
-tests pass on the merged revision.
+105 files / 3,439 tests pass on the merged revision.
+
+### Two process lessons from resolving this, for whoever resolves the next one
+
+**"Both sides added a block" is only safe when the block boundaries are whole,
+and conflict markers do not guarantee that.** The first keep-both join here
+spliced mid-structure and dropped two closing braces and a comment opener. The
+suite caught it as a *parse error*, not a failed assertion — which is luck, not
+design. Where a conflict runs through a file with real structure, as #284's
+renderer did, take the incoming file and re-apply the change onto it; a
+re-apply is verifiable by counting deletions against main, and a splice is not.
+
+**Run Biome over the changed files as the last step of a resolution.** Resolving
+by hand is exactly when prose rewrapping drifts, and it broke the format check
+here after the conflict was otherwise correct. It is the same class as the
+formatter churn on #281, from the opposite direction.
 
 ## Not in this change
 

@@ -101,8 +101,8 @@ export const McaProviderInterview = ({
               </h2>
               <p className="text-muted-foreground text-sm">
                 <Trans>
-                  This release supports net card receipts and collection through processor splits. Choose the forum
-                  and how disputes are resolved below. Unsupported alternatives need additional drafting before use.
+                  This release supports net card receipts and collection through processor splits. Choose the forum and
+                  how disputes are resolved below. Unsupported alternatives need additional drafting before use.
                 </Trans>
               </p>
               <CheckAnswer
