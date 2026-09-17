@@ -46,6 +46,33 @@ describe('the package handed to the gate describes this template', () => {
   });
 
   /**
+   * TOTAL, NOT MERELY NON-EMPTY.
+   *
+   * Every item the compiler put in the document is judged. The earlier version
+   * dropped an item whose slug the library could not resolve, which would hand
+   * the gate a SUBSET — and a gate that judges a subset can pass a package whose
+   * dropped clause is exactly the one no attorney approved. Raised in review on
+   * #303; unreachable today, and asserted anyway, because #292 already holds
+   * that a partition is asserted total rather than assumed.
+   */
+  it('judges every item the document contains, not the ones it recognises', async () => {
+    const compiled = snapshot();
+    const document = compiled.documents.find((candidate) => candidate.instrument === 'frpa');
+    const pkg = await mcaPublishablePackageFor(compiled, 'frpa');
+
+    expect(pkg.items.map((item) => item.slug)).toEqual(document?.items.map((item) => item.slug));
+  });
+
+  it('refuses to judge a package carrying content the library cannot produce', async () => {
+    const compiled = snapshot();
+    const document = compiled.documents.find((candidate) => candidate.instrument === 'frpa');
+
+    document?.items.push({ ...document.items[0], slug: 'frpa.not-in-the-library' });
+
+    await expect(mcaPublishablePackageFor(compiled, 'frpa')).rejects.toThrow(/frpa\.not-in-the-library/);
+  });
+
+  /**
    * The gate checks an approval fingerprint over the AUTHORED words, so it
    * needs the library's own `McaContent` — not the snapshot's projection, which
    * is numbered and has provider values resolved into it.
