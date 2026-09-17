@@ -2558,4 +2558,53 @@ model BizrethinkMcaPublication {
   @@index([templateId, templateRevision])
 }
 
+/// The legal entity that issues a document, and how its programme runs.
+///
+/// ADR 0026: entity + type = one template. Saved once and chosen when a
+/// template is created, so a funder names itself once rather than once per
+/// document — the rule `BizrethinkProperty` already states for the lease.
+///
+/// NOT A COUNTERPARTY. The merchant, the guarantor, the ISO partner, the
+/// processor and the report subject all come from the caller at send time.
+/// There will never be a row here per broker, for the same reason there is not
+/// one per deal. An entity is OUR side, and that is the whole distinction.
+///
+/// COPIED INTO A TEMPLATE REVISION, NEVER READ LIVE BY ONE. Revisions are
+/// immutable and publication happens against a named revision, so editing this
+/// row must not change what an already-published document says. This is where
+/// an entity is edited; the revision snapshot is where it freezes.
+model BizrethinkMcaEntity {
+  id             String @id
+  organisationId String
+  teamId         Int
+
+  /// How a person picks this record out of a list. Usually the legal name, but
+  /// its own field because two entities can share one and a person still has to
+  /// tell them apart.
+  label String
+
+  /// `McaEntityIdentity` — who this entity is, as it appears in a document.
+  /// Shape owned by `mca/entities/entity.ts`, not by Prisma, so the validator
+  /// and the column cannot drift.
+  identity Json
+
+  /// `McaEntityPolicy` — how the programme runs: venue, guaranty scope,
+  /// renewal, equipment, recipient states, fees. These decide which clauses a
+  /// document contains, which is why they belong to the entity running the
+  /// programme rather than to each document separately.
+  policy Json
+
+  /// Compare-and-swap, as revisions use. Two people editing one entity is a
+  /// conflict to report, not a silent last write: these terms decide clause
+  /// selection for every document the entity issues.
+  version Int @default(1)
+
+  createdByUserId Int
+  updatedByUserId Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([teamId, updatedAt])
+}
+
 // BIZRETHINK_ADDITIONS_END
