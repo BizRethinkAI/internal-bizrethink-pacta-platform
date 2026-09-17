@@ -20,7 +20,7 @@ describe('separate catalogues share review protection', () => {
         (entry) => ['field-group', 'document-block', 'guidance'].includes(entry.kind) && entry.number === null,
       ),
     ).toBe(true);
-    expect(clauses.totals.clauses).toBe(210);
+    expect(clauses.totals.clauses).toBe(212);
     expect(reusable.totals.items).toBe(25);
   });
 

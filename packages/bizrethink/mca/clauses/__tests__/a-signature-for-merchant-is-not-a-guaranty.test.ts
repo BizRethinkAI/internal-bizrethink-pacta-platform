@@ -322,8 +322,8 @@ describe('the gate and the provenance are unchanged', () => {
    * of the last two changes rather than found again each time.
    */
   it('adds no record to the library', () => {
-    expect(libraryFor('frpa')).toHaveLength(107);
-    expect(ALL_MCA_CLAUSES).toHaveLength(210);
+    expect(libraryFor('frpa')).toHaveLength(109);
+    expect(ALL_MCA_CLAUSES).toHaveLength(212);
     expect(ALL_MCA_CLAUSES.filter((entry) => entry.slug === IDENTITY && entry.instrument === 'frpa')).toHaveLength(1);
   });
 

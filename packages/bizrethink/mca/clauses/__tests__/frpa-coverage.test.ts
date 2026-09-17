@@ -131,7 +131,7 @@ describe('the FRPA library accounts for the whole document', () => {
     // a RECORD and no section and every assembled document still holds one §6.1.
     // The §4.15 shape again, and for the same reason: the ungated §6.1 decided
     // the guaranty for every template from inside Section 6.
-    expect(clauses).toHaveLength(107);
+    expect(clauses).toHaveLength(109);
     expect(clauses.filter((clause) => !clause.unnumberedReason).length).toBeGreaterThan(0);
   });
 

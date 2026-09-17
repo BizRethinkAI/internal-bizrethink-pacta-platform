@@ -31,6 +31,7 @@ export const McaProviderInterview = ({
   const [error, setError] = useState<string | null>(null);
   const equipment = form.watch('policy.equipment');
   const broker = form.watch('policy.brokerChannel');
+  const funderVenue = form.watch('policy.venueRule') === 'funder-state';
   const next = async () => {
     const fields: FieldPath<McaProviderProfile>[] = step === 0 ? ['label', 'buyer'] : ['policy'];
     if (await form.trigger(fields, { shouldFocus: true })) {
@@ -100,14 +101,31 @@ export const McaProviderInterview = ({
               </h2>
               <p className="text-muted-foreground text-sm">
                 <Trans>
-                  This release supports net card receipts, collection through processor splits and merchant-state venue.
-                  Choose how disputes are resolved below. Unsupported alternatives need additional drafting before use.
+                  This release supports net card receipts and collection through processor splits. Choose the forum and
+                  how disputes are resolved below. Unsupported alternatives need additional drafting before use.
                 </Trans>
               </p>
               <CheckAnswer
                 name="policy.supportedTermsConfirmed"
                 label={msg`I confirm this provider uses these supported terms`}
               />
+              <SelectAnswer
+                name="policy.venueRule"
+                label={msg`Where an action under the Agreement is brought`}
+                options={[
+                  ['merchant-state', msg`The merchant's own state`],
+                  ['funder-state', msg`The provider's own forum`],
+                ]}
+              />
+              {funderVenue && (
+                <>
+                  <TextAnswer name="buyer.venueState" label={msg`Provider forum state`} />
+                  <TextAnswer
+                    name="buyer.venueCounty"
+                    label={msg`Provider forum county, if the courts are named by county`}
+                  />
+                </>
+              )}
               <SelectAnswer
                 name="policy.disputeResolution"
                 label={msg`Dispute resolution`}

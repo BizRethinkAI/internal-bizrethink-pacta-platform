@@ -37,7 +37,7 @@ describe('the MCA clause library surface', () => {
     // separate from the material around it.
     // 203 until 2026-09-11 added the four `full-performance` guaranty records
     // and `frpa.arbitration-7-26`.
-    expect(surface.clauses).toHaveLength(210);
+    expect(surface.clauses).toHaveLength(212);
   });
 
   it('groups by instrument, in the declared order', () => {
@@ -48,7 +48,7 @@ describe('the MCA clause library surface', () => {
       expect(entry.clauseCount).toBe(ALL_MCA_CLAUSES.filter((c) => c.instrument === entry.id).length);
     }
 
-    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(210);
+    expect(surface.instruments.reduce((n, e) => n + e.clauseCount, 0)).toBe(212);
   });
 
   /**
@@ -61,7 +61,7 @@ describe('the MCA clause library surface', () => {
    */
   it('reports that nothing is publishable, and why', () => {
     expect(surface.totals.publishable).toBe(0);
-    expect(surface.totals.clauses).toBe(210);
+    expect(surface.totals.clauses).toBe(212);
 
     for (const clause of surface.clauses) {
       expect(clause.publishProblems).toEqual([
