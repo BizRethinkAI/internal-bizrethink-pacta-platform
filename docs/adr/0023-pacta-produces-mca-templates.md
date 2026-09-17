@@ -49,12 +49,25 @@ old pipeline did; it stops being the source of truth.
 
 ### 3. Parity before the first publication
 
-The builder's output must match the documents in use — same field labels, same
-recipient roles, same signer fields — before anything it produces is published.
+The builder's output must match the documents in use — same AcroForm widget
+names, same recipient roles, same signer fields — before anything it produces is
+published.
 
-**Labels are an interface contract.** `lombard-platform` prefills *by label*
-(`documenso-prefill-helper.mjs`). A label the builder renames breaks a caller
-this repository does not deploy, silently, at the moment a merchant is waiting.
+**The widget names are an interface contract.** `lombard-platform` prefills by
+**widget name**: `formValues` keyed by the names in the published record's
+`acroformFields`, with `prefillFields` sent empty
+(`documenso-prefill-helper.mjs`, `buildFormValues`). Field labels are not the
+interface.
+
+And nothing on that side catches a rename. `buildFormValues` warns about an
+unknown name only when the record carries `formFields`; every live record
+carries `acroformFields` instead. So a name the builder renames breaks a caller
+this repository does not deploy — silently, at the moment a merchant is waiting,
+as a blank where a figure belonged.
+
+The set is pinned in `packages/bizrethink/mca/publish/template-parity.ts`, with
+every gap between it and the library stated and checked. Parity is a diff, not a
+judgement — and it is not yet met.
 
 ## Consequences
 

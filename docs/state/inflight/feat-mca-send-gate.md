@@ -76,15 +76,17 @@ TDD: 11 assertions failed with no module, then passed.
 - The renderer needs a second mode. Today's output carries an `INTERNAL DRAFT`
   banner and deliberately has no placeholders; only `{{...}}` placeholders become
   Documenso fields, and an AcroForm widget can never be signer-written.
-- Field labels are an interface contract: the funder's platform prefills by
-  label, so a rename breaks a caller we do not deploy.
+- The **AcroForm widget names** are the interface contract: the funder's
+  platform prefills by widget name (`formValues` keyed by `acroformFields`,
+  `prefillFields: []`), not by field label. Nothing on that side catches a
+  rename, so it fails as a blank in a merchant's document rather than an error.
 - The two blocking questions were answered the same day and are recorded as
   **ADR 0023**: the Pacta builder becomes the only producer of MCA agreement
   templates, and Pacta owns the record of what was published, exposed over the
   API rather than kept in a JSON file in a third repository. Parity with the
   documents in use comes before the first publication, because
-  `lombard-platform` prefills by label and a renamed label breaks a caller this
-  repository does not deploy.
+  `lombard-platform` prefills by widget name and a renamed widget breaks a
+  caller this repository does not deploy.
 
 ## Not in this change
 

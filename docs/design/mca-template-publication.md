@@ -14,13 +14,15 @@ work.
 Lombard's platform holds the deal and calls Pacta:
 
 ```
-POST /api/v2/template/use     templateId + prefillFields (by label) + recipients
+POST /api/v2/template/use     templateId + formValues + recipients
 ```
 
-`lombard-platform/src/lib/pacta.ts` owns that call; `documenso-prefill-helper.mjs`
-maps field labels to values; `src/templates/*.published.json` records each
-`templateId`. Pacta returns a document, the platform sends it and collects
-signing URLs.
+`lombard-platform/src/lib/pacta.ts` owns that call. `formValues` is keyed by
+**AcroForm widget name** — the names in the published record's `acroformFields`
+— and `prefillFields` is sent empty; `documenso-prefill-helper.mjs`
+(`buildFormValues`) is where the keys are used. `src/templates/*.published.json`
+records each `templateId`. Pacta returns a document, the platform sends it and
+collects signing URLs.
 
 **No MCA code is in that path.** It is upstream Documenso's template flow against
 templates that already exist in the funder's team. Three consequences:
@@ -32,8 +34,12 @@ templates that already exist in the funder's team. Three consequences:
 2. **A per-deal interview in Pacta is not part of this** and never was — ADR 0011
    assigns deal fill to the funder's platform, over the API, for exactly the
    automation reason ADR 0010 protects.
-3. **Field labels are an interface contract.** The platform prefills *by label*.
-   A label we rename silently breaks a caller we do not deploy.
+3. **The AcroForm widget names are an interface contract.** The platform
+   prefills *by widget name*, and **nothing there catches a rename**:
+   `buildFormValues` warns about an unknown name only when the published record
+   carries `formFields`, and every live record carries `acroformFields` instead.
+   So a name we rename is not an error anybody sees — it is a blank where a
+   figure belonged, in a document a merchant is signing.
 
 ## What publication requires, and where today's renderer falls short
 
@@ -58,7 +64,7 @@ So publication needs a **second render mode**, not a tweak:
 | | internal draft (today) | merchant-ready (needed) |
 |---|---|---|
 | Banner | `INTERNAL DRAFT` every page | none |
-| Deal fields | value or `[to complete]` | `{{TEXT, rN, label=<binding>, readOnly=true}}` |
+| Deal fields | value or `[to complete]` | an AcroForm widget under the pinned name |
 | Signer fields | printed rules | `{{SIGNATURE, rN}}`, `{{DATE, rN}}`, `{{INITIALS, rN}}` |
 | Recipients | none | one `rN` per signing role, stable across the package |
 
@@ -84,9 +90,9 @@ true for `lombard-contracts`, which publishes over REST from another repository.
    renderer work rather than clause work.
 2. **Recipient model.** Map signing roles to stable `rN` indexes across the six
    instruments, so `r1` means the same party in every document of a package.
-3. **Label contract.** Emit `label=` from each field's binding, and pin the
-   emitted set in a test — it is the interface the funder's platform prefills
-   against.
+3. ~~**Widget-name contract.**~~ **Done** — `publish/template-parity.ts` and its
+   test. Each live widget now has a binding or a stated gap, and the gaps are
+   checked against the library rather than asserted.
 4. **Publication service.** Render → extract → `createEnvelope(TEMPLATE)` into
    the funder's team, recording the resulting `templateId` against the provider
    revision that produced it.
@@ -106,15 +112,38 @@ Recorded as [ADR 0023](../adr/0023-pacta-produces-mca-templates.md):
    revision that produced it and exposed over the API, rather than in a JSON
    file in a third repository.
 3. **Parity first.** The builder's output matches the documents in use — same
-   labels, same recipient roles, same signer fields — before anything it
-   produces is published, because `lombard-platform` prefills by label.
+   AcroForm widget names, same recipient roles, same signer fields — before
+   anything it produces is published, because `lombard-platform` prefills by
+   widget name.
 
 Still undecided, and not blocking: which team a second funder publishes into,
 and when the existing templates are retired. Both can wait for parity and
 counsel.
 
-## What parity means, concretely
+## What parity means, concretely — measured
 
-The first piece of work is measuring it: extract the label and recipient set
-from the templates in use, and pin it as the contract the builder's output must
-satisfy. Until that set is written down as a test, "parity" is an opinion.
+Measured in `publish/template-parity.ts`, against the widget names and recipient
+roles extracted from the templates actually in use. What it found:
+
+- **`acroformFieldCount` is not a field count.** It counts widget annotations.
+  `merchant_legal_name` is one field with three widgets on the FRPA, and one
+  `formValues` entry fills all three. A renderer that emitted one field per
+  occurrence would ask for the same fact three times.
+- **Eight widgets the builder would not emit at all.** `processor_name`,
+  `provider_address`, `provider_legal_name`, `commission_percentage` map to
+  `MCA_PROVIDER_BINDINGS` — facts resolved from the provider profile *at
+  publication* and printed, not left as a slot. The platform would keep sending
+  values for names that no longer exist. **This is the sharpest break**, and it
+  is a decision per name at the first publication, not a bug to fix now.
+- **Eleven widgets have no binding**: two retired on purpose (`guarantor_ssn`),
+  one settled by clause selection rather than by a slot (`rollover_method`),
+  four the library holds no fact for, four whose binding exists but which no
+  clause of that instrument carries.
+- **The lease and the subscription are one template in the send path.** The
+  platform has no `equipment-lease` kind and resolves `subscription` to template
+  120. The library publishes the twin as two documents.
+- **A widget name carries the funder's own name** — `lombard_signer_name`. A
+  second funder cannot reuse it, so the name changes at the first publication
+  and the platform has to be told. The concrete case for ADR 0023 §2.
+
+Parity is now a diff rather than an opinion. It is not yet met.
