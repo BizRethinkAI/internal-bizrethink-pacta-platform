@@ -74,6 +74,42 @@ guard (missing forum, named forum, Virginia refusal, merchant-state untouched).
   gained `venueRule` in its offered-group matrix; `provider.venueForum` is a
   labelled field so the counsel reader annotates it.
 
+## Review findings, fixed
+
+An independent review of this PR found the deal-level guard was a free-text
+string match: `['virginia', 'va']` against a trimmed, lowercased value, so
+"Va.", "Commonwealth of Virginia" and "US-VA" all missed and the blocker
+**silently did not fire** — on the one check standing between a Virginia
+merchant and a funder's forum.
+
+- `usStateCode` now reads a typed state into a code, tolerating
+  "Commonwealth of", "State of", a `US-` prefix and punctuation, and **returns
+  `null` for anything it cannot read**. "West Virginia" is a different state and
+  does not match Virginia.
+- An unreadable state under a funder-forum template raises its own
+  **`venue-unverified`** blocker rather than passing as "not Virginia". A
+  merchant-state template asks nothing, because the question does not arise.
+- Nine near-miss cases and both unreadable-state cases are pinned.
+
+The same review asked why the funder-state arm carried
+`whyThisClause: 'implements'` with `appliesInStates: ['US-VA']`, on the arm a
+Virginia programme is refused. It was wrong: `appliesInStates` drives the
+counsel-routing sentence in `approval.ts`, so it asked for a Virginia-admitted
+reviewer to approve the one clause Virginia can never use. The arm is now
+`discretionary` with no states — no statute requires a funder's forum — and a
+test pins the asymmetry so it is not "corrected" later. The merchant-state arm
+keeps `implements` and Virginia, because it satisfies §6.2-2234(A) by
+construction.
+
+## Batch-level effect worth knowing
+
+This batch changes the clause library, so `compileMcaTemplate(stored
+profile).fingerprint` no longer equals a stored `revision.fingerprint`, and
+`providerSourcesCurrent` flips false for every existing template revision after
+deploy. That is the designed staleness signal, not a defect: stored packages
+stay readable because saved reviews compare stored to stored. It will be visible
+in the workspace, and belongs in the shipping consolidation.
+
 ## Not in this change
 
 `collectionMethod` and `settlementBase` are still pinned. Funder-state governing

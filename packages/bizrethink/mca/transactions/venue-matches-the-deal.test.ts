@@ -54,6 +54,35 @@ describe('a deal cannot take a funder forum into a state that fixes its own', ()
     expect(draft.blockers.map((blocker) => blocker.kind)).not.toContain('venue-conflict');
   });
 
+  it.each([
+    ['Virginia', true],
+    ['virginia', true],
+    ['VA', true],
+    ['Va.', true],
+    ['Commonwealth of Virginia', true],
+    ['US-VA', true],
+    ['  VIRGINIA  ', true],
+    ['West Virginia', false],
+    ['Florida', false],
+  ])('reads %s as a Virginia merchant: %s', (state, conflicts) => {
+    const kinds = draftIn(funderVenueTemplate(), state).blockers.map((blocker) => blocker.kind);
+
+    expect(kinds.includes('venue-conflict')).toBe(conflicts);
+  });
+
+  it('refuses to pass a state it cannot read, rather than assuming it is fine', () => {
+    const kinds = draftIn(funderVenueTemplate(), 'Freedonia').blockers.map((blocker) => blocker.kind);
+
+    expect(kinds).toContain('venue-unverified');
+    expect(kinds).not.toContain('venue-conflict');
+  });
+
+  it('does not ask about an unreadable state under a merchant-state template', () => {
+    const kinds = draftIn(compileMcaTemplate(providerFixture()), 'Freedonia').blockers.map((blocker) => blocker.kind);
+
+    expect(kinds).not.toContain('venue-unverified');
+  });
+
   it('collects the principal-place state both venue clauses name', () => {
     const draft = draftIn(compileMcaTemplate(providerFixture()), 'Florida');
     const fields = draft.documents.flatMap((document) => document.items).flatMap((item) => item.fields);

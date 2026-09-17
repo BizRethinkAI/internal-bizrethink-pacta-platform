@@ -59,3 +59,31 @@ describe('venue is a choice with a clause behind each answer', () => {
     expect(alternative?.body).not.toMatch(/Florida|New York|Pasco/);
   });
 });
+
+/**
+ * The two arms are not symmetrical, and that is deliberate.
+ *
+ * Merchant-state venue satisfies Va. Code §6.2-2234(A) by construction, which
+ * is why the base form needs no Virginia variant — so that arm implements it
+ * and asks for a Virginia-admitted reviewer. The funder-state arm implements
+ * nothing: no statute requires a funder's forum, and the profile refuses it for
+ * a Virginia programme. Claiming Virginia there would route a Virginia attorney
+ * to approve the clause Virginia can never use.
+ */
+describe('only one arm claims Virginia', () => {
+  const clause = (slug: string) => libraryFor('frpa').find((entry) => entry.slug === slug);
+
+  it('implements the Virginia rule on the merchant-state arm', () => {
+    const merchantState = clause('frpa.venue-7-5');
+
+    expect(merchantState?.whyThisClause.kind).toBe('implements');
+    expect(merchantState?.appliesInStates).toEqual(['US-VA']);
+  });
+
+  it('claims nothing statutory on the funder-state arm', () => {
+    const funderState = clause('frpa.venue-funder-state-7-5');
+
+    expect(funderState?.whyThisClause.kind).toBe('discretionary');
+    expect(funderState?.appliesInStates).toEqual([]);
+  });
+});

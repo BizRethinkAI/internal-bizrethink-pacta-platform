@@ -540,10 +540,20 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
   {
     slug: 'frpa.venue-funder-state-7-5',
     referenceId: 'frpa.venue-7-5',
-    whyThisClause: {
-      kind: 'implements',
-      citation: 'Va. Code §6.2-2234(A) (Virginia forum for covered sales-based financing)',
-    },
+    /*
+      DISCRETIONARY, AND ITS SISTER IS NOT. The merchant-state arm implements
+      Va. Code §6.2-2234(A) — it satisfies the Commonwealth's forum rule by
+      construction, which is why the base form needs no Virginia variant. This
+      arm implements nothing: no statute requires a funder's forum, it is a
+      funder's commercial choice, and the profile refuses it outright for a
+      programme that lists Virginia.
+
+      `appliesInStates` is empty for the same reason. It drives the counsel
+      routing sentence in `approval.ts`, and claiming Virginia here would ask
+      for a Virginia-admitted reviewer to approve the one clause a Virginia
+      programme can never use.
+    */
+    whyThisClause: { kind: 'discretionary' },
     variance: { kind: 'offered', fact: 'venueRule' },
     version: 1,
     instrument: 'frpa',
@@ -555,7 +565,7 @@ export const FRPA_MISCELLANEOUS: McaClause[] = [
     body: 'An action arising under this Agreement shall be brought in a state court of competent jurisdiction sitting in {{field:provider.venueForum}}, or in a federal court of competent jurisdiction sitting in that state. Neither party may require the other to bring or defend such an action anywhere else, and nothing in this Section selects a court that lacks subject-matter jurisdiction.\nSection [[clause:frpa.state-law-riders-7-24]] states the forum rule that applies where the law of a particular state fixes one, and this Section yields to it. Where the law of the state in which Merchant’s principal place of business is located fixes a forum for this transaction, that rule governs and this Section does not apply. This Section is not a waiver of a jurisdictional objection, of a mandatory rule about where an action must be brought, or of any protection applicable law does not permit to be given up.',
     source: { kind: 'attorney-drafted', author: null },
     status: 'draft',
-    appliesInStates: ['US-VA'],
+    appliesInStates: [],
     examinedBy: [
       {
         review: 'REVIEW-01',

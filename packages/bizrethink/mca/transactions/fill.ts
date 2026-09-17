@@ -32,7 +32,100 @@ const unsigned = (field: ClauseField) => field.kind === 'signature' || field.bin
  * list is deliberately short and sourced; it grows when a statutory walk finds
  * another, not when someone guesses.
  */
-const FORUM_FIXED_BY_STATE = [{ jurisdiction: 'US-VA', names: ['virginia', 'va'] }];
+const US_STATES: Record<string, string> = {
+  alabama: 'AL',
+  alaska: 'AK',
+  arizona: 'AZ',
+  arkansas: 'AR',
+  california: 'CA',
+  colorado: 'CO',
+  connecticut: 'CT',
+  delaware: 'DE',
+  'district of columbia': 'DC',
+  florida: 'FL',
+  georgia: 'GA',
+  hawaii: 'HI',
+  idaho: 'ID',
+  illinois: 'IL',
+  indiana: 'IN',
+  iowa: 'IA',
+  kansas: 'KS',
+  kentucky: 'KY',
+  louisiana: 'LA',
+  maine: 'ME',
+  maryland: 'MD',
+  massachusetts: 'MA',
+  michigan: 'MI',
+  minnesota: 'MN',
+  mississippi: 'MS',
+  missouri: 'MO',
+  montana: 'MT',
+  nebraska: 'NE',
+  nevada: 'NV',
+  'new hampshire': 'NH',
+  'new jersey': 'NJ',
+  'new mexico': 'NM',
+  'new york': 'NY',
+  'north carolina': 'NC',
+  'north dakota': 'ND',
+  ohio: 'OH',
+  oklahoma: 'OK',
+  oregon: 'OR',
+  pennsylvania: 'PA',
+  'rhode island': 'RI',
+  'south carolina': 'SC',
+  'south dakota': 'SD',
+  tennessee: 'TN',
+  texas: 'TX',
+  utah: 'UT',
+  vermont: 'VT',
+  virginia: 'VA',
+  washington: 'WA',
+  'west virginia': 'WV',
+  wisconsin: 'WI',
+  wyoming: 'WY',
+};
+
+/**
+ * Read a typed state into a code, or admit that it cannot be read.
+ *
+ * The first version of this guard compared a trimmed, lowercased string against
+ * `['virginia', 'va']`. "Virginia" and "VA" hit; "Va.", "Commonwealth of
+ * Virginia" and "US-VA" all missed, and the blocker silently did not fire —
+ * on the one check standing between a Virginia merchant and a funder's forum.
+ *
+ * Returning `null` for anything unrecognised is the point: an unreadable answer
+ * raises its own blocker rather than passing as "not Virginia". "West Virginia"
+ * is a different state and must not match Virginia's prefix.
+ */
+export const usStateCode = (value: string): string | null => {
+  const cleaned = value
+    .trim()
+    .toLowerCase()
+    .replace(/^(the\s+)?(commonwealth|state)\s+of\s+/, '')
+    .replace(/^us[-\s]/, '')
+    .replace(/[.,]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (US_STATES[cleaned]) {
+    return US_STATES[cleaned];
+  }
+
+  const code = cleaned.toUpperCase();
+  return Object.values(US_STATES).includes(code) ? code : null;
+};
+
+/**
+ * States whose own law fixes where an action under a covered contract is brought.
+ *
+ * Virginia is the one a vendored source establishes: Va. Code §6.2-2234(A)
+ * makes a provision mandating a forum outside the Commonwealth unenforceable,
+ * and §6.2-2228 defines a recipient by its principal place of business. The
+ * list is deliberately short and sourced; it grows when a statutory walk finds
+ * another, not when someone guesses.
+ */
+const FORUM_FIXED_BY_STATE = ['VA'];
 
 /** The form exposes current semantic bindings only. Repeated guarantors have their own input path. */
 export const mcaDraftControls = (template: McaTemplateSnapshot) => {
@@ -334,10 +427,10 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
       documents.push({ ...document, id, items, signatures });
     }
   }
-  const principalState = (values['merchant.principalState'] ?? '').trim().toLowerCase();
-  const venueConflict =
-    template.profile.policy.venueRule === 'funder-state' &&
-    FORUM_FIXED_BY_STATE.some((state) => state.names.includes(principalState));
+  const funderForum = template.profile.policy.venueRule === 'funder-state';
+  const principalState = usStateCode(values['merchant.principalState'] ?? '');
+  const venueConflict = funderForum && principalState !== null && FORUM_FIXED_BY_STATE.includes(principalState);
+  const venueUnverified = funderForum && principalState === null;
   const blockers = [
     ...(venueConflict
       ? [
@@ -345,6 +438,15 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
             kind: 'venue-conflict',
             detail:
               'This merchant’s state fixes the forum for a covered transaction, and this template names the provider’s forum. Use a merchant-state template for this deal, or obtain advice before proceeding.',
+          },
+        ]
+      : []),
+    ...(venueUnverified
+      ? [
+          {
+            kind: 'venue-unverified',
+            detail:
+              'This template names the provider’s forum, and the merchant’s state of principal place of business could not be read as a US state. Enter it plainly, because some states fix the forum for a covered transaction.',
           },
         ]
       : []),
