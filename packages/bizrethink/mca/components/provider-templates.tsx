@@ -5,10 +5,8 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { LegalSummary, LegalWorkspace } from '../../legal-ui/reader';
 import { INSTRUMENTS } from '../clauses/instruments';
-import { instrumentsFor } from '../engine/select-clauses';
 import { PRODUCED_INSTRUMENTS, type ProducedInstrument } from '../publish/recipient-contract';
 import type { McaTemplateSnapshot } from '../templates/compile';
-import { providerSelectionFacts } from '../templates/profile';
 import { McaOperatingRequirements } from './operating-requirements';
 import { McaPackageReader } from './package-reader';
 import { McaProviderInterview } from './provider-interview';
@@ -166,25 +164,25 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
             {canWrite && saved.data.current && !isOldRevision && (
               <div className="space-y-3">
                 {/*
-                  Derived from the saved profile rather than a compiled
-                  snapshot, because this page holds the profile and compiles
-                  nothing. `instrumentsFor` is the same function the compiler
-                  uses, so the list cannot disagree with what publishing would
-                  actually produce.
+                  ONE TEMPLATE PUBLISHES ONE DOCUMENT: its own.
+
+                  This asked the PROGRAMME which documents it runs, and offered
+                  a control for each — correct while a template was a package.
+                  ADR 0026 made a template one document, so `instrumentsFor`
+                  now answers a different question: which documents this funder
+                  is entitled to have templates FOR, across templates. Asking it
+                  here offered to publish documents this template does not
+                  contain, and `publishMcaTemplate` would refuse them at the
+                  artifact step rather than the page never offering them.
+
+                  The template names its own document, so that is what is asked.
                 */}
-                {instrumentsFor(providerSelectionFacts(saved.data.profile))
-                  .filter((instrument): instrument is ProducedInstrument =>
-                    (PRODUCED_INSTRUMENTS as readonly string[]).includes(instrument),
-                  )
-                  .map((instrument) => (
-                    <McaPublishTemplate
-                      key={instrument}
-                      teamId={teamId}
-                      templateId={saved.data.id}
-                      version={saved.data.version}
-                      instrument={instrument}
-                    />
-                  ))}
+                <McaPublishTemplate
+                  teamId={teamId}
+                  templateId={saved.data.id}
+                  version={saved.data.version}
+                  instrument={saved.data.instrument}
+                />
               </div>
             )}
             {saved.data.profile?.policy?.recipientStates && (
