@@ -194,7 +194,7 @@ export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number)
         'This review copy is not a complete delivery package. Required disclosures, processor forms, clearance and separate signatures remain outstanding.',
         styles.warning,
       ),
-      ...groupMcaSections(document.items).flatMap((section, index) => [
+      ...groupMcaSections(document.items, document.instrument).flatMap((section, index) => [
         h(Text, { key: `section:${index}`, style: styles.sectionHeading, minPresenceAhead: 90 }, section.heading),
         ...section.items.flatMap(itemElements),
       ]),

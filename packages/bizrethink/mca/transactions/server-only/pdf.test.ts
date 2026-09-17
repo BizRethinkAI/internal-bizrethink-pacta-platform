@@ -18,7 +18,12 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
           ),
         ),
       );
-      const parentHeadings = ['1. Funding Terms', '2. Preamble', '3. Purchase', '4. Reconciliation'];
+      const parentHeadings = [
+        'Section 1: Merchant and Funding Information',
+        'Section 2: Preamble',
+        'Section 3: Purchase and Sale of Future Receivables',
+        'Section 4: Reconciliation and Adjustment',
+      ];
       for (const heading of parentHeadings) {
         headings.add(heading);
       }
@@ -76,7 +81,7 @@ describe('the real MCA PDF is an identifiable unsigned review copy', () => {
         ).toBe(true);
       }
       const completeText = texts.join(' ').replace(/\s+/g, ' ');
-      expect(completeText.indexOf('1. Funding Terms')).toBeLessThan(
+      expect(completeText.indexOf('Section 1: Merchant and Funding Information')).toBeLessThan(
         completeText.indexOf('1.1 Estimated Daily Holdback'),
       );
       expect(completeText.indexOf('3. Purchase')).toBeLessThan(completeText.indexOf('3.1 Definitions'));
