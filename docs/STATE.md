@@ -15,16 +15,17 @@ true *right now*.
 
 _Last updated: 2026-09-16_
 
-## 2026-09-16 — MCA document fidelity, and three funder choices (#277–#284)
+## 2026-09-16 — MCA document fidelity, three funder choices, and the Payzli wording (#277–#285)
 
-Eight PRs merged in this order: #277 `43fe1cbd6`, #278 `1befe0aae`, #279
+Nine PRs merged in this order: #277 `43fe1cbd6`, #278 `1befe0aae`, #279
 `850f46691`, #280 `e1cd9e195`, #281 `fc6ee068f`, #282 `13ef4786f`, #283
-`714217014`, #284 `f2b433b49`. **Main is `f2b433b49`. Production still runs
-`d51d9fb03`; this batch is not deployed at the time of writing.**
+`714217014`, #284 `f2b433b49`, #285 `f0d5c93b8`. **Main is `f0d5c93b8`.
+Production still runs `d51d9fb03`; this batch is not deployed at the time of
+writing.**
 
 Written and reviewed by different sessions: one authoring session wrote all
-eight, an independent shipping session reviewed and merged them, and no session
-merged its own work.
+nine, an independent shipping session reviewed and merged #277–#284, and no
+session merged its own work. #285 was merged by the owner; see below.
 
 **Everything here is internal draft output.** Every MCA clause remains
 `status: 'draft'` with `author: null`, zero counsel approvals exist, and no
@@ -177,29 +178,63 @@ CI's Typecheck step caught the first attempt. Notes written before that fix say
   coverage came from the default-setup scan on push to main, and #282–#284 each
   carried the full CodeQL and Analyze set.
 
-### The Payzli letter is in review, not queued
+### The Payzli letter now carries the processor form's own wording (#285)
 
-STATE.md said on 2026-09-15 that replacing the retained text with the template's
-wording was "the next MCA task". It is now **open work in review**, not future
-work: `lombardpay/lombard-contracts` #14 restores the letter's instruction
-paragraph to the published `lombard-api` wording, and this repo's **#285**
-re-vendors that document, pins the new digest and stops
-`scripts/mca/vendor-agreement.py` rewriting the processor-form header on every
-regeneration.
+#285 merged after the eight above, at `f0d5c93b8`, and its note folds in here
+rather than into a second consolidation. **It changes operative legal wording**,
+so it is not part of the renderer batch's "presentation only" story.
 
-- **#285 depends on #14 and must merge after it**, and **#14 must be merged with
-  a merge commit, not squashed.** #285's vendored header pins lombard-contracts
-  commit `ecd1c6a`; that repo permits squash and rebase and has no ruleset
-  restricting them, so a squash would leave the provenance pin on a legal
-  document naming a commit unreachable from that repo's main.
-- Neither PR is in this batch, and **neither has been reviewed by the session
-  that reviewed #277–#284.** #285 carries claims about a turned-over defect
-  register and about the letter being funder-drafted rather than Payzli-issued;
-  those are that PR's own review to settle, and are recorded here as open, not
-  as fact.
-- **`State ready to ship` will go red again when #285 merges**, because it
-  carries its own note. That is expected and needs a second, smaller
-  consolidation — not a regression.
+ADR 0019 settles that a split funding letter is the processor's form, used
+exactly as supplied and never edited, and the owner confirmed on 2026-09-15 that
+the `lombard-api` Payzli template is the reference text. `lombard-contracts` #14
+restored the instruction paragraph to that wording; #285 re-vendors it, pins the
+new digest with `bodiesVerifiedAt: '2026-09-17'`, and carries
+`split-funding.split-funding-instruction` at **version 2**.
+
+**The three passages removed were ours, not Payzli's** — each answered a
+REVIEW-02 finding, and each was an edit to a document that is not ours to edit:
+
+- the limit of debiting to card settlement and not to a deposit account;
+- the sentence making the Purchased Amount informational rather than the stopping
+  point;
+- the merchant's route to stop withholding on confirmation of the Completion
+  Threshold.
+
+**The defect register turned over accordingly.** Two entries were deleted because
+they described text our own edits had introduced. Two arrived because they are
+true of the processor's text: debiting is authorised without being limited to
+card settlement, where §4.1 promises no deposit-account debiting; and withholding
+stops at the Purchased Amount, where §2.6 completes on the Completion Threshold,
+which may include fees. A third is an absence no pattern can match — the letter
+gives the merchant no route to stop withholding — recorded in `lombard-contracts`
+change note 20. **All three are FRPA-side and counsel work now.** That is the
+trade ADR 0019 describes: a conflict between a processor's letter and the FRPA is
+resolved in our documents, the deal facts, or the choice of processor, never in
+the letter.
+
+`scripts/mca/vendor-agreement.py` no longer hard-codes *"the words are ours"* into
+every vendored header, which would have silently undone #271's correction on the
+next regeneration. It now takes a per-document header for processor-controlled
+forms.
+
+The review-annotation pin in `review/presentation.ts` was re-taken, because a pin
+is to exact text and a changed passage loses its labels until somebody re-reads
+it. That is the mechanism working, not an inconvenience.
+
+**The provenance chain holds.** `lombard-contracts` #14 was merged as a merge
+commit (`a7b9d0c1`), so `ecd1c6a` — the commit #285's vendored header names — is
+reachable from that repo's main. A squash would have orphaned it; that repo
+permits squash and rebase with no ruleset restricting them, so this is worth
+re-checking on the next re-vendor rather than assuming.
+
+**Still not established: that this is a form Payzli *issued*.** It is
+funder-drafted and addressed to a processor. The owner's confirmation was
+narrower — that the `lombard-api` template is the reference text — and #285
+claims nothing more.
+
+**#285 was not reviewed by the session that reviewed #277–#284**, and was merged
+by the owner. Its own CI was green, and the shipping session read the merged
+result before deploying rather than treating it as out of scope.
 
 ## 2026-09-15 — ADRs compacted; split funding letters settled (#271, #274)
 
