@@ -64,8 +64,12 @@ asserts every kind emits exactly its template's widgets. What it cannot see is a
 template **republished from outside that repository** — which is precisely what
 this ADR introduces. A name the builder renames therefore breaks a caller this
 repository does not deploy, at the moment a merchant is waiting, as a blank where
-a figure belonged. lombard-platform #262 adds a runtime warning for that case;
-the parity test here is what stops it reaching publication at all.
+a figure belonged. lombard-platform #262 adds a runtime warning for that case
+and is **live from `1066bfc`**; it warns and drops the unrecognised name rather
+than throwing, so it reports the drift and does not prevent it. The parity test
+here is what stops it reaching publication at all. See
+[ADR 0024](0024-pacta-is-custodian-of-every-mca-template.md) for what that guard
+does in full and what its safety rests on.
 
 The set is pinned in `packages/bizrethink/mca/publish/template-parity.ts`, with
 every gap between it and the library stated and checked. Parity is a diff, not a
