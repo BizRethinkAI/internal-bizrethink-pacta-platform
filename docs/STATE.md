@@ -15,6 +15,155 @@ true *right now*.
 
 _Last updated: 2026-09-17_
 
+## 2026-09-17 (afternoon) — the builder can publish, and the gate is wired (#295–#304)
+
+Nine PRs merged in this order: #295 `eb75232fa`, #297 `e1b36cfdb`, #300
+`714574418`, #301 `739fed868`, #302 `296be7609`, #303 `3556b8793`, #304
+`08c9a06d4`, #296 `7e208a86f`, #298 `3d9ad0ebc`. **Main is `3d9ad0ebc`.
+Production runs `243ff2852`** — this morning's batch — and this one is not
+deployed at the time of writing.
+
+**This batch carries a migration.** `20260917010000_add_mca_publication_record`
+adds `BizrethinkMcaPublication`. The table is new and additive; nothing is
+dropped or altered, and there is no backfill. Deploying applies it.
+
+**Still nothing publishes.** The gate now has a caller, and it refuses every
+package: no clause carries a counsel approval, every clause is `status: 'draft'`
+with `author: null`. That is the designed state.
+
+### The gate stopped being theoretical (#302, #303, #304)
+
+The previous batch built `assertMcaPackagePublishable` with no caller, on
+purpose. It has one now. `publishMcaTemplate` calls it **first** —
+
+```
+// FIRST. Nothing is rendered, uploaded or created until this has passed.
+assertMcaPackagePublishable(await mcaPublishablePackageFor(snapshot, instrument));
+```
+
+— before the render, the upload, the envelope and the record. The ordering is
+not fastidiousness: a refusal after an upload leaves an orphan behind. Its tests
+drive a refusal through the gate and then assert that `artifact`, `put`,
+`createEnvelope` and `record` were none of them called, and that the access check
+refuses before the gate is even reached.
+
+`mcaPublishablePackageFor` is the single place the gate's inputs are assembled,
+so a second caller cannot build a subtly different package and get a different
+answer about the same template.
+
+### The bug that only a composed test could find (#297)
+
+Rendering, injecting and reading back through upstream's extractor in one test
+failed with names the page had never been asked to carry:
+
+```
+Expected but never marked: effective_date, equipment_defer_amount, remittance_frequency
+Marked but not expected:   eqective_date, e2uipment_defer_amount, remittance_fre2uency
+```
+
+**`@libpdf/core` reads text rendered in the sans face back scrambled.** Probing
+each face: Tinos, Helvetica and Times-Roman round-trip; `McaSans` and
+`McaSansBold` return `«eteciv_ed»aieq` for `«effective_date»`. **pdfjs reads the
+same file correctly**, so the PDF is sound and that one extractor cannot read
+that subset — and `@libpdf/core` is what both our injector and Documenso's
+`extractPlaceholdersFromPDF` use.
+
+A template would have looked right to a human and published with widgets nobody
+could fill. **The author's first version of that test asserted with pdfjs and
+passed while the markers were corrupt** — the extractor you assert with *is* the
+test. The lease vertical had already recorded this class in Phase 0 and retired
+it with Tinos; this is a fresh instance in a different face.
+
+### The order inside the artifact is load-bearing (#302)
+
+`buildMcaTemplateArtifact` does: render → inject widgets → **extract the signer
+placeholders** → paint out the token text.
+
+**Reverse the last two and the fields still appear**, because painting leaves the
+text in place — so the mistake is invisible until somebody reads a sealed
+document. The lease vertical shipped a pilot with `{{SIGNATURE, r1, …}}` behind
+every widget and had to learn it; `white-out-signing-tokens.ts` carries that
+scar and this reuses it rather than writing a second one that can drift. Verified
+as a spike before any of it was written, because it could not be reasoned out.
+
+### The record that ends the vendored copy (#295)
+
+`lombard-platform` vendors a **copy** of every published template into
+`src/templates/*.published.json`, and its own widget-totality spec compares its
+builders against that copy. Both sides of the comparison come from one snapshot,
+so **nothing there can notice the snapshot going stale against what is actually
+published**: republish without refreshing the copy and CI stays green while
+production drifts. Serving the record from the producer removes the copy. ADR
+0024 makes republication routine, so this matters more from here, not less.
+
+`BizrethinkMcaPublication` is append-only: a row records what a merchant was
+actually sent, so re-publishing writes a new row and an earlier publication stays
+readable. It keeps the **interface** — widget names as published, signing roles
+with their recipient ids — not just an identifier, because a caller given only a
+`templateId` would still need its own copy of the names.
+
+`GET /api/bizrethink/mca-templates` returns the shape `*.published.json` already
+has, so adopting it is a change of source rather than a rewrite.
+
+### ADR 0025 (#296)
+
+[ADR 0025](adr/0025-what-the-mca-vertical-is-for.md) records what the vertical is
+for. It carries the owner's line that settled a design question in this batch:
+**Pacta guarantees the goods — accurate, coherent, honestly labelled templates —
+and the entity runs the business.** An earlier proposal for a publication-time
+venue gate, refusing to publish a funder-state template for a Virginia programme,
+was rejected on that basis: the answer is an accurate label the caller reads, not
+a refusal anywhere in Pacta.
+
+### Guard 2 compares against the merge base (#298)
+
+The append-only ADR guard diffed `BASE_SHA HEAD_SHA` — two dots — which cannot
+distinguish *this branch modified the file* from *this branch is behind main on
+it*. It now resolves `git merge-base` explicitly, falling back to `BASE_SHA` so a
+missing merge base fails the way it did before rather than passing silently. The
+failure message no longer offers the override; it says the comparison is against
+the merge base, so a branch merely behind main is not reported, and that a guard
+which is wrong wants fixing rather than excusing.
+
+**The first attempt shipped without the fix, and the reason generalises.** Its
+verification step ran `git add -A && git commit -m probe && … && git reset --hard
+HEAD~1`, which swept the uncommitted `governance.yml` change into the throwaway
+commit and discarded it. The note was written afterwards, so the branch's only
+commit described a change that was no longer in it. **The step that verified the
+fix ate the fix.** Two rules came out of it: commit the change before probing it,
+and never put `git add -A` in a step that ends in `reset --hard`.
+
+### What review changed before these landed
+
+- **#298 contained no fix.** Its entire diff against main was the in-flight note;
+  `governance.yml` was untouched, while the note described the change in detail.
+  It read green 13/13 because a docs-only diff passes everything including the
+  docs-only E2E skip. **A docs-only green means the note is well-formed, not that
+  the code is there** — twice in one day that mattered.
+- **A fail-open in what the gate judges.** `clausesIn` silently dropped any
+  document item whose slug was absent from the instrument's catalogue, handing
+  the gate a subset to judge, with no test asserting totality. No reachable path
+  was found — reusable content is covered, the lease/subscription twin carries its
+  own records, and a missing document fails closed — but it was fixed anyway, on
+  the grounds that unreachable is a fact about the code as it stands rather than a
+  property of it, and #292 already holds that a partition is asserted total rather
+  than assumed. It now throws naming every unresolved slug, held by two tests.
+- **#296 was targeted at an already-merged branch** (`docs/mca-single-producer`)
+  and reported `CLEAN`. Merging it there would have landed it in a dead branch
+  where it never reached main — the #165 mode. It was retargeted to main and the
+  base confirmed before merging.
+
+### Open, and deliberately not here
+
+- **Nothing calls `publishMcaTemplate`.** There is no route, no UI, no scheduled
+  job. Publication is reachable only by a caller that does not yet exist.
+- **`lombard-platform` still reads its vendored copy.** The endpoint that replaces
+  it exists; adopting it is work in a repository this session does not own.
+- **The sans face cannot be used for marker text** until `@libpdf/core` can read
+  it back, or the markers are rendered in a face that round-trips.
+- Counsel has approved nothing, so the gate refuses everything and will keep
+  refusing until that changes.
+
 ## 2026-09-17 — Pacta becomes the producer of MCA templates, and measures the distance (#288–#294)
 
 Seven PRs merged in this order: #288 `cf7c1a1c9`, #291 `c3178f441`, #289
