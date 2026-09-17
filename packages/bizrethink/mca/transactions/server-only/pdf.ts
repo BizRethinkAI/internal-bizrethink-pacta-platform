@@ -3,7 +3,7 @@ import type { Style } from '@react-pdf/types';
 import { createElement as h } from 'react';
 import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/render/fonts/font-data';
 import { groupMcaSections } from '../../engine/section-headings';
-import { fieldRows } from '../../render/field-layout';
+import { fieldBlocks, fieldRows } from '../../render/field-layout';
 import type { McaTemplateItem } from '../../templates/compile';
 import type { McaFilledDraft } from '../fill';
 
@@ -81,6 +81,16 @@ const styles = StyleSheet.create({
   fieldCell: { flexBasis: '50%', flexGrow: 0, flexShrink: 1, paddingRight: 14 },
   fieldCellLast: { flexBasis: '50%', flexGrow: 0, flexShrink: 1 },
   fieldCellFull: { flexBasis: '100%', flexGrow: 0, flexShrink: 1 },
+  // An itemization: label left, figure right, every figure on one edge.
+  moneyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingVertical: 4.5,
+    borderBottomWidth: 0.4,
+    borderBottomColor: '#d5d9df',
+  },
+  moneyLabel: { flexGrow: 1, flexShrink: 1, fontFamily: 'McaSans', fontSize: 9, color: '#344054' },
+  moneyValue: { flexBasis: 120, flexGrow: 0, flexShrink: 0, fontFamily: 'McaSans', fontSize: 10, textAlign: 'right' },
   label: { fontFamily: 'McaSans', fontSize: 8.5, color: '#667085' },
   value: { fontFamily: 'McaSans', fontSize: 10 },
   warning: { fontFamily: 'McaSans', fontSize: 9, color: '#935d17', marginBottom: 9 },
@@ -239,29 +249,42 @@ const itemElements = (item: McaTemplateItem) => {
   const heading = `${item.number ? `${item.number}  ` : ''}${item.heading}`;
   const paragraphs = item.body.split('\n').filter(Boolean);
   const printable = item.fields.filter((field) => field.kind !== 'signature' && !field.binding.endsWith('.signedDate'));
-  const fields = fieldRows(printable).map((row, index) =>
-    h(
-      View,
-      { key: `${item.slug}:row${index}`, style: styles.fieldRow, wrap: false },
-      ...row.map((field, column) =>
-        h(
-          View,
-          {
-            key: `${item.slug}:${field.widget}`,
-            style: [
-              row.length === 1
-                ? styles.fieldCellFull
-                : column === row.length - 1
-                  ? styles.fieldCellLast
-                  : styles.fieldCell,
-              styles.field,
-            ],
-          },
-          text(field.label, styles.label),
-          text(field.value || (field.required ? '[to complete]' : '[not designated]'), styles.value),
+  const answer = (field: (typeof printable)[number]) =>
+    field.value || (field.required ? '[to complete]' : '[not designated]');
+  const fields = fieldBlocks(printable).flatMap((block, blockIndex) =>
+    block.kind === 'money'
+      ? block.fields.map((field) =>
+          h(
+            View,
+            { key: `${item.slug}:${field.widget}`, style: styles.moneyRow, wrap: false },
+            text(field.label, styles.moneyLabel),
+            text(answer(field), styles.moneyValue),
+          ),
+        )
+      : fieldRows(block.fields).map((row, index) =>
+          h(
+            View,
+            { key: `${item.slug}:b${blockIndex}row${index}`, style: styles.fieldRow, wrap: false },
+            ...row.map((field, column) =>
+              h(
+                View,
+                {
+                  key: `${item.slug}:${field.widget}`,
+                  style: [
+                    row.length === 1
+                      ? styles.fieldCellFull
+                      : column === row.length - 1
+                        ? styles.fieldCellLast
+                        : styles.fieldCell,
+                    styles.field,
+                  ],
+                },
+                text(field.label, styles.label),
+                text(answer(field), styles.value),
+              ),
+            ),
+          ),
         ),
-      ),
-    ),
   );
   if (!paragraphs.length) {
     return [

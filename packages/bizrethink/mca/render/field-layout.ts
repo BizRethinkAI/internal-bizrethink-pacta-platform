@@ -74,3 +74,56 @@ export const fieldRows = <T extends Pick<ClauseField, 'binding' | 'label' | 'kin
 
   return rows;
 };
+
+export type FieldBlock<T> = { kind: 'grid' | 'money'; fields: T[] };
+
+/**
+ * Figures leave the grid and become a column.
+ *
+ * Two or more currency fields in a row are an itemization, and the real
+ * documents set those as label-left, figure-right so the amounts align on one
+ * edge and can be read down. A single figure among ordinary answers is not an
+ * itemization — it is one answer — so it stays in the grid and keeps its pair.
+ */
+export const fieldBlocks = <T extends Pick<ClauseField, 'binding' | 'label' | 'kind'>>(
+  fields: T[],
+): FieldBlock<T>[] => {
+  const merge = (blocks: FieldBlock<T>[]): FieldBlock<T>[] =>
+    blocks.reduce<FieldBlock<T>[]>((kept, block) => {
+      const previous = kept.at(-1);
+
+      if (previous && previous.kind === block.kind) {
+        previous.fields.push(...block.fields);
+        return kept;
+      }
+
+      kept.push({ kind: block.kind, fields: [...block.fields] });
+      return kept;
+    }, []);
+
+  // One field, one block; the passes below decide what groups with what.
+  const runs = merge(fields.map((field) => ({ kind: field.kind === 'currency' ? 'money' : 'grid', fields: [field] })));
+
+  // A rate belongs to the itemization it qualifies. One non-currency field
+  // between two columns of figures — an origination fee percentage beside the
+  // fee it produces — reads as part of the column, and the real documents set
+  // it that way. Two such fields are ordinary answers, not a rate.
+  const bridged = merge(
+    runs.map((block, index) =>
+      block.kind === 'grid' &&
+      block.fields.length === 1 &&
+      runs[index - 1]?.kind === 'money' &&
+      runs[index + 1]?.kind === 'money'
+        ? { kind: 'money' as const, fields: block.fields }
+        : block,
+    ),
+  );
+
+  // A column of one is a field, not a table: it keeps the grid's pairing
+  // rather than sitting alone on a full-width row.
+  return merge(
+    bridged.map((block) =>
+      block.kind === 'money' && block.fields.length < 2 ? { ...block, kind: 'grid' as const } : block,
+    ),
+  );
+};

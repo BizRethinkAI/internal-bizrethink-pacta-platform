@@ -230,3 +230,64 @@ describe('an assembled document carries the funder identity', () => {
     expect(flush.length, 'flush-right body lines').toBeGreaterThan(20);
   }, 30_000);
 });
+
+/**
+ * The itemization reads down a column.
+ *
+ * Real §1.4 sets the funding figures label-left, amount-right with the amounts
+ * on one edge. Rendered as half-width grid cells they landed wherever the
+ * pairing put them, which is unreadable for comparing numbers.
+ */
+describe('funding figures align on one edge', () => {
+  it('sets the itemization as a money column', async () => {
+    const bytes = await renderMcaDraftPdf(filledDraftFixture().draft, 3);
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const parsed = await pdfjs.getDocument({ data: new Uint8Array(bytes), useSystemFonts: false }).promise;
+    const rows: { label?: { str: string; x: number }; amount?: { right: number } }[] = [];
+
+    for (let number = 1; number <= parsed.numPages; number += 1) {
+      const content = await (await parsed.getPage(number)).getTextContent();
+      const items = content.items
+        .filter((item) => 'str' in item && item.str.trim())
+        .map((item) =>
+          'str' in item
+            ? {
+                str: item.str.trim(),
+                x: item.transform[4],
+                right: item.transform[4] + item.width,
+                y: item.transform[5],
+              }
+            : { str: '', x: 0, right: 0, y: 0 },
+        );
+
+      for (const label of items.filter((item) => item.str.startsWith('Itemization — '))) {
+        // Label and figure are set at different sizes, so their baselines differ
+        // by a point or two inside the same row. A money row's figure is set
+        // flush to the measure; a grid cell's label beside it is not.
+        const amount = items.find(
+          (item) => Math.abs(item.y - label.y) < 6 && item.x > label.x + 100 && item.right > 538,
+        );
+        rows.push({ label, amount });
+      }
+    }
+
+    await parsed.destroy();
+
+    // Currency fields become money rows; a percentage or a free-text line on an
+    // itemization label stays in the grid, which is why this names the figures.
+    for (const label of [
+      'Itemization — Purchase Price / Funds Provided',
+      'Itemization — Origination Fee Deducted',
+      'Itemization — Cash Disbursed to Merchant',
+    ]) {
+      expect(rows.find((row) => row.label?.str === label)?.amount, `figure beside ${label}`).toBeDefined();
+    }
+
+    const figures = rows.filter((row) => row.amount);
+    expect(figures.length, 'itemization figures').toBeGreaterThan(4);
+
+    // One right edge for every figure.
+    const edges = new Set(figures.map((row) => Math.round(row.amount?.right ?? 0)));
+    expect(edges.size, `figure right edges: ${[...edges].join(',')}`).toBe(1);
+  }, 30_000);
+});
