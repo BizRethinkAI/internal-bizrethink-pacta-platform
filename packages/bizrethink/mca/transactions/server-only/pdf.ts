@@ -5,6 +5,7 @@ import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/rende
 import { groupMcaSections } from '../../engine/section-headings';
 import { fieldBlocks, fieldRows } from '../../render/field-layout';
 import type { McaTemplateItem } from '../../templates/compile';
+import type { McaFee } from '../../templates/profile';
 import type { McaFilledDraft } from '../fill';
 
 Font.register({ family: 'McaBody', src: TINOS_REGULAR });
@@ -100,11 +101,57 @@ const styles = StyleSheet.create({
   executionCell: { flexBasis: '50%', flexGrow: 0, flexShrink: 1, paddingRight: 18 },
   executionCellLast: { flexBasis: '50%', flexGrow: 0, flexShrink: 1 },
   executionCellFull: { flexBasis: '100%', flexGrow: 0, flexShrink: 1 },
+  // Appendix A: what a fee costs on the right, what it is for underneath.
+  feeRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 9 },
+  feeName: { flexGrow: 1, flexShrink: 1, fontFamily: 'McaSansBold', fontSize: 10 },
+  feeAmount: { flexBasis: 200, flexGrow: 0, flexShrink: 0, fontFamily: 'McaSans', fontSize: 10, textAlign: 'right' },
+  feeDetail: {
+    fontFamily: 'McaSans',
+    fontSize: 9,
+    color: '#475467',
+    paddingBottom: 6,
+    borderBottomWidth: 0.4,
+    borderBottomColor: '#d5d9df',
+  },
   executionRole: { fontFamily: 'McaSansBold', fontSize: 8, letterSpacing: 2, color: '#935d17', marginBottom: 4 },
   executionParty: { fontFamily: 'McaSans', fontSize: 10.5, marginBottom: 2 },
   executionLine: { fontFamily: 'McaSans', fontSize: 9.5, color: '#344054', marginTop: 9 },
 });
 const text = (value: string, style: Style | Style[] = styles.paragraph) => h(Text, { style }, value);
+
+/**
+ * The completed Appendix A.
+ *
+ * `frpa.appendix-a-fees-collectible` says a fee may be charged only where the
+ * completed Appendix identifies it by name, amount or calculation method,
+ * payee, purpose and timing, and that anything unlisted is $0.00. So an empty
+ * schedule prints as a statement that none is identified rather than as an
+ * empty table: the blank is the operative fact.
+ */
+const feeScheduleElements = (fees: McaFee[] | undefined) => {
+  if (!fees) {
+    return [];
+  }
+
+  return [
+    h(Text, { key: 'fees:heading', style: styles.heading, minPresenceAhead: 80 }, 'Appendix A — Permitted Fees'),
+    ...(fees.length
+      ? fees.map((fee, index) =>
+          h(
+            View,
+            { key: `fee:${index}`, wrap: false },
+            h(
+              View,
+              { style: styles.feeRow },
+              text(fee.name, styles.feeName),
+              text(fee.basis === 'amount' ? fee.amount : fee.method, styles.feeAmount),
+            ),
+            text(`Paid to ${fee.payee} · ${fee.purpose} · ${fee.when}`, styles.feeDetail),
+          ),
+        )
+      : [text('No fee is identified in this Appendix.', styles.warning)]),
+  ];
+};
 
 /** Role labels are letter-spaced on the execution page, as the real documents set them. */
 const spaced = (value: string) => value.toUpperCase().split('').join(' ');
@@ -198,6 +245,7 @@ export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number)
         h(Text, { key: `section:${index}`, style: styles.sectionHeading, minPresenceAhead: 90 }, section.heading),
         ...section.items.flatMap(itemElements),
       ]),
+      ...feeScheduleElements(document.feeSchedule),
       h(Text, { style: styles.heading, minPresenceAhead: 100 }, 'Separate execution locations — unsigned'),
       text('Internal draft — no signature is collected or applied in this copy.', styles.label),
       ...executionRows(document.signatures).map((row, index) =>

@@ -8,7 +8,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
-import { type FieldPath, useForm, useFormContext } from 'react-hook-form';
+import { type FieldPath, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS } from '../jurisdictions';
 import { type McaProviderProfile, ZMcaProviderProfile } from '../templates/profile';
@@ -109,6 +109,7 @@ export const McaProviderInterview = ({
                 name="policy.supportedTermsConfirmed"
                 label={msg`I confirm this provider uses these supported terms`}
               />
+              <FeeSchedule />
               <SelectAnswer
                 name="policy.venueRule"
                 label={msg`Where an action under the Agreement is brought`}
@@ -298,6 +299,74 @@ export const McaProviderInterview = ({
   );
 };
 
+/**
+ * The funder's own fees, in the terms the Appendix clause requires.
+ *
+ * `frpa.appendix-a-fees-collectible` permits only a fee the completed Appendix
+ * identifies by name, amount or calculation method, payee, purpose and timing,
+ * and reads anything unlisted as $0.00. Leaving this empty is therefore a
+ * complete answer: the funder charges nothing.
+ */
+const FeeSchedule = () => {
+  const { control } = useFormContext<McaProviderProfile>();
+  const { fields, append, remove } = useFieldArray({ control, name: 'policy.fees' });
+
+  return (
+    <section className="space-y-3 rounded-lg border p-4">
+      <h3 className="font-semibold">
+        <Trans>Permitted fees (Appendix A)</Trans>
+      </h3>
+      <p className="text-muted-foreground text-sm">
+        <Trans>
+          A fee this Appendix does not identify is $0.00 and cannot be charged. State each fee by name, what it costs,
+          who is paid, what it is for and when it is charged. A provider that charges no fee leaves this empty.
+        </Trans>
+      </p>
+      {fields.map((entry, index) => (
+        <fieldset key={entry.id} className="space-y-3 rounded border p-3">
+          <legend className="text-sm">
+            <Trans>Fee {index + 1}</Trans>
+          </legend>
+          <TextAnswer name={`policy.fees.${index}.name`} label={msg`Fee name`} />
+          <SelectAnswer
+            name={`policy.fees.${index}.basis`}
+            label={msg`Stated as`}
+            options={[
+              ['amount', msg`A dollar amount`],
+              ['method', msg`A calculation method`],
+            ]}
+          />
+          <TextAnswer name={`policy.fees.${index}.amount`} label={msg`Dollar amount, for example 500.00`} />
+          <TextAnswer name={`policy.fees.${index}.method`} label={msg`Calculation method`} />
+          <TextAnswer name={`policy.fees.${index}.payee`} label={msg`Who is paid`} />
+          <TextAnswer name={`policy.fees.${index}.purpose`} label={msg`What the fee is for`} />
+          <TextAnswer name={`policy.fees.${index}.when`} label={msg`When it is charged`} />
+          <Button type="button" variant="outline" onClick={() => remove(index)}>
+            <Trans>Remove fee</Trans>
+          </Button>
+        </fieldset>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        disabled={fields.length >= 20}
+        onClick={() =>
+          append({
+            basis: 'amount',
+            name: '',
+            amount: '',
+            payee: '',
+            purpose: '',
+            when: '',
+          } as McaProviderProfile['policy']['fees'][number])
+        }
+      >
+        <Trans>Add a fee</Trans>
+      </Button>
+    </section>
+  );
+};
+
 const TextAnswer = ({
   name,
   label,
@@ -464,6 +533,7 @@ const emptyProfile = (): McaProviderProfile => ({
     settlementBase: 'net',
     venueRule: 'merchant-state',
     supportedTermsConfirmed: false,
+    fees: [],
     guarantyScope: 'none',
     equipment: 'none',
     renewalModel: 'none',

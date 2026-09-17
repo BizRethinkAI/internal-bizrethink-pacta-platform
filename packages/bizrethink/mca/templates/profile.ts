@@ -27,6 +27,49 @@ const ZEntity = z
   .strict();
 
 /** Answers only about the provider. Transaction facts belong to the fill contract. */
+/** The same dollar shape the transaction layer validates: no symbol, two decimals at most. */
+const money = z
+  .string()
+  .trim()
+  .regex(/^(0|[1-9]\d{0,11})(\.\d{1,2})?$/, 'Enter a dollar amount, for example 500.00.');
+
+/**
+ * One row of the completed Appendix A.
+ *
+ * The shape is not invented here: `frpa.appendix-a-fees-collectible` says a fee
+ * may be charged only if the completed Appendix identifies it "by its name, its
+ * dollar amount or a lawful calculation method, the person to whom it is paid,
+ * what it is for, and when it is charged". These are those five, and the
+ * either/or is why `basis` exists rather than two optional strings.
+ *
+ * A fee not listed here is $0.00 by the clause's own terms, so an empty
+ * schedule is a complete answer, not a missing one.
+ */
+export const ZMcaFee = z.discriminatedUnion('basis', [
+  z
+    .object({
+      basis: z.literal('amount'),
+      name: line(200),
+      amount: money,
+      payee: line(200),
+      purpose: line(400),
+      when: line(400),
+    })
+    .strict(),
+  z
+    .object({
+      basis: z.literal('method'),
+      name: line(200),
+      method: line(400),
+      payee: line(200),
+      purpose: line(400),
+      when: line(400),
+    })
+    .strict(),
+]);
+
+export type McaFee = z.infer<typeof ZMcaFee>;
+
 export const ZMcaProviderProfile = z
   .object({
     label: line(120),
@@ -57,6 +100,12 @@ export const ZMcaProviderProfile = z
         equipment: z.enum(['none', 'merchant-elects']),
         renewalModel: z.enum(['none', 'payoff-only', 'carry']),
         concurrentPositions: z.boolean(),
+        // The funder's own fees. Twenty is a ceiling on a form, not a policy.
+        //
+        // A default, so a revision saved before this release still opens and
+        // reads as charging nothing — which is what the Appendix clause says an
+        // unlisted fee costs.
+        fees: z.array(ZMcaFee).max(20).default([]),
         // Both answers are authored and selectable: the court programme carries
         // the jury, class and counterclaim waivers, arbitration carries §7.26.
         // ADR 0020 §5.6 — a lawful term a funder wants is one the platform
@@ -146,6 +195,15 @@ export const ZMcaProviderProfile = z
   });
 
 export type McaProviderProfile = z.infer<typeof ZMcaProviderProfile>;
+
+/**
+ * What may be handed to the compiler, as opposed to what comes back parsed.
+ *
+ * `fees` has a default, so a revision saved before it existed is valid input
+ * and gains an empty schedule on the way through. Typing the compiler's
+ * parameter as the parsed profile would reject exactly those saved rows.
+ */
+export type McaProviderProfileInput = z.input<typeof ZMcaProviderProfile>;
 
 /** Legacy selection accepts one additional transaction fact; it is never an interview answer. */
 export const providerSelectionFacts = (profile: McaProviderProfile): McaFacts => ({

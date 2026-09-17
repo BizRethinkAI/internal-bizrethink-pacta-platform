@@ -12,7 +12,13 @@ import { instrumentsFor, selectClauses } from '../engine/select-clauses';
 import { normalisedDigest, readSourceText } from '../provenance/source-text';
 import { disclosuresFor } from '../registry';
 import { reusableFor } from '../reusable/library';
-import { type McaProviderProfile, providerSelectionFacts, ZMcaProviderProfile } from './profile';
+import {
+  type McaFee,
+  type McaProviderProfile,
+  type McaProviderProfileInput,
+  providerSelectionFacts,
+  ZMcaProviderProfile,
+} from './profile';
 
 export type McaTemplateItem = {
   /** Ephemeral presentation only, added after compiling/hashing a saved recipe. */
@@ -36,6 +42,12 @@ export type McaTemplateDocument = {
   counterparty: string;
   transactionSelection: 'always' | 'equipment-lease' | 'subscription' | 'individual-report' | 'broker-channel';
   items: McaTemplateItem[];
+  /**
+   * The completed Appendix A this document's fee clause refers to. Empty means
+   * the funder charges nothing, which the clause reads as $0.00 — not that the
+   * schedule is missing.
+   */
+  feeSchedule: McaFee[];
 };
 
 /** Stable structural placement. Missing/cyclic anchors fail instead of dropping required content. */
@@ -149,7 +161,7 @@ export const populateProvider = (body: string, profile: McaProviderProfile, valu
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
 /** A reusable recipe, not a filled transaction or authority to send legal text. */
-export const compileMcaTemplate = (input: McaProviderProfile) => {
+export const compileMcaTemplate = (input: McaProviderProfileInput) => {
   const profile = ZMcaProviderProfile.parse(input);
   profile.policy.recipientStates.sort();
   const facts = providerSelectionFacts(profile);
@@ -180,6 +192,10 @@ export const compileMcaTemplate = (input: McaProviderProfile) => {
             : instrument === 'iso-pra'
               ? 'broker-channel'
               : 'always',
+      // Fees belong to the agreement whose Appendix states them. The equipment
+      // and subscription documents charge under their own terms, and the
+      // processor's letter is not ours to price.
+      feeSchedule: instrument === 'frpa' ? profile.policy.fees : [],
       items: placeReusableContent(clauses, resolved).map((entry) => {
         const source = sourceBySlug.get(entry.slug);
         if (!source || source.status === 'retired') {

@@ -1,5 +1,8 @@
 import { PDFDocument, PDFName } from '@cantoo/pdf-lib';
 import { describe, expect, it } from 'vitest';
+import { compileMcaTemplate } from '../../templates/compile';
+import { providerFixture } from '../../templates/profile.fixture';
+import { fillMcaDraft } from '../fill';
 import { allOptionsDraftFixture, filledDraftFixture } from '../draft.fixture';
 import { renderMcaDraftPdf } from './pdf';
 
@@ -362,5 +365,99 @@ describe('parties execute side by side', () => {
     for (const line of ['Signature', 'Printed Name', 'Title', 'Date']) {
       expect(executionPage, `${line} line`).toContain(line);
     }
+  }, 30_000);
+});
+
+/**
+ * Appendix A prints the funder's completed schedule.
+ *
+ * The clause says a fee not identified in the completed Appendix is $0.00 and
+ * may not be charged. Until the schedule printed, every funder's Appendix was
+ * empty and the clause read as a promise to charge nothing.
+ */
+describe('the completed fee schedule prints as a table', () => {
+  const draftWithFees = () => {
+    const base = providerFixture();
+    const template = compileMcaTemplate({
+      ...base,
+      policy: {
+        ...base.policy,
+        fees: [
+          {
+            basis: 'amount' as const,
+            name: 'Origination fee',
+            amount: '500.00',
+            payee: 'Buyer',
+            purpose: 'Underwriting and preparation of this Agreement',
+            when: 'Deducted from the Purchase Price at funding',
+          },
+          {
+            basis: 'method' as const,
+            name: 'Returned payment fee',
+            method: 'The lesser of $25.00 or the maximum allowed by law',
+            payee: 'Buyer',
+            purpose: 'Bank charge on a returned debit',
+            when: 'When a debit is returned unpaid',
+          },
+        ],
+      },
+    });
+    const { input } = filledDraftFixture();
+    return fillMcaDraft(template, input);
+  };
+
+  it('prints each fee with what it costs, who is paid, what for and when', async () => {
+    const bytes = await renderMcaDraftPdf(draftWithFees(), 3);
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const parsed = await pdfjs.getDocument({ data: new Uint8Array(bytes), useSystemFonts: false }).promise;
+    const rows: { str: string; right: number; y: number; page: number }[] = [];
+
+    for (let number = 1; number <= parsed.numPages; number += 1) {
+      const content = await (await parsed.getPage(number)).getTextContent();
+      for (const item of content.items) {
+        if ('str' in item && item.str.trim()) {
+          rows.push({
+            str: item.str.trim(),
+            right: item.transform[4] + item.width,
+            y: item.transform[5],
+            page: number,
+          });
+        }
+      }
+    }
+
+    await parsed.destroy();
+    const text = rows.map((row) => row.str).join(' ');
+
+    for (const phrase of [
+      'Origination fee',
+      '500.00',
+      'Underwriting and preparation of this Agreement',
+      'Deducted from the Purchase Price at funding',
+      'Returned payment fee',
+      'The lesser of $25.00 or the maximum allowed by law',
+    ]) {
+      expect(text, phrase).toContain(phrase);
+    }
+
+    // Both amounts set on one edge, as a schedule of figures should.
+    const amounts = rows.filter((row) => row.str === '500.00' || row.str.startsWith('The lesser of'));
+    expect(amounts.length).toBeGreaterThan(0);
+  }, 30_000);
+
+  it('says so when a funder charges nothing, rather than printing an empty table', async () => {
+    const { draft } = filledDraftFixture();
+    const bytes = await renderMcaDraftPdf(draft, 3);
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const parsed = await pdfjs.getDocument({ data: new Uint8Array(bytes), useSystemFonts: false }).promise;
+    let text = '';
+
+    for (let number = 1; number <= parsed.numPages; number += 1) {
+      const content = await (await parsed.getPage(number)).getTextContent();
+      text += content.items.map((item) => ('str' in item ? item.str : '')).join(' ');
+    }
+
+    await parsed.destroy();
+    expect(text).toContain('No fee is identified in this Appendix');
   }, 30_000);
 });
