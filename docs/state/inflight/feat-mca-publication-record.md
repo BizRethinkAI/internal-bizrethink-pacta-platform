@@ -90,3 +90,20 @@ endpoint returns an empty list until then, which is correct and not a failure.
 `lombard-platform` is untouched. Moving it off the vendored copy is a change in
 a repository this session does not own, and it must not happen before the
 builder can actually publish.
+
+## Base, and a note about stacks
+
+Retargeted to `main` once #293 merged. It matters, and it cost two red runs to
+learn why.
+
+Consolidation folds every in-flight note into `STATE.md` and deletes it, so
+`main` carries none. A stacked branch therefore sits between two truths: its
+base branch still has its ancestors' notes, and `main` does not. Merge `main`
+into a branch whose base is a *merged* branch and the state-notes guard sees
+four foreign notes being **deleted**; retarget to `main` before the parent lands
+and it sees them being **added**. Both times the guard is right and the
+sequencing is wrong.
+
+The rule that falls out: **retarget only after the parent merges, and merge
+`main` only once you have.** Against its own live base, this branch adds exactly
+one note — its own.
