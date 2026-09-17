@@ -98,7 +98,7 @@ const US_STATES: Record<string, string> = {
  * raises its own blocker rather than passing as "not Virginia". "West Virginia"
  * is a different state and must not match Virginia's prefix.
  *
- * The lookup asks `Object.hasOwn` rather than indexing straight into the record:
+ * The lookup asks `hasOwnProperty` rather than indexing straight into the record:
  * a plain object answers for its prototype, so "constructor" returned
  * `Object.prototype.constructor` — truthy, not a state code, and therefore past
  * both guards, which is exactly the fail-open shape this function exists to
@@ -114,7 +114,11 @@ export const usStateCode = (value: string): string | null => {
     .replace(/\s+/g, ' ')
     .trim();
 
-  if (Object.hasOwn(US_STATES, cleaned)) {
+  // `Object.hasOwn` would read better and is ES2022; this package compiles at
+  // ES2018 through upstream's shared tsconfig, and raising that target to
+  // harden one lookup would need an overlay on a file every upstream sync
+  // touches.
+  if (Object.prototype.hasOwnProperty.call(US_STATES, cleaned)) {
     return US_STATES[cleaned];
   }
 
