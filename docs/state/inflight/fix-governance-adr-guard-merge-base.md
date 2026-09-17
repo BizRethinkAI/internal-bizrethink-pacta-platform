@@ -23,19 +23,57 @@ question the guard means to ask: what did this branch do.
 The guard now takes the merge base explicitly, with `|| echo "$BASE_SHA"` so a
 missing merge base falls back to today's behaviour rather than passing silently.
 
-## Verified both directions, because a guard that stops catching things is worse than one that over-catches
+## Verified both directions, against the committed change
 
-| | two-dot | merge-base |
-|---|---|---|
-| branch merely **behind** main on ADR 0023 | flags it | **clean** |
-| branch that genuinely **edits** an ADR on main | flags it | **flags it** |
+A guard that stops catching things is worse than one that over-catches, so both
+directions were run — and run against the fix as committed, not against a
+description of it.
 
-Run against the real SHAs: `origin/main` against `f69531865` (#294 before its
-refresh) for the first, and a synthetic in-place edit of ADR 0020 for the
-second.
+```
+CASE 1 — a branch merely BEHIND main on ADR 0023 (the false positive)
+    two-dot   : docs/adr/0023-pacta-produces-mca-templates.md
+    merge-base: (clean)
+
+CASE 2 — a branch that genuinely EDITS an ADR already on main
+    two-dot   : docs/adr/0020-mca-decisions-consolidated.md
+                docs/adr/0024-pacta-is-custodian-of-every-mca-template.md
+    merge-base: docs/adr/0020-mca-decisions-consolidated.md
+```
+
+Case 1 used real SHAs — `origin/main` against `f69531865`, which is #294 before
+its refresh. Case 2 built a throwaway branch, edited ADR 0020 in place, and
+deleted the branch afterwards.
+
+**Case 2 demonstrates both properties at once.** The genuine edit (0020) is still
+caught. The extra file two-dot reports — 0024, which that branch is merely behind
+main on — is exactly the false positive, and the merge-base comparison drops it.
 
 An ADR **added and then amended in the same PR** is an Add relative to the merge
-base, so it is correctly not flagged — that was already true and stays true.
+base and so is correctly not flagged. That was already true and stays true; it is
+how ADR 0023 could be corrected inside #288.
+
+## HOW THE FIRST ATTEMPT SHIPPED WITHOUT THE FIX
+
+Worth writing down, because the shape is general and the failure was invisible.
+
+The verification step built its positive case like this:
+
+```
+printf '...' >> docs/adr/0020-....md && git add -A && git commit -m "probe" \
+  && check ... && git reset --hard HEAD~1
+```
+
+`git add -A` swept the uncommitted `governance.yml` fix into the throwaway probe
+commit, and `git reset --hard` then discarded **both**. The in-flight note was
+written afterwards, so the branch's only commit described a change that was no
+longer in it — and CI was green, because a docs-only diff passes everything
+including the docs-only E2E skip.
+
+**Green meant "the note is well-formed", not "the guard was fixed."** A reviewer
+caught it by diffing the branch rather than reading the note.
+
+Two rules fall out. Commit the change *before* probing it, and never use
+`git add -A` inside a step that ends in `reset --hard`.
 
 ## The message mattered as much as the logic
 
