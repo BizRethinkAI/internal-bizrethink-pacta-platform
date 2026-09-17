@@ -1,6 +1,7 @@
 import { router } from '@documenso/trpc/server/trpc';
 import { mcaTemplateAccessRoute } from './access';
 import { createMcaTemplateRoute } from './create';
+import { deleteMcaDealRoute, listMcaDealsRoute, openMcaDealRoute, saveMcaDealRoute } from './deals';
 import { fillMcaDraftRoute } from './fill';
 import { getMcaTemplateRoute } from './get';
 import { listMcaTemplateRoute } from './list';
@@ -17,4 +18,8 @@ export const mcaTemplatesRouter = router({
   fill: fillMcaDraftRoute,
   update: updateMcaTemplateRoute,
   setAccess: setMcaAccessRoute,
+  saveDeal: saveMcaDealRoute,
+  openDeal: openMcaDealRoute,
+  listDeals: listMcaDealsRoute,
+  deleteDeal: deleteMcaDealRoute,
 });

@@ -24,6 +24,7 @@ const grant = async (userId: number, feature: string, enabled: boolean) => {
   });
 };
 const cleanup = async (userId: number) => {
+  await prisma.bizrethinkMcaDeal.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkMcaTemplate.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkFeatureAccess.deleteMany({
     where: { scope: 'user', scopeId: String(userId), feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] } },
@@ -190,6 +191,55 @@ test('filled preview and direct PDF export enforce the same live access, revisio
     expect(disabledPdf.headers()['content-type']).not.toContain('application/pdf');
   } finally {
     await prisma.user.update({ where: { id: own.user.id }, data: { disabled: false } });
+    await cleanup(own.user.id);
+  }
+});
+
+/**
+ * ADR 0022: a deal survives a reload, and what survives is the answers.
+ *
+ * The interview lost everything on reload, which made the builder unusable for
+ * work that takes more than one sitting. This exercises the round trip through
+ * a real browser and a real database: fill, save, reload to an empty form,
+ * reopen, and confirm the answers came back and the row holds no document.
+ */
+test('a deal is saved, reopened after a reload, and deleted', async ({ page }) => {
+  test.setTimeout(60_000);
+  const own = await seedUser();
+  const team = own.organisation.teams[0];
+  try {
+    await grant(own.user.id, 'mca-builder', true);
+    await grant(own.user.id, 'mca-clause-draft-rendering', true);
+    await apiSignin({ page, email: own.user.email });
+    expect((await post(page.request, 'create', { teamId: team.id, data: providerFixture() })).ok()).toBe(true);
+    const saved = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: own.user.id } });
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca_/draft?template=${saved.id}&revision=1`);
+
+    await page.getByLabel('Transaction reference', { exact: true }).fill('SAVED-DEAL-001');
+    await page.locator('input[id="draft-input-values.merchant.legalName"]').fill('Persisted Merchant Inc.');
+    await page.getByRole('button', { name: 'Save this deal', exact: true }).click();
+    await expect(page.locator('[data-mca-saved-deals]').getByText('Persisted Merchant Inc.')).toBeVisible();
+
+    // The row holds answers, not an assembled document.
+    const row = await prisma.bizrethinkMcaDeal.findFirstOrThrow({ where: { createdByUserId: own.user.id } });
+    expect(JSON.stringify(row.input)).toContain('Persisted Merchant Inc.');
+    expect(JSON.stringify(row.input)).not.toContain('Pursuant to');
+    expect(row.templateRevision).toBe(1);
+
+    // A reload empties the form; reopening brings the answers back.
+    await page.reload();
+    await expect(page.getByLabel('Transaction reference', { exact: true })).toHaveValue('');
+    await page.locator('[data-mca-saved-deals]').getByRole('button', { name: 'Open', exact: true }).click();
+    await expect(page.getByLabel('Transaction reference', { exact: true })).toHaveValue('SAVED-DEAL-001');
+    await expect(page.locator('input[id="draft-input-values.merchant.legalName"]')).toHaveValue(
+      'Persisted Merchant Inc.',
+    );
+
+    // Deleting removes the row rather than flagging it.
+    await page.locator('[data-mca-saved-deals]').getByRole('button', { name: 'Delete', exact: true }).click();
+    await expect(page.locator('[data-mca-saved-deals]').getByText('No saved deals yet.')).toBeVisible();
+    expect(await prisma.bizrethinkMcaDeal.count({ where: { createdByUserId: own.user.id } })).toBe(0);
+  } finally {
     await cleanup(own.user.id);
   }
 });

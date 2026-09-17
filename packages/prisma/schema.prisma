@@ -2371,6 +2371,35 @@ model BizrethinkPdfUpload {
 }
 
 /// Team-owned provider policy. This is not an upstream sendable Envelope template.
+/// A deal in progress: the ANSWERS, never the assembled document.
+///
+/// ADR 0022. Reopening recompiles from the named template revision, so a saved
+/// deal cannot carry stale legal text forward, and there is no archived copy to
+/// be mistaken for an executed one.
+///
+/// `input` is a validated `McaDraftInput`. The fill contract refuses unmasked
+/// personal identifiers, unmasked account numbers, signatures, signed dates,
+/// processor acceptance and approvals, so none of those can be here.
+model BizrethinkMcaDeal {
+  id               String   @id
+  organisationId   String
+  teamId           Int
+  templateId       String
+  templateRevision Int
+  label            String
+  /// Compare-and-swap on save. Two people editing one deal is a conflict to
+  /// report, not a silent last write: these are contract figures.
+  version          Int      @default(1)
+  input            Json
+  createdByUserId  Int
+  updatedByUserId  Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([teamId, updatedAt])
+  @@index([templateId])
+}
+
 model BizrethinkMcaTemplate {
   id                String   @id
   organisationId    String

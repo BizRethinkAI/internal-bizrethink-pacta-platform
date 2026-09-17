@@ -4,7 +4,10 @@ Open a current provider revision in `/t/:teamUrl/mca`, choose **Use this
 template**, enter the transaction facts, preview the filled draft and download
 an unsigned PDF review copy. `/t/:teamUrl/mca/draft` is a separate page so it
 works with the existing team layout. The provider recipe remains reusable;
-transaction input is stateless and is cleared on reload. Downloading creates a
+a deal can be saved and reopened (ADR 0022), and an unsaved one is still cleared
+on reload. A saved deal holds the ANSWERS only: reopening recompiles the
+documents from the template revision it names, so it cannot carry stale wording
+forward, and deleting one removes the row rather than flagging it. Downloading creates a
 local review copy, not a stored document, Envelope, signature request or delivery.
 
 ## Boundaries implemented

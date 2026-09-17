@@ -21,4 +21,16 @@ export const ZSetMcaAccessRequestSchema = z
   .object({ feature: z.enum(['mca-builder', 'mca-clause-draft-rendering']), enabled: z.boolean() })
   .strict();
 
+export const ZSaveMcaDealRequestSchema = ZListMcaTemplatesRequestSchema.extend({
+  id: z.string().min(1).max(80).optional(),
+  expectedVersion: z.number().int().positive().optional(),
+  templateId: z.string().min(1).max(80),
+  label: z.string().trim().min(1).max(200),
+  input: ZMcaDraftInput,
+}).strict();
+export const ZOpenMcaDealRequestSchema = ZListMcaTemplatesRequestSchema.extend({
+  id: z.string().min(1).max(80),
+}).strict();
+export const ZDeleteMcaDealRequestSchema = ZOpenMcaDealRequestSchema;
+
 export const ZFillMcaDraftRequestSchema = ZPreviewMcaTemplateRequestSchema.extend({ draft: ZMcaDraftInput }).strict();

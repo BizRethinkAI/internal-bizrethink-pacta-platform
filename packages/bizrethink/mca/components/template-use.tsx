@@ -82,6 +82,14 @@ const McaDraftInterview = ({
 }) => {
   const form = useForm<McaDraftInput>({ resolver: zodResolver(ZMcaDraftInput), defaultValues: emptyMcaDraftInput() });
   const preview = trpc.bizrethink.mcaTemplates.fill.useMutation();
+  const saveDeal = trpc.bizrethink.mcaTemplates.saveDeal.useMutation();
+  const openDeal = trpc.bizrethink.mcaTemplates.openDeal.useMutation();
+  const deleteDeal = trpc.bizrethink.mcaTemplates.deleteDeal.useMutation();
+  const deals = trpc.bizrethink.mcaTemplates.listDeals.useQuery({ teamId });
+  // The saved deal this form is editing, and the version it was loaded at: a
+  // save carries that version so a second editor is a conflict, not a
+  // last-write. ADR 0022.
+  const [saved, setSaved] = useState<{ id: string; version: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
   const [previewInput, setPreviewInput] = useState<string | null>(null);
@@ -131,15 +139,98 @@ const McaDraftInterview = ({
       setDownloading(false);
     }
   };
+  const save = form.handleSubmit(
+    async (draft) => {
+      setError(null);
+      try {
+        const label = draft.values['merchant.legalName']?.trim() || draft.reference || t`Untitled deal`;
+        const result = await saveDeal.mutateAsync({
+          teamId,
+          templateId,
+          label,
+          input: draft,
+          ...(saved ? { id: saved.id, expectedVersion: saved.version } : {}),
+        });
+        setSaved({ id: result.id, version: result.version });
+        await deals.refetch();
+      } catch (cause) {
+        setError(AppError.parseError(cause).message);
+      }
+    },
+    () => setError(t`Correct the highlighted draft inputs before saving.`),
+  );
+  const resume = async (id: string) => {
+    setError(null);
+    try {
+      const opened = await openDeal.mutateAsync({ teamId, id });
+      form.reset(opened.input);
+      setSaved({ id: opened.id, version: opened.version });
+      setPreviewInput(null);
+    } catch (cause) {
+      setError(AppError.parseError(cause).message);
+    }
+  };
+  const discard = async (id: string) => {
+    setError(null);
+    try {
+      await deleteDeal.mutateAsync({ teamId, id });
+      if (saved?.id === id) {
+        setSaved(null);
+      }
+      await deals.refetch();
+    } catch (cause) {
+      setError(AppError.parseError(cause).message);
+    }
+  };
   return (
     <Form {...form}>
       <form onSubmit={refresh} className="space-y-5">
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-950 text-sm">
           <Trans>
-            Internal draft. Inputs on this page are not saved; downloading creates a review copy only. Disclosures,
-            processor acceptance, approvals and actual signatures remain separate requirements.
+            Internal draft. A saved deal keeps the answers only and recompiles the documents when reopened; downloading
+            creates a review copy. Disclosures, processor acceptance, approvals and actual signatures remain separate
+            requirements.
           </Trans>
         </div>
+        <section data-mca-saved-deals className="space-y-3 rounded-lg border p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-semibold text-lg">
+              <Trans>Saved deals</Trans>
+            </h2>
+            <Button type="button" variant="outline" onClick={save} disabled={saveDeal.isPending}>
+              {saved ? <Trans>Save changes</Trans> : <Trans>Save this deal</Trans>}
+            </Button>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            <Trans>
+              A saved deal holds the answers on this page, not the assembled documents. Deleting one removes it.
+            </Trans>
+          </p>
+          {deals.data?.length ? (
+            <ul className="space-y-2">
+              {deals.data.map((entry) => (
+                <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 rounded border p-3">
+                  <span className="text-sm">
+                    {entry.label}
+                    {saved?.id === entry.id ? <Trans> — editing</Trans> : null}
+                  </span>
+                  <span className="flex gap-2">
+                    <Button type="button" variant="outline" onClick={() => resume(entry.id)}>
+                      <Trans>Open</Trans>
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => discard(entry.id)}>
+                      <Trans>Delete</Trans>
+                    </Button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              <Trans>No saved deals yet.</Trans>
+            </p>
+          )}
+        </section>
         <fieldset disabled={preview.isPending || downloading} className="space-y-5 disabled:opacity-70">
           <DraftText name="reference" label={t`Transaction reference`} />
           {template.profile.policy.equipment !== 'none' && (
