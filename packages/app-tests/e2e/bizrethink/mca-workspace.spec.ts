@@ -18,10 +18,10 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
   await signedInAsAdmin({ page, redirectPath: '/admin/mca-library' });
   const nav = page.getByRole('navigation', { name: 'MCA workspace' });
   await expect(page.getByRole('heading', { name: 'MCA Clauses', exact: true })).toBeVisible();
-  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(210);
+  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(212);
   await expect(page.locator('[data-mca-kind]:not([data-mca-kind="clause"])')).toHaveCount(0);
   const numbers = await page.locator('[data-mca-number]').allTextContents();
-  expect(numbers).toHaveLength(210);
+  expect(numbers).toHaveLength(212);
   expect(numbers.every((number) => /^\d+\.\d+$/.test(number.trim()))).toBe(true);
   const fundingSection = page.locator('[data-mca-section="funding-terms"]');
   await expect(
@@ -42,7 +42,7 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
     page.getByRole('heading', { name: 'Section 3: Purchase and Sale of Future Receivables', exact: true }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
-  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(210);
+  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(212);
 
   await nav.getByRole('link', { name: 'Reusable content', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'MCA Reusable content', exact: true })).toBeVisible();
@@ -62,7 +62,7 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
   await expect(page.getByRole('heading', { name: 'MCA disclosures & requirements', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /approv/i })).toHaveCount(0);
   await nav.getByRole('link', { name: 'Clauses', exact: true }).click();
-  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(210);
+  await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(212);
 });
 
 test('ordinary members cannot load either MCA authored-content catalogue or the disclosure view', async ({ page }) => {

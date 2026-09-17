@@ -77,6 +77,13 @@ export const ZMcaProviderProfile = z
       reconciliationEmail: email,
       reconciliationAddress: line(600),
       servicingPhone: z.union([z.literal(''), line(80)]).optional(),
+      // Where this funder litigates, asked only because a funder-state venue
+      // needs it. Owner's decision, 2026-09-16: an explicit forum, not the state
+      // of organisation, because a funder organised in Delaware litigates where
+      // it works. The county is optional; a funder that names only a state gets
+      // a state-wide forum.
+      venueState: z.union([z.literal(''), line(100)]).optional(),
+      venueCounty: z.union([z.literal(''), line(100)]).optional(),
       // Printed on the cover and in the page footer, as the funder's own
       // documents carry it. Optional: an older saved revision has none and
       // renders with the line absent rather than a placeholder.
@@ -86,7 +93,7 @@ export const ZMcaProviderProfile = z
       .object({
         collectionMethod: z.literal('split-only'),
         settlementBase: z.literal('net'),
-        venueRule: z.literal('merchant-state'),
+        venueRule: z.enum(['merchant-state', 'funder-state']),
         // An express provider answer; the draft's example profile is not evidence.
         supportedTermsConfirmed: z.boolean().refine(Boolean, 'Confirm that these are your supported terms.'),
         guarantyScope: z.enum(['none', 'limited-conduct', 'full-performance']),
@@ -163,6 +170,28 @@ export const ZMcaProviderProfile = z
         message: 'Identify the ISO contracting company, portal and commission terms.',
       });
     }
+    if (profile.policy.venueRule === 'funder-state') {
+      if (!profile.buyer.venueState) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['buyer', 'venueState'],
+          message: 'Name the state whose courts hear an action under the Agreement.',
+        });
+      }
+      // Va. Code §6.2-2234(A) makes a forum outside the Commonwealth
+      // unenforceable for a covered transaction, and a Virginia recipient is
+      // defined by its principal place of business. A merchant-state rule
+      // satisfies that by construction; this one does not, so the programme
+      // cannot claim both.
+      if (profile.policy.recipientStates.includes('US-VA')) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['policy', 'venueRule'],
+          message:
+            'A Virginia programme cannot fix the funder’s forum: Va. Code §6.2-2234(A) requires an action under a covered contract to be brought in the Commonwealth.',
+        });
+      }
+    }
   });
 
 export type McaProviderProfile = z.infer<typeof ZMcaProviderProfile>;
@@ -203,6 +232,7 @@ export const MCA_PROVIDER_BINDINGS = new Set([
   'provider.reconciliationEmail',
   'provider.reconciliationAddress',
   'provider.servicingPhone',
+  'provider.venueForum',
   'processor.approvedProcessors',
   'equipment.providerLegalName',
   'equipment.providerEntityType',
