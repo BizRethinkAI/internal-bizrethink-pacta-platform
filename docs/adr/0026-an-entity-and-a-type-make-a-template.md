@@ -1,9 +1,9 @@
 # ADR 0026 — An entity and a document type make a template
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date recorded:** 2026-09-17
-- **Decision date:** 2026-09-17 (repository owner, in conversation; this ADR is
-  the confirmation artifact and nothing is built until it is accepted)
+- **Decision date:** 2026-09-17 (repository owner, in conversation, then
+  confirmed against this text)
 - **Amends:** [ADR 0025](0025-what-the-mca-vertical-is-for.md), which settled
   that the artifact is a template, and [ADR 0016](0016-mca-provider-template-revisions.md),
   which made a template a saved *package* recipe
@@ -142,7 +142,11 @@ disclosures, which stay in `lombard-contracts` until ADR 0024's step 3. Their
 rather than a new idea — but it is a change in a repository this session does
 not own and must not happen before the builder can publish.
 
-## Open, and worth settling before building
+## Open, and not blocking
+
+Three fields whose side is genuinely unclear. None of them blocks the compiler
+work, and each is a one-line change in `field-plan.ts` once settled — so they
+are recorded here rather than guessed at.
 
 - **`iso.commissionPercentage`.** A live widget today, so the caller sends it —
   but it is a term between the funder and the broker, which reads like programme

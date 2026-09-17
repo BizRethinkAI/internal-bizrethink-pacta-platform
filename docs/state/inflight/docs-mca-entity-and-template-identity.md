@@ -1,8 +1,8 @@
 # docs/mca-entity-and-template-identity — ADR 0026, proposed
 
-**Documentation only, and deliberately `Proposed` rather than `Accepted`.** It
-is the confirmation artifact for a conversation, and nothing is built until the
-owner has read it back.
+**Documentation only.** Written as `Proposed`, read back by the owner, and
+accepted against this text rather than against a recollection of the
+conversation that produced it.
 
 ## What it settles
 
@@ -49,5 +49,6 @@ Worth recording, because the reasoning moved twice:
 ## Not in this change
 
 No code. The restructure is large — the compiler returns one document instead of
-a set — and it should start from an accepted ADR rather than from a
-conversation.
+a set — and starts from this, now that it is accepted. Three fields whose side
+is unclear are recorded as open at the end of the ADR; none blocks the compiler,
+and each is a one-line change once settled.
