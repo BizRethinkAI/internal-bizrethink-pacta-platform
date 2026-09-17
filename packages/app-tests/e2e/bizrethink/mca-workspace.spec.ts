@@ -24,7 +24,9 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
   expect(numbers).toHaveLength(212);
   expect(numbers.every((number) => /^\d+\.\d+$/.test(number.trim()))).toBe(true);
   const fundingSection = page.locator('[data-mca-section="funding-terms"]');
-  await expect(fundingSection.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+  await expect(
+    fundingSection.getByRole('heading', { name: 'Section 1: Merchant and Funding Information', exact: true }),
+  ).toBeVisible();
   await expect(fundingSection.locator('[data-mca-slug="frpa.holdback-explainer"] [data-mca-number]')).toHaveText('1.1');
   await fundingSection.screenshot({ path: testInfo.outputPath('mca-funding-section.png') });
   await expect(page.getByRole('button', { name: /Merchant and Funding Information/ })).toHaveCount(0);
@@ -36,7 +38,9 @@ test('one MCA workspace separates numbered clauses, reusable content and read-on
   await expect(page.locator('[data-mca-kind]')).toHaveCount(0);
   await expect(page.locator('[data-mca-section]')).toHaveCount(0);
   await page.getByLabel('Search library', { exact: true }).fill('Definitions');
-  await expect(page.getByRole('heading', { name: '3. Purchase', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Section 3: Purchase and Sale of Future Receivables', exact: true }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
   await expect(page.locator('[data-mca-kind="clause"]')).toHaveCount(212);
 
@@ -110,7 +114,9 @@ test('a complete neutral counsel package preserves findings, source context and 
     expect(column?.width).toBeLessThan(850);
     await counsel.screenshot({ path: testInfo.outputPath('neutral-complete-counsel-package.png'), fullPage: false });
     await counsel.getByRole('button', { name: 'Start reviewing', exact: true }).click();
-    await expect(counsel.getByRole('heading', { name: '1. Funding Terms', exact: true })).toBeVisible();
+    await expect(
+      counsel.getByRole('heading', { name: 'Section 1: Merchant and Funding Information', exact: true }),
+    ).toBeVisible();
     await expect(counsel.locator('[data-mca-package-item="frpa.merchant-and-funding-information"]')).toBeVisible();
     await counsel.screenshot({ path: testInfo.outputPath('neutral-counsel-reading-column.png'), fullPage: false });
 
@@ -123,7 +129,9 @@ test('a complete neutral counsel package preserves findings, source context and 
     await reference.click();
     await expect(counsel.getByRole('dialog')).toContainText('Citation context');
     await counsel.getByRole('button', { name: 'Open in reading context', exact: true }).click();
-    await expect(counsel.getByRole('heading', { name: '3. Purchase', exact: true })).toBeVisible();
+    await expect(
+      counsel.getByRole('heading', { name: 'Section 3: Purchase and Sale of Future Receivables', exact: true }),
+    ).toBeVisible();
     await counsel.getByRole('button', { name: 'Return to passage', exact: true }).click();
     await expect(reference).toBeFocused();
     await item.getByText('Findings for this item', { exact: false }).click();

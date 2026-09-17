@@ -102,7 +102,7 @@ export const McaProviderInterview = ({
               <p className="text-muted-foreground text-sm">
                 <Trans>
                   This release supports net card receipts and collection through processor splits. Choose the forum
-                  below. Unsupported alternatives need additional drafting before use.
+                  and how disputes are resolved below. Unsupported alternatives need additional drafting before use.
                 </Trans>
               </p>
               <CheckAnswer
@@ -126,6 +126,14 @@ export const McaProviderInterview = ({
                   />
                 </>
               )}
+              <SelectAnswer
+                name="policy.disputeResolution"
+                label={msg`Dispute resolution`}
+                options={[
+                  ['courts', msg`Court proceedings, with the jury, class and counterclaim waivers`],
+                  ['arbitration', msg`Binding arbitration, with the authored arbitration clause`],
+                ]}
+              />
               <SelectAnswer
                 name="policy.guarantyScope"
                 label={msg`FRPA guaranty`}

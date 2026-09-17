@@ -41,6 +41,10 @@ export const ZMcaProviderProfile = z
       // a state-wide forum.
       venueState: z.union([z.literal(''), line(100)]).optional(),
       venueCounty: z.union([z.literal(''), line(100)]).optional(),
+      // Printed on the cover and in the page footer, as the funder's own
+      // documents carry it. Optional: an older saved revision has none and
+      // renders with the line absent rather than a placeholder.
+      website: z.union([z.literal(''), line(120)]).optional(),
     }).strict(),
     policy: z
       .object({
@@ -53,9 +57,11 @@ export const ZMcaProviderProfile = z
         equipment: z.enum(['none', 'merchant-elects']),
         renewalModel: z.enum(['none', 'payoff-only', 'carry']),
         concurrentPositions: z.boolean(),
-        // The current provider-template release supports the court bundle. The
-        // authored arbitration alternative remains available for legal review.
-        disputeResolution: z.literal('courts'),
+        // Both answers are authored and selectable: the court programme carries
+        // the jury, class and counterclaim waivers, arbitration carries §7.26.
+        // ADR 0020 §5.6 — a lawful term a funder wants is one the platform
+        // supports; Pacta holds no position on which a funder should choose.
+        disputeResolution: z.enum(['courts', 'arbitration']),
         recipientStates: z
           .array(
             z.custom<McaJurisdiction>(

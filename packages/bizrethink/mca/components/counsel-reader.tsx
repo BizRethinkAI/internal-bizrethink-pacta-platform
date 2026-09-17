@@ -45,6 +45,7 @@ export const McaCounselReader = ({
       clauses
         .filter((clause) => clause.section === section)
         .map((clause) => ({ number: (view.readingContexts[context]?.[clause.slug] ?? clause.reading).number })),
+      view.instrument.id,
     );
   const selected = decision
     ? clauses.filter((clause) => clause.variance.kind === 'offered' && clause.variance.fact === decision)

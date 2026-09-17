@@ -15,12 +15,12 @@ describe('counsel reads the numbered selection and its identified alternatives',
   it('names the parent sections using the existing clause numbers, including fields before the first clause', () => {
     const sections = toReadableAgreement(contentForReview('frpa'));
     expect(sections.slice(0, 4).map((section) => section.name)).toEqual([
-      '1. Funding Terms',
-      '2. Preamble',
-      '3. Purchase',
-      '4. Reconciliation',
+      'Section 1: Merchant and Funding Information',
+      'Section 2: Preamble',
+      'Section 3: Purchase and Sale of Future Receivables',
+      'Section 4: Reconciliation and Adjustment',
     ]);
-    expect(sections.find((section) => section.id === 'appendix')?.name).toBe('12. Fee Schedule');
+    expect(sections.find((section) => section.id === 'appendix')?.name).toBe('Section 12: Fee Schedule');
     expect(sections[0].clauses[0].number).toBeNull();
     expect(sections[0].clauses.find((clause) => clause.number)?.number).toBe('1.1');
   });

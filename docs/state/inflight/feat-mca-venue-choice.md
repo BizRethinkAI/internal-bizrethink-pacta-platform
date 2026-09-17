@@ -117,6 +117,24 @@ deploy. That is the designed staleness signal, not a defect: stored packages
 stay readable because saved reviews compare stored to stored. It will be visible
 in the workspace, and belongs in the shipping consolidation.
 
+## Refreshed onto the merged batch
+
+Merged main at `13ef4786f` (the renderer stack plus #282). Three conflicts, all
+two sides adding distinct blocks, resolved keep-both:
+
+- `profile.ts` — venue fields beside #278's `website`.
+- `provider-interview.tsx` — the venue question and its conditional forum
+  fields beside #282's dispute-resolution question; the step blurb now claims
+  neither venue nor disputes as fixed, because both are choices.
+- `profile.test.ts` — **both** `disputeResolution: 'arbitration'` and
+  `venueRule: 'funder-state'` leave the unsupported-values list, each because
+  its clauses became selectable. `collectionMethod` and `settlementBase` still
+  have none.
+
+The first keep-both join spliced mid-structure and dropped two closing braces;
+the suite caught it as a parse error, and it is repaired. 105 files / 3,439
+tests pass on the merged revision.
+
 ## Not in this change
 
 `collectionMethod` and `settlementBase` are still pinned. Funder-state governing

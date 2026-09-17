@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { compileMcaTemplate } from './compile';
 import { ZMcaProviderProfile } from './profile';
 import { providerFixture } from './profile.fixture';
 
@@ -25,9 +26,10 @@ describe('the provider interview describes the provider, not a future merchant t
     ['collectionMethod', 'ach-only'],
     ['collectionMethod', 'split-with-ach-backstop'],
     ['settlementBase', 'gross'],
-    // `venueRule: 'funder-state'` left this list when §7.5 split and the
-    // interview began collecting the funder's forum.
-    ['disputeResolution', 'arbitration'],
+    // Two values left this list as their clauses became selectable:
+    // `disputeResolution: 'arbitration'` (#282) and `venueRule: 'funder-state'`
+    // (#283, when §7.5 split and the interview began collecting the forum).
+    // The values above still have no clauses behind them.
     ['supportedTermsConfirmed', false],
   ])('does not substitute the baseline for unsupported %s=%s', (key, value) => {
     const profile = providerFixture();
@@ -108,5 +110,60 @@ describe('a funder-state forum is validated, not assumed', () => {
     const profile = withVenue({ venueRule: 'merchant-state', recipientStates: ['US-FL', 'US-VA'] });
 
     expect(ZMcaProviderProfile.safeParse(profile).success).toBe(true);
+  });
+});
+
+/**
+ * A funder that arbitrates can say so.
+ *
+ * The arbitration bundle is authored — §7.26 arbitrates, and the jury, class
+ * and counterclaim waivers belong to the court programme — but the profile
+ * pinned `disputeResolution` to `courts`, so no funder could ever select it and
+ * the clause could never appear in a package. ADR 0020 §5.6: a lawful term a
+ * funder wants is a term the platform supports.
+ */
+describe('the funder chooses courts or arbitration', () => {
+  it('accepts arbitration', () => {
+    const profile = {
+      ...providerFixture(),
+      policy: { ...providerFixture().policy, disputeResolution: 'arbitration' as const },
+    };
+
+    expect(() => ZMcaProviderProfile.parse(profile)).not.toThrow();
+  });
+
+  it('still refuses a value with no clauses behind it', () => {
+    const profile = {
+      ...providerFixture(),
+      policy: { ...providerFixture().policy, disputeResolution: 'mediation' as unknown as 'courts' },
+    };
+
+    expect(() => ZMcaProviderProfile.parse(profile)).toThrow();
+  });
+
+  it('selects the arbitration clause and drops the court waivers', () => {
+    const profile = {
+      ...providerFixture(),
+      policy: { ...providerFixture().policy, disputeResolution: 'arbitration' as const },
+    };
+    const slugs = compileMcaTemplate(profile)
+      .documents.flatMap((document) => document.items)
+      .map((item) => item.slug);
+
+    expect(slugs).toContain('frpa.arbitration-7-26');
+    expect(slugs).not.toContain('frpa.jury-trial-waiver-7-10');
+    expect(slugs).not.toContain('frpa.class-action-waiver-7-11');
+    expect(slugs).not.toContain('frpa.counterclaim-waiver-7-20');
+  });
+
+  it('keeps the court programme exactly as it was', () => {
+    const slugs = compileMcaTemplate(providerFixture())
+      .documents.flatMap((document) => document.items)
+      .map((item) => item.slug);
+
+    expect(slugs).toContain('frpa.jury-trial-waiver-7-10');
+    expect(slugs).toContain('frpa.class-action-waiver-7-11');
+    expect(slugs).toContain('frpa.counterclaim-waiver-7-20');
+    expect(slugs).not.toContain('frpa.arbitration-7-26');
   });
 });

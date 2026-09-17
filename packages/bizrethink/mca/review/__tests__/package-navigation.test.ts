@@ -13,7 +13,7 @@ describe('navigation in the saved complete counsel package', () => {
     expect(index.find((item) => item.slug === 'frpa.merchant-and-funding-information')).toMatchObject({
       instrument: 'frpa',
       section: 'funding-terms',
-      sectionName: '1. Funding Terms',
+      sectionName: 'Section 1: Merchant and Funding Information',
       kind: 'field-group',
     });
     for (const document of snapshot.documents) {

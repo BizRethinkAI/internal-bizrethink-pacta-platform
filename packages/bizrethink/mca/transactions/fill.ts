@@ -489,6 +489,13 @@ export const fillMcaDraft = (template: McaTemplateSnapshot, raw: unknown) => {
   return {
     reference: input.reference,
     templateFingerprint: template.fingerprint,
+    // Identity for the cover and footer. Copied, not re-derived: the renderer
+    // prints what this revision says the funder is called.
+    provider: {
+      legalName: template.profile.buyer.legalName,
+      address: template.profile.buyer.address,
+      website: template.profile.buyer.website ?? '',
+    },
     documents,
     missing,
     blockers,
