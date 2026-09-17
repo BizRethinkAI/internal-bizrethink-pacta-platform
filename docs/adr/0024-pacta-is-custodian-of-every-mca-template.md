@@ -114,11 +114,30 @@ the way they are sent. Each move is a deliberate re-publication.
 
 ## The interim rule on the caller's side
 
-`lombard-platform` #262 fixes a guard that never fired — it read `formFields`
-while every record carries `acroformFields`. It **warns rather than throws**,
-including on state disclosures, and that is right for now: the disclosures are
-not yet republished from Pacta, so the case the guard covers cannot arise for
-them, and a throw at send time would turn a cosmetic drift into an outage.
+`lombard-platform` #262 fixed a guard that had never fired — it read
+`formFields` while every record carries `acroformFields`. **It is merged and
+live from `1066bfc`.** Precisely what it does:
+
+- reads `acroformFields`, falling back to `formFields`, both behind
+  `Array.isArray`, so neither key can silently disable it again;
+- **warns and drops** an unrecognised name, rather than throwing. The document
+  is equally blank either way, so throwing at send time would turn a cosmetic
+  drift into an outage;
+- names the field and never the value — a test feeds an identifier-shaped value
+  and asserts it is not echoed into the log.
+
+**Dropping is only safe because something else proves the names match.** That is
+their `pacta-v2-registry.test.ts`, which asserts per kind that the builder's
+emitted names and the template's widget list are the same set. Their reviewer
+found that spec's sample map was hand-maintained and typed `Partial`, so a newly
+published kind could have escaped it silently; it now asserts its own
+completeness against every kind that has widgets. `processor2` is exempt on
+principle — its record carries no widgets while the template is unpublished —
+rather than by exception.
+
+The warn-not-throw rule extends to state disclosures, and that is right for now:
+they are not yet republished from Pacta, so the case the guard covers cannot
+arise for them.
 
 **Revisit when the first disclosure publishes from Pacta.** At that point a
 blank required figure stops being cosmetic and the rule should be argued again,
