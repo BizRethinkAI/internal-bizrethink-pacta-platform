@@ -1,7 +1,6 @@
 import { router } from '@documenso/trpc/server/trpc';
 import { mcaTemplateAccessRoute } from './access';
 import { createMcaTemplateRoute } from './create';
-import { fillMcaDraftRoute } from './fill';
 import { getMcaTemplateRoute } from './get';
 import { listMcaTemplateRoute } from './list';
 import { previewMcaTemplateRoute } from './preview';
@@ -17,7 +16,6 @@ export const mcaTemplatesRouter = router({
   preview: previewMcaTemplateRoute,
   publicationStatus: mcaPublicationStatusRoute,
   publish: publishMcaTemplateRoute,
-  fill: fillMcaDraftRoute,
   update: updateMcaTemplateRoute,
   setAccess: setMcaAccessRoute,
 });

@@ -61,6 +61,7 @@ before it got there.
 | [0023](0023-pacta-produces-mca-templates.md) | Pacta produces MCA templates and owns the record of them | Current, amended by 0024 | Completes 0016. Its "does not decide" parking of the state disclosures is reversed by 0024 |
 | [0024](0024-pacta-is-custodian-of-every-mca-template.md) | Pacta is custodian and producer of EVERY MCA template | Current | `lombard-contracts` becomes an archive. Agreements move first, then the record and API, then the disclosures |
 | [0025](0025-what-the-mca-vertical-is-for.md) | What the MCA vertical is for | Current | Amends 0020 §1 and §6.3. The artifact is a TEMPLATE; no deal enters the vertical. Registration duties in scope. Monthly source change-detection deferred but recorded |
+| [0026](0026-an-entity-and-a-type-make-a-template.md) | An entity and a document type make a template | Current | Amends 0025 and 0016. A template stops being a package: entity + type = one template |
 
 **0022 is unused.** It was drafted for a pull request that was closed without
 merging, and the number was not reissued so that nothing already written against

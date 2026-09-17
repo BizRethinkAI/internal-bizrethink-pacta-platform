@@ -192,16 +192,46 @@ describe('numbering belongs to a selected MCA document (ADR 0011)', () => {
     );
   });
 
-  it('stales the ISO review when the FRPA moves a cited provision', () => {
+  /**
+   * THE INVERSE OF WHAT THIS USED TO ASSERT, and deliberately so.
+   *
+   * It read: moving an FRPA clause stales a review of the ISO PRA. That was
+   * true, and it was true because the ISO PRA cited an FRPA clause BY NUMBER —
+   * so the citation moved whenever the FRPA renumbered, which ADR 0011 says
+   * happens whenever any clause drops out of selection.
+   *
+   * ADR 0026 makes each document its own template, and reworded that citation
+   * to name the Right to Cancel provision rather than number it. The coupling
+   * is gone, and its absence is what lets the ISO PRA be compiled without an
+   * FRPA in scope. That is the property worth pinning now.
+   *
+   * The MACHINERY for cross-instrument citation is untouched and still tested
+   * directly above, on a synthetic clause. Nothing in the library uses it.
+   */
+  it('no longer stales the ISO review when the FRPA renumbers', () => {
     const iso = libraryFor('iso-pra');
     const prior = mcaLibraryFingerprint(iso);
     const cancellation = libraryFor('frpa').find((clause) => clause.slug === 'frpa.right-to-cancel-4-14') as McaClause;
     const sortKey = cancellation.sortKey;
+
     try {
       cancellation.sortKey = 0;
-      expect(mcaLibraryFingerprint(iso)).not.toBe(prior);
+      expect(mcaLibraryFingerprint(iso)).toBe(prior);
     } finally {
       cancellation.sortKey = sortKey;
     }
+  });
+
+  /**
+   * A cross-document reference NAMES the other instrument — `clause:frpa.x` or
+   * `section:frpa#y`. A bare `section:commission` is this document's own
+   * section and is not one; the first version of this test matched those too
+   * and reported two false positives.
+   */
+  it('cites the FRPA by name, so nothing in the library crosses a document', () => {
+    const crossing = /\[\[clause:(?!iso-pra\.)[a-z-]+\.|\[\[section:(?!iso-pra#)[a-z-]+#/;
+    const citing = libraryFor('iso-pra').filter((clause) => crossing.test(clause.body));
+
+    expect(citing.map((clause) => clause.slug)).toEqual([]);
   });
 });

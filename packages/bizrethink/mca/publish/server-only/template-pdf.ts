@@ -29,10 +29,11 @@ import { markerFor } from './acroform';
  *                        sender-writable only, so a signature built as one
  *                        ships permanently blank
  *
- * It is a separate module from `transactions/server-only/pdf.ts` rather than a
- * mode inside it, because the two produce different artifacts for different
- * readers and sharing one function would mean a flag deciding whether a
- * merchant may be handed the output.
+ * There is no second renderer beside it. The internal-draft renderer this
+ * replaced took a filled deal and produced a review copy; ADR 0025 retired
+ * both, and a preview is now this same function with specimen values in the
+ * slots (`specimen.ts`) rather than a separate document that could disagree
+ * with the one it previews.
  */
 
 Font.register({ family: 'McaBody', src: TINOS_REGULAR });
@@ -181,12 +182,27 @@ export const templatePlacement = (snapshot: McaTemplateSnapshot, instrument: Pro
   const plan = fieldPlanFor(instrument);
   const widgetFor = new Map(plan.marked.map((field) => [field.binding, field.widget]));
   const document = snapshot.documents.find((candidate) => candidate.instrument === instrument);
+
+  /*
+    FAILS CLOSED, like the renderer below it.
+
+    It used to read `document?.items ?? []`, which reported a placement of
+    nothing at all for a snapshot that does not carry this document — and a
+    caller cannot tell that apart from a document with no fields to place. ADR
+    0026 made the mismatch reachable: a template is one document now, so a
+    snapshot and an instrument can disagree where before the package held them
+    all.
+  */
+  if (!document) {
+    throw new Error(`This template compiles no ${instrument}, so it places nothing.`);
+  }
+
   const marked: { binding: string; widget: string }[] = [];
   const printed: string[] = [];
   const unplaced: string[] = [];
   const seen = new Set<string>();
 
-  for (const item of document?.items ?? []) {
+  for (const item of document.items) {
     for (const field of item.fields) {
       if (seen.has(field.binding) || field.kind === 'signature' || field.binding.endsWith('.signedDate')) {
         continue;

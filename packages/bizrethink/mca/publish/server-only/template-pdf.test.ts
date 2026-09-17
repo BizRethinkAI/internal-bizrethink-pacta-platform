@@ -2,7 +2,7 @@ import { PDFDocument } from '@cantoo/pdf-lib';
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { PDF } from '@libpdf/core';
 import { describe, expect, it, vi } from 'vitest';
-
+import type { McaInstrument } from '../../clauses/instruments';
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
 import { fieldPlanFor } from '../field-plan';
@@ -24,7 +24,7 @@ import { renderMcaTemplatePdf, templatePlacement } from './template-pdf';
 // assertions to fit a budget would be the wrong trade.
 vi.setConfig({ testTimeout: 60_000 });
 
-const snapshot = () => compileMcaTemplate(providerFixture());
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
 
 /**
  * Render each document once per file, not once per assertion.
@@ -42,7 +42,7 @@ const templateOf = (instrument: Parameters<typeof renderMcaTemplatePdf>[1]): Pro
     return existing;
   }
 
-  const pending = renderMcaTemplatePdf(snapshot(), instrument, 3);
+  const pending = renderMcaTemplatePdf(snapshot(instrument), instrument, 3);
 
   rendered.set(instrument, pending);
 
@@ -232,15 +232,25 @@ describe('the rendered template survives the whole publication chain', () => {
  */
 describe('the fields this renderer cannot place yet', () => {
   it('reports them rather than dropping them', () => {
-    const placement = templatePlacement(snapshot(), 'frpa');
+    const placement = templatePlacement(snapshot('frpa'), 'frpa');
 
     expect(placement.unplaced.length).toBeGreaterThan(0);
     expect(placement.marked.length).toBe(fieldPlanFor('frpa').marked.length);
   });
 
   it('never counts a signer field as unplaced', () => {
-    const placement = templatePlacement(snapshot(), 'frpa');
+    const placement = templatePlacement(snapshot('frpa'), 'frpa');
 
     expect(placement.unplaced.filter((binding) => /\.(signature|signedDate)$/.test(binding))).toEqual([]);
+  });
+
+  /**
+   * A TEMPLATE IS ONE DOCUMENT (ADR 0026), so a snapshot and an instrument can
+   * now disagree. Placing nothing is the wrong answer to that: it reads
+   * identically to a document with no fields, and the gap this whole describe
+   * block exists to count would be reported as zero.
+   */
+  it('refuses a snapshot compiled for a different document rather than placing nothing', () => {
+    expect(() => templatePlacement(snapshot('frpa'), 'equipment-lease')).toThrow(/compiles no equipment-lease/);
   });
 });

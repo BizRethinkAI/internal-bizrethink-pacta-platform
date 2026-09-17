@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { LOMBARD_FACTS } from '../../clauses/facts';
 import { MCA_INSTRUMENTS } from '../../clauses/instruments';
 import { contentForReview } from '../../reusable/review';
+import { allOptionsDocuments } from '../../templates/all-options.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
-import { allOptionsDraftFixture } from '../../transactions/draft.fixture';
 import { groupMcaSections, hasMcaSectionName, mcaSectionHeading, mcaSectionName } from '../section-headings';
 import { selectClauses } from '../select-clauses';
 
@@ -58,18 +58,33 @@ describe('MCA parent headings use the displayed selection without changing its c
 
   it('keeps saved recipes unchanged and restarts headings for every actual document instance', () => {
     const profile = providerFixture();
-    const snapshot = compileMcaTemplate(profile);
+    const snapshot = compileMcaTemplate(profile, 'frpa');
     const before = structuredClone(snapshot);
     for (const document of snapshot.documents) {
       groupMcaSections(document.items);
     }
     expect(snapshot).toEqual(before);
-    expect(compileMcaTemplate(profile).fingerprint).toBe(before.fingerprint);
-    const documents = allOptionsDraftFixture().draft.documents;
+    expect(compileMcaTemplate(profile, 'frpa').fingerprint).toBe(before.fingerprint);
+    /*
+      ADR 0026: each document is its own template, so a test that wants to look
+      across documents compiles each separately — which is what the caller does
+      and what publishing does.
+    */
+    const documents = allOptionsDocuments(['frpa', 'equipment-lease', 'iso-pra', 'permission-to-release']);
+
     for (const document of documents) {
       expect(groupMcaSections(document.items)[0].heading).toMatch(/^Section 1: /);
     }
-    expect(documents.filter((document) => document.instrument === 'permission-to-release')).toHaveLength(2);
+
+    /*
+      ONE DOCUMENT PER TEMPLATE (ADR 0026), and before that one per instrument
+      rather than one per report subject (ADR 0025). The property under test is
+      unchanged — headings restart at Section 1 for every document — and the
+      count is asserted so the weaker input stays explicit rather than silently
+      lost.
+    */
+    expect(new Set(documents.map((document) => document.instrument)).size).toBe(documents.length);
+    expect(documents.some((document) => document.instrument === 'permission-to-release')).toBe(true);
   });
 });
 

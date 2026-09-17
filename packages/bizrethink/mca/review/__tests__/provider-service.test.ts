@@ -31,7 +31,11 @@ describe('provider counsel invitations are isolated by team and revision', () =>
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.access.mockResolvedValue({ id: 17, organisationId: 'org-a' });
-    mocks.preview.mockResolvedValue({ ...compileMcaTemplate(providerFixture()), version: 2, templateId: 'template-a' });
+    mocks.preview.mockResolvedValue({
+      ...compileMcaTemplate(providerFixture(), 'frpa'),
+      version: 2,
+      templateId: 'template-a',
+    });
     mocks.feature.mockResolvedValue(true);
     mocks.db.bizrethinkMcaPackageReview.findMany.mockResolvedValue([]);
     mocks.db.bizrethinkMcaPackageReview.create.mockImplementation(({ data }) => Promise.resolve(data));

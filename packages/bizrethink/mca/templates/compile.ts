@@ -9,6 +9,7 @@ import { inReviewOrder } from '../clauses/library';
 import type { ClauseField, McaContent, McaReusableContent } from '../clauses/types';
 import { resolveReferences, type SelectedMcaClause } from '../engine/number-clauses';
 import { instrumentsFor, selectClauses } from '../engine/select-clauses';
+import type { McaJurisdiction } from '../jurisdictions';
 import { normalisedDigest, readSourceText } from '../provenance/source-text';
 import { disclosuresFor } from '../registry';
 import { reusableFor } from '../reusable/library';
@@ -160,17 +161,54 @@ export const populateProvider = (body: string, profile: McaProviderProfile, valu
 
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
-/** A reusable recipe, not a filled transaction or authority to send legal text. */
-export const compileMcaTemplate = (input: McaProviderProfileInput) => {
+/**
+ * A reusable recipe for ONE document, not a filled transaction or authority to
+ * send legal text.
+ *
+ * ADR 0026: **entity + type = one template.** It used to compile whichever set
+ * of documents the policy selected, and that set existed nowhere else —
+ * `lombard-api` holds five separate published templates, each with its own
+ * `templateId`, each sent on its own. The caller has never seen a package.
+ *
+ * `instrumentsFor` still decides which documents a programme is ENTITLED to
+ * have; it no longer decides what a template contains. Asking for one the
+ * policy does not support is refused rather than silently compiled, because a
+ * template for a document the programme does not run is a document nobody can
+ * lawfully send.
+ */
+export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: McaInstrument): McaTemplateSnapshot => {
   const profile = ZMcaProviderProfile.parse(input);
   profile.policy.recipientStates.sort();
   const facts = providerSelectionFacts(profile);
-  // A processor's actual form remains externally controlled and separately reviewed.
-  const instruments = instrumentsFor(facts).filter((instrument) => instrument !== 'split-funding');
-  const selections = instruments.map((instrument) => ({
-    instrument,
-    clauses: selectClauses({ facts, instrument }).selected,
-  }));
+
+  // A processor's actual form remains externally controlled and separately
+  // reviewed (ADR 0019); the builder produces none.
+  if (instrument === 'split-funding') {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'A split funding letter is the processor’s and is never built here.',
+    });
+  }
+
+  if (!instrumentsFor(facts).includes(instrument)) {
+    // Named by title where we have one; an unknown instrument still has to
+    // refuse clearly rather than throw reading a property off undefined, which
+    // is what it did and which masked the real call site.
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `This programme does not run a ${INSTRUMENTS[instrument]?.title ?? instrument}.`,
+    });
+  }
+
+  const selections = [{ instrument, clauses: selectClauses({ facts, instrument }).selected }];
+
+  /*
+    THIS DOCUMENT'S CLAUSES, AND ONLY ITS OWN.
+
+    It used to be every selected document's clauses, so a clause could cite one
+    in another and resolve a number. Exactly one did — the ISO PRA's commission
+    clause, citing the FRPA — and ADR 0026 reworded it to name the Right to
+    Cancel provision instead. `numbering.test.ts` asserts nothing in the library
+    crosses a document, so this cannot silently start failing to resolve.
+  */
   const context = selections.flatMap((selection) => selection.clauses);
   const values = providerValues(profile);
   const documents: McaTemplateDocument[] = selections.map(({ instrument, clauses }) => {
@@ -250,6 +288,16 @@ export const compileMcaTemplate = (input: McaProviderProfileInput) => {
   ];
   const snapshot = {
     schemaVersion: 1 as const,
+    /*
+      WHICH DOCUMENT THIS TEMPLATE IS, carried at the top level and not only
+      inside `documents[0]`.
+
+      A recompile has to ask for the same document to produce the same
+      fingerprint, and `isMcaTemplateCurrent` recompiles from the snapshot
+      alone. Without this it had nothing to ask for — it recompiled with no
+      instrument at all, which under ADR 0026 no longer has a meaning.
+    */
+    instrument,
     profile,
     documents,
     externalDocuments,
@@ -259,7 +307,55 @@ export const compileMcaTemplate = (input: McaProviderProfileInput) => {
   return { ...snapshot, fingerprint: hash(snapshot) };
 };
 
-export type McaTemplateSnapshot = ReturnType<typeof compileMcaTemplate>;
+/**
+ * What a state disclosure obliges this programme to do, listed and never decided.
+ */
+export type McaTemplateRequirement = {
+  slug: string;
+  jurisdiction: McaJurisdiction;
+  citation: string;
+  /*
+    WIDE ON PURPOSE. Narrowing this to the three literals makes the declared
+    type disagree with what the compiler's own expression infers, and nothing
+    discriminates on it — a requirement is listed, never branched on.
+  */
+  kind: string;
+  transaction: string;
+  applicability: 'determine-per-transaction';
+  specFingerprint: string;
+  sourceDigest: string;
+};
+
+/** A form this programme needs but does not produce — the processor's letter (ADR 0019). */
+export type McaTemplateExternalDocument = {
+  instrument: 'split-funding';
+  processor: string;
+  form: { title: string; version: string; reference: string };
+  control: 'processor-controlled';
+  acceptance: 'required-per-transaction';
+};
+
+/**
+ * DECLARED, NOT INFERRED FROM `compileMcaTemplate`.
+ *
+ * It was `ReturnType<typeof compileMcaTemplate>`. This is the shape the review,
+ * publish and reading pipelines are all written against and the shape the tRPC
+ * preview route returns, so it is worth stating rather than deriving: a
+ * declared type is checked against what the compiler actually builds, and it
+ * already caught `kind` and the processor's `form` being looser than intended.
+ */
+export type McaTemplateSnapshot = {
+  schemaVersion: 1;
+  /** Which document this template is. ADR 0026: entity + type = one template. */
+  instrument: McaInstrument;
+  profile: McaProviderProfile;
+  documents: McaTemplateDocument[];
+  externalDocuments: McaTemplateExternalDocument[];
+  requirements: McaTemplateRequirement[];
+  readyToSend: false;
+  fingerprint: string;
+};
 
 export const isMcaTemplateCurrent = (snapshot: McaTemplateSnapshot): boolean =>
-  snapshot.schemaVersion === 1 && snapshot.fingerprint === compileMcaTemplate(snapshot.profile).fingerprint;
+  snapshot.schemaVersion === 1 &&
+  snapshot.fingerprint === compileMcaTemplate(snapshot.profile, snapshot.instrument).fingerprint;

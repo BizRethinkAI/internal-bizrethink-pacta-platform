@@ -4,7 +4,7 @@ import { assertMcaTeamAccess } from '@bizrethink/customizations/mca/templates/se
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { useLoaderData } from 'react-router';
-import type { Route } from './+types/mca_.draft';
+import type { Route } from './+types/mca_.preview';
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: legalStyles }];
 
@@ -14,8 +14,8 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   await assertMcaTeamAccess({ teamId: team.id, userId: user.id });
   return { teamId: team.id, teamUrl: team.url };
 };
-const McaDraftPage = () => {
+const McaTemplatePreviewPage = () => {
   const data = useLoaderData<typeof loader>();
   return <McaTemplateUseWorkspace {...data} />;
 };
-export default McaDraftPage;
+export default McaTemplatePreviewPage;

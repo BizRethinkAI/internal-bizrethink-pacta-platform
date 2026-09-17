@@ -11,12 +11,13 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@documenso/prisma', () => ({ prisma: mocks.db }));
 vi.mock('../../server-only/clause-approvals', () => ({ loadMcaClauseApprovals: mocks.approvals }));
 
+import type { McaInstrument } from '../../clauses/instruments';
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
 import { assertMcaPackagePublishable, mcaPublicationRefusals } from '../publishable';
 import { mcaPublishablePackageFor } from './publishable-package';
 
-const snapshot = () => compileMcaTemplate(providerFixture());
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -35,7 +36,7 @@ beforeEach(() => {
  */
 describe('the package handed to the gate describes this template', () => {
   it('carries the clauses of the instrument being published', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
 
     expect(pkg.items.length).toBeGreaterThan(0);
 
@@ -56,7 +57,7 @@ describe('the package handed to the gate describes this template', () => {
    * that a partition is asserted total rather than assumed.
    */
   it('judges every item the document contains, not the ones it recognises', async () => {
-    const compiled = snapshot();
+    const compiled = snapshot('frpa');
     const document = compiled.documents.find((candidate) => candidate.instrument === 'frpa');
     const pkg = await mcaPublishablePackageFor(compiled, 'frpa');
 
@@ -64,7 +65,7 @@ describe('the package handed to the gate describes this template', () => {
   });
 
   it('refuses to judge a package carrying content the library cannot produce', async () => {
-    const compiled = snapshot();
+    const compiled = snapshot('frpa');
     const document = compiled.documents.find((candidate) => candidate.instrument === 'frpa');
 
     document?.items.push({ ...document.items[0], slug: 'frpa.not-in-the-library' });
@@ -78,7 +79,7 @@ describe('the package handed to the gate describes this template', () => {
    * is numbered and has provider values resolved into it.
    */
   it('hands over the authored clause, not the rendered projection', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
     const [first] = pkg.items;
 
     expect(first.content).toHaveProperty('examinedBy');
@@ -91,7 +92,7 @@ describe('the package handed to the gate describes this template', () => {
    * fill, because there is no widget to send a value to.
    */
   it('reports a field nothing can fill as a missing input', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
 
     expect(pkg.blockers).toEqual([]);
     expect(pkg.missing.length).toBeGreaterThan(0);
@@ -102,7 +103,7 @@ describe('the package handed to the gate describes this template', () => {
     mocks.db.bizrethinkMcaLibraryFinding.count.mockResolvedValue(2);
     mocks.db.bizrethinkMcaPackageFinding.count.mockResolvedValue(3);
 
-    expect((await mcaPublishablePackageFor(snapshot(), 'frpa')).unansweredCounselFindings).toBe(5);
+    expect((await mcaPublishablePackageFor(snapshot('frpa'), 'frpa')).unansweredCounselFindings).toBe(5);
   });
 
   /**
@@ -110,7 +111,7 @@ describe('the package handed to the gate describes this template', () => {
    * indistinguishable from a clean library. The gate must be told which it is.
    */
   it('passes the register’s availability rather than inferring it', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
 
     expect(typeof pkg.evidenceAvailable).toBe('boolean');
   });
@@ -121,7 +122,7 @@ describe('the package handed to the gate describes this template', () => {
    * of bug #283 shipped and a review caught.
    */
   it('takes approvals as a Map, so there are no prototype keys to answer', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
 
     expect(pkg.approvals).toBeInstanceOf(Map);
     expect(pkg.approvals.get('constructor')).toBeUndefined();
@@ -135,7 +136,7 @@ describe('the package handed to the gate describes this template', () => {
  */
 describe('nothing publishes yet, and the refusal says why', () => {
   it('refuses every clause for want of an approval', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
     const refusals = mcaPublicationRefusals(pkg);
 
     expect(refusals.length).toBeGreaterThan(0);
@@ -143,7 +144,7 @@ describe('nothing publishes yet, and the refusal says why', () => {
   });
 
   it('throws rather than returning a list a caller could ignore', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
 
     expect(() => assertMcaPackagePublishable(pkg)).toThrow();
   });
@@ -153,7 +154,7 @@ describe('nothing publishes yet, and the refusal says why', () => {
    * binding, so the fix is findable rather than a count.
    */
   it('names each unfillable field, not just how many there are', async () => {
-    const pkg = await mcaPublishablePackageFor(snapshot(), 'frpa');
+    const pkg = await mcaPublishablePackageFor(snapshot('frpa'), 'frpa');
     const refusals = mcaPublicationRefusals(pkg);
     const named = refusals.filter((refusal) => refusal.reason.startsWith('required input not supplied:'));
 

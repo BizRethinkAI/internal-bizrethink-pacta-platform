@@ -6,7 +6,8 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/generated/types';
 
 import { getFeatureAccess } from '../../../server-only/feature-access';
-import { compileMcaTemplate } from '../compile';
+import type { McaInstrument } from '../../clauses/instruments';
+import { compileMcaTemplate, type McaTemplateSnapshot } from '../compile';
 import { type McaProviderProfile, ZMcaProviderProfile } from '../profile';
 
 export const MCA_BUILDER_FEATURE = 'mca-builder';
@@ -39,15 +40,26 @@ const scope = (id: string, team: { id: number; organisationId: string }) => ({
 });
 const missing = () => new AppError(AppErrorCode.NOT_FOUND, { message: 'No such MCA template revision.' });
 
-export const createMcaTemplate = async ({ teamId, userId, profile }: TeamActor & { profile: McaProviderProfile }) => {
+/**
+ * ADR 0026: a template is one entity's version of ONE document, and which
+ * document it is settled when it is created. Changing it afterwards would make
+ * every earlier revision a record of something else.
+ */
+export const createMcaTemplate = async ({
+  teamId,
+  userId,
+  profile,
+  instrument,
+}: TeamActor & { profile: McaProviderProfile; instrument: McaInstrument }) => {
   const team = await assertMcaTeamAccess({ teamId, userId, write: true });
-  const snapshot = compileMcaTemplate(profile);
+  const snapshot = compileMcaTemplate(profile, instrument);
   return prisma.bizrethinkMcaTemplate.create({
     data: {
       id: `mcat_${randomUUID()}`,
       teamId: team.id,
       organisationId: team.organisationId,
       label: snapshot.profile.label,
+      instrument,
       createdByUserId: userId,
       revisions: {
         create: {
@@ -72,7 +84,22 @@ export const reviseMcaTemplate = async ({
   profile,
 }: TeamActor & { id: string; expectedVersion: number; profile: McaProviderProfile }) => {
   const team = await assertMcaTeamAccess({ teamId, userId, write: true });
-  const snapshot = compileMcaTemplate(profile);
+
+  /*
+    THE INSTRUMENT IS READ, NOT ACCEPTED. A revision is a new version of THIS
+    template's document; letting an update name a different one would leave the
+    revision history describing two documents under one id.
+  */
+  const existing = await prisma.bizrethinkMcaTemplate.findFirst({
+    where: scope(id, team),
+    select: { instrument: true },
+  });
+
+  if (!existing) {
+    throw missing();
+  }
+
+  const snapshot = compileMcaTemplate(profile, existing.instrument as McaInstrument);
   const version = expectedVersion + 1;
   return prisma.$transaction(async (tx) => {
     const updated = await tx.bizrethinkMcaTemplate.updateMany({
@@ -106,6 +133,7 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
     select: {
       id: true,
       label: true,
+      instrument: true,
       currentRevision: true,
       revisions: {
         where: version ? { version } : undefined,
@@ -121,10 +149,19 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
     throw missing();
   }
   const profile = ZMcaProviderProfile.parse(revision.profile);
-  const current = compileMcaTemplate(profile).fingerprint === revision.fingerprint;
+  const instrument = row.instrument as McaInstrument;
+
+  /*
+    Recompiled against THIS template's document. The fingerprint covers the
+    compiled result, so comparing it against a different instrument's output
+    would report every template as stale.
+  */
+  const current = compileMcaTemplate(profile, instrument).fingerprint === revision.fingerprint;
+
   return {
     id: row.id,
     label: row.label,
+    instrument,
     currentRevision: row.currentRevision,
     version: revision.version,
     profile,
@@ -133,8 +170,23 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
   };
 };
 
+/**
+ * A compiled template plus where it was read from.
+ *
+ * DECLARED, not inferred: this is the tRPC preview route's output, so it is a
+ * contract every caller reads rather than an implementation detail.
+ */
+export type McaPreviewedTemplate = McaTemplateSnapshot & {
+  templateId: string;
+  version: number;
+  currentRevision: number;
+  audience: 'internal-draft';
+};
+
 /** Internal-only preview. Creating a recipe or a draft grant is never merchant-send permission. */
-export const previewMcaTemplate = async (input: TeamActor & { id: string; version: number }) => {
+export const previewMcaTemplate = async (
+  input: TeamActor & { id: string; version: number },
+): Promise<McaPreviewedTemplate> => {
   const team = await assertMcaTeamAccess(input);
   if (
     !(await getFeatureAccess({ feature: MCA_DRAFT_FEATURE, organisationId: team.organisationId, userId: input.userId }))
@@ -148,7 +200,11 @@ export const previewMcaTemplate = async (input: TeamActor & { id: string; versio
     });
   }
   return {
-    ...compileMcaTemplate(template.profile),
+    ...compileMcaTemplate(template.profile, template.instrument),
+    // Named explicitly as well as spread. A caller reading this over tRPC has
+    // to know which document it is looking at, and ADR 0026 makes that the
+    // template's identity rather than a detail of `documents[0]`.
+    instrument: template.instrument,
     templateId: input.id,
     version: input.version,
     currentRevision: template.currentRevision,

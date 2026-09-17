@@ -28,8 +28,9 @@ const profile = providerFixture();
 const existing = () => ({
   id: 'mca-existing',
   label: profile.label,
+  instrument: 'frpa',
   currentRevision: 1,
-  revisions: [{ version: 1, profile, fingerprint: compileMcaTemplate(profile).fingerprint }],
+  revisions: [{ version: 1, profile, fingerprint: compileMcaTemplate(profile, 'frpa').fingerprint }],
 });
 
 beforeEach(() => {
@@ -53,7 +54,7 @@ describe('team-owned provider template revisions and independent draft access', 
     expect(mocks.db.bizrethinkMcaTemplate.findFirst).not.toHaveBeenCalled();
   });
   it('requires a team manager for provider policy writes', async () => {
-    await createMcaTemplate({ ...identity, profile });
+    await createMcaTemplate({ ...identity, profile, instrument: 'frpa' });
     expect(mocks.db.team.findFirst.mock.calls[0]?.[0].where.teamGroups.some.teamRole.in).toEqual(['ADMIN', 'MANAGER']);
   });
   it('keeps every template lookup scoped to the authorized team', async () => {

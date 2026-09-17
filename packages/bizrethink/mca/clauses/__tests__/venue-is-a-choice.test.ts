@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { LOMBARD_FACTS } from '../facts';
 import { selectClauses } from '../../engine/select-clauses';
+import { LOMBARD_FACTS } from '../facts';
 import { libraryFor } from '../library';
 
 /**
