@@ -94,10 +94,45 @@ const styles = StyleSheet.create({
   label: { fontFamily: 'McaSans', fontSize: 8.5, color: '#667085' },
   value: { fontFamily: 'McaSans', fontSize: 10 },
   warning: { fontFamily: 'McaSans', fontSize: 9, color: '#935d17', marginBottom: 9 },
-  signature: { marginTop: 14, padding: 12, borderWidth: 0.5, borderColor: '#abb3bd' },
-  signatureLine: { marginTop: 20, fontFamily: 'McaSans', fontSize: 10 },
+  // The execution page: parties side by side, each block a column of the four
+  // lines a signer completes. Rules, never signing tokens — this copy is unsigned.
+  executionRow: { flexDirection: 'row', marginTop: 16 },
+  executionCell: { flexBasis: '50%', flexGrow: 0, flexShrink: 1, paddingRight: 18 },
+  executionCellLast: { flexBasis: '50%', flexGrow: 0, flexShrink: 1 },
+  executionCellFull: { flexBasis: '100%', flexGrow: 0, flexShrink: 1 },
+  executionRole: { fontFamily: 'McaSansBold', fontSize: 8, letterSpacing: 2, color: '#935d17', marginBottom: 4 },
+  executionParty: { fontFamily: 'McaSans', fontSize: 10.5, marginBottom: 2 },
+  executionLine: { fontFamily: 'McaSans', fontSize: 9.5, color: '#344054', marginTop: 9 },
 });
 const text = (value: string, style: Style | Style[] = styles.paragraph) => h(Text, { style }, value);
+
+/** Role labels are letter-spaced on the execution page, as the real documents set them. */
+const spaced = (value: string) => value.toUpperCase().split('').join(' ');
+
+/**
+ * Two parties to a row, except a guarantor, who takes the width.
+ *
+ * Burying a guaranty beside the party it guarantees is what let the real
+ * document's guaranty reach a natural person without saying so; the separate
+ * full-width block is what makes the next such reach visible.
+ */
+const executionRows = <T extends { role: string }>(signatures: T[]): T[][] => {
+  const rows: T[][] = [];
+
+  for (const signature of signatures) {
+    const full = /guarantor/i.test(signature.role);
+    const previous = rows.at(-1);
+
+    if (!full && previous?.length === 1 && !/guarantor/i.test(previous[0].role)) {
+      previous.push(signature);
+      continue;
+    }
+
+    rows.push([signature]);
+  }
+
+  return rows;
+};
 
 /** Review output only. No AcroForms, signing tokens, delivery artifacts or regulator-form imitations. */
 export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number): Promise<Buffer> => {
@@ -164,16 +199,31 @@ export const renderMcaDraftPdf = async (draft: McaFilledDraft, revision: number)
         ...section.items.flatMap(itemElements),
       ]),
       h(Text, { style: styles.heading, minPresenceAhead: 100 }, 'Separate execution locations — unsigned'),
-      ...document.signatures.map((signature, index) =>
+      text('Internal draft — no signature is collected or applied in this copy.', styles.label),
+      ...executionRows(document.signatures).map((row, index) =>
         h(
           View,
-          { key: `${signature.role}:${index}`, style: styles.signature, wrap: false },
-          text(`${signature.role}: ${signature.partyName || '[party to identify]'}`, styles.heading),
-          text(`Printed signer: ${signature.signerName || '[to complete]'}`, styles.value),
-          text(`Capacity: ${signature.capacity || '[to complete]'}`, styles.value),
-          text(`Email: ${signature.email || '[to complete before electronic signing]'}`, styles.value),
-          text('Signature: ______________________________     Date: ______________', styles.signatureLine),
-          text('Internal draft — no signature is collected or applied in this copy.', styles.label),
+          { key: `execution:${index}`, style: styles.executionRow, wrap: false },
+          ...row.map((signature, column) =>
+            h(
+              View,
+              {
+                key: `${signature.role}:${column}`,
+                style:
+                  row.length === 1
+                    ? styles.executionCellFull
+                    : column === row.length - 1
+                      ? styles.executionCellLast
+                      : styles.executionCell,
+              },
+              text(spaced(signature.role), styles.executionRole),
+              text(signature.partyName || '[party to identify]', styles.executionParty),
+              text('Signature: ____________________________', styles.executionLine),
+              text(`Printed Name: ${signature.signerName || '__________________'}`, styles.executionLine),
+              text(`Title: ${signature.capacity || '__________________'}`, styles.executionLine),
+              text('Date: ____________________', styles.executionLine),
+            ),
+          ),
         ),
       ),
     ),
