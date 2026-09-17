@@ -5,7 +5,12 @@ export type ReviewDocument = McaReviewPackage['documents'][number];
 export type FieldPart = { kind: 'text' | 'field'; text: string; original: string; label?: string };
 
 // Review annotations for these exact saved Payzli passages, verified against the
-// vendored letter at 7b8e61c3. They do not fill fields or merge its two percentages.
+// vendored letter. They do not fill fields or merge its two percentages.
+//
+// The instruction passage's pin was re-taken on 2026-09-17, when the letter went
+// back to the processor form's own wording under ADR 0019. A pin is to exact
+// text, so a changed passage loses its labels until somebody re-reads it and
+// re-takes the pin — which is the point, not an inconvenience.
 const processorFields: Record<string, Record<string, string>> = {
   ff37bc9f6a1a6a76ed467825716a32ecb6d09debeda9b3059be33910e4c1b1bd: {
     '1': 'Seller name',
@@ -13,7 +18,7 @@ const processorFields: Record<string, Record<string, string>> = {
     '8': 'Funding company name',
     '2': 'Purchase agreement percentage',
   },
-  e38009aea62dba870d0396e2f07b7acfec6506da3f9505e487eb79a30dbf6870: {
+  '9ce8158e21c079b7706e09a48fcadf4b8538c72a4572959684ed73f36dc65701': {
     '3': 'Processor withholding percentage',
     '16': 'Purchased amount',
   },

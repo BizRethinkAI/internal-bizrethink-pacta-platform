@@ -118,8 +118,8 @@ export const LOMBARD: McaTenant = {
     },
     'split-funding': {
       file: 'Lombard_Payzli_Split_Funding_Authorization_v2.txt',
-      digest: '2c077ddff1656c3f6c94fa9ae1563779947fcb6900abd785cd47c672083d2d21',
-      bodiesVerifiedAt: '2026-09-08',
+      digest: '33f86fdb695fcce20a934a55577929b4eb1f4c93c2aa35e7346a1a7f7dafe4fa',
+      bodiesVerifiedAt: '2026-09-17',
     },
     'permission-to-release': {
       file: 'Lombard_Permission_to_Release_v1.txt',
