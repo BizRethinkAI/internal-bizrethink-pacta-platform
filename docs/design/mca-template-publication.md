@@ -35,11 +35,13 @@ templates that already exist in the funder's team. Three consequences:
    assigns deal fill to the funder's platform, over the API, for exactly the
    automation reason ADR 0010 protects.
 3. **The AcroForm widget names are an interface contract.** The platform
-   prefills *by widget name*, and **nothing there catches a rename**:
-   `buildFormValues` warns about an unknown name only when the published record
-   carries `formFields`, and every live record carries `acroformFields` instead.
-   So a name we rename is not an error anybody sees — it is a blank where a
-   figure belonged, in a document a merchant is signing.
+   prefills *by widget name*. Their CI catches a drift authored on their side —
+   `pacta-v2-registry.test.ts` asserts every kind emits exactly its template's
+   widgets — but it cannot see a template **republished from outside their
+   repository**, which is exactly what ADR 0023 introduces. Their runtime
+   backstop for that case is lombard-platform #262, which warns; the failure it
+   guards against is a blank where a figure belonged, in a document a merchant
+   is signing.
 
 ## What publication requires, and where today's renderer falls short
 

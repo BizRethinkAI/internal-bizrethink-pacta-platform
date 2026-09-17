@@ -59,11 +59,13 @@ published.
 (`documenso-prefill-helper.mjs`, `buildFormValues`). Field labels are not the
 interface.
 
-And nothing on that side catches a rename. `buildFormValues` warns about an
-unknown name only when the record carries `formFields`; every live record
-carries `acroformFields` instead. So a name the builder renames breaks a caller
-this repository does not deploy — silently, at the moment a merchant is waiting,
-as a blank where a figure belonged.
+Their own CI catches a drift authored on their side: `pacta-v2-registry.test.ts`
+asserts every kind emits exactly its template's widgets. What it cannot see is a
+template **republished from outside that repository** — which is precisely what
+this ADR introduces. A name the builder renames therefore breaks a caller this
+repository does not deploy, at the moment a merchant is waiting, as a blank where
+a figure belonged. lombard-platform #262 adds a runtime warning for that case;
+the parity test here is what stops it reaching publication at all.
 
 The set is pinned in `packages/bizrethink/mca/publish/template-parity.ts`, with
 every gap between it and the library stated and checked. Parity is a diff, not a
