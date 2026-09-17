@@ -13,9 +13,11 @@ templates expect and checks the library against it.
 names recipients by **role key** (`recipients: { merchant: {...}, guarantor:
 {...} }`), and `sendDocument` throws `recipient "x" expected by template but not
 provided` when a key it expects is missing. A widget name that stops matching,
-by contrast, is a silent blank in a signed document (#289). Both are interfaces
-this repository does not deploy; knowing which one shouts changes how carefully
-each has to be handled at the first publication.
+by contrast, raises nothing at send time — it is a blank in a signed document
+(#289), caught only by a CI spec on their side that cannot see a template
+republished from here, plus the runtime warning in lombard-platform #262. Both
+are interfaces this repository does not deploy; knowing which one refuses to
+proceed changes how carefully each has to be handled at the first publication.
 
 The role key is load-bearing in the return direction too: the platform reads
 `recipientTokens.merchant` and `signingUrls.merchant` back out by the same key.
