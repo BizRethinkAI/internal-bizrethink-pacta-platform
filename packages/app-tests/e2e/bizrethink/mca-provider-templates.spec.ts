@@ -49,7 +49,7 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
     await grant(peer.user.id, 'mca-builder', true);
     await grant(peer.user.id, 'mca-clause-draft-rendering', true);
     await apiSignin({ page, email: user.email });
-    const created = await post(page.request, 'create', { teamId: team.id, data: profile });
+    const created = await post(page.request, 'create', { teamId: team.id, data: profile, instrument: 'frpa' });
     expect(created.ok()).toBe(true);
     const template = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: user.id } });
     const scope = { teamId: team.id, id: template.id, version: 1 };
@@ -298,7 +298,21 @@ test('HTTP access separates membership, write authority and draft permission; st
   try {
     await grant(own.user.id, 'mca-builder', true);
     await apiSignin({ page, email: own.user.email });
-    const created = await post(page.request, 'create', { teamId, data: profile });
+    /*
+      ADR 0019 AT THE EDGE. A split funding letter is the processor's, used
+      exactly as supplied, and the builder produces none — so the route's own
+      input schema turns it away before anything reaches the compiler. Asserted
+      over HTTP because the schema is the guard, and only this exercises it.
+    */
+    const processorForm = await post(page.request, 'create', {
+      teamId,
+      data: profile,
+      instrument: 'split-funding',
+    });
+    expect(processorForm.ok()).toBe(false);
+    expect(await prisma.bizrethinkMcaTemplate.count({ where: { teamId } })).toBe(0);
+
+    const created = await post(page.request, 'create', { teamId, data: profile, instrument: 'frpa' });
     expect(created.ok()).toBe(true);
     const row = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: own.user.id } });
     const input = { teamId, id: row.id, version: 1 };
@@ -308,7 +322,11 @@ test('HTTP access separates membership, write authority and draft permission; st
     const preview = await get(page.request, 'preview', input);
     expect(preview.status()).toBe(403);
     expect(await preview.text()).toContain('Internal draft preview access is required');
-    const foreignResult = await post(page.request, 'create', { teamId: foreignTeamId, data: profile });
+    const foreignResult = await post(page.request, 'create', {
+      teamId: foreignTeamId,
+      data: profile,
+      instrument: 'frpa',
+    });
     expect(foreignResult.status()).toBe(404);
     expect(await prisma.bizrethinkMcaTemplate.count({ where: { teamId: foreignTeamId } })).toBe(0);
     const leaf = await page.request.get(`${NEXT_PUBLIC_WEBAPP_URL()}/admin/mca-templates.data`, {

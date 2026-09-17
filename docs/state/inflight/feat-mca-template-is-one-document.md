@@ -110,6 +110,18 @@ Fourteen, in three kinds:
 
 Nothing was deleted to make this green.
 
+## The E2E gate
+
+The MCA specs post to the `create` route directly and had to name a document
+too. While there, the ADR 0019 guard is now asserted **over HTTP**: the route's
+input schema refuses a split funding letter, and no row is written. The schema
+is the guard, and this is the only thing that exercises it end to end.
+
+Two non-MCA specs failed in the same run and **passed on retry #1** —
+`update-envelope-items.spec.ts:298` and `envelope-save-as-template.spec.ts:445`,
+both green on #311. Flaky, not this branch. The MCA failures failed all five
+attempts, which is what a real one looks like.
+
 ## Local failures that are not this branch
 
 Four regression files fail in this worktree and pass in the main checkout:
