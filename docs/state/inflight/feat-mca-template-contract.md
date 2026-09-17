@@ -13,10 +13,21 @@ contract". They are wrong on the mechanism, and the correction is in this branch
 `acroformFields` and sends `prefillFields: []`; `buildFormValues`
 (`documenso-prefill-helper.mjs`) is where the keys are used.
 
-**And nothing on that side catches a rename.** `buildFormValues` warns about an
-unknown name only when the published record carries `formFields`. None of the
-live records do — they carry `acroformFields`. A renamed widget is therefore a
-silent blank in a merchant's document, which is why this lands as a test.
+**What catches a drift, corrected 2026-09-17.** An earlier draft of this note
+said nothing on that side catches a rename. The platform session checked instead
+of taking my word for it: their `pacta-v2-registry.test.ts` asserts every kind
+emits exactly its template's widgets, and it is clean across 6,283 tests. So
+nothing is being dropped silently today and I overstated the exposure.
+
+What that spec cannot see is a template **republished from outside their
+repository** — exactly what ADR 0023 introduces by making this builder the
+producer. Their runtime backstop for that is lombard-platform #262, which reads
+`acroformFields` (the key the records actually carry) and warns rather than
+throws: a drifted name leaves the document equally blank either way, and
+throwing at send time would turn a cosmetic drift into an outage.
+
+The risk this test answers is the one neither covers — a name renamed *here*, in
+a template produced *here* — and it fails before publication rather than after.
 
 **`acroformFieldCount` is not the number of fields.** It counts widget
 annotations: `merchant_legal_name` is one field with three widgets on the FRPA,
