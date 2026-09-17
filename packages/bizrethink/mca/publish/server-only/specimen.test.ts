@@ -1,6 +1,6 @@
 import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { PDF } from '@libpdf/core';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { compileMcaTemplate } from '../../templates/compile';
 import { providerFixture } from '../../templates/profile.fixture';
@@ -23,7 +23,31 @@ import { renderMcaTemplatePdf } from './template-pdf';
  * signer fields — it is inert, rather than a document that looks like it works.
  */
 
+// Real PDFs, read back through two libraries. Slower than the 5s default by
+// nature, and one case renders the template AND its preview to compare them.
+vi.setConfig({ testTimeout: 60_000 });
+
 const snapshot = () => compileMcaTemplate(providerFixture());
+
+/** Render each artifact once per file rather than once per assertion. */
+const rendered = new Map<string, Promise<Buffer>>();
+
+const once = (key: string, make: () => Promise<Buffer>): Promise<Buffer> => {
+  const existing = rendered.get(key);
+
+  if (existing) {
+    return existing;
+  }
+
+  const pending = make();
+
+  rendered.set(key, pending);
+
+  return pending;
+};
+
+const previewOf = () => once('preview', () => renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3));
+const templateOf = () => once('template', () => renderMcaTemplatePdf(snapshot(), 'frpa', 3));
 
 const textOf = async (pdf: Buffer): Promise<string> => {
   const doc = await PDF.load(new Uint8Array(pdf));
@@ -67,13 +91,13 @@ describe('a specimen value stands in for a real one', () => {
 
 describe('the preview shows the document that will publish', () => {
   it('carries no marker, because a reviewer is reading values not slots', async () => {
-    const text = await textOf(await renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3));
+    const text = await textOf(await previewOf());
 
     expect(text).not.toMatch(/«[a-z][a-z0-9_]*»/);
   });
 
   it('puts a specimen value where the template puts a marker', async () => {
-    const text = await textOf(await renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3));
+    const text = await textOf(await previewOf());
 
     expect(text.toLowerCase()).toContain('specimen');
   });
@@ -83,8 +107,8 @@ describe('the preview shows the document that will publish', () => {
    * only if what it shows is what will be published.
    */
   it('keeps the wording and structure of the template exactly', async () => {
-    const template = await textOf(await renderMcaTemplatePdf(snapshot(), 'frpa', 3));
-    const preview = await textOf(await renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3));
+    const template = await textOf(await templateOf());
+    const preview = await textOf(await previewOf());
     const headings = fieldPlanFor('frpa');
 
     // The clause prose is the bulk of both documents and must be identical.
@@ -109,20 +133,20 @@ describe('the preview shows the document that will publish', () => {
  */
 describe('a preview cannot become a working template by accident', () => {
   it('says on every page that it is not for signing', async () => {
-    const text = await textOf(await renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3));
+    const text = await textOf(await previewOf());
 
     expect(text).toMatch(/PREVIEW/i);
     expect(text).toMatch(/not for signing|specimen values/i);
   });
 
   it('offers Documenso no signer field to make', async () => {
-    const extracted = await extractPlaceholdersFromPDF(await renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3));
+    const extracted = await extractPlaceholdersFromPDF(await previewOf());
 
     expect(extracted).toEqual([]);
   });
 
   it('offers the injector nothing to place', async () => {
-    const preview = await renderMcaTemplatePreviewPdf(snapshot(), 'frpa', 3);
+    const preview = await previewOf();
     const markers = (await PDF.load(new Uint8Array(preview)))
       .getPages()
       .flatMap((page) => page.findText(/«[a-z][a-z0-9_]*»/g));
@@ -135,7 +159,7 @@ describe('a preview cannot become a working template by accident', () => {
    * thing that publishes, and it still carries both mechanisms.
    */
   it('leaves the publishable template carrying both, as before', async () => {
-    const extracted = await extractPlaceholdersFromPDF(await renderMcaTemplatePdf(snapshot(), 'frpa', 3));
+    const extracted = await extractPlaceholdersFromPDF(await templateOf());
 
     expect(extracted.length).toBe(6);
   });
