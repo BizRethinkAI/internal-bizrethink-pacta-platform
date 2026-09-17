@@ -38,6 +38,22 @@ snapshot and the instrument argument can now disagree where the package used to
 hold them all. It fails closed now, like the renderer beside it, and the test
 that proves it replaced one that was passing on an incidental throw.
 
+**The same mistake exists one layer up, in the publish UI on #308.** Both
+derive *what this template can produce* from the programme's policy rather than
+from the template itself — which was correct while a template was a package and
+became wrong the moment ADR 0026 made it one document. Here it was
+`snapshot.documents.find(...)` falling through to an empty placement; there it
+is `instrumentsFor(providerSelectionFacts(profile))` rendering a publish control
+per entitled instrument, which after this change offers four documents the
+template does not contain. A clean textual merge preserves that exactly, with
+`publishMcaTemplate` refusing them at the artifact step instead of the UI never
+offering them.
+
+**The mistake was not local to the renderer**, which is the part worth keeping:
+finding it in one place was reason to look for it in the others. The UI half is
+fixed on #308 as its own commit rather than inside a conflict resolution, so it
+gets read as a behaviour change and not as a rebase.
+
 **`isMcaTemplateCurrent` recompiled with no instrument at all**, which under ADR
 0026 has no meaning. The snapshot carries `instrument` at the top level now, and
 two tests cover it — one that every document checks out as current, and one that
