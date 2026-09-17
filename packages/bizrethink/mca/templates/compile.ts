@@ -338,12 +338,11 @@ export type McaTemplateExternalDocument = {
 /**
  * DECLARED, NOT INFERRED FROM `compileMcaTemplate`.
  *
- * It was `ReturnType<typeof compileMcaTemplate>`, and that inference is
- * circular — `projectTemplateReading` is generic over this type and feeds the
- * tRPC preview route, so resolving it required resolving itself. TypeScript
- * answers a circular inference with `any` and says nothing, which is how a
- * snapshot missing `instrument` reached a component prop that requires it and
- * only failed there.
+ * It was `ReturnType<typeof compileMcaTemplate>`. This is the shape the review,
+ * publish and reading pipelines are all written against and the shape the tRPC
+ * preview route returns, so it is worth stating rather than deriving: a
+ * declared type is checked against what the compiler actually builds, and it
+ * already caught `kind` and the processor's `form` being looser than intended.
  */
 export type McaTemplateSnapshot = {
   schemaVersion: 1;

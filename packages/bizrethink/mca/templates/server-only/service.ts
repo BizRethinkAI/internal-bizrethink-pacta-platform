@@ -173,10 +173,8 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
 /**
  * A compiled template plus where it was read from.
  *
- * DECLARED, not inferred. This is the tRPC preview route's output, and an
- * inferred one degrades across that boundary: the client saw a shape with no
- * `instrument` on it long after the compiler had one, and the only thing that
- * failed was a component prop several files away.
+ * DECLARED, not inferred: this is the tRPC preview route's output, so it is a
+ * contract every caller reads rather than an implementation detail.
  */
 export type McaPreviewedTemplate = McaTemplateSnapshot & {
   templateId: string;
