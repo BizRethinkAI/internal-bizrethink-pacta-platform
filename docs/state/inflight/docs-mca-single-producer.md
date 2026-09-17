@@ -80,3 +80,34 @@ asserts its own completeness.
 ADR 0023 links to ADR 0024, which is not on `main` until this lands, so the
 relative link dangles in the interval. Governance has no link checker, and the
 link resolves the moment this merges.
+
+## A governance guard that reads a stale branch as a modification
+
+Guard 2 enforces append-only ADRs, and it failed this branch with:
+
+```
+✗ These ADRs were modified or deleted in place:
+  docs/adr/0023-pacta-produces-mca-templates.md
+```
+
+This branch never modified ADR 0023. It branched off `feat/mca-send-gate`
+*before* that PR's last commit, #288 then merged, and main moved ahead on that
+file while this tree kept the older copy.
+
+**Guard 2 diffs `BASE_SHA HEAD_SHA` with two dots, and a two-dot diff cannot
+tell "this branch changed the file" from "this branch is behind main on the
+file".** The three-dot diff `origin/main...HEAD` on ADR 0023 was empty, and
+GitHub reported the PR mergeable — so merging was never going to revert
+anything.
+
+**Fixed by merging `origin/main` into the branch, not by taking the override
+the failure message offers.** An override is for a guard that is right about
+the facts and a human accepts it anyway. Here a refresh makes the guard pass
+legitimately, and an override granted for a false positive on an append-only
+rule is how that rule stops meaning anything.
+
+It bit here only because an ADR was added and then amended within one PR while
+another PR was stacked on it mid-flight. The next person to hit it will be
+pointed at the override by the message, which is why it is written down here.
+Changing the guard to a three-dot diff is a real fix and belongs in its own
+change, not smuggled into this one.
