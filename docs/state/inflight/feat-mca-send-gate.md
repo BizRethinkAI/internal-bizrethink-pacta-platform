@@ -1,13 +1,21 @@
-# The gate that has to exist before anything can be sent
+# The gate a recipe must pass before it becomes a template
 
 Author: `mca-output-fidelity-20260916`. Base: main `a615747ab`.
 Independent of #287; they touch different files.
 
 ## Durable behavior
 
-`mca/publish/sendable.ts` answers one question: may this package reach a
-merchant? Today the answer is always no, and the gate says why, clause by
+`mca/publish/publishable.ts` answers one question: may this package be published
+as a template? Today the answer is always no, and the gate says why, clause by
 clause.
+
+**The control point is publication, not sending, and this PR was re-pointed
+after the owner corrected me.** A funder's platform sends by calling
+`POST /api/v2/template/use` against a template already in its team — no MCA code
+is in that path, so gating "send" would gate nothing. ADR 0016 had already said
+it: an unapproved recipe must not become a sendable template merely because the
+interview was completed. `docs/design/mca-template-publication.md`, added here,
+scopes the path this gate guards.
 
 **It inverts `assertPublishable`'s default, deliberately.** That function
 returns early on anything not `published`, which is right for a report and wrong
@@ -21,8 +29,9 @@ moved, an unreadable review register, an outstanding blocker, a missing required
 input, an unanswered counsel finding. The cost of a wrong "yes" is a merchant
 signing text no attorney approved.
 
-`mcaPackageRefusals` returns the list for a screen; `assertMcaPackageSendable`
-throws, for callers that must not be able to ignore it. A gate that only returns
+`mcaPublicationRefusals` returns the list for a screen;
+`assertMcaPackagePublishable` throws, for callers that must not be able to
+ignore it. A gate that only returns
 a list is a gate somebody forgets to read.
 
 **Approvals arrive as a `Map`, not an object.** A plain object answers for its
@@ -58,8 +67,23 @@ TDD: 11 assertions failed with no module, then passed.
   package, and a prototype-shaped slug.
 - `mca` suite: **107 files / 3,461 tests pass.** Typecheck clean for the module.
 
+## What the scope document establishes
+
+- Publication is scriptable from inside Pacta. The runbook's "manual UI upload"
+  binds external REST callers; `extractPdfPlaceholders` and
+  `createEnvelope(TEMPLATE)` are reachable in-repo, and the **lease vertical
+  already publishes this way**.
+- The renderer needs a second mode. Today's output carries an `INTERNAL DRAFT`
+  banner and deliberately has no placeholders; only `{{...}}` placeholders become
+  Documenso fields, and an AcroForm widget can never be signer-written.
+- Field labels are an interface contract: the funder's platform prefills by
+  label, so a rename breaks a caller we do not deploy.
+- Four questions are open for the owner, two of which decide whether this path
+  replaces the `lombard-contracts` pipeline or sits beside it. Nothing should be
+  built until those two are answered.
+
 ## Not in this change
 
-No envelope, no recipients, no signing, no send. Internal drafts are untouched
-and stay available while unapproved — the gate is for merchant-bound output
-only, and wiring it to the draft path would break the thing ADR 0009 protects.
+No envelope, no recipients, no signing, no publication. Internal drafts are
+untouched and stay available while unapproved — the gate is for merchant-bound
+output only, and wiring it to the draft path would break what ADR 0009 protects.

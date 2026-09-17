@@ -6,9 +6,9 @@ import type { McaContent } from '../clauses/types';
 import type { McaJurisdiction } from '../jurisdictions';
 import type { ReviewFinding } from '../clauses/examination';
 
-export type McaSendRefusal = { slug: string; reason: string };
+export type McaPublishRefusal = { slug: string; reason: string };
 
-export type McaSendablePackage = {
+export type McaPublishablePackage = {
   items: { slug: string; content: McaContent }[];
   /**
    * Approvals by slug, **as a Map**.
@@ -31,13 +31,24 @@ export type McaSendablePackage = {
 };
 
 /**
- * Why this package may not reach a merchant, clause by clause.
+ * Why this package may not be PUBLISHED as a template, clause by clause.
  *
- * ADR 0020 §3.2 requires the first merchant-bound output to fail closed on
- * `assertPublishable`, with the test written first. This is that gate, and it
- * is built while NOTHING in the library is approved — so it ships shut, and on
- * the day approvals exist it is already the thing standing in the way rather
- * than something to be added once there is pressure to send.
+ * THE CONTROL POINT IS PUBLICATION, NOT SENDING, and getting that wrong is easy:
+ * a funder's platform sends by calling `POST /api/v2/template/use` against a
+ * template that already exists in its team, and no MCA code is anywhere in that
+ * path. By the time a deal is being sent it is far too late for this gate to
+ * matter. ADR 0016 says it plainly: *"An internal, unapproved MCA recipe must
+ * not become a sendable upstream template merely because the provider interview
+ * was completed."*
+ *
+ * Publication is the irreversible step — it hands text to a distribution path
+ * Pacta's MCA code does not control — so it is the step that must refuse.
+ *
+ * ADR 0020 §3.2 requires merchant-bound output to fail closed on
+ * `assertPublishable`. This is that gate, and it is built while NOTHING in the
+ * library is approved — so it ships shut, and on the day approvals exist it is
+ * already the thing standing in the way rather than something to be added once
+ * there is pressure to publish.
  *
  * **It inverts `assertPublishable`'s default, deliberately.** That function
  * returns early on anything not `published`, which is right for a report and
@@ -50,8 +61,8 @@ export type McaSendablePackage = {
  * reason to proceed, because the cost of a wrong "yes" is a merchant signing
  * text no attorney approved.
  */
-export const mcaPackageRefusals = (input: McaSendablePackage): McaSendRefusal[] => {
-  const refusals: McaSendRefusal[] = [];
+export const mcaPublicationRefusals = (input: McaPublishablePackage): McaPublishRefusal[] => {
+  const refusals: McaPublishRefusal[] = [];
 
   for (const blocker of input.blockers) {
     refusals.push({ slug: 'package', reason: `outstanding ${blocker.kind}: ${blocker.detail}` });
@@ -100,21 +111,22 @@ export const mcaPackageRefusals = (input: McaSendablePackage): McaSendRefusal[] 
 /**
  * The same question, asked where a caller cannot ignore the answer.
  *
- * A gate that returns a list is a gate somebody forgets to read. Sending paths
- * call this; the workspace calls `mcaPackageRefusals` to show the list.
+ * A gate that returns a list is a gate somebody forgets to read. The template
+ * publication path calls this; the workspace calls `mcaPublicationRefusals` to show
+ * the list while a funder is still deciding.
  */
-export const assertMcaPackageSendable = (input: McaSendablePackage): void => {
+export const assertMcaPackagePublishable = (input: McaPublishablePackage): void => {
   if (!input.items.length) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'This package has no content, and an empty package is not a sendable one.',
+      message: 'This package has no content, and an empty package is not a publishable one.',
     });
   }
 
-  const refusals = mcaPackageRefusals(input);
+  const refusals = mcaPublicationRefusals(input);
 
   if (refusals.length) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `This package cannot be sent: ${refusals.length} refusal(s), starting with ${refusals[0].slug} — ${refusals[0].reason}.`,
+      message: `This package cannot be published as a template: ${refusals.length} refusal(s), starting with ${refusals[0].slug} — ${refusals[0].reason}.`,
     });
   }
 };
