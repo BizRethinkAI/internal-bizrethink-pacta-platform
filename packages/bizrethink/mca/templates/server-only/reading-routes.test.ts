@@ -3,9 +3,10 @@ import type { TrpcContext } from '@documenso/trpc/server/context';
 import { router } from '@documenso/trpc/server/trpc';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ALL_MCA_CONTENT } from '../../catalogue';
-import { fillMcaDraftRoute } from '../../server-only/trpc/templates/fill';
 import { previewMcaTemplateRoute } from '../../server-only/trpc/templates/preview';
-import { allOptionsDraftFixture, filledDraftFixture } from '../../transactions/draft.fixture';
+import { allOptionsTemplateFixture } from '../all-options.fixture';
+import { compileMcaTemplate } from '../compile';
+import { providerFixture } from '../profile.fixture';
 
 const mocks = vi.hoisted(() => ({
   db: { team: { findFirst: vi.fn() }, bizrethinkMcaTemplate: { findFirst: vi.fn() } },
@@ -16,7 +17,7 @@ vi.mock('../../../server-only/feature-access', () => ({ getFeatureAccess: mocks.
 
 // Keep the actual authenticated handlers, service, compiler, projection and
 // preparation path. Only database/feature lookups use synthetic records.
-const api = router({ preview: previewMcaTemplateRoute, fill: fillMcaDraftRoute });
+const api = router({ preview: previewMcaTemplateRoute });
 const context = (): TrpcContext => ({
   user: {
     id: 41,
@@ -52,12 +53,18 @@ beforeEach(() => {
   mocks.grant.mockResolvedValue(true);
 });
 
-describe('referenced clauses through provider preview and draft preparation', () => {
+/**
+ * ADR 0025 retired the deal path, and with it this file's second half — a
+ * `fill` route that took a merchant's answers. What it was actually protecting
+ * survives untouched: a `[[clause:...]]` reference must come back through the
+ * ROUTE as a real number pointing at a real clause, across documents.
+ */
+describe('referenced clauses through provider preview', () => {
   it.each([
-    { label: 'FRPA', fixture: filledDraftFixture, hasCrossDocumentReferences: false },
-    { label: 'all offered instruments', fixture: allOptionsDraftFixture, hasCrossDocumentReferences: true },
-  ])('$label retains readable clause and section references through both routes', async (scenario) => {
-    const { template, input } = scenario.fixture();
+    { label: 'FRPA', fixture: () => compileMcaTemplate(providerFixture()), hasCrossDocumentReferences: false },
+    { label: 'all offered instruments', fixture: allOptionsTemplateFixture, hasCrossDocumentReferences: true },
+  ])('$label retains readable clause and section references through the route', async (scenario) => {
+    const template = scenario.fixture();
     const before = JSON.stringify(template);
     mocks.db.bizrethinkMcaTemplate.findFirst.mockResolvedValue({
       id: 'synthetic-template',
@@ -107,17 +114,6 @@ describe('referenced clauses through provider preview and draft preparation', ()
     expect(hasCrossDocumentReference).toBe(scenario.hasCrossDocumentReferences);
     expect(preview.fingerprint).toBe(template.fingerprint);
 
-    const draft = await caller.fill({ ...request, draft: input });
-    expect(draft).toMatchObject({ templateId: request.id, version: 1, readyToSend: false });
-    expect(
-      draft.documents.flatMap((document) => document.items).some((item) => item.body.includes('Example Merchant Inc.')),
-    ).toBe(true);
-    for (const document of draft.documents) {
-      for (const item of document.items) {
-        expect(item.body, item.slug).not.toMatch(/\[\[|\]\]/);
-        expect(item.reading?.segments.map((part) => part.text).join(''), item.slug).toBe(item.body);
-      }
-    }
     expect(JSON.stringify(template)).toBe(before);
   });
 });

@@ -5,14 +5,13 @@ import { focusReadingItem, LegalText, legalItemId, ReferenceWorkspace } from '..
 import type { LegalReading } from '../../legal-ui/reading';
 import { groupMcaSections } from '../engine/section-headings';
 import type { McaTemplateDocument } from '../templates/compile';
-import type { McaDraftSignature } from '../transactions/fill';
 
 /** The index follows compiled documents, including repeated report-subject instances. */
 export const McaPackageReader = ({
   documents,
   unfilled = false,
 }: {
-  documents: (McaTemplateDocument & { id?: string; signatures?: McaDraftSignature[] })[];
+  documents: (McaTemplateDocument & { id?: string })[];
   unfilled?: boolean;
 }) => {
   const [selectedId, setSelectedId] = useState(documents[0]?.id ?? documents[0]?.instrument ?? '');
@@ -181,18 +180,6 @@ export const McaPackageReader = ({
             </section>
           ))}
         </div>
-        {active.signatures && (
-          <section className="rounded-lg border p-5">
-            <h3 className="mb-3 font-semibold">
-              <Trans>Separate unsigned execution locations</Trans>
-            </h3>
-            {active.signatures.map((signature, index) => (
-              <p key={`${signature.role}-${index}`} className="mt-2 text-sm">
-                {signature.role}: {signature.partyName} — {signature.signerName} ({signature.capacity})
-              </p>
-            ))}
-          </section>
-        )}
         <nav className="flex flex-wrap gap-3" aria-label="Adjacent documents">
           {projected
             .filter((_document, index) => Math.abs(index - projected.indexOf(active)) === 1)
