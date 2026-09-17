@@ -4,11 +4,15 @@ import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { LegalSummary, LegalWorkspace } from '../../legal-ui/reader';
+import { instrumentsFor } from '../engine/select-clauses';
+import { PRODUCED_INSTRUMENTS, type ProducedInstrument } from '../publish/recipient-contract';
 import type { McaTemplateSnapshot } from '../templates/compile';
+import { providerSelectionFacts } from '../templates/profile';
 import { McaOperatingRequirements } from './operating-requirements';
 import { McaPackageReader } from './package-reader';
 import { McaProviderInterview } from './provider-interview';
 import { McaProviderReviewManager } from './provider-review-manager';
+import { McaPublishTemplate } from './publish-template';
 
 export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; canWrite: boolean }) => {
   const [search, setSearch] = useSearchParams();
@@ -150,6 +154,30 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                 <Trans>Preview document package</Trans>
               </Button>
             </div>
+            {canWrite && saved.data.current && !isOldRevision && (
+              <div className="space-y-3">
+                {/*
+                  Derived from the saved profile rather than a compiled
+                  snapshot, because this page holds the profile and compiles
+                  nothing. `instrumentsFor` is the same function the compiler
+                  uses, so the list cannot disagree with what publishing would
+                  actually produce.
+                */}
+                {instrumentsFor(providerSelectionFacts(saved.data.profile))
+                  .filter((instrument): instrument is ProducedInstrument =>
+                    (PRODUCED_INSTRUMENTS as readonly string[]).includes(instrument),
+                  )
+                  .map((instrument) => (
+                    <McaPublishTemplate
+                      key={instrument}
+                      teamId={teamId}
+                      templateId={saved.data.id}
+                      version={saved.data.version}
+                      instrument={instrument}
+                    />
+                  ))}
+              </div>
+            )}
             {saved.data.profile?.policy?.recipientStates && (
               <McaOperatingRequirements states={saved.data.profile.policy.recipientStates} />
             )}

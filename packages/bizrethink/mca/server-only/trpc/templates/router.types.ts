@@ -22,3 +22,8 @@ export const ZSetMcaAccessRequestSchema = z
   .strict();
 
 export const ZFillMcaDraftRequestSchema = ZPreviewMcaTemplateRequestSchema.extend({ draft: ZMcaDraftInput }).strict();
+
+/** Publishing names one document of one revision. */
+export const ZMcaPublicationRequestSchema = ZPreviewMcaTemplateRequestSchema.extend({
+  instrument: z.enum(['frpa', 'equipment-lease', 'subscription', 'iso-pra', 'permission-to-release']),
+}).strict();
