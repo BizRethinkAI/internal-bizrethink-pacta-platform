@@ -43,6 +43,16 @@ export type McaPublicationInput = TeamActor & {
   /** The AcroForm widget names as published, which the caller prefills by. */
   widgets: string[];
   recipients: McaPublicationRecipient[];
+  /**
+   * What this template is for, so a caller holding several can choose.
+   *
+   * Pacta labels the goods; the entity runs the business. Which template suits a
+   * given merchant is the entity's decision with the entity's deal data — this
+   * refuses nothing, and exists because an entity cannot choose between two
+   * templates that do not say what they are for.
+   */
+  recipientStates: string[];
+  venueRule: string;
   /** The compiled snapshot's fingerprint at the moment of publication. */
   fingerprint: string;
 };
@@ -56,6 +66,8 @@ export type McaPublication = {
   envelopeId: string;
   widgets: string[];
   recipients: McaPublicationRecipient[];
+  recipientStates: string[];
+  venueRule: string;
   fingerprint: string;
   publishedAt: Date;
 };
@@ -79,6 +91,8 @@ export const recordMcaPublication = async ({
       envelopeId: published.envelopeId,
       widgets: published.widgets,
       recipients: published.recipients,
+      recipientStates: published.recipientStates,
+      venueRule: published.venueRule,
       fingerprint: published.fingerprint,
       publishedByUserId: userId,
     },
@@ -111,6 +125,8 @@ export const currentMcaPublications = async ({ teamId, userId }: TeamActor): Pro
       envelopeId: true,
       widgets: true,
       recipients: true,
+      recipientStates: true,
+      venueRule: true,
       fingerprint: true,
       publishedAt: true,
     },
@@ -126,6 +142,7 @@ export const currentMcaPublications = async ({ teamId, userId }: TeamActor): Pro
         instrument: row.instrument as McaInstrument,
         widgets: row.widgets as string[],
         recipients: row.recipients as McaPublicationRecipient[],
+        recipientStates: row.recipientStates as string[],
       });
     }
   }
