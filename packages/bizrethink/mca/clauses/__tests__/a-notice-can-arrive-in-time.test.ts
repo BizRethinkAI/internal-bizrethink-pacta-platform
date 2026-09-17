@@ -561,15 +561,25 @@ describe('the exhibit that moves the money meets §2.3’s specification', () =>
  * outside `miscellaneous`'s two files. Handed back in the cluster report.
  */
 const AUTHORIZATION_DEFECTS: { slug: string; pattern: RegExp; what: string }[] = [
+  /*
+    THE TWO ENTRIES THAT WERE HERE ARE GONE, AND THE DOCBLOCK ABOVE SAYS WHY:
+    "the day somebody rewrites the Payzli letter this test goes red and the entry
+    is deleted rather than left standing as a line that can no longer fail."
+
+    That day was 2026-09-17. Both described text OUR OWN 2026-09 edits had put in
+    the letter — a sentence sweeping fees out of settlement, and the removal of
+    the aggregate cap — and restoring the processor form's wording under ADR 0019
+    took both out. What the restored text does instead is below.
+  */
   {
     slug: 'split-funding.split-funding-instruction',
-    pattern: /may include fees in addition to the Purchased Amount/i,
-    what: 'sweeps a fee out of settlement, which §4.1 and Appendix A both forbid',
+    pattern: /withhold or debit _«3»_% of the payments due/i,
+    what: 'authorises debiting without limiting it to card settlement, where §4.1 promises no deposit-account debiting',
   },
   {
     slug: 'split-funding.split-funding-instruction',
-    pattern: /is not the point at which withholding stops/i,
-    what: 'has no aggregate cap: withholding runs past the Purchased Amount until Buyer says otherwise',
+    pattern: /an aggregate of \$ _____«16»______ \(the Purchased Amount/i,
+    what: 'stops at the Purchased Amount, where §2.6 completes on the Completion Threshold, which may include fees',
   },
   {
     slug: 'split-funding.indemnity',
