@@ -93,6 +93,7 @@ export const McaEntities = ({ teamId, canWrite }: { teamId: number; canWrite: bo
               <Trans>Add an entity</Trans>
             </h2>
             <McaEntityEditor
+              teamId={teamId}
               onSave={async (entity) => {
                 const result = await create.mutateAsync({ teamId, entity });
                 setSearch({ entity: result.id });
@@ -116,6 +117,7 @@ export const McaEntities = ({ teamId, canWrite }: { teamId: number; canWrite: bo
               </p>
             )}
             <McaEntityEditor
+              teamId={teamId}
               key={`${saved.data.id}:${saved.data.version}`}
               initial={{ label: saved.data.label, identity: saved.data.identity, policy: saved.data.policy }}
               readOnly={!canWrite}

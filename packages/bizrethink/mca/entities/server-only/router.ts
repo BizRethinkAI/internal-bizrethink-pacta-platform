@@ -1,9 +1,11 @@
 import { authenticatedProcedure, router } from '@documenso/trpc/server/trpc';
-
+import { assertMcaTeamAccess } from '../../templates/server-only/service';
+import { answerConsequences, documentsThisEntityCanHave } from '../consequences';
 import {
   ZCreateMcaEntityRequestSchema,
   ZGetMcaEntityRequestSchema,
   ZListMcaEntitiesRequestSchema,
+  ZMcaAnswerConsequencesRequestSchema,
   ZUpdateMcaEntityRequestSchema,
 } from './router.types';
 import { createMcaEntity, getMcaEntity, listMcaEntities, updateMcaEntity } from './service';
@@ -33,6 +35,23 @@ export const mcaEntitiesRouter = router({
 
   create: authenticatedProcedure.input(ZCreateMcaEntityRequestSchema).mutation(async ({ ctx, input }) => {
     return createMcaEntity({ teamId: input.teamId, entity: input.entity, userId: ctx.user.id });
+  }),
+
+  /**
+   * What each answer would do to the documents, derived from the same selection
+   * the compiler runs — never a written description, which would drift from the
+   * document the first time a clause's predicate moved.
+   *
+   * Server-side because the clause library is several hundred clauses and has
+   * no business in a browser bundle.
+   */
+  consequences: authenticatedProcedure.input(ZMcaAnswerConsequencesRequestSchema).query(async ({ ctx, input }) => {
+    await assertMcaTeamAccess({ teamId: input.teamId, userId: ctx.user.id });
+
+    return {
+      answers: answerConsequences(input.policy),
+      documents: documentsThisEntityCanHave(input.policy),
+    };
   }),
 
   update: authenticatedProcedure.input(ZUpdateMcaEntityRequestSchema).mutation(async ({ ctx, input }) => {

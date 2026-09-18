@@ -170,7 +170,7 @@ export type McaEntityInput = z.input<typeof ZMcaEntity>;
  * a deal — whether this merchant's processor accepted the split — and a
  * template is not a deal (ADR 0025).
  */
-export const entitySelectionFacts = (entity: McaEntity): McaFacts => ({
+export const entitySelectionFacts = (entity: Pick<McaEntity, 'policy'>): McaFacts => ({
   collectionMethod: entity.policy.collectionMethod,
   settlementBase: entity.policy.settlementBase,
   venueRule: entity.policy.venueRule,

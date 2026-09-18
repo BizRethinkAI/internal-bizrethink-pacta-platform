@@ -99,8 +99,47 @@ form that no longer exists; it is now two pages — add the entity, then create 
 template against it — and it asserts the guarantee that matters: editing the
 entity and revising the template leaves revision 1 byte-identical.
 
-## Still owed
+## The interview
 
-- The per-document-type interview. The template builder now picks an entity and
-  a document; it does not yet ask anything about the document itself.
+The owner's model, confirmed before building: **the questionnaire belongs on the
+entity**, and creating a template is entity + type + preview. That follows from
+§3 — every fact that selects clauses lives on the entity, so once you have
+chosen an entity and a document type there is nothing left for a per-document
+interview to ask.
+
+**Every explanation is derived, never written.** `answerConsequences(policy)`
+runs the same `selectClauses` the compiler runs, once per option, and diffs the
+result. So the page can say *"arbitration adds Arbitration and removes the Jury
+Trial Waiver, Class and Representative Proceedings, and Defences, Setoff and
+Counterclaims"* and be right by construction. A sentence written by hand goes
+stale the first time a predicate moves, silently, which in a legal document is
+the expensive kind.
+
+**It observes; it does not recommend.** The owner agreed to follow the lease
+builder's rule, which `suggestions.test.ts` enforces by asserting the literal
+absence of "we recommend". Same discipline asserted here. We also agreed **not
+to invent market observations** — there is no defensible source for "most
+funders choose X" in MCA, so the interview shows consequence only.
+
+Three things the derivation turned up that hand-written prose would have missed:
+
+- **A variant swap is one change, not two.** Both forums are "Venue and
+  Jurisdiction", so reporting it as added AND removed read as nonsense.
+  `replaces` says what actually happens.
+- **Some answers create paper rather than editing it.** Broker channel does not
+  alter the FRPA; it brings a channel agreement into being. Reported as
+  `documentsAdded` rather than as thirty-odd clause additions.
+- **Two "questions" were never questions.** `collectionMethod` and
+  `settlementBase` are `z.literal()`, so the interview states them as a
+  constraint of this release instead of offering a choice the schema refuses.
+
+**The Virginia contradiction now warns where it is made.** It was a validation
+error after saving; choosing a funder-state forum with Virginia on the list says
+so at the point of choosing, with the citation.
+
+**The payoff:** the end of the interview lists what these answers entitle the
+entity to have templates for, from the same `instrumentsFor` the compiler uses —
+so it cannot promise a document the builder would refuse.
+
+## Still owed
 - `equipment.affiliateLegalName` needs a widget name agreed with lombard.
