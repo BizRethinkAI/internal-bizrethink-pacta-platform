@@ -1,7 +1,7 @@
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Trans } from '@lingui/react/macro';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 import { LegalWorkspace } from '../../legal-ui/reader';
 import { McaEntityEditor } from './entity-editor';
@@ -18,7 +18,15 @@ import { McaEntityEditor } from './entity-editor';
  * this is where entities are kept, and the template builder still carries its
  * own provider interview.
  */
-export const McaEntities = ({ teamId, canWrite }: { teamId: number; canWrite: boolean }) => {
+export const McaEntities = ({
+  teamId,
+  teamUrl,
+  canWrite,
+}: {
+  teamId: number;
+  teamUrl: string;
+  canWrite: boolean;
+}) => {
   const [search, setSearch] = useSearchParams();
   const id = search.get('entity');
   const creating = search.get('new') === '1';
@@ -37,9 +45,14 @@ export const McaEntities = ({ teamId, canWrite }: { teamId: number; canWrite: bo
     <LegalWorkspace>
       <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
         <header className="space-y-2">
-          <h1 className="font-semibold text-2xl tracking-tight sm:text-3xl">
-            <Trans>Entities</Trans>
-          </h1>
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h1 className="font-semibold text-2xl tracking-tight sm:text-3xl">
+              <Trans>Entities</Trans>
+            </h1>
+            <Link className="font-medium text-sm underline" to={`/t/${teamUrl}/mca`}>
+              <Trans>MCA templates</Trans>
+            </Link>
+          </div>
           <p className="text-muted-foreground">
             <Trans>
               The companies that issue your documents. Add an entity once, with its addresses and the programme terms it

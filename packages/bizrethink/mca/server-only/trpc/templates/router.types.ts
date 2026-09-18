@@ -31,8 +31,20 @@ export const ZUpdateMcaTemplateRequestSchema = ZListMcaTemplatesRequestSchema.ex
 export const ZPreviewMcaTemplateRequestSchema = ZGetMcaTemplateRequestSchema.extend({
   version: z.number().int().positive(),
 }).strict();
+/**
+ * Where to record the grant.
+ *
+ * `organisationId` absent means the admin's own account, which is not scoped
+ * to anything — it turns the feature on for every team they belong to. Naming
+ * one organisation writes the organisation scope instead, which is the only
+ * way to choose between them. The route checks the admin belongs to it.
+ */
 export const ZSetMcaAccessRequestSchema = z
-  .object({ feature: z.enum(['mca-builder', 'mca-clause-draft-rendering']), enabled: z.boolean() })
+  .object({
+    feature: z.enum(['mca-builder', 'mca-clause-draft-rendering']),
+    enabled: z.boolean(),
+    organisationId: z.string().min(1).max(80).optional(),
+  })
   .strict();
 
 /**

@@ -15,7 +15,15 @@ import { McaPackageReader } from './package-reader';
 import { McaProviderReviewManager } from './provider-review-manager';
 import { McaPublishTemplate } from './publish-template';
 
-export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; canWrite: boolean }) => {
+export const McaProviderTemplates = ({
+  teamId,
+  teamUrl,
+  canWrite,
+}: {
+  teamId: number;
+  teamUrl: string;
+  canWrite: boolean;
+}) => {
   const { _ } = useLingui();
   const [search, setSearch] = useSearchParams();
   const id = search.get('template');
@@ -56,7 +64,11 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
   );
   const preview = trpc.bizrethink.mcaTemplates.preview.useQuery(
     { teamId, id: id ?? '', version: saved.data?.version ?? 1 },
-    { enabled: previewRequested && Boolean(saved.data), retry: false, staleTime: 0 },
+    {
+      enabled: previewRequested && Boolean(saved.data),
+      retry: false,
+      staleTime: 0,
+    },
   );
   const isOldRevision = saved.data && saved.data.version !== saved.data.currentRevision;
   const choose = (templateId: string | null) => {
@@ -68,13 +80,25 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
     <LegalWorkspace>
       <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
         <header className="space-y-2">
-          <h1 className="font-semibold text-2xl">
-            <Trans>MCA provider templates</Trans>
-          </h1>
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h1 className="font-semibold text-2xl">
+              <Trans>MCA templates</Trans>
+            </h1>
+            {/*
+              The entity editor is a sibling page with nothing pointing at it —
+              the MCA nav item goes here and stops. A template cannot be created
+              without an entity, so the way to entities belongs on this page
+              rather than in a URL someone has to know.
+            */}
+            <Link className="font-medium text-sm underline" to={`/t/${teamUrl}/mca-entities`}>
+              <Trans>Entities</Trans>
+            </Link>
+          </div>
           <p className="text-muted-foreground">
             <Trans>
-              Set a provider's programme once, then reuse its document package. Merchant details, funding figures,
-              equipment elections and signatures belong to each transaction.
+              An entity is a company that issues documents — its addresses and programme terms are answered once. A
+              template is one entity's version of one document. Merchant details, funding figures and signatures come
+              from your platform with each transaction.
             </Trans>
           </p>
         </header>
@@ -156,7 +180,10 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                   onChange={(event) => {
                     setPreviewRequested(false);
                     setWorkspaceView('answers');
-                    setSearch({ template: saved.data.id, revision: event.target.value });
+                    setSearch({
+                      template: saved.data.id,
+                      revision: event.target.value,
+                    });
                   }}
                 >
                   {Array.from({ length: saved.data.currentRevision }, (_, i) => i + 1)
@@ -311,11 +338,21 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
               </select>
             </div>
 
+            {/*
+              THE EMPTY STATE IS THE WAY OUT OF IT. It used to say "add the
+              company first" and link nowhere, on a page that links nowhere
+              either — so the only route to the entity editor was typing its
+              URL. Telling someone to do something they cannot reach is worse
+              than saying nothing.
+            */}
             {entities.data?.length === 0 && (
               <p className="text-muted-foreground text-sm">
                 <Trans>
-                  No entities yet. Add the company that issues your documents first — its addresses and programme terms
-                  are answered once there rather than once per document.
+                  No entities yet.{' '}
+                  <Link className="font-medium underline" to={`/t/${teamUrl}/mca-entities?new=1`}>
+                    Add the company that issues your documents
+                  </Link>{' '}
+                  first — its addresses and programme terms are answered once there rather than once per document.
                 </Trans>
               </p>
             )}
@@ -379,9 +416,16 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
               onClick={async () => {
                 setCreateError(null);
                 try {
-                  const result = await create.mutateAsync({ teamId, entityId, instrument });
+                  const result = await create.mutateAsync({
+                    teamId,
+                    entityId,
+                    instrument,
+                  });
                   setPreviewRequested(false);
-                  setSearch({ template: result.id, revision: String(result.currentRevision) });
+                  setSearch({
+                    template: result.id,
+                    revision: String(result.currentRevision),
+                  });
                   await list.refetch();
                 } catch (cause) {
                   setCreateError(AppError.parseError(cause).message);
@@ -421,7 +465,10 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                     data: { expectedVersion: saved.data.version },
                   });
                   setPreviewRequested(false);
-                  setSearch({ template: result.id, revision: String(result.currentRevision) });
+                  setSearch({
+                    template: result.id,
+                    revision: String(result.currentRevision),
+                  });
                   await Promise.all([saved.refetch(), list.refetch()]);
                 } catch (cause) {
                   setReviseError(AppError.parseError(cause).message);
@@ -485,9 +532,29 @@ export const McaTemplateAdminHub = ({ grants }: { grants: { builder: boolean; dr
   const access = trpc.bizrethink.mcaTemplates.access.useQuery();
   const mutation = trpc.bizrethink.mcaTemplates.setAccess.useMutation();
   const [current, setCurrent] = useState(grants);
-  const change = async (feature: 'mca-builder' | 'mca-clause-draft-rendering', enabled: boolean) => {
-    await mutation.mutateAsync({ feature, enabled });
-    setCurrent((previous) => ({ ...previous, [feature === 'mca-builder' ? 'builder' : 'draft']: enabled }));
+  /*
+    Naming an organisation records the grant against it; omitting one records
+    the account-wide grant, which reaches every team this admin belongs to.
+    Only the second is mirrored into `current` — the first is read back from
+    the refetched query, so the toggles show what was actually written rather
+    than what was clicked.
+  */
+  const change = async (
+    feature: 'mca-builder' | 'mca-clause-draft-rendering',
+    enabled: boolean,
+    organisationId?: string,
+  ) => {
+    await mutation.mutateAsync(
+      organisationId === undefined ? { feature, enabled } : { feature, enabled, organisationId },
+    );
+
+    if (organisationId === undefined) {
+      setCurrent((previous) => ({
+        ...previous,
+        [feature === 'mca-builder' ? 'builder' : 'draft']: enabled,
+      }));
+    }
+
     await access.refetch();
   };
   return (
@@ -498,15 +565,24 @@ export const McaTemplateAdminHub = ({ grants }: { grants: { builder: boolean; dr
         </h1>
         <p className="text-muted-foreground">
           <Trans>
-            Templates belong to a team. These admin controls grant access only to your account and do not change team
-            membership or permission to send documents.
+            Templates belong to a team. These controls grant access to teams you already belong to; they do not change
+            team membership or permission to send documents.
           </Trans>
         </p>
         <LegalSummary
           values={[
-            { label: <Trans>Eligible teams</Trans>, value: access.data?.teams.length ?? '—' },
-            { label: <Trans>Provider interview access</Trans>, value: current.builder ? 'Enabled' : 'Disabled' },
-            { label: <Trans>Internal draft previews</Trans>, value: current.draft ? 'Enabled' : 'Disabled' },
+            {
+              label: <Trans>Eligible teams</Trans>,
+              value: access.data?.teams.length ?? '—',
+            },
+            {
+              label: <Trans>Provider interview access</Trans>,
+              value: current.builder ? 'Enabled' : 'Disabled',
+            },
+            {
+              label: <Trans>Internal draft previews</Trans>,
+              value: current.draft ? 'Enabled' : 'Disabled',
+            },
           ]}
         />
         <div className="flex flex-wrap gap-3">
@@ -516,9 +592,9 @@ export const McaTemplateAdminHub = ({ grants }: { grants: { builder: boolean; dr
             onClick={() => void change('mca-builder', !current.builder).catch(() => undefined)}
           >
             {current.builder ? (
-              <Trans>Disable my provider interview access</Trans>
+              <Trans>Disable provider interview access for all my teams</Trans>
             ) : (
-              <Trans>Enable my provider interview access</Trans>
+              <Trans>Enable provider interview access for all my teams</Trans>
             )}
           </Button>
           <Button
@@ -535,7 +611,7 @@ export const McaTemplateAdminHub = ({ grants }: { grants: { builder: boolean; dr
         </div>
         {mutation.error && <p role="alert">{mutation.error.message}</p>}
         <h2 className="font-semibold text-lg">
-          <Trans>Open a team workspace</Trans>
+          <Trans>Teams</Trans>
         </h2>
         {access.error && <p role="alert">{access.error.message}</p>}
         {access.isLoading && (
@@ -543,18 +619,76 @@ export const McaTemplateAdminHub = ({ grants }: { grants: { builder: boolean; dr
             <Trans>Loading teams…</Trans>
           </p>
         )}
+        {/*
+          EVERY team, not only the permitted ones. A list of what is already on
+          gives an admin nothing to switch on, which is what sent them looking
+          for the account-wide button in the first place.
+
+          Each row says what is carrying it. The grant is recorded against the
+          ORGANISATION, because that is what the resolver reads, so a row whose
+          organisation holds other teams names them: the control moves those
+          too and hiding that would misstate its reach. And while the
+          account-wide grant is set it outranks every organisation row in both
+          directions, which makes these toggles inert — so the row says that
+          rather than leaving the admin to conclude the control is broken.
+        */}
         <ul className="grid gap-3 sm:grid-cols-2">
-          {access.data?.teams.map((team) => (
-            <li key={team.id} className="rounded-lg border p-4">
-              <Link className="block font-medium underline underline-offset-4" to={`/t/${team.url}/mca`}>
-                {team.name}
-              </Link>
+          {access.data?.grants.map((grant) => (
+            <li key={grant.team.id} className="space-y-2 rounded-lg border p-4">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                {grant.allowed ? (
+                  <Link className="font-medium underline underline-offset-4" to={`/t/${grant.team.url}/mca`}>
+                    {grant.team.name}
+                  </Link>
+                ) : (
+                  <span className="font-medium">{grant.team.name}</span>
+                )}
+                <span className="text-muted-foreground text-sm">
+                  {grant.allowed ? <Trans>On</Trans> : <Trans>Off</Trans>}
+                </span>
+              </div>
+              <Button
+                disabled={mutation.isPending}
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  void change('mca-builder', grant.organisationEnabled !== true, grant.team.organisationId).catch(
+                    () => undefined,
+                  )
+                }
+              >
+                {grant.organisationEnabled === true ? (
+                  <Trans>Remove this organisation's access</Trans>
+                ) : (
+                  <Trans>Give this organisation access</Trans>
+                )}
+              </Button>
+              {grant.source === 'user' && (
+                <p className="text-muted-foreground text-sm">
+                  {grant.allowed ? (
+                    <Trans>
+                      On because of your account-wide grant, whatever this button says. Turn that off above to choose
+                      per team.
+                    </Trans>
+                  ) : (
+                    <Trans>
+                      Off because your account-wide grant is switched off, which overrides this button. Clear it above
+                      to choose per team.
+                    </Trans>
+                  )}
+                </p>
+              )}
+              {grant.alsoCovers.length > 0 && (
+                <p className="text-muted-foreground text-sm">
+                  <Trans>This button also moves:</Trans> {grant.alsoCovers.join(', ')}
+                </p>
+              )}
             </li>
           ))}
         </ul>
-        {access.data?.teams.length === 0 && (
+        {access.data?.grants.length === 0 && (
           <p className="text-muted-foreground">
-            <Trans>No teams with MCA access are available to this account.</Trans>
+            <Trans>This account belongs to no teams yet.</Trans>
           </p>
         )}
       </div>

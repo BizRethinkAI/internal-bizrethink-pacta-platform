@@ -113,11 +113,23 @@ export const getFeatureAccess = async ({
 }: GetFeatureAccessOptions): Promise<boolean> => {
   const [userRow, orgRow] = await Promise.all([
     prisma.bizrethinkFeatureAccess.findUnique({
-      where: { feature_scope_scopeId: { feature, scope: 'user', scopeId: String(userId) } },
+      where: {
+        feature_scope_scopeId: {
+          feature,
+          scope: 'user',
+          scopeId: String(userId),
+        },
+      },
       select: { enabled: true },
     }),
     prisma.bizrethinkFeatureAccess.findUnique({
-      where: { feature_scope_scopeId: { feature, scope: 'organisation', scopeId: organisationId } },
+      where: {
+        feature_scope_scopeId: {
+          feature,
+          scope: 'organisation',
+          scopeId: organisationId,
+        },
+      },
       select: { enabled: true },
     }),
   ]);
@@ -166,3 +178,75 @@ export const listLeaseBuilderOrganisationIds = async ({ userId }: { userId: numb
 
   return granted.filter((id): id is string => id !== null);
 };
+
+export type GrantedTeam = {
+  id: number;
+  url: string;
+  name: string;
+  organisationId: string;
+};
+
+export type TeamGrant = {
+  team: GrantedTeam;
+  /** What `getFeatureAccess` would answer for this team. */
+  allowed: boolean;
+  /**
+   * WHICH grant decided it, or null where nothing has been recorded.
+   *
+   * The page needs this to explain a toggle that appears not to work: a
+   * user-scoped row wins in both directions, so while one is present every
+   * organisation toggle is inert and the admin has to be told why rather than
+   * left to conclude the control is broken.
+   */
+  source: 'user' | 'organisation' | null;
+  /**
+   * This organisation's own row — `true`, `false`, or null for never recorded.
+   *
+   * Distinct from `allowed`, which is the resolved answer. The toggle renders
+   * this one, so switching an organisation off while the account-wide grant is
+   * on still shows the state it actually wrote.
+   */
+  organisationEnabled: boolean | null;
+  /**
+   * The other teams in the same organisation, by name.
+   *
+   * Grants are recorded per organisation because that is what the resolver
+   * reads; teams are what a person recognises. Where an organisation holds
+   * more than one team a single toggle moves all of them, and a control that
+   * implied otherwise would be lying about its own blast radius.
+   */
+  alsoCovers: string[];
+};
+
+export type DescribeTeamGrantsOptions = {
+  teams: GrantedTeam[];
+  /** The account-wide row, if any. */
+  userGrant: FeatureGrant | null;
+  /** Organisation rows by organisation id. Absent means never recorded. */
+  orgGrants: Record<string, FeatureGrant | undefined>;
+};
+
+/**
+ * Describe one feature's grants across the teams a person belongs to.
+ *
+ * Every team is reported, not only the permitted ones — the previous query
+ * returned the permitted set, which is why a feature nobody had been granted
+ * offered nothing to switch on.
+ *
+ * Pure, and takes the rows rather than reading them, so the attribution the
+ * page shows is the same resolution the loaders run and cannot drift from it.
+ */
+export const describeTeamGrants = ({ teams, userGrant, orgGrants }: DescribeTeamGrantsOptions): TeamGrant[] =>
+  teams.map((team) => {
+    const orgGrant = orgGrants[team.organisationId] ?? null;
+
+    return {
+      team,
+      allowed: resolveFeatureAccess({ userGrant, orgGrant }),
+      source: userGrant ? 'user' : orgGrant ? 'organisation' : null,
+      organisationEnabled: orgGrant ? orgGrant.enabled : null,
+      alsoCovers: teams
+        .filter((other) => other.organisationId === team.organisationId && other.id !== team.id)
+        .map((other) => other.name),
+    };
+  });
