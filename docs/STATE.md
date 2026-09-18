@@ -15,6 +15,46 @@ true *right now*.
 
 _Last updated: 2026-09-18_
 
+## 2026-09-18 — the scratch directory is ignored (#323)
+
+#323 merged at `9467f3961`, after the consolidation above, so this is its own
+small fold. **Main is `9467f3961`.** One rule in `.gitignore`:
+
+```
+output/
+```
+
+`output/` — the owner's prototypes, generated HTML and review screenshots — was
+**untracked and unignored**, which is a trap rather than a neutral state. On
+2026-09-18 a branch was created inside the main checkout rather than a worktree,
+and a broad `git add` swept all 41 files, including six binaries, into a commit
+whose legitimate diff was four files.
+
+**Then switching that checkout back to `main` deleted them from the working
+tree** — tracked on the branch, untracked on `main`, so the checkout removed
+them. They were gone from disk for about twenty minutes.
+
+**The recovery order is the part worth keeping.** They existed only in the commit
+that should never have contained them. The obvious sequence — drop them from the
+branch, as the reviewer had asked — would have destroyed the only surviving copy.
+Restored first, cleaned second.
+
+Nothing under `output/` was ever tracked, so there was no index entry to remove
+and no history to touch. The rule prevents the accident reaching a commit; it
+does not stop `git clean -fdx`, which removes ignored files too.
+
+**The general lesson is not "avoid `git add -A`".** The flag is fine in a tree
+that is entirely yours. Both of the day's incidents — this one, and the earlier
+commit that discarded a fix while its note described it as done — shared a
+working directory holding files the author had not put there. **A worktree is
+the precondition that makes a broad add safe**, not a matter of tidiness.
+
+**Decided by the owner, offered by the implementing session.** Both the
+implementing and reviewing sessions held that whether the directory is ignored,
+moved or left alone was the owner's call; the PR was the offer and the merge was
+the decision. Recorded because the shared GitHub account cannot convey which
+session proposed a change.
+
 ## 2026-09-18 — the entity is the template, and a failed migration stops the boot (#317, #321, #320)
 
 Three PRs merged: #317 `5cd5c02ea`, #321 `3559be672`, #320 `4d17197f3`. **Main is
