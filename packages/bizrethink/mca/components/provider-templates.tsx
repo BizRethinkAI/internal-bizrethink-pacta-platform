@@ -43,6 +43,17 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
   const [createError, setCreateError] = useState<string | null>(null);
   const [reviseError, setReviseError] = useState<string | null>(null);
   const entities = trpc.bizrethink.mcaEntities.list.useQuery({ teamId });
+
+  /*
+    Compiled, not saved. Runs only once both choices are made, and is allowed
+    to fail visibly: asking for a document the entity's programme does not run
+    is refused by the compiler, and showing that refusal here is better than
+    offering a template the builder would then decline to create.
+  */
+  const prospective = trpc.bizrethink.mcaTemplates.prospective.useQuery(
+    { teamId, entityId, instrument },
+    { enabled: Boolean(entityId), retry: false },
+  );
   const preview = trpc.bizrethink.mcaTemplates.preview.useQuery(
     { teamId, id: id ?? '', version: saved.data?.version ?? 1 },
     { enabled: previewRequested && Boolean(saved.data), retry: false, staleTime: 0 },
@@ -326,6 +337,36 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                 ))}
               </select>
             </div>
+
+            {/*
+              THE DOCUMENT BEFORE THE DECISION. ADR 0026 makes creating a
+              template exactly these two choices, so the useful thing to show
+              here is what they add up to — and it is compiled without being
+              saved, because revision 1 is a record rather than a draft.
+            */}
+            {entityId && (
+              <section className="space-y-2 rounded-lg border p-4" data-mca-prospective>
+                <h3 className="font-semibold">
+                  <Trans>What this template will contain</Trans>
+                </h3>
+                {prospective.isLoading && (
+                  <p role="status" className="text-muted-foreground text-sm">
+                    <Trans>Compiling…</Trans>
+                  </p>
+                )}
+                {prospective.error && <p role="alert">{prospective.error.message}</p>}
+                {prospective.data && (
+                  <>
+                    <p className="text-muted-foreground text-sm">
+                      <Trans>
+                        Nothing is saved yet. Creating the template copies the entity's answers as they stand now.
+                      </Trans>
+                    </p>
+                    <McaPackageReader documents={prospective.data.documents} unfilled />
+                  </>
+                )}
+              </section>
+            )}
 
             {createError && (
               <p role="alert" className="text-destructive text-sm">
