@@ -46,3 +46,14 @@ export const ZSetMcaAccessRequestSchema = z
 export const ZMcaPublicationRequestSchema = ZPreviewMcaTemplateRequestSchema.extend({
   instrument: z.enum(PRODUCED_INSTRUMENTS),
 }).strict();
+
+/**
+ * A preview of the template those two choices WOULD produce, before it exists.
+ *
+ * No `id` and no `version`, unlike `ZPreviewMcaTemplateRequestSchema` — there
+ * is nothing saved to name yet, which is the whole point of it.
+ */
+export const ZProspectiveMcaTemplateRequestSchema = ZListMcaTemplatesRequestSchema.extend({
+  entityId: z.string().min(1).max(80),
+  instrument: z.enum(PRODUCED_INSTRUMENTS),
+}).strict();

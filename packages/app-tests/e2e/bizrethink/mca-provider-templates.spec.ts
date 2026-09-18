@@ -324,6 +324,20 @@ test('an entity is added once, then a template is created against it and revised
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca`);
     await page.getByLabel('Which entity issues it?', { exact: true }).selectOption(saved.id);
     await page.getByLabel('Which document is it?', { exact: true }).selectOption('frpa');
+
+    /*
+      THE DOCUMENT BEFORE THE DECISION, and nothing saved to produce it. The
+      preview compiles from the entity alone, so it has to appear before the
+      template exists — and no row may be written to show it.
+    */
+    const prospective = page.locator('[data-mca-prospective]');
+
+    await expect(prospective).toContainText('What this template will contain');
+    await expect(prospective.locator('[data-mca-template-item="frpa.party-identification"]')).toContainText(
+      'Example Receipts Inc.',
+    );
+    expect(await prisma.bizrethinkMcaTemplate.count({ where: { createdByUserId: user.id } })).toBe(0);
+
     await page.getByRole('button', { name: 'Create template', exact: true }).click();
 
     await expect(page).toHaveURL(/template=/);
