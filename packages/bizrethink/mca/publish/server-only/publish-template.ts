@@ -4,7 +4,7 @@ import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { INSTRUMENTS } from '../../clauses/instruments';
-import { previewMcaTemplate } from '../../templates/server-only/service';
+import { assertMcaTeamAccess, previewMcaTemplate } from '../../templates/server-only/service';
 import { assertMcaPackagePublishable } from '../publishable';
 import type { ProducedInstrument } from '../recipient-contract';
 import { buildMcaTemplateArtifact } from './artifact';
@@ -67,6 +67,17 @@ export const publishMcaTemplate = async ({
   instrument,
   requestMetadata,
 }: PublishOptions) => {
+  /*
+    PUBLISHING NEEDS TEAM ADMIN OR MANAGER, and asserting it here rather than in
+    a route is the point: a second caller must not be able to reach this without
+    passing the same check.
+
+    ADR 0016 restricts provider POLICY to a programme's managers because it is
+    the funder's programme. Publishing is the act that puts that programme in
+    front of a merchant, so it cannot need less.
+  */
+  await assertMcaTeamAccess({ teamId, userId, write: true });
+
   // Membership, the draft-rendering grant, and that the revision still compiles
   // to what it compiled to. Decided there, not repeated here.
   const snapshot = await previewMcaTemplate({ userId, teamId, id, version });

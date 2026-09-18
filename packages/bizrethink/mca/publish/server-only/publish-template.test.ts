@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
+  access: vi.fn(),
   preview: vi.fn(),
   packageFor: vi.fn(),
   gate: vi.fn(),
@@ -10,7 +11,10 @@ const mocks = vi.hoisted(() => ({
   record: vi.fn(),
 }));
 
-vi.mock('../../templates/server-only/service', () => ({ previewMcaTemplate: mocks.preview }));
+vi.mock('../../templates/server-only/service', () => ({
+  previewMcaTemplate: mocks.preview,
+  assertMcaTeamAccess: mocks.access,
+}));
 vi.mock('./publishable-package', () => ({ mcaPublishablePackageFor: mocks.packageFor }));
 vi.mock('../publishable', () => ({ assertMcaPackagePublishable: mocks.gate }));
 vi.mock('./artifact', () => ({ buildMcaTemplateArtifact: mocks.artifact }));
@@ -57,6 +61,7 @@ beforeEach(() => {
     ],
   });
   mocks.record.mockResolvedValue({ id: 'pub-1' });
+  mocks.access.mockResolvedValue({ id: 17, organisationId: 'org-a' });
 });
 
 /**
@@ -86,6 +91,28 @@ describe('nothing happens behind a refusal', () => {
 
     expect(mocks.packageFor.mock.calls[0]?.[1]).toBe('frpa');
     expect(mocks.gate).toHaveBeenCalledWith({ items: [] });
+  });
+
+  /**
+   * ADR 0016 restricts provider policy to a programme's managers because it is
+   * the funder's programme. Publishing puts that programme in front of a
+   * merchant, so it cannot need less — and the check is in the service rather
+   * than a route, so a second caller cannot reach this without it.
+   */
+  it('refuses anyone without write authority over the team', async () => {
+    mocks.access.mockRejectedValue(new Error('MCA templates are unavailable for this team.'));
+
+    await expect(publishMcaTemplate(input)).rejects.toThrow();
+
+    expect(mocks.preview).not.toHaveBeenCalled();
+    expect(mocks.gate).not.toHaveBeenCalled();
+    expect(mocks.createEnvelope).not.toHaveBeenCalled();
+  });
+
+  it('asks for write authority, not merely membership', async () => {
+    await publishMcaTemplate(input);
+
+    expect(mocks.access).toHaveBeenCalledWith({ teamId: 17, userId: 41, write: true });
   });
 
   /**

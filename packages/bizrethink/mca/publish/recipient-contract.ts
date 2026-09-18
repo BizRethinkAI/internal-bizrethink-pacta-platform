@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { McaInstrument } from '../clauses/instruments';
 
 /**
@@ -40,6 +41,33 @@ export const PRODUCED_INSTRUMENTS = [
 ] as const satisfies readonly McaInstrument[];
 
 export type ProducedInstrument = (typeof PRODUCED_INSTRUMENTS)[number];
+
+/**
+ * Narrow a stored `instrument` column to a document the builder produces.
+ *
+ * `BizrethinkMcaTemplate.instrument` is a `String`, so reading it back proved
+ * nothing and every call site cast. A cast asserts what nothing checked, on
+ * the path that decides whether a template can be published at all — and ADR
+ * 0019 means `split-funding` is a value no template may legitimately hold, so
+ * it is a state to handle rather than to assert away.
+ *
+ * Parsed on the way out, not cast, for the reason `getMcaEntity` gives: a row
+ * written before a schema change, or edited outside the service, would
+ * otherwise flow on as though it were valid. The create route already
+ * constrains new rows with `z.enum(PRODUCED_INSTRUMENTS)`; this makes the read
+ * agree with the write instead of trusting it.
+ */
+export const producedInstrumentOf = (value: string, templateId: string): ProducedInstrument => {
+  const found = PRODUCED_INSTRUMENTS.find((produced) => produced === value);
+
+  if (!found) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `Template ${templateId} names a document this builder does not produce: ${value}.`,
+    });
+  }
+
+  return found;
+};
 
 /**
  * The lease and the subscription share one live template, so they share its

@@ -4,6 +4,7 @@ import { createMcaTemplateRoute } from './create';
 import { getMcaTemplateRoute } from './get';
 import { listMcaTemplateRoute } from './list';
 import { previewMcaTemplateRoute } from './preview';
+import { mcaPublicationStatusRoute, publishMcaTemplateRoute } from './publish';
 import { setMcaAccessRoute } from './set-access';
 import { updateMcaTemplateRoute } from './update';
 
@@ -13,6 +14,8 @@ export const mcaTemplatesRouter = router({
   get: getMcaTemplateRoute,
   list: listMcaTemplateRoute,
   preview: previewMcaTemplateRoute,
+  publicationStatus: mcaPublicationStatusRoute,
+  publish: publishMcaTemplateRoute,
   update: updateMcaTemplateRoute,
   setAccess: setMcaAccessRoute,
 });

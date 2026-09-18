@@ -6,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/generated/types';
 
 import { getFeatureAccess } from '../../../server-only/feature-access';
-import type { McaInstrument } from '../../clauses/instruments';
+import { type ProducedInstrument, producedInstrumentOf } from '../../publish/recipient-contract';
 import { compileMcaTemplate, type McaTemplateSnapshot } from '../compile';
 import { type McaProviderProfile, ZMcaProviderProfile } from '../profile';
 
@@ -50,7 +50,7 @@ export const createMcaTemplate = async ({
   userId,
   profile,
   instrument,
-}: TeamActor & { profile: McaProviderProfile; instrument: McaInstrument }) => {
+}: TeamActor & { profile: McaProviderProfile; instrument: ProducedInstrument }) => {
   const team = await assertMcaTeamAccess({ teamId, userId, write: true });
   const snapshot = compileMcaTemplate(profile, instrument);
   return prisma.bizrethinkMcaTemplate.create({
@@ -99,7 +99,7 @@ export const reviseMcaTemplate = async ({
     throw missing();
   }
 
-  const snapshot = compileMcaTemplate(profile, existing.instrument as McaInstrument);
+  const snapshot = compileMcaTemplate(profile, producedInstrumentOf(existing.instrument, id));
   const version = expectedVersion + 1;
   return prisma.$transaction(async (tx) => {
     const updated = await tx.bizrethinkMcaTemplate.updateMany({
@@ -149,7 +149,7 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
     throw missing();
   }
   const profile = ZMcaProviderProfile.parse(revision.profile);
-  const instrument = row.instrument as McaInstrument;
+  const instrument = producedInstrumentOf(row.instrument, row.id);
 
   /*
     Recompiled against THIS template's document. The fingerprint covers the

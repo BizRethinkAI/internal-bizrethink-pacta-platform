@@ -29,3 +29,15 @@ export const ZPreviewMcaTemplateRequestSchema = ZGetMcaTemplateRequestSchema.ext
 export const ZSetMcaAccessRequestSchema = z
   .object({ feature: z.enum(['mca-builder', 'mca-clause-draft-rendering']), enabled: z.boolean() })
   .strict();
+
+/**
+ * Publishing names one document of one revision.
+ *
+ * `PRODUCED_INSTRUMENTS` rather than the same five literals written out again:
+ * the split funding letter is absent from it on purpose (ADR 0019), and a
+ * second copy of that list is what drifts when a sixth document appears. The
+ * create schema above already reads it.
+ */
+export const ZMcaPublicationRequestSchema = ZPreviewMcaTemplateRequestSchema.extend({
+  instrument: z.enum(PRODUCED_INSTRUMENTS),
+}).strict();

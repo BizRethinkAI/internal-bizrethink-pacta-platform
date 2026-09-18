@@ -11,6 +11,7 @@ import { McaOperatingRequirements } from './operating-requirements';
 import { McaPackageReader } from './package-reader';
 import { McaProviderInterview } from './provider-interview';
 import { McaProviderReviewManager } from './provider-review-manager';
+import { McaPublishTemplate } from './publish-template';
 
 export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; canWrite: boolean }) => {
   const [search, setSearch] = useSearchParams();
@@ -160,6 +161,30 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                 <Trans>Preview document package</Trans>
               </Button>
             </div>
+            {canWrite && saved.data.current && !isOldRevision && (
+              <div className="space-y-3">
+                {/*
+                  ONE TEMPLATE PUBLISHES ONE DOCUMENT: its own.
+
+                  This asked the PROGRAMME which documents it runs, and offered
+                  a control for each — correct while a template was a package.
+                  ADR 0026 made a template one document, so `instrumentsFor`
+                  now answers a different question: which documents this funder
+                  is entitled to have templates FOR, across templates. Asking it
+                  here offered to publish documents this template does not
+                  contain, and `publishMcaTemplate` would refuse them at the
+                  artifact step rather than the page never offering them.
+
+                  The template names its own document, so that is what is asked.
+                */}
+                <McaPublishTemplate
+                  teamId={teamId}
+                  templateId={saved.data.id}
+                  version={saved.data.version}
+                  instrument={saved.data.instrument}
+                />
+              </div>
+            )}
             {saved.data.profile?.policy?.recipientStates && (
               <McaOperatingRequirements states={saved.data.profile.policy.recipientStates} />
             )}
