@@ -1,0 +1,37 @@
+# Why: A failed `prisma migrate deploy` did not stop the boot. Upstream runs the migration and then starts the server regardless, and the script has no `set -e` — so a failed migration left the app serving against the OLD schema while `/api/health` answered 200 and Coolify recorded a successful deployment.
+# Why-not-additive: `docker/start.sh` is upstream's container entrypoint; the migration step and the launch are in that one file and the deploy runs it directly.
+# Upstream-merge-fragility: low; wraps one existing command in an `if`. Re-apply if upstream restructures the entrypoint or adds its own `set -e`.
+
+diff --git a/docker/start.sh b/docker/start.sh
+index e1b190f91..89839b167 100755
+--- a/docker/start.sh
++++ b/docker/start.sh
+@@ -25,7 +25,27 @@ printf "📊 Certificate status: http://localhost:3000/api/certificate-status\n"
+ printf "👥 Community: https://github.com/documenso/documenso\n\n"
+ 
+ printf "🗄️  Running database migrations...\n"
+-npx prisma migrate deploy --schema ../../packages/prisma/schema.prisma
++# MODIFIED for BizRethink (overlay 093): a failed migration must stop the boot.
++#
++# Upstream runs `migrate deploy` and then starts the server regardless of how it
++# went. There is no `set -e` in this script, so a migration that fails leaves the
++# app running against the OLD schema, `/api/health` answers 200, and Coolify
++# reports a successful deployment. A deploy whose only failure mode reports
++# itself as a success is worse than one that fails.
++#
++# It had never bitten because every migration until now was additive with a
++# default and could not realistically fail. `20260918010000_mca_template_names_
++# its_entity` adds two NOT NULL columns with no default, which fails against any
++# table holding rows.
++#
++# Postgres DDL is transactional, so a failed migration rolls back and destroys
++# nothing; what this adds is refusing to serve from a schema we did not reach.
++if ! npx prisma migrate deploy --schema ../../packages/prisma/schema.prisma; then
++    printf "\n❌ Database migration failed — refusing to start the server.\n"
++    printf "The schema was NOT changed: Postgres rolls a failed migration back.\n"
++    printf "Fix the migration and redeploy; the previous container keeps serving.\n"
++    exit 1
++fi
+ 
+ printf "🌟 Starting Documenso server...\n"
+ # MODIFIED for BizRethink (overlay 033): --import loads Sentry
