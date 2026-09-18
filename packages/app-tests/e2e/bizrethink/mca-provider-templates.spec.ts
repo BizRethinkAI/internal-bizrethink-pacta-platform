@@ -370,11 +370,20 @@ test('an entity is added once, then a template is created against it and revised
     await page.getByLabel('Legal name', { exact: true }).fill('Revised Example Receipts Inc.');
 
     /*
-      The step chip rather than Next. Both call `setStep(1)` and both are how a
-      person moves through the interview, but the chip is the one that names
-      where it goes — and on the create path above, Next is already exercised.
+      NEXT, ON A SAVED ENTITY — the path #319 was about. It shared a render slot
+      with the submit button, so React retyped the clicked node and the browser
+      submitted the form after the click: the edit saved itself, `version` moved,
+      and the remount that followed put the person back on step one looking at a
+      button that appeared to do nothing. This routed around it through the step
+      chip until the cause was found.
     */
-    await page.getByRole('button', { name: '2. Its programme', exact: true }).click();
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await expect(
+      page.getByRole('heading', { name: "How does this entity's programme run?", exact: true }),
+    ).toBeVisible();
+    // Advancing a step is not a save. The bug's signature was this reading 2.
+    expect((await prisma.bizrethinkMcaEntity.findUniqueOrThrow({ where: { id: saved.id } })).version).toBe(1);
+
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();

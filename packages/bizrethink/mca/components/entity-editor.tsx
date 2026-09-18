@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { useMemo, useState } from 'react';
+import { type MouseEvent, useMemo, useState } from 'react';
 import { useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { type McaEntityInput, ZMcaEntity } from '../entities/entity';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS } from '../jurisdictions';
@@ -100,8 +100,16 @@ export const McaEntityEditor = ({
 
     An interview is a thing you move around in. It is checked when it is
     saved, which is the moment that matters.
+
+    IT ALSO CANCELS THE CLICK — see the button row at the bottom of this form
+    and #319. `setStep` runs from a discrete event, so React flushes the
+    re-render while the click is still dispatching, and whatever sits under the
+    pointer when the browser gets to the click's default action is what gets
+    activated. Advancing a step is never a save, so say so here too rather than
+    relying on the layout below staying the shape it is.
   */
-  const next = () => {
+  const next = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     setError(null);
     setStep(1);
   };
@@ -365,18 +373,38 @@ export const McaEntityEditor = ({
           </p>
         )}
 
+        {/*
+          EACH BUTTON GETS ITS OWN SLOT. Next and Save entity used to be the two
+          branches of one ternary, which reads as an either/or and is not one:
+          it is a single position in a single children array, so React keeps the
+          host node and retypes it from `button` to `submit` in place.
+
+          Clicking Next therefore SAVED. The state update is discrete, so React
+          flushed it during the click; by the time the browser ran the click's
+          default action the node under the pointer said `type="submit"` and it
+          submitted the form. A saved entity is already valid, so the write
+          went through, `version` moved, and the `key` on this editor —
+          `${id}:${version}` — remounted it at step one. Nothing on screen
+          looked wrong; the button simply appeared to do nothing (#319).
+
+          Three conditionals are three positions, so React unmounts one button
+          and mounts another instead of editing the one that was clicked.
+          `packages/bizrethink/mca/__tests__/advance-button-does-not-submit.test.ts`
+          keeps it that way.
+        */}
         <div className="flex flex-wrap gap-2">
           {step === 1 && (
-            <Button type="button" variant="outline" onClick={() => setStep(0)}>
+            <Button key="back" type="button" variant="outline" onClick={() => setStep(0)}>
               <Trans>Back</Trans>
             </Button>
           )}
-          {step === 0 ? (
-            <Button type="button" onClick={next}>
+          {step === 0 && (
+            <Button key="next" type="button" onClick={next}>
               <Trans>Next</Trans>
             </Button>
-          ) : (
-            <Button type="submit" disabled={form.formState.isSubmitting || readOnly}>
+          )}
+          {step === 1 && (
+            <Button key="save" type="submit" disabled={form.formState.isSubmitting || readOnly}>
               <Trans>Save entity</Trans>
             </Button>
           )}
