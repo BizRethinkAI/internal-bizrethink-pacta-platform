@@ -7,7 +7,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useMemo, useState } from 'react';
-import { type FieldPath, useFieldArray, useForm, useFormContext } from 'react-hook-form';
+import { useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { type McaEntityInput, ZMcaEntity } from '../entities/entity';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS } from '../jurisdictions';
 import { CheckAnswer, SelectAnswer, TextAnswer } from './answers';
@@ -88,26 +88,22 @@ export const McaEntityEditor = ({
   const consequences = derived.data?.answers ?? [];
 
   /*
-    SAYS WHY IT CANNOT ADVANCE, rather than doing nothing.
+    NEXT JUST ADVANCES, like the step chips above it.
 
-    This used to return silently when the first step did not validate, so a
-    funder with one bad field clicked Next and watched the page ignore them —
-    the worst kind of form, because nothing is wrong on screen. It also made
-    the failure undiagnosable from a test: "the button never appeared" and
-    "the answers were rejected" look identical from the outside.
+    It used to pre-validate the first step and refuse to move. Three things
+    were wrong with that. The chips already jump between steps with no
+    validation, so the form contradicted itself. Submitting already validates
+    everything and sends you back to the step that failed, so nothing was
+    protected. And when the pre-validation misbehaved it did so in silence —
+    click, and the page ignores you — which is the worst failure a form has,
+    because nothing on screen looks wrong.
+
+    An interview is a thing you move around in. It is checked when it is
+    saved, which is the moment that matters.
   */
-  const next = async () => {
-    const fields: FieldPath<McaEntityInput>[] = ['label', 'identity'];
-
+  const next = () => {
     setError(null);
-
-    if (await form.trigger(fields, { shouldFocus: true })) {
-      setStep(1);
-
-      return;
-    }
-
-    setError(_(msg`Complete the highlighted answers about the entity before continuing.`));
+    setStep(1);
   };
 
   return (
@@ -188,6 +184,12 @@ export const McaEntityEditor = ({
               <Text name="identity.reconciliationAddress" label={msg`Reconciliation mailing address`} />
               <Text name="identity.servicingPhone" label={msg`Servicing phone`} type="tel" />
               <Text name="identity.website" label={msg`Website, as your documents carry it`} type="url" />
+              <Text
+                name="identity.partnerPortalUrl"
+                label={msg`Partner portal URL`}
+                hint={msg`Where a broker signs in to see what it is owed. Printed in the channel agreement, so it is the same URL for every broker.`}
+                type="url"
+              />
               <Text
                 name="identity.creditDisputeAddress"
                 label={msg`Credit dispute address`}
@@ -528,6 +530,7 @@ const emptyEntity = (): McaEntityInput => ({
     venueState: '',
     venueCounty: '',
     website: '',
+    partnerPortalUrl: '',
     creditDisputeAddress: '',
   },
   policy: {
