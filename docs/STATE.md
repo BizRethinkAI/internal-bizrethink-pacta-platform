@@ -15,6 +15,143 @@ true *right now*.
 
 _Last updated: 2026-09-17_
 
+## 2026-09-17 (evening) — a template is one document, and the deal leaves (#306–#312)
+
+Seven PRs merged in this order: #306 `fab92dcd1`, #311 `73890e595`, #312
+`a7f4358cd`, #309 `1e79d4a30`, #310 `83f3b31c2`, #307 `d432d8fa4`, #308
+`bb3f53019`. **Main is `bb3f53019`. Production runs `d632c0322`** — the previous
+batch — and this one is not deployed at the time of writing.
+
+**This batch carries two migrations**, `20260917120000_add_mca_entity` (new table
+`BizrethinkMcaEntity`, purely additive) and
+`20260917140000_mca_template_names_its_document` (`ALTER TABLE
+"BizrethinkMcaTemplate" ADD COLUMN "instrument" TEXT NOT NULL DEFAULT 'frpa'`).
+
+### The decision (#309)
+
+[ADR 0026](adr/0026-an-entity-and-a-type-make-a-template.md): **an entity and a
+document type make a template.** A template used to compile whichever set of
+documents the policy selected, and that set existed nowhere else —
+`lombard-api` holds five separate published templates, each with its own id,
+each sent on its own. The caller has never seen a package. §8 records that the
+templates saved today are test data and will be superseded: no backfill, no
+dual-shape compatibility.
+
+### The deal leaves the vertical (#306)
+
+−2,823 lines. `mca/transactions/` — fill, input, fixtures, the internal-draft
+renderer — the `templates.fill` route, and the `/api/bizrethink/mca-draft`
+endpoint are gone, replaced by `/t/:teamUrl/mca/preview` rendering specimen
+values.
+
+**No merchant's details can now reach this vertical, because nothing left
+accepts them.** The endpoint deleted here read up to 600,000 bytes of merchant
+identity. The question of merchant PII at rest in Pacta — circled repeatedly in
+schema refusals, a closed PR and a stateless rule — stops existing rather than
+being managed. **Verified before merging that no consumer calls the deleted
+endpoint**, with control searches run first so an empty result was evidence
+rather than a broken tool; CircularPay's integration is `/api/v2/*` and is
+untouched.
+
+### One template, one document (#311, #312)
+
+`compileMcaTemplate` takes the instrument and returns one document.
+`instrumentsFor` stops deciding which documents exist; the template names its
+own. **Three things this turned up that were not the subject**, the first of
+which matters beyond itself: `templatePlacement` read `document?.items ?? []`,
+so a snapshot not carrying the document asked for got a placement of *nothing at
+all* — indistinguishable from a document with no fields to place. One template
+per document is what made that mismatch reachable.
+
+### Publishing is something a person does (#307, #308)
+
+#307 surfaces what a state requires of the funder, quoted and never advised.
+**The silence is the dangerous part**: an empty result could mean "this state
+asks nothing of you" or "we have not looked", which are opposite facts with
+opposite consequences. The library holds registration text for **two states of
+eleven**, so the panel names the rest and says in as many words that an absent
+record is not a statement that a state requires nothing. The 2-of-11 count is
+pinned in a test, so extending coverage is a visible diff.
+
+#308 gives publishing a button, a refusal list shown **before** the button
+rather than after it, and the authority to match: `assertMcaTeamAccess({ write:
+true })` restricts it to ADMIN or MANAGER, asserted **in the service, not the
+route**, so a second caller cannot reach publication without passing the same
+check. ADR 0016 restricts provider policy to a programme's managers; publishing
+is the act that puts that programme in front of a merchant, so it cannot need
+less. The order is unchanged and load-bearing: write authority → membership and
+draft grant → **the gate** → artifact, upload, envelope, record.
+
+#310 adds the entity record — identity and policy in separate columns, written
+by ADMIN or MANAGER, read by any member, and **parsed on the way out rather than
+cast**.
+
+### What review changed before these landed
+
+- **A conflict that merges cleanly is not the same as a conflict that resolves
+  correctly.** One of the three #308/#312 collisions was semantic, not textual:
+  #308 rendered a publish control per instrument derived from programme policy,
+  which was right while a template was a package and became wrong the moment ADR
+  0026 made it one document. A clean textual merge preserves that exactly —
+  offering to publish four documents the template does not contain, with
+  `publishMcaTemplate` refusing them at the artifact step instead of the page
+  never offering them. It landed as its own commit, separate from the rebase, so
+  it could be read as a behaviour change rather than a diff.
+- **A stale comment asserting a false invariant is worse than wrong code.** The
+  comment above that block said `instrumentsFor` "is the same function the
+  compiler uses, so the list cannot disagree with what publishing would actually
+  produce" — true while a template was a package, false after ADR 0026. It was
+  replaced rather than deleted: a reader who trusts such a sentence stops looking.
+- **The type was earned instead of asserted.** Removing the narrowing filter left
+  `McaInstrument` flowing into a prop typed `ProducedInstrument`, and the real
+  source was `row.instrument as McaInstrument` — a cast off a `String` column.
+  It is now `producedInstrumentOf`, which parses against `PRODUCED_INSTRUMENTS`
+  and refuses anything else by name, at both reads. `createMcaTemplate` takes
+  `ProducedInstrument` too, so **the read agrees with the write instead of
+  trusting it.** A cast would have put a fail-open back on the publish path one
+  commit after one was removed there.
+
+### The migration question, closed by evidence
+
+The `DEFAULT 'frpa'` labels every existing row. The column is read —
+`compileMcaTemplate(profile, instrument)` — so a mislabelled row would compile
+the wrong document. **Checked rather than assumed, with the owner's approval for
+a production read: `BizrethinkMcaTemplate` and `BizrethinkMcaTemplateRevision`
+are both zero rows**, against a control query of 38 users, 624 envelopes and 40
+teams, so the empty result is absence rather than a broken connection. There is
+nothing for the default to mislabel.
+
+**Staging was not checked** — `PACTA_STG_DATABASE_URL` was not configured — so it
+is unverified rather than clear, and the distinction is deliberate.
+
+### A worktree does not type-check against its own branch
+
+**Anything reached by package name resolves through the shared `node_modules`
+into the main checkout; only relative imports come from the branch.** So a
+worktree type-checks against whatever is checked out in the *main checkout's*
+working tree — not against `main`, and not against itself. That is why a local
+`tsc` reported #308's own `publish` route as non-existent while it sat in
+`router.ts` two directories away, and why four attempted fixes to a client-side
+type had no effect: none of them were being read.
+
+**An earlier note carried a shell snippet for repointing those links. It does not
+work and has been removed rather than carried forward** — the links resolve
+against the main checkout, so rewriting them sets them to the values they already
+had. A false remedy is worse than none: whoever runs it believes the problem is
+fixed. Verify a type question against CI, not a worktree.
+
+### Open, and deliberately not here
+
+- **Three casts on the same column remain** on other read paths:
+  `review/server-only/service.ts:153`, `publish/server-only/templates-api.ts:53`
+  and `publish/server-only/publications.ts:142`. The narrowing above fixed the
+  templates read path only. Deferred to their own PR, disclosed rather than
+  discovered.
+- **Nothing publishes.** The gate has a caller and a button now, and it refuses
+  every package, because no clause carries a counsel approval.
+- **`lombard-platform` still reads its vendored copy.** The endpoint replacing it
+  exists; adopting it is work in a repository this session does not own.
+
 ## 2026-09-17 (afternoon) — the builder can publish, and the gate is wired (#295–#304)
 
 Nine PRs merged in this order: #295 `eb75232fa`, #297 `e1b36cfdb`, #300
