@@ -105,9 +105,23 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
       the index search is still worth exercising, on something the review does
       contain.
     */
-    await counsel.getByLabel('Search review index', { exact: true }).fill('Purchase and Sale');
     const index = counsel.getByRole('complementary', { name: 'Review index' });
-    await expect(index.getByRole('navigation', { name: 'Review contents' }).getByRole('button').first()).toBeVisible();
+    const contents = index.getByRole('navigation', { name: 'Review contents' }).getByRole('button');
+
+    // The index is populated before anything is typed into it.
+    await expect(contents.first()).toBeVisible();
+
+    const everything = await contents.count();
+
+    /*
+      Searching narrows it. The term is taken from the document rather than
+      guessed: the party-identification clause is asserted above to contain it,
+      so a miss here is the index failing rather than the fixture changing.
+    */
+    await counsel.getByLabel('Search review index', { exact: true }).fill('Example Receipts');
+    await expect.poll(async () => await contents.count()).toBeLessThan(everything);
+
+    // No processor form to open: a template names no processor (ADR 0026 §6).
     await expect(counsel.locator('[data-mca-processor-review]')).toHaveCount(0);
 
     await counsel.getByRole('button', { name: 'Progress & findings', exact: true }).click();

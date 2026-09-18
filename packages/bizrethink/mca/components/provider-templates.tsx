@@ -274,11 +274,19 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
               </Trans>
             </p>
 
-            <label className="block space-y-1">
-              <span className="font-medium text-sm">
+            {/*
+              `htmlFor` rather than wrapping the select in the label. A label
+              that CONTAINS a select takes every option into its text content,
+              so the control's accessible name becomes the question followed by
+              the whole list — which a screen reader reads out and an exact
+              match cannot find.
+            */}
+            <div className="space-y-1">
+              <label className="block font-medium text-sm" htmlFor="mca-template-entity">
                 <Trans>Which entity issues it?</Trans>
-              </span>
+              </label>
               <select
+                id="mca-template-entity"
                 className="w-full rounded-md border p-2 text-sm"
                 value={entityId}
                 onChange={(event) => setEntityId(event.target.value)}
@@ -290,7 +298,7 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
             {entities.data?.length === 0 && (
               <p className="text-muted-foreground text-sm">
@@ -301,11 +309,12 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
               </p>
             )}
 
-            <label className="block space-y-1">
-              <span className="font-medium text-sm">
+            <div className="space-y-1">
+              <label className="block font-medium text-sm" htmlFor="mca-template-instrument">
                 <Trans>Which document is it?</Trans>
-              </span>
+              </label>
               <select
+                id="mca-template-instrument"
                 className="w-full rounded-md border p-2 text-sm"
                 value={instrument}
                 onChange={(event) => setInstrument(event.target.value as ProducedInstrument)}
@@ -316,7 +325,7 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
             {createError && (
               <p role="alert" className="text-destructive text-sm">
