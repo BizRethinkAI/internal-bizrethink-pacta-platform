@@ -13,7 +13,124 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-17_
+_Last updated: 2026-09-18_
+
+## 2026-09-18 — an entity gets a door, and the cast class is closed (#314, #315)
+
+Two PRs merged: #314 `16fffc688` and #315 `e94fab419`. **Main is `e94fab419`.
+Production runs `267e1af4a`** — the previous batch — and this one is not deployed
+at the time of writing. **No migrations in this batch.**
+
+Both were written by the implementing session, which read the shipping rules,
+found that it may not merge its own work, and handed over evidence rather than a
+verdict without being asked. Reviewed and merged by an independent session.
+
+### An entity can be created (#314)
+
+#310 shipped `mca/entities/` with a schema, a service and **nothing else** — no
+routes, no UI, no caller. ADR 0026 §2 makes an entity the thing a template is
+created against, so an entity nobody could create was a floor with no door. This
+adds four procedures under `bizrethink.mcaEntities`, a page and a team route.
+
+**No schema carries a `userId`, and that is enforced rather than incidental.**
+Every procedure passes `ctx.user.id`; a route that read the caller from input
+would let anyone act as anyone, and the service cannot catch it because it is
+handed whatever the route passes. Because the schemas are `.strict()`, a
+caller-supplied `userId` is **refused**, not ignored — and the test asserts the
+refusal *and* that the service was never reached, rather than asserting a correct
+value. It fails if someone adds the field, which is the failure mode that matters.
+
+**An update names the version it was opened at, required rather than defaulted.**
+It is used in the `WHERE` clause, so a stale edit matches zero rows instead of
+becoming a silent last-write-wins over terms that decide clause selection for
+every document the entity issues. Creating and updating need ADMIN or MANAGER;
+reading needs membership.
+
+The editor is two steps because an entity answers two kinds of question — who the
+company is, and how its programme runs — and burying the second under address
+fields is how it gets answered without being read.
+
+**The branch name `feat/mca-template-names-its-entity` promises a join this PR
+does not make.** It was cut expecting to wire templates to entities, which turned
+out to need this step first; renaming would have orphaned the PR. Recorded rather
+than hidden.
+
+### The cast class is closed (#315)
+
+#308 replaced `row.instrument as McaInstrument` with `producedInstrumentOf` in
+the templates service and **deliberately left three identical casts alone**,
+naming them in its PR body rather than sweeping them in, because each deserved
+its own reading. This is that reading, and **`as McaInstrument` is now absent
+from all four read paths.**
+
+Both columns are `String`, so a cast asserted what nothing checked.
+`McaPublicationInput` and `McaPublication` now say `ProducedInstrument` too, so
+the write and the read agree instead of one trusting the other. ADR 0019 is why
+`split-funding` is refused rather than tolerated.
+
+**The three behave differently, which is the point of reading them apart:**
+
+- `review/server-only/service.ts` **degrades** — the call already sits in a `try`
+  that sets `providerSourcesCurrent = false`, and an instrument we do not produce
+  does mean the sources cannot be current. No new failure mode.
+- `publications.ts` **throws** to an internal caller.
+- `templates-api.ts` **throws to `lombard-platform`**, and that one is a trade
+  worth naming — below.
+
+### An open trade, not settled here
+
+`listMcaTemplatesForApi` now throws on a corrupt row, so one bad row would return
+**500 for the whole listing** rather than serving an instrument the caller cannot
+interpret. `lombard-platform` reads that endpoint, and this repository's rules say
+that integration must not break. The alternative — skip the row and log — silently
+omits a published template a caller believes exists and will try to send.
+
+**It cannot arise today, and that is why it was not treated as a blocker.** The
+endpoint reads publication rows; `instrument` is typed `ProducedInstrument` on the
+way in, written only by `recordMcaPublication`, reachable only from
+`publishMcaTemplate`, which the gate refuses for every package because no clause
+carries a counsel approval. A 500 would need an approval to exist, a publication
+to occur, *and* a row corrupted outside the only writer.
+
+**The choice becomes live the day publication does.** It is recorded here as open
+rather than decided, because which way it should fail is a judgement about the
+funder integration and not one to infer.
+
+
+### A guard the entity schema does not have (found on main, not introduced here)
+
+`ZMcaProviderProfile`'s `line()` has always refused `{{`, `[[`, `«`, `»` and
+control characters, because an answer a person types ends up inside compiled
+legal text and **three layers read certain sequences as instructions**: the
+compiler substitutes `{{field:…}}` and `{{funder}}`, the numbering engine
+resolves `[[clause:…]]`, and `injectMcaWidgets` turns `«name»` into an AcroForm
+widget. **`ZMcaEntity`'s own `line()` carries no such refinement** — it is a bare
+`z.string().trim().min(1).max(max)`, and has been since the entity schema landed
+with #310.
+
+The shape of the risk: an entity legally named `«merchant_legal_name»` would put
+a second widget of that name onto a published page — one the funder never asked
+for and the caller would fill.
+
+**It is not reachable on this revision**, and that was checked rather than
+assumed: `compileMcaTemplate` takes a provider profile and not an entity, no
+compile, render or injection path reads entity data, and
+`BizrethinkMcaTemplate` has no entity column — the join ADR 0026 describes does
+not exist yet.
+
+**What #314 changed is that such a value can now be stored.** Before it, entities
+had a schema and a service and no way in. They are inert once stored, but the
+precise state is "storable and never compiled" rather than "impossible", and that
+distinction is what the join will remove.
+
+A fix — shared plain-value primitives both schemas draw from, so they cannot
+drift apart again — is written but **not merged at the time of this entry**. The
+divergence above is what is true of main right now.
+
+### Still true
+
+Nothing publishes: the gate has a caller and a button, and refuses every package.
+`lombard-platform` still reads its vendored copy. Counsel has approved nothing.
 
 ## 2026-09-17 (evening) — a template is one document, and the deal leaves (#306–#312)
 
