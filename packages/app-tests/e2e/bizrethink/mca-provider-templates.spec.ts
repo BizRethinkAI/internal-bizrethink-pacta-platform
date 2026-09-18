@@ -354,7 +354,13 @@ test('an entity is added once, then a template is created against it and revised
     */
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca-entities?entity=${saved.id}`);
     await page.getByLabel('Legal name', { exact: true }).fill('Revised Example Receipts Inc.');
-    await page.getByRole('button', { name: 'Next', exact: true }).click();
+
+    /*
+      The step chip rather than Next. Both call `setStep(1)` and both are how a
+      person moves through the interview, but the chip is the one that names
+      where it goes — and on the create path above, Next is already exercised.
+    */
+    await page.getByRole('button', { name: '2. Its programme', exact: true }).click();
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();
