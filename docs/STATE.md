@@ -15,6 +15,55 @@ true *right now*.
 
 _Last updated: 2026-09-18_
 
+## 2026-09-18 — Next on a saved entity was saving it (#325)
+
+#325 merged at `e426450c5`, closing issue #319. **Main is `e426450c5`.**
+Production runs `c7ea4a34d` and this is not deployed at the time of writing.
+
+**The symptom and the cause were three steps apart.** Opening a *saved* entity
+and pressing Next appeared to do nothing — no step change, no error, nothing on
+screen wrong. What actually happened is that the form **saved**.
+
+The editor rendered both buttons from one ternary:
+
+```jsx
+{step === 0 ? <Button type="button" onClick={next}/> : <Button type="submit"/>}
+```
+
+A ternary is **one position in one children array**, so React reconciles both
+branches onto one host node and mutates its attributes rather than replacing it.
+`setStep` comes from a discrete event, so React flushes it synchronously *while
+the click is still dispatching*; by the time the browser ran the click's
+activation behaviour, the very node that was clicked read `type="submit"` and its
+form was submitted. A saved entity is already valid, so the write went through,
+`version` moved, and the editor's `key` — `${id}:${version}` — remounted it at
+step one. Hence "the button does nothing".
+
+**Why CI never caught it.** On the *create* path the same accidental submit
+failed validation, and the invalid handler happened to land on step two — so that
+path looked correct. The E2E that existed reached step two by the **step chip**
+rather than by Next, which was a legitimate route and left Next uncovered on the
+one path where it misbehaved.
+
+**The fix is two layers.** `next` now takes the event and calls
+`preventDefault()`, cancelling the click's default action; and the ternary is
+split into separate conditionals with distinct keys, so React unmounts one button
+and mounts another instead of retyping the clicked one in place. Either would
+have done; both are there because the second is the rule and the first is the
+belt.
+
+**The coverage is what makes this finished rather than patched.** The E2E now
+clicks Next **on a saved entity** and asserts not only that step two appears but
+that `version` is still `1` — testing the cause rather than the symptom, since a
+heading-only assertion would have passed straight through a save-and-remount.
+Alongside it, `advance-button-does-not-submit.test.ts` asserts the rule across
+every `.tsx` in the repo: **the branches of a conditional may not render elements
+whose `type` differs.** It works on the syntax rather than on rendered output,
+because this repo has no React rendering harness and the failure lives in
+reconciliation rather than in the markup either branch produces — and it opens by
+asserting that it found the components at all, so a broken file walk fails loudly
+instead of reporting no offenders.
+
 ## 2026-09-18 — the scratch directory is ignored (#323)
 
 #323 merged at `9467f3961`, after the consolidation above, so this is its own
