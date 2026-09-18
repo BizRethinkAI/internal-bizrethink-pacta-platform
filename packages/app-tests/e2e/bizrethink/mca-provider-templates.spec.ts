@@ -337,7 +337,7 @@ test('an entity is added once, then a template is created against it and revised
 
     await expect(preview).toContainText('Internal draft — transaction fields remain unfilled');
     await expect(preview.locator('[data-mca-template-item="frpa.party-identification"]')).toContainText(
-      'Example Receipts Inc., a corporation organized under the laws of DE',
+      'Example Receipts Inc., a corporation organized under the laws of Delaware',
     );
 
     /*
