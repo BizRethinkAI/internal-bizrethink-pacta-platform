@@ -1,4 +1,5 @@
 import { router } from '@documenso/trpc/server/trpc';
+import { mcaEntitiesRouter } from '../../mca/entities/server-only/router';
 import { mcaPackageReviewRouter } from '../../mca/review/server-only/router';
 import { mcaClauseLibraryRouter } from '../../mca/server-only/trpc/clause-library-router';
 import { mcaTemplatesRouter } from '../../mca/server-only/trpc/templates/router';
@@ -54,5 +55,10 @@ export const bizrethinkRouter = router({
   // customer — so there is no tenancy to authorise against.
   mcaClauseLibrary: mcaClauseLibraryRouter,
   mcaPackageReview: mcaPackageReviewRouter,
+  // MCA entities — the legal entity that issues a document, saved once and
+  // chosen when a template is created (ADR 0026). Team-scoped like templates;
+  // writing needs ADMIN or MANAGER, because these terms decide which clauses
+  // every document the entity issues contains.
+  mcaEntities: mcaEntitiesRouter,
   mcaTemplates: mcaTemplatesRouter,
 });
