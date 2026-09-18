@@ -2,8 +2,8 @@ import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-ap
 import { prisma } from '@documenso/prisma';
 
 import { getFeatureAccess } from '../../../server-only/feature-access';
-import type { McaInstrument } from '../../clauses/instruments';
 import { MCA_BUILDER_FEATURE } from '../../templates/server-only/service';
+import { producedInstrumentOf } from '../recipient-contract';
 import type { McaPublicationRecipient } from './publications';
 
 /**
@@ -50,7 +50,7 @@ type PublishedRow = {
 };
 
 const asResponse = (row: PublishedRow) => ({
-  instrument: row.instrument as McaInstrument,
+  instrument: producedInstrumentOf(row.instrument, row.templateId),
   /** What `POST /api/v2/template/use` takes. */
   templateId: row.documensoTemplateId,
   envelopeId: row.envelopeId,
