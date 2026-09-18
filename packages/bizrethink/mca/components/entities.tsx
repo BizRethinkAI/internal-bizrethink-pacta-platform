@@ -18,15 +18,7 @@ import { McaEntityEditor } from './entity-editor';
  * this is where entities are kept, and the template builder still carries its
  * own provider interview.
  */
-export const McaEntities = ({
-  teamId,
-  teamUrl,
-  canWrite,
-}: {
-  teamId: number;
-  teamUrl: string;
-  canWrite: boolean;
-}) => {
+export const McaEntities = ({ teamId, teamUrl, canWrite }: { teamId: number; teamUrl: string; canWrite: boolean }) => {
   const [search, setSearch] = useSearchParams();
   const id = search.get('entity');
   const creating = search.get('new') === '1';
