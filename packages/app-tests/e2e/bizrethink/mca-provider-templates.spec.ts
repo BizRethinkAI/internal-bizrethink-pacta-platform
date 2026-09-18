@@ -297,7 +297,10 @@ test('an entity is added once, then a template is created against it and revised
     await expect(dispute.locator('[data-mca-consequence]').first()).toContainText('Arbitration');
     await page.getByRole('button', { name: 'Florida', exact: true }).click();
     await page.getByRole('button', { name: 'New York', exact: true }).click();
-    await page.getByRole('button', { name: 'Save entity', exact: true }).click();
+    const saveEntity = page.getByRole('button', { name: 'Save entity', exact: true });
+
+    await expect(saveEntity).toBeEnabled();
+    await saveEntity.click();
 
     /*
       WAIT FOR THE SAVE TO LAND BEFORE READING THE ROW. Clicking returns as soon
@@ -348,7 +351,10 @@ test('an entity is added once, then a template is created against it and revised
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca-entities?entity=${saved.id}`);
     await page.getByLabel('Legal name', { exact: true }).fill('Revised Example Receipts Inc.');
     await page.getByRole('button', { name: 'Next', exact: true }).click();
-    await page.getByRole('button', { name: 'Save entity', exact: true }).click();
+    const saveEntity = page.getByRole('button', { name: 'Save entity', exact: true });
+
+    await expect(saveEntity).toBeEnabled();
+    await saveEntity.click();
 
     // Same race as above: read the row back rather than trusting the click.
     await expect

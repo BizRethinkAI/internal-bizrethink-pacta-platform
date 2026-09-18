@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { type FieldPath, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { type McaEntityInput, ZMcaEntity } from '../entities/entity';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS } from '../jurisdictions';
@@ -67,9 +67,23 @@ export const McaEntityEditor = ({
     while the next answer is being computed; a flickering explanation is worse
     than a slightly stale one, and the staleness lasts one round trip.
   */
+  /*
+    THE INPUT IS MEMOISED ON ITS OWN CONTENT, not rebuilt every render.
+
+    `form.watch` hands back a fresh object on every keystroke, so an unmemoised
+    input made this refetch continuously — the consequence lists under each
+    option appeared and vanished, the page never settled, and the submit button
+    could not be clicked because it never stopped moving. Keyed on the
+    serialised policy so it refetches when an ANSWER changes and not when
+    somebody types an address.
+  */
+  const policyKey = JSON.stringify(policy ?? null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the serialised value, not the identity.
+  const stablePolicy = useMemo(() => policy, [policyKey]);
+
   const derived = trpc.bizrethink.mcaEntities.consequences.useQuery(
-    { teamId, policy: policy as never },
-    { enabled: Boolean(policy), placeholderData: (previous) => previous, retry: false },
+    { teamId, policy: stablePolicy as never },
+    { enabled: Boolean(stablePolicy), retry: false, staleTime: Number.POSITIVE_INFINITY },
   );
   const consequences = derived.data?.answers ?? [];
 
