@@ -2,19 +2,8 @@ import { z } from 'zod';
 
 import type { McaFacts } from '../clauses/facts';
 import { MCA_JURISDICTIONS, type McaJurisdiction } from '../jurisdictions';
+import { email, line, type McaFee, ZMcaFee } from '../plain-values';
 
-/** Plain input values cannot introduce another template directive or paragraph. */
-const line = (max = 240) =>
-  z
-    .string()
-    .trim()
-    .min(1)
-    .max(max)
-    .refine(
-      (value) => !/\{\{|\[\[|«|»/.test(value) && [...value].every((character) => character.charCodeAt(0) >= 32),
-      'Enter a plain value, without template markers or line breaks.',
-    );
-const email = z.string().trim().email().max(254);
 const ZEntity = z
   .object({
     legalName: line(),
@@ -27,48 +16,9 @@ const ZEntity = z
   .strict();
 
 /** Answers only about the provider. Transaction facts belong to the fill contract. */
-/** The same dollar shape the transaction layer validates: no symbol, two decimals at most. */
-const money = z
-  .string()
-  .trim()
-  .regex(/^(0|[1-9]\d{0,11})(\.\d{1,2})?$/, 'Enter a dollar amount, for example 500.00.');
 
-/**
- * One row of the completed Appendix A.
- *
- * The shape is not invented here: `frpa.appendix-a-fees-collectible` says a fee
- * may be charged only if the completed Appendix identifies it "by its name, its
- * dollar amount or a lawful calculation method, the person to whom it is paid,
- * what it is for, and when it is charged". These are those five, and the
- * either/or is why `basis` exists rather than two optional strings.
- *
- * A fee not listed here is $0.00 by the clause's own terms, so an empty
- * schedule is a complete answer, not a missing one.
- */
-export const ZMcaFee = z.discriminatedUnion('basis', [
-  z
-    .object({
-      basis: z.literal('amount'),
-      name: line(200),
-      amount: money,
-      payee: line(200),
-      purpose: line(400),
-      when: line(400),
-    })
-    .strict(),
-  z
-    .object({
-      basis: z.literal('method'),
-      name: line(200),
-      method: line(400),
-      payee: line(200),
-      purpose: line(400),
-      when: line(400),
-    })
-    .strict(),
-]);
-
-export type McaFee = z.infer<typeof ZMcaFee>;
+/** Re-exported: the fee schema moved to `plain-values` when the entity took the schedule (ADR 0026). */
+export { type McaFee, ZMcaFee };
 
 export const ZMcaProviderProfile = z
   .object({

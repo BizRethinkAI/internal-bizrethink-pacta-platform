@@ -123,3 +123,62 @@ describe('what the entity carries for the documents it issues', () => {
     expect(parsed.success && parsed.data.fees).toEqual([]);
   });
 });
+
+/**
+ * AN ENTITY'S OWN TEXT REACHES THE PAGE, so it must not be able to act as an
+ * instruction once it gets there.
+ *
+ * The compiler substitutes `{{field:…}}` and `{{funder}}`, the numbering engine
+ * resolves `[[clause:…]]`, and `injectMcaWidgets` turns `«name»` into an
+ * AcroForm widget. An entity named `«merchant_legal_name»` would therefore put
+ * a second widget of that name onto a published document — one the funder never
+ * asked for and the caller would fill.
+ *
+ * `ZMcaProviderProfile` guarded this from the start. `ZMcaEntity` was written
+ * without the guard, and ADR 0026 is what makes the entity the thing whose text
+ * is printed. Both now share `plain-values`, and this is what keeps them from
+ * drifting apart again.
+ */
+describe('an entity cannot smuggle a template directive into a document', () => {
+  it.each([
+    ['a widget marker', '«merchant_legal_name»'],
+    ['a field binding', '{{field:provider.legalName}}'],
+    ['a role token', '{{funder}}'],
+    ['a clause reference', '[[clause:frpa.parties]]'],
+  ])('refuses %s in the legal name', (_label, injected) => {
+    const entity = entityFixture();
+
+    entity.identity.legalName = `Example Receipts Inc. ${injected}`;
+
+    expect(ZMcaEntity.safeParse(entity).success).toBe(false);
+  });
+
+  it('refuses one in an optional field too, where empty is still allowed', () => {
+    const entity = entityFixture();
+
+    entity.identity.creditDisputeAddress = 'PO Box 50 «merchant_address»';
+
+    expect(ZMcaEntity.safeParse(entity).success).toBe(false);
+    expect(
+      ZMcaEntity.safeParse({ ...entityFixture(), identity: { ...entityFixture().identity, creditDisputeAddress: '' } })
+        .success,
+    ).toBe(true);
+  });
+
+  it('refuses one in a fee row, which prints in Appendix A', () => {
+    const entity = entityFixture();
+
+    entity.policy.fees = [
+      {
+        basis: 'amount',
+        name: 'Origination «fee»',
+        amount: '500.00',
+        payee: 'Funder',
+        purpose: 'Origination',
+        when: 'At funding',
+      },
+    ];
+
+    expect(ZMcaEntity.safeParse(entity).success).toBe(false);
+  });
+});

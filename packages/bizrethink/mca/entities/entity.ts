@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { MCA_JURISDICTIONS } from '../jurisdictions';
-import { ZMcaFee } from '../templates/profile';
+import { email, line, optionalLine, ZMcaFee } from '../plain-values';
 
 /**
  * The legal entity that issues a document, and how its programme runs.
@@ -23,10 +23,6 @@ import { ZMcaFee } from '../templates/profile';
  * those are its own arrangements. Pacta holds entities and knows which document
  * a template produces, and nothing more.
  */
-
-const line = (max = 240) => z.string().trim().min(1).max(max);
-const optionalLine = (max = 240) => z.union([z.literal(''), z.string().trim().max(max)]);
-const email = z.string().trim().email().max(254);
 
 /**
  * Who this entity is, as it appears in a document.
