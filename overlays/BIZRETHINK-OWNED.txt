@@ -197,3 +197,8 @@ apps/remix/app/routes/api+/bizrethink.mca-templates.ts
 
 # ADR 0025: preview a template rendered with specimen values.
 apps/remix/app/routes/api+/bizrethink.mca-template-preview.ts
+
+# ADR 0026: the entity that issues a document, added once and then chosen.
+# The team route itself is already covered by the `t.$teamUrl+/mca*.tsx` glob
+# above; this is its end-to-end cover.
+packages/app-tests/e2e/bizrethink/mca-entities.spec.ts
