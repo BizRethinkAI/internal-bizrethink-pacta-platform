@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@documenso/prisma';
 
-import type { McaInstrument } from '../../clauses/instruments';
 import { assertMcaTeamAccess } from '../../templates/server-only/service';
+import { type ProducedInstrument, producedInstrumentOf } from '../recipient-contract';
 
 /**
  * What was published, kept by the producer that published it.
@@ -37,7 +37,7 @@ export type McaPublicationRecipient = {
 export type McaPublicationInput = TeamActor & {
   templateId: string;
   templateRevision: number;
-  instrument: McaInstrument;
+  instrument: ProducedInstrument;
   documensoTemplateId: number;
   envelopeId: string;
   /** The AcroForm widget names as published, which the caller prefills by. */
@@ -61,7 +61,7 @@ export type McaPublication = {
   id: string;
   templateId: string;
   templateRevision: number;
-  instrument: McaInstrument;
+  instrument: ProducedInstrument;
   documensoTemplateId: number;
   envelopeId: string;
   widgets: string[];
@@ -139,7 +139,7 @@ export const currentMcaPublications = async ({ teamId, userId }: TeamActor): Pro
     if (!newest.has(row.instrument)) {
       newest.set(row.instrument, {
         ...row,
-        instrument: row.instrument as McaInstrument,
+        instrument: producedInstrumentOf(row.instrument, row.templateId),
         widgets: row.widgets as string[],
         recipients: row.recipients as McaPublicationRecipient[],
         recipientStates: row.recipientStates as string[],

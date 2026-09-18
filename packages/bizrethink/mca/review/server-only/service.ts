@@ -2,7 +2,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { BizrethinkMcaPackageReview, Prisma } from '@prisma/client';
-import type { McaInstrument } from '../../clauses/instruments';
+import { producedInstrumentOf } from '../../publish/recipient-contract';
 import { compileMcaTemplate } from '../../templates/compile';
 import { ZMcaProviderProfile } from '../../templates/profile';
 import { MCA_REVIEW_LINK_TTL_DAYS } from '../link';
@@ -150,7 +150,8 @@ const providerSnapshotState = async (
   if (parsed.success) {
     try {
       providerSourcesCurrent =
-        compileMcaTemplate(parsed.data, template.instrument as McaInstrument).fingerprint === revision.fingerprint;
+        compileMcaTemplate(parsed.data, producedInstrumentOf(template.instrument, row.templateId)).fingerprint ===
+        revision.fingerprint;
     } catch {
       // Saved text remains available even when current selection rules no longer accept this profile.
       providerSourcesCurrent = false;

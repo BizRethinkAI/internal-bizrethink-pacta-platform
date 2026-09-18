@@ -179,3 +179,24 @@ describe('a publication belongs to its team', () => {
     await expect(currentMcaPublications(identity)).rejects.toThrow();
   });
 });
+
+/**
+ * A PUBLICATION ROW'S `instrument` IS A `String` COLUMN, so reading it back
+ * proved nothing and the code cast. `publishMcaTemplate` only ever writes a
+ * `ProducedInstrument`, so a row saying otherwise means something wrote outside
+ * the service — a tripwire rather than a path anyone travels.
+ *
+ * Refused rather than served: a caller handed an instrument it cannot interpret
+ * is worse off than one told the record is unreadable.
+ */
+describe('a publication row naming a document we do not produce', () => {
+  it.each([
+    ['a processor form', 'split-funding'],
+    ['nonsense', 'not-an-instrument'],
+    ['nothing at all', ''],
+  ])('refuses %s rather than casting it', async (_label, instrument) => {
+    mocks.db.bizrethinkMcaPublication.findMany.mockResolvedValue([{ ...published(), instrument }]);
+
+    await expect(currentMcaPublications(identity)).rejects.toThrow(/does not produce/i);
+  });
+});

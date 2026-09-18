@@ -152,6 +152,29 @@ describe('it refuses anything it cannot place', () => {
   });
 
   /**
+   * A PUBLICATION ROW'S `instrument` IS A `String` COLUMN, and this endpoint
+   * used to cast it. `publishMcaTemplate` only ever writes a
+   * `ProducedInstrument`, so a row saying otherwise means something wrote
+   * outside the service — a tripwire rather than a path anyone travels.
+   *
+   * What must not happen is serving it: a funder's platform handed an
+   * instrument it cannot interpret would pick a template by a name that means
+   * nothing, and ADR 0019 makes `split-funding` in particular a document this
+   * builder never produces.
+   */
+  it('never serves an instrument this builder does not produce', async () => {
+    mocks.db.bizrethinkMcaPublication.findMany.mockResolvedValue([row({ instrument: 'split-funding' })]);
+
+    // Either it refuses outright or it answers — but it never answers with the
+    // instrument. Both are acceptable; serving it is not.
+    const response = await listMcaTemplatesForApi(request('secret')).catch(() => null);
+    const body = response ? await response.text() : '';
+
+    expect(body).not.toContain('split-funding');
+    expect(response === null || response.status !== 200).toBe(true);
+  });
+
+  /**
    * The query is bound to the token's own team. A token cannot read another
    * funder's templates, and the widget names of a funder's agreements are not
    * public.
