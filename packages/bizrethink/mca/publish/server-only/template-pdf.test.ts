@@ -3,8 +3,8 @@ import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-
 import { PDF } from '@libpdf/core';
 import { describe, expect, it, vi } from 'vitest';
 import type { McaInstrument } from '../../clauses/instruments';
+import { entityFixture } from '../../entities/entity.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 import { fieldPlanFor } from '../field-plan';
 import { injectMcaWidgets } from './acroform';
 import { renderMcaTemplatePdf, templatePlacement } from './template-pdf';
@@ -24,7 +24,7 @@ import { renderMcaTemplatePdf, templatePlacement } from './template-pdf';
 // assertions to fit a budget would be the wrong trade.
 vi.setConfig({ testTimeout: 60_000 });
 
-const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(entityFixture(), instrument);
 
 /**
  * Render each document once per file, not once per assertion.
@@ -126,11 +126,17 @@ describe('what a published template carries', () => {
    */
   it('sets the funder’s own facts in type, with no widget for them', async () => {
     const text = await textOf(await templateOf('frpa'));
-    const profile = providerFixture();
+    const entity = entityFixture();
 
-    expect(text).toContain(profile.buyer.legalName);
+    expect(text).toContain(entity.identity.legalName);
     expect(text).not.toContain('«provider_address»');
-    expect(text).not.toContain('«processor_name»');
+    /*
+      `processor_name` IS a widget now, unlike the funder's own address beside
+      it. ADR 0026 §6: which processor a merchant uses is a fact about the deal,
+      so the caller sends it — this asserts the split rather than the old
+      assumption that everything provider-shaped is printed.
+    */
+    expect(text).toContain('«processor_name»');
   });
 
   it('prints a signer placeholder for each party, numbered in signing order', async () => {

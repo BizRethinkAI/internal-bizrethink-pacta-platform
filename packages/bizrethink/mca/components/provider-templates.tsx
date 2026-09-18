@@ -1,5 +1,8 @@
+import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
@@ -9,11 +12,11 @@ import { PRODUCED_INSTRUMENTS, type ProducedInstrument } from '../publish/recipi
 import type { McaTemplateSnapshot } from '../templates/compile';
 import { McaOperatingRequirements } from './operating-requirements';
 import { McaPackageReader } from './package-reader';
-import { McaProviderInterview } from './provider-interview';
 import { McaProviderReviewManager } from './provider-review-manager';
 import { McaPublishTemplate } from './publish-template';
 
 export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; canWrite: boolean }) => {
+  const { _ } = useLingui();
   const [search, setSearch] = useSearchParams();
   const id = search.get('template');
   const versionText = search.get('revision');
@@ -36,6 +39,10 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
     refuses to accept the field at all.
   */
   const [instrument, setInstrument] = useState<ProducedInstrument>('frpa');
+  const [entityId, setEntityId] = useState('');
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [reviseError, setReviseError] = useState<string | null>(null);
+  const entities = trpc.bizrethink.mcaEntities.list.useQuery({ teamId });
   const preview = trpc.bizrethink.mcaTemplates.preview.useQuery(
     { teamId, id: id ?? '', version: saved.data?.version ?? 1 },
     { enabled: previewRequested && Boolean(saved.data), retry: false, staleTime: 0 },
@@ -254,50 +261,125 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
             />
           </section>
         )}
-        {((!id && canWrite) || saved.data) && (
-          <section hidden={Boolean(id) && workspaceView !== 'answers'} className="rounded-lg border p-4 sm:p-6">
-            {!id && canWrite && (
-              <div className="mb-4 space-y-1">
-                <label className="font-medium text-sm" htmlFor="mca-template-instrument">
-                  <Trans>Which document is this template?</Trans>
-                </label>
-                <select
-                  id="mca-template-instrument"
-                  className="w-full rounded-md border p-2 text-sm"
-                  value={instrument}
-                  onChange={(event) => setInstrument(event.target.value as ProducedInstrument)}
-                >
-                  {PRODUCED_INSTRUMENTS.map((produced) => (
-                    <option key={produced} value={produced}>
-                      {INSTRUMENTS[produced].title}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-muted-foreground text-sm">
-                  <Trans>
-                    One template is one document. Chosen now and fixed afterwards — a template that changed which
-                    document it was would invalidate every revision behind it.
-                  </Trans>
-                </p>
-              </div>
+        {!id && canWrite && (
+          <section className="space-y-4 rounded-lg border p-4 sm:p-6">
+            <h2 className="font-semibold text-xl">
+              <Trans>Create a template</Trans>
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              <Trans>
+                A template is one entity's version of one document. Choose the entity that issues it and which document
+                it is; both are fixed afterwards, because a template that changed either would make every revision
+                behind it a record of something else.
+              </Trans>
+            </p>
+
+            <label className="block space-y-1">
+              <span className="font-medium text-sm">
+                <Trans>Which entity issues it?</Trans>
+              </span>
+              <select
+                className="w-full rounded-md border p-2 text-sm"
+                value={entityId}
+                onChange={(event) => setEntityId(event.target.value)}
+              >
+                <option value="">{_(msg`Choose an entity…`)}</option>
+                {entities.data?.map((entity) => (
+                  <option key={entity.id} value={entity.id}>
+                    {entity.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {entities.data?.length === 0 && (
+              <p className="text-muted-foreground text-sm">
+                <Trans>
+                  No entities yet. Add the company that issues your documents first — its addresses and programme terms
+                  are answered once there rather than once per document.
+                </Trans>
+              </p>
             )}
-            <McaProviderInterview
-              key={`${id ?? 'new'}:${saved.data?.version ?? 0}`}
-              initial={saved.data?.profile}
-              readOnly={!canWrite || Boolean(isOldRevision)}
-              onSave={async (profile) => {
-                const result = saved.data
-                  ? await update.mutateAsync({
-                      teamId,
-                      id: saved.data.id,
-                      data: { expectedVersion: saved.data.version, profile },
-                    })
-                  : await create.mutateAsync({ teamId, data: profile, instrument });
-                setPreviewRequested(false);
-                setSearch({ template: result.id, revision: String(result.currentRevision) });
-                await list.refetch();
+
+            <label className="block space-y-1">
+              <span className="font-medium text-sm">
+                <Trans>Which document is it?</Trans>
+              </span>
+              <select
+                className="w-full rounded-md border p-2 text-sm"
+                value={instrument}
+                onChange={(event) => setInstrument(event.target.value as ProducedInstrument)}
+              >
+                {PRODUCED_INSTRUMENTS.map((produced) => (
+                  <option key={produced} value={produced}>
+                    {INSTRUMENTS[produced].title}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {createError && (
+              <p role="alert" className="text-destructive text-sm">
+                {createError}
+              </p>
+            )}
+
+            <Button
+              disabled={!entityId || create.isPending}
+              onClick={async () => {
+                setCreateError(null);
+                try {
+                  const result = await create.mutateAsync({ teamId, entityId, instrument });
+                  setPreviewRequested(false);
+                  setSearch({ template: result.id, revision: String(result.currentRevision) });
+                  await list.refetch();
+                } catch (cause) {
+                  setCreateError(AppError.parseError(cause).message);
+                }
               }}
-            />
+            >
+              <Trans>Create template</Trans>
+            </Button>
+          </section>
+        )}
+
+        {saved.data && canWrite && !isOldRevision && (
+          <section className="space-y-3 rounded-lg border p-4 sm:p-6">
+            <h2 className="font-semibold text-xl">
+              <Trans>Take a fresh copy of the entity</Trans>
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              <Trans>
+                This template holds a copy of its entity as it stood when this revision was made. Editing the entity
+                never changes a document already published — creating a new revision is how an edit reaches one.
+              </Trans>
+            </p>
+            {reviseError && (
+              <p role="alert" className="text-destructive text-sm">
+                {reviseError}
+              </p>
+            )}
+            <Button
+              variant="outline"
+              disabled={update.isPending}
+              onClick={async () => {
+                setReviseError(null);
+                try {
+                  const result = await update.mutateAsync({
+                    teamId,
+                    id: saved.data.id,
+                    data: { expectedVersion: saved.data.version },
+                  });
+                  setPreviewRequested(false);
+                  setSearch({ template: result.id, revision: String(result.currentRevision) });
+                  await Promise.all([saved.refetch(), list.refetch()]);
+                } catch (cause) {
+                  setReviseError(AppError.parseError(cause).message);
+                }
+              }}
+            >
+              <Trans>Create a new revision</Trans>
+            </Button>
           </section>
         )}
       </div>
@@ -317,7 +399,7 @@ export const McaPackagePreview = ({
   snapshot,
   requirementsOnly = false,
 }: {
-  snapshot: Pick<McaTemplateSnapshot, 'documents' | 'externalDocuments' | 'requirements'>;
+  snapshot: Pick<McaTemplateSnapshot, 'documents' | 'requirements'>;
   requirementsOnly?: boolean;
 }) => {
   return (
@@ -326,19 +408,13 @@ export const McaPackagePreview = ({
         <Trans>Internal draft — transaction fields remain unfilled</Trans>
       </p>
       {!requirementsOnly && <McaPackageReader documents={snapshot.documents} unfilled />}
-      <section>
-        <h3 className="font-semibold">
-          <Trans>Processor-controlled document</Trans>
-        </h3>
-        {snapshot.externalDocuments.map((document) => (
-          <p key={document.instrument} className="text-sm">
-            {document.processor}: {document.form.title} ({document.form.version}) — {document.form.reference}
-          </p>
-        ))}
-        <p className="text-muted-foreground text-sm">
-          <Trans>Obtain the required form and confirm its terms and acceptance for the transaction.</Trans>
-        </p>
-      </section>
+      {/*
+        NO PROCESSOR SECTION. A template names no processor (ADR 0026 §6): the
+        split funding letter is the processor's, used exactly as supplied, and
+        the caller picks the processor-specific template when it creates that
+        envelope. `processor_name` remains a widget on the FRPA, because which
+        processor a merchant uses is a fact about the deal.
+      */}
       <section>
         <h3 className="font-semibold">
           <Trans>Disclosure and agreement requirements to check per transaction</Trans>

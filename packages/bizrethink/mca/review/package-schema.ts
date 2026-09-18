@@ -98,16 +98,6 @@ export const ZProviderReviewPackage = ZLibraryReviewPackage.extend({
     legalName: z.string(),
     policy: z.array(z.string()),
   }),
-  externalDocuments: z.array(
-    z.object({
-      id: z.string(),
-      processor: z.string(),
-      title: z.string(),
-      version: z.string(),
-      reference: z.string(),
-      content: z.string().nullable(),
-    }),
-  ),
 });
 
 export const ZReviewPackage = z.discriminatedUnion('schemaVersion', [ZLibraryReviewPackage, ZProviderReviewPackage]);

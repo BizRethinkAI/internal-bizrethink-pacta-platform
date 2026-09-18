@@ -2,16 +2,16 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { ALL_MCA_CONTENT } from '../catalogue';
 import { referenceSegments } from '../engine/reference-segments';
 import { selectClauses } from '../engine/select-clauses';
-import { type McaTemplateSnapshot, populateProvider, providerValues } from './compile';
-import { providerSelectionFacts } from './profile';
+import { entitySelectionFacts } from '../entities/entity';
+import { entityValues, type McaTemplateSnapshot, populateEntity } from './compile';
 
 /** Apply only after the existing access/current-source check; never save or hash this projection. */
 export const projectTemplateReading = <T extends McaTemplateSnapshot>(snapshot: T): T => {
-  const facts = providerSelectionFacts(snapshot.profile);
+  const facts = entitySelectionFacts(snapshot.entity);
   const context = snapshot.documents.flatMap(
     (document) => selectClauses({ instrument: document.instrument, facts }).selected,
   );
-  const values = providerValues(snapshot.profile);
+  const values = entityValues(snapshot.entity);
   return {
     ...snapshot,
     documents: snapshot.documents.map((document) => ({
@@ -22,7 +22,7 @@ export const projectTemplateReading = <T extends McaTemplateSnapshot>(snapshot: 
           throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'The selected source item is unavailable.' });
         }
         const segments = referenceSegments(
-          { ...source, body: populateProvider(source.body, snapshot.profile, values) },
+          { ...source, body: populateEntity(source.body, snapshot.entity, document.instrument, values) },
           context,
           'Saved provider selection',
         );

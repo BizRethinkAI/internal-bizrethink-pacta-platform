@@ -12,12 +12,12 @@ vi.mock('@documenso/prisma', () => ({ prisma: mocks.db }));
 vi.mock('../../server-only/clause-approvals', () => ({ loadMcaClauseApprovals: mocks.approvals }));
 
 import type { McaInstrument } from '../../clauses/instruments';
+import { entityFixture } from '../../entities/entity.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 import { assertMcaPackagePublishable, mcaPublicationRefusals } from '../publishable';
 import { mcaPublishablePackageFor } from './publishable-package';
 
-const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(entityFixture(), instrument);
 
 beforeEach(() => {
   vi.resetAllMocks();

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { contentFor } from '../catalogue';
-import { MCA_PROVIDER_BINDINGS } from '../templates/profile';
+import { MCA_ENTITY_BINDINGS } from '../entities/entity';
 import { fieldPlanFor } from './field-plan';
 import { FIELD_TRIAGE, newWidgetNames, unreachableDealFields } from './field-triage';
 import { PRODUCED_INSTRUMENTS } from './recipient-contract';
@@ -104,7 +104,7 @@ describe('every unreachable field is accounted for', () => {
   });
 
   it('triages nothing the provider profile already resolves', () => {
-    expect(Object.keys(FIELD_TRIAGE).filter((binding) => MCA_PROVIDER_BINDINGS.has(binding))).toEqual([]);
+    expect(Object.keys(FIELD_TRIAGE).filter((binding) => MCA_ENTITY_BINDINGS.has(binding))).toEqual([]);
   });
 
   it('carries no entry for a binding no instrument actually has', () => {

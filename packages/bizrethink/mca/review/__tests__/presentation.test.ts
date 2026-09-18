@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { LegalSegment } from '../../../legal-ui/reading';
+import { entityFixture } from '../../entities/entity.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 import { buildLibraryReviewPackage, reviewPackageFingerprint } from '../package';
 import {
   fieldRequirement,
@@ -159,23 +159,29 @@ describe('readable saved MCA review content', () => {
     expect(rows.at(-1)?.text).toContain('not prescribed / not recorded');
   });
 
-  it('searches the saved sources and processor forms, not the current catalogue', () => {
+  it('searches the saved sources, not the current catalogue', () => {
     const saved = structuredClone(snapshot);
     saved.requirements[0].entries[0].paragraphs = ['Verbatim: Archived-source-only wording.'];
     expect(searchSavedPackage(saved, 'archived-source-only')[0]?.id).toBe(`requirement:${saved.requirements[0].slug}`);
     expect(
       searchSavedPackage(saved, '10 CCR §914').some((result) => result.id === 'requirement:ca-offer-summary'),
     ).toBe(true);
+    /*
+      No processor form to search any more. ADR 0026 §6 removed the processor
+      from templates, so a template review has none to carry — what remains is
+      the saved wording of the document itself, which is what the assertions
+      above cover.
+    */
     const provider = buildProviderReviewPackage({
-      compiled: compileMcaTemplate(providerFixture(), 'frpa'),
+      compiled: compileMcaTemplate(entityFixture(), 'frpa'),
       templateId: 'saved',
       revision: 1,
       contact: 'Legal operations',
-      processorText: 'Archived-processor-only instruction.',
+      processorText: null,
     });
-    expect(searchSavedPackage(provider, 'archived-processor-only')[0]?.documentId).toBe(
-      `processor:${provider.externalDocuments[0].id}`,
-    );
+
+    expect(provider).not.toHaveProperty('externalDocuments');
+    expect(searchSavedPackage(provider, 'nothing-matches-this')).toEqual([]);
   });
 
   it('explains saved calculations and separates provider wording from its citation without inferring missing material', () => {

@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import { MCA_JURISDICTIONS } from '../jurisdictions';
+import type { McaFacts } from '../clauses/facts';
+
+import { MCA_JURISDICTIONS, type McaJurisdiction } from '../jurisdictions';
 import { email, line, optionalLine, ZMcaFee } from '../plain-values';
 
 /**
@@ -58,6 +60,15 @@ export const ZMcaEntityIdentity = z
     /** Printed on the cover and in the footer, as the funder's own documents carry it. */
     website: optionalLine(120).optional(),
 
+    /**
+     * Where a broker signs in to see what it is owed.
+     *
+     * The funder's own portal, not the broker's, which is why it belongs here
+     * and not to the caller — the ISO PRA's commission-transparency clause
+     * names it, and it is the same URL for every broker.
+     */
+    partnerPortalUrl: optionalLine(200).optional(),
+
     /** Where a customer disputes what this entity reported about them. */
     creditDisputeAddress: optionalLine(600).optional(),
   })
@@ -91,8 +102,13 @@ export const ZMcaEntityPolicy = z
     /** Whether it pulls a consumer report, which a separate permission covers. */
     consumerReportPulled: z.boolean(),
     supportedTermsConfirmed: z.boolean().refine(Boolean, 'Confirm that these are your supported terms.'),
+    /*
+      Typed as `McaJurisdiction`, not `string`. The requirements list a
+      compiled template carries is keyed by jurisdiction, and a loose type here
+      made every one of them `string` all the way out to the caller.
+    */
     recipientStates: z
-      .array(z.enum(MCA_JURISDICTIONS as unknown as [string, ...string[]]))
+      .array(z.enum(MCA_JURISDICTIONS as unknown as [McaJurisdiction, ...McaJurisdiction[]]))
       .max(MCA_JURISDICTIONS.length),
     fees: z.array(ZMcaFee).max(20).default([]),
   })
@@ -142,3 +158,79 @@ export type McaEntityIdentity = z.infer<typeof ZMcaEntityIdentity>;
 export type McaEntityPolicy = z.infer<typeof ZMcaEntityPolicy>;
 export type McaEntity = z.infer<typeof ZMcaEntity>;
 export type McaEntityInput = z.input<typeof ZMcaEntity>;
+
+/**
+ * The facts clause selection runs on.
+ *
+ * Every one of them comes from `policy`, which is why policy belongs to the
+ * entity rather than to each document: two documents from one programme must
+ * not disagree about the guaranty.
+ *
+ * `processorSplitAccepted` is false here and always will be. It is a fact about
+ * a deal — whether this merchant's processor accepted the split — and a
+ * template is not a deal (ADR 0025).
+ */
+export const entitySelectionFacts = (entity: McaEntity): McaFacts => ({
+  collectionMethod: entity.policy.collectionMethod,
+  settlementBase: entity.policy.settlementBase,
+  venueRule: entity.policy.venueRule,
+  guarantyScope: entity.policy.guarantyScope,
+  equipment: entity.policy.equipment,
+  renewalModel: entity.policy.renewalModel,
+  concurrentPositions: entity.policy.concurrentPositions,
+  disputeResolution: entity.policy.disputeResolution,
+  recipientStates: [...entity.policy.recipientStates].sort(),
+  brokerChannel: entity.policy.brokerChannel,
+  consumerReportPulled: entity.policy.consumerReportPulled,
+  processorSplitAccepted: false,
+});
+
+/**
+ * The bindings the ENTITY supplies, printed into the document at publication.
+ *
+ * A binding in this set is already in the compiled text, so it must NOT also
+ * become an AcroForm widget the caller fills — `field-plan.ts` is where that
+ * split is made.
+ *
+ * ADR 0026 §5 moves two out of it:
+ *
+ *   `processor.approvedProcessors`  which processor a merchant uses is a fact
+ *                                   about the deal (§6)
+ *   `iso.commissionPercentage`      a term with a particular broker, and a live
+ *                                   widget today — the caller already sends it
+ *
+ * TWO `iso.*` BINDINGS STAY, and the naming is a trap worth stating. On the ISO
+ * PRA `iso.companyLegalName` is the **Company** — us — while the broker is
+ * `iso.partnerLegalName`. ADR 0026 §5 cites that very widget as its evidence
+ * that our side is a Pacta record. Moving it out would have made the funder's
+ * own legal name a field the caller fills on its own channel agreement.
+ * `iso.portalUrl` is likewise the funder's partner portal, not the broker's.
+ *
+ * And one binding is new and deliberately absent from here:
+ * `equipment.affiliateLegalName`, the FRPA's mention of whoever the merchant
+ * leases equipment from. A template names one entity, so the FRPA cannot know
+ * a separate equipment company of the funder's and the caller sends it. On an
+ * equipment lease or subscription the entity IS the lessor, which is why
+ * `equipment.provider*` below stay printed.
+ */
+export const MCA_ENTITY_BINDINGS = new Set([
+  'provider.legalName',
+  'provider.entityType',
+  'provider.organizationState',
+  'provider.principalAddress',
+  'provider.noticeAddress',
+  'provider.noticeEmail',
+  'provider.reconciliationEmail',
+  'provider.reconciliationAddress',
+  'provider.servicingPhone',
+  'provider.venueForum',
+  'equipment.providerLegalName',
+  'equipment.providerEntityType',
+  'equipment.providerFormationState',
+  'equipment.providerAddress',
+  'equipment.providerNoticeAddress',
+  'equipment.providerNoticeEmail',
+  'equipment.creditDisputeAddress',
+  'iso.companyLegalName',
+  'iso.portalUrl',
+]);

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { contentFor } from '../catalogue';
 import type { McaInstrument } from '../clauses/instruments';
-import { compileMcaTemplate, isMcaTemplateCurrent } from './compile';
-import { providerFixture } from './profile.fixture';
+import { entityFixture } from '../entities/entity.fixture';
+import { compileMcaTemplate, entityValues, isMcaTemplateCurrent } from './compile';
 
 /**
  * ADR 0026: **entity + type = one template.**
@@ -16,38 +16,33 @@ import { providerFixture } from './profile.fixture';
  * which is what a template is and what the caller has always seen.
  */
 
-const itemsOf = (instrument: McaInstrument = 'frpa', profile = providerFixture()) =>
-  compileMcaTemplate(profile, instrument).documents[0]?.items ?? [];
+const itemsOf = (instrument: McaInstrument = 'frpa', entity = entityFixture()) =>
+  compileMcaTemplate(entity, instrument).documents[0]?.items ?? [];
 
 /** Every document the all-options programme below is entitled to. */
 const OFFERED = ['equipment-lease', 'frpa', 'iso-pra', 'permission-to-release', 'subscription'] as const;
 
-/** A programme that offers every document the builder produces, with distinct names per party. */
+/**
+ * An entity whose programme offers every document the builder produces.
+ *
+ * It no longer invents a separate equipment company or broker. Under ADR 0026
+ * the broker comes from the caller per deal, and an entity that places
+ * equipment IS the lessor on its own equipment template — two companies means
+ * two entities and two templates, not one template naming both.
+ */
 const allOptions = () => {
-  const profile = providerFixture();
-  const { reconciliationEmail: _email, reconciliationAddress: _address, ...entity } = profile.buyer;
+  const entity = entityFixture();
 
-  return {
-    ...profile,
-    policy: {
-      ...profile.policy,
-      equipment: 'merchant-elects' as const,
-      brokerChannel: true,
-      consumerReportPulled: true,
-    },
-    equipmentProvider: { ...entity, legalName: 'Separate Equipment LLC', entityType: 'limited liability company' },
-    broker: {
-      company: { ...entity, legalName: 'Separate Channel Inc.' },
-      portalUrl: 'https://partners.example.invalid',
-      commissionPercentage: 2.75,
-      fixedIsoTermsAccepted: true,
-    },
-  };
+  entity.policy.equipment = 'merchant-elects';
+  entity.policy.brokerChannel = true;
+  entity.policy.consumerReportPulled = true;
+
+  return entity;
 };
 
 describe('the provider interview produces a template for one document', () => {
   it('compiles the document it was asked for, and nothing beside it', () => {
-    const result = compileMcaTemplate(providerFixture(), 'frpa');
+    const result = compileMcaTemplate(entityFixture(), 'frpa');
 
     expect(result.documents.map((entry) => entry.instrument)).toEqual(['frpa']);
     // Carried at the top level too, so a recompile can ask for the same one.
@@ -84,39 +79,50 @@ describe('the provider interview produces a template for one document', () => {
     expect(identity).not.toMatch(/Florida limited liability company|Lombard|\{\{funder\}\}/);
   });
 
-  it('never treats a provider-supplied processor form as future transaction acceptance', () => {
-    const result = compileMcaTemplate(providerFixture(), 'frpa');
+  /**
+   * ADR 0026 §6: NO PROCESSOR IS EVER SELECTED IN A TEMPLATE. The split funding
+   * letter is the processor's, supplied fixed, and the caller picks the
+   * processor-specific template when it creates that envelope — so a compiled
+   * template names no processor at all, where it used to carry one as an
+   * "external document" read off the provider profile.
+   */
+  it('supplies no processor value, so the caller fills one', () => {
+    const result = compileMcaTemplate(entityFixture(), 'frpa');
 
-    expect(result.externalDocuments).toEqual([
-      expect.objectContaining({ instrument: 'split-funding', acceptance: 'required-per-transaction' }),
-    ]);
-    expect(result.documents.map((doc) => doc.instrument)).not.toContain('split-funding');
+    // The template used to carry the processor's form as an "external
+    // document", read off the provider profile. There is no profile and no
+    // processor now.
+    expect(result).not.toHaveProperty('externalDocuments');
+
+    // The binding survives in the clause text unresolved, which is exactly
+    // what turns it into a widget the funder's platform fills per deal.
+    expect(Object.keys(entityValues(result.entity)).filter((key) => key.startsWith('processor.'))).toEqual([]);
   });
 
   it('lists state disclosure requirements without deciding future applicability or readiness', () => {
-    const result = compileMcaTemplate(providerFixture(), 'frpa');
+    const result = compileMcaTemplate(entityFixture(), 'frpa');
 
-    expect([...new Set(result.requirements.map((entry) => entry.jurisdiction))].sort()).toEqual(['US-CA', 'US-FL']);
+    expect([...new Set(result.requirements.map((entry) => entry.jurisdiction))].sort()).toEqual(['US-FL', 'US-NY']);
     expect(result.requirements.every((entry) => entry.applicability === 'determine-per-transaction')).toBe(true);
     expect(result.readyToSend).toBe(false);
   });
 
   it('removes guarantor fields with the no-guaranty option but retains the liability limits', () => {
-    const profile = providerFixture();
-    const entries = itemsOf('frpa', { ...profile, policy: { ...profile.policy, guarantyScope: 'none' } });
+    const entity = entityFixture();
+    const entries = itemsOf('frpa', { ...entity, policy: { ...entity.policy, guarantyScope: 'none' } });
 
     expect(entries.some((entry) => entry.slug === 'frpa.guarantor-fields')).toBe(false);
     expect(entries.some((entry) => entry.slug === 'frpa.sales-of-receipts-not-a-loan-2-1')).toBe(true);
   });
 
   it('pins policy and exact content without time-dependent fingerprints', () => {
-    const profile = providerFixture();
-    const first = compileMcaTemplate(profile, 'frpa');
+    const entity = entityFixture();
+    const first = compileMcaTemplate(entity, 'frpa');
 
     expect(first.fingerprint).toMatch(/^[a-f0-9]{64}$/);
-    expect(compileMcaTemplate(profile, 'frpa').fingerprint).toBe(first.fingerprint);
+    expect(compileMcaTemplate(entity, 'frpa').fingerprint).toBe(first.fingerprint);
     expect(
-      compileMcaTemplate({ ...profile, buyer: { ...profile.buyer, legalName: 'Another Buyer LLC' } }, 'frpa')
+      compileMcaTemplate({ ...entity, identity: { ...entity.identity, legalName: 'Another Buyer LLC' } }, 'frpa')
         .fingerprint,
     ).not.toBe(first.fingerprint);
 
@@ -127,29 +133,29 @@ describe('the provider interview produces a template for one document', () => {
     const body = entry.body;
     try {
       entry.body = `${body} Changed drafting.`;
-      expect(compileMcaTemplate(profile, 'frpa').fingerprint).not.toBe(first.fingerprint);
+      expect(compileMcaTemplate(entity, 'frpa').fingerprint).not.toBe(first.fingerprint);
     } finally {
       entry.body = body;
     }
   });
 
   it('pins selected content across server bundles without hashing a predicate’s printed code', () => {
-    const profile = providerFixture();
+    const entity = entityFixture();
     const entry = contentFor('frpa').find((item) => item.slug === 'frpa.guarantor-fields');
     if (!entry?.includeWhen) {
       throw new Error('The guarantor field group must have a selection predicate.');
     }
     const includeWhen = entry.includeWhen;
-    const first = compileMcaTemplate(profile, 'frpa');
+    const first = compileMcaTemplate(entity, 'frpa');
     try {
       // Bundlers can rename parameters or change expression formatting without
       // changing the selected content for the saved provider policy.
       entry.includeWhen = (compiledFacts) => compiledFacts.guarantyScope !== 'none';
       expect(entry.includeWhen.toString()).not.toBe(includeWhen.toString());
-      expect(compileMcaTemplate(profile, 'frpa')).toEqual(first);
+      expect(compileMcaTemplate(entity, 'frpa')).toEqual(first);
 
       entry.includeWhen = () => false;
-      const changed = compileMcaTemplate(profile, 'frpa');
+      const changed = compileMcaTemplate(entity, 'frpa');
       expect(changed.documents[0]?.items.some((item) => item.slug === entry.slug)).toBe(false);
       expect(changed.fingerprint).not.toBe(first.fingerprint);
     } finally {
@@ -170,7 +176,7 @@ describe('a template for a document the programme does not run', () => {
     { label: 'ISO PRA with no broker channel', instrument: 'iso-pra' as const },
     { label: 'report permission with no consumer report pulled', instrument: 'permission-to-release' as const },
   ])('refuses $label', ({ instrument }) => {
-    expect(() => compileMcaTemplate(providerFixture(), instrument)).toThrow(/does not run/i);
+    expect(() => compileMcaTemplate(entityFixture(), instrument)).toThrow(/does not run/i);
   });
 
   /**
@@ -197,14 +203,28 @@ describe('every document an all-options programme offers', () => {
     expect(JSON.stringify(result)).not.toMatch(/app\.lombardpay\.com|\{\{funder\}\}|\{\{equipmentAffiliate\}\}/);
   });
 
-  it('gives the channel agreement the broker’s own identity and terms', () => {
+  /**
+   * THE CHANNEL AGREEMENT IS BETWEEN US AND A BROKER, and only one of those is
+   * a Pacta record. The naming is a trap: on the ISO PRA `iso.companyLegalName`
+   * is the **Company** — us — while the broker is `iso.partnerLegalName`. ADR
+   * 0026 §5 cites that very widget as its evidence, which is why it prints and
+   * the broker does not.
+   */
+  it('prints the Company on its own channel agreement, and leaves the broker to the caller', () => {
     const items = compileMcaTemplate(allOptions(), 'iso-pra').documents[0]?.items ?? [];
+    const parties = items.find((item) => item.slug === 'iso-pra.parties')?.body ?? '';
 
-    expect(items.find((item) => item.slug === 'iso-pra.parties')?.body).toContain('Separate Channel Inc.');
-    expect(items.find((item) => item.slug === 'iso-pra.commission-rate')?.body).toContain('2.75%');
+    expect(parties).toContain('Example Receipts Inc.');
     expect(items.find((item) => item.slug === 'iso-pra.commission-transparency')?.body).toContain(
       'https://partners.example.invalid',
     );
+
+    // There is never a template per broker, so nothing here names one and the
+    // commission with that broker is a term of the deal, not of the programme.
+    const everything = JSON.stringify(items);
+
+    expect(everything).toContain('{{field:iso.partnerLegalName}}');
+    expect(everything).toContain('{{field:iso.commissionPercentage}}');
   });
 
   it('does not invent an equipment counterparty when the programme offers none', () => {
@@ -249,7 +269,7 @@ it('fails closed instead of dropping an orphaned required document block', () =>
   const placement = entry.placement;
   try {
     entry.placement = { before: 'frpa.missing-anchor' };
-    expect(() => compileMcaTemplate(providerFixture(), 'frpa')).toThrow('Required MCA content has no placement');
+    expect(() => compileMcaTemplate(entityFixture(), 'frpa')).toThrow('Required MCA content has no placement');
   } finally {
     entry.placement = placement;
   }
@@ -263,7 +283,7 @@ it('fails closed on cyclic required-content placement', () => {
   const placement = entry.placement;
   try {
     entry.placement = { before: entry.slug };
-    expect(() => compileMcaTemplate(providerFixture(), 'frpa')).toThrow();
+    expect(() => compileMcaTemplate(entityFixture(), 'frpa')).toThrow();
   } finally {
     entry.placement = placement;
   }

@@ -131,8 +131,8 @@ export const publishMcaTemplate = async ({
       // which is the only thing both lists agree on by construction.
       recipientId: byOrder.get(index + 1) ?? 0,
     })),
-    recipientStates: snapshot.profile.policy.recipientStates,
-    venueRule: snapshot.profile.policy.venueRule,
+    recipientStates: snapshot.entity.policy.recipientStates,
+    venueRule: snapshot.entity.policy.venueRule,
     fingerprint: snapshot.fingerprint,
   });
 

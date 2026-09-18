@@ -6,7 +6,7 @@ import { type ReactNode, useId, useState } from 'react';
 import { focusReadingItem, LegalText, LegalWorkspace, legalItemId, ReferenceWorkspace } from '../../legal-ui/reader';
 import { packageReviewIndex } from '../review/package-navigation';
 import type { McaReviewItem, McaReviewPackage } from '../review/package-schema';
-import { readableReviewMetadata, reviewParagraphs, searchSavedPackage, selectionLabel } from '../review/presentation';
+import { readableReviewMetadata, searchSavedPackage, selectionLabel } from '../review/presentation';
 import { reviewTargets } from '../review/targets';
 import { McaReviewRequirements, reviewDate } from './review-requirements';
 import { McaReviewFields, McaReviewText } from './review-text';
@@ -166,12 +166,6 @@ export const McaPackageCounselReader = ({
               <p className="text-muted-foreground text-xs">
                 {snapshot.documents.length} <Trans>instruments</Trans> · {snapshot.requirements.length}{' '}
                 <Trans>source records</Trans>
-                {snapshot.kind === 'provider' && snapshot.externalDocuments.length > 0 && (
-                  <>
-                    {' '}
-                    · {snapshot.externalDocuments.length} <Trans>processor forms</Trans>
-                  </>
-                )}
               </p>
               <nav aria-label="Review overview" className="my-4 space-y-1">
                 <Button
@@ -208,12 +202,6 @@ export const McaPackageCounselReader = ({
                       {document.title}
                     </option>
                   ))}
-                  {snapshot.kind === 'provider' &&
-                    snapshot.externalDocuments.map((document) => (
-                      <option key={document.id} value={`processor:${document.id}`}>
-                        {document.processor} · {document.title}
-                      </option>
-                    ))}
                   <option value="requirements">Disclosures & requirements</option>
                 </select>
               </nav>
@@ -448,44 +436,6 @@ export const McaPackageCounselReader = ({
                       })}
                   </section>
                 )}
-                {panel === 'reading' &&
-                  snapshot.kind === 'provider' &&
-                  snapshot.externalDocuments
-                    .filter((document) => selected === `processor:${document.id}`)
-                    .map((document) => (
-                      <section
-                        key={document.id}
-                        id={legalItemId(`processor:${document.id}`)}
-                        tabIndex={-1}
-                        className={`space-y-4 rounded-lg border p-5 ${large ? 'text-lg' : 'text-base'}`}
-                        data-mca-processor-review={document.id}
-                      >
-                        <h2 className="font-semibold text-2xl">{document.title}</h2>
-                        <p>
-                          {document.processor} · {document.version}
-                        </p>
-                        <p>{document.reference}</p>
-                        <p className="text-muted-foreground text-sm">
-                          <Trans>
-                            Processor-controlled text supplied for this saved review; acceptance must be confirmed
-                            separately.
-                          </Trans>
-                        </p>
-                        {document.content ? (
-                          <LegalText
-                            paragraphs={reviewParagraphs([{ kind: 'text', text: document.content }])}
-                            large={large}
-                          />
-                        ) : (
-                          <p role="alert">
-                            <Trans>
-                              The controlled processor form is missing. Request a new package containing the required
-                              text before completing review.
-                            </Trans>
-                          </p>
-                        )}
-                      </section>
-                    ))}
                 {panel === 'reading' && selected === 'requirements' && (
                   <McaReviewRequirements requirements={snapshot.requirements} large={large} />
                 )}

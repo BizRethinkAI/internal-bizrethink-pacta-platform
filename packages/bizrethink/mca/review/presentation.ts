@@ -226,17 +226,6 @@ export const searchSavedPackage = (snapshot: McaReviewPackage, query: string) =>
       slug: `requirement:${requirement.slug}`,
       search: requirement.entries.flatMap((entry) => [entry.label, ...entry.paragraphs]).join(' '),
     })),
-    ...(snapshot.kind === 'provider'
-      ? snapshot.externalDocuments.map((document) => ({
-          id: `processor:${document.id}`,
-          documentId: `processor:${document.id}`,
-          label: `${document.processor} · ${document.title}`,
-          detail: 'Processor form',
-          section: null,
-          slug: `processor:${document.id}`,
-          search: `${document.version} ${document.reference} ${document.content ?? ''}`,
-        }))
-      : []),
   ];
   const needle = query.trim().toLocaleLowerCase();
   return entries.filter((entry) =>
