@@ -261,8 +261,26 @@ test('an entity is added once, then a template is created against it and revised
 
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await page.getByLabel('I confirm this entity uses these supported terms', { exact: true }).check();
-    await page.getByLabel('Guaranty', { exact: true }).selectOption('limited-conduct');
-    await page.getByLabel('Renewals', { exact: true }).selectOption('payoff-only');
+
+    /*
+      RADIOS, NOT DROPDOWNS. The interview shows what each answer would do to
+      the documents, and a dropdown hides the alternatives — which are the
+      whole point. Answered by clicking the option's own label.
+    */
+    const guaranty = page.locator('[data-mca-question="policy.guarantyScope"]');
+    await guaranty.getByText("Limited to the guarantor's own conduct", { exact: true }).click();
+
+    const renewals = page.locator('[data-mca-question="policy.renewalModel"]');
+    await renewals.getByText('Only after the existing balance is paid off', { exact: true }).click();
+
+    /*
+      The consequence under an unchosen option is DERIVED from the same clause
+      selection the compiler runs, so it is worth asserting that it reaches the
+      page at all — a silent failure here would leave the interview explaining
+      nothing while still looking complete.
+    */
+    const dispute = page.locator('[data-mca-question="policy.disputeResolution"]');
+    await expect(dispute.locator('[data-mca-consequence]').first()).toContainText('Arbitration');
     await page.getByRole('button', { name: 'Florida', exact: true }).click();
     await page.getByRole('button', { name: 'New York', exact: true }).click();
     await page.getByRole('button', { name: 'Save entity', exact: true }).click();
