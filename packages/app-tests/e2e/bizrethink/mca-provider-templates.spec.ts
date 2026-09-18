@@ -246,6 +246,12 @@ test('an entity is added once, then a template is created against it and revised
   const { user, organisation } = await signedInAsAdmin({ page, redirectPath: '/admin/mca-templates' });
   const team = organisation.teams[0];
   const entity = entityFixture();
+  /*
+    The interview recomputes what each answer would do, so the form settles a
+    beat after the last answer rather than instantly. Declared once and used
+    for both saves — it is the same button on the same page.
+  */
+  const saveEntity = page.getByRole('button', { name: 'Save entity', exact: true });
 
   try {
     await page.getByRole('button', { name: 'Enable my provider interview access', exact: true }).click();
@@ -297,8 +303,6 @@ test('an entity is added once, then a template is created against it and revised
     await expect(dispute.locator('[data-mca-consequence]').first()).toContainText('Arbitration');
     await page.getByRole('button', { name: 'Florida', exact: true }).click();
     await page.getByRole('button', { name: 'New York', exact: true }).click();
-    const saveEntity = page.getByRole('button', { name: 'Save entity', exact: true });
-
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();
 
@@ -351,8 +355,6 @@ test('an entity is added once, then a template is created against it and revised
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca-entities?entity=${saved.id}`);
     await page.getByLabel('Legal name', { exact: true }).fill('Revised Example Receipts Inc.');
     await page.getByRole('button', { name: 'Next', exact: true }).click();
-    const saveEntity = page.getByRole('button', { name: 'Save entity', exact: true });
-
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();
 
