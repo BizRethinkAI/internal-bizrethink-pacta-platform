@@ -98,18 +98,17 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
     await expect(party.locator('[data-mca-review-text] > .font-serif')).not.toContainText('{{field:');
     await expect(party.locator('[data-mca-review-text] > .font-serif')).toContainText('Example Receipts Inc.');
     await expect(party.locator('[data-review-field]')).not.toHaveCount(0);
-    await counsel.getByLabel('Search review index', { exact: true }).fill('Synthetic controlled processor terms');
+    /*
+      NO PROCESSOR FORM IN A TEMPLATE REVIEW (ADR 0026 §6). This used to search
+      the index for the processor's supplied terms and open them in their own
+      panel. A template names no processor, so there is nothing to open — and
+      the index search is still worth exercising, on something the review does
+      contain.
+    */
+    await counsel.getByLabel('Search review index', { exact: true }).fill('Purchase and Sale');
     const index = counsel.getByRole('complementary', { name: 'Review index' });
-    await index.getByRole('navigation', { name: 'Review contents' }).getByRole('button').click();
-    await expect(counsel.locator('[data-mca-processor-review]')).toBeFocused();
-    const processorOption = counsel
-      .getByLabel('Review document', { exact: true })
-      .locator('option')
-      .filter({ hasText: 'Example Processor Inc' });
-    await counsel
-      .getByLabel('Review document', { exact: true })
-      .selectOption((await processorOption.getAttribute('value'))!);
-    await expect(counsel.locator('[data-mca-processor-review]')).toContainText('Synthetic controlled processor terms.');
+    await expect(index.getByRole('navigation', { name: 'Review contents' }).getByRole('button').first()).toBeVisible();
+    await expect(counsel.locator('[data-mca-processor-review]')).toHaveCount(0);
 
     await counsel.getByRole('button', { name: 'Progress & findings', exact: true }).click();
     await counsel.locator('summary').filter({ hasText: 'Record a holistic finding' }).click();
@@ -268,6 +267,16 @@ test('an entity is added once, then a template is created against it and revised
     await page.getByRole('button', { name: 'New York', exact: true }).click();
     await page.getByRole('button', { name: 'Save entity', exact: true }).click();
 
+    /*
+      WAIT FOR THE SAVE TO LAND BEFORE READING THE ROW. Clicking returns as soon
+      as the click dispatches, so querying Prisma straight after raced the
+      mutation and found nothing. The page puts the new id in the URL, which is
+      the first observable evidence the write happened — and a visible alert
+      here would mean the form refused, which is worth failing on distinctly.
+    */
+    await expect(page.locator('[role="alert"]')).toHaveCount(0);
+    await expect(page).toHaveURL(/entity=/);
+
     const saved = await prisma.bizrethinkMcaEntity.findFirstOrThrow({ where: { createdByUserId: user.id } });
 
     expect(saved.label).toBe(entity.label);
@@ -278,6 +287,7 @@ test('an entity is added once, then a template is created against it and revised
     await page.getByLabel('Which document is it?', { exact: true }).selectOption('frpa');
     await page.getByRole('button', { name: 'Create template', exact: true }).click();
 
+    await expect(page).toHaveURL(/template=/);
     await expect(page.getByRole('heading', { name: 'Saved revision 1', exact: true })).toBeVisible();
 
     const id = new URL(page.url()).searchParams.get('template');
@@ -307,6 +317,11 @@ test('an entity is added once, then a template is created against it and revised
     await page.getByLabel('Legal name', { exact: true }).fill('Revised Example Receipts Inc.');
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await page.getByRole('button', { name: 'Save entity', exact: true }).click();
+
+    // Same race as above: read the row back rather than trusting the click.
+    await expect
+      .poll(async () => (await prisma.bizrethinkMcaEntity.findUniqueOrThrow({ where: { id: saved.id } })).version)
+      .toBe(2);
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca?template=${id}`);
     await page.getByRole('button', { name: 'Create a new revision', exact: true }).click();
