@@ -75,3 +75,12 @@ tmp/
 
 # opencode
 .opencode/package-lock.json
+
+# Owner's scratch output — prototypes, generated HTML, review screenshots.
+#
+# Untracked and unignored, it was a trap for anyone working in this checkout: a
+# broad `git add` picked it up silently, and a later branch switch then DELETED
+# it from the working tree, because the files were tracked on the branch and
+# untracked on main. That happened on 2026-09-18 and cost 41 files for twenty
+# minutes. Ignored so the same mistake cannot reach a commit.
+output/
