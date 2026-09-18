@@ -87,12 +87,27 @@ export const McaEntityEditor = ({
   );
   const consequences = derived.data?.answers ?? [];
 
+  /*
+    SAYS WHY IT CANNOT ADVANCE, rather than doing nothing.
+
+    This used to return silently when the first step did not validate, so a
+    funder with one bad field clicked Next and watched the page ignore them —
+    the worst kind of form, because nothing is wrong on screen. It also made
+    the failure undiagnosable from a test: "the button never appeared" and
+    "the answers were rejected" look identical from the outside.
+  */
   const next = async () => {
     const fields: FieldPath<McaEntityInput>[] = ['label', 'identity'];
 
+    setError(null);
+
     if (await form.trigger(fields, { shouldFocus: true })) {
       setStep(1);
+
+      return;
     }
+
+    setError(_(msg`Complete the highlighted answers about the entity before continuing.`));
   };
 
   return (
