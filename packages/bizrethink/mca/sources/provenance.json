@@ -1,0 +1,54 @@
+{
+  "$comment": [
+    "Where each stored source came from, and what its published page looked like when a person last confirmed it.",
+    "ADR 0025 \u00a73.",
+    "",
+    "A SIDECAR, NOT A HEADER IN THE FILES. The vendored sources are evidence: `provenance-honesty.test.ts` pins",
+    "each one's digest so that a verification date is bound to the exact bytes that were verified \u2014 'it proves the",
+    "bytes have not moved since they said they did'. Writing our own metadata into those files moves the bytes and",
+    "forces a re-pin, which breaks the binding the invariant exists to protect. An earlier draft of this did exactly",
+    "that and four of those tests failed, which is the invariant working.",
+    "",
+    "`retrievedFrom` and `sourceDigest` together are what let the monthly check run by itself. A URL without a",
+    "digest is not enough: the baseline asserts 'I read this page and it is the statute we stored', and a machine",
+    "taking that baseline on its first run would silently bless a change nobody had seen. So recording one is a",
+    "person's job, and until they do the source is reported as needing a person.",
+    "",
+    "The URLs below are NOT looked up: each is the one that source's own prose header already records."
+  ],
+  "GA-SB90-enrolled.txt": {
+    "retrievedFrom": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+    "recordedOn": "2026-09-07",
+    "sourceDigest": null,
+    "note": "URL and date taken from this file's own header; no baseline confirmed yet.",
+    "publisher": "Georgia General Assembly",
+    "site": "https://www.legis.ga.gov"
+  },
+  "TX-7TAC-86-310-313.txt": {
+    "retrievedFrom": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
+    "recordedOn": "2026-09-09",
+    "sourceDigest": null,
+    "note": "URL and date taken from this file's own header; no baseline confirmed yet.",
+    "publisher": "Texas Secretary of State (Texas Register); rules adopted by the Finance Commission of Texas",
+    "site": "https://www.sos.state.tx.us"
+  },
+  "TX-Fin-Code-Ch-398.txt": {
+    "retrievedFrom": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
+    "recordedOn": "2026-09-05",
+    "sourceDigest": null,
+    "note": "URL and date taken from this file's own header; no baseline confirmed yet.",
+    "publisher": "Texas Legislature Online",
+    "site": "https://capitol.texas.gov"
+  },
+  "CT-DOB-Guidance.layout.txt": {
+    "publisher": "Connecticut Department of Banking",
+    "site": "https://portal.ct.gov/DOB",
+    "recordedOn": "2026-09-08",
+    "note": "The layout-preserving companion of CT-DOB-Guidance.txt \u2014 same document, same publisher, recorded the same day. Taken from that file's block, not looked up."
+  },
+  "VA-Disclosure-Form.pdf": {
+    "note": "A prescribed form, and a PDF, so it carries no readable header. Publisher taken from its text sibling VA-Disclosure-Form.txt, which is the same document. Nobody has confirmed it against its source.",
+    "publisher": "Virginia State Corporation Commission, Bureau of Financial Institutions",
+    "site": "https://ris.dls.virginia.gov"
+  }
+}
