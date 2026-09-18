@@ -331,6 +331,9 @@ test('HTTP access separates membership, write authority and draft permission; st
   try {
     await grant(own.user.id, 'mca-builder', true);
     await apiSignin({ page, email: own.user.email });
+
+    const entityId = await seedEntity(page.request, teamId, own.user.id);
+
     /*
       ADR 0019 AT THE EDGE. A split funding letter is the processor's, used
       exactly as supplied, and the builder produces none — so the route's own
@@ -345,7 +348,6 @@ test('HTTP access separates membership, write authority and draft permission; st
     expect(processorForm.ok()).toBe(false);
     expect(await prisma.bizrethinkMcaTemplate.count({ where: { teamId } })).toBe(0);
 
-    const entityId = await seedEntity(page.request, teamId, own.user.id);
     const created = await post(page.request, 'create', { teamId, entityId, instrument: 'frpa' });
     expect(created.ok()).toBe(true);
     const row = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: own.user.id } });

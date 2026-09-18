@@ -192,8 +192,8 @@ export const McaProviderTemplates = ({ teamId, canWrite }: { teamId: number; can
                 />
               </div>
             )}
-            {saved.data.profile?.policy?.recipientStates && (
-              <McaOperatingRequirements states={saved.data.profile.policy.recipientStates} />
+            {saved.data.entity?.policy?.recipientStates && (
+              <McaOperatingRequirements states={saved.data.entity.policy.recipientStates} />
             )}
             {saved.data.current && !isOldRevision && (
               <Link
