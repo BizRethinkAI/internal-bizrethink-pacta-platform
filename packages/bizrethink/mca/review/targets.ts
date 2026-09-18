@@ -21,13 +21,6 @@ export const reviewTargets = (snapshot: McaReviewPackage): ReviewTarget[] => [
     label: `${requirement.jurisdictionName} · ${requirement.citation}`,
     reviewUnit: true,
   })),
-  ...(snapshot.kind === 'provider'
-    ? snapshot.externalDocuments.map((document) => ({
-        id: `processor:${document.id}`,
-        label: `${document.processor} · ${document.title} (${document.version})`,
-        reviewUnit: true,
-      }))
-    : []),
 ];
 
 export const validateFindingTargets = (snapshot: McaReviewPackage, targetIds: string[]) => {
@@ -55,8 +48,20 @@ export const reviewCompletionBlockers = (
   if (unanswered > 0) {
     blockers.push('There are unanswered findings.');
   }
-  if (snapshot.kind === 'provider' && snapshot.externalDocuments.some((document) => !document.content?.trim())) {
-    blockers.push('The controlled processor form is missing.');
-  }
+  /*
+    NO PROCESSOR FORM BLOCKER HERE ANY MORE, and its absence is deliberate.
+
+    This asked a counsel review of a TEMPLATE to carry the processor's split
+    funding letter. ADR 0026 §6 removed the processor from templates entirely:
+    the letter is the processor's, supplied fixed and used exactly as given
+    (ADR 0019), and the caller picks the processor-specific template when it
+    creates that envelope.
+
+    The obligation did not disappear — it moved out of this gate's reach. A
+    processor form still needs its own review before it is used; what it no
+    longer is, is a condition on publishing a document that never contained it.
+    Left as a comment rather than deleted silently, because a gate that quietly
+    stops applying looks identical to one that was never needed.
+  */
   return blockers;
 };

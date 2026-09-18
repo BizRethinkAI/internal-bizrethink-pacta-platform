@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { providerFixture } from '@bizrethink/customizations/mca/templates/profile.fixture';
+import { entityFixture } from '@bizrethink/customizations/mca/entities/entity.fixture';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -23,6 +23,21 @@ const grant = async (userId: number, feature: string, enabled: boolean) => {
     update: { enabled },
   });
 };
+/** A template needs an entity to be created against (ADR 0026). */
+const seedEntity = async (request: APIRequestContext, teamId: number, userId: number) => {
+  const created = await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/bizrethink.mcaEntities.create`, {
+    data: dataTransformer.serialize({ teamId, entity: entityFixture() }),
+  });
+
+  expect(created.ok()).toBe(true);
+
+  return (await prisma.bizrethinkMcaEntity.findFirstOrThrow({ where: { createdByUserId: userId } })).id;
+};
+
+const cleanupEntities = async (userId: number) => {
+  await prisma.bizrethinkMcaEntity.deleteMany({ where: { createdByUserId: userId } });
+};
+
 const cleanup = async (userId: number) => {
   await prisma.bizrethinkMcaPackageReview.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkMcaTemplate.deleteMany({ where: { createdByUserId: userId } });
@@ -41,7 +56,6 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
   const peerTeam = peer.organisation.teams[0];
   const counselContext = await browser.newContext();
   const peerContext = await browser.newContext();
-  const profile = providerFixture();
   const reviewEndpoint = (route: string) => `${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/bizrethink.mcaPackageReview.${route}`;
   try {
     await grant(user.id, 'mca-builder', true);
@@ -49,7 +63,8 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
     await grant(peer.user.id, 'mca-builder', true);
     await grant(peer.user.id, 'mca-clause-draft-rendering', true);
     await apiSignin({ page, email: user.email });
-    const created = await post(page.request, 'create', { teamId: team.id, data: profile, instrument: 'frpa' });
+    const entityId = await seedEntity(page.request, team.id, user.id);
+    const created = await post(page.request, 'create', { teamId: team.id, entityId, instrument: 'frpa' });
     expect(created.ok()).toBe(true);
     const template = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: user.id } });
     const scope = { teamId: team.id, id: template.id, version: 1 };
@@ -83,18 +98,31 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
     await expect(party.locator('[data-mca-review-text] > .font-serif')).not.toContainText('{{field:');
     await expect(party.locator('[data-mca-review-text] > .font-serif')).toContainText('Example Receipts Inc.');
     await expect(party.locator('[data-review-field]')).not.toHaveCount(0);
-    await counsel.getByLabel('Search review index', { exact: true }).fill('Synthetic controlled processor terms');
+    /*
+      NO PROCESSOR FORM IN A TEMPLATE REVIEW (ADR 0026 §6). This used to search
+      the index for the processor's supplied terms and open them in their own
+      panel. A template names no processor, so there is nothing to open — and
+      the index search is still worth exercising, on something the review does
+      contain.
+    */
     const index = counsel.getByRole('complementary', { name: 'Review index' });
-    await index.getByRole('navigation', { name: 'Review contents' }).getByRole('button').click();
-    await expect(counsel.locator('[data-mca-processor-review]')).toBeFocused();
-    const processorOption = counsel
-      .getByLabel('Review document', { exact: true })
-      .locator('option')
-      .filter({ hasText: 'Example Processor Inc' });
-    await counsel
-      .getByLabel('Review document', { exact: true })
-      .selectOption((await processorOption.getAttribute('value'))!);
-    await expect(counsel.locator('[data-mca-processor-review]')).toContainText('Synthetic controlled processor terms.');
+    const contents = index.getByRole('navigation', { name: 'Review contents' }).getByRole('button');
+
+    // The index is populated before anything is typed into it.
+    await expect(contents.first()).toBeVisible();
+
+    const everything = await contents.count();
+
+    /*
+      Searching narrows it. The term is taken from the document rather than
+      guessed: the party-identification clause is asserted above to contain it,
+      so a miss here is the index failing rather than the fixture changing.
+    */
+    await counsel.getByLabel('Search review index', { exact: true }).fill('Example Receipts');
+    await expect.poll(async () => await contents.count()).toBeLessThan(everything);
+
+    // No processor form to open: a template names no processor (ADR 0026 §6).
+    await expect(counsel.locator('[data-mca-processor-review]')).toHaveCount(0);
 
     await counsel.getByRole('button', { name: 'Progress & findings', exact: true }).click();
     await counsel.locator('summary').filter({ hasText: 'Record a holistic finding' }).click();
@@ -172,7 +200,6 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
       id: template.id,
       data: {
         expectedVersion: 1,
-        profile: { ...profile, buyer: { ...profile.buyer, legalName: 'Revised Example Receipts Inc.' } },
       },
     });
     expect(revised.ok()).toBe(true);
@@ -208,81 +235,150 @@ test('counsel reviews a pinned provider revision, raises holistic findings and c
   }
 });
 
-test('a provider interview saves, reopens and revises a real team template with immutable history', async ({
+/**
+ * ADR 0026: an entity is added once, and a template is one entity's version of
+ * one document. So the flow this covers is two pages, not one form — which is
+ * the point of the change rather than an accident of it.
+ */
+test('an entity is added once, then a template is created against it and revised with immutable history', async ({
   page,
 }) => {
   const { user, organisation } = await signedInAsAdmin({ page, redirectPath: '/admin/mca-templates' });
   const team = organisation.teams[0];
-  const profile = providerFixture();
-  profile.buyer.servicingPhone = '+1 555 010 0200';
+  const entity = entityFixture();
+  /*
+    The interview recomputes what each answer would do, so the form settles a
+    beat after the last answer rather than instantly. Declared once and used
+    for both saves — it is the same button on the same page.
+  */
+  const saveEntity = page.getByRole('button', { name: 'Save entity', exact: true });
+
   try {
     await page.getByRole('button', { name: 'Enable my provider interview access', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Disable my provider interview access', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Enable my internal draft previews', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Disable my internal draft previews', exact: true })).toBeVisible();
-    await page.getByRole('link', { name: team.name, exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'MCA provider templates', exact: true })).toBeVisible();
-    await page.getByLabel('Template name', { exact: true }).fill(profile.label);
+
+    // 1. The entity, answered once.
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca-entities`);
+    await expect(page.getByRole('heading', { name: 'Entities', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Add an entity', exact: true }).click();
+
+    await page.getByLabel('Name for this entity in Pacta', { exact: true }).fill(entity.label);
+
     for (const [label, value] of [
-      ['Legal name', profile.buyer.legalName],
-      ['Entity type', profile.buyer.entityType],
-      ['Formation jurisdiction', profile.buyer.organizationState],
-      ['Principal address', profile.buyer.address],
-      ['Notice mailing address', profile.buyer.noticeAddress],
-      ['Notice email', profile.buyer.noticeEmail],
-      ['Reconciliation email', profile.buyer.reconciliationEmail],
-      ['Reconciliation mailing address', profile.buyer.reconciliationAddress],
-    ]) {
+      ['Legal name', entity.identity.legalName],
+      ['Entity type, for example corporation', entity.identity.entityType],
+      ['State of organisation', entity.identity.organizationState],
+      ['Principal address', entity.identity.address],
+      ['Notice email', entity.identity.noticeEmail],
+      ['Notice mailing address', entity.identity.noticeAddress],
+      ['Reconciliation email', entity.identity.reconciliationEmail],
+      ['Reconciliation mailing address', entity.identity.reconciliationAddress],
+    ] as const) {
       await page.getByLabel(label, { exact: true }).fill(value);
     }
-    await page.getByLabel('Buyer servicing phone', { exact: true }).fill(profile.buyer.servicingPhone);
-    await page.getByRole('button', { name: 'Continue', exact: true }).click();
-    await page.getByLabel('I confirm this provider uses these supported terms', { exact: true }).check();
-    await page.getByLabel('FRPA guaranty', { exact: true }).selectOption('limited-conduct');
-    await page.getByLabel('Renewal treatment', { exact: true }).selectOption('payoff-only');
-    await page.getByLabel('California', { exact: true }).check();
-    await page.getByLabel('Florida', { exact: true }).check();
-    await page.getByRole('button', { name: 'Continue', exact: true }).click();
-    for (const [label, value] of [
-      ['Processor legal name', profile.processor.legalName],
-      ['Required processor form title', profile.processor.requiredForm.title],
-      ['Processor form version', profile.processor.requiredForm.version],
-      ['Form reference or controlled document location', profile.processor.requiredForm.reference],
-    ]) {
-      await page.getByLabel(label, { exact: true }).fill(value);
-    }
-    await page.getByRole('button', { name: 'Save template revision', exact: true }).click();
+
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await page.getByLabel('I confirm this entity uses these supported terms', { exact: true }).check();
+
+    /*
+      RADIOS, NOT DROPDOWNS. The interview shows what each answer would do to
+      the documents, and a dropdown hides the alternatives — which are the
+      whole point. Answered by clicking the option's own label.
+    */
+    const guaranty = page.locator('[data-mca-question="policy.guarantyScope"]');
+    await guaranty.getByText("Limited to the guarantor's own conduct", { exact: true }).click();
+
+    const renewals = page.locator('[data-mca-question="policy.renewalModel"]');
+    await renewals.getByText('Only after the existing balance is paid off', { exact: true }).click();
+
+    /*
+      The consequence under an unchosen option is DERIVED from the same clause
+      selection the compiler runs, so it is worth asserting that it reaches the
+      page at all — a silent failure here would leave the interview explaining
+      nothing while still looking complete.
+    */
+    const dispute = page.locator('[data-mca-question="policy.disputeResolution"]');
+    await expect(dispute.locator('[data-mca-consequence]').first()).toContainText('Arbitration');
+    await page.getByRole('button', { name: 'Florida', exact: true }).click();
+    await page.getByRole('button', { name: 'New York', exact: true }).click();
+    await expect(saveEntity).toBeEnabled();
+    await saveEntity.click();
+
+    /*
+      WAIT FOR THE SAVE TO LAND BEFORE READING THE ROW. Clicking returns as soon
+      as the click dispatches, so querying Prisma straight after raced the
+      mutation and found nothing. The page puts the new id in the URL, which is
+      the first observable evidence the write happened — and a visible alert
+      here would mean the form refused, which is worth failing on distinctly.
+    */
+    await expect(page.locator('[role="alert"]')).toHaveCount(0);
+    await expect(page).toHaveURL(/entity=/);
+
+    const saved = await prisma.bizrethinkMcaEntity.findFirstOrThrow({ where: { createdByUserId: user.id } });
+
+    expect(saved.label).toBe(entity.label);
+
+    // 2. The template, which chooses that entity and one document.
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca`);
+    await page.getByLabel('Which entity issues it?', { exact: true }).selectOption(saved.id);
+    await page.getByLabel('Which document is it?', { exact: true }).selectOption('frpa');
+    await page.getByRole('button', { name: 'Create template', exact: true }).click();
+
+    await expect(page).toHaveURL(/template=/);
     await expect(page.getByRole('heading', { name: 'Saved revision 1', exact: true })).toBeVisible();
+
     const id = new URL(page.url()).searchParams.get('template');
+
     expect(id).toBeTruthy();
+
     const first = await prisma.bizrethinkMcaTemplateRevision.findFirstOrThrow({ where: { templateId: id ?? '' } });
-    expect(first.profile).toEqual(profile);
-    await page.reload();
-    await expect(page.getByLabel('Legal name', { exact: true })).toHaveValue(profile.buyer.legalName);
+
+    // COPIED, not referenced. ADR 0026 §4.
+    expect(first.entity).toMatchObject({ label: entity.label });
+
     await page.getByRole('button', { name: 'Preview document package', exact: true }).click();
+
     const preview = page.locator('[data-mca-template-preview]');
+
     await expect(preview).toContainText('Internal draft — transaction fields remain unfilled');
-    await preview.getByLabel('Package document', { exact: true }).selectOption('frpa');
-    await expect(
-      preview.getByRole('heading', { name: 'Section 1: Merchant and Funding Information', exact: true }),
-    ).toBeVisible();
-    await expect(
-      preview.getByRole('heading', { name: 'Section 3: Purchase and Sale of Future Receivables', exact: true }),
-    ).toBeVisible();
     await expect(preview.locator('[data-mca-template-item="frpa.party-identification"]')).toContainText(
-      'Example Receipts Inc., a corporation organized under the laws of DE',
+      'Example Receipts Inc., a corporation organized under the laws of Delaware',
     );
-    await page.getByRole('button', { name: 'Provider answers', exact: true }).click();
-    await page.getByLabel('Template name', { exact: true }).fill('Revised synthetic programme');
-    await page.getByRole('button', { name: '3. Operations', exact: true }).click();
-    await page.getByRole('button', { name: 'Save template revision', exact: true }).click();
+
+    /*
+      A REVISION TAKES A FRESH COPY OF THE ENTITY, and editing the entity is
+      the only way an edit ever reaches a document. The already-published
+      revision keeps the terms it froze.
+    */
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca-entities?entity=${saved.id}`);
+    await page.getByLabel('Legal name', { exact: true }).fill('Revised Example Receipts Inc.');
+
+    /*
+      The step chip rather than Next. Both call `setStep(1)` and both are how a
+      person moves through the interview, but the chip is the one that names
+      where it goes — and on the create path above, Next is already exercised.
+    */
+    await page.getByRole('button', { name: '2. Its programme', exact: true }).click();
+    await expect(page.locator('[role="alert"]')).toHaveCount(0);
+    await expect(saveEntity).toBeEnabled();
+    await saveEntity.click();
+
+    // Same race as above: read the row back rather than trusting the click.
+    await expect
+      .poll(async () => (await prisma.bizrethinkMcaEntity.findUniqueOrThrow({ where: { id: saved.id } })).version)
+      .toBe(2);
+
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca?template=${id}`);
+    await page.getByRole('button', { name: 'Create a new revision', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Saved revision 2', exact: true })).toBeVisible();
+
     expect(await prisma.bizrethinkMcaTemplateRevision.count({ where: { templateId: id ?? '' } })).toBe(2);
+    // Revision 1 is untouched by the entity edit — that is the whole guarantee.
     expect(await prisma.bizrethinkMcaTemplateRevision.findUnique({ where: { id: first.id } })).toEqual(first);
-    await page.getByLabel('Revision history', { exact: true }).selectOption('1');
-    await expect(page.getByLabel('Template name', { exact: true })).toHaveValue(profile.label);
-    await expect(page.getByLabel('Template name', { exact: true })).toBeDisabled();
   } finally {
+    await cleanupEntities(user.id);
     await cleanup(user.id);
   }
 });
@@ -294,10 +390,12 @@ test('HTTP access separates membership, write authority and draft permission; st
   const foreign = await seedUser();
   const teamId = own.organisation.teams[0].id;
   const foreignTeamId = foreign.organisation.teams[0].id;
-  const profile = providerFixture();
   try {
     await grant(own.user.id, 'mca-builder', true);
     await apiSignin({ page, email: own.user.email });
+
+    const entityId = await seedEntity(page.request, teamId, own.user.id);
+
     /*
       ADR 0019 AT THE EDGE. A split funding letter is the processor's, used
       exactly as supplied, and the builder produces none — so the route's own
@@ -306,13 +404,13 @@ test('HTTP access separates membership, write authority and draft permission; st
     */
     const processorForm = await post(page.request, 'create', {
       teamId,
-      data: profile,
+      entityId,
       instrument: 'split-funding',
     });
     expect(processorForm.ok()).toBe(false);
     expect(await prisma.bizrethinkMcaTemplate.count({ where: { teamId } })).toBe(0);
 
-    const created = await post(page.request, 'create', { teamId, data: profile, instrument: 'frpa' });
+    const created = await post(page.request, 'create', { teamId, entityId, instrument: 'frpa' });
     expect(created.ok()).toBe(true);
     const row = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: own.user.id } });
     const input = { teamId, id: row.id, version: 1 };
@@ -324,7 +422,7 @@ test('HTTP access separates membership, write authority and draft permission; st
     expect(await preview.text()).toContain('Internal draft preview access is required');
     const foreignResult = await post(page.request, 'create', {
       teamId: foreignTeamId,
-      data: profile,
+      entityId,
       instrument: 'frpa',
     });
     expect(foreignResult.status()).toBe(404);
@@ -340,7 +438,7 @@ test('HTTP access separates membership, write authority and draft permission; st
     const update = {
       teamId,
       id: row.id,
-      data: { expectedVersion: 1, profile: { ...profile, label: 'Second revision' } },
+      data: { expectedVersion: 1 },
     };
     expect((await post(page.request, 'update', update)).ok()).toBe(true);
     const stale = await post(page.request, 'update', update);

@@ -1,16 +1,18 @@
 import { AppError } from '@documenso/lib/errors/app-error';
+import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Form } from '@documenso/ui/primitives/form/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { useState } from 'react';
-import { type FieldPath, useFieldArray, useForm, useFormContext } from 'react-hook-form';
-
+import { useMemo, useState } from 'react';
+import { useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { type McaEntityInput, ZMcaEntity } from '../entities/entity';
 import { JURISDICTION_NAMES, MCA_JURISDICTIONS } from '../jurisdictions';
 import { CheckAnswer, SelectAnswer, TextAnswer } from './answers';
+import { McaDocumentsThisEntityCanHave } from './entity-documents';
+import { McaChoice, McaYesNo } from './interview-choice';
 
 /**
  * Adding the entity that issues a document. ADR 0026.
@@ -28,12 +30,16 @@ import { CheckAnswer, SelectAnswer, TextAnswer } from './answers';
 const Text = TextAnswer<McaEntityInput>;
 const Select = SelectAnswer<McaEntityInput>;
 const Check = CheckAnswer<McaEntityInput>;
+const Choice = McaChoice<McaEntityInput>;
+const YesNo = McaYesNo<McaEntityInput>;
 
 export const McaEntityEditor = ({
+  teamId,
   initial,
   onSave,
   readOnly = false,
 }: {
+  teamId: number;
   initial?: McaEntityInput;
   onSave: (entity: McaEntityInput) => Promise<void>;
   readOnly?: boolean;
@@ -45,14 +51,59 @@ export const McaEntityEditor = ({
   });
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const funderVenue = form.watch('policy.venueRule') === 'funder-state';
+  const policy = form.watch('policy');
+  const funderVenue = policy?.venueRule === 'funder-state';
+  const virginia = (policy?.recipientStates ?? []).includes('US-VA');
 
-  const next = async () => {
-    const fields: FieldPath<McaEntityInput>[] = ['label', 'identity'];
+  /*
+    WHAT EACH ANSWER WOULD DO, derived server-side.
 
-    if (await form.trigger(fields, { shouldFocus: true })) {
-      setStep(1);
-    }
+    Keyed on the policy alone, because nothing in the derivation reads an
+    identity — so this refetches when an answer changes rather than when
+    somebody types an address. Server-side because the clause library is
+    several hundred clauses and has no business in a browser bundle.
+
+    `keepPreviousData` so the consequences under each option do not blink out
+    while the next answer is being computed; a flickering explanation is worse
+    than a slightly stale one, and the staleness lasts one round trip.
+  */
+  /*
+    THE INPUT IS MEMOISED ON ITS OWN CONTENT, not rebuilt every render.
+
+    `form.watch` hands back a fresh object on every keystroke, so an unmemoised
+    input made this refetch continuously — the consequence lists under each
+    option appeared and vanished, the page never settled, and the submit button
+    could not be clicked because it never stopped moving. Keyed on the
+    serialised policy so it refetches when an ANSWER changes and not when
+    somebody types an address.
+  */
+  const policyKey = JSON.stringify(policy ?? null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed on the serialised value, not the identity.
+  const stablePolicy = useMemo(() => policy, [policyKey]);
+
+  const derived = trpc.bizrethink.mcaEntities.consequences.useQuery(
+    { teamId, policy: stablePolicy as never },
+    { enabled: Boolean(stablePolicy), retry: false, staleTime: Number.POSITIVE_INFINITY },
+  );
+  const consequences = derived.data?.answers ?? [];
+
+  /*
+    NEXT JUST ADVANCES, like the step chips above it.
+
+    It used to pre-validate the first step and refuse to move. Three things
+    were wrong with that. The chips already jump between steps with no
+    validation, so the form contradicted itself. Submitting already validates
+    everything and sends you back to the step that failed, so nothing was
+    protected. And when the pre-validation misbehaved it did so in silence —
+    click, and the page ignores you — which is the worst failure a form has,
+    because nothing on screen looks wrong.
+
+    An interview is a thing you move around in. It is checked when it is
+    saved, which is the moment that matters.
+  */
+  const next = () => {
+    setError(null);
+    setStep(1);
   };
 
   return (
@@ -134,6 +185,12 @@ export const McaEntityEditor = ({
               <Text name="identity.servicingPhone" label={msg`Servicing phone`} type="tel" />
               <Text name="identity.website" label={msg`Website, as your documents carry it`} type="url" />
               <Text
+                name="identity.partnerPortalUrl"
+                label={msg`Partner portal URL`}
+                hint={msg`Where a broker signs in to see what it is owed. Printed in the channel agreement, so it is the same URL for every broker.`}
+                type="url"
+              />
+              <Text
                 name="identity.creditDisputeAddress"
                 label={msg`Credit dispute address`}
                 hint={msg`Where a customer writes to dispute what this entity reported about them.`}
@@ -154,22 +211,58 @@ export const McaEntityEditor = ({
                 </Trans>
               </p>
 
+              {/*
+                NOT A QUESTION. `collectionMethod` and `settlementBase` are
+                `z.literal()` in the schema — this release supports one value
+                each — so they are stated as a constraint rather than offered as
+                a choice the schema would refuse.
+              */}
+              <div className="rounded-lg border border-dashed p-3 text-sm">
+                <p className="font-medium">
+                  <Trans>What this release supports</Trans>
+                </p>
+                <p className="text-muted-foreground">
+                  <Trans>
+                    Card receipts settled net, collected through a processor split. These are not choices yet —
+                    alternatives need drafting before they can be offered.
+                  </Trans>
+                </p>
+              </div>
+
               <Check
                 name="policy.supportedTermsConfirmed"
                 label={msg`I confirm this entity uses these supported terms`}
-                hint={msg`This release supports net card receipts collected through processor splits. Unsupported alternatives need drafting before use.`}
               />
 
-              <Select
+              <Choice
                 name="policy.venueRule"
-                label={msg`Where an action under the Agreement is brought`}
+                label={msg`Where is an action under the Agreement brought?`}
+                explain={msg`Which court hears a dispute. A merchant-state rule follows the merchant; a funder-state rule fixes one forum for every deal.`}
                 options={[
                   ['merchant-state', msg`The merchant's own state`],
                   ['funder-state', msg`This entity's own forum`],
                 ]}
+                consequences={consequences}
               />
               {funderVenue && (
                 <>
+                  {/*
+                    A CONTRADICTION WARNED ABOUT WHERE IT IS MADE, rather than
+                    reported after saving. Va. Code §6.2-2234(A) requires an
+                    action under a covered contract to be brought in the
+                    Commonwealth, so a funder-state forum and a Virginia
+                    programme cannot both hold. The schema refuses it either
+                    way; this is the same refusal, said in time to be useful.
+                  */}
+                  {virginia && (
+                    <p role="alert" className="rounded-lg border border-destructive p-3 text-destructive text-sm">
+                      <Trans>
+                        This entity offers the programme in Virginia, and Va. Code §6.2-2234(A) requires an action under
+                        a covered contract to be brought there. A fixed forum of your own cannot hold alongside it —
+                        either the merchant's state, or Virginia comes off the list below.
+                      </Trans>
+                    </p>
+                  )}
                   <Text name="identity.venueState" label={msg`Forum state`} />
                   <Text
                     name="identity.venueCounty"
@@ -179,54 +272,89 @@ export const McaEntityEditor = ({
                 </>
               )}
 
-              <Select
+              <Choice
                 name="policy.disputeResolution"
-                label={msg`Dispute resolution`}
+                label={msg`How are disputes resolved?`}
+                explain={msg`Whether a dispute goes to court or to an arbitrator. The two bring different clauses: one carries the jury, class and counterclaim waivers, the other the arbitration clause.`}
                 options={[
-                  ['courts', msg`Court proceedings, with the jury, class and counterclaim waivers`],
-                  ['arbitration', msg`Binding arbitration, with the authored arbitration clause`],
+                  ['courts', msg`Court proceedings`],
+                  ['arbitration', msg`Binding arbitration`],
                 ]}
+                consequences={consequences}
               />
-              <Select
+
+              <Choice
                 name="policy.guarantyScope"
-                label={msg`Guaranty`}
+                label={msg`Does someone stand behind the merchant, and for how much?`}
+                explain={msg`A guaranty is a person promising to answer for the business. The scope decides what they answer for — their own conduct, or the merchant's whole performance.`}
                 options={[
                   ['none', msg`No guaranty is taken`],
                   ['limited-conduct', msg`Limited to the guarantor's own conduct`],
                   ['full-performance', msg`Full performance of the merchant's obligations`],
                 ]}
+                consequences={consequences}
               />
-              <Select
+
+              <Choice
                 name="policy.renewalModel"
-                label={msg`Renewals`}
+                label={msg`Can a merchant renew before the balance is complete?`}
+                explain={msg`What happens to an unfinished balance when a merchant takes new funding.`}
                 options={[
                   ['none', msg`No renewals`],
-                  ['payoff-only', msg`Payoff of the existing balance only`],
+                  ['payoff-only', msg`Only after the existing balance is paid off`],
                   ['carry', msg`The balance may be carried into the new agreement`],
                 ]}
+                consequences={consequences}
               />
-              <Select
+
+              <Choice
                 name="policy.equipment"
-                label={msg`Equipment`}
+                label={msg`Does this programme place equipment?`}
+                explain={msg`Point-of-sale equipment leased or subscribed alongside the advance. Choosing to place it gives this entity equipment paper of its own.`}
                 options={[
-                  ['none', msg`This programme places no equipment`],
+                  ['none', msg`No equipment`],
                   ['merchant-elects', msg`The merchant may elect equipment`],
                 ]}
+                consequences={consequences}
               />
-              <Check name="policy.concurrentPositions" label={msg`Merchants may hold concurrent positions`} />
-              <Check
+
+              <YesNo
+                name="policy.concurrentPositions"
+                label={msg`May a merchant hold another advance at the same time?`}
+                explain={msg`Whether this programme allows a merchant to run a concurrent position with another funder.`}
+                yes={msg`Yes, concurrent positions are allowed`}
+                no={msg`No, a single active position only`}
+                consequences={consequences}
+              />
+
+              <YesNo
                 name="policy.brokerChannel"
-                label={msg`This entity takes business through brokers`}
-                hint={msg`Brokers come from your platform per deal — this only decides whether the channel agreement exists as a template.`}
+                label={msg`Does this entity take business through brokers?`}
+                explain={msg`Brokers come from your platform per deal — there is never a template per broker. This only decides whether this entity has a channel agreement at all.`}
+                yes={msg`Yes, through ISOs and brokers`}
+                no={msg`No, direct only`}
+                consequences={consequences}
               />
-              <Check
+
+              <YesNo
                 name="policy.consumerReportPulled"
-                label={msg`This entity pulls a consumer report`}
-                hint={msg`A separate permission document covers it.`}
+                label={msg`Does this entity pull a consumer report?`}
+                explain={msg`A consumer report on an individual needs that person's written permission, which is its own document.`}
+                yes={msg`Yes`}
+                no={msg`No`}
+                consequences={consequences}
               />
 
               <RecipientStates />
               <FeeSchedule />
+
+              {/*
+                THE PAYOFF. Derived from the same `instrumentsFor` the compiler
+                uses, so this cannot promise a document the builder would refuse
+                to compile — and it turns a page of choices into a visible
+                result before anything is saved.
+              */}
+              <McaDocumentsThisEntityCanHave documents={derived.data?.documents ?? []} />
             </>
           )}
         </fieldset>
@@ -402,6 +530,7 @@ const emptyEntity = (): McaEntityInput => ({
     venueState: '',
     venueCounty: '',
     website: '',
+    partnerPortalUrl: '',
     creditDisputeAddress: '',
   },
   policy: {

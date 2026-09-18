@@ -22,6 +22,7 @@ export const entityFixture = (): McaEntityInput => ({
     venueState: '',
     venueCounty: '',
     website: 'https://example.invalid',
+    partnerPortalUrl: 'https://partners.example.invalid',
     creditDisputeAddress: 'PO Box 50, Dover, DE 19901',
   },
   policy: {

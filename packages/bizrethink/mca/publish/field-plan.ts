@@ -1,4 +1,4 @@
-import { MCA_PROVIDER_BINDINGS } from '../templates/profile';
+import { MCA_ENTITY_BINDINGS } from '../entities/entity';
 import contract from './live-template-contract.json';
 import { type ProducedInstrument, RECIPIENTS } from './recipient-contract';
 import { WIDGET_PARITY, type WidgetParity } from './template-parity';
@@ -95,7 +95,7 @@ export const fieldPlanFor = (instrument: ProducedInstrument): McaFieldPlan => {
       continue;
     }
 
-    if (MCA_PROVIDER_BINDINGS.has(parity.binding)) {
+    if (MCA_ENTITY_BINDINGS.has(parity.binding)) {
       printed.push({ widget, kind: 'printed', why: printedBecause(parity.binding) });
       continue;
     }

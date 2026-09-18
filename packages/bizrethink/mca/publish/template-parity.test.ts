@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ALL_MCA_CONTENT, contentFor } from '../catalogue';
 import { MCA_INSTRUMENTS, type McaInstrument } from '../clauses/instruments';
-import { MCA_PROVIDER_BINDINGS } from '../templates/profile';
+import { MCA_ENTITY_BINDINGS } from '../entities/entity';
 import contract from './live-template-contract.json';
 import { WIDGET_PARITY, type WidgetParity } from './template-parity';
 
@@ -137,7 +137,7 @@ describe('every live widget is answered: by a binding, or by a stated gap', () =
    * found here.
    *
    * These names are filled per deal today, by the platform. In the builder the
-   * same facts come from the provider profile (`MCA_PROVIDER_BINDINGS`) and are
+   * same facts come from the provider profile (`MCA_ENTITY_BINDINGS`) and are
    * resolved when the template is published — so they would be printed text,
    * not a widget. The platform would keep sending values for names that no
    * longer exist, and `buildFormValues` would not complain.
@@ -151,7 +151,7 @@ describe('every live widget is answered: by a binding, or by a stated gap', () =
       mapped(instrument)
         .filter(([, parity]) => {
           const binding = bound(parity);
-          return binding !== null && MCA_PROVIDER_BINDINGS.has(binding);
+          return binding !== null && MCA_ENTITY_BINDINGS.has(binding);
         })
         .map(([widget]) => `${instrument}.${widget}`),
     );
@@ -159,9 +159,7 @@ describe('every live widget is answered: by a binding, or by a stated gap', () =
     expect(fixed.sort()).toEqual([
       'equipment-lease.provider_address',
       'equipment-lease.provider_legal_name',
-      'frpa.processor_name',
       'frpa.provider_address',
-      'iso-pra.commission_percentage',
       'iso-pra.provider_legal_name',
       'subscription.provider_address',
       'subscription.provider_legal_name',

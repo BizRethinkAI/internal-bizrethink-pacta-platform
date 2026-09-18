@@ -62,11 +62,23 @@ describe('how far from parity, exactly', () => {
       }),
     );
 
+    /*
+      TWO BINDINGS MOVED FROM `printed` TO `marked` UNDER ADR 0026 §5, and
+      nothing else did. `processor_name` on the FRPA, because which processor a
+      merchant uses is a fact about the deal (§6); `commission_percentage` on
+      the ISO PRA, because it is a term with one particular broker and there is
+      never a template per broker. Both are live widgets the caller already
+      sends, so this closes a gap rather than opening one.
+
+      The other `iso.*` bindings deliberately did NOT move. On the ISO PRA
+      `iso.companyLegalName` is the Company — us — and §5 cites that very widget
+      as its evidence that our side is a Pacta record.
+    */
     expect(shortfall).toEqual({
-      frpa: { marked: 37, printed: 2, absent: 3 },
+      frpa: { marked: 38, printed: 1, absent: 3 },
       'equipment-lease': { marked: 22, printed: 2, absent: 4 },
       subscription: { marked: 22, printed: 2, absent: 4 },
-      'iso-pra': { marked: 6, printed: 2, absent: 1 },
+      'iso-pra': { marked: 7, printed: 1, absent: 1 },
       // Nothing printed here: the one provider fact this form names is absent
       // from the instrument rather than resolved at publication.
       'permission-to-release': { marked: 7, printed: 0, absent: 3 },
@@ -81,7 +93,8 @@ describe('how far from parity, exactly', () => {
     ).toEqual([
       'guarantor_ssn',
       'merchant_primary_contact_title',
-      'processor_name',
+      // `processor_name` left this list: ADR 0026 §6 makes it the caller's, so
+      // it is a widget now rather than a value the platform would lose.
       'provider_address',
       'rollover_method',
     ]);

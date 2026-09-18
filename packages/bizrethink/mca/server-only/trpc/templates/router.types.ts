@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { PRODUCED_INSTRUMENTS } from '../../../publish/recipient-contract';
-import { ZMcaProviderProfile } from '../../../templates/profile';
 
 export const ZListMcaTemplatesRequestSchema = z.object({ teamId: z.number().int().positive() }).strict();
 export const ZGetMcaTemplateRequestSchema = ZListMcaTemplatesRequestSchema.extend({
@@ -16,12 +15,18 @@ export const ZGetMcaTemplateRequestSchema = ZListMcaTemplatesRequestSchema.exten
   exactly as supplied (ADR 0019), and the builder produces none.
 */
 export const ZCreateMcaTemplateRequestSchema = ZListMcaTemplatesRequestSchema.extend({
-  data: ZMcaProviderProfile,
+  /** Which saved entity issues it. ADR 0026: entity + type = one template. */
+  entityId: z.string().min(1).max(80),
   instrument: z.enum(PRODUCED_INSTRUMENTS),
 }).strict();
+/**
+ * A revision takes a fresh copy of the entity as it stands; there is nothing to
+ * send but which revision you were looking at. The entity is edited on the
+ * entity, which is the only way an edit ever reaches a document (ADR 0026 §4).
+ */
 export const ZUpdateMcaTemplateRequestSchema = ZListMcaTemplatesRequestSchema.extend({
   id: z.string().min(1).max(80),
-  data: z.object({ expectedVersion: z.number().int().positive(), profile: ZMcaProviderProfile }).strict(),
+  data: z.object({ expectedVersion: z.number().int().positive() }).strict(),
 }).strict();
 export const ZPreviewMcaTemplateRequestSchema = ZGetMcaTemplateRequestSchema.extend({
   version: z.number().int().positive(),

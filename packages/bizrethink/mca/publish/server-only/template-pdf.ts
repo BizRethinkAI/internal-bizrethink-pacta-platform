@@ -327,7 +327,7 @@ export const renderTemplateDocument = async (
 
   const plan = fieldPlanFor(instrument);
   const widgetFor = new Map(plan.marked.map((field) => [field.binding, field.widget]));
-  const provider = snapshot.profile.buyer;
+  const provider = snapshot.entity.identity;
 
   const page = h(
     Page,

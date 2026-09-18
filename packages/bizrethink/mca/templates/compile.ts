@@ -9,17 +9,12 @@ import { inReviewOrder } from '../clauses/library';
 import type { ClauseField, McaContent, McaReusableContent } from '../clauses/types';
 import { resolveReferences, type SelectedMcaClause } from '../engine/number-clauses';
 import { instrumentsFor, selectClauses } from '../engine/select-clauses';
+import { entitySelectionFacts, type McaEntity, type McaEntityInput, ZMcaEntity } from '../entities/entity';
 import type { McaJurisdiction } from '../jurisdictions';
+import type { McaFee } from '../plain-values';
 import { normalisedDigest, readSourceText } from '../provenance/source-text';
 import { disclosuresFor } from '../registry';
 import { reusableFor } from '../reusable/library';
-import {
-  type McaFee,
-  type McaProviderProfile,
-  type McaProviderProfileInput,
-  providerSelectionFacts,
-  ZMcaProviderProfile,
-} from './profile';
 
 export type McaTemplateItem = {
   /** Ephemeral presentation only, added after compiling/hashing a saved recipe. */
@@ -107,57 +102,78 @@ export const placeReusableContent = (clauses: SelectedMcaClause[], reusable: Mca
   return result;
 };
 
-/** Identity answers populate variables; no example tenant supplies missing facts. */
-export const providerValues = (profile: McaProviderProfile): Record<string, string> => ({
-  'provider.legalName': profile.buyer.legalName,
-  'provider.entityType': profile.buyer.entityType,
-  'provider.organizationState': profile.buyer.organizationState,
-  'provider.principalAddress': profile.buyer.address,
-  'provider.noticeAddress': profile.buyer.noticeAddress,
-  'provider.noticeEmail': profile.buyer.noticeEmail,
-  'provider.reconciliationEmail': profile.buyer.reconciliationEmail,
-  'provider.reconciliationAddress': profile.buyer.reconciliationAddress,
-  ...(profile.buyer.servicingPhone ? { 'provider.servicingPhone': profile.buyer.servicingPhone } : {}),
-  ...(profile.buyer.venueState
-    ? {
-        'provider.venueForum': [profile.buyer.venueCounty, profile.buyer.venueState].filter(Boolean).join(', '),
-      }
-    : {}),
-  'processor.approvedProcessors': profile.processor.legalName,
-  ...(profile.equipmentProvider
-    ? {
-        'equipment.providerLegalName': profile.equipmentProvider.legalName,
-        'equipment.providerEntityType': profile.equipmentProvider.entityType,
-        'equipment.providerFormationState': profile.equipmentProvider.organizationState,
-        'equipment.providerAddress': profile.equipmentProvider.address,
-        'equipment.providerNoticeAddress': profile.equipmentProvider.noticeAddress,
-        'equipment.providerNoticeEmail': profile.equipmentProvider.noticeEmail,
-        ...(profile.equipmentProvider.creditDisputeAddress
-          ? { 'equipment.creditDisputeAddress': profile.equipmentProvider.creditDisputeAddress }
-          : {}),
-      }
-    : {}),
-  ...(profile.broker
-    ? {
-        'iso.companyLegalName': profile.broker.company.legalName,
-        'iso.portalUrl': profile.broker.portalUrl,
-        'iso.commissionPercentage': String(profile.broker.commissionPercentage),
-      }
-    : {}),
-});
+/**
+ * What the ENTITY supplies, printed into the document at publication.
+ *
+ * ADR 0026 §5: our side is a Pacta record and prints; every other party comes
+ * from the caller per send and is a widget. So `processor.*` and `iso.*` are
+ * gone from here — a processor is a fact about the deal (§6) and there is never
+ * a template per broker.
+ *
+ * `equipment.provider*` stays, and means the entity itself: on an equipment
+ * lease or a subscription the entity IS the lessor. The FRPA's mention of a
+ * possibly-different affiliate is a separate binding, filled by the caller —
+ * see `populateEntity`.
+ */
+export const entityValues = (entity: McaEntity): Record<string, string> => {
+  const { identity } = entity;
+  const venueForum = [identity.venueCounty, identity.venueState].filter(Boolean).join(', ');
 
-export const populateProvider = (body: string, profile: McaProviderProfile, values: Record<string, string>) =>
-  body
-    .replace(/\{\{(funder|equipmentAffiliate|processor)\}\}/g, (_token, role: string) => {
-      if (role === 'funder') {
-        return profile.buyer.legalName;
-      }
-      if (role === 'processor') {
-        return profile.processor.legalName;
-      }
-      return profile.equipmentProvider?.legalName ?? '{{field:equipment.providerLegalName}}';
-    })
+  return {
+    'provider.legalName': identity.legalName,
+    'provider.entityType': identity.entityType,
+    'provider.organizationState': identity.organizationState,
+    'provider.principalAddress': identity.address,
+    'provider.noticeAddress': identity.noticeAddress,
+    'provider.noticeEmail': identity.noticeEmail,
+    'provider.reconciliationEmail': identity.reconciliationEmail,
+    'provider.reconciliationAddress': identity.reconciliationAddress,
+    ...(identity.servicingPhone ? { 'provider.servicingPhone': identity.servicingPhone } : {}),
+    ...(identity.venueState ? { 'provider.venueForum': venueForum } : {}),
+
+    // The entity as lessor. Same company, so the same answers.
+    'equipment.providerLegalName': identity.legalName,
+    'equipment.providerEntityType': identity.entityType,
+    'equipment.providerFormationState': identity.organizationState,
+    'equipment.providerAddress': identity.address,
+    'equipment.providerNoticeAddress': identity.noticeAddress,
+    'equipment.providerNoticeEmail': identity.noticeEmail,
+    ...(identity.creditDisputeAddress ? { 'equipment.creditDisputeAddress': identity.creditDisputeAddress } : {}),
+
+    // The Company on its own channel agreement — us, not the broker.
+    'iso.companyLegalName': identity.legalName,
+    ...(identity.partnerPortalUrl ? { 'iso.portalUrl': identity.partnerPortalUrl } : {}),
+  };
+};
+
+/**
+ * Substitute the role tokens and the entity's own bindings.
+ *
+ * `{{equipmentAffiliate}}` RESOLVES DIFFERENTLY PER DOCUMENT, and that is the
+ * point. On an equipment lease or a subscription the lessor is the entity
+ * issuing the document, so its name prints. On the FRPA the clause names
+ * whoever the merchant leases from, which may be a different company of the
+ * funder's — a template names one entity, so the FRPA cannot know it and the
+ * caller sends it. Owner's decision, recorded here because the alternative
+ * silently prints FundCo where OpCo belongs, in a clause about who the
+ * merchant owes money to.
+ *
+ * `{{processor}}` is gone: a processor is never selected in a template (§6).
+ */
+export const populateEntity = (
+  body: string,
+  entity: McaEntity,
+  instrument: McaInstrument,
+  values: Record<string, string>,
+) => {
+  const entityIsTheLessor = instrument === 'equipment-lease' || instrument === 'subscription';
+
+  return body
+    .replace(/\{\{(funder|equipmentAffiliate)\}\}/g, (_token, role: string) =>
+      role === 'funder' || entityIsTheLessor ? entity.identity.legalName : '{{field:equipment.affiliateLegalName}}',
+    )
     .replace(/\{\{field:([^}]+)\}\}/g, (token, binding: string) => values[binding] ?? token);
+};
 
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
@@ -176,10 +192,12 @@ const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(valu
  * template for a document the programme does not run is a document nobody can
  * lawfully send.
  */
-export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: McaInstrument): McaTemplateSnapshot => {
-  const profile = ZMcaProviderProfile.parse(input);
-  profile.policy.recipientStates.sort();
-  const facts = providerSelectionFacts(profile);
+export const compileMcaTemplate = (input: McaEntityInput, instrument: McaInstrument): McaTemplateSnapshot => {
+  const entity = ZMcaEntity.parse(input);
+
+  entity.policy.recipientStates.sort();
+
+  const facts = entitySelectionFacts(entity);
 
   // A processor's actual form remains externally controlled and separately
   // reviewed (ADR 0019); the builder produces none.
@@ -210,7 +228,7 @@ export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: M
     crosses a document, so this cannot silently start failing to resolve.
   */
   const context = selections.flatMap((selection) => selection.clauses);
-  const values = providerValues(profile);
+  const values = entityValues(entity);
   const documents: McaTemplateDocument[] = selections.map(({ instrument, clauses }) => {
     const helpers = reusableFor(instrument).filter(
       (entry) => entry.uses.includes('document') && (entry.includeWhen === null || entry.includeWhen(facts)),
@@ -233,7 +251,7 @@ export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: M
       // Fees belong to the agreement whose Appendix states them. The equipment
       // and subscription documents charge under their own terms, and the
       // processor's letter is not ours to price.
-      feeSchedule: instrument === 'frpa' ? profile.policy.fees : [],
+      feeSchedule: instrument === 'frpa' ? entity.policy.fees : [],
       items: placeReusableContent(clauses, resolved).map((entry) => {
         const source = sourceBySlug.get(entry.slug);
         if (!source || source.status === 'retired') {
@@ -249,7 +267,7 @@ export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: M
           kind: entry.kind,
           section: entry.section,
           heading: entry.heading,
-          body: populateProvider(entry.body, profile, values),
+          body: populateEntity(entry.body, entity, instrument, values),
           number: numbers.get(entry.slug) ?? null,
           fields: (entry.fields ?? []).map((field) => ({ ...field, value: values[field.binding] ?? null })),
           repeatFor: entry.repeatFor ?? null,
@@ -257,11 +275,11 @@ export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: M
       }),
     };
   });
-  const requirements = profile.policy.recipientStates.flatMap((jurisdiction) =>
+  const requirements = entity.policy.recipientStates.flatMap((jurisdiction) =>
     disclosuresFor(jurisdiction)
       .filter(
         (spec) =>
-          !('transaction' in spec) || spec.transaction !== 'lease-financing' || profile.policy.equipment !== 'none',
+          !('transaction' in spec) || spec.transaction !== 'lease-financing' || entity.policy.equipment !== 'none',
       )
       .map((spec) => {
         const sourceText = readSourceText(spec.sourceFile);
@@ -277,15 +295,6 @@ export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: M
         };
       }),
   );
-  const externalDocuments = [
-    {
-      instrument: 'split-funding' as const,
-      processor: profile.processor.legalName,
-      form: profile.processor.requiredForm,
-      control: 'processor-controlled' as const,
-      acceptance: 'required-per-transaction' as const,
-    },
-  ];
   const snapshot = {
     schemaVersion: 1 as const,
     /*
@@ -298,9 +307,8 @@ export const compileMcaTemplate = (input: McaProviderProfileInput, instrument: M
       instrument at all, which under ADR 0026 no longer has a meaning.
     */
     instrument,
-    profile,
+    entity,
     documents,
-    externalDocuments,
     requirements,
     readyToSend: false as const,
   };
@@ -326,15 +334,6 @@ export type McaTemplateRequirement = {
   sourceDigest: string;
 };
 
-/** A form this programme needs but does not produce — the processor's letter (ADR 0019). */
-export type McaTemplateExternalDocument = {
-  instrument: 'split-funding';
-  processor: string;
-  form: { title: string; version: string; reference: string };
-  control: 'processor-controlled';
-  acceptance: 'required-per-transaction';
-};
-
 /**
  * DECLARED, NOT INFERRED FROM `compileMcaTemplate`.
  *
@@ -348,9 +347,8 @@ export type McaTemplateSnapshot = {
   schemaVersion: 1;
   /** Which document this template is. ADR 0026: entity + type = one template. */
   instrument: McaInstrument;
-  profile: McaProviderProfile;
+  entity: McaEntity;
   documents: McaTemplateDocument[];
-  externalDocuments: McaTemplateExternalDocument[];
   requirements: McaTemplateRequirement[];
   readyToSend: false;
   fingerprint: string;
@@ -358,4 +356,4 @@ export type McaTemplateSnapshot = {
 
 export const isMcaTemplateCurrent = (snapshot: McaTemplateSnapshot): boolean =>
   snapshot.schemaVersion === 1 &&
-  snapshot.fingerprint === compileMcaTemplate(snapshot.profile, snapshot.instrument).fingerprint;
+  snapshot.fingerprint === compileMcaTemplate(snapshot.entity, snapshot.instrument).fingerprint;

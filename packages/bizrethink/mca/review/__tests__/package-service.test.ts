@@ -8,8 +8,8 @@ const db = vi.hoisted(() => ({
 }));
 vi.mock('@documenso/prisma', () => ({ prisma: db }));
 
+import { entityFixture } from '../../entities/entity.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 import { buildLibraryReviewPackage, reviewPackageFingerprint } from '../package';
 import { buildProviderReviewPackage } from '../provider-package';
 import {
@@ -114,8 +114,8 @@ describe('package bearer scope and saved findings', () => {
     'library',
     'unknown',
   ])('rejects provider snapshots incorrectly labelled %s before reading or recording findings', async (kind) => {
-    const profile = providerFixture();
-    const compiled = compileMcaTemplate(profile, 'frpa');
+    const entity = entityFixture();
+    const compiled = compileMcaTemplate(entity, 'frpa');
     const provider = buildProviderReviewPackage({
       compiled,
       templateId: 'template-a',
@@ -137,7 +137,7 @@ describe('package bearer scope and saved findings', () => {
     db.bizrethinkMcaPackageReview.findFirst.mockResolvedValue(mislabelled);
     db.bizrethinkMcaTemplate.findFirst.mockResolvedValue({
       currentRevision: 1,
-      revisions: [{ profile, fingerprint: compiled.fingerprint }],
+      revisions: [{ entity, fingerprint: compiled.fingerprint }],
     });
     const result = (operation: Promise<unknown>) =>
       operation.then(
@@ -157,8 +157,8 @@ describe('package bearer scope and saved findings', () => {
   });
 
   it('binds public provider access to the saved team and revision and reports a superseding revision without replacing text', async () => {
-    const profile = providerFixture();
-    const compiled = compileMcaTemplate(profile, 'frpa');
+    const entity = entityFixture();
+    const compiled = compileMcaTemplate(entity, 'frpa');
     const provider = buildProviderReviewPackage({
       compiled,
       templateId: 'template-a',
@@ -187,7 +187,7 @@ describe('package bearer scope and saved findings', () => {
     db.bizrethinkMcaTemplate.findFirst.mockResolvedValue({
       currentRevision: 2,
       instrument: 'frpa',
-      revisions: [{ profile, fingerprint: compiled.fingerprint }],
+      revisions: [{ entity, fingerprint: compiled.fingerprint }],
     });
     const result = await openPackageReview('mcpr_a');
     expect(result.providerRevisionCurrent).toBe(false);

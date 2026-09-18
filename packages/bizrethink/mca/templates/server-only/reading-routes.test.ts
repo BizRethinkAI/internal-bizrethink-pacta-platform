@@ -3,10 +3,10 @@ import type { TrpcContext } from '@documenso/trpc/server/context';
 import { router } from '@documenso/trpc/server/trpc';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ALL_MCA_CONTENT } from '../../catalogue';
+import { entityFixture } from '../../entities/entity.fixture';
 import { previewMcaTemplateRoute } from '../../server-only/trpc/templates/preview';
 import { allOptionsTemplateFixture } from '../all-options.fixture';
 import { compileMcaTemplate } from '../compile';
-import { providerFixture } from '../profile.fixture';
 
 const mocks = vi.hoisted(() => ({
   db: { team: { findFirst: vi.fn() }, bizrethinkMcaTemplate: { findFirst: vi.fn() } },
@@ -73,7 +73,7 @@ describe('referenced clauses through provider preview', () => {
     so a clause that reintroduced a crossing still fails here.
   */
   it.each([
-    { label: 'FRPA', fixture: () => compileMcaTemplate(providerFixture(), 'frpa') },
+    { label: 'FRPA', fixture: () => compileMcaTemplate(entityFixture(), 'frpa') },
     { label: 'FRPA, every option offered', fixture: () => allOptionsTemplateFixture('frpa') },
     { label: 'ISO PRA', fixture: () => allOptionsTemplateFixture('iso-pra') },
   ])('$label retains readable clause and section references through the route', async (scenario) => {
@@ -81,10 +81,11 @@ describe('referenced clauses through provider preview', () => {
     const before = JSON.stringify(template);
     mocks.db.bizrethinkMcaTemplate.findFirst.mockResolvedValue({
       id: 'synthetic-template',
-      label: template.profile.label,
+      label: template.entity.label,
       instrument: template.instrument,
       currentRevision: 1,
-      revisions: [{ version: 1, profile: template.profile, fingerprint: template.fingerprint }],
+      entityId: 'mcaent_1',
+      revisions: [{ version: 1, entity: template.entity, fingerprint: template.fingerprint }],
     });
     const request = { teamId: 17, id: 'synthetic-template', version: 1 };
     const caller = api.createCaller(context());

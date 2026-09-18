@@ -3,8 +3,8 @@ import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-
 import { PDF } from '@libpdf/core';
 import { describe, expect, it, vi } from 'vitest';
 import type { McaInstrument } from '../../clauses/instruments';
+import { entityFixture } from '../../entities/entity.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 import { fieldPlanFor } from '../field-plan';
 import { buildMcaTemplateArtifact } from './artifact';
 
@@ -32,7 +32,7 @@ vi.setConfig({ testTimeout: 60_000 });
  * learn this; `white-out-signing-tokens.ts` carries that scar.
  */
 
-const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(entityFixture(), instrument);
 
 const built = (() => {
   let pending: ReturnType<typeof buildMcaTemplateArtifact> | null = null;
@@ -124,7 +124,7 @@ describe('it refuses to build something half-formed', () => {
   it('refuses to compile a document this programme does not run', () => {
     expect(() =>
       compileMcaTemplate(
-        { ...providerFixture(), policy: { ...providerFixture().policy, equipment: 'none' as const } },
+        { ...entityFixture(), policy: { ...entityFixture().policy, equipment: 'none' as const } },
         'equipment-lease',
       ),
     ).toThrow(/does not run/i);

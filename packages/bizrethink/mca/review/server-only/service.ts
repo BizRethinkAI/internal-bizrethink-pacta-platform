@@ -2,9 +2,9 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { BizrethinkMcaPackageReview, Prisma } from '@prisma/client';
+import { ZMcaEntity } from '../../entities/entity';
 import { producedInstrumentOf } from '../../publish/recipient-contract';
 import { compileMcaTemplate } from '../../templates/compile';
-import { ZMcaProviderProfile } from '../../templates/profile';
 import { MCA_REVIEW_LINK_TTL_DAYS } from '../link';
 import {
   buildLibraryReviewPackage,
@@ -138,14 +138,14 @@ const providerSnapshotState = async (
       // ADR 0026: recompiling to test freshness needs the document this
       // template is, or the comparison is against something else entirely.
       instrument: true,
-      revisions: { where: { version: row.templateVersion }, select: { profile: true, fingerprint: true }, take: 1 },
+      revisions: { where: { version: row.templateVersion }, select: { entity: true, fingerprint: true }, take: 1 },
     },
   });
   const revision = template?.revisions[0];
   if (!template || !revision || revision.fingerprint !== snapshot.provider.templateFingerprint) {
     throw unavailable();
   }
-  const parsed = ZMcaProviderProfile.safeParse(revision.profile);
+  const parsed = ZMcaEntity.safeParse(revision.entity);
   let providerSourcesCurrent = false;
   if (parsed.success) {
     try {
@@ -153,7 +153,7 @@ const providerSnapshotState = async (
         compileMcaTemplate(parsed.data, producedInstrumentOf(template.instrument, row.templateId)).fingerprint ===
         revision.fingerprint;
     } catch {
-      // Saved text remains available even when current selection rules no longer accept this profile.
+      // Saved text remains available even when current selection rules no longer accept this entity.
       providerSourcesCurrent = false;
     }
   }

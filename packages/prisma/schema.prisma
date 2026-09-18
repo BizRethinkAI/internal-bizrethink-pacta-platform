@@ -2388,6 +2388,15 @@ model BizrethinkMcaTemplate {
   /// builder produces none (ADR 0019).
   instrument        String   @default("frpa")
 
+  /// WHICH ENTITY ISSUES IT. ADR 0026: entity + type = one template.
+  ///
+  /// Chosen when the template is created and fixed afterwards, like the
+  /// instrument beside it. Not a relation: the entity is COPIED into each
+  /// revision (§4), and a foreign key would invite reading it live — which is
+  /// exactly what must not happen, because editing an entity would then
+  /// rewrite what an already-published document says.
+  entityId          String
+
   currentRevision   Int      @default(1)
   createdByUserId    Int
   createdAt         DateTime @default(now())
@@ -2403,7 +2412,12 @@ model BizrethinkMcaTemplateRevision {
   templateId        String
   template          BizrethinkMcaTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
   version           Int
-  profile           Json
+
+  /// `McaEntity` — the issuing entity as it stood when this revision was made.
+  /// A COPY, never a reference. Revisions are immutable and fingerprinted, and
+  /// publishing names one, so an entity edit must not reach a document that
+  /// already went out.
+  entity            Json
   snapshot          Json
   fingerprint       String
   createdByUserId    Int

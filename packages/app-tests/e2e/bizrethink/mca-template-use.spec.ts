@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { providerFixture } from '@bizrethink/customizations/mca/templates/profile.fixture';
+import { entityFixture } from '@bizrethink/customizations/mca/entities/entity.fixture';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -29,6 +29,17 @@ const post = (request: APIRequestContext, route: string, input: unknown) =>
 const pdf = (request: APIRequestContext, input: unknown) =>
   request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/bizrethink/mca-template-preview`, { data: input });
 
+/** A template needs an entity to be created against (ADR 0026). */
+const seedEntity = async (request: APIRequestContext, teamId: number, userId: number) => {
+  const created = await request.post(`${NEXT_PUBLIC_WEBAPP_URL()}/api/trpc/bizrethink.mcaEntities.create`, {
+    data: dataTransformer.serialize({ teamId, entity: entityFixture() }),
+  });
+
+  expect(created.ok()).toBe(true);
+
+  return (await prisma.bizrethinkMcaEntity.findFirstOrThrow({ where: { createdByUserId: userId } })).id;
+};
+
 const grant = async (userId: number, feature: string, enabled: boolean) => {
   const key = { feature, scope: 'user', scopeId: String(userId) };
 
@@ -41,6 +52,7 @@ const grant = async (userId: number, feature: string, enabled: boolean) => {
 
 const cleanup = async (userId: number) => {
   await prisma.bizrethinkMcaTemplate.deleteMany({ where: { createdByUserId: userId } });
+  await prisma.bizrethinkMcaEntity.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkFeatureAccess.deleteMany({
     where: { scope: 'user', scopeId: String(userId), feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] } },
   });
@@ -57,9 +69,9 @@ test('a saved provider template previews the document it produces, as a PDF', as
     await grant(own.user.id, 'mca-clause-draft-rendering', true);
     await apiSignin({ page, email: own.user.email });
 
-    expect(
-      (await post(page.request, 'create', { teamId: team.id, data: providerFixture(), instrument: 'frpa' })).ok(),
-    ).toBe(true);
+    const entityId = await seedEntity(page.request, team.id, own.user.id);
+
+    expect((await post(page.request, 'create', { teamId: team.id, entityId, instrument: 'frpa' })).ok()).toBe(true);
 
     const saved = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({
       where: { createdByUserId: own.user.id },
@@ -115,9 +127,9 @@ test('previewing enforces the same live access, revision and account restriction
     await grant(own.user.id, 'mca-builder', true);
     await apiSignin({ page, email: own.user.email });
 
-    const profile = providerFixture();
+    const entityId = await seedEntity(page.request, teamId, own.user.id);
 
-    expect((await post(page.request, 'create', { teamId, data: profile, instrument: 'frpa' })).ok()).toBe(true);
+    expect((await post(page.request, 'create', { teamId, entityId, instrument: 'frpa' })).ok()).toBe(true);
 
     const row = await prisma.bizrethinkMcaTemplate.findFirstOrThrow({ where: { createdByUserId: own.user.id } });
     const input = { teamId, id: row.id, version: 1, instrument: 'frpa' };
@@ -152,7 +164,7 @@ test('previewing enforces the same live access, revision and account restriction
         await post(page.request, 'update', {
           teamId,
           id: row.id,
-          data: { expectedVersion: 1, profile: { ...profile, label: 'New current revision' } },
+          data: { expectedVersion: 1 },
         })
       ).ok(),
     ).toBe(true);

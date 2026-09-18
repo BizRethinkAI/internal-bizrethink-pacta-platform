@@ -7,7 +7,7 @@ export const createMcaTemplateRoute = authenticatedProcedure
   .mutation(async ({ ctx, input }) => {
     return createMcaTemplate({
       teamId: input.teamId,
-      profile: input.data,
+      entityId: input.entityId,
       instrument: input.instrument,
       userId: ctx.user.id,
     });

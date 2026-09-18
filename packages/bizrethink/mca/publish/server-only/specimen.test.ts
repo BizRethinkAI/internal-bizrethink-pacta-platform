@@ -2,8 +2,8 @@ import { extractPlaceholdersFromPDF } from '@documenso/lib/server-only/pdf/auto-
 import { PDF } from '@libpdf/core';
 import { describe, expect, it, vi } from 'vitest';
 import type { McaInstrument } from '../../clauses/instruments';
+import { entityFixture } from '../../entities/entity.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 import { fieldPlanFor } from '../field-plan';
 import { renderMcaTemplatePreviewPdf, specimenFor } from './specimen';
 import { renderMcaTemplatePdf } from './template-pdf';
@@ -27,7 +27,7 @@ import { renderMcaTemplatePdf } from './template-pdf';
 // nature, and one case renders the template AND its preview to compare them.
 vi.setConfig({ testTimeout: 60_000 });
 
-const snapshot = (instrument: McaInstrument) => compileMcaTemplate(providerFixture(), instrument);
+const snapshot = (instrument: McaInstrument) => compileMcaTemplate(entityFixture(), instrument);
 
 /** Render each artifact once per file rather than once per assertion. */
 const rendered = new Map<string, Promise<Buffer>>();

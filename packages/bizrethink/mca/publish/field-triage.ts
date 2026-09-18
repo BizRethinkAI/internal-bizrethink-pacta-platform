@@ -1,5 +1,5 @@
 import { contentFor } from '../catalogue';
-import { MCA_PROVIDER_BINDINGS } from '../templates/profile';
+import { MCA_ENTITY_BINDINGS } from '../entities/entity';
 import { fieldPlanFor } from './field-plan';
 import type { ProducedInstrument } from './recipient-contract';
 
@@ -180,7 +180,7 @@ export const unreachableDealFields = (instrument: ProducedInstrument): string[] 
 
   for (const entry of contentFor(instrument)) {
     for (const field of entry.fields ?? []) {
-      if (!marked.has(field.binding) && !signer.has(field.binding) && !MCA_PROVIDER_BINDINGS.has(field.binding)) {
+      if (!marked.has(field.binding) && !signer.has(field.binding) && !MCA_ENTITY_BINDINGS.has(field.binding)) {
         found.add(field.binding);
       }
     }

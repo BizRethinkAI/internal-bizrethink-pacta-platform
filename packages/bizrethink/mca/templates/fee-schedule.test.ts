@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { type McaEntityInput, ZMcaEntity } from '../entities/entity';
+import { entityFixture } from '../entities/entity.fixture';
 import { compileMcaTemplate } from './compile';
-import { type McaProviderProfileInput, ZMcaProviderProfile } from './profile';
-import { providerFixture } from './profile.fixture';
 
 /**
  * The fee schedule the Appendix already demands.
@@ -16,8 +16,8 @@ import { providerFixture } from './profile.fixture';
  * These rows are the funder's, not a fixed list: the next funder charges
  * different fees, and the clause binds whatever they enter.
  */
-const withFees = (fees: McaProviderProfileInput['policy']['fees']) => {
-  const base = providerFixture();
+const withFees = (fees: McaEntityInput['policy']['fees']) => {
+  const base = entityFixture();
   return { ...base, policy: { ...base.policy, fees } };
 };
 
@@ -32,32 +32,32 @@ const ORIGINATION = {
 
 describe('a funder states its own fees', () => {
   it('accepts a schedule with no fees at all', () => {
-    expect(ZMcaProviderProfile.safeParse(withFees([])).success).toBe(true);
+    expect(ZMcaEntity.safeParse(withFees([])).success).toBe(true);
   });
 
   it('accepts a fee stated as a dollar amount', () => {
-    expect(ZMcaProviderProfile.safeParse(withFees([ORIGINATION])).success).toBe(true);
+    expect(ZMcaEntity.safeParse(withFees([ORIGINATION])).success).toBe(true);
   });
 
   it('accepts a fee stated as a calculation method, which the clause allows', () => {
     const { amount: _amount, ...rest } = ORIGINATION;
     const rate = { ...rest, basis: 'method' as const, method: '3% of the Purchase Price' };
 
-    expect(ZMcaProviderProfile.safeParse(withFees([rate])).success).toBe(true);
+    expect(ZMcaEntity.safeParse(withFees([rate])).success).toBe(true);
   });
 
   it('refuses a fee that states neither an amount nor a method', () => {
     const { amount: _amount, ...bare } = ORIGINATION;
     // The type already refuses this, which is why the cast is here: the point
     // is that validation refuses it too, for input arriving as JSON.
-    const fees = [bare] as McaProviderProfileInput['policy']['fees'];
+    const fees = [bare] as McaEntityInput['policy']['fees'];
 
-    expect(ZMcaProviderProfile.safeParse(withFees(fees)).success).toBe(false);
+    expect(ZMcaEntity.safeParse(withFees(fees)).success).toBe(false);
   });
 
   it('refuses a fee that does not say who is paid, what for, or when', () => {
     for (const key of ['payee', 'purpose', 'when'] as const) {
-      expect(ZMcaProviderProfile.safeParse(withFees([{ ...ORIGINATION, [key]: '' }])).success, key).toBe(false);
+      expect(ZMcaEntity.safeParse(withFees([{ ...ORIGINATION, [key]: '' }])).success, key).toBe(false);
     }
   });
 
@@ -87,8 +87,8 @@ describe('a funder states its own fees', () => {
  */
 describe('a profile saved before this release', () => {
   const legacy = () => {
-    const { fees: _fees, ...policy } = providerFixture().policy;
-    return { ...providerFixture(), policy };
+    const { fees: _fees, ...policy } = entityFixture().policy;
+    return { ...entityFixture(), policy };
   };
 
   it('compiles, and charges nothing', () => {
@@ -99,7 +99,7 @@ describe('a profile saved before this release', () => {
   });
 
   it('parses, and reads as charging nothing', () => {
-    const parsed = ZMcaProviderProfile.parse(legacy());
+    const parsed = ZMcaEntity.parse(legacy());
 
     expect(parsed.policy.fees).toEqual([]);
   });

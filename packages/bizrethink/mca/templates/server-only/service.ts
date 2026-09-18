@@ -6,9 +6,11 @@ import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/generated/types';
 
 import { getFeatureAccess } from '../../../server-only/feature-access';
+import { INSTRUMENTS } from '../../clauses/instruments';
+import { type McaEntity, ZMcaEntity } from '../../entities/entity';
+import { getMcaEntity, type SavedMcaEntity } from '../../entities/server-only/service';
 import { type ProducedInstrument, producedInstrumentOf } from '../../publish/recipient-contract';
 import { compileMcaTemplate, type McaTemplateSnapshot } from '../compile';
-import { type McaProviderProfile, ZMcaProviderProfile } from '../profile';
 
 export const MCA_BUILDER_FEATURE = 'mca-builder';
 export const MCA_DRAFT_FEATURE = 'mca-clause-draft-rendering';
@@ -41,6 +43,21 @@ const scope = (id: string, team: { id: number; organisationId: string }) => ({
 const missing = () => new AppError(AppErrorCode.NOT_FOUND, { message: 'No such MCA template revision.' });
 
 /**
+ * The entity itself, without the record it was read from.
+ *
+ * `getMcaEntity` returns the saved row's `id`, `version` and `updatedAt`
+ * alongside it, and `ZMcaEntity` is `.strict()` — so handing the whole thing to
+ * the compiler throws on the three extra keys. Naming the copy explicitly is
+ * also the more honest shape: what a revision freezes is the entity's terms,
+ * not which row they came from or how many times it has been edited since.
+ */
+const copyOf = (saved: SavedMcaEntity): McaEntity => ({
+  label: saved.label,
+  identity: saved.identity,
+  policy: saved.policy,
+});
+
+/**
  * ADR 0026: a template is one entity's version of ONE document, and which
  * document it is settled when it is created. Changing it afterwards would make
  * every earlier revision a record of something else.
@@ -48,24 +65,36 @@ const missing = () => new AppError(AppErrorCode.NOT_FOUND, { message: 'No such M
 export const createMcaTemplate = async ({
   teamId,
   userId,
-  profile,
+  entityId,
   instrument,
-}: TeamActor & { profile: McaProviderProfile; instrument: ProducedInstrument }) => {
+}: TeamActor & { entityId: string; instrument: ProducedInstrument }) => {
   const team = await assertMcaTeamAccess({ teamId, userId, write: true });
-  const snapshot = compileMcaTemplate(profile, instrument);
+
+  /*
+    COPIED INTO THE REVISION, NEVER REFERENCED LIVE. ADR 0026 §4.
+
+    Revisions are immutable and fingerprinted, and `publishMcaTemplate`
+    publishes against a named one. A template that read its entity live would
+    have its parties and its programme terms silently rewritten the next time
+    somebody edited that entity — including a revision already published.
+  */
+  const saved = await getMcaEntity({ teamId, userId, id: entityId });
+  const snapshot = compileMcaTemplate(copyOf(saved), instrument);
+
   return prisma.bizrethinkMcaTemplate.create({
     data: {
       id: `mcat_${randomUUID()}`,
       teamId: team.id,
       organisationId: team.organisationId,
-      label: snapshot.profile.label,
+      label: `${saved.label} — ${INSTRUMENTS[instrument].title}`,
       instrument,
+      entityId,
       createdByUserId: userId,
       revisions: {
         create: {
           id: `mcar_${randomUUID()}`,
           version: 1,
-          profile: snapshot.profile,
+          entity: snapshot.entity,
           snapshot,
           fingerprint: snapshot.fingerprint,
           createdByUserId: userId,
@@ -81,8 +110,7 @@ export const reviseMcaTemplate = async ({
   userId,
   id,
   expectedVersion,
-  profile,
-}: TeamActor & { id: string; expectedVersion: number; profile: McaProviderProfile }) => {
+}: TeamActor & { id: string; expectedVersion: number }) => {
   const team = await assertMcaTeamAccess({ teamId, userId, write: true });
 
   /*
@@ -92,19 +120,29 @@ export const reviseMcaTemplate = async ({
   */
   const existing = await prisma.bizrethinkMcaTemplate.findFirst({
     where: scope(id, team),
-    select: { instrument: true },
+    select: { instrument: true, entityId: true },
   });
 
   if (!existing) {
     throw missing();
   }
 
-  const snapshot = compileMcaTemplate(profile, producedInstrumentOf(existing.instrument, id));
+  /*
+    A REVISION IS A FRESH COPY OF THE ENTITY AS IT STANDS NOW.
+
+    This used to take a profile, because the template carried its own answers.
+    Under ADR 0026 the entity is where those answers are edited, so revising a
+    template means taking the copy again rather than being handed one — and it
+    is the only way an entity edit ever reaches a document, which is what makes
+    already-published revisions safe from it.
+  */
+  const saved = await getMcaEntity({ teamId, userId, id: existing.entityId });
+  const snapshot = compileMcaTemplate(copyOf(saved), producedInstrumentOf(existing.instrument, id));
   const version = expectedVersion + 1;
   return prisma.$transaction(async (tx) => {
     const updated = await tx.bizrethinkMcaTemplate.updateMany({
       where: { ...scope(id, team), currentRevision: expectedVersion },
-      data: { label: snapshot.profile.label, currentRevision: version },
+      data: { currentRevision: version },
     });
     if (updated.count !== 1) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -116,7 +154,7 @@ export const reviseMcaTemplate = async ({
         id: `mcar_${randomUUID()}`,
         templateId: id,
         version,
-        profile: snapshot.profile,
+        entity: snapshot.entity,
         snapshot,
         fingerprint: snapshot.fingerprint,
         createdByUserId: userId,
@@ -139,8 +177,8 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
         where: version ? { version } : undefined,
         orderBy: { version: 'desc' },
         take: 1,
-        // The archival snapshot contains legal text; profile retrieval must not return it.
-        select: { version: true, profile: true, fingerprint: true },
+        // The archival snapshot contains legal text; reading the entity back must not return it.
+        select: { version: true, entity: true, fingerprint: true },
       },
     },
   });
@@ -148,7 +186,12 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
   if (!row || !revision) {
     throw missing();
   }
-  const profile = ZMcaProviderProfile.parse(revision.profile);
+  /*
+    PARSED ON THE WAY OUT, NOT CAST — the same reason `getMcaEntity` gives. A
+    revision written before a schema change would otherwise flow into clause
+    selection as though it were valid.
+  */
+  const entity = ZMcaEntity.parse(revision.entity);
   const instrument = producedInstrumentOf(row.instrument, row.id);
 
   /*
@@ -156,7 +199,7 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
     compiled result, so comparing it against a different instrument's output
     would report every template as stale.
   */
-  const current = compileMcaTemplate(profile, instrument).fingerprint === revision.fingerprint;
+  const current = compileMcaTemplate(entity, instrument).fingerprint === revision.fingerprint;
 
   return {
     id: row.id,
@@ -164,7 +207,7 @@ export const getMcaTemplate = async ({ teamId, userId, id, version }: TeamActor 
     instrument,
     currentRevision: row.currentRevision,
     version: revision.version,
-    profile,
+    entity,
     fingerprint: revision.fingerprint,
     current,
   };
@@ -200,7 +243,7 @@ export const previewMcaTemplate = async (
     });
   }
   return {
-    ...compileMcaTemplate(template.profile, template.instrument),
+    ...compileMcaTemplate(template.entity, template.instrument),
     // Named explicitly as well as spread. A caller reading this over tRPC has
     // to know which document it is looking at, and ADR 0026 makes that the
     // template's identity rather than a detail of `documents[0]`.

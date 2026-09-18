@@ -1,56 +1,32 @@
 import type { McaInstrument } from '../clauses/instruments';
+import { entityFixture } from '../entities/entity.fixture';
 import { compileMcaTemplate } from './compile';
-import { providerFixture } from './profile.fixture';
 
 /**
- * A provider programme that offers every document the builder produces.
- *
- * Ported out of `transactions/draft.fixture.ts` when ADR 0025 retired the deal
- * path. That fixture built a compiled template AND a merchant's answers; only
- * the first half describes a template, and only the first half survives.
+ * An entity whose programme offers every document the builder produces.
  *
  * It exists because most compiled fixtures are an FRPA and little else, so a
  * bug in the equipment, channel or report documents had nowhere to show itself.
  * Synthetic throughout — never a product default, and never evidence of an
  * offer, a signing or an acceptance.
+ *
+ * Under ADR 0026 it no longer invents a separate equipment company or broker:
+ * the broker comes from the caller per deal, and an entity that leases
+ * equipment IS the lessor on its own equipment template.
  */
-export const allOptionsTemplateFixture = (instrument: McaInstrument = 'frpa') => {
-  const profile = providerFixture();
+export const allOptionsEntity = () => {
+  const entity = entityFixture();
 
-  profile.buyer.servicingPhone = '+1 555 010 0200';
+  entity.identity.servicingPhone = '+1 555 010 0200';
+  entity.policy.equipment = 'merchant-elects';
+  entity.policy.brokerChannel = true;
+  entity.policy.consumerReportPulled = true;
 
-  const {
-    reconciliationEmail: _email,
-    reconciliationAddress: _address,
-    servicingPhone: _phone,
-    ...entity
-  } = profile.buyer;
-
-  return compileMcaTemplate(
-    {
-      ...profile,
-      policy: {
-        ...profile.policy,
-        equipment: 'merchant-elects',
-        brokerChannel: true,
-        consumerReportPulled: true,
-      },
-      equipmentProvider: {
-        ...entity,
-        legalName: 'Example Equipment LLC',
-        entityType: 'limited liability company',
-        creditDisputeAddress: 'PO Box 50, Dover, DE 19901',
-      },
-      broker: {
-        company: { ...entity, legalName: 'Example Channel Inc.' },
-        portalUrl: 'https://partners.example.invalid',
-        commissionPercentage: 2.75,
-        fixedIsoTermsAccepted: true,
-      },
-    },
-    instrument,
-  );
+  return entity;
 };
+
+export const allOptionsTemplateFixture = (instrument: McaInstrument = 'frpa') =>
+  compileMcaTemplate(allOptionsEntity(), instrument);
 
 /**
  * Every document this programme is entitled to, compiled separately.

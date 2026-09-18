@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZMcaEntity } from '../entity';
+import { ZMcaEntity, ZMcaEntityPolicy } from '../entity';
 
 /**
  * The wire shape for entity records. ADR 0026.
@@ -38,4 +38,17 @@ export const ZUpdateMcaEntityRequestSchema = ZListMcaEntitiesRequestSchema.exten
       entity: ZMcaEntity,
     })
     .strict(),
+}).strict();
+
+/**
+ * What each answer would do, asked about a DRAFT rather than a saved record.
+ *
+ * Takes the policy alone: nothing in the derivation reads an identity, so the
+ * interview refetches when an answer changes rather than when someone types an
+ * address. It is a read of the clause library with no tenancy of its own, but
+ * it still goes through the team gate — the library is not public, and the
+ * shape of a funder's programme is not a thing to answer for strangers.
+ */
+export const ZMcaAnswerConsequencesRequestSchema = ZListMcaEntitiesRequestSchema.extend({
+  policy: ZMcaEntityPolicy,
 }).strict();

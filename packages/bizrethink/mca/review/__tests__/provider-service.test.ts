@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { entityFixture } from '../../entities/entity.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 
 const mocks = vi.hoisted(() => ({
   access: vi.fn(),
@@ -32,7 +32,7 @@ describe('provider counsel invitations are isolated by team and revision', () =>
     vi.clearAllMocks();
     mocks.access.mockResolvedValue({ id: 17, organisationId: 'org-a' });
     mocks.preview.mockResolvedValue({
-      ...compileMcaTemplate(providerFixture(), 'frpa'),
+      ...compileMcaTemplate(entityFixture(), 'frpa'),
       version: 2,
       templateId: 'template-a',
     });

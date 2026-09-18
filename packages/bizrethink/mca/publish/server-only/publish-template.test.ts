@@ -38,7 +38,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   mocks.preview.mockResolvedValue({
     fingerprint: 'fp-1',
-    profile: { policy: { recipientStates: ['US-VA'], venueRule: 'merchant-state' } },
+    entity: { policy: { recipientStates: ['US-VA'], venueRule: 'merchant-state' } },
     documents: [],
   });
   mocks.packageFor.mockResolvedValue({ items: [] });

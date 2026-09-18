@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { LOMBARD_FACTS } from '../../clauses/facts';
 import { MCA_INSTRUMENTS } from '../../clauses/instruments';
+import { entityFixture } from '../../entities/entity.fixture';
 import { contentForReview } from '../../reusable/review';
 import { allOptionsDocuments } from '../../templates/all-options.fixture';
 import { compileMcaTemplate } from '../../templates/compile';
-import { providerFixture } from '../../templates/profile.fixture';
 import { groupMcaSections, hasMcaSectionName, mcaSectionHeading, mcaSectionName } from '../section-headings';
 import { selectClauses } from '../select-clauses';
 
@@ -57,7 +57,7 @@ describe('MCA parent headings use the displayed selection without changing its c
   });
 
   it('keeps saved recipes unchanged and restarts headings for every actual document instance', () => {
-    const profile = providerFixture();
+    const profile = entityFixture();
     const snapshot = compileMcaTemplate(profile, 'frpa');
     const before = structuredClone(snapshot);
     for (const document of snapshot.documents) {

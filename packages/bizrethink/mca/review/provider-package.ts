@@ -64,7 +64,7 @@ export const buildProviderReviewPackage = ({
   return ZProviderReviewPackage.parse({
     schemaVersion: 2,
     kind: 'provider',
-    title: `${compiled.profile.label} — provider counsel review`,
+    title: `${compiled.entity.label} — provider counsel review`,
     contact,
     profileDescription:
       'Selected saved provider policy. Transaction elections may still select an equipment document, report authorization or other conditional instrument.',
@@ -72,8 +72,8 @@ export const buildProviderReviewPackage = ({
       templateId,
       revision,
       templateFingerprint: compiled.fingerprint,
-      legalName: compiled.profile.buyer.legalName,
-      policy: Object.entries(compiled.profile.policy).map(
+      legalName: compiled.entity.identity.legalName,
+      policy: Object.entries(compiled.entity.policy).map(
         ([key, value]) =>
           `${key.replace(/([a-z])([A-Z])/g, '$1 $2')}: ${Array.isArray(value) ? value.join(', ') : String(value)}`,
       ),
@@ -87,13 +87,5 @@ export const buildProviderReviewPackage = ({
     requirements: reviewRequirements().filter((requirement) =>
       compiled.requirements.some((selected) => selected.slug === requirement.slug),
     ),
-    externalDocuments: compiled.externalDocuments.map((document) => ({
-      id: document.instrument,
-      processor: document.processor,
-      title: document.form.title,
-      version: document.form.version,
-      reference: document.form.reference,
-      content: processorText,
-    })),
   });
 };
