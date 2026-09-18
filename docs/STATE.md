@@ -15,6 +15,117 @@ true *right now*.
 
 _Last updated: 2026-09-18_
 
+## 2026-09-18 — the entity is the template, and a failed migration stops the boot (#317, #321, #320)
+
+Three PRs merged: #317 `5cd5c02ea`, #321 `3559be672`, #320 `4d17197f3`. **Main is
+`4d17197f3`. Production runs `948b74c05`** and this batch is not deployed at the
+time of writing.
+
+**#317 was merged without review, by accident.** Nothing shipped: auto-deploy is
+off, so the merge triggered nothing, and the migration runs at deploy. It was
+therefore unreviewed code rather than unverified code, and it was read properly
+afterwards. **It was not reverted, deliberately**: `git revert -m 1` on a merge
+commit blocks re-merging those commits without reverting the revert, this repo
+keeps merge commits for upstream-sync ancestry, #320 was stacked on it — and the
+risk was already contained by not deploying.
+
+### ADR 0026, implemented (#317)
+
+`compileMcaTemplate(entity, instrument)`. The provider profile and its interview
+are gone. The template names the entity that issues it, and **each revision
+carries a copy of that entity rather than a reference** — revisions are immutable
+and publishing names one, so editing an entity must never rewrite a document that
+already went out. `externalDocuments` is gone (§6). Every explanation in the
+entity interview is derived from the same `selectClauses` the compiler runs
+rather than written by hand.
+
+**The bindings split (§5): exactly two moved from printed to widget**, and the
+pinned parity counts moved with them — FRPA `37 marked / 2 printed → 38 / 1`
+(`processor_name`), ISO PRA `6 / 2 → 7 / 1` (`commission_percentage`). Both are
+live widgets the caller already sends, so this closes a gap rather than opening
+one.
+
+**Two `iso.*` bindings deliberately did not move.** On the ISO PRA
+`iso.companyLegalName` is the **Company — us** — while the broker is
+`iso.partnerLegalName`, and §5 cites that very widget as its evidence that our
+side is a Pacta record. Moving it would have turned the funder's own legal name
+into a field the caller fills on its own channel agreement.
+
+**Two of ADR 0026's three open questions are closed by construction**, recorded
+here rather than by editing an append-only ADR: `provider.venueForum` and
+`equipment.creditDisputeAddress` **print**, because the entity schema already
+carries them; `iso.commissionPercentage` is a **widget**, being a term with one
+particular broker.
+
+**A gate that no longer applies was removed rather than left inert.**
+`reviewCompletionBlockers` required the processor form before a counsel review
+could complete; a template contains no processor form now, so the check would have
+become present-and-unable-to-fire. `validateFindingTargets` now *throws* on a
+processor target rather than accepting one, so the surface is closed. The
+obligation moved (ADR 0019) rather than vanished.
+
+### A failed migration used to report itself as a success (#321)
+
+`docker/start.sh` ran `prisma migrate deploy` and then started the server
+**regardless of how it went**. There is no `set -e` in that script and the call
+was unguarded, so a failed migration left the app serving the **old schema**,
+`/api/health` answered 200, and Coolify recorded a successful deployment.
+
+It had never bitten because every migration until now was additive with a default
+and could not realistically fail. **#317's is the first that can**:
+
+```sql
+ALTER TABLE "BizrethinkMcaTemplate"         ADD COLUMN "entityId" TEXT NOT NULL;  -- no default
+ALTER TABLE "BizrethinkMcaTemplateRevision" DROP COLUMN "profile";
+ALTER TABLE "BizrethinkMcaTemplateRevision" ADD COLUMN "entity" JSONB NOT NULL;
+```
+
+Postgres DDL is transactional, so a failure rolls back and **destroys nothing** —
+the migration's own comment is right that failing is the correct outcome on an
+environment holding rows. What did not hold was the consequence: the deploy would
+have carried on and reported success. Overlay 093 wraps the command in an `if !`
+that exits non-zero, guarded by
+`regression-tests/docker-start-migration-guard.test.ts`, which accepts `set -e`,
+`||` or `&&` as well, so a later correct rewrite passes on its merits rather than
+by matching one spelling.
+
+**The migration itself is the one irreversible thing in this batch.** It carries
+no backfill by design (ADR 0026 §8), production was verified empty before it was
+written, and there is no Pacta staging environment at all — the only staging app
+in the fleet belongs to another project.
+
+### Preview before the template exists (#320)
+
+A new read-only tRPC route shows what an entity and a document type would produce
+before anything is created. Authorisation is read-level, which is right for a
+preview, and the entity is fetched through the accessor that re-asserts team
+access, so it cannot be read across tenants.
+
+### Open, and not fixed here
+
+- **`equipment.affiliateLegalName` is a new widget name** the live templates do
+  not carry — twenty-eight, not twenty-seven. **`lombard-platform` has to
+  implement it.** That is work in a repository this session does not own.
+- **Issue #319: the entity editor's Next button does nothing when editing a
+  *saved* entity.** It came in with #314 and is on main. #317's test reaches step
+  two by the step chip instead, which is a legitimate path and leaves Next covered
+  on the create path — but the defect is real and a green suite must not read as
+  it being fixed.
+- Nothing publishes. Counsel has approved nothing.
+
+### A working practice, learned twice in one day
+
+Two mistakes in this batch had the same shape: **a broad `git add` in a checkout
+holding something the author did not put there.** One of them discarded a fix and
+described it as done; the other swept 41 unrelated files — including six binaries
+— into a five-file PR, and then, because committing them made them tracked on the
+branch, **switching that checkout back to `main` deleted them from disk**. They
+were recovered from the branch commit *before* the branch was cleaned, which is
+the only order that would have worked.
+
+The lesson is not "use `git add -p`". It is that **a broad add is only safe when
+the working tree is entirely yours**, and a worktree is what makes that true.
+
 ## 2026-09-18 — an entity gets a door, and the cast class is closed (#314, #315)
 
 Two PRs merged: #314 `16fffc688` and #315 `e94fab419`. **Main is `e94fab419`.
