@@ -96,6 +96,37 @@ to occur, *and* a row corrupted outside the only writer.
 rather than decided, because which way it should fail is a judgement about the
 funder integration and not one to infer.
 
+
+### A guard the entity schema does not have (found on main, not introduced here)
+
+`ZMcaProviderProfile`'s `line()` has always refused `{{`, `[[`, `«`, `»` and
+control characters, because an answer a person types ends up inside compiled
+legal text and **three layers read certain sequences as instructions**: the
+compiler substitutes `{{field:…}}` and `{{funder}}`, the numbering engine
+resolves `[[clause:…]]`, and `injectMcaWidgets` turns `«name»` into an AcroForm
+widget. **`ZMcaEntity`'s own `line()` carries no such refinement** — it is a bare
+`z.string().trim().min(1).max(max)`, and has been since the entity schema landed
+with #310.
+
+The shape of the risk: an entity legally named `«merchant_legal_name»` would put
+a second widget of that name onto a published page — one the funder never asked
+for and the caller would fill.
+
+**It is not reachable on this revision**, and that was checked rather than
+assumed: `compileMcaTemplate` takes a provider profile and not an entity, no
+compile, render or injection path reads entity data, and
+`BizrethinkMcaTemplate` has no entity column — the join ADR 0026 describes does
+not exist yet.
+
+**What #314 changed is that such a value can now be stored.** Before it, entities
+had a schema and a service and no way in. They are inert once stored, but the
+precise state is "storable and never compiled" rather than "impossible", and that
+distinction is what the join will remove.
+
+A fix — shared plain-value primitives both schemas draw from, so they cannot
+drift apart again — is written but **not merged at the time of this entry**. The
+divergence above is what is true of main right now.
+
 ### Still true
 
 Nothing publishes: the gate has a caller and a button, and refuses every package.
