@@ -28,6 +28,7 @@ describe('which sources the job can check by itself', () => {
         'Retrieved: https://dfpi.ca.gov/x.pdf',
         `SourceDigest: ${'a'.repeat(64)}`,
       ]),
+      sidecar,
       now,
     );
 
@@ -43,6 +44,7 @@ describe('which sources the job can check by itself', () => {
     const entry = watchedSource(
       'CA-10CCR-900-956.txt',
       header(['Publisher: DFPI', 'Retrieved: https://dfpi.ca.gov/x.pdf']),
+      sidecar,
       now,
     );
 
