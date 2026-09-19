@@ -15,6 +15,118 @@ true *right now*.
 
 _Last updated: 2026-09-19_
 
+## 2026-09-19 — baselining a source, printing Appendix A, and one page for the builder (#335–#338)
+
+Four PRs merged: #336 `04bd2d965`, #337 `6b06b73dd`, #335 `4c9e22372`, #338
+`029ffda29`. **Main is `029ffda29`.** Production runs `454f6047e` and this batch
+is not deployed at the time of writing. **No migrations.**
+
+### The machine half of setting a baseline, and an audit of it (#335)
+
+#329 shipped a check with nothing to compare against — all nineteen sources
+reported as needing a person. This is the tooling that creates a baseline, built
+so the mechanical parts cannot make the assertion on a person's behalf: three
+steps whose order is enforced rather than documented, and **two signatures,
+because "where would an amendment appear" is not "where did the text come from"**.
+Answering the second in place of the first is what left eleven frozen pages in
+the sidecar. **One source is now baselined**; the check reports `AUTOMATIC (1)`.
+
+**The audit is the substance.** The procedure had been written retrospectively by
+the session that did the first source by hand and already knew the answer, so the
+branch was deliberately held without a PR until a fresh session ran it **cold**,
+against a different state, with signing forbidden. It found four defects; a fifth
+surfaced while fixing them. Every one was reproduced before being fixed.
+
+The serious one: **the central guarantee was bypassable by anything that could
+write JSON.** The waiver filter subtracted every named reason *including the
+signature failures*, so `acknowledged: ['READING_ATTESTATION_WRONG']` beside a
+signature reading "looks fine to me" applied cleanly. Four reasons are now
+non-waivable. **The test that appeared to cover this set `signOff` to null, so
+`acknowledged` was empty and the subtraction never ran.**
+
+The one worth knowing operationally: Georgia serves enrolled bills with no
+`Content-Type` and no `.pdf` in the path, so a 13-page PDF produced 16,674
+characters of **PDF syntax** — not empty, so the extraction guard would not have
+caught it, and it would have been digested and signed as statute. Magic-byte
+sniffing now.
+
+**What is still wrong with it, found by a second cold run after this merged.**
+`readyToApply` was made defensive against fields being *absent* and does nothing
+about them being *malformed*: `{ method: 'x' }` with no verdict applies,
+`verdict: 'maybe'` applies, and some shapes still throw out of the gate. It does
+not parse before it reasons. And **the claim, in both that PR's body and its
+note, that the gate refuses a page without a screenshot is false** — the guard is
+`page.screenshot === null`, so an *absent* screenshot does not block. A third
+cold run is queued before the fix is opened, because each of two rounds has found
+the previous round incomplete.
+
+**Georgia is unresolvable automatically**: the official text sits behind a
+CAPTCHA, Justia returns 403 to the watcher's user-agent, and substituting a
+secondary publisher would make the digest assert that a third party's rendering
+is the statute. It stays manual, which the check already reports as overdue.
+
+### The Appendix prints, and the document has a cover (#336, #337)
+
+Issue #326: the fee schedule was collected and never printed, so #284's Appendix
+A work did not reach the rendered document. It now prints as five columns — the
+five facts `frpa.appendix-a-fees-collectible` requires — with the amount-or-method
+discriminated union and an explicit empty case, since an unlisted fee is $0.00 by
+the clause's own terms. #337 adds the cover page and running head, closing #327
+and the remainder of #276.
+
+### One page for the builder, and three boundaries that were wrong (#338)
+
+Entities and templates now live on one page, shaped like the lease builder, and
+the entity interview is eleven steps rather than two tabs.
+
+**Splitting it moved three fields onto the wrong step.** The split was done by a
+script walking backwards from each field to its opening tag, and the walk accepted
+`<Check` as well as `<Choice`, so three boundaries landed one element early. One
+was loud: `supportedTermsConfirmed` rendered under the `venue` guard, so the step
+that stated the constraint offered nothing to agree to, and an E2E timed out on a
+checkbox that genuinely was not there.
+
+**Two were silent, and they are the finding.** `disputeResolution` was counted on
+one step and rendered on another; so was `renewalModel`. **No test failed for
+either.** The rail would report an answer outstanding and show nothing to answer
+it — which nobody reports as a bug. They conclude the rail is wrong and stop
+reading it. Checking the other boundaries rather than assuming only the loud one
+was broken turned one visible defect into three real ones.
+
+`interview-steps-hold-their-fields.test.ts` now reads both lists out of the source
+and compares them in both directions, because the rail's counts and the rendered
+questions were two lists with nothing making them agree.
+
+**A leaked access grant, introduced by #330 and found while tracing this.** That
+spec's `cleanup` deleted only the user-scoped feature grant — the only scope
+anything wrote until #330 added the per-organisation toggle and the spec started
+clicking it. The organisation row was surviving cleanup and leaking into whatever
+ran next, which is exactly the shape that makes an unrelated access test go red.
+It now clears both scopes.
+
+### A failure mode worth naming, because it happened four times
+
+Twice in the implementing session's work and twice in this session's review, a
+check passed while covering less than it claimed:
+
+- the acknowledgement test that set `signOff` to null, so the branch it meant to
+  exercise never ran;
+- a source-reading test whose parse matched **nine of eleven** entries, because
+  the formatter wraps a long field list and keeps a short one inline — it now
+  carries an assertion whose only job is to fail when the parse goes vacuous;
+- a review that read test *names* — "refuses a page with no screenshot recorded" —
+  as evidence the class was covered, and so merged the absent-versus-null gap
+  above;
+- a triage that listed every `✘` in a Playwright log as a failure, when two of
+  them were followed by `✓ (retry #1)`. The run's real tally was **1 failed, 4
+  flaky, 1178 passed**. Two tests were called deterministic that were not, and one
+  was nearly investigated for nothing.
+
+The tell is the same every time: **asserting on a proxy for the property rather
+than the property, because the proxy is cheaper to compute.** A test name is a
+proxy for coverage; a `✘` is a proxy for a failure; a parse that finds *most*
+entries is a proxy for finding them all.
+
 ## 2026-09-19 — the only access grant was unscoped, and statutes get watched (#330, #329)
 
 Two PRs merged: #330 `ac9d5b1f0` and #329 `6410c30af`. **Main is `6410c30af`.**
