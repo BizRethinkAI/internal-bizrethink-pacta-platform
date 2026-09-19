@@ -167,3 +167,22 @@ entry makes the provenance of the URL explicit so the pass can correct it.
 - Ran the real job: 0 automatic, 19 needing a person — the honest state.
 - Ran the extractor against the live Texas page, which is how the frozen-URL
   finding surfaced.
+
+### Review finding #329-1 — the workflow pinned a literal Node 22
+
+Correct finding. `.github/actions/node-install` defaults to `v24.x` and the only
+literal left on main is `pr-discipline.yml: 24`, whose own comment calls it "the
+last literal version left" after the 20-to-24 EOL sweep. This job added a second
+one, at a *lower* version than everything else in the repo — so the first change
+here relying on a 24 feature would break a monthly job nobody is watching, for a
+reason with nothing to do with statutes.
+
+Fixed with `node-version-file: .node-version` rather than the literal `24` the
+review offered, because that is what `governance.yml` and
+`state-ready-to-ship.yml` already do and it cannot go stale. `.node-version` is
+also the real pin rather than a preference: `engines.node` is `>=24.0.0`, which
+admits 25 and 26, and zod-prisma-types calls `fs.rmdirSync(path, {recursive:
+true})`, which throws after 24 — `ci.yml` records the measurement.
+
+Not the composite action: it runs `npm ci --no-audit` and `prisma:generate`, and
+this job needs `tsx` alone and no database client.

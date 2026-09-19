@@ -36,9 +36,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # `.node-version`, not a literal and not `./.github/actions/node-install`.
+      #
+      # A literal is what the 20-to-24 EOL sweep removed, and this job would
+      # have been the second one left — at a LOWER version than the rest of the
+      # repo, so the first change here relying on a 24 feature would break a
+      # monthly job nobody is watching, for a reason that has nothing to do with
+      # statutes. `.node-version` is also the real pin rather than a preference:
+      # `engines.node` admits 25 and 26, and zod-prisma-types' `fs.rmdirSync`
+      # throws after 24 (ci.yml records the measurement).
+      #
+      # The composite action would be the other way to inherit it, but it runs
+      # `npm ci --no-audit` and `prisma:generate` — a database client this job
+      # has no use for, and an env var it would have to be given.
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
 
       # `npm ci` for `tsx` alone: the script imports the comparison rule from
       # the package where it is tested, rather than carrying its own copy.
