@@ -123,3 +123,47 @@ describe('textFromHtml', () => {
     expect(textFromHtml('<html><head><script>x()</script></head><body></body></html>')).toBe('');
   });
 });
+
+/**
+ * The class CodeQL named: `js/incomplete-multi-character-sanitization`.
+ *
+ * The first version stripped markup with a sequence of `.replace()` calls, and
+ * one pass over `<scr<script>ipt>` removes the inner tag and leaves a live one
+ * behind. Nothing here is rendered as HTML — the result is hashed and compared,
+ * and the report never carries fetched text — so it was not exploitable. It was
+ * still a function shaped like a sanitizer that was not one, which is a trap
+ * for whoever reaches for it next.
+ *
+ * These pin the scan, not the two alerts.
+ */
+describe('markup cannot survive the scan', () => {
+  it('leaves no tag behind when tags are nested inside a tag name', () => {
+    expect(textFromHtml('<scr<script>ipt>alert(1)</script>Statute.')).not.toContain('<');
+  });
+
+  it('leaves no comment opener behind when comments are nested', () => {
+    expect(textFromHtml('<!--<!-- build -->Statute.')).not.toContain('<!');
+  });
+
+  it('drops the body of a script nobody closed rather than reading it as text', () => {
+    // A browser does the same. Letting it through would put code in the digest.
+    expect(textFromHtml('<p>Statute.</p><script>var a = "<p>not text</p>";')).toBe('Statute.');
+  });
+
+  it('is not confused by a greater-than inside an attribute value', () => {
+    expect(textFromHtml('<p title="a > b">Statute.</p>')).toBe('Statute.');
+  });
+
+  /*
+    A statute may write a bare `<` and mean it. Treating it as the start of a
+    tag would silently eat the words after it, which is the one outcome that
+    matters more than tidiness.
+  */
+  it('keeps a bare less-than that begins no tag', () => {
+    expect(textFromHtml('<p>amounts &lt; $500 and a < b</p>')).toBe('amounts < $500 and a < b');
+  });
+
+  it('drops an svg without dropping what follows it', () => {
+    expect(textFromHtml('<p>Before.</p><svg><path d="M0 0"/></svg><p>After.</p>')).toBe('Before.\nAfter.');
+  });
+});

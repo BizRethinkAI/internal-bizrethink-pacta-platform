@@ -123,41 +123,147 @@ const decodeEntities = (text: string): string =>
     return NAMED_ENTITIES[body.toLowerCase()] ?? whole;
   });
 
-const escapeForClass = (names: string[]) => names.join('|');
+const DROPPED_SET = new Set(DROPPED);
+const BLOCKS_SET = new Set(BLOCKS);
 
-export const textFromHtml = (html: string): string => {
-  let text = html;
+/**
+ * Where the tag starting at `from` ends, honouring quoted attribute values.
+ *
+ * `<a title="a > b">` is one tag, not a tag ending at the `>` inside the
+ * quotes. Returns the index just past the closing `>`, or the end of the input
+ * for a tag nobody closed.
+ */
+const endOfTag = (html: string, from: number): number => {
+  let quote: string | null = null;
 
-  // Comments first: publishers keep build stamps and edit dates in them, and a
-  // comment can otherwise contain anything, including markup.
-  text = text.replace(/<!--[\s\S]*?-->/g, '');
+  for (let i = from + 1; i < html.length; i += 1) {
+    const ch = html[i];
 
-  // Doctype and processing instructions carry no words.
-  text = text.replace(/<![^>]*>/g, '');
+    if (quote !== null) {
+      if (ch === quote) {
+        quote = null;
+      }
 
-  // Whole bodies that are never the statute.
-  for (const tag of DROPPED) {
-    text = text.replace(new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}\\s*>`, 'gi'), ' ');
-    // A self-closed or unclosed one still has to lose its tag.
-    text = text.replace(new RegExp(`<\\/?${tag}\\b[^>]*>`, 'gi'), ' ');
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+    } else if (ch === '>') {
+      return i + 1;
+    }
   }
 
-  // Block boundaries become line breaks BEFORE the remaining tags are removed,
-  // so that what was a block boundary is still visible as one.
-  text = text.replace(new RegExp(`<\\/?(?:${escapeForClass(BLOCKS)})\\b[^>]*>`, 'gi'), '\n');
+  return html.length;
+};
 
-  // Everything left is inline — it separates nothing, so it leaves no space.
-  text = text.replace(/<[^>]*>/g, '');
+const tagNameAt = (html: string, from: number): { name: string; closing: boolean } => {
+  let i = from + 1;
+  const closing = html[i] === '/';
 
-  text = decodeEntities(text);
+  if (closing) {
+    i += 1;
+  }
+
+  const start = i;
+
+  while (i < html.length && /[a-z0-9]/i.test(html[i])) {
+    i += 1;
+  }
+
+  return { name: html.slice(start, i).toLowerCase(), closing };
+};
+
+/**
+ * ONE LINEAR PASS, not a sequence of regex replacements.
+ *
+ * The first version stripped markup with `.replace()` per construct, and CodeQL
+ * was right to call it `js/incomplete-multi-character-sanitization`: a single
+ * pass over `<scr<script>ipt>` removes the inner tag and leaves a live one
+ * behind. Nothing here is rendered as HTML — the result is hashed and compared,
+ * and `source-check.test.ts` asserts the fetched text never reaches the report —
+ * so it was not exploitable. But a function shaped like a sanitizer that is not
+ * one is a trap for whoever reaches for it next, and the scan below removes the
+ * whole class rather than the two alerts.
+ *
+ * It also cannot backtrack, so there is no ReDoS surface in a job that fetches
+ * pages we do not control.
+ */
+export const textFromHtml = (html: string): string => {
+  const out: string[] = [];
+  let i = 0;
+
+  while (i < html.length) {
+    if (html[i] !== '<') {
+      out.push(html[i]);
+      i += 1;
+
+      continue;
+    }
+
+    // Comments: publishers keep build stamps and edit dates in them, and a
+    // comment can otherwise contain anything, including markup.
+    if (html.startsWith('<!--', i)) {
+      const close = html.indexOf('-->', i + 4);
+
+      i = close === -1 ? html.length : close + 3;
+
+      continue;
+    }
+
+    // Doctype and processing instructions carry no words.
+    if (html.startsWith('<!', i) || html.startsWith('<?', i)) {
+      i = endOfTag(html, i);
+
+      continue;
+    }
+
+    const { name, closing } = tagNameAt(html, i);
+
+    // A bare `<` that begins no tag is text — a statute writing "less than".
+    if (name === '') {
+      out.push('<');
+      i += 1;
+
+      continue;
+    }
+
+    const afterTag = endOfTag(html, i);
+
+    if (DROPPED_SET.has(name)) {
+      if (closing) {
+        i = afterTag;
+
+        continue;
+      }
+
+      /*
+        Skip the whole body. Searched for case-insensitively from the end of the
+        opening tag, and an unclosed one swallows the rest of the document
+        rather than letting its contents through as text — which is what a
+        browser would do with it too.
+      */
+      const close = html.toLowerCase().indexOf(`</${name}`, afterTag);
+
+      i = close === -1 ? html.length : endOfTag(html, close);
+
+      continue;
+    }
+
+    // A block boundary has to survive as one, or two cells fuse into a word
+    // that is in neither of them. Everything else is inline and separates
+    // nothing.
+    out.push(BLOCKS_SET.has(name) ? '\n' : '');
+    i = afterTag;
+  }
 
   return (
-    text
+    decodeEntities(out.join(''))
       .split('\n')
       /*
       Horizontal whitespace only. A tab, a non-breaking space and a run of
-      indentation are all layout; a line break is the block structure that was
-      just recovered and has to survive to the join below.
+      indentation are all layout; a line break is the block structure just
+      recovered and has to survive to the join below.
     */
       .map((line) => line.replace(/[^\S\n]+/g, ' ').trim())
       .filter((line) => line !== '')
