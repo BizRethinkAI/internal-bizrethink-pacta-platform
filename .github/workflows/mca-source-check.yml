@@ -1,0 +1,68 @@
+name: MCA source check
+
+# ADR 0025 §3 — the monthly check that our stored copy of each statute still
+# matches what the publisher publishes.
+#
+# The provenance checkers in the test suite verify that a stored copy still
+# matches ITSELF, character by character. That catches our drift from the copy
+# and can never catch the copy drifting from the law. This is the other half.
+#
+# It REPORTS and never resolves: a statute that moved is a reading task, not a
+# merge, and nothing here writes to mca/sources/.
+#
+# It FAILS when something needs a person — a difference, a source that could not
+# be fetched, or a manual source that has gone too long unconfirmed. A check
+# that silently stops running is worse than no check, so a red run here is the
+# intended way for that to become visible.
+#
+# Monthly rather than on push: statutes do not change per commit, and a check
+# that runs constantly is a check nobody reads.
+
+on:
+  schedule:
+    # 06:00 UTC on the first of each month.
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Compare stored sources with their publishers
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # `.node-version`, not a literal and not `./.github/actions/node-install`.
+      #
+      # A literal is what the 20-to-24 EOL sweep removed, and this job would
+      # have been the second one left — at a LOWER version than the rest of the
+      # repo, so the first change here relying on a 24 feature would break a
+      # monthly job nobody is watching, for a reason that has nothing to do with
+      # statutes. `.node-version` is also the real pin rather than a preference:
+      # `engines.node` admits 25 and 26, and zod-prisma-types' `fs.rmdirSync`
+      # throws after 24 (ci.yml records the measurement).
+      #
+      # The composite action would be the other way to inherit it, but it runs
+      # `npm ci --no-audit` and `prisma:generate` — a database client this job
+      # has no use for, and an env var it would have to be given.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      # `npm ci` for `tsx` alone: the script imports the comparison rule from
+      # the package where it is tested, rather than carrying its own copy.
+      - name: Install
+        run: npm ci --ignore-scripts
+
+      # `VA-Disclosure-Form.pdf` is a prescribed form, so its words are the
+      # requirement and it has to be compared as text. This is the extraction
+      # the 2026-09-12 source audit used and recorded.
+      - name: Install pdftotext
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Check each source against its publisher
+        run: npx tsx scripts/mca/check-sources.ts
