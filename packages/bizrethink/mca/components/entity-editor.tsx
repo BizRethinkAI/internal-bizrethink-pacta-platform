@@ -370,16 +370,28 @@ export const McaEntityEditor = ({
                       </Trans>
                     </p>
                   </div>
+
+                  {/*
+                    THE CONFIRMATION BELONGS TO THE CONSTRAINT IT CONFIRMS.
+
+                    It briefly did not: the step boundary landed before this
+                    checkbox rather than after it, so "What this release
+                    supports" stated the constraint and offered nothing to
+                    agree to, while the venue step opened with a confirmation
+                    of something a page earlier. Caught by the E2E, which timed
+                    out waiting for a checkbox that was real and on the wrong
+                    step — and it is also the answer this step's rail count is
+                    counting.
+                  */}
+                  <Check
+                    name="policy.supportedTermsConfirmed"
+                    label={msg`I confirm this entity uses these supported terms`}
+                  />
                 </>
               )}
 
               {step === STEP_INDEX.venue && (
                 <>
-                  <Check
-                    name="policy.supportedTermsConfirmed"
-                    label={msg`I confirm this entity uses these supported terms`}
-                  />
-
                   <Choice
                     name="policy.venueRule"
                     label={msg`Where is an action under the Agreement brought?`}
@@ -417,11 +429,6 @@ export const McaEntityEditor = ({
                       />
                     </>
                   )}
-                </>
-              )}
-
-              {step === STEP_INDEX.guaranty && (
-                <>
                   <Choice
                     name="policy.disputeResolution"
                     label={msg`How are disputes resolved?`}
@@ -432,7 +439,11 @@ export const McaEntityEditor = ({
                     ]}
                     consequences={consequences}
                   />
+                </>
+              )}
 
+              {step === STEP_INDEX.guaranty && (
+                <>
                   <Choice
                     name="policy.guarantyScope"
                     label={msg`Does someone stand behind the merchant, and for how much?`}
@@ -444,11 +455,6 @@ export const McaEntityEditor = ({
                     ]}
                     consequences={consequences}
                   />
-                </>
-              )}
-
-              {step === STEP_INDEX.equipment && (
-                <>
                   <Choice
                     name="policy.renewalModel"
                     label={msg`Can a merchant renew before the balance is complete?`}
@@ -460,7 +466,11 @@ export const McaEntityEditor = ({
                     ]}
                     consequences={consequences}
                   />
+                </>
+              )}
 
+              {step === STEP_INDEX.equipment && (
+                <>
                   <Choice
                     name="policy.equipment"
                     label={msg`Does this programme place equipment?`}
