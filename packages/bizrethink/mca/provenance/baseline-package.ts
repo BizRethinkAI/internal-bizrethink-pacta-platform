@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * The package a person signs before a baseline is recorded.
  *
@@ -119,6 +121,90 @@ export type ApplyVerdict = { ok: true; pages: { url: string; digest: string }[] 
 const SHA256 = /^[a-f0-9]{64}$/i;
 
 /**
+ * THE PACKAGE'S SHAPE, CHECKED BEFORE ANYTHING REASONS ABOUT IT.
+ *
+ * An earlier fix read every field through `??`, which handles a field that is
+ * ABSENT and does nothing about one that is the wrong TYPE. An independent
+ * audit walked straight through it: `{ method: 'x' }` with no verdict applied,
+ * `verdict: 'maybe'` applied, and `method: 42`, `pages: {}` and a missing
+ * nested `amendmentAppearsAt` each threw a TypeError out of the gate.
+ *
+ * Patching those would leave a fourth. A package is a JSON file a person edits
+ * by hand, so its shape is exactly what a schema is for — and everything else
+ * in this package is validated with zod. Parsing first removes the class.
+ *
+ * `.passthrough()` rather than `.strict()`: an unknown field is a package from
+ * a newer version of this tool, which is not a reason to refuse a baseline a
+ * person has signed.
+ */
+const ZSignOff = z
+  .object({
+    by: z.string().min(1),
+    at: z.string().min(1),
+    confirms: z.string(),
+    acknowledged: z.array(z.string()).optional(),
+  })
+  .passthrough();
+
+const ZBaselinePackage = z
+  .object({
+    file: z.string().min(1),
+    mode: z.enum(['baseline', 'adjudicate']),
+    generatedAt: z.string().min(1),
+    pageIdentification: z
+      .object({
+        recordedPages: z.array(z.object({ url: z.string(), provenance: z.string() }).passthrough()),
+        amendmentAppearsAt: z.array(z.string().min(1)).nullable(),
+        reasoning: z.string().nullable(),
+        signOff: ZSignOff.nullable(),
+      })
+      .passthrough(),
+    baseline: z
+      .object({
+        pages: z.array(
+          z
+            .object({
+              url: z.string().min(1),
+              finalUrl: z.string().min(1),
+              httpStatus: z.number(),
+              contentType: z.string().nullable(),
+              extractedChars: z.number(),
+              extractedDigest: z.string(),
+              /*
+                EVIDENCE, NOT A NOTE. The screenshot is the only instrument that
+                catches a page which is a consent gate, a stub, or the wrong
+                heading entirely — the audit caught a Missouri capture showing
+                §40.405 above the commercial-financing body. A blank path is no
+                evidence, so it is refused like a missing one.
+              */
+              screenshot: z.string().trim().min(1).nullable(),
+            })
+            .passthrough(),
+        ),
+        /*
+          A verdict and findings, not just a method. Requiring one non-blank
+          sentence does not establish that a comparison happened; the audit's
+          words for what that produces are "vague comparison paperwork".
+        */
+        textComparison: z
+          .object({
+            method: z.string().trim().min(1),
+            verdict: z.enum(['equivalent', 'differs']),
+            findings: z.string().trim().min(1),
+          })
+          .passthrough()
+          .nullable(),
+        visionCorroboration: z
+          .object({ agreesWithTextVerdict: z.boolean(), notes: z.string() })
+          .passthrough()
+          .nullable(),
+        signOff: ZSignOff.nullable(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+
+/**
  * Reasons an acknowledgement can never clear.
  *
  * The filter used to subtract every named reason, so
@@ -154,23 +240,30 @@ export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
   const blocked: string[] = [];
 
   /*
-    READ EVERYTHING DEFENSIVELY. A package is a JSON file a person edits by
-    hand, so a missing field, an older shape or a typo is ordinary rather than
-    exceptional — and the gate has to REFUSE those, not throw on them. It did
-    throw: `textComparison === null` is false when the field is absent, and
-    reading `.method` off `undefined` threw a TypeError straight out of here.
-    A gate that crashes has not said no, it has said nothing.
+    PARSE, THEN REASON. A gate that crashes has not said no — it has said
+    nothing, and a caller that catches would be free to read that as anything.
   */
-  const identification = pkg.pageIdentification ?? {
-    recordedPages: [],
-    amendmentAppearsAt: null,
-    reasoning: null,
-    signOff: null,
-  };
-  const baseline = pkg.baseline ?? { pages: [], textComparison: null, visionCorroboration: null, signOff: null };
-  const pages = baseline.pages ?? [];
-  const textComparison = baseline.textComparison ?? null;
-  const visionCorroboration = baseline.visionCorroboration ?? null;
+  const parsed = ZBaselinePackage.safeParse(pkg);
+
+  if (!parsed.success) {
+    /*
+      Reported as ONE reason with the paths, rather than as a pile of missing
+      signatures. A malformed package is a different problem from an unsigned
+      one and sending somebody to sign it would be the wrong instruction.
+    */
+    return {
+      ok: false,
+      blocked: [
+        'PACKAGE_MALFORMED',
+        ...parsed.error.issues.map((issue) => `  ${issue.path.join('.')}: ${issue.message}`),
+      ],
+    };
+  }
+
+  const { pageIdentification: identification, baseline } = parsed.data;
+  const pages = baseline.pages;
+  const textComparison = baseline.textComparison;
+  const visionCorroboration = baseline.visionCorroboration;
 
   if (!signedWith(identification.signOff ?? null, PAGE_IDENTIFICATION_ATTESTATION)) {
     blocked.push(
@@ -236,7 +329,7 @@ export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
     }
   }
 
-  if (textComparison === null || (textComparison.method ?? '').trim() === '') {
+  if (textComparison === null) {
     blocked.push('NO_TEXT_COMPARISON');
   } else if (textComparison.verdict === 'differs') {
     blocked.push('TEXT_COMPARISON_DIFFERS');

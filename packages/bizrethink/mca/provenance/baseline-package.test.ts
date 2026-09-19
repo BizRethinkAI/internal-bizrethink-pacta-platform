@@ -484,3 +484,105 @@ describe('a malformed or older package is refused, never thrown on', () => {
     expect(readyToApply({} as BaselinePackage)).toMatchObject({ ok: false });
   });
 });
+
+/**
+ * A SECOND AUDIT, AND THE LESSON FROM IT.
+ *
+ * The first audit found the gate threw on a package with a missing field. The
+ * fix read every field through `??`, which handles ABSENT and does nothing
+ * about MALFORMED — so the second audit walked straight through it:
+ *
+ *   - `{ method: 'x' }` with no verdict and no findings APPLIED;
+ *   - `verdict: 'maybe'` APPLIED;
+ *   - `method: 42` threw `TypeError: .trim is not a function`;
+ *   - `pages: {}` threw `pages.map is not a function`;
+ *   - a missing nested `amendmentAppearsAt` threw on `.length`.
+ *
+ * Patching those three would leave a fourth. A package is a JSON file a person
+ * edits by hand, so its shape is exactly what a schema is for, and this package
+ * validates everything else it touches with zod. `readyToApply` now parses
+ * before it reasons, and a package that does not parse is refused rather than
+ * thrown on — the whole class, not the five instances.
+ *
+ * And a claim I had made that was simply false: the in-flight note and the PR
+ * body both said the gate refuses a page without a screenshot. It did not.
+ * Only an explicit `null` blocked; omitted and empty string both applied.
+ */
+describe('a malformed package is refused, whatever shape the malformation takes', () => {
+  // Deliberately untyped: the point is packages TypeScript would never produce
+  // but a person hand-editing JSON does, which is what the gate has to survive.
+  // biome-ignore lint/suspicious/noExplicitAny: reproducing hand-edited JSON
+  const bad = (mutate: (pkg: any) => void): BaselinePackage => {
+    const pkg = complete() as unknown;
+    mutate(pkg);
+
+    return pkg as BaselinePackage;
+  };
+
+  const refused = (pkg: BaselinePackage) => {
+    expect(() => readyToApply(pkg)).not.toThrow();
+    expect(readyToApply(pkg)).toMatchObject({ ok: false });
+  };
+
+  it('refuses a text comparison with a method and nothing else', () => {
+    refused(bad((pkg) => Object.assign(pkg.baseline, { textComparison: { method: 'x' } })));
+  });
+
+  it('refuses a verdict that is not one of the two', () => {
+    refused(
+      bad((pkg) => Object.assign(pkg.baseline, { textComparison: { method: 'x', verdict: 'maybe', findings: 'f' } })),
+    );
+  });
+
+  it('refuses findings that say nothing', () => {
+    refused(
+      bad((pkg) =>
+        Object.assign(pkg.baseline, { textComparison: { method: 'x', verdict: 'equivalent', findings: '' } }),
+      ),
+    );
+  });
+
+  it('refuses a method that is not a string', () => {
+    refused(
+      bad((pkg) =>
+        Object.assign(pkg.baseline, { textComparison: { method: 42, verdict: 'equivalent', findings: 'f' } }),
+      ),
+    );
+  });
+
+  it('refuses pages that are not a list', () => {
+    refused(bad((pkg) => Object.assign(pkg.baseline, { pages: {} })));
+  });
+
+  it('refuses a missing amendmentAppearsAt', () => {
+    refused(bad((pkg) => Object.assign(pkg.pageIdentification, { amendmentAppearsAt: undefined })));
+  });
+
+  it('refuses a digest that is not a string', () => {
+    refused(bad((pkg) => Object.assign(pkg.baseline.pages[0], { extractedDigest: 12345 })));
+  });
+
+  /*
+    THE FALSE CLAIM. Screenshot evidence is the only instrument that catches a
+    page which is a consent gate, a stub or the wrong heading entirely — the
+    second audit caught a Missouri capture showing §40.405 above the
+    commercial-financing body — so a page without one must not apply.
+  */
+  it('refuses a page whose screenshot is omitted', () => {
+    refused(bad((pkg) => Object.assign(pkg.baseline.pages[0], { screenshot: undefined })));
+  });
+
+  it('refuses a page whose screenshot is an empty string', () => {
+    refused(bad((pkg) => Object.assign(pkg.baseline.pages[0], { screenshot: '   ' })));
+  });
+
+  it('still applies a package that is actually well formed', () => {
+    expect(readyToApply(complete())).toMatchObject({ ok: true });
+  });
+
+  it('names the shape problem rather than reporting it as a missing signature', () => {
+    const verdict = readyToApply(bad((pkg) => Object.assign(pkg.baseline, { pages: {} })));
+
+    expect(verdict.ok === false && verdict.blocked).toContain('PACKAGE_MALFORMED');
+  });
+});

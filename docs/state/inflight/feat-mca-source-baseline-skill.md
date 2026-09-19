@@ -201,6 +201,75 @@ Its digest is unchanged and the monthly check still reports `AUTOMATIC (1)`.
 the owner signed, moved out of prose into the field the gate now requires —
 the package records that it was backfilled and that nothing was re-decided.
 
+## A second audit, and what it says about the first fix
+
+The same independent session re-ran the procedure cold against Missouri. It
+confirmed the PDF fix works — the Georgia endpoint again arrived with no
+`Content-Type` and no `.pdf`, and now yields 24,026 characters of statute — and
+then walked through three of the others.
+
+### Defensive against ABSENT is not defensive against MALFORMED
+
+The first audit found the gate threw on a package with a missing field. The fix
+read every field through `??`. That handles a field that is not there and does
+nothing about one that is the wrong type, and the second audit demonstrated it:
+
+- `{ method: 'x' }` with no verdict and no findings **applied**;
+- `verdict: 'maybe'` **applied**;
+- `method: 42` threw `TypeError: .trim is not a function`;
+- `pages: {}` threw `pages.map is not a function`;
+- a missing nested `amendmentAppearsAt` threw on `.length`.
+
+Patching those would have left a fourth. A package is a JSON file a person
+edits by hand, so its shape is what a schema is for, and everything else here is
+validated with zod. `readyToApply` now **parses before it reasons** and reports
+`PACKAGE_MALFORMED` with the offending paths — a different problem from an
+unsigned package, and sending somebody to sign it would be the wrong
+instruction.
+
+### A claim of mine that was simply false
+
+The in-flight note and the PR body both said the gate refuses a page without a
+screenshot. **It did not.** Only an explicit `null` blocked; an omitted field
+and an empty string both applied. The schema now requires a non-blank path.
+
+That matters more than it sounds: the same audit caught a Missouri screenshot
+showing §40.405 — larceny and court-martial — above the commercial-financing
+body, with §427.300 elsewhere on the page. A check that the section number
+"appears somewhere" would have passed it. The screenshot is the instrument that
+catches that, so a page without one cannot apply.
+
+### The re-fetch invalidation was half a fix
+
+Clearing the signature in memory and saving only after every page succeeded
+still leaves freshly written extraction files on disk beside a package carrying
+the old signature, if a later page fails. The invalidation is now written
+**before the first request goes out**, so a crash, a 404 or a Ctrl-C leaves an
+unsigned package next to whatever was fetched. Worse-looking, and true.
+
+### Two smaller ones
+
+- **Every stored source was read as `latin1`**, so a UTF-8 statute came back
+  with `§` as `Â§` and the "characters" it reported were bytes. Text sources now
+  read UTF-8; `VA-Disclosure-Form.pdf` is genuinely binary and keeps the
+  byte-preserving read.
+- **The CLI claimed to produce a diff it does not produce.** It now says so, and
+  says what `textComparison.method` has to carry instead.
+
+### Still open from that audit, and not fixed here
+
+- **`textComparison` is enforced but not established.** A verdict and findings
+  are now required and typed, which stops the vaguest paperwork, but nothing
+  checks that a comparison actually happened. The auditor wrote one — bounding
+  the statutory text, excluding editorial chrome, normalising, comparing every
+  character across all eight subsections — and showed it catching a mutated
+  exemption threshold that a disclosure-only comparison missed. Turning that
+  into a helper the script offers is the real fix and is a separate change.
+- **"Prefer a URL with no year in it" is the wrong rule.** Missouri's historical
+  and current links are both yearless, and a pinned historical version passes
+  the edition check. The publisher's own persistent bookmark is the distinction.
+- **"A miss is usually normalisation" is dangerous reassurance** and should go.
+
 ## Not done here
 
 - The remaining eighteen sources.

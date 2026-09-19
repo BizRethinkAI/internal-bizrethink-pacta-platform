@@ -56,6 +56,19 @@ const packagePath = (file: string) => join(OUT, `${file}.json`);
 
 const readPackage = (path: string): BaselinePackage => JSON.parse(readFileSync(path, 'utf8'));
 
+/**
+ * Read a stored source as the text it is.
+ *
+ * This read `latin1` for every file, so a UTF-8 statute came back with its
+ * punctuation mangled — `§` as `Â§` — and the character count it printed was
+ * the byte count. Harmless for the header parser that first wanted bytes;
+ * wrong for a summary a person reads and for anything compared against a
+ * fetched page. `VA-Disclosure-Form.pdf` is genuinely binary and keeps the
+ * byte-preserving read.
+ */
+const readStoredSource = (file: string): string =>
+  readFileSync(join(SOURCES, file), file.toLowerCase().endsWith('.pdf') ? 'latin1' : 'utf8');
+
 const writePackage = (path: string, pkg: BaselinePackage) => {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`);
@@ -85,7 +98,7 @@ const collect = (file: string) => {
     die(`${file} is not in mca/sources/`);
   }
 
-  const stored = readFileSync(join(SOURCES, file), 'latin1');
+  const stored = readStoredSource(file);
 
   const pkg: BaselinePackage = {
     file,
@@ -141,14 +154,22 @@ const fetchStep = async (path: string) => {
     die('Refusing to fetch: amendmentAppearsAt is empty, so there is nothing identified to watch.');
   }
 
-  const stored = readFileSync(join(SOURCES, pkg.file), 'latin1');
+  const stored = readStoredSource(pkg.file);
 
   /*
-    A RE-FETCH INVALIDATES THE READING. This used to replace `pages` and leave
-    the reading signature, the comparison and the vision verdict untouched, so
-    fetching again after somebody had signed carried their signature onto
-    content they had never seen — the exact substitution the signature exists
-    to prevent. Found by an independent audit.
+    A RE-FETCH INVALIDATES THE READING, AND DOES IT ON DISK FIRST.
+
+    The first version replaced `pages` and left the reading signature, the
+    comparison and the vision verdict untouched, so fetching again after
+    somebody had signed carried their signature onto content they had never
+    seen. The fix cleared them IN MEMORY and saved only once every page had
+    been fetched — which a second audit pointed out is still wrong: a later
+    page failing leaves freshly written extraction files on disk beside a
+    package that still carries the old signature.
+
+    So the invalidation is written before the first request goes out. A crash,
+    a 404 or a Ctrl-C now leaves an unsigned package next to whatever was
+    fetched, which is accurate. Worse-looking, and true.
   */
   if (pkg.baseline.signOff !== null || pkg.baseline.textComparison !== null) {
     console.log('  (re-fetch: clearing the previous reading, comparison and vision verdict)');
@@ -158,6 +179,7 @@ const fetchStep = async (path: string) => {
   pkg.baseline.signOff = null;
   pkg.baseline.textComparison = null;
   pkg.baseline.visionCorroboration = null;
+  writePackage(path, pkg);
 
   for (const url of amendmentAppearsAt) {
     process.stdout.write(`  fetching ${url} … `);
@@ -193,9 +215,13 @@ const fetchStep = async (path: string) => {
   console.log(`Stored copy:  ${stored.length} characters, for the reading comparison.`);
   console.log('');
   console.log('STEP 2 — read the page against our stored copy.');
-  console.log('  The text diff is the verdict. A screenshot and a vision reading corroborate it and');
-  console.log('  are the evidence of what the page looked like; record them on each page and in');
-  console.log('  `visionCorroboration`. Vision disagreeing with the text is itself a finding.');
+  console.log('  THIS SCRIPT PRODUCES NO DIFF. It fetched, extracted and digested; comparing the');
+  console.log('  extraction above against the stored copy is yours, and `textComparison.method`');
+  console.log('  has to say how you did it — the stored file and the published page are often');
+  console.log('  different publications of the same law, so what counts as equivalent depends');
+  console.log('  entirely on what was compared. A verdict and findings are required with it.');
+  console.log('  A screenshot and a vision reading corroborate that comparison and are the');
+  console.log('  evidence of what the page looked like. Vision disagreeing is itself a finding.');
   console.log('');
   console.log(`  Then sign baseline.signOff with exactly:\n    confirms: "${READING_ATTESTATION}"`);
   console.log(`  Then: npx tsx scripts/mca/source-baseline.ts apply ${path}`);
