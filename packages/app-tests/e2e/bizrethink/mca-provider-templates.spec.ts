@@ -272,9 +272,17 @@ test('an entity is added once, then a template is created against it and revised
       in was to know the URL; a test that types the URL cannot notice that.
     */
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca`);
-    await page.getByRole('link', { name: 'Entities', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Entities', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Add an entity', exact: true }).click();
+    await page.getByRole('link', { name: 'Add an entity', exact: true }).click();
+
+    /*
+      MOVED BY THE RAIL, NOT BY WALKING. The interview is eleven steps and
+      every one of them is reachable — an interview that forced a strict order
+      would be one you could not correct a typo in without walking the whole
+      thing. Jumping is what a person does, so it is what the test does.
+    */
+    const rail = page.getByRole('navigation', { name: 'The interview' });
+    const goToStep = (title: string) => rail.getByRole('button', { name: new RegExp(title) }).click();
 
     await page.getByLabel('Name for this entity in Pacta', { exact: true }).fill(entity.label);
 
@@ -283,6 +291,13 @@ test('an entity is added once, then a template is created against it and revised
       ['Entity type, for example corporation', entity.identity.entityType],
       ['State of organisation', entity.identity.organizationState],
       ['Principal address', entity.identity.address],
+    ] as const) {
+      await page.getByLabel(label, { exact: true }).fill(value);
+    }
+
+    await goToStep('Notices and servicing');
+
+    for (const [label, value] of [
       ['Notice email', entity.identity.noticeEmail],
       ['Notice mailing address', entity.identity.noticeAddress],
       ['Reconciliation email', entity.identity.reconciliationEmail],
@@ -291,8 +306,9 @@ test('an entity is added once, then a template is created against it and revised
       await page.getByLabel(label, { exact: true }).fill(value);
     }
 
-    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await goToStep('What this release supports');
     await page.getByLabel('I confirm this entity uses these supported terms', { exact: true }).check();
+    await goToStep('Guaranty and renewal');
 
     /*
       RADIOS, NOT DROPDOWNS. The interview shows what each answer would do to
@@ -311,10 +327,15 @@ test('an entity is added once, then a template is created against it and revised
       page at all — a silent failure here would leave the interview explaining
       nothing while still looking complete.
     */
+    await goToStep('Venue and disputes');
+
     const dispute = page.locator('[data-mca-question="policy.disputeResolution"]');
     await expect(dispute.locator('[data-mca-consequence]').first()).toContainText('Arbitration');
+
+    await goToStep('Where you fund');
     await page.getByRole('button', { name: 'Florida', exact: true }).click();
     await page.getByRole('button', { name: 'New York', exact: true }).click();
+    await goToStep('Review');
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();
 
@@ -405,7 +426,7 @@ test('an entity is added once, then a template is created against it and revised
     */
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await expect(
-      page.getByRole('heading', { name: "How does this entity's programme run?", exact: true }),
+      page.getByRole('heading', { name: 'Where does a merchant write to this entity?', exact: true }),
     ).toBeVisible();
     // Advancing a step is not a save. The bug's signature was this reading 2.
     expect((await prisma.bizrethinkMcaEntity.findUniqueOrThrow({ where: { id: saved.id } })).version).toBe(1);
