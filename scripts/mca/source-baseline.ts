@@ -40,6 +40,7 @@ import {
   PAGE_IDENTIFICATION_ATTESTATION,
   READING_ATTESTATION,
   readyToApply,
+  sidecarEntryFor,
 } from '../../packages/bizrethink/mca/provenance/baseline-package';
 import { normalisedDigest } from '../../packages/bizrethink/mca/provenance/source-text';
 import { fetchPage } from './fetch-page';
@@ -207,7 +208,13 @@ const apply = (path: string) => {
   const path_ = join(SOURCES, 'provenance.json');
   const all = JSON.parse(readFileSync(path_, 'utf8'));
 
-  all[pkg.file] = { ...all[pkg.file], pages: verdict.pages.map(({ url, digest }) => ({ url, digest })) };
+  /*
+    The note is rewritten, not left alone. Writing digests and keeping the old
+    note gave Texas "URL from this file's own header. No baseline confirmed
+    yet." beside a researched URL and a signed digest — both clauses false, in
+    the file whose whole job is saying where things came from.
+  */
+  all[pkg.file] = { ...all[pkg.file], ...sidecarEntryFor(pkg) };
   writeFileSync(path_, `${JSON.stringify(all, null, 2)}\n`);
 
   console.log(`Recorded ${verdict.pages.length} baseline(s) for ${pkg.file}:`);

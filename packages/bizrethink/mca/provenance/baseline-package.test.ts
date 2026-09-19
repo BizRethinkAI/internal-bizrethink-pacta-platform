@@ -5,6 +5,7 @@ import {
   PAGE_IDENTIFICATION_ATTESTATION,
   READING_ATTESTATION,
   readyToApply,
+  sidecarEntryFor,
 } from './baseline-package';
 
 /**
@@ -244,5 +245,49 @@ describe('vision corroboration', () => {
     unsigned.baseline.signOff = null;
 
     expect(readyToApply(unsigned)).toMatchObject({ ok: false });
+  });
+});
+
+/**
+ * The note has to stop being true the moment it stops being true.
+ *
+ * `apply` first wrote the digests and left the sidecar `note` alone, so
+ * Texas's entry read "URL from this file's own header. No baseline confirmed
+ * yet." beside a URL that came from research and a digest a person had just
+ * signed. Both clauses false, in the one file whose entire job is saying where
+ * things came from. Caught by reading the diff.
+ */
+describe('sidecarEntryFor — what gets written next to the digest', () => {
+  it('records that the page was identified rather than inherited, and when', () => {
+    const entry = sidecarEntryFor(complete());
+
+    expect(entry.pages).toEqual([
+      {
+        url: 'https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm',
+        digest: 'a'.repeat(64),
+      },
+    ]);
+    expect(entry.note).toContain('2026-09-19');
+    expect(entry.note).not.toContain('No baseline confirmed yet');
+  });
+
+  /*
+    The superseded URL is kept, because "this is not where the text came from"
+    is the most surprising thing about the entry and deleting it would make the
+    record quieter and less true.
+  */
+  it('keeps the URL it replaced, so the change is legible', () => {
+    const entry = sidecarEntryFor(complete());
+
+    expect(entry.note).toContain('capitol.texas.gov');
+  });
+
+  it('does not claim a page was superseded when it was the recorded one', () => {
+    const same = complete();
+    same.pageIdentification.recordedPages = [
+      { url: 'https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm', provenance: 'header' },
+    ];
+
+    expect(sidecarEntryFor(same).note).not.toContain('supersedes');
   });
 });

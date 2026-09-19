@@ -88,11 +88,43 @@ two implementations would drift, and the first symptom would be every source
 reporting `differs` on the run after its baseline was set. The monthly check was
 re-run after the refactor and still behaves identically.
 
+## The first baseline is recorded
+
+`TX-Fin-Code-Ch-398.txt` went through all three steps with the owner signing
+both attestations. The monthly check now reports **AUTOMATIC (1)**, where it
+reported none: it fetched the codified chapter, compared it against the signed
+baseline and returned `ok`.
+
+The reading evidence, recorded in `visionCorroboration`:
+
+- 15 structural landmarks read off the owner's screenshot — Title 5, Chapter
+  398, all three subchapters, §§398.001-005, 398.051-056, 398.101-102, the
+  $10,000 penalty, the effective date — each confirmed present in the extracted
+  text by literal match.
+- The stored file is the ENROLLED BILL and the watched page is the CODIFIED
+  CHAPTER, so they differ by wrapper and that difference is expected rather than
+  a finding. All twelve phrases of the §398.051(a)(1)-(11) disclosure elements
+  our spec is built on appear in both, verbatim after normalisation. The only
+  divergences are wrappers: "Added by Acts 2025" source notes on the code side,
+  "BE IT ENACTED BY THE LEGISLATURE" / "Secretary of the Senate" / "Speaker of
+  the House" on the bill side. No operative provision differs.
+
+### A defect found by reading the diff
+
+`apply` wrote the digests and left the sidecar `note` alone, so the entry read
+"URL from this file's own header. No baseline confirmed yet." beside a URL that
+came from research and a digest that had just been signed — both clauses false,
+in the one file whose whole job is saying where things came from.
+
+`sidecarEntryFor` now rewrites it, and three tests pin it. The note it replaces
+is NOT carried forward: quoting "No baseline confirmed yet" inside the note that
+confirms a baseline reproduces the confusion being fixed, and what the entry used
+to say is git's job. The superseded URL IS kept, because "this is not where the
+text came from" is the most surprising thing about the entry.
+
 ## Not done here
 
-- The skill wrapper that drives the screenshots and the model, which is where
-  `visionCorroboration` gets filled. The contract it writes into is settled and
-  tested; the wrapper is not written.
-- Any baseline. Nothing in this branch signs anything, and `provenance.json` is
-  unchanged.
 - The remaining eighteen sources.
+- The skill lives at `~/.claude/skills/mca-source-baseline/SKILL.md`, outside
+  this repo, because this repo does not version `.claude/` — same as
+  `review-and-ship`. It is therefore not reviewable in this PR.

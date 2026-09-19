@@ -192,3 +192,41 @@ export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
     pages: pkg.baseline.pages.map((page) => ({ url: page.url, digest: page.extractedDigest })),
   };
 };
+
+/**
+ * What replaces the sidecar entry once a baseline is signed.
+ *
+ * `apply` used to write the digests and leave `note` alone, so Texas ended up
+ * reading "URL from this file's own header. No baseline confirmed yet." beside
+ * a URL that came from research and a digest a person had just signed — both
+ * clauses false, in the one file whose entire job is saying where things came
+ * from. A stale note is worse than no note, because it is read as current.
+ *
+ * The superseded URL is kept rather than dropped. "This is not where the text
+ * came from" is the most surprising thing about such an entry, and a record
+ * that quietly loses it is quieter and less true.
+ *
+ * The note it REPLACES is not carried forward. Quoting "No baseline confirmed
+ * yet" inside the note that confirms a baseline reproduces the confusion this
+ * exists to fix; what the entry used to say is git's job.
+ */
+export const sidecarEntryFor = (pkg: BaselinePackage): { pages: { url: string; digest: string }[]; note: string } => {
+  const verdict = readyToApply(pkg);
+
+  if (!verdict.ok) {
+    throw new Error(`Refusing to build a sidecar entry for an unapplied package: ${verdict.blocked.join(', ')}`);
+  }
+
+  const confirmedOn = pkg.baseline.signOff?.at ?? pkg.generatedAt.slice(0, 10);
+  const watched = new Set(verdict.pages.map((page) => page.url));
+  const superseded = pkg.pageIdentification.recordedPages.map((page) => page.url).filter((url) => !watched.has(url));
+
+  const note = [
+    `Baseline confirmed ${confirmedOn} against the page where an amendment would appear.`,
+    superseded.length > 0
+      ? `Page identified by research, not inherited: supersedes the recorded retrieval ${superseded.join(', ')}, a finished document that could never change.`
+      : 'Page identified as the one an amendment would appear on.',
+  ].join(' ');
+
+  return { pages: verdict.pages, note };
+};
