@@ -122,6 +122,85 @@ confirms a baseline reproduces the confusion being fixed, and what the entry use
 to say is git's job. The superseded URL IS kept, because "this is not where the
 text came from" is the most surprising thing about the entry.
 
+## An independent audit found four real defects
+
+The procedure was written retrospectively by the session that did Texas by
+hand, which already knew the answer. A fresh Codex session ran it cold against
+`GA-SB90-enrolled.txt` with signing forbidden. It found more than the document
+was worth, and every code finding below was reproduced before being fixed.
+
+**1. Signatures could be acknowledged away.** The waiver filter subtracted every
+named reason, including the signature failures — so `acknowledged:
+['READING_ATTESTATION_WRONG']` beside a signature reading "looks fine to me"
+applied cleanly. **The gate was bypassable by anything that could write JSON**,
+which is precisely what demanding an exact attestation sentence was meant to
+prevent. The four signature reasons are now non-waivable. The test that looked
+like it covered this set `signOff` to null, so `acknowledged` was empty and the
+subtraction never ran — it tested the adjacent case and read as coverage.
+
+**2. A PDF was routed to the HTML extractor.** Georgia serves its enrolled bills
+from `legis.ga.gov/api/legislation/document/<id>` with **no `Content-Type`
+header and no `.pdf` in the path**. Both of the fetcher's tests missed, so a
+13-page PDF went through `textFromHtml` and produced 16,674 characters of PDF
+syntax — not empty, so `NOTHING_EXTRACTED` would not have caught it, and it
+would have been digested and signed as though it were statute. Now sniffed by
+magic bytes first. After the fix the same URL yields 24,026 characters of real
+text carrying §10-1-393.18 and no PDF debris.
+
+**3. A re-fetch kept the previous reading signature.** `fetch` replaced `pages`
+and left `signOff` and the vision verdict intact, so fetching again after
+somebody signed carried their signature onto content they had never seen. It
+now clears the reading, the comparison and the vision verdict.
+
+**4. `agreesWithTextVerdict` had nothing to agree with.** The script extracts
+and hashes and never compares, while the procedure said "the text diff is the
+verdict" — describing an artifact that does not exist. A confident visual
+reading could therefore look like a completed verification. `textComparison` is
+now a required field with a required `method`, because what counts as
+equivalent depends entirely on what was compared.
+
+### And a fifth, found by running the fix
+
+`readyToApply` **threw** on the first package ever written, because
+`textComparison === null` is false when the field is absent and reading
+`.method` off `undefined` is a TypeError. A gate that crashes has not said no,
+it has said nothing. A package is a JSON file a person edits by hand, so a
+missing field or an older shape is ordinary rather than exceptional; the gate
+now reads everything defensively and four tests hold it to refusing rather than
+throwing, down to an empty object.
+
+### Corrections to the procedure itself
+
+- **"Bill and code differ only by wrappers" was the Texas result stated as a
+  general rule.** Georgia's stored file is an omnibus bill also carrying
+  operative real-estate and telephone-solicitation provisions, which are not
+  wrappers. The TX package's `findings` now says so against itself.
+- **Verification must go through the watcher's retrieval path.** Justia renders
+  in a browser and returns **403** to the watcher's user-agent; Georgia's
+  official Lexis gateway returns a bootstrap that extracts to zero characters.
+  A page only a human can fetch cannot be watched.
+- **An annual edition is another frozen document.** A `/2023/` codified page has
+  the right heading and is exactly as unamendable as the bill.
+- **UNRESOLVED is a legitimate step-1 outcome.** Georgia's official text sits
+  behind a CAPTCHA, so it has none and stays manual. Substituting a secondary
+  publisher would make the digest assert that a third party's rendering is the
+  statute.
+- `mode: 'adjudicate'` is a field, not a feature — `collect` always writes
+  `baseline` and carries no prior digest. The skill now says so.
+- The screenshot is **not** the only instrument that sees a consent gate;
+  response bodies, status codes and accessibility text often show it cheaper.
+
+The audit report and Georgia's unsigned package are under `output/`, which is
+gitignored. Both `signOff` fields there are null and no tracked file was
+modified by that run.
+
+### The Texas baseline stands
+
+Its digest is unchanged and the monthly check still reports `AUTOMATIC (1)`.
+`textComparison` was backfilled verbatim from the comparison presented before
+the owner signed, moved out of prose into the field the gate now requires —
+the package records that it was backfilled and that nothing was re-decided.
+
 ## Not done here
 
 - The remaining eighteen sources.

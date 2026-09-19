@@ -66,14 +66,34 @@ export const fetchPage = async (url: string): Promise<FetchedPage> => {
   }
 
   const contentType = response.headers.get('content-type');
-  const isPdf = (contentType ?? '').includes('pdf') || new URL(response.url).pathname.toLowerCase().endsWith('.pdf');
+  const bytes = Buffer.from(await response.arrayBuffer());
+
+  /*
+    THE BYTES DECIDE, not the headers or the URL.
+
+    Georgia publishes its enrolled bills from
+    `legis.ga.gov/api/legislation/document/<id>` — no `Content-Type` header at
+    all and no `.pdf` in the path, serving a 13-page PDF. Routing that to the
+    HTML extractor produced 16,674 characters of PDF syntax and decoding
+    debris, which is not empty, so `NOTHING_EXTRACTED` would not have caught
+    it: it would have been digested and signed as though it were statute.
+    Found by an independent audit and reproduced.
+
+    A magic-byte check is the only one of the three that cannot be wrong, so it
+    goes first and the other two remain as fallbacks for a server that declares
+    a PDF it does not send.
+  */
+  const isPdf =
+    bytes.subarray(0, 5).toString('latin1') === '%PDF-' ||
+    (contentType ?? '').includes('pdf') ||
+    new URL(response.url).pathname.toLowerCase().endsWith('.pdf');
 
   return {
     url,
     finalUrl: response.url,
     httpStatus: response.status,
     contentType,
-    text: isPdf ? textFromPdf(Buffer.from(await response.arrayBuffer())) : textFromHtml(await response.text()),
+    text: isPdf ? textFromPdf(bytes) : textFromHtml(bytes.toString('utf8')),
   };
 };
 

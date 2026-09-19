@@ -61,6 +61,11 @@ const complete = (): BaselinePackage => ({
   },
   baseline: {
     pages: [page('https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm')],
+    textComparison: {
+      method: 'Operative provisions of §398.051(a)(1)-(11) compared against the stored bill.',
+      verdict: 'equivalent',
+      findings: 'All eleven disclosure elements present in both; only bill/code wrappers differ.',
+    },
     visionCorroboration: { agreesWithTextVerdict: true, notes: 'Screenshot shows Finance Code Chapter 398.' },
     signOff: signed(READING_ATTESTATION),
   },
@@ -289,5 +294,193 @@ describe('sidecarEntryFor — what gets written next to the digest', () => {
     ];
 
     expect(sidecarEntryFor(same).note).not.toContain('supersedes');
+  });
+});
+
+/**
+ * FOUND BY AN INDEPENDENT AUDIT, and the most serious defect in this file.
+ *
+ * The acknowledgement filter subtracted EVERY named reason, including the
+ * signature failures — so `acknowledged: ['READING_ATTESTATION_WRONG']` beside
+ * a signature reading "looks fine to me" applied cleanly. The gate was
+ * bypassable by anything that could write JSON, which is precisely what
+ * demanding an exact attestation sentence was supposed to prevent.
+ *
+ * The test above it, "does not let acknowledgements substitute for a
+ * signature", set `signOff` to null — so `acknowledged` was empty and the
+ * subtraction never ran. It tested the adjacent case and read as coverage.
+ *
+ * A waiver is for a judgement a person made about the EVIDENCE. It was never
+ * meant to waive the requirement that a person be there at all.
+ */
+describe('signature failures cannot be acknowledged away', () => {
+  const withAck = (confirms: string, acknowledged: string[]) => {
+    const pkg = complete();
+    pkg.baseline.signOff = { by: 'x', at: '2026-09-19', confirms, acknowledged };
+
+    return pkg;
+  };
+
+  it('refuses a wrong reading attestation that names its own failure code', () => {
+    const verdict = readyToApply(withAck('looks fine to me', ['READING_ATTESTATION_WRONG']));
+
+    expect(verdict.ok).toBe(false);
+    expect(verdict.ok === false && verdict.blocked).toContain('READING_ATTESTATION_WRONG');
+  });
+
+  it('refuses a wrong page-identification attestation acknowledged from the reading signature', () => {
+    const pkg = complete();
+    pkg.pageIdentification.signOff = { by: 'x', at: '2026-09-19', confirms: 'nope' };
+    pkg.baseline.signOff = {
+      by: 'x',
+      at: '2026-09-19',
+      confirms: READING_ATTESTATION,
+      acknowledged: ['PAGE_IDENTIFICATION_ATTESTATION_WRONG'],
+    };
+
+    expect(readyToApply(pkg)).toMatchObject({ ok: false });
+  });
+
+  it('refuses when both attestations are wrong and both codes are acknowledged', () => {
+    const pkg = withAck('nope', ['READING_ATTESTATION_WRONG', 'PAGE_IDENTIFICATION_ATTESTATION_WRONG']);
+    pkg.pageIdentification.signOff = { by: 'x', at: '2026-09-19', confirms: 'also nope' };
+
+    expect(readyToApply(pkg)).toMatchObject({ ok: false });
+  });
+
+  it('still lets an evidence judgement be acknowledged', () => {
+    // The waiver exists for what a person decided about the evidence, and that
+    // still works — it is only the presence of the person that cannot be waived.
+    const pkg = complete();
+    pkg.baseline.visionCorroboration = { agreesWithTextVerdict: false, notes: 'Table reflowed, words identical.' };
+    pkg.baseline.signOff = {
+      by: 'repository owner',
+      at: '2026-09-19',
+      confirms: READING_ATTESTATION,
+      acknowledged: ['VISION_DISAGREES'],
+    };
+
+    expect(readyToApply(pkg)).toMatchObject({ ok: true });
+  });
+});
+
+/**
+ * `agreesWithTextVerdict` had nothing to agree with.
+ *
+ * The script never produced a comparison — `fetch` extracts and hashes and
+ * stops — while the skill told people "the text diff is the verdict". So the
+ * vision field could record agreement with an artifact that did not exist, and
+ * a confident visual reading would look like a completed verification. Also
+ * found by the audit.
+ */
+describe('vision corroborates a comparison that has to exist', () => {
+  it('refuses a package with no text comparison at all', () => {
+    const pkg = complete();
+    pkg.baseline.textComparison = null;
+
+    const verdict = readyToApply(pkg);
+
+    expect(verdict.ok).toBe(false);
+    expect(verdict.ok === false && verdict.blocked).toContain('NO_TEXT_COMPARISON');
+  });
+
+  it('refuses a comparison that does not say how it was made', () => {
+    const pkg = complete();
+    pkg.baseline.textComparison = { method: '', verdict: 'equivalent', findings: 'looks right' };
+
+    expect(readyToApply(pkg)).toMatchObject({ ok: false });
+  });
+
+  /*
+    A comparison that found a difference is not a reason to refuse — the stored
+    file and the published page are often different publications of the same
+    law. It has to be STATED, and then a person decides.
+  */
+  it('applies when a stated difference has been signed for', () => {
+    const pkg = complete();
+    pkg.baseline.textComparison = {
+      method: 'Operative provisions of §10-1-393.18 compared subsection by subsection.',
+      verdict: 'differs',
+      findings: 'The stored bill carries unrelated Part 2 provisions the codified section does not.',
+    };
+    pkg.baseline.signOff = {
+      by: 'repository owner',
+      at: '2026-09-19',
+      confirms: READING_ATTESTATION,
+      acknowledged: ['TEXT_COMPARISON_DIFFERS'],
+    };
+
+    expect(readyToApply(pkg)).toMatchObject({ ok: true });
+  });
+
+  it('refuses an unacknowledged difference', () => {
+    const pkg = complete();
+    pkg.baseline.textComparison = { method: 'm', verdict: 'differs', findings: 'f' };
+
+    expect(readyToApply(pkg)).toMatchObject({ ok: false });
+  });
+});
+
+/** Evidence has to be attached, not merely described. */
+describe('screenshot evidence', () => {
+  it('refuses a page with no screenshot recorded', () => {
+    const pkg = complete();
+    pkg.baseline.pages[0].screenshot = null;
+
+    const verdict = readyToApply(pkg);
+
+    expect(verdict.ok).toBe(false);
+    expect(verdict.ok === false && verdict.blocked).toContain('NO_SCREENSHOT');
+  });
+});
+
+/**
+ * A package is a JSON file a person edits by hand, so it will be malformed —
+ * a missing field, an older shape, a typo. The gate has to REFUSE those, not
+ * throw on them.
+ *
+ * `textComparison === null` was false for a package written before the field
+ * existed, where it is `undefined`, and reading `.method` off it threw a
+ * TypeError out of `readyToApply`. A gate that crashes has not said no; it has
+ * said nothing, and a caller that catches would be free to read that as
+ * anything at all. Found by running `apply` against the first package ever
+ * written.
+ */
+describe('a malformed or older package is refused, never thrown on', () => {
+  const stripped = (drop: (pkg: BaselinePackage) => void): BaselinePackage => {
+    const pkg = complete();
+    drop(pkg);
+
+    return pkg;
+  };
+
+  it('refuses a package written before textComparison existed', () => {
+    const old = stripped((pkg) => {
+      delete (pkg.baseline as { textComparison?: unknown }).textComparison;
+    });
+
+    expect(() => readyToApply(old)).not.toThrow();
+    expect(readyToApply(old)).toMatchObject({ ok: false });
+  });
+
+  it('refuses a package with no baseline section at all', () => {
+    const wrecked = { file: 'x.txt', mode: 'baseline', generatedAt: '2026-09-19' } as unknown as BaselinePackage;
+
+    expect(() => readyToApply(wrecked)).not.toThrow();
+    expect(readyToApply(wrecked)).toMatchObject({ ok: false });
+  });
+
+  it('refuses a package whose pages are missing', () => {
+    const noPages = stripped((pkg) => {
+      delete (pkg.baseline as { pages?: unknown }).pages;
+    });
+
+    expect(() => readyToApply(noPages)).not.toThrow();
+    expect(readyToApply(noPages)).toMatchObject({ ok: false });
+  });
+
+  it('refuses an entirely empty object', () => {
+    expect(() => readyToApply({} as BaselinePackage)).not.toThrow();
+    expect(readyToApply({} as BaselinePackage)).toMatchObject({ ok: false });
   });
 });

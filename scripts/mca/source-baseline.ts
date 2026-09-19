@@ -100,7 +100,7 @@ const collect = (file: string) => {
       reasoning: null,
       signOff: null,
     },
-    baseline: { pages: [], visionCorroboration: null, signOff: null },
+    baseline: { pages: [], textComparison: null, visionCorroboration: null, signOff: null },
   };
 
   const path = packagePath(file);
@@ -143,7 +143,21 @@ const fetchStep = async (path: string) => {
 
   const stored = readFileSync(join(SOURCES, pkg.file), 'latin1');
 
+  /*
+    A RE-FETCH INVALIDATES THE READING. This used to replace `pages` and leave
+    the reading signature, the comparison and the vision verdict untouched, so
+    fetching again after somebody had signed carried their signature onto
+    content they had never seen — the exact substitution the signature exists
+    to prevent. Found by an independent audit.
+  */
+  if (pkg.baseline.signOff !== null || pkg.baseline.textComparison !== null) {
+    console.log('  (re-fetch: clearing the previous reading, comparison and vision verdict)');
+  }
+
   pkg.baseline.pages = [];
+  pkg.baseline.signOff = null;
+  pkg.baseline.textComparison = null;
+  pkg.baseline.visionCorroboration = null;
 
   for (const url of amendmentAppearsAt) {
     process.stdout.write(`  fetching ${url} … `);

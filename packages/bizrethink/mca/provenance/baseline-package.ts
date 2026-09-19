@@ -84,6 +84,23 @@ export type BaselinePackage = {
   baseline: {
     pages: BaselinePage[];
     /**
+     * The comparison of the fetched page against our stored copy.
+     *
+     * REQUIRED, because `agreesWithTextVerdict` used to have nothing to agree
+     * with: the script extracts and hashes and never compares, while the
+     * procedure said "the text diff is the verdict". A vision field recording
+     * agreement with an artifact that did not exist made a confident visual
+     * reading look like a completed verification.
+     *
+     * `method` says how the comparison was made and is not optional, because
+     * the stored file and the published page are frequently different
+     * publications of the same law — a bill against a codified section — and
+     * what counts as equivalent depends entirely on what was compared.
+     * `differs` is a legitimate outcome; it has to be stated and signed for,
+     * not avoided.
+     */
+    textComparison: { method: string; verdict: 'equivalent' | 'differs'; findings: string } | null;
+    /**
      * Vision on the screenshot, against the text verdict.
      *
      * Corroboration, never the verdict: for statute text the authoritative
@@ -101,6 +118,27 @@ export type ApplyVerdict = { ok: true; pages: { url: string; digest: string }[] 
 
 const SHA256 = /^[a-f0-9]{64}$/i;
 
+/**
+ * Reasons an acknowledgement can never clear.
+ *
+ * The filter used to subtract every named reason, so
+ * `acknowledged: ['READING_ATTESTATION_WRONG']` beside a signature reading
+ * "looks fine to me" applied cleanly — the gate was bypassable by anything
+ * that could write JSON, which is exactly what demanding an exact attestation
+ * sentence was meant to prevent. Found by an independent audit of the
+ * procedure; the test that looked like it covered this set `signOff` to null,
+ * so the subtraction never ran.
+ *
+ * A waiver is for a judgement a person made about the EVIDENCE. It was never
+ * meant to waive the requirement that a person be there at all.
+ */
+const NON_WAIVABLE = new Set([
+  'PAGE_IDENTIFICATION_NOT_SIGNED',
+  'PAGE_IDENTIFICATION_ATTESTATION_WRONG',
+  'READING_NOT_SIGNED',
+  'READING_ATTESTATION_WRONG',
+]);
+
 const signedWith = (signOff: SignOff | null, attestation: string): boolean =>
   signOff !== null && signOff.confirms === attestation;
 
@@ -115,19 +153,38 @@ const signedWith = (signOff: SignOff | null, attestation: string): boolean =>
 export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
   const blocked: string[] = [];
 
-  if (!signedWith(pkg.pageIdentification.signOff, PAGE_IDENTIFICATION_ATTESTATION)) {
+  /*
+    READ EVERYTHING DEFENSIVELY. A package is a JSON file a person edits by
+    hand, so a missing field, an older shape or a typo is ordinary rather than
+    exceptional — and the gate has to REFUSE those, not throw on them. It did
+    throw: `textComparison === null` is false when the field is absent, and
+    reading `.method` off `undefined` threw a TypeError straight out of here.
+    A gate that crashes has not said no, it has said nothing.
+  */
+  const identification = pkg.pageIdentification ?? {
+    recordedPages: [],
+    amendmentAppearsAt: null,
+    reasoning: null,
+    signOff: null,
+  };
+  const baseline = pkg.baseline ?? { pages: [], textComparison: null, visionCorroboration: null, signOff: null };
+  const pages = baseline.pages ?? [];
+  const textComparison = baseline.textComparison ?? null;
+  const visionCorroboration = baseline.visionCorroboration ?? null;
+
+  if (!signedWith(identification.signOff ?? null, PAGE_IDENTIFICATION_ATTESTATION)) {
     blocked.push(
-      pkg.pageIdentification.signOff === null
+      (identification.signOff ?? null) === null
         ? 'PAGE_IDENTIFICATION_NOT_SIGNED'
         : 'PAGE_IDENTIFICATION_ATTESTATION_WRONG',
     );
   }
 
-  if (!signedWith(pkg.baseline.signOff, READING_ATTESTATION)) {
-    blocked.push(pkg.baseline.signOff === null ? 'READING_NOT_SIGNED' : 'READING_ATTESTATION_WRONG');
+  if (!signedWith(baseline.signOff ?? null, READING_ATTESTATION)) {
+    blocked.push((baseline.signOff ?? null) === null ? 'READING_NOT_SIGNED' : 'READING_ATTESTATION_WRONG');
   }
 
-  const identified = pkg.pageIdentification.amendmentAppearsAt;
+  const identified = identification.amendmentAppearsAt;
 
   if (identified === null || identified.length === 0) {
     blocked.push('NO_PAGE_IDENTIFIED');
@@ -138,7 +195,7 @@ export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
       baselined the enrolled bill would record a digest for a document that can
       never change, under a signature saying otherwise.
     */
-    const fetched = pkg.baseline.pages.map((page) => page.url);
+    const fetched = pages.map((page) => page.url);
     const same = identified.length === fetched.length && identified.every((url) => fetched.includes(url));
 
     if (!same) {
@@ -146,11 +203,11 @@ export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
     }
   }
 
-  if (pkg.baseline.pages.length === 0) {
+  if (pages.length === 0) {
     blocked.push('NOTHING_FETCHED');
   }
 
-  for (const page of pkg.baseline.pages) {
+  for (const page of pages) {
     if (page.httpStatus !== 200) {
       blocked.push('PAGE_NOT_FETCHED_CLEANLY');
     }
@@ -167,11 +224,27 @@ export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
     if (page.extractedChars === 0) {
       blocked.push('NOTHING_EXTRACTED');
     }
+
+    /*
+      Evidence attached, not merely described. The screenshot is the only
+      record of what the page looked like on the day, and the one instrument
+      that catches a page which is a consent gate or a navigation shell rather
+      than the statute.
+    */
+    if (page.screenshot === null) {
+      blocked.push('NO_SCREENSHOT');
+    }
   }
 
-  if (pkg.baseline.visionCorroboration === null) {
+  if (textComparison === null || (textComparison.method ?? '').trim() === '') {
+    blocked.push('NO_TEXT_COMPARISON');
+  } else if (textComparison.verdict === 'differs') {
+    blocked.push('TEXT_COMPARISON_DIFFERS');
+  }
+
+  if (visionCorroboration === null) {
     blocked.push('NOT_CORROBORATED');
-  } else if (!pkg.baseline.visionCorroboration.agreesWithTextVerdict) {
+  } else if (!visionCorroboration.agreesWithTextVerdict) {
     blocked.push('VISION_DISAGREES');
   }
 
@@ -180,17 +253,14 @@ export const readyToApply = (pkg: BaselinePackage): ApplyVerdict => {
     cannot acknowledge its way through: the attestation check above has already
     blocked, and nothing here can clear it.
   */
-  const acknowledged = new Set(pkg.baseline.signOff?.acknowledged ?? []);
-  const remaining = [...new Set(blocked)].filter((reason) => !acknowledged.has(reason));
+  const acknowledged = new Set(baseline.signOff?.acknowledged ?? []);
+  const remaining = [...new Set(blocked)].filter((reason) => NON_WAIVABLE.has(reason) || !acknowledged.has(reason));
 
   if (remaining.length > 0) {
     return { ok: false, blocked: remaining };
   }
 
-  return {
-    ok: true,
-    pages: pkg.baseline.pages.map((page) => ({ url: page.url, digest: page.extractedDigest })),
-  };
+  return { ok: true, pages: pages.map((page) => ({ url: page.url, digest: page.extractedDigest })) };
 };
 
 /**
