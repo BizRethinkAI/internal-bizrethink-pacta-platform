@@ -386,3 +386,92 @@ describe('the completed Appendix A', () => {
     expect(row).toBeGreaterThan(clause);
   });
 });
+
+/**
+ * THE COVER AND THE RUNNING HEAD — #327.
+ *
+ * A published document opened mid-clause. The real Lombard paper opens with a
+ * cover — title, who prepared it, what it is, that it is confidential — and
+ * carries the document's name at the head of every page after it.
+ *
+ * Read off `Lombard_FRPA_v4.pdf`, which is the reference: a rule across the
+ * top, the title large, a short rule beneath it, then a metadata block reading
+ * PREPARED BY / DOCUMENT TYPE / CONFIDENTIALITY against a vertical rule, and a
+ * confidentiality line in the footer. Page 2 of that PDF is numbered PAGE 1, so
+ * the cover is not counted.
+ *
+ * ADR 0026: all of it comes from the ENTITY. There is no provider profile any
+ * more, which is one of the four premises of #276 that no longer holds.
+ *
+ * WHAT IS SET IN WHICH FACE IS A TESTABILITY DECISION, not only a design one.
+ * `McaSansBold` does not survive `@libpdf/core` — it is why `Execution` reads
+ * back as `EDecution` and `BUYER` as `B U x E R`. `McaSans` does survive, as
+ * the existing footer shows. So the running head and every value a test has to
+ * read back are set in a face that round-trips; the cover's display title may
+ * be bold because the metadata block states the same thing readably.
+ */
+const pagesOf = async (pdf: Buffer): Promise<string[]> => {
+  const doc = await PDF.load(new Uint8Array(pdf));
+
+  return doc.getPages().map((page) =>
+    page
+      .extractText()
+      .lines.map((line) => line.text)
+      .join(' '),
+  );
+};
+
+describe('the cover and the running head', () => {
+  it('opens with a cover naming the entity that issues it', async () => {
+    const [cover] = await pagesOf(await templateOf('frpa'));
+
+    expect(cover).toContain(entityFixture().identity.legalName);
+  });
+
+  it('names the document on the cover', async () => {
+    const [cover] = await pagesOf(await templateOf('frpa'));
+
+    expect(cover).toContain('Future Receivables Purchase Agreement');
+  });
+
+  it('says on the cover that the document is confidential', async () => {
+    const [cover] = await pagesOf(await templateOf('frpa'));
+
+    expect(cover).toMatch(/confidential/i);
+  });
+
+  /*
+    The cover is a cover. Clause text on it would mean the document still
+    opens mid-clause, with a title pasted above it.
+  */
+  it('carries no clause text on the cover', async () => {
+    const [cover, second] = await pagesOf(await templateOf('frpa'));
+
+    expect(second).toMatch(/Merchant|Buyer/);
+    expect(cover).not.toMatch(/\bMerchant hereby\b|\bSection 1\b/);
+  });
+
+  it('carries the document name at the head of every page after the cover', async () => {
+    const pages = await pagesOf(await templateOf('frpa'));
+
+    // Every page but the cover, and there are 30-odd of them.
+    const headed = pages.slice(1).filter((page) => page.includes('FUTURE RECEIVABLES PURCHASE AGREEMENT'));
+
+    expect(pages.length).toBeGreaterThan(5);
+    expect(headed).toHaveLength(pages.length - 1);
+  });
+
+  /**
+   * THE COVER IS NOT PAGE 1. The reference numbers the page after the cover as
+   * PAGE 1, and a cover that counts itself would make every later reference
+   * off by one against the paper it is modelled on.
+   */
+  it('does not number the cover, and starts the count after it', async () => {
+    const pages = await pagesOf(await templateOf('frpa'));
+    const body = pages.length - 1;
+
+    expect(pages[0]).not.toMatch(/\b1 \/ \d+\b/);
+    expect(pages[1]).toContain(`1 / ${body}`);
+    expect(pages[pages.length - 1]).toContain(`${body} / ${body}`);
+  });
+});

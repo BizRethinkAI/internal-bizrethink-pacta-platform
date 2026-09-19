@@ -139,6 +139,74 @@ const styles = StyleSheet.create({
   },
   feeValue: { flexGrow: 1, flexShrink: 1, fontFamily: 'McaBody', fontSize: 9.5 },
   feeNone: { fontFamily: 'McaBody', fontSize: 10, marginTop: 8 },
+  /*
+    THE COVER — #327, read off `Lombard_FRPA_v4.pdf`.
+
+    A rule across the top, the title large, a short rule beneath it, a metadata
+    block against a vertical rule, and a confidentiality line at the foot.
+  */
+  cover: { fontFamily: 'McaBody', paddingTop: 0, paddingBottom: 62, paddingHorizontal: 72, color: '#17202b' },
+  coverRule: { position: 'absolute', top: 44, left: 0, right: 0, height: 2.5, backgroundColor: '#8a6d2f' },
+  coverMark: { fontFamily: 'McaSans', fontSize: 19, marginTop: 92, color: '#17202b' },
+  coverTitle: { fontFamily: 'McaSansBold', fontSize: 30, lineHeight: 1.22, marginTop: 92 },
+  coverTitleRule: { width: 96, height: 3, backgroundColor: '#8a6d2f', marginTop: 12 },
+  /*
+    The subtitle and the metadata VALUES are set in a face that survives
+    `@libpdf/core`. The display title above may be bold because this block
+    states the same facts readably — an unreadable cover would be one nothing
+    could verify had rendered.
+  */
+  coverSubtitle: { fontFamily: 'McaSans', fontSize: 11.5, color: '#475467', marginTop: 12 },
+  coverMeta: { marginTop: 118, borderLeftWidth: 2.5, borderLeftColor: '#8a6d2f', paddingLeft: 12 },
+  coverMetaLabel: { fontFamily: 'McaSans', fontSize: 7, letterSpacing: 1.6, color: '#98a2b3', marginBottom: 2 },
+  coverMetaValue: { fontFamily: 'McaSans', fontSize: 10.5, marginBottom: 11, color: '#17202b' },
+  coverFootRule: { position: 'absolute', bottom: 46, left: 72, right: 72, height: 0.5, backgroundColor: '#d5d9df' },
+  coverFoot: {
+    position: 'absolute',
+    bottom: 30,
+    left: 72,
+    right: 72,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    fontFamily: 'McaSans',
+    fontSize: 7.5,
+    color: '#667085',
+  },
+  /*
+    THE RUNNING HEAD. `McaSans` and not `McaSansBold`: the bold face does not
+    survive `@libpdf/core`, which is why `Execution` reads back as `EDecution`.
+    A running head nothing can read back is one nothing can verify rendered,
+    and it would also defeat a text search for the document's own name.
+  */
+  runningHead: {
+    position: 'absolute',
+    top: 38,
+    left: 72,
+    right: 122,
+    fontFamily: 'McaSans',
+    fontSize: 9,
+    letterSpacing: 0.8,
+    textAlign: 'right',
+    color: '#17202b',
+  },
+  runningRule: { position: 'absolute', top: 54, left: 72, right: 72, height: 1.25, backgroundColor: '#17202b' },
+  pageBox: {
+    position: 'absolute',
+    top: 28,
+    right: 72,
+    width: 44,
+    height: 40,
+    backgroundColor: '#17202b',
+    paddingTop: 7,
+  },
+  pageBoxLabel: {
+    fontFamily: 'McaSans',
+    fontSize: 5.5,
+    letterSpacing: 1.2,
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  pageBoxNumber: { fontFamily: 'McaSans', fontSize: 11, color: '#ffffff', textAlign: 'center', marginTop: 2 },
   executionRow: { flexDirection: 'row', marginTop: 16 },
   executionCell: { flexBasis: '50%', flexGrow: 0, flexShrink: 1, paddingRight: 18 },
   executionCellLast: { flexBasis: '50%', flexGrow: 0, flexShrink: 1 },
@@ -148,6 +216,23 @@ const styles = StyleSheet.create({
 });
 
 const text = (value: string, style: Style | Style[] = styles.paragraph) => h(Text, { style }, value);
+
+/**
+ * The line under the cover title, saying what the document does.
+ *
+ * The reference FRPA reads "Purchase of Future Receivables" beneath its title —
+ * a plain description for someone holding the paper, not a second title. Only
+ * the documents this builder produces appear here; anything else falls back to
+ * its own title rather than inventing a description for a document nobody has
+ * looked at.
+ */
+const INSTRUMENT_SUBTITLES: Partial<Record<ProducedInstrument, string>> = {
+  frpa: 'Purchase of Future Receivables',
+  'equipment-lease': 'Lease of Equipment',
+  subscription: 'Subscription Services',
+  'iso-pra': 'Partner Referral Arrangement',
+  'permission-to-release': 'Authorisation to Release Information',
+};
 
 /** `1250.00` as `$1,250.00`. Stored unformatted so the transaction layer can validate it. */
 const asDollars = (amount: string): string => {
@@ -442,6 +527,54 @@ export const renderTemplateDocument = async (
   const widgetFor = new Map(plan.marked.map((field) => [field.binding, field.widget]));
   const provider = snapshot.entity.identity;
 
+  /*
+    THE COVER — #327. A separate `Page`, which is also what keeps the body's
+    fixed header and footer off it: a `fixed` element repeats on every page of
+    the Page it belongs to, so a cover inside the body Page would carry the
+    running head it exists to precede.
+
+    Everything on it comes from the ENTITY (ADR 0026). There is no provider
+    profile any more, which is one of the four premises of #276 that no longer
+    hold.
+  */
+  const cover = h(
+    Page,
+    { size: 'LETTER', style: styles.cover },
+    h(View, { key: 'rule', style: styles.coverRule }),
+    text(provider.legalName, styles.coverMark),
+    /*
+      NO HYPHENATION ON THE COVER TITLE. react-pdf hyphenates by default and
+      set "Future Receivables Purchase Agree- ment" across two lines. The text
+      tests could not see it — extraction rejoins the halves, so the assertion
+      that the cover names the document passed while the cover looked wrong.
+      Caught by rendering it and looking, which is what #327 asks for.
+    */
+    h(Text, { key: 'title', style: styles.coverTitle, hyphenationCallback: (word: string) => [word] }, document.title),
+    h(View, { key: 'titlerule', style: styles.coverTitleRule }),
+    text(INSTRUMENT_SUBTITLES[instrument] ?? document.title, styles.coverSubtitle),
+    h(
+      View,
+      { key: 'meta', style: styles.coverMeta },
+      ...(
+        [
+          ['PREPARED BY', provider.legalName],
+          ['DOCUMENT TYPE', document.title],
+          ['CONFIDENTIALITY', 'Private & Confidential'],
+        ] as const
+      ).flatMap(([label, value]) => [
+        h(Text, { key: `${label}:l`, style: styles.coverMetaLabel }, label),
+        h(Text, { key: `${label}:v`, style: styles.coverMetaValue }, value),
+      ]),
+    ),
+    h(View, { key: 'footrule', style: styles.coverFootRule }),
+    h(
+      View,
+      { key: 'foot', style: styles.coverFoot },
+      h(Text, { key: 'l' }, 'This document contains confidential and proprietary information.'),
+      h(Text, { key: 'r' }, provider.website ?? ''),
+    ),
+  );
+
   const page = h(
     Page,
     { size: 'LETTER', style: styles.page },
@@ -456,12 +589,30 @@ export const renderTemplateDocument = async (
       style: styles.footer,
       fixed: true,
       render: ({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
-        // A published template says which revision produced it. A signed
-        // document that cannot be traced to its wording is not evidence of
-        // much, and the reference costs one line.
-        `${document.title} · rev ${revision} · ${pageNumber} / ${totalPages}`,
+        /*
+          A published template says which revision produced it. A signed
+          document that cannot be traced to its wording is not evidence of
+          much, and the reference costs one line.
+
+          THE COVER IS NOT COUNTED. It is page 1 of the PDF, so the body's
+          first page is react-pdf's page 2 — and the reference numbers that
+          page 1. A cover that counted itself would put every page reference
+          one out against the paper this is modelled on.
+        */
+        `${document.title} · rev ${revision} · ${pageNumber - 1} / ${totalPages - 1}`,
     }),
-    text(document.title, styles.title),
+    h(Text, { key: 'head', style: styles.runningHead, fixed: true }, document.title.toUpperCase()),
+    h(View, { key: 'headrule', style: styles.runningRule, fixed: true }),
+    h(
+      View,
+      { key: 'pagebox', style: styles.pageBox, fixed: true },
+      h(Text, { key: 'l', style: styles.pageBoxLabel }, 'PAGE'),
+      h(Text, {
+        key: 'n',
+        style: styles.pageBoxNumber,
+        render: ({ pageNumber }: { pageNumber: number }) => String(pageNumber - 1),
+      }),
+    ),
     ...groupMcaSections(document.items, document.instrument).flatMap((section, index) => [
       h(Text, { key: `section:${index}`, style: styles.sectionHeading, minPresenceAhead: 90 }, section.heading),
       ...section.items.flatMap((item) => itemElements(item, widgetFor, mode)),
@@ -505,7 +656,7 @@ export const renderTemplateDocument = async (
       ),
   );
 
-  const stream = await renderToStream(h(Document, {}, page));
+  const stream = await renderToStream(h(Document, {}, cover, page));
   const chunks: Buffer[] = [];
 
   for await (const chunk of stream) {
