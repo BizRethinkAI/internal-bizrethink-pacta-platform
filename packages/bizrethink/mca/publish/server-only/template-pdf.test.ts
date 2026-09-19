@@ -260,3 +260,129 @@ describe('the fields this renderer cannot place yet', () => {
     expect(() => templatePlacement(snapshot('frpa'), 'equipment-lease')).toThrow(/compiles no equipment-lease/);
   });
 });
+
+/**
+ * THE COMPLETED APPENDIX A — #326.
+ *
+ * `frpa.appendix-a-fees-collectible` renders as ordinary body text and says, in
+ * one sentence:
+ *
+ *   > A fee left blank, or not identified in the completed Appendix, is $0.00
+ *   > and may not be charged.
+ *
+ * The clause printed. The Appendix it points at did not. A published FRPA
+ * therefore stated the rule and then carried no table, so on the document's own
+ * terms every fee the funder had entered was $0.00 and uncollectable. The
+ * schedule was collected by the interview, stored on the entity and attached to
+ * the document by `compile.ts` — and then read by nothing.
+ *
+ * Fees ride on the FRPA alone, so the other documents must stay unaffected.
+ */
+const FEES = [
+  {
+    basis: 'amount' as const,
+    name: 'Origination fee',
+    amount: '1250.00',
+    payee: 'Example Receipts Inc.',
+    purpose: 'Underwriting and preparing this agreement',
+    when: 'Deducted from the disbursement at funding',
+  },
+  {
+    basis: 'method' as const,
+    name: 'Returned payment fee',
+    method: 'The lesser of $35.00 or the amount the bank charges the provider',
+    payee: 'Example Receipts Inc.',
+    purpose: 'Recovering the cost of a rejected debit',
+    when: 'On each returned payment',
+  },
+];
+
+const withFees = (fees: typeof FEES | []) => {
+  const entity = entityFixture();
+
+  return compileMcaTemplate({ ...entity, policy: { ...entity.policy, fees } }, 'frpa');
+};
+
+describe('the completed Appendix A', () => {
+  it('prints a fee the funder entered as a dollar amount', async () => {
+    const text = await textOf(await renderMcaTemplatePdf(withFees(FEES), 'frpa', 3));
+
+    expect(text).toContain('Origination fee');
+    expect(text).toContain('1,250.00');
+    expect(text).toContain('Example Receipts Inc.');
+    expect(text).toContain('Deducted from the disbursement at funding');
+  });
+
+  /*
+    The either/or is the whole reason `basis` exists. A row shows the amount or
+    the method, never both and never an empty column where the other would be —
+    a blank in the amount column is exactly what the clause reads as $0.00.
+  */
+  it('prints a fee stated as a calculation method instead of an amount', async () => {
+    const text = await textOf(await renderMcaTemplatePdf(withFees(FEES), 'frpa', 3));
+
+    expect(text).toContain('Returned payment fee');
+    expect(text).toContain('The lesser of $35.00 or the amount the bank charges the provider');
+  });
+
+  it('prints every column the clause requires the Appendix to identify', async () => {
+    const text = await textOf(await renderMcaTemplatePdf(withFees(FEES), 'frpa', 3));
+
+    // name, amount-or-method, payee, purpose, when — the five §-required facts.
+    for (const required of [
+      'Origination fee',
+      '1,250.00',
+      'Example Receipts Inc.',
+      'Underwriting and preparing this agreement',
+      'Deducted from the disbursement at funding',
+    ]) {
+      expect(text).toContain(required);
+    }
+  });
+
+  /**
+   * AN EMPTY SCHEDULE IS A COMPLETE ANSWER, NOT A MISSING ONE.
+   *
+   * "This funder charges nothing" is a real state and the commonest one. Left
+   * as a blank, a reader has to decide whether the table is empty or unfinished
+   * — and the clause already answers that question in the funder's disfavour,
+   * so the document should say it outright rather than make it inferable.
+   */
+  it('says so when the funder charges no fees at all', async () => {
+    const text = await textOf(await renderMcaTemplatePdf(withFees([]), 'frpa', 3));
+
+    expect(text).toMatch(/charges no fees|no fees are charged|No fees/i);
+  });
+
+  it('does not leave the reader an empty table to interpret', async () => {
+    const text = await textOf(await renderMcaTemplatePdf(withFees([]), 'frpa', 3));
+
+    // The column headings belong to a table with rows in it.
+    expect(text).not.toContain('Payable to');
+  });
+
+  /*
+    The table belongs UNDER THE CLAUSE THAT POINTS AT IT. `appendix` already
+    carries the heading "Fee Schedule", and a table printed somewhere else on
+    the page would be a different document that happened to contain the same
+    words. Asserted by order rather than by coordinates, which survives a
+    reflow.
+
+    (That fees ride on the FRPA alone is a compile-time fact and is covered in
+    `templates/fee-schedule.test.ts`; this fixture's programme runs no other
+    document, so asserting it again here would prove nothing.)
+  */
+  it('prints the table under the Fee Schedule heading, after the clause', async () => {
+    const text = await textOf(await renderMcaTemplatePdf(withFees(FEES), 'frpa', 3));
+
+    // `lastIndexOf` for the heading: "Fee Schedule" also appears earlier in the
+    // body, and the one that matters is the section heading the table sits under.
+    const heading = text.lastIndexOf('Fee Schedule');
+    const clause = text.indexOf('may not  be charged');
+    const row = text.indexOf('Origination fee');
+
+    expect(heading).toBeGreaterThan(-1);
+    expect(clause).toBeGreaterThan(heading);
+    expect(row).toBeGreaterThan(clause);
+  });
+});

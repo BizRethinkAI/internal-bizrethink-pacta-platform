@@ -5,6 +5,7 @@ import { createElement as h } from 'react';
 import { SANS_REGULAR, SANS_SEMIBOLD, TINOS_REGULAR } from '../../../lease/render/fonts/font-data';
 import type { ClauseField } from '../../clauses/types';
 import { groupMcaSections } from '../../engine/section-headings';
+import type { McaFee } from '../../plain-values';
 import { fieldBlocks, fieldRows } from '../../render/field-layout';
 import type { McaTemplateItem, McaTemplateSnapshot } from '../../templates/compile';
 import { fieldPlanFor } from '../field-plan';
@@ -117,6 +118,27 @@ const styles = StyleSheet.create({
   moneyValue: { flexBasis: 150, flexGrow: 0, flexShrink: 0, fontFamily: 'McaBody', fontSize: 10, textAlign: 'right' },
   label: { fontFamily: 'McaSans', fontSize: 8.5, color: '#667085' },
   value: { fontFamily: 'McaBody', fontSize: 10 },
+  /*
+    APPENDIX A. Five columns because the clause names five facts, and a row
+    shows the amount OR the method — `ZMcaFee` is a discriminated union on
+    `basis`, and an empty cell where the other would be is precisely what
+    `frpa.appendix-a-fees-collectible` reads as $0.00.
+  */
+  feeTable: { marginTop: 10 },
+  feeEntry: { marginBottom: 10, borderTopWidth: 0.75, borderTopColor: '#98a2b3', paddingTop: 6 },
+  feeLine: { flexDirection: 'row', marginBottom: 2 },
+  feeLabel: {
+    flexBasis: 118,
+    flexGrow: 0,
+    flexShrink: 0,
+    fontFamily: 'McaSans',
+    fontSize: 7.5,
+    letterSpacing: 0.6,
+    color: '#667085',
+    paddingTop: 1.5,
+  },
+  feeValue: { flexGrow: 1, flexShrink: 1, fontFamily: 'McaBody', fontSize: 9.5 },
+  feeNone: { fontFamily: 'McaBody', fontSize: 10, marginTop: 8 },
   executionRow: { flexDirection: 'row', marginTop: 16 },
   executionCell: { flexBasis: '50%', flexGrow: 0, flexShrink: 1, paddingRight: 18 },
   executionCellLast: { flexBasis: '50%', flexGrow: 0, flexShrink: 1 },
@@ -126,6 +148,97 @@ const styles = StyleSheet.create({
 });
 
 const text = (value: string, style: Style | Style[] = styles.paragraph) => h(Text, { style }, value);
+
+/** `1250.00` as `$1,250.00`. Stored unformatted so the transaction layer can validate it. */
+const asDollars = (amount: string): string => {
+  const [whole, cents = '00'] = amount.split('.');
+
+  return `$${whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${cents.padEnd(2, '0')}`;
+};
+
+/**
+ * THE COMPLETED APPENDIX A — #326.
+ *
+ * `frpa.appendix-a-fees-collectible` renders as body text and says a fee may be
+ * charged only if the completed Appendix identifies it "by its name, its dollar
+ * amount or a lawful calculation method, the person to whom it is paid, what it
+ * is for, and when it is charged" — and that "a fee left blank, or not
+ * identified in the completed Appendix, is $0.00 and may not be charged."
+ *
+ * The clause printed and the table did not. So a published FRPA stated the rule
+ * and then carried nothing, and on its own terms every fee the funder had
+ * entered was uncollectable. The schedule was collected by the interview,
+ * stored on the entity and attached by `compile.ts` — and read by nothing.
+ *
+ * The columns are those five facts, in that order, and a row shows the amount
+ * or the method according to `basis`. Never both, and never a blank where the
+ * other would be: a blank is the one thing the clause reads against the funder.
+ */
+const feeSchedule = (fees: McaFee[]) => {
+  /*
+    NO FEES IS AN ANSWER, NOT AN ABSENCE. It is also the commonest case. An
+    empty table leaves a reader deciding whether it is empty or unfinished, and
+    the clause already answers that in the funder's disfavour — so the document
+    says it outright rather than leaving it to be inferred.
+  */
+  if (fees.length === 0) {
+    return [
+      h(
+        Text,
+        { key: 'fees:none', style: styles.feeNone },
+        'This provider charges no fees under this agreement. No fee is collectible.',
+      ),
+    ];
+  }
+
+  /*
+    A LABELLED BLOCK PER FEE, NOT FIVE COLUMNS ACROSS A 468pt MEASURE.
+
+    Five columns gives each about 94pt, which is too narrow for "Deducted from
+    the disbursement at funding" — it wraps to three lines, and a wrapped cell
+    in a multi-column row interleaves with its neighbours on every line. That
+    is bad to read and worse to quote, and the clause makes the identification
+    itself the thing that permits the charge, so a fee a merchant cannot read
+    back cleanly is the wrong artifact. Here each value gets the full measure.
+
+    No hyphenation, for the same reason the lease tokens disable it: a fee
+    broken mid-word is harder to read and harder to cite.
+  */
+  const whole = (word: string) => [word];
+
+  const line = (key: string, label: string, value: string) =>
+    h(
+      View,
+      { key, style: styles.feeLine },
+      h(Text, { key: 'l', style: styles.feeLabel }, label),
+      h(Text, { key: 'v', style: styles.feeValue, hyphenationCallback: whole }, value),
+    );
+
+  return [
+    h(
+      View,
+      { key: 'fees', style: styles.feeTable },
+      ...fees.map((fee, index) =>
+        h(
+          View,
+          { key: `fee:${index}`, style: styles.feeEntry, wrap: false },
+          line('name', 'FEE', fee.name),
+          /*
+            The amount OR the method, never both and never a blank where the
+            other would be — `ZMcaFee` is a discriminated union on `basis`, and
+            a blank is the one thing the clause reads as $0.00.
+          */
+          fee.basis === 'amount'
+            ? line('charge', 'AMOUNT', asDollars(fee.amount))
+            : line('charge', 'HOW IT IS CALCULATED', fee.method),
+          line('payee', 'PAYABLE TO', fee.payee),
+          line('purpose', 'WHAT IT IS FOR', fee.purpose),
+          line('when', 'WHEN IT IS CHARGED', fee.when),
+        ),
+      ),
+    ),
+  ];
+};
 
 /**
  * What fills each kind of slot.
@@ -352,6 +465,13 @@ export const renderTemplateDocument = async (
     ...groupMcaSections(document.items, document.instrument).flatMap((section, index) => [
       h(Text, { key: `section:${index}`, style: styles.sectionHeading, minPresenceAhead: 90 }, section.heading),
       ...section.items.flatMap((item) => itemElements(item, widgetFor, mode)),
+      /*
+        The table goes UNDER THE CLAUSE THAT POINTS AT IT, at the end of the
+        section that already carries the heading "Fee Schedule". Printed
+        anywhere else it would be a table that happened to contain the same
+        words rather than the Appendix the clause names.
+      */
+      ...(section.section === 'appendix' ? feeSchedule(document.feeSchedule) : []),
     ]),
     h(Text, { style: styles.heading, minPresenceAhead: 120 }, 'Execution'),
     // Two parties to a row, each block carrying the native placeholders
