@@ -13,7 +13,108 @@ Durable rules live in [`engineering-standard.md`](engineering-standard.md).
 Decisions and their reasoning live in [`adr/`](adr/). This file is for what is
 true *right now*.
 
-_Last updated: 2026-09-18_
+_Last updated: 2026-09-19_
+
+## 2026-09-19 — the only access grant was unscoped, and statutes get watched (#330, #329)
+
+Two PRs merged: #330 `ac9d5b1f0` and #329 `6410c30af`. **Main is `6410c30af`.**
+Production runs `f92abea55` and this batch is not deployed at the time of
+writing. **No migrations.**
+
+### The single access control was not scoped to anything (#330)
+
+`/admin/mca-templates` offered one button, which wrote
+`{ feature, scope: 'user', scopeId: <admin> }`. **A user-scoped grant is not
+scoped to an organisation.** `getFeatureAccess` looks the user row up by
+`{ feature, scope: 'user', scopeId }` — with no `organisationId` in the key — and
+`resolveFeatureAccess` returns it first, short-circuiting the organisation row by
+design, so that one row answered `true` for **every** organisation asked. The
+button therefore enabled the MCA builder everywhere the admin was a member, with
+no way to choose which. `resolveFeatureAccess` has understood
+`scope: 'organisation'` since the lease builder; nothing had ever written it.
+
+**Scope precisely: this was over-broad feature enablement within the admin's own
+memberships, not cross-tenant access.** `assertMcaTeamAccess` still gates on
+`buildTeamWhereQuery`, so a non-member reached nothing.
+
+`setAccess` now takes an optional `organisationId` and writes the organisation
+scope — **and verifies the admin belongs to that organisation first**, so
+instance admin remains permission to opt *in* rather than permission to switch a
+feature on inside a customer's account. The account-wide grant survives,
+relabelled, as an explicit choice; while it is set it outranks every organisation
+row, and each per-team toggle says so rather than leaving an admin to conclude
+the control is broken.
+
+**Nothing linked to the entities page.** `/t/<team>/mca-entities` had no link from
+anywhere, and under ADR 0026 a template cannot be created without an entity — so
+the only way in was knowing the URL. The E2E now reaches it **by clicking the
+link** rather than typing the URL, because a test that types the URL cannot
+notice that nothing points at the page. That is how this survived.
+
+### A stored statute can now be caught drifting from its publisher (#329)
+
+The provenance checkers verify that a stored copy still matches **itself**, byte
+for byte. That catches our drift from the copy and can never catch the copy
+drifting from the law. A monthly job (ADR 0025 §3) is the other half: it fetches
+each source's published pages and compares. **It reports and never resolves** —
+a statute that moved is a reading task, not a merge — and it holds
+`permissions: contents: read`, so it cannot write to `mca/sources/`.
+
+**A baseline is a person's job, and the absence of one fails the run.** A digest
+is `null` until somebody reads the page and confirms it is the statute we stored;
+a machine taking that baseline on its first run would hash the page against
+itself and silently bless an amendment nobody had seen. A never-confirmed source
+counts as **overdue**, which makes the job exit non-zero — *"reporting it as fine
+because there is nothing to compare against would be the check congratulating
+itself on its own blind spot."*
+
+**A source is watched only when every one of its pages is.** `retrievedFrom` was
+one URL; the sources are not one page — Florida consolidates six statute
+sections, and Connecticut, Utah and both Virginia extractions cite two each. A
+consolidation counts as checkable only once every part has a baseline, because
+checking the parts somebody got to would report "unchanged" for a statute with an
+unwatched section.
+
+**The digest hashes extracted text, not raw HTML**, or a publisher's analytics
+change would read identically to an amendment. The extractor is one linear scan
+rather than a sequence of regex replacements: CodeQL flagged the first version as
+`js/incomplete-multi-character-sanitization` and was right — a single pass over
+`<scr<script>ipt>` leaves a live tag behind. Nothing here is rendered, so it was
+not exploitable, but **a function shaped like a sanitizer that is not one is a
+trap for the next caller**, so the class was removed rather than the two alerts
+suppressed. The scan cannot backtrack, so there is no ReDoS surface in a job that
+fetches pages we do not control.
+
+### Known and deliberately not fixed here
+
+**Three limitations the first real runs will meet.**
+
+- **Extraction removes markup, not chrome.** A cookie banner or a reworded
+  navigation label is text the publisher renders, so it lands in the digest. This
+  is the likeliest source of false positives in the first months, and the
+  extraction fix above does not close it — that fix stopped a publisher's
+  analytics change reading identically to an amendment, which is a different
+  problem.
+- **Florida's URLs carry the year.** `flsenate.gov/Laws/Statutes/2026/559.961`
+  and its five siblings. A rollover to `/2027/` reads as **unreachable**, not as
+  the statute moving — so it fires within months and presents as the wrong
+  failure.
+- **One source records no publisher**: `VA-Code-6.2-2228-2238.txt`. An admitted
+  gap rather than an invented attribution, pinned as an exact list in
+  `source-watch.test.ts` so it can only shrink deliberately.
+
+**Roughly 11 of the 26 recorded pages are the wrong shape to watch** — enrolled
+bills, an archive URL, dated snapshots, final rulemaking texts. `TX-Fin-Code-Ch-398.txt`
+is the 2025 enrolled bill, and that URL will read the same in 2030; an amendment
+to Chapter 398 appears in the codified chapter instead. So this merges a working
+mechanism whose data is honest but not yet useful — **and those entries fail the
+run rather than passing it**, so the gap is visible rather than silent. Every
+entry carries a `note` recording where its URL came from, so the baselining pass
+(#331) can correct rather than inherit a guess.
+
+**Nothing detects a state we do not already track** (#332). Three of the eleven
+sources are regulations rather than statutes, so a bill tracker alone would
+reproduce our own blind spot.
 
 ## 2026-09-18 — Next on a saved entity was saving it (#325)
 
