@@ -169,11 +169,11 @@
     "recordedOn": "2026-09-05",
     "pages": [
       {
-        "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
-        "digest": null
+        "url": "https://tcss.legis.texas.gov/resources/FI/htm/FI.398.htm",
+        "digest": "79b9174536729a5296e53ef0809c4d623ec0bf9acff140612fe10c0465121c02"
       }
     ],
-    "note": "URL from this file's own header. No baseline confirmed yet."
+    "note": "Baseline confirmed 2026-09-18 against the page where an amendment would appear. Page identified by research, not inherited: supersedes the recorded retrieval https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm, a finished document that could never change."
   },
   "UT-Title-7-Ch-27.txt": {
     "pages": [
