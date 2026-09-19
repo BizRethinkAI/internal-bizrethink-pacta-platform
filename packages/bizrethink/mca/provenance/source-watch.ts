@@ -24,13 +24,27 @@ import { sourceProvenance } from './source-provenance';
 /** How long a manual source may go unchecked before the report calls it overdue. */
 export const MANUAL_CHECK_DUE_AFTER_DAYS = 180;
 
+/**
+ * One published page a source was taken from, and what it hashed to when a
+ * person last confirmed it.
+ *
+ * A LIST, BECAUSE THE SOURCES ARE NOT ONE PAGE. `retrievedFrom` was a single
+ * URL. Counting the deep links in the stored files' own headers:
+ * `FL-Stat-559.961-9615.txt` consolidates six statute sections, and
+ * `CT-CGS-36a-861-872.txt`, `UT-Title-7-Ch-27.txt` and both Virginia form
+ * extractions cite two each — only seven of nineteen are cleanly one page.
+ * Connecticut's README says so outright: "the combined file is our
+ * consolidation, not a document fetched from a single official URL."
+ */
+export type WatchedPage = { url: string; digest: string };
+
 export type WatchedSource = {
   /** The file under `mca/sources/`. */
   file: string;
   publisher: string | null;
   site: string | null;
 } & (
-  | { kind: 'automatic'; retrievedFrom: string; recordedOn: string | null; sourceDigest: string }
+  | { kind: 'automatic'; pages: WatchedPage[]; recordedOn: string | null }
   | { kind: 'manual'; recordedOn: string | null; daysSinceRecorded: number | null; overdue: boolean }
 );
 
@@ -60,6 +74,11 @@ export type SidecarEntry = {
   retrievedFrom?: string | null;
   recordedOn?: string | null;
   sourceDigest?: string | null;
+  /**
+   * The pages a consolidated source was assembled from, each with its own
+   * baseline. `digest: null` is a page nobody has confirmed yet.
+   */
+  pages?: { url: string; digest: string | null }[] | null;
 };
 
 export const watchedSource = (
@@ -82,13 +101,34 @@ export const watchedSource = (
   const sourceDigest = inFile.sourceDigest ?? extra.sourceDigest ?? null;
 
   /*
+    The file's own single `Retrieved:`/`SourceDigest:` header is one page; the
+    sidecar's `pages` is the general form. The header wins where it has one,
+    for the same reason it wins above — it sits inside the bytes a person
+    verified.
+  */
+  const declared: { url: string; digest: string | null }[] =
+    retrievedFrom !== null ? [{ url: retrievedFrom, digest: sourceDigest }] : (extra.pages ?? []);
+
+  /*
     A URL alone is not enough to check a source automatically — there has to be
     a baseline to compare the page against. Recording one is a person's job: it
     asserts "I read this page and it is the statute we stored", and a baseline
     taken by a machine would silently bless a change nobody had seen.
+
+    EVERY page, and at least one. Checking the five sections someone got to
+    while ignoring the sixth would report `unchanged` for a statute with an
+    unwatched part — the check blessing its own blind spot, which is precisely
+    what requiring a human baseline exists to prevent.
   */
-  if (retrievedFrom !== null && sourceDigest !== null) {
-    return { file, publisher, site, kind: 'automatic', retrievedFrom, recordedOn, sourceDigest };
+  if (declared.length > 0 && declared.every((page) => page.digest !== null)) {
+    return {
+      file,
+      publisher,
+      site,
+      kind: 'automatic',
+      pages: declared as WatchedPage[],
+      recordedOn,
+    };
   }
 
   const daysSinceRecorded = recordedOn === null ? null : daysBetween(recordedOn, now);

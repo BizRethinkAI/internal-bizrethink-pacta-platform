@@ -45,5 +45,11 @@ jobs:
       - name: Install
         run: npm ci --ignore-scripts
 
+      # `VA-Disclosure-Form.pdf` is a prescribed form, so its words are the
+      # requirement and it has to be compared as text. This is the extraction
+      # the 2026-09-12 source audit used and recorded.
+      - name: Install pdftotext
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
+
       - name: Check each source against its publisher
         run: npx tsx scripts/mca/check-sources.ts

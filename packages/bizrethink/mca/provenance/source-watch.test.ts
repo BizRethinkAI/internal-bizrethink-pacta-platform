@@ -32,7 +32,10 @@ describe('which sources the job can check by itself', () => {
       now,
     );
 
-    expect(entry).toMatchObject({ kind: 'automatic', retrievedFrom: 'https://dfpi.ca.gov/x.pdf' });
+    expect(entry).toMatchObject({ kind: 'automatic' });
+    expect(entry.kind === 'automatic' && entry.pages).toEqual([
+      { url: 'https://dfpi.ca.gov/x.pdf', digest: 'a'.repeat(64) },
+    ]);
   });
 
   /**
@@ -163,5 +166,100 @@ describe('the sources as they actually stand', () => {
     const virginia = watchedSources(files, shipped, now).find((entry) => entry.file === 'VA-Code-6.2-2228-2238.txt');
 
     expect(virginia).toMatchObject({ kind: 'manual', recordedOn: null, overdue: true });
+  });
+});
+
+/**
+ * SOURCES THAT ARE NOT ONE PAGE.
+ *
+ * `retrievedFrom` was a single URL, and the stored sources are not. Counting
+ * the deep links in their own headers: `FL-Stat-559.961-9615.txt` consolidates
+ * SIX statute sections, and `CT-CGS-36a-861-872.txt`, `UT-Title-7-Ch-27.txt`
+ * and both Virginia form extractions cite two each. Only seven of nineteen are
+ * cleanly one page. Connecticut's README says it outright: "the combined file
+ * is our consolidation, not a document fetched from a single official URL."
+ *
+ * A consolidation is watched by watching its parts. Any part moving is the
+ * source moving, because any part is the law.
+ */
+describe('sources consolidated from more than one page', () => {
+  const site = (urls: { url: string; digest: string | null }[]) => ({ pages: urls });
+
+  it('is automatic once every page has a confirmed baseline', () => {
+    const entry = watchedSource(
+      'FL-Stat.txt',
+      header(['Publisher: Florida Senate']),
+      {
+        'FL-Stat.txt': site([
+          { url: 'https://flsenate.gov/559.961', digest: 'a'.repeat(64) },
+          { url: 'https://flsenate.gov/559.9611', digest: 'b'.repeat(64) },
+        ]),
+      },
+      now,
+    );
+
+    expect(entry).toMatchObject({ kind: 'automatic' });
+    expect(entry.kind === 'automatic' && entry.pages).toEqual([
+      { url: 'https://flsenate.gov/559.961', digest: 'a'.repeat(64) },
+      { url: 'https://flsenate.gov/559.9611', digest: 'b'.repeat(64) },
+    ]);
+  });
+
+  /*
+    PARTIALLY BASELINED IS NOT BASELINED. Checking the five sections someone got
+    to and silently ignoring the sixth would report `unchanged` for a statute
+    with an unwatched part — the check blessing its own blind spot, which is the
+    failure the baseline rule exists to prevent.
+  */
+  it('stays manual while any one page is unconfirmed', () => {
+    const entry = watchedSource(
+      'FL-Stat.txt',
+      header(['Publisher: Florida Senate']),
+      {
+        'FL-Stat.txt': site([
+          { url: 'https://flsenate.gov/559.961', digest: 'a'.repeat(64) },
+          { url: 'https://flsenate.gov/559.9611', digest: null },
+        ]),
+      },
+      now,
+    );
+
+    expect(entry).toMatchObject({ kind: 'manual', overdue: true });
+  });
+
+  it('stays manual when the page list is empty', () => {
+    const entry = watchedSource('x.txt', header(['Publisher: X']), { 'x.txt': site([]) }, now);
+
+    expect(entry).toMatchObject({ kind: 'manual' });
+  });
+
+  /*
+    The single-URL form still works and is what a file's own `Retrieved:` and
+    `SourceDigest:` header produces. One page is a list of one.
+  */
+  it('reads a single-page source as a list of one', () => {
+    const entry = watchedSource(
+      'TX.txt',
+      header(['Publisher: TLO', 'Retrieved: https://capitol.texas.gov/x.htm', `SourceDigest: ${'c'.repeat(64)}`]),
+      {},
+      now,
+    );
+
+    expect(entry.kind === 'automatic' && entry.pages).toEqual([
+      { url: 'https://capitol.texas.gov/x.htm', digest: 'c'.repeat(64) },
+    ]);
+  });
+
+  it('prefers the file’s own header over the sidecar, as it always did', () => {
+    const entry = watchedSource(
+      'TX.txt',
+      header(['Publisher: TLO', 'Retrieved: https://capitol.texas.gov/in-file.htm', `SourceDigest: ${'c'.repeat(64)}`]),
+      { 'TX.txt': site([{ url: 'https://example.invalid/sidecar.htm', digest: 'd'.repeat(64) }]) },
+      now,
+    );
+
+    expect(entry.kind === 'automatic' && entry.pages.map((page) => page.url)).toEqual([
+      'https://capitol.texas.gov/in-file.htm',
+    ]);
   });
 });

@@ -24,15 +24,49 @@
  * the comparison logic into a plain script would mean the thing that runs
  * monthly is not the thing the tests cover.
  */
-import { appendFileSync, readdirSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { appendFileSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { checkSources } from '../../packages/bizrethink/mca/provenance/source-check';
+import { textFromHtml } from '../../packages/bizrethink/mca/provenance/source-extract';
 
 const SOURCES = resolve(dirname(fileURLToPath(import.meta.url)), '../../packages/bizrethink/mca/sources');
 
-/** A real fetch, with a timeout so an unresponsive host fails rather than hangs the job. */
+/**
+ * `pdftotext`, the extraction the 2026-09-12 audit used and recorded.
+ *
+ * A PDF read through `response.text()` is mojibake — deterministic, so it
+ * raises no false alarm, but it verifies nothing about the words and any
+ * re-save of the file changes it wholesale. `VA-Disclosure-Form.pdf` is a
+ * PRESCRIBED FORM, so its words are the requirement.
+ */
+const textFromPdf = (bytes: Buffer): string => {
+  const path = join(tmpdir(), `mca-source-${process.pid}-${Date.now()}.pdf`);
+
+  writeFileSync(path, bytes);
+
+  try {
+    return execFileSync('pdftotext', [path, '-'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  } finally {
+    unlinkSync(path);
+  }
+};
+
+/**
+ * Fetch a page and return ITS WORDS, not its bytes.
+ *
+ * The extraction is here rather than in `source-check.ts` because it is the
+ * I/O half of the job; the comparison rule stays pure and testable without a
+ * network. What matters is that the thing compared is text: hashing raw HTML
+ * put script bodies, inline styles and every attribute into the fingerprint,
+ * so a publisher touching its template was indistinguishable from a
+ * legislature amending the statute.
+ *
+ * A timeout, so an unresponsive host fails rather than hanging the job.
+ */
 const fetchSource = async (url: string): Promise<string> => {
   const response = await fetch(url, {
     redirect: 'follow',
@@ -44,7 +78,13 @@ const fetchSource = async (url: string): Promise<string> => {
     throw new Error(`${response.status} ${response.statusText}`);
   }
 
-  return response.text();
+  const contentType = response.headers.get('content-type') ?? '';
+
+  if (contentType.includes('pdf') || new URL(response.url).pathname.toLowerCase().endsWith('.pdf')) {
+    return textFromPdf(Buffer.from(await response.arrayBuffer()));
+  }
+
+  return textFromHtml(await response.text());
 };
 
 /** Wrapped rather than top-level: `tsx` emits CommonJS, which has no top-level await. */
@@ -105,8 +145,9 @@ const main = async (): Promise<void> => {
       : 'Nothing needs a person this month.',
     '',
     'To move a source into the automatic column: read its published page, confirm it is the statute we stored,',
-    'and record both `retrievedFrom` and `sourceDigest` for it in mca/sources/provenance.json. The baseline is a',
-    'person saying "I read this" — taking it automatically would bless a change nobody had seen.',
+    'and record its `pages` — every URL the file was assembled from, each with the digest that page had when you',
+    'read it — in mca/sources/provenance.json. EVERY page, because any part of a consolidation is the law. The',
+    'baseline is a person saying "I read this"; taking it automatically would bless a change nobody had seen.',
   );
 
   const text = lines.join('\n');

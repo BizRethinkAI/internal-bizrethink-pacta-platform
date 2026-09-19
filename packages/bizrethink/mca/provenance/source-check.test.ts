@@ -101,7 +101,9 @@ describe('comparing the stored copy with the source it came from', () => {
       now,
     );
 
-    expect(report.results[0]).toMatchObject({ state: 'unreachable', why: '404 Not Found' });
+    expect(report.results[0]).toMatchObject({ state: 'unreachable' });
+    // Names the page, not just the error: a consolidated source has several.
+    expect(report.results[0].state === 'unreachable' && report.results[0].why).toContain('404 Not Found');
     expect(report.needsAttention).toBe(true);
   });
 });
@@ -184,5 +186,111 @@ describe('the sources nobody can check automatically', () => {
 
     expect(fetched).toBe(0);
     expect(report.results[0]).toMatchObject({ state: 'manual', overdue: true });
+  });
+});
+
+/**
+ * A consolidated source is watched by watching its parts.
+ *
+ * `FL-Stat-559.961-9615.txt` is six statute sections in one file; Connecticut
+ * is a base chapter plus a 2026 supplement. Any part is the law, so any part
+ * moving is the source moving.
+ */
+const consolidated = (pages: { url: string; digest: string | null }[]) => ({ 'fl.txt': { pages } });
+
+describe('a source assembled from several pages', () => {
+  const page = (body: string) => body;
+
+  it('reports unchanged only when every page is unchanged', async () => {
+    const report = await checkSources(
+      [{ file: 'fl.txt', text: 'Publisher: Florida Senate\n\nOur copy.' }],
+      consolidated([
+        { url: 'https://fl/559.961', digest: normalisedDigest('one') },
+        { url: 'https://fl/559.9611', digest: normalisedDigest('two') },
+      ]),
+      async (url) => page(url.endsWith('559.961') ? 'one' : 'two'),
+      now,
+    );
+
+    expect(report.results[0]).toMatchObject({ state: 'unchanged' });
+    expect(report.needsAttention).toBe(false);
+  });
+
+  /*
+    THE CASE A SINGLE URL COULD NOT SEE. Five sections unchanged and the sixth
+    amended is still an amended statute, and the old model would have watched
+    whichever one page happened to be recorded.
+  */
+  it('reports the source as differing when any one page has moved', async () => {
+    const report = await checkSources(
+      [{ file: 'fl.txt', text: 'Publisher: Florida Senate\n\nOur copy.' }],
+      consolidated([
+        { url: 'https://fl/559.961', digest: normalisedDigest('one') },
+        { url: 'https://fl/559.9611', digest: normalisedDigest('two') },
+      ]),
+      async (url) => page(url.endsWith('559.961') ? 'one' : 'two, amended'),
+      now,
+    );
+
+    expect(report.results[0]).toMatchObject({ state: 'differs' });
+    expect(report.results[0].state === 'differs' && report.results[0].why).toContain('559.9611');
+    expect(report.needsAttention).toBe(true);
+  });
+
+  it('names the page it could not reach rather than the source as a whole', async () => {
+    const report = await checkSources(
+      [{ file: 'fl.txt', text: 'Publisher: Florida Senate\n\nOur copy.' }],
+      consolidated([
+        { url: 'https://fl/559.961', digest: normalisedDigest('one') },
+        { url: 'https://fl/559.9611', digest: normalisedDigest('two') },
+      ]),
+      async (url) => {
+        if (url.endsWith('559.9611')) {
+          throw new Error('404 Not Found');
+        }
+
+        return 'one';
+      },
+      now,
+    );
+
+    expect(report.results[0]).toMatchObject({ state: 'unreachable' });
+    expect(report.results[0].state === 'unreachable' && report.results[0].why).toContain('559.9611');
+  });
+
+  /*
+    An unreachable page outranks a difference on another. "We could not look"
+    is a weaker claim than "it changed", and reporting the stronger one from a
+    partial read would overstate what the run actually established.
+  */
+  it('reports a page it could not reach even when another page differs', async () => {
+    const report = await checkSources(
+      [{ file: 'fl.txt', text: 'Publisher: Florida Senate\n\nOur copy.' }],
+      consolidated([
+        { url: 'https://fl/a', digest: normalisedDigest('a') },
+        { url: 'https://fl/b', digest: normalisedDigest('b') },
+      ]),
+      async (url) => {
+        if (url.endsWith('/b')) {
+          throw new Error('503');
+        }
+
+        return 'a, amended';
+      },
+      now,
+    );
+
+    expect(report.results[0]).toMatchObject({ state: 'unreachable' });
+  });
+
+  it('still never hands back the text it fetched', async () => {
+    const report = await checkSources(
+      [{ file: 'fl.txt', text: 'Publisher: Florida Senate\n\nOur copy.' }],
+      consolidated([{ url: 'https://fl/a', digest: normalisedDigest('a') }]),
+      async () => 'a, amended in 2026',
+      now,
+    );
+
+    expect(JSON.stringify(report)).not.toContain('amended in 2026');
   });
 });

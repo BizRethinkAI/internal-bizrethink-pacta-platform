@@ -87,27 +87,52 @@ export const checkSources = async (
       continue;
     }
 
-    try {
-      const live = await fetch(entry.retrievedFrom);
+    /*
+      EVERY page of the source, and all of them every run. Stopping at the first
+      difference would report one amended section and leave the rest of a
+      six-section statute unread until somebody dealt with that one, so the
+      report names them all at once.
+    */
+    const moved: string[] = [];
+    const unreachable: string[] = [];
 
-      results.push(
-        digestOf(live) === entry.sourceDigest
-          ? { file: entry.file, state: 'unchanged', from: entry.retrievedFrom }
-          : {
-              file: entry.file,
-              state: 'differs',
-              from: entry.retrievedFrom,
-              why: 'The published page has changed since it was last confirmed. Read it; do not merge it.',
-            },
-      );
-    } catch (cause) {
-      results.push({
-        file: entry.file,
-        state: 'unreachable',
-        from: entry.retrievedFrom,
-        why: cause instanceof Error ? cause.message : 'The source could not be fetched.',
-      });
+    for (const page of entry.pages) {
+      try {
+        const live = await fetch(page.url);
+
+        if (digestOf(live) !== page.digest) {
+          moved.push(page.url);
+        }
+      } catch (cause) {
+        unreachable.push(`${page.url} (${cause instanceof Error ? cause.message : 'could not be fetched'})`);
+      }
     }
+
+    const from = entry.pages.map((page) => page.url).join(', ');
+
+    /*
+      "We could not look" outranks "it changed". A difference found across a
+      partial read is a weaker finding than it looks, and reporting the stronger
+      state would claim more than the run established.
+    */
+    if (unreachable.length > 0) {
+      results.push({ file: entry.file, state: 'unreachable', from, why: `Could not fetch: ${unreachable.join('; ')}` });
+
+      continue;
+    }
+
+    results.push(
+      moved.length === 0
+        ? { file: entry.file, state: 'unchanged', from }
+        : {
+            file: entry.file,
+            state: 'differs',
+            from,
+            why:
+              `The published page has changed since it was last confirmed: ${moved.join(', ')}. ` +
+              'Read it; do not merge it.',
+          },
+    );
   }
 
   return {

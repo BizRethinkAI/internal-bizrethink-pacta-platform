@@ -1,54 +1,238 @@
 {
   "$comment": [
-    "Where each stored source came from, and what its published page looked like when a person last confirmed it.",
-    "ADR 0025 \u00a73.",
+    "Where each stored source came from, and what its published pages looked like when a person last confirmed them.",
+    "ADR 0025 §3.",
     "",
     "A SIDECAR, NOT A HEADER IN THE FILES. The vendored sources are evidence: `provenance-honesty.test.ts` pins",
-    "each one's digest so that a verification date is bound to the exact bytes that were verified \u2014 'it proves the",
+    "each one's digest so that a verification date is bound to the exact bytes that were verified — 'it proves the",
     "bytes have not moved since they said they did'. Writing our own metadata into those files moves the bytes and",
     "forces a re-pin, which breaks the binding the invariant exists to protect. An earlier draft of this did exactly",
     "that and four of those tests failed, which is the invariant working.",
     "",
-    "`retrievedFrom` and `sourceDigest` together are what let the monthly check run by itself. A URL without a",
-    "digest is not enough: the baseline asserts 'I read this page and it is the statute we stored', and a machine",
-    "taking that baseline on its first run would silently bless a change nobody had seen. So recording one is a",
-    "person's job, and until they do the source is reported as needing a person.",
+    "`pages` IS A LIST BECAUSE THE SOURCES ARE NOT ONE PAGE. FL-Stat consolidates six statute sections; CT, UT and",
+    "both Virginia form extractions cite two each. A consolidation is watched by watching its parts, and any part is",
+    "the law — so a source counts as checkable only once EVERY page has a confirmed baseline. Checking the parts",
+    "somebody got to and ignoring the rest would report 'unchanged' for a statute with an unwatched section.",
     "",
-    "The URLs below are NOT looked up: each is the one that source's own prose header already records."
+    "`digest` IS NULL UNTIL A PERSON READS THE PAGE. It records what the published page hashed to when someone",
+    "confirmed it is the statute we stored. A machine taking that baseline on its first run would hash the page",
+    "against itself and silently bless an amendment nobody had seen, so recording one is a person's job and until",
+    "they do the source is reported as needing a person.",
+    "",
+    "The URLs are NOT looked up. Each is recorded in the source's own header, in the 2026-09-12 source audit's",
+    "verified retrieval, or in that document's text sibling — the `note` on each entry says which."
   ],
-  "GA-SB90-enrolled.txt": {
-    "retrievedFrom": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
-    "recordedOn": "2026-09-07",
-    "sourceDigest": null,
-    "note": "URL and date taken from this file's own header; no baseline confirmed yet.",
-    "publisher": "Georgia General Assembly",
-    "site": "https://www.legis.ga.gov"
+  "CA-10CCR-900-956.txt": {
+    "pages": [
+      {
+        "url": "https://dfpi.ca.gov/wp-content/uploads/sites/337/2022/06/PRO-01-18-Commercial-Financing-Disclosure-Regulation-Final-Text.pdf",
+        "digest": null
+      }
+    ],
+    "note": "URL from the 2026-09-12 source audit's verified retrieval. No baseline confirmed yet."
   },
-  "TX-7TAC-86-310-313.txt": {
-    "retrievedFrom": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
-    "recordedOn": "2026-09-09",
-    "sourceDigest": null,
-    "note": "URL and date taken from this file's own header; no baseline confirmed yet.",
-    "publisher": "Texas Secretary of State (Texas Register); rules adopted by the Finance Commission of Texas",
-    "site": "https://www.sos.state.tx.us"
+  "CA-Fin-Code-22800-22807.txt": {
+    "pages": [
+      {
+        "url": "https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?lawCode=FIN&division=9.5.&title=&part=&chapter=&article=",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
   },
-  "TX-Fin-Code-Ch-398.txt": {
-    "retrievedFrom": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
-    "recordedOn": "2026-09-05",
-    "sourceDigest": null,
-    "note": "URL and date taken from this file's own header; no baseline confirmed yet.",
-    "publisher": "Texas Legislature Online",
-    "site": "https://capitol.texas.gov"
+  "CT-CGS-36a-861-872.txt": {
+    "pages": [
+      {
+        "url": "https://www.cga.ct.gov/current/pub/chap_669.htm",
+        "digest": null
+      },
+      {
+        "url": "https://www.cga.ct.gov/2026/sup/chap_669.htm",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "CT-DOB-Guidance.txt": {
+    "pages": [
+      {
+        "url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
   },
   "CT-DOB-Guidance.layout.txt": {
     "publisher": "Connecticut Department of Banking",
     "site": "https://portal.ct.gov/DOB",
     "recordedOn": "2026-09-08",
-    "note": "The layout-preserving companion of CT-DOB-Guidance.txt \u2014 same document, same publisher, recorded the same day. Taken from that file's block, not looked up."
+    "pages": [
+      {
+        "url": "https://portal.ct.gov/-/media/dob/consumer-credit-division/commercial-financing-guidance-8-1.pdf",
+        "digest": null
+      }
+    ],
+    "note": "URL from this document's text sibling, which is the same document. No baseline confirmed yet."
+  },
+  "FL-Stat-559.961-9615.txt": {
+    "pages": [
+      {
+        "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.961",
+        "digest": null
+      },
+      {
+        "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9611",
+        "digest": null
+      },
+      {
+        "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9612",
+        "digest": null
+      },
+      {
+        "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9613",
+        "digest": null
+      },
+      {
+        "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9614",
+        "digest": null
+      },
+      {
+        "url": "https://www.flsenate.gov/Laws/Statutes/2026/559.9615",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "GA-SB90-enrolled.txt": {
+    "publisher": "Georgia General Assembly",
+    "site": "https://www.legis.ga.gov",
+    "recordedOn": "2026-09-07",
+    "pages": [
+      {
+        "url": "https://www.legis.ga.gov/api/legislation/document/20232024/219440",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "KS-SB-345.txt": {
+    "pages": [
+      {
+        "url": "https://www.kslegislature.gov/b2023_24/bills/download/?apn=b2023_24/year2/ready_for_publication/sb_345/sb345_00_0000.pdf",
+        "digest": null
+      }
+    ],
+    "note": "URL from the 2026-09-12 source audit's verified retrieval. No baseline confirmed yet."
+  },
+  "LA-Act-198.txt": {
+    "pages": [
+      {
+        "url": "https://www.legis.la.gov/Legis/ViewDocument.aspx?d=1421306",
+        "digest": null
+      }
+    ],
+    "note": "URL from the 2026-09-12 source audit's verified retrieval. No baseline confirmed yet."
+  },
+  "MO-RSMo-427.300.txt": {
+    "pages": [
+      {
+        "url": "https://www.revisor.mo.gov/main/OneSection.aspx?section=427.300",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "NY-23NYCRR-600.txt": {
+    "pages": [
+      {
+        "url": "https://www.dfs.ny.gov/system/files/documents/2023/01/rf_finservices_23nycrr600_text.pdf",
+        "digest": null
+      }
+    ],
+    "note": "URL from the 2026-09-12 source audit's verified retrieval. No baseline confirmed yet."
+  },
+  "TX-7TAC-86-310-313.txt": {
+    "publisher": "Texas Secretary of State (Texas Register); rules adopted by the Finance Commission of Texas",
+    "site": "https://www.sos.state.tx.us",
+    "recordedOn": "2026-09-09",
+    "pages": [
+      {
+        "url": "https://www.sos.state.tx.us/texreg/archive/July32026/Adopted%20Rules/7.BANKING%20AND%20SECURITIES.html",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "TX-Fin-Code-Ch-398.txt": {
+    "publisher": "Texas Legislature Online",
+    "site": "https://capitol.texas.gov",
+    "recordedOn": "2026-09-05",
+    "pages": [
+      {
+        "url": "https://capitol.texas.gov/tlodocs/89R/billtext/html/HB00700F.htm",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "UT-Title-7-Ch-27.txt": {
+    "pages": [
+      {
+        "url": "https://le.utah.gov/xcode/Title7/Chapter27/C7-27_2022050420220504.pdf",
+        "digest": null
+      },
+      {
+        "url": "https://le.utah.gov/xcode/Title7/Chapter27/7-27.html",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "VA-10VAC5-240.txt": {
+    "pages": [
+      {
+        "url": "https://law.lis.virginia.gov/admincodeexpand/title10/agency5/chapter240/",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "VA-Code-6.2-2228-2238.txt": {
+    "pages": [
+      {
+        "url": "https://law.lis.virginia.gov/vacodefull/title6.2/chapter22.1/",
+        "digest": null
+      }
+    ],
+    "note": "URL from the 2026-09-12 source audit's verified retrieval. No baseline confirmed yet."
+  },
+  "VA-Disclosure-Form.txt": {
+    "pages": [
+      {
+        "url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+        "digest": null
+      }
+    ],
+    "note": "URL from this file's own header. No baseline confirmed yet."
+  },
+  "VA-Disclosure-Form.layout.txt": {
+    "pages": [
+      {
+        "url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+        "digest": null
+      }
+    ],
+    "note": "URL from this document's text sibling, which is the same document. No baseline confirmed yet."
   },
   "VA-Disclosure-Form.pdf": {
-    "note": "A prescribed form, and a PDF, so it carries no readable header. Publisher taken from its text sibling VA-Disclosure-Form.txt, which is the same document. Nobody has confirmed it against its source.",
     "publisher": "Virginia State Corporation Commission, Bureau of Financial Institutions",
-    "site": "https://ris.dls.virginia.gov"
+    "site": "https://ris.dls.virginia.gov",
+    "pages": [
+      {
+        "url": "https://ris.dls.virginia.gov/uploads/10VAC5/forms/Sales-Based%20Financing%20Disclosure%20Form-20220920152455.pdf",
+        "digest": null
+      }
+    ],
+    "note": "A prescribed form, and a PDF, so it carries no readable header. URL and publisher taken from its text sibling VA-Disclosure-Form.txt, which is the same document. No baseline confirmed yet."
   }
 }
