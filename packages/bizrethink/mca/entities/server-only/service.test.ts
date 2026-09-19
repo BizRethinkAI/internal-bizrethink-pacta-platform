@@ -157,11 +157,27 @@ describe('an entity belongs to its team', () => {
   /**
    * A list is for choosing between entities, so it carries what distinguishes
    * them and not the programme terms behind each.
+   *
+   * ASSERTED ON WHAT THE CALLER GETS, not on the `select`. It used to check the
+   * query, which is a proxy — and the proxy failed the moment the list started
+   * deriving its one-line summary, which reads `policy` on the server and
+   * returns a string. Nothing leaked; the proxy simply was not the property.
+   * Checking the returned rows is both stricter and what the docstring above
+   * has always claimed.
    */
-  it('does not carry policy in a list', async () => {
-    await listMcaEntities(actor);
+  it('does not carry policy or identity in a list', async () => {
+    const [entity] = await listMcaEntities(actor);
 
-    expect(mocks.db.bizrethinkMcaEntity.findMany.mock.calls[0]?.[0].select).not.toHaveProperty('policy');
+    expect(entity).not.toHaveProperty('policy');
+    expect(entity).not.toHaveProperty('identity');
+  });
+
+  /** And the one line it does carry says enough to tell two entities apart. */
+  it('carries a summary line derived from the entity', async () => {
+    const [entity] = await listMcaEntities(actor);
+
+    expect(entity.summary).toContain(entityFixture().identity.entityType);
+    expect(entity.summary).toContain(entityFixture().identity.organizationState);
   });
 });
 

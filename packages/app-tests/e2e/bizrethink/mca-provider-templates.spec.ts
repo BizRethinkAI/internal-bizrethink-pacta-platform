@@ -262,9 +262,7 @@ test('an entity is added once, then a template is created against it and revised
       grant under test is the organisation-scoped row the resolver reads.
     */
     await page.getByRole('button', { name: 'Give this organisation access', exact: true }).click();
-    await expect(
-      page.getByRole('button', { name: "Remove this organisation's access", exact: true }),
-    ).toBeVisible();
+    await expect(page.getByRole('button', { name: "Remove this organisation's access", exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Enable my internal draft previews', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Disable my internal draft previews', exact: true })).toBeVisible();
 
@@ -334,9 +332,23 @@ test('an entity is added once, then a template is created against it and revised
 
     expect(saved.label).toBe(entity.label);
 
-    // 2. The template, which chooses that entity and one document.
+    /*
+      2. The template, started FROM THE ENTITY'S OWN CARD.
+
+      The landing page lists entities above the templates written against them,
+      the way the lease builder lists properties above leases, and "New
+      template" opens from the entity the way "New lease" opens from a
+      property. So the entity is already chosen by the time the panel appears
+      and the only question left is which document — which is the one thing a
+      template still has to be told (ADR 0026).
+    */
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca`);
-    await page.getByLabel('Which entity issues it?', { exact: true }).selectOption(saved.id);
+    await expect(page.getByRole('heading', { name: 'Entities', exact: true })).toBeVisible();
+
+    const card = page.locator('li').filter({ hasText: entity.label }).first();
+
+    await expect(card).toContainText(entity.identity.entityType);
+    await card.getByRole('button', { name: 'New template', exact: true }).click();
     await page.getByLabel('Which document is it?', { exact: true }).selectOption('frpa');
 
     /*
