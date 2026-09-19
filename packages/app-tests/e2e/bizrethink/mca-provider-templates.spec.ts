@@ -254,13 +254,27 @@ test('an entity is added once, then a template is created against it and revised
   const saveEntity = page.getByRole('button', { name: 'Save entity', exact: true });
 
   try {
-    await page.getByRole('button', { name: 'Enable my provider interview access', exact: true }).click();
-    await expect(page.getByRole('button', { name: 'Disable my provider interview access', exact: true })).toBeVisible();
+    /*
+      GRANTED FOR ONE ORGANISATION, not account-wide. The account-wide button
+      is still there, but it is not scoped to anything — it turns the builder
+      on for every team the admin belongs to, which was the only control this
+      page had and left no way to choose. This clicks the per-team one, so the
+      grant under test is the organisation-scoped row the resolver reads.
+    */
+    await page.getByRole('button', { name: 'Give this organisation access', exact: true }).click();
+    await expect(
+      page.getByRole('button', { name: "Remove this organisation's access", exact: true }),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Enable my internal draft previews', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Disable my internal draft previews', exact: true })).toBeVisible();
 
-    // 1. The entity, answered once.
-    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca-entities`);
+    /*
+      1. The entity, answered once — REACHED BY FOLLOWING A LINK. The entities
+      page had nothing pointing at it from anywhere in the app, so the only way
+      in was to know the URL; a test that types the URL cannot notice that.
+    */
+    await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca`);
+    await page.getByRole('link', { name: 'Entities', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Entities', exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Add an entity', exact: true }).click();
 

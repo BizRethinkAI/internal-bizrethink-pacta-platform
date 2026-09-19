@@ -25,6 +25,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
 
   return {
     teamId: team.id,
+    teamUrl: params.teamUrl,
     canWrite: team.currentTeamRole === TeamMemberRole.ADMIN || team.currentTeamRole === TeamMemberRole.MANAGER,
   };
 };
