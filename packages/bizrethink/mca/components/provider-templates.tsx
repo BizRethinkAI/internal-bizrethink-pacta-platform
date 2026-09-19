@@ -48,6 +48,13 @@ export const McaProviderTemplates = ({
   */
   const [instrument, setInstrument] = useState<ProducedInstrument>('frpa');
   const [entityId, setEntityId] = useState('');
+  /*
+    The create panel opens from an entity's own card, the way "New lease" opens
+    from a property. The entity is therefore already chosen by the time the
+    panel appears, and the only question left is which document — which is the
+    one thing a template still has to be told (ADR 0026).
+  */
+  const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [reviseError, setReviseError] = useState<string | null>(null);
   const entities = trpc.bizrethink.mcaEntities.list.useQuery({ teamId });
@@ -84,15 +91,6 @@ export const McaProviderTemplates = ({
             <h1 className="font-semibold text-2xl">
               <Trans>MCA templates</Trans>
             </h1>
-            {/*
-              The entity editor is a sibling page with nothing pointing at it —
-              the MCA nav item goes here and stops. A template cannot be created
-              without an entity, so the way to entities belongs on this page
-              rather than in a URL someone has to know.
-            */}
-            <Link className="font-medium text-sm underline" to={`/t/${teamUrl}/mca-entities`}>
-              <Trans>Entities</Trans>
-            </Link>
           </div>
           <p className="text-muted-foreground">
             <Trans>
@@ -107,16 +105,73 @@ export const McaProviderTemplates = ({
             Internal drafting workspace. Saved templates and previews do not authorize merchant delivery or signing.
           </Trans>
         </div>
-        <section className="space-y-3 rounded-lg border p-4">
+        {/*
+          ENTITIES ABOVE TEMPLATES, ON ONE PAGE — the shape the lease builder
+          already uses: properties, then the leases written against them.
+
+          An entity is the thing you add once and then choose, so it belongs
+          above the documents that hang off it rather than on a sibling page a
+          person has to know about. The entity editor keeps its own route, as
+          `leases.$id` does, because it is an interview rather than a list.
+        */}
+        <section className="space-y-3">
           <div className="flex items-center justify-between gap-4">
-            <h2 className="font-semibold">
-              <Trans>Saved templates</Trans>
+            <h2 className="font-semibold text-lg">
+              <Trans>Entities</Trans>
             </h2>
             {canWrite && (
-              <Button variant="outline" onClick={() => choose(null)}>
-                <Trans>New provider template</Trans>
+              <Button asChild variant="outline" size="sm">
+                <Link to={`/t/${teamUrl}/mca-entities?new=1`}>
+                  <Trans>Add an entity</Trans>
+                </Link>
               </Button>
             )}
+          </div>
+          {entities.error && <p role="alert">{entities.error.message}</p>}
+          {entities.data?.length === 0 ? (
+            <p className="rounded-lg border border-dashed p-6 text-center text-muted-foreground text-sm">
+              <Trans>
+                No entities yet. An entity is the company that issues your documents — its addresses and the programme
+                terms it runs are answered once here, rather than once per document.
+              </Trans>
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {entities.data?.map((entity) => (
+                <li key={entity.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4">
+                  <div>
+                    <p className="font-medium">{entity.label}</p>
+                    <p className="text-muted-foreground text-sm">{entity.summary}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <Link to={`/t/${teamUrl}/mca-entities?entity=${entity.id}`}>
+                        <Trans>Edit</Trans>
+                      </Link>
+                    </Button>
+                    {canWrite && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setEntityId(entity.id);
+                          setCreating(true);
+                          choose(null);
+                        }}
+                      >
+                        <Trans>New template</Trans>
+                      </Button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+        <section className="space-y-3">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="font-semibold text-lg">
+              <Trans>Templates</Trans>
+            </h2>
           </div>
           {list.error && <p role="alert">{list.error.message}</p>}
           {list.isLoading && (
@@ -299,16 +354,24 @@ export const McaProviderTemplates = ({
             />
           </section>
         )}
-        {!id && canWrite && (
+        {!id && canWrite && creating && (
           <section className="space-y-4 rounded-lg border p-4 sm:p-6">
-            <h2 className="font-semibold text-xl">
-              <Trans>Create a template</Trans>
-            </h2>
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="font-semibold text-xl">
+                <Trans>New template</Trans>
+                {entities.data?.find((entity) => entity.id === entityId)?.label
+                  ? ` — ${entities.data.find((entity) => entity.id === entityId)?.label}`
+                  : ''}
+              </h2>
+              <Button variant="ghost" size="sm" onClick={() => setCreating(false)}>
+                <Trans>Cancel</Trans>
+              </Button>
+            </div>
             <p className="text-muted-foreground text-sm">
               <Trans>
-                A template is one entity's version of one document. Choose the entity that issues it and which document
-                it is; both are fixed afterwards, because a template that changed either would make every revision
-                behind it a record of something else.
+                A template is one entity's version of one document. Which entity issues it and which document it is are
+                both fixed afterwards, because a template that changed either would make every revision behind it a
+                record of something else.
               </Trans>
             </p>
 

@@ -5,6 +5,7 @@ import { prisma } from '@documenso/prisma';
 
 import { assertMcaTeamAccess } from '../../templates/server-only/service';
 import { type McaEntity, type McaEntityInput, ZMcaEntity } from '../entity';
+import { entitySummaryLine } from '../summary';
 
 /**
  * Saving and reading the entity that issues a document.
@@ -127,10 +128,27 @@ export const getMcaEntity = async ({ teamId, userId, id }: TeamActor & { id: str
 export const listMcaEntities = async ({ teamId, userId }: TeamActor) => {
   const team = await assertMcaTeamAccess({ teamId, userId });
 
-  return prisma.bizrethinkMcaEntity.findMany({
+  const rows = await prisma.bizrethinkMcaEntity.findMany({
     where: { teamId: team.id, organisationId: team.organisationId },
     orderBy: { updatedAt: 'desc' },
     take: 100,
-    select: { id: true, label: true, version: true, updatedAt: true },
+    select: { id: true, label: true, version: true, updatedAt: true, identity: true, policy: true },
   });
+
+  /*
+    THE SUMMARY IS DERIVED HERE, NOT SENT WHOLE.
+
+    The card under each entity's name needs the facts that distinguish two
+    records — the lease builder's property card is the model. Sending `identity`
+    and `policy` to the browser to format there would put the entity's notice
+    addresses and its whole programme into a list payload that only needs one
+    line, and would let the list describe a programme the compiler does not run.
+  */
+  return rows.map(({ identity, policy, ...row }) => ({
+    ...row,
+    summary: entitySummaryLine({
+      identity: identity as McaEntityInput['identity'],
+      policy: policy as McaEntityInput['policy'],
+    }),
+  }));
 };

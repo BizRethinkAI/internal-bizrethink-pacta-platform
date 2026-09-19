@@ -41,8 +41,28 @@ const cleanupEntities = async (userId: number) => {
 const cleanup = async (userId: number) => {
   await prisma.bizrethinkMcaPackageReview.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkMcaTemplate.deleteMany({ where: { createdByUserId: userId } });
+  /*
+    BOTH SCOPES. This deleted only the user-scoped grant, which was the only
+    one anything wrote — until #330 gave the admin page a per-organisation
+    toggle and this spec started clicking it. The organisation row then
+    survived cleanup and leaked into whatever ran next, which is the kind of
+    failure that shows up as an unrelated access test going red.
+  */
   await prisma.bizrethinkFeatureAccess.deleteMany({
-    where: { scope: 'user', scopeId: String(userId), feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] } },
+    where: { scopeId: String(userId), scope: 'user', feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] } },
+  });
+
+  const organisations = await prisma.organisation.findMany({
+    where: { members: { some: { userId } } },
+    select: { id: true },
+  });
+
+  await prisma.bizrethinkFeatureAccess.deleteMany({
+    where: {
+      scope: 'organisation',
+      scopeId: { in: organisations.map((organisation) => organisation.id) },
+      feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] },
+    },
   });
 };
 
@@ -262,9 +282,7 @@ test('an entity is added once, then a template is created against it and revised
       grant under test is the organisation-scoped row the resolver reads.
     */
     await page.getByRole('button', { name: 'Give this organisation access', exact: true }).click();
-    await expect(
-      page.getByRole('button', { name: "Remove this organisation's access", exact: true }),
-    ).toBeVisible();
+    await expect(page.getByRole('button', { name: "Remove this organisation's access", exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Enable my internal draft previews', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Disable my internal draft previews', exact: true })).toBeVisible();
 
@@ -274,9 +292,17 @@ test('an entity is added once, then a template is created against it and revised
       in was to know the URL; a test that types the URL cannot notice that.
     */
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca`);
-    await page.getByRole('link', { name: 'Entities', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Entities', exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Add an entity', exact: true }).click();
+    await page.getByRole('link', { name: 'Add an entity', exact: true }).click();
+
+    /*
+      MOVED BY THE RAIL, NOT BY WALKING. The interview is eleven steps and
+      every one of them is reachable — an interview that forced a strict order
+      would be one you could not correct a typo in without walking the whole
+      thing. Jumping is what a person does, so it is what the test does.
+    */
+    const rail = page.getByRole('navigation', { name: 'The interview' });
+    const goToStep = (title: string) => rail.getByRole('button', { name: new RegExp(title) }).click();
 
     await page.getByLabel('Name for this entity in Pacta', { exact: true }).fill(entity.label);
 
@@ -285,6 +311,13 @@ test('an entity is added once, then a template is created against it and revised
       ['Entity type, for example corporation', entity.identity.entityType],
       ['State of organisation', entity.identity.organizationState],
       ['Principal address', entity.identity.address],
+    ] as const) {
+      await page.getByLabel(label, { exact: true }).fill(value);
+    }
+
+    await goToStep('Notices and servicing');
+
+    for (const [label, value] of [
       ['Notice email', entity.identity.noticeEmail],
       ['Notice mailing address', entity.identity.noticeAddress],
       ['Reconciliation email', entity.identity.reconciliationEmail],
@@ -293,8 +326,9 @@ test('an entity is added once, then a template is created against it and revised
       await page.getByLabel(label, { exact: true }).fill(value);
     }
 
-    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await goToStep('What this release supports');
     await page.getByLabel('I confirm this entity uses these supported terms', { exact: true }).check();
+    await goToStep('Guaranty and renewal');
 
     /*
       RADIOS, NOT DROPDOWNS. The interview shows what each answer would do to
@@ -313,10 +347,15 @@ test('an entity is added once, then a template is created against it and revised
       page at all — a silent failure here would leave the interview explaining
       nothing while still looking complete.
     */
+    await goToStep('Venue and disputes');
+
     const dispute = page.locator('[data-mca-question="policy.disputeResolution"]');
     await expect(dispute.locator('[data-mca-consequence]').first()).toContainText('Arbitration');
+
+    await goToStep('Where you fund');
     await page.getByRole('button', { name: 'Florida', exact: true }).click();
     await page.getByRole('button', { name: 'New York', exact: true }).click();
+    await goToStep('Review');
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();
 
@@ -334,9 +373,23 @@ test('an entity is added once, then a template is created against it and revised
 
     expect(saved.label).toBe(entity.label);
 
-    // 2. The template, which chooses that entity and one document.
+    /*
+      2. The template, started FROM THE ENTITY'S OWN CARD.
+
+      The landing page lists entities above the templates written against them,
+      the way the lease builder lists properties above leases, and "New
+      template" opens from the entity the way "New lease" opens from a
+      property. So the entity is already chosen by the time the panel appears
+      and the only question left is which document — which is the one thing a
+      template still has to be told (ADR 0026).
+    */
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/mca`);
-    await page.getByLabel('Which entity issues it?', { exact: true }).selectOption(saved.id);
+    await expect(page.getByRole('heading', { name: 'Entities', exact: true })).toBeVisible();
+
+    const card = page.locator('li').filter({ hasText: entity.label }).first();
+
+    await expect(card).toContainText(entity.identity.entityType);
+    await card.getByRole('button', { name: 'New template', exact: true }).click();
     await page.getByLabel('Which document is it?', { exact: true }).selectOption('frpa');
 
     /*
@@ -393,12 +446,25 @@ test('an entity is added once, then a template is created against it and revised
     */
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await expect(
-      page.getByRole('heading', { name: "How does this entity's programme run?", exact: true }),
+      page.getByRole('heading', { name: 'Where does a merchant write to this entity?', exact: true }),
     ).toBeVisible();
     // Advancing a step is not a save. The bug's signature was this reading 2.
     expect((await prisma.bizrethinkMcaEntity.findUniqueOrThrow({ where: { id: saved.id } })).version).toBe(1);
 
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
+
+    /*
+      SAVE LIVES ON THE LAST STEP, so getting to it is part of the edit now.
+
+      This used to assert Save was available right here, and it was: with two
+      steps, one Next landed on the last one. With eleven it does not, and the
+      assertion failed looking for a button that correctly was not rendered —
+      a test carrying an assumption from the shape it was written against.
+
+      The #319 property is asserted above and is untouched by this: Next
+      advanced a step and `version` is still 1, which is the whole point.
+    */
+    await goToStep('Review');
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();
 
