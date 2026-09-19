@@ -87,6 +87,22 @@ fetches pages we do not control.
 
 ### Known and deliberately not fixed here
 
+**Three limitations the first real runs will meet.**
+
+- **Extraction removes markup, not chrome.** A cookie banner or a reworded
+  navigation label is text the publisher renders, so it lands in the digest. This
+  is the likeliest source of false positives in the first months, and the
+  extraction fix above does not close it — that fix stopped a publisher's
+  analytics change reading identically to an amendment, which is a different
+  problem.
+- **Florida's URLs carry the year.** `flsenate.gov/Laws/Statutes/2026/559.961`
+  and its five siblings. A rollover to `/2027/` reads as **unreachable**, not as
+  the statute moving — so it fires within months and presents as the wrong
+  failure.
+- **One source records no publisher**: `VA-Code-6.2-2228-2238.txt`. An admitted
+  gap rather than an invented attribution, pinned as an exact list in
+  `source-watch.test.ts` so it can only shrink deliberately.
+
 **Roughly 11 of the 26 recorded pages are the wrong shape to watch** — enrolled
 bills, an archive URL, dated snapshots, final rulemaking texts. `TX-Fin-Code-Ch-398.txt`
 is the 2025 enrolled bill, and that URL will read the same in 2030; an amendment
