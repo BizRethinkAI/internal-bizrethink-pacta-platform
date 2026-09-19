@@ -41,8 +41,28 @@ const cleanupEntities = async (userId: number) => {
 const cleanup = async (userId: number) => {
   await prisma.bizrethinkMcaPackageReview.deleteMany({ where: { createdByUserId: userId } });
   await prisma.bizrethinkMcaTemplate.deleteMany({ where: { createdByUserId: userId } });
+  /*
+    BOTH SCOPES. This deleted only the user-scoped grant, which was the only
+    one anything wrote — until #330 gave the admin page a per-organisation
+    toggle and this spec started clicking it. The organisation row then
+    survived cleanup and leaked into whatever ran next, which is the kind of
+    failure that shows up as an unrelated access test going red.
+  */
   await prisma.bizrethinkFeatureAccess.deleteMany({
-    where: { scope: 'user', scopeId: String(userId), feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] } },
+    where: { scopeId: String(userId), scope: 'user', feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] } },
+  });
+
+  const organisations = await prisma.organisation.findMany({
+    where: { members: { some: { userId } } },
+    select: { id: true },
+  });
+
+  await prisma.bizrethinkFeatureAccess.deleteMany({
+    where: {
+      scope: 'organisation',
+      scopeId: { in: organisations.map((organisation) => organisation.id) },
+      feature: { in: ['mca-builder', 'mca-clause-draft-rendering'] },
+    },
   });
 };
 
@@ -432,6 +452,19 @@ test('an entity is added once, then a template is created against it and revised
     expect((await prisma.bizrethinkMcaEntity.findUniqueOrThrow({ where: { id: saved.id } })).version).toBe(1);
 
     await expect(page.locator('[role="alert"]')).toHaveCount(0);
+
+    /*
+      SAVE LIVES ON THE LAST STEP, so getting to it is part of the edit now.
+
+      This used to assert Save was available right here, and it was: with two
+      steps, one Next landed on the last one. With eleven it does not, and the
+      assertion failed looking for a button that correctly was not rendered —
+      a test carrying an assumption from the shape it was written against.
+
+      The #319 property is asserted above and is untouched by this: Next
+      advanced a step and `version` is still 1, which is the whole point.
+    */
+    await goToStep('Review');
     await expect(saveEntity).toBeEnabled();
     await saveEntity.click();
 
